@@ -1,0 +1,22 @@
+services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    environment:
+      # Configurazione realm, admin user e password iniziali
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: nsl80cdm
+      # Attiva modalità dev per default (per produzione rimuovere o cambiare)
+      KC_DB: dev-mem
+      KC_HTTP_ENABLED: "true"
+      KC_PROXY: edge
+      KC_HOSTNAME_STRICT: "false"
+    command:
+      - start-dev
+    ports:
+      - "8181:8080"   # Espone Keycloak su porta host 8181 (interno 8080)
+    volumes:
+      - keycloak_data:/opt/keycloak/data
+    restart: unless-stopped
+
+volumes:
+  keycloak_data:

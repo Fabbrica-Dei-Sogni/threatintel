@@ -1,0 +1,54 @@
+name: "threat-intelligence-suite"
+services:
+
+  mongodb-threatintel:
+    image: mongo:4.4.6
+    container_name: mongodb-threatintel
+    restart: unless-stopped #always valutare un alternativa
+    ports:
+      - "127.0.0.1:17017:27017"
+    environment:
+      #parametri per inizializzare i database al primo avvio
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD:-cambiapwd}
+      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE:-admin}
+
+      #credenziali per creare il database applicativo al primo avvio
+      MONGODB_USERNAME: ${MONGODB_USERNAME:-intelagent}
+      MONGODB_PASSWORD: ${MONGODB_PASSWORD:-intelagent}
+      MONGODB_DATABASE: ${MONGODB_DATABASE:-threatinteldb}
+    volumes:
+      - mongodb_storage-threatintel:/data/db
+      - ./mongo-init/:/docker-entrypoint-initdb.d/:ro
+    networks:
+      - network-threatintel
+
+  mongo-express-threatintel:
+    image: mongo-express
+    container_name: mongo-express-threatintel
+    ports:
+      - "8082:8081"
+    environment:
+      ME_CONFIG_CONNECT_RETRIES: ${MAX_RETRIES:-1}    
+      ME_CONFIG_MONGODB_SERVER: ${ME_CONFIG_MONGODB_SERVER:-mongodb-threatintel}
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${ME_CONFIG_MONGODB_ADMINUSERNAME:-admin}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${ME_CONFIG_MONGODB_ADMINPASSWORD:-cambiapwd}
+      ME_CONFIG_MONGODB_ENABLE_ADMIN: ${ME_CONFIG_MONGODB_ENABLE_ADMIN:-true}
+      ME_CONFIG_BASICAUTH_USERNAME: admin
+      ME_CONFIG_BASICAUTH_PASSWORD: "!ThreatIntel!"      
+      #ME_CONFIG_MONGODB_PORT: ${ME_CONFIG_MONGODB_PORT:-27017}    
+    networks:
+      - network-threatintel
+    depends_on:
+      - mongodb-threatintel
+
+networks:
+  network-threatintel:
+    driver: bridge
+
+volumes:
+  mongodb_storage-threatintel:
+    driver_opts:
+      type: local
+      o: bind
+      device: ${MOUNT_STORAGE_DB:-/mnt/threatintel/mongodb-storage}

@@ -1,0 +1,25 @@
+[Unit]
+Description=Threat Intelligence Logger
+After=network-online.target docker.service
+Wants=network-online.target docker.service
+
+[Service]
+Type=simple
+#User=www-data
+User=amodica
+WorkingDirectory=/home/amodica/workspaces/devops-procedure/common/cybersecurity/threatintel
+ExecStartPre=/bin/bash /home/amodica/workspaces/devops-procedure/common/cybersecurity/threatintel/redis/check-redis.sh
+ExecStartPre=/bin/bash /home/amodica/workspaces/devops-procedure/common/cybersecurity/threatintel/mongodb/check-mongodb.sh
+ExecStart=/usr/bin/node server.js
+Restart=always
+RestartSec=5
+Environment=NODE_ENV=production
+Environment=PORT=3999
+Environment=MONGO_URI=mongodb://intelagent:intelagent@127.0.0.1:17017/threatinteldb
+Environment=REDIS_HOST=127.0.0.1
+Environment=REDIS_PORT=6379
+Environment=REDIS_PASSWORD=!!!HoneyPotRedis!!!
+Environment=REDIS_DB=0
+
+[Install]
+WantedBy=multi-user.target

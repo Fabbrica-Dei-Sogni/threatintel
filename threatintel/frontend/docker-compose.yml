@@ -1,0 +1,11 @@
+services:
+  dashboard-honeypot:
+    build:
+      context: ./dashboard
+      args:
+        VITE_APP_API_URL: "https://alessandromodica.com:2443/honeypot"  
+    ports:
+      - "127.0.0.1:8180:80"
+    restart: unless-stopped
+    extra_hosts:
+      - "host.docker.internal:host-gateway"    

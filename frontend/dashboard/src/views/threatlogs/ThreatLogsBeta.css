@@ -1,0 +1,243 @@
+.threatlogs {
+  background-color: #0a3a19; /* verde scuro fresco */
+  color: #d9f0d9; /* verde chiaro pallido */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  min-height: 100vh;
+  padding: 30px 35px;
+}
+
+h1 {
+  color: #b3e6b3; /* verde chiaro luminoso per titolo */
+  text-shadow: 0 0 5px #0c5a20;
+  margin-bottom: 30px;
+}
+
+.actions {
+  margin-bottom: 20px;
+}
+
+.btn-action {
+  background: linear-gradient(145deg, #38a83e, #2d8a2f);
+  border: none;
+  color: #e6f5e6;
+  padding: 10px 24px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 700;
+  box-shadow: 0 5px 12px rgba(47, 138, 47, 0.7);
+  transition: background 0.3s ease, box-shadow 0.3s ease;
+  margin-right: 14px;
+}
+
+.btn-action:hover {
+  background: linear-gradient(145deg, #2d8a2f, #246d23);
+  box-shadow: 0 7px 17px rgba(36, 109, 35, 0.9);
+}
+
+.filters {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.input-wrapper {
+  flex: 1;
+  position: relative;
+}
+
+.input {
+  width: 100%;
+  padding: 9px 12px;
+  border-radius: 8px;
+  border: none;
+  font-size: 1em;
+  font-weight: 500;
+  background-color: #2e712f;
+  color: #dbf0db;
+  box-shadow: inset 0 0 8px #1f4d1f;
+  transition: background-color 0.3s ease;
+}
+
+.input::placeholder {
+  color: #a7d19e;
+}
+
+.input:focus {
+  outline: none;
+  background-color: #3f9340;
+  box-shadow: 0 0 10px #6dcc6d;
+}
+
+.clear-button {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: #9bcb99;
+  font-weight: 700;
+  font-size: 1.2em;
+  cursor: pointer;
+  transition: color 0.25s ease;
+}
+
+.clear-button:hover {
+  color: #d6f9d6;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 20px;
+  font-weight: 600;
+  color: #b3e6b3;
+}
+
+.pagination button {
+  background-color: #2d8a2f;
+  border: none;
+  color: #e6f5e6;
+  padding: 8px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 700;
+  transition: background-color 0.3s ease;
+}
+
+.pagination button:disabled {
+  background-color: #1d5419;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.pagination button:hover:not(:disabled) {
+  background-color: #246d23;
+}
+
+.pagination-input {
+  background-color: #267026;
+  color: #d9f0d9;
+  border: none;
+  border-radius: 6px;
+  text-align: center;
+  font-weight: 600;
+  box-shadow: inset 0 0 8px #164316;
+  transition: background-color 0.3s ease;
+}
+
+.pagination-input:focus {
+  background-color: #389438;
+  outline: none;
+  box-shadow: 0 0 10px #6dcc6d;
+}
+
+.log-table table {
+  width: 100%;
+  border-collapse: collapse;
+  box-shadow: 0 0 24px rgba(50, 120, 50, 0.5);
+  border-radius: 12px;
+  overflow: hidden;
+  background-color: #1e4e1e;
+}
+
+.log-table th,
+.log-table td {
+  padding: 14px 18px;
+  color: #c7ebc7;
+  font-weight: 600;
+  text-align: left;
+  border-bottom: 1px solid #3a833a;
+}
+
+.log-table th {
+  background-color: #2d8a2f;
+  user-select: none;
+}
+
+.log-table tr:hover {
+  background-color: #366c36;
+  cursor: default;
+}
+
+.sort-control {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sort-button {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #ace6ac;
+  font-size: 1.1em;
+  line-height: 1em;
+  padding: 0;
+  user-select: none;
+}
+
+.sort-button:hover {
+  color: #d4f2d4;
+}
+
+.url-cell {
+  max-width: 300px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.info-btn {
+  background: transparent;
+  border: none;
+  color: #9bdc9b;
+  cursor: pointer;
+  text-decoration: underline;
+  font-weight: 700;
+  padding: 0;
+}
+
+.info-btn:hover {
+  color: #d9f0d9;
+}
+
+.btn-copy-ip,
+.btn-copy-url {
+  background: #3ca73c;
+  border: none;
+  color: #e6f5e6;
+  border-radius: 6px;
+  padding: 4px 8px;
+  margin-left: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.3s ease;
+}
+
+.btn-copy-ip:hover,
+.btn-copy-url:hover {
+  background: #2d8a2f;
+}
+
+.loading,
+.error {
+  font-style: italic;
+  text-align: center;
+  padding: 20px;
+  border-radius: 10px;
+  margin-top: 20px;
+}
+
+.loading {
+  background-color: #2d8a2f;
+  color: #c7ebc7;
+}
+
+.error {
+  background-color: #69311a;
+  color: #ffb3a3;
+}
+
+

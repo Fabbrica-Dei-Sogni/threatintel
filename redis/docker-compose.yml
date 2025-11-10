@@ -48,7 +48,7 @@ services:
     ports:
       - "127.0.0.1:5540:5540"  # Porta web di RedisInsight accessibile su localhost:5540
     volumes:
-      - redisinsight-data:/db
+      - redisinsight-data:/data
     networks:
       - honeypot-support
     depends_on:
@@ -74,6 +74,10 @@ services:
 volumes:
   redisinsight-data: 
     driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./redisinsight-data    
   redis-data:
     driver: local
     driver_opts:

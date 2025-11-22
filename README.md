@@ -1,5 +1,7 @@
 # Procedura standard per installare l'honeypot al pari di come è installato ora
 
+[Analisi tecnica](./docs/analisi-tecnica-codebase.md)
+
 Aggiornare l'host con i comandi
 
 sudo apt update

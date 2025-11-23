@@ -1,4 +1,4 @@
-const logger = require('../utils/logger');
+const { logger } = require('../../logger');
 const ThreatLog = require('../models/ThreatLogSchema');
 const AttackDTO = require('../models/dto/AttackDTO');
 const IpDetailsService = require('./IpDetailsService');

@@ -1,6 +1,6 @@
 // Crea uno script per analisi avanzate
 const ThreatLogService = require('../services/ThreatLogService');
-const logger = require('../utils/logger');
+const { logger } = require('../../logger');
 require('dotenv').config();
 
 const timeoutAnalyze = parseInterval(process.env.ANALYZE_INTERVAL || '5m');

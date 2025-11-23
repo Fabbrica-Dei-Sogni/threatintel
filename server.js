@@ -1,6 +1,6 @@
 require('dotenv').config();
 
-const logger = require('./core/utils/logger');
+const { logger } = require('./logger');
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');

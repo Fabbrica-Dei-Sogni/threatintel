@@ -1,4 +1,4 @@
-const logger = require('../../utils/logger');
+const { logger } = require('../../../logger');
 const ConfigService = require('../ConfigService');
 require('dotenv').config();
 
@@ -69,7 +69,7 @@ class ForensicService {
                     }, {});
                 }
             }
-            this.tolleranceWeights = { ...tollerances };            
+            this.tolleranceWeights = { ...tollerances };
 
             logger.info(`[ForensicService] Configurazioni pesi e tolleranze per gli attacchi caricate da DB`);
         } catch (err) {
@@ -133,7 +133,7 @@ class ForensicService {
                         timeToStart = new Date(now.getTime() - (timeConfig.to.days * 24 * 60 * 60 * 1000));
                     }
                 }
-            
+
 
                 // Caso 3: Solo 'from' - da un punto nel passato ad ora
                 else if (timeConfig.from) {
@@ -190,12 +190,12 @@ class ForensicService {
         };
 
         const tolleranceWeights = {
-            unqTechTol: this.tolleranceWeights.UNQTECHTOL ? this.tolleranceWeights.UNQTECHTOL :  6,
+            unqTechTol: this.tolleranceWeights.UNQTECHTOL ? this.tolleranceWeights.UNQTECHTOL : 6,
             rpsTol: this.tolleranceWeights.RPSTOL ? this.tolleranceWeights.RPSTOL : 10,
             durTol: this.tolleranceWeights.DURTOL ? this.tolleranceWeights.DURTOL : 361,
             scoreTol: this.tolleranceWeights.SCORETOL ? this.tolleranceWeights.SCORETOL : 40,
             durDecayTol: this.tolleranceWeights.DURDECAYTOL ? this.tolleranceWeights.DURDECAYTOL : 240
-        };        
+        };
 
         return [
 
@@ -239,7 +239,7 @@ class ForensicService {
                     ],
                     as: 'rateLimitEvents'
                 }
-            },            
+            },
 
             // Stage 3: Filtra gruppi significativi
             {

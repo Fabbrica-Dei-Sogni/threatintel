@@ -1,4 +1,4 @@
-const logger = require('../utils/logger');
+const { logger } = require('../../logger');
 const geoip = require('geoip-lite');
 const crypto = require('crypto');
 const ConfigService = require('./ConfigService');
@@ -159,7 +159,7 @@ class PatternAnalysisService {
         };
 
         const jndiPayload = req.jndiPayload || '';
-        
+
         return this.analyze(fullUrl, userAgent, bodyStr, referer, method, queryStr, otherToAnalyze, jndiPayload);
     }
 
@@ -232,10 +232,10 @@ class PatternAnalysisService {
                 score += this.suspiciousScores.SUSPICIOUS_REFERER;
             }
         });
-        if (jndiPayload) { 
+        if (jndiPayload) {
             suspicious.push(`SUSPICIOUS_REFERER:JNDI_PAYLOAD[${jndiPayload}]`);
             //aggiungo un valore piu alto ad un jndiPayload, in futuro gestiro meglio questo punteggio
-                score += this.suspiciousScores.SUSPICIOUS_REFERER + 15;
+            score += this.suspiciousScores.SUSPICIOUS_REFERER + 15;
         }
 
         // 6. Metodo HTTP anomalo

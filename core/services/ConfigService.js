@@ -1,5 +1,5 @@
 const Configuration = require('../models/ConfigSchema');
-const logger = require('../utils/logger');
+const { logger } = require('../../logger');
 
 console.log = (...args) => logger.info(args.join(' '));
 console.info = (...args) => logger.info(args.join(' '));

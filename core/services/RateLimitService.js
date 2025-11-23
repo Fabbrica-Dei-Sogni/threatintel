@@ -1,5 +1,5 @@
 const RateLimitEvent = require('../models/RateLimitEventSchema'); // percorso schema
-const logger = require('../utils/logger');
+const { logger } = require('../../logger');
 
 console.log = (...args) => logger.info(args.join(' '));
 console.info = (...args) => logger.info(args.join(' '));
@@ -55,14 +55,14 @@ class RateLimitService {
             .skip(skip)
             //.sort(options.sort || { timestamp: -1 });
             .sort({ timestamp: -1 })
-        
+
         return events;
-    }    
+    }
 
     async countEventsByIp(filters = {}) {
         const count = await RateLimitEvent.countDocuments(filters);
         return count;
-    }    
+    }
 
 }
 

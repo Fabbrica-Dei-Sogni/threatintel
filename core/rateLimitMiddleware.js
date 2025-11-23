@@ -1,4 +1,4 @@
-const rateLimit = require('express-rate-limit');
+const { rateLimit, ipKeyGenerator } = require('express-rate-limit');
 const RedisStoreImport = require('rate-limit-redis');
 const RedisStore = RedisStoreImport.default || RedisStoreImport;
 const rateLimitService = require('./services/RateLimitService');
@@ -84,7 +84,7 @@ const createRateLimitHandler = (limitType, logger) => {
             headers: req.headers
         };
 
-        
+
         const eventData = {
             ...logData,
             honeypotId: process.env.HONEYPOT_INSTANCE_ID,
@@ -123,7 +123,7 @@ const ddosProtectionLimiter = (logger) => rateLimit({
     standardHeaders: true,
     legacyHeaders: false,
     handler: createRateLimitHandler('ddos-protection', logger),
-    keyGenerator: (req) => `ddos:${req.ip}`,
+    keyGenerator: (req) => `ddos:${ipKeyGenerator(req)}`,
     skip: (req) => {
         // Skip per IP esclusi dalla configurazione esistente
         const excludedIPs = (process.env.EXCLUDED_IPS || '').split(',').map(ip => ip.trim());
@@ -140,7 +140,7 @@ const criticalEndpointsLimiter = (logger) => rateLimit({
     standardHeaders: true,
     legacyHeaders: false,
     handler: createRateLimitHandler('critical-endpoints', logger),
-    keyGenerator: (req) => `critical:${req.ip}:${req.path}`,
+    keyGenerator: (req) => `critical:${ipKeyGenerator(req)}:${req.path}`,
     skipSuccessfulRequests: false // Conta anche richieste "riuscite" per honeypot
 });
 
@@ -153,7 +153,7 @@ const trapEndpointsLimiter = (logger) => rateLimit({
     standardHeaders: true,
     legacyHeaders: false,
     handler: createRateLimitHandler('trap-endpoints', logger),
-    keyGenerator: (req) => `trap:${req.ip}`
+    keyGenerator: (req) => `trap:${ipKeyGenerator(req)}`
 });
 
 // 4. Rate limiting generale applicazione
@@ -165,7 +165,7 @@ const applicationLimiter = (logger) => rateLimit({
     standardHeaders: true,
     legacyHeaders: false,
     handler: createRateLimitHandler('application', logger),
-    keyGenerator: (req) => `app:${req.ip}`
+    keyGenerator: (req) => `app:${ipKeyGenerator(req)}`
 });
 
 // Middleware per tracking violazioni e blacklist automatica

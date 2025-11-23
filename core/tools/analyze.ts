@@ -6,18 +6,18 @@ dotenv.config();
 
 const timeoutAnalyze = parseInterval(process.env.ANALYZE_INTERVAL || '5m');
 
-export async function analyze() {
+export function scheduleAnalysis() {
+    setInterval(analyze, timeoutAnalyze);
+    analyze();
+}
+
+async function analyze() {
 
     const stats = await ThreatLogService.getStats('24h');
     const topThreats = await ThreatLogService.getTopThreats(10);
 
     logger.info(`📊 Statistiche ultime 24h: ${stats.totalRequests}`);
     logger.info(`⚠️  Top minacce: ${JSON.stringify(topThreats)}`);
-}
-
-export function scheduleAnalysis() {
-    setInterval(analyze, timeoutAnalyze);
-    analyze();
 }
 
 function parseInterval(val: string, defaultUnit = 's'): number {

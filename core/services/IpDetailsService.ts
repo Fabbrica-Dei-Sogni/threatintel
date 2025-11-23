@@ -82,7 +82,7 @@ class IpDetailsService {
 
             // Enrichment asincrono
             saveAbuseDoc = await this.getAndSaveAbuseIpDb(ip);
-            const enrichedData = await enrichIpData(ip); // <-- la tua funzione ipinfo/whois
+            const enrichedData = await this.enrichIpData(ip); // <-- la tua funzione ipinfo/whois
 
             //TODO: eseguire l'enrichment del reputation score ogni volta
             ipDetails = new IpDetails({ ip, ...enrichedData, abuseipdbId: saveAbuseDoc?._id || null });
@@ -147,7 +147,7 @@ class IpDetailsService {
     async getAndSaveAbuseIpDb(ip: string) {
         try {
             // Enrichment AbuseIPDB
-            const abuseData = await enrichWithAbuse(ip);
+            const abuseData = await this.enrichWithAbuse(ip);
             if (!abuseData) return null;
 
             const payload = {
@@ -190,7 +190,7 @@ class IpDetailsService {
             let morePages = true;
 
             while (morePages) {
-                const reportsData = await getAbuseReportsFromApi(ip, maxAgeInDays, perPage, page);
+                const reportsData = await this.getAbuseReportsFromApi(ip, maxAgeInDays, perPage, page);
                 const reports = reportsData.results || [];
 
                 for (const rep of reports) {
@@ -230,91 +230,89 @@ class IpDetailsService {
         }
     }
 
-}
+    /**
+     * Metodo per ottenere i dettagli di un IP arricchiti dalla fonte abuse ipdb
+     
+     * @param {*} ip 
+     * @returns 
+     */
+    async enrichWithAbuse(ip: string) {
+
+        try {
+            // Solo se non già controllato o se score ancora assente
+            const data = await axios.get("https://api.abuseipdb.com/api/v2/check", {
+                headers: { Key: process.env.ABUSEIPDB_KEY, Accept: "application/json" },
+                params: { ipAddress: ip, maxAgeInDays: 30 }
+            });
+            return {
+                abuseConfidenceScore: data.data.data.abuseConfidenceScore,
+                countryCode: data.data.data.countryCode,
+                domain: data.data.data.domain,
+                isp: data.data.data.isp,
+                isTor: data.data.data.isTor,
+                isWhitelisted: data.data.data.isWhitelisted,
+                usageType: data.data.data.usageType,
+                lastReportedAt: data.data.data.lastReportedAt,
+                totalReports: data.data.data.totalReports
+            };
+
+        } catch (err) {
+            throw err;
+        }
+    }
 
 
-/**
- * Metodo per ottenere i dettagli di un IP arricchiti dalla fonte abuse ipdb
- 
- * @param {*} ip 
- * @returns 
- */
-async function enrichWithAbuse(ip: string) {
+    async getAbuseReportsFromApi(ip: string, maxAgeInDays = 1, perPage = 10, page = 1) {
+        try {
+            const response = await axios.get('https://api.abuseipdb.com/api/v2/reports', {
+                headers: { Key: process.env.ABUSEIPDB_KEY, Accept: "application/json" },
+                params: {
+                    ipAddress: ip,
+                    maxAgeInDays,  // intervallo massimo supportato
+                    perPage,       // massimo consentito dalla API
+                    page             // prende la prima pagina (fino a 100 report)                
+                }
+            });
 
-    try {
-        // Solo se non già controllato o se score ancora assente
-        const data = await axios.get("https://api.abuseipdb.com/api/v2/check", {
-            headers: { Key: process.env.ABUSEIPDB_KEY, Accept: "application/json" },
-            params: { ipAddress: ip, maxAgeInDays: 30 }
-        });
+            return response.data.data; // array di reports
+        } catch (error: any) {
+            logger.error(`Errore chiamata AbuseIPDB reports per IP ${ip}: ${error.message}`);
+            throw error;
+        }
+    }
+
+    /**
+     * Arricchisce un indirizzo IP con sorgenti pubbliche/lookup
+     * @param {string} ip
+     * @returns {Promise<Object>}  // Vedi schema sotto
+     */
+    async enrichIpData(ip: string) {
+
+        // Dettaglio da ipinfo (puoi registrarti per key se sfori il free tier)
+        const info = await this.ipinfoPromise(ip);
+
+        // Whois con promisify (richiede connessione)
+        let whoisData: any = '';
+        try {
+            whoisData = await whoisAsync(ip);
+        } catch (e) { whoisData = null; }
+
         return {
-            abuseConfidenceScore: data.data.data.abuseConfidenceScore,
-            countryCode: data.data.data.countryCode,
-            domain: data.data.data.domain,
-            isp: data.data.data.isp,
-            isTor: data.data.data.isTor,
-            isWhitelisted: data.data.data.isWhitelisted,
-            usageType: data.data.data.usageType,
-            lastReportedAt: data.data.data.lastReportedAt,
-            totalReports: data.data.data.totalReports
+            ip,
+            ipinfo: info || null,
+            whois_raw: whoisData || null,
+            enrichedAt: new Date()
         };
-
-    } catch (err) {
-        throw err;
     }
-}
 
-
-async function getAbuseReportsFromApi(ip: string, maxAgeInDays = 1, perPage = 10, page = 1) {
-    try {
-        const response = await axios.get('https://api.abuseipdb.com/api/v2/reports', {
-            headers: { Key: process.env.ABUSEIPDB_KEY, Accept: "application/json" },
-            params: {
-                ipAddress: ip,
-                maxAgeInDays,  // intervallo massimo supportato
-                perPage,       // massimo consentito dalla API
-                page             // prende la prima pagina (fino a 100 report)                
-            }
+    ipinfoPromise(ip: string) {
+        return new Promise((resolve) => {
+            ipinfo(ip, {}, (err: any, c: any) => {
+                if (err) return resolve(null);
+                resolve(c);
+            });
         });
-
-        return response.data.data; // array di reports
-    } catch (error: any) {
-        logger.error(`Errore chiamata AbuseIPDB reports per IP ${ip}: ${error.message}`);
-        throw error;
     }
+
 }
-
-/**
- * Arricchisce un indirizzo IP con sorgenti pubbliche/lookup
- * @param {string} ip
- * @returns {Promise<Object>}  // Vedi schema sotto
- */
-async function enrichIpData(ip: string) {
-
-    // Dettaglio da ipinfo (puoi registrarti per key se sfori il free tier)
-    const info = await ipinfoPromise(ip);
-
-    // Whois con promisify (richiede connessione)
-    let whoisData: any = '';
-    try {
-        whoisData = await whoisAsync(ip);
-    } catch (e) { whoisData = null; }
-
-    return {
-        ip,
-        ipinfo: info || null,
-        whois_raw: whoisData || null,
-        enrichedAt: new Date()
-    };
-}
-
-function ipinfoPromise(ip: string) {
-    return new Promise((resolve) => {
-        ipinfo(ip, {}, (err: any, c: any) => {
-            if (err) return resolve(null);
-            resolve(c);
-        });
-    });
-}
-
 export default new IpDetailsService();

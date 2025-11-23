@@ -43,6 +43,41 @@
 
 **Deliverable**: Applicazione bilingue (JS + TS) funzionante ✅
 
+---
+
+### 📋 Strategia di Migrazione (IMPORTANTE!)
+
+> [!IMPORTANT]
+> **Approccio in 3 fasi obbligatorie:**
+>
+> **A) Migrazione graduale JS → TS**
+> - Convertire file per file
+> - Usare SEMPRE librerie TypeScript corrette (`@types/*`)
+> - **NO workaround** o `any` generalizzati
+> - Verificare compilazione: `npm run build` ✅
+> - Verificare runtime: `npm run dev:ts` ✅
+> - **FERMARSI e indagare** se errori prima di procedere
+>
+> **B) Integrazione Dependency Injection**
+> - **SOLO DOPO** completamento migrazione TypeScript
+> - Usare `tsyringe` + `reflect-metadata`
+> - Integrare DI dove serve (non ovunque)
+> - Verificare compilazione ✅
+> - Verificare runtime ✅
+>
+> **C) Ridefinizione Test Suite**
+> - **DOPO** integrazione DI
+> - Adattare test per usare DI mocking
+> - Mantenere coverage 80%+
+
+**Regole ferree:**
+1. ✅ Compilazione corretta
+2. ✅ Runtime funzionante
+3. ⚠️ Errore? → STOP e indaga
+4. 🚫 Non proseguire con errori
+
+---
+
 ### Phase 2: Core Utilities (Next)
 - [ ] Convert `core/utils/logger.js` → `.ts`
 - [ ] Convert `core/config.js` → `.ts`

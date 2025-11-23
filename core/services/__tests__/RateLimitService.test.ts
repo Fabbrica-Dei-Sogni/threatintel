@@ -1,10 +1,10 @@
 /**
- * Test suite for RateLimitService
+ * Test suite for RateLimitService (TypeScript)
  */
 
-const mongoose = require('mongoose');
-const RateLimitService = require('../RateLimitService');
-const RateLimitEvent = require('../../models/RateLimitEventSchema');
+import mongoose from 'mongoose';
+import RateLimitService from '../RateLimitService';
+import RateLimitEvent from '../../models/RateLimitEventSchema';
 
 describe('RateLimitService', () => {
     beforeAll(async () => {
@@ -32,7 +32,7 @@ describe('RateLimitService', () => {
                 timestamp: new Date(),
                 headers: { 'user-agent': 'test-agent' },
                 honeypotId: 'test-id',
-                message: 'Rate limit exceeded'
+                message: 'Rate limit exceeded',
             };
 
             const savedEvent = await RateLimitService.logEvent(eventData);
@@ -44,18 +44,6 @@ describe('RateLimitService', () => {
             const count = await RateLimitEvent.countDocuments();
             expect(count).toBe(1);
         });
-
-        test('should throw error on invalid data', async () => {
-            const invalidData = {
-                // Missing required fields if any (schema dependent)
-                // Assuming schema is loose or we force an error
-            };
-
-            // If schema has no required fields, this might pass. 
-            // Let's try to force a validation error if possible, or just skip if schema is too loose.
-            // RateLimitEventSchema usually doesn't enforce strict required except maybe type/ip?
-            // Let's assume it works for now.
-        });
     });
 
     describe('getEvents', () => {
@@ -63,7 +51,7 @@ describe('RateLimitService', () => {
             await RateLimitEvent.create([
                 { ip: '1.1.1.1', limitType: 'ddos-protection', path: '/api/1', timestamp: new Date('2023-01-01') },
                 { ip: '2.2.2.2', limitType: 'application', path: '/api/2', timestamp: new Date('2023-01-02') },
-                { ip: '1.1.1.1', limitType: 'ddos-protection', path: '/api/1', timestamp: new Date('2023-01-03') }
+                { ip: '1.1.1.1', limitType: 'ddos-protection', path: '/api/1', timestamp: new Date('2023-01-03') },
             ]);
         });
 
@@ -89,15 +77,14 @@ describe('RateLimitService', () => {
             await RateLimitEvent.create([
                 { ip: '10.0.0.1', limitType: 'ddos-protection', path: '/test', timestamp: new Date() },
                 { ip: '10.0.0.1', limitType: 'ddos-protection', path: '/test', timestamp: new Date() },
-                { ip: '10.0.0.2', limitType: 'ddos-protection', path: '/test', timestamp: new Date() }
+                { ip: '10.0.0.2', limitType: 'ddos-protection', path: '/test', timestamp: new Date() },
             ]);
         });
 
         test('should get events for specific IP', async () => {
             const events = await RateLimitService.getEventsByIp({
-                filters: { ip: '10.0.0.1' }
+                filters: { ip: '10.0.0.1' },
             });
-
             expect(events).toHaveLength(2);
             expect(events[0].ip).toBe('10.0.0.1');
         });
@@ -106,9 +93,8 @@ describe('RateLimitService', () => {
             const events = await RateLimitService.getEventsByIp({
                 page: 1,
                 pageSize: 1,
-                filters: { ip: '10.0.0.1' }
+                filters: { ip: '10.0.0.1' },
             });
-
             expect(events).toHaveLength(1);
         });
     });
@@ -118,7 +104,7 @@ describe('RateLimitService', () => {
             await RateLimitEvent.create([
                 { ip: '192.168.0.1', limitType: 'ddos-protection', path: '/test' },
                 { ip: '192.168.0.1', limitType: 'ddos-protection', path: '/test' },
-                { ip: '192.168.0.2', limitType: 'ddos-protection', path: '/test' }
+                { ip: '192.168.0.2', limitType: 'ddos-protection', path: '/test' },
             ]);
         });
 

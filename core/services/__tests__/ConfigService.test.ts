@@ -1,9 +1,11 @@
 /**
- * Test suite for ConfigService
+ * Test suite for ConfigService (TypeScript)
  */
 
-const mongoose = require('mongoose');
-const ConfigService = require('../ConfigService');
+import mongoose from 'mongoose';
+import ConfigService from '../ConfigService';
+
+// Import JS model
 const ConfigSchema = require('../../models/ConfigSchema');
 
 describe('ConfigService', () => {
@@ -52,6 +54,17 @@ describe('ConfigService', () => {
             const num = await ConfigService.saveConfig('num_key', '123');
             expect(num.value).toBe('123');
         });
+
+        test('should handle errors gracefully', async () => {
+            // Mock Configuration.findOneAndUpdate to throw an error
+            const originalFindOneAndUpdate = ConfigSchema.findOneAndUpdate;
+            ConfigSchema.findOneAndUpdate = jest.fn().mockRejectedValue(new Error('Database error'));
+
+            await expect(ConfigService.saveConfig('error_key', 'error_value')).rejects.toThrow('Database error');
+
+            // Restore original method
+            ConfigSchema.findOneAndUpdate = originalFindOneAndUpdate;
+        });
     });
 
     describe('getConfigValue', () => {
@@ -68,6 +81,17 @@ describe('ConfigService', () => {
 
             expect(value).toBeNull();
         });
+
+        test('should handle errors gracefully', async () => {
+            // Mock Configuration.findOne to throw an error
+            const originalFindOne = ConfigSchema.findOne;
+            ConfigSchema.findOne = jest.fn().mockRejectedValue(new Error('Database error'));
+
+            await expect(ConfigService.getConfigValue('error_key')).rejects.toThrow('Database error');
+
+            // Restore original method
+            ConfigSchema.findOne = originalFindOne;
+        });
     });
 
     describe('getAllConfigs', () => {
@@ -79,15 +103,26 @@ describe('ConfigService', () => {
             const all = await ConfigService.getAllConfigs();
 
             expect(all).toHaveLength(3);
-            expect(all.map(c => c.key)).toContain('key1');
-            expect(all.map(c => c.key)).toContain('key2');
-            expect(all.map(c => c.key)).toContain('key3');
+            expect(all.map((c: any) => c.key)).toContain('key1');
+            expect(all.map((c: any) => c.key)).toContain('key2');
+            expect(all.map((c: any) => c.key)).toContain('key3');
         });
 
         test('should return empty array when no configs exist', async () => {
             const all = await ConfigService.getAllConfigs();
 
             expect(all).toEqual([]);
+        });
+
+        test('should handle errors gracefully', async () => {
+            // Mock Configuration.find to throw an error
+            const originalFind = ConfigSchema.find;
+            ConfigSchema.find = jest.fn().mockRejectedValue(new Error('Database error'));
+
+            await expect(ConfigService.getAllConfigs()).rejects.toThrow('Database error');
+
+            // Restore original method
+            ConfigSchema.find = originalFind;
         });
     });
 });

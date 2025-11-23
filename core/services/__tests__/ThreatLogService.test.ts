@@ -1,17 +1,17 @@
 /**
- * Test suite for ThreatLogService
+ * Test suite for ThreatLogService (TypeScript)
  */
 
-const mongoose = require('mongoose');
-const ThreatLogService = require('../ThreatLogService');
-const ThreatLog = require('../../models/ThreatLogSchema');
-const IpDetails = require('../../models/IpDetailsSchema');
+import mongoose from 'mongoose';
+import ThreatLogService from '../ThreatLogService';
+import ThreatLog from '../../models/ThreatLogSchema';
+import IpDetails from '../../models/IpDetailsSchema';
 
 // Mock dependencies
 jest.mock('../IpDetailsService', () => ({
     parseExcludedIPs: jest.fn().mockReturnValue([]),
     isIPExcluded: jest.fn().mockReturnValue(false),
-    saveIpDetails: jest.fn().mockResolvedValue('507f1f77bcf86cd799439011') // Valid ObjectId string
+    saveIpDetails: jest.fn().mockResolvedValue('507f1f77bcf86cd799439011'), // ObjectId string
 }));
 
 jest.mock('../PatternAnalysisService', () => {
@@ -20,13 +20,13 @@ jest.mock('../PatternAnalysisService', () => {
             suspicious: false,
             score: 0,
             indicators: [],
-            isBot: false
-        })
+            isBot: false,
+        }),
     }));
 });
 
 jest.mock('../forense/ForensicService', () => ({
-    buildAttackGroupsBasePipeline: jest.fn().mockResolvedValue([])
+    buildAttackGroupsBasePipeline: jest.fn().mockResolvedValue([]),
 }));
 
 describe('ThreatLogService', () => {
@@ -55,17 +55,17 @@ describe('ThreatLogService', () => {
                     method: 'GET',
                     url: '/test',
                     headers: {},
-                    body: {}
+                    body: {},
                 },
                 fingerprint: {
                     hash: 'hash123',
                     suspicious: false,
                     score: 0,
-                    indicators: []
-                }
+                    indicators: [],
+                },
             };
 
-            const savedLog = await ThreatLogService.saveLog(logEntry);
+            const savedLog = await ThreatLogService.saveLog(logEntry as any);
 
             expect(savedLog).toBeDefined();
             expect(savedLog.id).toBe(logEntry.id);
@@ -81,8 +81,8 @@ describe('ThreatLogService', () => {
 
             const logEntry = {
                 id: 'test-id-excluded',
-                request: { ip: '127.0.0.1' }
-            };
+                request: { ip: '127.0.0.1' },
+            } as any;
 
             const result = await ThreatLogService.saveLog(logEntry);
 
@@ -97,17 +97,17 @@ describe('ThreatLogService', () => {
             await ThreatLog.create([
                 { id: '1', request: { ip: '1.1.1.1', url: '/a' }, timestamp: new Date('2023-01-01') },
                 { id: '2', request: { ip: '2.2.2.2', url: '/b' }, timestamp: new Date('2023-01-02') },
-                { id: '3', request: { ip: '1.1.1.1', url: '/c' }, timestamp: new Date('2023-01-03') }
+                { id: '3', request: { ip: '1.1.1.1', url: '/c' }, timestamp: new Date('2023-01-03') },
             ]);
         });
 
         test('should get all logs with pagination', async () => {
-            const logs = await ThreatLogService.getLogs({ pageSize: 2 });
+            const logs = await ThreatLogService.getLogs({ pageSize: 2 } as any);
             expect(logs).toHaveLength(2);
         });
 
         test('should filter logs', async () => {
-            const logs = await ThreatLogService.getLogs({ filters: { 'request.ip': '1.1.1.1' } });
+            const logs = await ThreatLogService.getLogs({ filters: { 'request.ip': '1.1.1.1' } } as any);
             expect(logs).toHaveLength(2);
         });
     });
@@ -120,18 +120,18 @@ describe('ThreatLogService', () => {
                     timestamp: new Date(),
                     request: { ip: '1.1.1.1', userAgent: 'UA1' },
                     fingerprint: { suspicious: true },
-                    geo: { country: 'US' }
+                    geo: { country: 'US' },
                 },
                 {
                     id: '2',
                     timestamp: new Date(),
                     request: { ip: '2.2.2.2', userAgent: 'UA2' },
                     fingerprint: { suspicious: false },
-                    geo: { country: 'IT' }
-                }
+                    geo: { country: 'IT' },
+                },
             ]);
 
-            const stats = await ThreatLogService.getStats('24h');
+            const stats = await ThreatLogService.getStats('24h' as any);
 
             expect(stats.totalRequests).toBe(2);
             expect(stats.suspiciousRequests).toBe(1);
@@ -146,12 +146,12 @@ describe('ThreatLogService', () => {
             await ThreatLog.create([
                 { id: '1', fingerprint: { suspicious: true, score: 10 } },
                 { id: '2', fingerprint: { suspicious: true, score: 50 } },
-                { id: '3', fingerprint: { suspicious: false, score: 0 } }
+                { id: '3', fingerprint: { suspicious: false, score: 0 } },
             ]);
 
             const threats = await ThreatLogService.getTopThreats(5);
 
-            expect(threats).toHaveLength(2); // Only suspicious ones
+            expect(threats).toHaveLength(2);
             expect(threats[0].fingerprint.score).toBe(50);
             expect(threats[1].fingerprint.score).toBe(10);
         });

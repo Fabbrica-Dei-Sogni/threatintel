@@ -1,5 +1,5 @@
 /**
- * Smoke test per verificare setup Jest
+ * Smoke test for Jest setup (TypeScript)
  */
 
 describe('Jest Setup Verification', () => {
@@ -14,7 +14,9 @@ describe('Jest Setup Verification', () => {
     });
 
     test('should mock console.log', () => {
+        const logSpy = jest.spyOn(console, 'log').mockImplementation(() => { });
         console.log('This should be mocked');
-        expect(console.log).toHaveBeenCalled();
+        expect(logSpy).toHaveBeenCalled();
+        logSpy.mockRestore();
     });
 });

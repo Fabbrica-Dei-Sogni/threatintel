@@ -1,28 +1,33 @@
-const { logger } = require('../../logger');
+import { logger } from '../../logger';
+import util from 'util';
+import axios from 'axios';
+import dotenv from 'dotenv';
+
+// Import JS dependencies
 const whois = require('whois');
 const ipinfo = require('ipinfo');
-const util = require('util');
-const whoisAsync = util.promisify(whois.lookup);
 const AbuseReport = require('../models/AbuseReportSchema');
 const IpDetails = require('../models/IpDetailsSchema');
 const AbuseIpDb = require('../models/AbuseIpDbSchema');
 const { AbuseCategoryEnum } = require('../models/AbuseCategoryEnum');
 const ipRangeCheck = require('ip-range-check');
-const axios = require('axios')
-require('dotenv').config();
 
-console.log = (...args) => logger.info(args.join(' '));
-console.info = (...args) => logger.info(args.join(' '));
-console.warn = (...args) => logger.warn(args.join(' '));
-console.error = (...args) => logger.error(args.join(' '));
+const whoisAsync = util.promisify(whois.lookup);
+
+dotenv.config();
 
 class IpDetailsService {
+    private excludedIPs: string[];
+
+    constructor() {
+        this.excludedIPs = this.parseExcludedIPs();
+    }
 
     /**
- * Parsa la variabile EXCLUDED_IPS dal .env
- * @returns {string[]} Array di IP e range CIDR da escludere
- */
-    parseExcludedIPs() {
+     * Parsa la variabile EXCLUDED_IPS dal .env
+     * @returns {string[]} Array di IP e range CIDR da escludere
+     */
+    parseExcludedIPs(): string[] {
         const excludedIPsEnv = process.env.EXCLUDED_IPS;
         if (!excludedIPsEnv) {
             // Default se non specificato
@@ -40,24 +45,23 @@ class IpDetailsService {
      * @param {string} ip 
      * @returns {boolean} true se deve essere escluso
      */
-    isIPExcluded(ip) {
+    isIPExcluded(ip: string): boolean {
         if (!ip) return true;
 
         // Usa ip-range-check per verificare se l'IP è in uno dei range esclusi
         return ipRangeCheck(ip, this.excludedIPs);
     }
 
-    async saveIpDetails(ip) {
-
+    async saveIpDetails(ip: string) {
         const ipDetailsId = await this.findOrCreate(ip);
         return ipDetailsId;
     }
 
-    async findOrCreate(ip, updateReputationScore = false) {
+    async findOrCreate(ip: string, updateReputationScore = false) {
         let ipDetails = await IpDetails.findOne({ ip });
         let now = new Date();
 
-        let saveAbuseDoc = null;
+        let saveAbuseDoc: any = null;
         //gestire il caso in se l'ip gia esiste, aggiornare il nuovo campo lastSeen
         //se è la prima volta definito il nuovo campo firstSeen
         if (ipDetails) {
@@ -68,7 +72,7 @@ class IpDetailsService {
 
             if (!ipDetails.abuseipdbId || updateReputationScore) {
                 saveAbuseDoc = await this.getAndSaveAbuseIpDb(ip);
-                ipDetails.abuseipdbId = saveAbuseDoc._id;
+                ipDetails.abuseipdbId = saveAbuseDoc?._id;
             }
 
             //rieseguire l'enrichment del reputation score ogni volta
@@ -102,7 +106,7 @@ class IpDetailsService {
         return ipDetails._id;
     }
 
-    async getIpDetails(ip) {
+    async getIpDetails(ip: string) {
         const ipDetails = await IpDetails.findOne({ ip })
             .populate('abuseipdbId')  // Popola il riferimento AbuseIpDb
             .exec();
@@ -110,22 +114,22 @@ class IpDetailsService {
         if (!ipDetails) return null;
 
         // Recupera i report associati se esiste un riferimento a AbuseIpDb
-        let abuseReports = [];
+        let abuseReports: any[] = [];
         if (ipDetails.abuseipdbId) {
             const reports = await AbuseReport.find({ abuseIpDbId: ipDetails.abuseipdbId._id })
                 .sort({ reportedAt: -1 })
                 .exec();
 
             // Invertiamo l'enum in modo da avere id -> nome chiave
-            const idToNameMap = Object.entries(AbuseCategoryEnum).reduce((acc, [key, val]) => {
-                acc[val] = key;
+            const idToNameMap = Object.entries(AbuseCategoryEnum).reduce((acc: any, [key, val]) => {
+                acc[val as string] = key;
                 return acc;
             }, {});
 
             // Mappa ID categorie in nomi testuali
-            abuseReports = reports.map(rep => ({
+            abuseReports = reports.map((rep: any) => ({
                 ...rep.toObject(),
-                categories: rep.categories.map(id => ({
+                categories: rep.categories.map((id: any) => ({
                     id,
                     name: idToNameMap[id] || `Unknown (${id})`,
                     //description: AbuseCategoryDescriptions[id] || ''
@@ -140,7 +144,7 @@ class IpDetailsService {
 
     }
 
-    async getAndSaveAbuseIpDb(ip) {
+    async getAndSaveAbuseIpDb(ip: string) {
         try {
             // Enrichment AbuseIPDB
             const abuseData = await enrichWithAbuse(ip);
@@ -169,20 +173,20 @@ class IpDetailsService {
             );
 
             return savedDoc;
-        } catch (error) {
+        } catch (error: any) {
             logger.error(`Errore aggiornamento AbuseIpDb per ${ip}: ${error.message}`);
             return null;
         }
 
     }
 
-    async getAndSaveReportsAbuseIpDb(ip, maxAgeInDays = 2, perPage = 100) {
+    async getAndSaveReportsAbuseIpDb(ip: string, maxAgeInDays = 2, perPage = 100) {
         try {
             const abuseDoc = await AbuseIpDb.findOne({ ip });
             if (!abuseDoc) return null;
 
             let page = 1;
-            let savedReports = [];
+            let savedReports: any[] = [];
             let morePages = true;
 
             while (morePages) {
@@ -220,7 +224,7 @@ class IpDetailsService {
             }
 
             return savedReports;
-        } catch (error) {
+        } catch (error: any) {
             logger.error(`Errore aggiornamento AbuseIpDb per ${ip}: ${error.message}`);
             throw error;
         }
@@ -235,7 +239,7 @@ class IpDetailsService {
  * @param {*} ip 
  * @returns 
  */
-async function enrichWithAbuse(ip) {
+async function enrichWithAbuse(ip: string) {
 
     try {
         // Solo se non già controllato o se score ancora assente
@@ -261,7 +265,7 @@ async function enrichWithAbuse(ip) {
 }
 
 
-async function getAbuseReportsFromApi(ip, maxAgeInDays = 1, perPage = 10, page = 1) {
+async function getAbuseReportsFromApi(ip: string, maxAgeInDays = 1, perPage = 10, page = 1) {
     try {
         const response = await axios.get('https://api.abuseipdb.com/api/v2/reports', {
             headers: { Key: process.env.ABUSEIPDB_KEY, Accept: "application/json" },
@@ -274,7 +278,7 @@ async function getAbuseReportsFromApi(ip, maxAgeInDays = 1, perPage = 10, page =
         });
 
         return response.data.data; // array di reports
-    } catch (error) {
+    } catch (error: any) {
         logger.error(`Errore chiamata AbuseIPDB reports per IP ${ip}: ${error.message}`);
         throw error;
     }
@@ -285,13 +289,13 @@ async function getAbuseReportsFromApi(ip, maxAgeInDays = 1, perPage = 10, page =
  * @param {string} ip
  * @returns {Promise<Object>}  // Vedi schema sotto
  */
-async function enrichIpData(ip) {
+async function enrichIpData(ip: string) {
 
     // Dettaglio da ipinfo (puoi registrarti per key se sfori il free tier)
     const info = await ipinfoPromise(ip);
 
     // Whois con promisify (richiede connessione)
-    let whoisData = '';
+    let whoisData: any = '';
     try {
         whoisData = await whoisAsync(ip);
     } catch (e) { whoisData = null; }
@@ -304,13 +308,13 @@ async function enrichIpData(ip) {
     };
 }
 
-function ipinfoPromise(ip) {
+function ipinfoPromise(ip: string) {
     return new Promise((resolve) => {
-        ipinfo(ip, {}, (err, c) => {
+        ipinfo(ip, {}, (err: any, c: any) => {
             if (err) return resolve(null);
             resolve(c);
         });
     });
 }
 
-module.exports = new IpDetailsService();
+export default new IpDetailsService();

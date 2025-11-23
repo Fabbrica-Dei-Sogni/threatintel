@@ -1,11 +1,8 @@
-const { logger } = require('../../../logger');
-const ConfigService = require('../ConfigService');
-require('dotenv').config();
+import { logger } from '../../../logger';
+import ConfigService from '../ConfigService';
+import dotenv from 'dotenv';
 
-console.log = (...args) => logger.info(args.join(' '));
-console.info = (...args) => logger.info(args.join(' '));
-console.warn = (...args) => logger.warn(args.join(' '));
-console.error = (...args) => logger.error(args.join(' '));
+dotenv.config();
 
 /**
  * Il servizio è studiato per implementare metodi che agiscano sui dati presenti su mongodb e/o redis.
@@ -16,6 +13,9 @@ console.error = (...args) => logger.error(args.join(' '));
  
  */
 class ForensicService {
+    private dangerWeights: any;
+    private tolleranceWeights: any;
+    private initialized: Promise<void>;
 
     constructor() {
 
@@ -40,13 +40,13 @@ class ForensicService {
             ]);
 
             // Parsing pesi
-            let weights = {};
+            let weights: any = {};
             if (dangerWeightStr) {
                 try {
                     weights = JSON.parse(dangerWeightStr);
                 } catch {
                     // fallback parsing key:value
-                    weights = dangerWeightStr.split(',').reduce((acc, pair) => {
+                    weights = dangerWeightStr.split(',').reduce((acc: any, pair: string) => {
                         const [key, value] = pair.split(':');
                         if (key && value && !isNaN(Number(value))) acc[key] = Number(value);
                         return acc;
@@ -56,13 +56,13 @@ class ForensicService {
             this.dangerWeights = { ...weights };
 
             // Parsing tolleranze
-            let tollerances = {};
+            let tollerances: any = {};
             if (tolleranceWeightStr) {
                 try {
                     tollerances = JSON.parse(tolleranceWeightStr);
                 } catch {
                     // fallback parsing key:value
-                    tollerances = tolleranceWeightStr.split(',').reduce((acc, pair) => {
+                    tollerances = tolleranceWeightStr.split(',').reduce((acc: any, pair: string) => {
                         const [key, value] = pair.split(':');
                         if (key && value && !isNaN(Number(value))) acc[key] = Number(value);
                         return acc;
@@ -72,7 +72,7 @@ class ForensicService {
             this.tolleranceWeights = { ...tollerances };
 
             logger.info(`[ForensicService] Configurazioni pesi e tolleranze per gli attacchi caricate da DB`);
-        } catch (err) {
+        } catch (err: any) {
             logger.error(`[ForensicService] Errore caricamento configurazioni da DB: ${err.message}`);
             // fallback o rilancio errore a seconda del contesto
             // qui si potrebbe caricare default oppure propagare errore
@@ -80,12 +80,12 @@ class ForensicService {
     }
 
     // Metodo privato per costruire la pipeline base condivisa
-    async buildAttackGroupsBasePipeline(mongoFilters, minLogsForAttack, timeConfig = null) {
+    async buildAttackGroupsBasePipeline(mongoFilters: any, minLogsForAttack: number, timeConfig: any = null) {
         // Aspetta che l'inizializzazione sia completata
         await this.initialized;
 
-        let timeAgo = null;
-        let timeToStart = null;
+        let timeAgo: Date | null = null;
+        let timeToStart: Date | null = null;
 
         if (timeConfig) {
             const now = new Date();
@@ -160,7 +160,7 @@ class ForensicService {
         }
 
         // Costruisce il filtro temporale dinamicamente
-        let timeFilter = {};
+        let timeFilter: any = {};
         if (timeAgo && timeToStart) {
             // Finestra temporale precisa: da timeAgo a timeToStart
             timeFilter = {
@@ -183,10 +183,10 @@ class ForensicService {
 
         //setting dei pesi di pericolosità interpolando con i valori di env e quelli di default.
         const dangerWeights = {
-            rpsNorm: this.dangerWeights.RPSNORM ? this.dangerWeights.RPSNORM : (parseFloat(process.env.DANGER_WEIGHT_RPSNORM) || 0.18),
-            durNormPenalized: this.dangerWeights.DURNORM ? this.dangerWeights.DURNORM : parseFloat(process.env.DANGER_WEIGHT_DURNORM) || 0.12,
-            scoreNorm: this.dangerWeights.SCORENORM ? this.dangerWeights.SCORENORM : parseFloat(process.env.DANGER_WEIGHT_SCORENORM) || 0.50,
-            uniqueTechNorm: this.dangerWeights.DURNORM ? this.dangerWeights.DURNORM : parseFloat(process.env.DANGER_WEIGHT_UNIQUETECHNORM) || 0.20
+            rpsNorm: this.dangerWeights.RPSNORM ? this.dangerWeights.RPSNORM : (parseFloat(process.env.DANGER_WEIGHT_RPSNORM || '0.18') || 0.18),
+            durNormPenalized: this.dangerWeights.DURNORM ? this.dangerWeights.DURNORM : parseFloat(process.env.DANGER_WEIGHT_DURNORM || '0.12') || 0.12,
+            scoreNorm: this.dangerWeights.SCORENORM ? this.dangerWeights.SCORENORM : parseFloat(process.env.DANGER_WEIGHT_SCORENORM || '0.50') || 0.50,
+            uniqueTechNorm: this.dangerWeights.DURNORM ? this.dangerWeights.DURNORM : parseFloat(process.env.DANGER_WEIGHT_UNIQUETECHNORM || '0.20') || 0.20
         };
 
         const tolleranceWeights = {
@@ -582,4 +582,4 @@ class ForensicService {
     }
 }
 
-module.exports = new ForensicService();
+export default new ForensicService();

@@ -1,31 +1,26 @@
-// Crea uno script per analisi avanzate
-const ThreatLogService = require('../services/ThreatLogService');
-const { logger } = require('../../logger');
-require('dotenv').config();
+import ThreatLogService from '../services/ThreatLogService';
+import { logger } from '../../logger';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const timeoutAnalyze = parseInterval(process.env.ANALYZE_INTERVAL || '5m');
 
-console.log = (...args) => logger.info(args.join(' '));
-console.info = (...args) => logger.info(args.join(' '));
-console.warn = (...args) => logger.warn(args.join(' '));
-console.error = (...args) => logger.error(args.join(' '));
-
-
-async function analyze() {
+export async function analyze() {
 
     const stats = await ThreatLogService.getStats('24h');
     const topThreats = await ThreatLogService.getTopThreats(10);
 
-    console.log('📊 Statistiche ultime 24h:', stats.totalRequests);
-    console.log('⚠️  Top minacce:', topThreats);
+    logger.info(`📊 Statistiche ultime 24h: ${stats.totalRequests}`);
+    logger.info(`⚠️  Top minacce: ${JSON.stringify(topThreats)}`);
 }
 
-function scheduleAnalysis() {
+export function scheduleAnalysis() {
     setInterval(analyze, timeoutAnalyze);
     analyze();
 }
 
-function parseInterval(val, defaultUnit = 's') {
+function parseInterval(val: string, defaultUnit = 's'): number {
     if (!val) throw new Error('Interval value is required');
 
     // Riconosce formato tipo '5m', '30s', o anche solo '120'
@@ -47,9 +42,3 @@ function parseInterval(val, defaultUnit = 's') {
             throw new Error(`Unità non supportata: "${unit}"`);
     }
 }
-
-
-module.exports = {
-    analyze,
-    scheduleAnalysis,
-};

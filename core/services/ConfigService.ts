@@ -1,10 +1,7 @@
-const Configuration = require('../models/ConfigSchema');
-const { logger } = require('../../logger');
+import { logger } from '../../logger';
 
-console.log = (...args) => logger.info(args.join(' '));
-console.info = (...args) => logger.info(args.join(' '));
-console.warn = (...args) => logger.warn(args.join(' '));
-console.error = (...args) => logger.error(args.join(' '));
+// Import JS model
+const Configuration = require('../models/ConfigSchema');
 
 class ConfigService {
     /**
@@ -12,7 +9,7 @@ class ConfigService {
      * @param {string} key 
      * @param {string} value 
      */
-    static async saveConfig(key, value) {
+    static async saveConfig(key: string, value: string) {
         try {
             const result = await Configuration.findOneAndUpdate(
                 { key },
@@ -21,13 +18,13 @@ class ConfigService {
             );
             logger.info(`[ConfigService] saveConfig success for key=${key}`);
             return result;
-        } catch (error) {
+        } catch (error: any) {
             logger.error(`[ConfigService] saveConfig ERROR for key=${key}: ${error.message}`);
             throw error;
         }
     }
 
-    static async getConfigValue(key) {
+    static async getConfigValue(key: string) {
         try {
             const config = await Configuration.findOne({ key });
             if (!config) {
@@ -36,7 +33,7 @@ class ConfigService {
             }
             logger.info(`[ConfigService] getConfigValue success for key=${key}`);
             return config.value;
-        } catch (error) {
+        } catch (error: any) {
             logger.error(`[ConfigService] getConfigValue ERROR for key=${key}: ${error.message}`);
             throw error;
         }
@@ -51,11 +48,11 @@ class ConfigService {
             const configs = await Configuration.find({});
             logger.info(`[ConfigService] getAllConfigs success: ${configs.length} configs retrieved`);
             return configs;
-        } catch (error) {
+        } catch (error: any) {
             logger.error(`[ConfigService] getAllConfigs ERROR: ${error.message}`);
             throw error;
         }
     }
 }
 
-module.exports = ConfigService;
+export default ConfigService;

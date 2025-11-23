@@ -1,17 +1,29 @@
-const { logger } = require('../../logger');
-const geoip = require('geoip-lite');
-const crypto = require('crypto');
-const ConfigService = require('./ConfigService');
-require('dotenv').config();
+import { logger } from '../../logger';
+import crypto from 'crypto';
+import ConfigService from './ConfigService';
+import dotenv from 'dotenv';
+import { Request } from 'express';
 
-console.log = (...args) => logger.info(args.join(' '));
-console.info = (...args) => logger.info(args.join(' '));
-console.warn = (...args) => logger.warn(args.join(' '));
-console.error = (...args) => logger.error(args.join(' '));
+// Import JS dependencies
+const geoip = require('geoip-lite');
+
+dotenv.config();
+
+interface RequestAnalysisResult {
+    fingerprint: string;
+    analysis: any;
+    geo: any;
+}
 
 class PatternAnalysisService {
+    private geoEnabled: boolean;
+    private suspiciousPatterns: RegExp[];
+    private botPatterns: RegExp[];
+    private suspiciousReferers: RegExp[];
+    private suspiciousScores: any;
+    private initialized: Promise<void>;
 
-    constructor(options = {}) {
+    constructor(options: any = {}) {
 
         this.geoEnabled = options.geoEnabled !== false;
         this.suspiciousPatterns = [];
@@ -41,30 +53,30 @@ class PatternAnalysisService {
             // Parsing patterns in Regex
             this.suspiciousPatterns = (suspiciousPatternsStr || '')
                 .split(',')
-                .map(p => p.trim())
+                .map((p: string) => p.trim())
                 .filter(Boolean)
-                .map(pat => new RegExp(pat, 'i'));
+                .map((pat: string) => new RegExp(pat, 'i'));
 
             this.botPatterns = (botPatternsStr || '')
                 .split(',')
-                .map(p => p.trim())
+                .map((p: string) => p.trim())
                 .filter(Boolean)
-                .map(pat => new RegExp(pat, 'i'));
+                .map((pat: string) => new RegExp(pat, 'i'));
 
             this.suspiciousReferers = (suspiciousReferersStr || '')
                 .split(',')
-                .map(p => p.trim())
+                .map((p: string) => p.trim())
                 .filter(Boolean)
-                .map(pat => new RegExp(pat, 'i'));
+                .map((pat: string) => new RegExp(pat, 'i'));
 
             // Parsing punteggi
-            let scores = {};
+            let scores: any = {};
             if (suspiciousScoresStr) {
                 try {
                     scores = JSON.parse(suspiciousScoresStr);
                 } catch {
                     // fallback parsing key:value
-                    scores = suspiciousScoresStr.split(',').reduce((acc, pair) => {
+                    scores = suspiciousScoresStr.split(',').reduce((acc: any, pair: string) => {
                         const [key, value] = pair.split(':');
                         if (key && value && !isNaN(Number(value))) acc[key] = Number(value);
                         return acc;
@@ -85,7 +97,7 @@ class PatternAnalysisService {
             this.suspiciousScores = { ...defaultScores, ...scores };
 
             logger.info(`[ThreatLogger] Configurazioni pattern caricate da DB`);
-        } catch (err) {
+        } catch (err: any) {
             logger.error(`[ThreatLogger] Errore caricamento configurazioni da DB: ${err.message}`);
             // fallback o rilancio errore a seconda del contesto
             // qui si potrebbe caricare default oppure propagare errore
@@ -93,17 +105,11 @@ class PatternAnalysisService {
     }
 
     /**
- * @typedef {Object} RequestAnalysisResult
- * @property {string} fingerprint        // Hash/fingerprint della richiesta
- * @property {Object} analysis           // Oggetto dettagliato del risultato analisi (score, suspicious, indicators, ...)
- * @property {Object} geo                // Oggetto geo con info paese, città, coordinate, ecc.
- */
-    /**
  * Applica analisi di fingerprint, threat e geolocalizzazione su una richiesta Express.
  * @param {import('express').Request} req
  * @returns {RequestAnalysisResult}
  */
-    async applyAnalysis(req, ip) {
+    async applyAnalysis(req: Request, ip: string): Promise<RequestAnalysisResult> {
         // Aspetta che l'inizializzazione sia completata
         await this.initialized;
 
@@ -129,7 +135,7 @@ class PatternAnalysisService {
         };
     }
 
-    generateFingerprint(req, ip) {
+    generateFingerprint(req: Request, ip: string) {
         const fingerprint = {
             ip: ip,
             userAgent: req.get('User-Agent'),
@@ -145,7 +151,7 @@ class PatternAnalysisService {
         return hash;
     }
 
-    analyzeRequest(req) {
+    analyzeRequest(req: Request) {
 
         const fullUrl = req.originalUrl || req.url;
         const userAgent = req.get('User-Agent') || '';
@@ -158,20 +164,20 @@ class PatternAnalysisService {
             headers: this.sanitizeHeaders(req.headers)
         };
 
-        const jndiPayload = req.jndiPayload || '';
+        const jndiPayload = (req as any).jndiPayload || '';
 
         return this.analyze(fullUrl, userAgent, bodyStr, referer, method, queryStr, otherToAnalyze, jndiPayload);
     }
 
-    sanitizeHeaders(headers) {
+    sanitizeHeaders(headers: any) {
         const sanitized = { ...headers };
         delete sanitized.authorization;
         delete sanitized.cookie;
         return sanitized;
     }
 
-    analyze(fullUrl, userAgent, bodyStr, referer, method, queryStr, requestToAnalyze, jndiPayload) {
-        const suspicious = [];
+    analyze(fullUrl: string, userAgent: string, bodyStr: string, referer: string, method: string, queryStr: string, requestToAnalyze: any, jndiPayload?: string) {
+        const suspicious: string[] = [];
         let score = 0;
         //0. analisi preliminare su controlli speciali di dogana
         //verificare se esiste l'header impostato dall'nginx della vps su cui traccia la provenienza da un altra porta
@@ -252,7 +258,7 @@ class PatternAnalysisService {
         };
     }
 
-    getGeoLocation(ip) {
+    getGeoLocation(ip: string) {
         if (!this.geoEnabled) return {};
 
         const geo = geoip.lookup(ip);
@@ -269,4 +275,4 @@ class PatternAnalysisService {
 
 }
 
-module.exports = PatternAnalysisService;
+export default PatternAnalysisService;

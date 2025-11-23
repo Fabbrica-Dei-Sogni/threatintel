@@ -1,26 +1,26 @@
-const { logger } = require('../../logger');
+import { logger } from '../../logger';
+import dotenv from 'dotenv';
+
+// Import JS dependencies (will be converted later)
 const ThreatLog = require('../models/ThreatLogSchema');
 const AttackDTO = require('../models/dto/AttackDTO');
-const IpDetailsService = require('./IpDetailsService');
-const PatternAnalysis = require('./PatternAnalysisService');
-const ForensicService = require('./forense/ForensicService');
+import IpDetailsService from './IpDetailsService';
+import PatternAnalysis from './PatternAnalysisService';
+import ForensicService from './forense/ForensicService';
 
-require('dotenv').config();
+dotenv.config();
 
-console.log = (...args) => logger.info(args.join(' '));
-console.info = (...args) => logger.info(args.join(' '));
-console.warn = (...args) => logger.warn(args.join(' '));
-console.error = (...args) => logger.error(args.join(' '));
+interface ThreatStats {
+    totalRequests: number;
+    suspiciousRequests: number;
+    uniqueIPs: string[];
+    topCountries: (string | null)[];
+    topUserAgents: (string | null)[];
+}
 
-/**
- * @typedef {Object} ThreatStats
- * @property {number} totalRequests
- * @property {number} suspiciousRequests
- * @property {string[]} uniqueIPs
- * @property {(string|null)[]} topCountries
- * @property {(string|null)[]} topUserAgents
- */
 class ThreatLogService {
+    private excludedIPs: any;
+    private patternAnalysisService: any;
 
     constructor() {
         // Parse della variabile di ambiente al costruttore
@@ -28,12 +28,12 @@ class ThreatLogService {
         this.patternAnalysisService = new PatternAnalysis({ geoEnabled: true });
     }
 
-    async saveLog(logEntry) {
+    async saveLog(logEntry: any) {
         const ip = logEntry.request.ip;
 
         // Se IP è nella lista degli esclusi, non salvare
         if (IpDetailsService.isIPExcluded(ip)) {
-            console.log(`[ThreatLogger] IP ${ip} escluso dal salvataggio`);
+            logger.info(`[ThreatLogger] IP ${ip} escluso dal salvataggio`);
             return null;
         }
 
@@ -47,7 +47,7 @@ class ThreatLogService {
     // Puoi aggiungere qui altri metodi di lettura/scrittura su ThreatLog
 
     // Lista log paginata e filtrata
-    async getLogs({ page = 1, pageSize = 20, filters = {}, sortFields = { timestamp: -1 } } = {}) {
+    async getLogs({ page = 1, pageSize = 20, filters = {}, sortFields = { timestamp: -1 } }: any = {}) {
         const skip = (page - 1) * pageSize;
 
         const mongoFilters = this.buildRegExpFilter(filters);
@@ -75,29 +75,6 @@ class ThreatLogService {
     /**
      * Recupera linearmente degli attacchi con min log per attacco di 3
      * Ritorna in una sola aggregazione sia gli item paginati che il totale risultato dal filtro
-
-    Elenco dei campi ordinabili dopo l'aggregazione    
-                    [
-            "timestamp",
-            "totaleLogs",
-            "firstSeen",
-            "lastSeen",
-            "averageScore",
-            "countRateLimit",
-            "rps",
-            "rpsStyle",
-            "attackDurationMinutes",
-            "intensityAttack",
-            "intensityWeight",
-            "durNorm",
-            "durDecay",
-            "durNormPenalized",
-            "scoreNorm",
-            "dangerScore",
-            "dangerLevel"
-            ]
-
-
      * @param {*} param0 
      * @returns 
      */
@@ -108,8 +85,7 @@ class ThreatLogService {
         minLogsForAttack = 10,
         timeConfig = {},
         sortFields = null
-    } = {},
-    ) {
+    }: any = {}) {
         const skip = (page - 1) * pageSize;
         const mongoFilters = this.buildRegExpFilter(filters);
 
@@ -181,8 +157,8 @@ class ThreatLogService {
         };
     }
 
-    buildRegExpFilter(filters) {
-        const mongoFilters = {};
+    buildRegExpFilter(filters: any) {
+        const mongoFilters: any = {};
 
         for (const [key, value] of Object.entries(filters)) {
             if (typeof value === 'string' && value.trim() !== '') {
@@ -198,7 +174,7 @@ class ThreatLogService {
 
 
     // Dettaglio singolo log per id
-    async getLogById(id) {
+    async getLogById(id: string) {
         return await ThreatLog.findOne({ id: id })
             .populate('ipDetailsId');
     }
@@ -209,14 +185,14 @@ class ThreatLogService {
     }
 
     // Aggiorna tutti i log per quell'IP, impostando il riferimento al record IpDetails
-    async assignIpDetailsToLogs(ip, ipDetailsId) {
+    async assignIpDetailsToLogs(ip: string, ipDetailsId: any) {
         return await ThreatLog.updateMany(
             { 'request.ip': ip },
             { $set: { ipDetailsId } }
         );
     }
 
-    async dryRunAnalyzeLogs() {
+    async dryRunAnalyzeLogs(limit: string) {
 
         // Recupera un campione di log
         const logs = await this.getLogs({
@@ -225,7 +201,7 @@ class ThreatLogService {
             filters: {}
         });
 
-        const previews = logs.map(logEntry => {
+        const previews = logs.map((logEntry: any) => {
             // Adatta i dati per il metodo analyzeRequest
             const fullUrl = logEntry.request.url || '';
             const userAgent = logEntry.request.userAgent || '';
@@ -271,8 +247,8 @@ class ThreatLogService {
 
         const summary = {
             totalSampled: previews.length,
-            withChanges: previews.filter(p => p.comparison.hasChanges).length,
-            withoutChanges: previews.filter(p => !p.comparison.hasChanges).length
+            withChanges: previews.filter((p: any) => p.comparison.hasChanges).length,
+            withoutChanges: previews.filter((p: any) => !p.comparison.hasChanges).length
         };
 
         return {
@@ -290,7 +266,7 @@ class ThreatLogService {
         let updated = 0;
         let errors = 0;
 
-        const results = {
+        const results: any = {
             totalLogs,
             processed: 0,
             updated: 0,
@@ -317,7 +293,7 @@ class ThreatLogService {
                 });
 
                 const batchResults = await Promise.allSettled(
-                    logs.map(async (logEntry) => {
+                    logs.map(async (logEntry: any) => {
                         try {
                             // Adatta i dati del logEntry per il nuovo metodo analyzeRequest
                             const fullUrl = logEntry.request.url || '';
@@ -349,7 +325,7 @@ class ThreatLogService {
                                 oldAnalysis.score !== newAnalysis.score ||
                                 JSON.stringify(oldAnalysis.indicators) !== JSON.stringify(newAnalysis.indicators);
 
-                            let updateResult = { status: 'unchanged', id: logEntry._id };
+                            let updateResult: any = { status: 'unchanged', id: logEntry._id };
 
                             // Se ci sono cambiamenti e updateDatabase è true, aggiorna il database
                             if (hasChanges && updateDatabase) {
@@ -388,7 +364,7 @@ class ThreatLogService {
 
                             return updateResult;
 
-                        } catch (error) {
+                        } catch (error: any) {
                             logger.error(`Errore rianalisi log ${logEntry._id}:`, error);
                             return {
                                 status: 'error',
@@ -403,15 +379,15 @@ class ThreatLogService {
                 const batchStats = {
                     batchNumber,
                     processed: batchResults.length,
-                    updated: batchResults.filter(r => r.value?.status === 'updated').length,
-                    wouldUpdate: batchResults.filter(r => r.value?.status === 'would-update').length,
-                    unchanged: batchResults.filter(r => r.value?.status === 'unchanged').length,
-                    errors: batchResults.filter(r => r.value?.status === 'error').length,
+                    updated: batchResults.filter(r => r.status === 'fulfilled' && (r as PromiseFulfilledResult<any>).value?.status === 'updated').length,
+                    wouldUpdate: batchResults.filter(r => r.status === 'fulfilled' && (r as PromiseFulfilledResult<any>).value?.status === 'would-update').length,
+                    unchanged: batchResults.filter(r => r.status === 'fulfilled' && (r as PromiseFulfilledResult<any>).value?.status === 'unchanged').length,
+                    errors: batchResults.filter(r => r.status === 'fulfilled' && (r as PromiseFulfilledResult<any>).value?.status === 'error').length,
                     duration: Date.now() - batchStart,
                     examples: batchResults
-                        .filter(r => r.value?.status === 'updated')
+                        .filter(r => r.status === 'fulfilled' && (r as PromiseFulfilledResult<any>).value?.status === 'updated')
                         .slice(0, 3)
-                        .map(r => r.value)
+                        .map(r => (r as PromiseFulfilledResult<any>).value)
                 };
 
                 processed += batchStats.processed;
@@ -422,7 +398,7 @@ class ThreatLogService {
 
                 logger.info(`Batch ${batchNumber} completato: processati ${batchStats.processed}, aggiornati ${batchStats.updated}, errori ${batchStats.errors}`);
 
-            } catch (batchError) {
+            } catch (batchError: any) {
                 logger.error(`Errore batch ${batchNumber}:`, batchError);
                 errors += batchSize;
 
@@ -441,7 +417,7 @@ class ThreatLogService {
         results.updated = updated;
         results.errors = errors;
         results.endTime = new Date();
-        results.duration = results.endTime - results.startTime;
+        results.duration = results.endTime.getTime() - results.startTime.getTime();
 
         logger.info(`Rianalisi completata: ${processed} processati, ${updated} aggiornati, ${errors} errori`);
 
@@ -485,4 +461,4 @@ class ThreatLogService {
     }
 }
 
-module.exports = new ThreatLogService();
+export default new ThreatLogService();

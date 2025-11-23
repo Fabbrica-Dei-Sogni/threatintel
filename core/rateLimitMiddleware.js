@@ -1,7 +1,7 @@
 const { rateLimit, ipKeyGenerator } = require('express-rate-limit');
 const RedisStoreImport = require('rate-limit-redis');
 const RedisStore = RedisStoreImport.default || RedisStoreImport;
-const rateLimitService = require('./services/RateLimitService');
+const rateLimitService = require('./services/RateLimitService').default;
 
 const Redis = require('ioredis');
 require('dotenv').config();

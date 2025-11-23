@@ -1,10 +1,7 @@
-const RateLimitEvent = require('../models/RateLimitEventSchema'); // percorso schema
-const { logger } = require('../../logger');
+import { logger } from '../../logger';
 
-console.log = (...args) => logger.info(args.join(' '));
-console.info = (...args) => logger.info(args.join(' '));
-console.warn = (...args) => logger.warn(args.join(' '));
-console.error = (...args) => logger.error(args.join(' '));
+// Import JS model
+const RateLimitEvent = require('../models/RateLimitEventSchema');
 
 class RateLimitService {
 
@@ -13,11 +10,11 @@ class RateLimitService {
     }
 
     /**
- * Salva un evento di rate limiting in MongoDB.
- * @param {Object} eventData - Dati evento (ip, limitType, path, ecc.)
- * @returns {Promise} Promise risolta al completamento
- */
-    async logEvent(eventData) {
+     * Salva un evento di rate limiting in MongoDB.
+     * @param {Object} eventData - Dati evento (ip, limitType, path, ecc.)
+     * @returns {Promise} Promise risolta al completamento
+     */
+    async logEvent(eventData: any) {
         try {
             const event = new RateLimitEvent(eventData);
             return await event.save();
@@ -33,7 +30,7 @@ class RateLimitService {
      * @param {Object} options - Opzioni (limit, skip, sort)
      * @returns {Promise<Array>} Lista eventi
      */
-    async getEvents(filter = {}, options = {}) {
+    async getEvents(filter: any = {}, options: any = {}) {
         const events = await RateLimitEvent.find(filter)
             .limit(options.limit || 100)
             .skip(options.skip || 0)
@@ -47,7 +44,7 @@ class RateLimitService {
      * @param {Object} options - Opzioni (limit, skip, sort)
      * @returns {Promise<Array>} Lista eventi per l’IP
      */
-    async getEventsByIp({ page = 1, pageSize = 20, filters = {} } = {}) {
+    async getEventsByIp({ page = 1, pageSize = 20, filters = {} }: any = {}) {
         const skip = (page - 1) * pageSize;
 
         const events = await RateLimitEvent.find(filters)
@@ -66,4 +63,4 @@ class RateLimitService {
 
 }
 
-module.exports = new RateLimitService();
+export default new RateLimitService();

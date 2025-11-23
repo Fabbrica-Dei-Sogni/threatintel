@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 
 // Import JS dependencies (will be converted later)
 const ThreatLog = require('../models/ThreatLogSchema');
-const AttackDTO = require('../models/dto/AttackDTO');
+import AttackDTO from '../models/dto/AttackDTO';
 import IpDetailsService from './IpDetailsService';
 import PatternAnalysis from './PatternAnalysisService';
 import ForensicService from './forense/ForensicService';
@@ -145,10 +145,7 @@ class ThreatLogService {
 
         const [result] = await ThreatLog.aggregate(pipeline);
 
-        /**
-        * @type {Array<AttackDTO>}
-        */
-        const attacks = result.dati;
+        const attacks: AttackDTO[] = result.dati;
 
 
         return {

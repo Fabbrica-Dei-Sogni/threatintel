@@ -10,7 +10,7 @@ const instance = axios.create({
     })
 });
 
-const verify = async function (token) { 
+const verify = async function (token) {
 
     console.log(`Verifica del token di autenticazione verso lo issuer Digital Auth... ${uriDigitalAuth}`);
     if (!token) {
@@ -37,9 +37,10 @@ const verify = async function (token) {
             throw { message: response.data.message };
         }
     } catch (error) {
-        console.error(`Errore durante la verifica token : ${error.response.data.message}`);
-        throw error.response.data;
-    }    
+        const msg = error.response?.data?.message || error.message || 'Errore sconosciuto';
+        console.error(`Errore durante la verifica token : ${msg}`);
+        throw error.response?.data || { message: msg };
+    }
 }
 
 /**

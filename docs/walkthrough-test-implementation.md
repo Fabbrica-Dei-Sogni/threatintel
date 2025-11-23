@@ -544,5 +544,99 @@ ConfigService.getConfigValue is not a function
 ---
 
 **Documento creato**: 2025-11-22  
-**Ultima modifica**: 2025-11-22  
-**Versione**: 1.0.0
+**Ultima modifica**: 2025-11-23  
+**Versione**: 1.1.0
+
+---
+
+## 🔷 TypeScript Migration - Phase 1: Infrastructure Setup
+
+**Data**: 2025-11-23  
+**Obiettivo**: Preparare infrastruttura TypeScript per migrazione graduale  
+**Stato**: Phase 1 Completata ✅
+
+### ✅ Lavoro Completato
+
+#### 1. Setup TypeScript
+
+**Dipendenze installate:**
+```json
+{
+  "devDependencies": {
+    "typescript": "latest",
+    "ts-node": "latest",
+    "@types/node": "latest",
+    "@types/express": "latest",
+    "@types/mongoose": "latest"
+  }
+}
+```
+
+**File creati:**
+- [`tsconfig.json`](file:///home/amodica/workspaces/threatintel/tsconfig.json) - Configurazione TypeScript con `allowJs: true` per coesistenza JS/TS
+- [`server.ts`](file:///home/amodica/workspaces/threatintel/server.ts) - Entry point TypeScript convertito da server.js
+
+**Script npm aggiunti:**
+```json
+{
+  "start:ts": "ts-node server.ts",
+  "dev:ts": "nodemon --watch '**/*.ts' --exec 'node --inspect --require ts-node/register' server.ts",
+  "build": "tsc"
+}
+```
+
+#### 2. Conversione Entry Point
+
+✅ **`server.js` → `server.ts`**
+- Convertito da CommonJS a ES6 modules (`import`/`export`)
+- Fix type error su `app.listen(PORT)` → `app.listen(Number(PORT))`
+- **Testato a runtime**: Server si avvia correttamente con `npm run dev:ts`
+- MongoDB e Redis si connettono
+- Tutti i servizi funzionano (ConfigService, ForensicService, ThreatLogger)
+
+#### 3. Fix Rate Limiter IPv6 Warning
+
+✅ **`core/rateLimitMiddleware.js`** - Risolto warning IPv6:
+- Importato `ipKeyGenerator` da `express-rate-limit`
+- Aggiornati tutti i 4 keyGenerator per usare `ipKeyGenerator(req)` invece di `req.ip`
+- Eliminato warning: *"Custom keyGenerator appears to use request IP without calling the ipKeyGenerator helper function"*
+
+### 🎯 Risultati
+
+**Applicazione Bilingue (JS + TS):**
+- ✅ `npm run dev` - Modalità JavaScript (originale) funzionante
+- ✅ `npm run dev:ts` - Modalità TypeScript funzionante
+- ✅ Entrambe le modalità avviano il server correttamente
+- ✅ Zero crash, zero regressioni
+- ✅ Infrastruttura pronta per migrazione graduale
+
+**Approccio "Bomba" adottato:**
+1. Setup infrastruttura senza toccare codice esistente
+2. Converti SOLO server.js
+3. **TESTA A RUNTIME** prima di procedere ✅
+4. Verifica che nulla sia rotto
+5. Commit checkpoint funzionante
+
+### 📊 Metriche
+
+| Metrica | Target | Risultato | Status |
+|---------|--------|-----------|--------|
+| App JS funzionante | ✓ | ✓ | ✅ |
+| App TS funzionante | ✓ | ✓ | ✅ |
+| Runtime test passed | ✓ | ✓ | ✅ |
+| Zero regressioni | ✓ | ✓ | ✅ |
+| Build TypeScript | Opzionale | Non testato | 🟡 |
+
+### 🚀 Prossimi Passi (Opzionali)
+
+**Phase 2: Core Utilities**
+- [ ] Convertire `core/utils/logger.js` → `.ts`
+- [ ] Testare runtime ✓
+- [ ] Convertire `core/config.js` → `.ts`
+- [ ] Testare runtime ✓
+
+**Phase 3-5**: Vedi [`ROADMAP.md`](file:///home/amodica/workspaces/threatintel/docs/ROADMAP.md)
+
+---
+
+**Checkpoint salvato** ✅ - Codice committato e pushato

@@ -1,7 +1,5 @@
 import { logger } from '../../logger';
-
-// Import JS model
-const Configuration = require('../models/ConfigSchema');
+import Configuration from '../models/ConfigSchema';
 
 class ConfigService {
     /**

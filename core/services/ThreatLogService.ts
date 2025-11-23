@@ -1,8 +1,8 @@
 import { logger } from '../../logger';
 import dotenv from 'dotenv';
 
-// Import JS dependencies (will be converted later)
-const ThreatLog = require('../models/ThreatLogSchema');
+// Import model
+import ThreatLog from '../models/ThreatLogSchema';
 import AttackDTO from '../models/dto/AttackDTO';
 import IpDetailsService from './IpDetailsService';
 import PatternAnalysis from './PatternAnalysisService';

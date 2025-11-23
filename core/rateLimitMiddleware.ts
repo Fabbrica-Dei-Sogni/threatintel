@@ -1,32 +1,33 @@
-const { rateLimit, ipKeyGenerator } = require('express-rate-limit');
-const RedisStoreImport = require('rate-limit-redis');
-const RedisStore = RedisStoreImport.default || RedisStoreImport;
-const rateLimitService = require('./services/RateLimitService').default;
+import rateLimit, { ipKeyGenerator } from 'express-rate-limit';
+import RedisStoreImport from 'rate-limit-redis';
+const RedisStore: any = (RedisStoreImport as any).default || RedisStoreImport;
+import Redis from 'ioredis';
+import rateLimitService from './services/RateLimitService';
+import dotenv from 'dotenv';
 
-const Redis = require('ioredis');
-require('dotenv').config();
+dotenv.config();
 
 // Configurazione Redis per rate limiting distribuito
-let redisClient = null;
+let redisClient: any = null;
 
 if (process.env.REDIS_HOST) {
     try {
-        redisClient = new Redis({
+        redisClient = new (Redis as any)({
             host: process.env.REDIS_HOST,
-            port: process.env.REDIS_PORT || 6379,
+            port: Number(process.env.REDIS_PORT) || 6379,
             password: process.env.REDIS_PASSWORD,
-            db: process.env.REDIS_DB || 0,
+            db: Number(process.env.REDIS_DB) || 0,
             retryDelayOnFailover: 100,
             enableOfflineQueue: true,
             maxRetriesPerRequest: 3,
             lazyConnect: false
-        });
+        } as any);
 
         redisClient.on('connect', () => {
             console.log('[REDIS] Rate limiting store connected');
         });
 
-        redisClient.on('error', (err) => {
+        redisClient.on('error', (err: any) => {
             console.error('[REDIS] Rate limiting store error:', err.message);
         });
     } catch (error) {
@@ -35,12 +36,12 @@ if (process.env.REDIS_HOST) {
     }
 }
 
-const manualBlacklistIP = async (ip) => {
+export const manualBlacklistIP = async (ip: string) => {
     if (!redisClient) {
         throw new Error('Redis non disponibile');
     }
 
-    const blacklistDuration = parseInt(process.env.BLACKLIST_DURATION) || 7200;
+    const blacklistDuration = parseInt(process.env.BLACKLIST_DURATION || '7200', 10);
 
     // Aggiunta ip in blacklist redis
     await redisClient.sadd('blacklisted-ips', ip);
@@ -58,25 +59,25 @@ const manualBlacklistIP = async (ip) => {
     };
 
     await rateLimitService.logEvent(eventData);
-    logger.info(`[MANUAL BLACKLIST] IP ${ip} aggiunto in blacklist per ${blacklistDuration} secondi.`);
+    console.info(`[MANUAL BLACKLIST] IP ${ip} aggiunto in blacklist per ${blacklistDuration} secondi.`);
 };
 
 // Store configurazione (Redis se disponibile, altrimenti memory)
 const getStore = () => {
     if (redisClient) {
         return new RedisStore({
-            sendCommand: (...args) => redisClient.call(...args),
+            sendCommand: (...args: any[]) => redisClient.call(...args),
         });
     }
     return undefined; // Default memory store
 };
 
 // Handler personalizzato per eventi di rate limiting
-const createRateLimitHandler = (limitType, logger) => {
-    return (req, res) => {
+const createRateLimitHandler = (limitType: string, logger?: any) => {
+    return (req: any, res: any) => {
         const logData = {
             ip: req.ip,
-            userAgent: req.get('User-Agent'),
+            userAgent: req.get && req.get('User-Agent'),
             path: req.path,
             method: req.method,
             limitType: limitType,
@@ -91,7 +92,7 @@ const createRateLimitHandler = (limitType, logger) => {
             message: res.statusMessage || 'Rate limit event'
         };
 
-        rateLimitService.logEvent(eventData).catch(err => {
+        rateLimitService.logEvent(eventData).catch((err: any) => {
             if (logger) logger.error('Errore salvataggio evento rate limit:', err);
         });
 
@@ -105,7 +106,7 @@ const createRateLimitHandler = (limitType, logger) => {
             error: 'Rate limit exceeded',
             type: limitType,
             message: 'Troppo veloce, amico! Rallenta un po\'...',
-            retryAfter: res.getHeader('Retry-After'),
+            retryAfter: res.getHeader && res.getHeader('Retry-After'),
             timestamp: new Date().toISOString(),
             honeypotId: process.env.HONEYPOT_INSTANCE_ID
         });
@@ -115,62 +116,61 @@ const createRateLimitHandler = (limitType, logger) => {
 // Configurazioni rate limiting per diversi livelli
 
 // 1. Protezione DDoS generale (applicata a tutte le richieste)
-const ddosProtectionLimiter = (logger) => rateLimit({
+export const ddosProtectionLimiter = (logger?: any) => rateLimit({
     store: getStore(),
-    windowMs: parseInt(process.env.DDOS_WINDOW_MS) || 60000,
-    max: parseInt(process.env.DDOS_MAX_REQUESTS) || 100,
+    windowMs: parseInt(process.env.DDOS_WINDOW_MS || '60000', 10),
+    max: parseInt(process.env.DDOS_MAX_REQUESTS || '100', 10),
     message: 'DDoS protection activated',
     standardHeaders: true,
     legacyHeaders: false,
     handler: createRateLimitHandler('ddos-protection', logger),
-    keyGenerator: (req) => `ddos:${ipKeyGenerator(req)}`,
-    skip: (req) => {
-        // Skip per IP esclusi dalla configurazione esistente
-        const excludedIPs = (process.env.EXCLUDED_IPS || '').split(',').map(ip => ip.trim());
+    keyGenerator: (req: any) => `ddos:${ipKeyGenerator(req)}`,
+    skip: (req: any) => {
+        const excludedIPs = (process.env.EXCLUDED_IPS || '').split(',').map((ip) => ip.trim()).filter(Boolean);
         return excludedIPs.includes(req.ip);
     }
 });
 
 // 2. Rate limiting per endpoint critici (login, admin)
-const criticalEndpointsLimiter = (logger) => rateLimit({
+export const criticalEndpointsLimiter = (logger?: any) => rateLimit({
     store: getStore(),
-    windowMs: parseInt(process.env.CRITICAL_WINDOW_MS) || 900000, // 15 minuti
-    max: parseInt(process.env.CRITICAL_MAX_REQUESTS) || 20,
+    windowMs: parseInt(process.env.CRITICAL_WINDOW_MS || '900000', 10), // 15 minuti
+    max: parseInt(process.env.CRITICAL_MAX_REQUESTS || '20', 10),
     message: 'Critical endpoint rate limit exceeded',
     standardHeaders: true,
     legacyHeaders: false,
     handler: createRateLimitHandler('critical-endpoints', logger),
-    keyGenerator: (req) => `critical:${ipKeyGenerator(req)}:${req.path}`,
+    keyGenerator: (req: any) => `critical:${ipKeyGenerator(req)}:${req.path}`,
     skipSuccessfulRequests: false // Conta anche richieste "riuscite" per honeypot
 });
 
 // 3. Rate limiting per endpoint trappola comuni
-const trapEndpointsLimiter = (logger) => rateLimit({
+export const trapEndpointsLimiter = (logger?: any) => rateLimit({
     store: getStore(),
-    windowMs: parseInt(process.env.TRAP_WINDOW_MS) || 300000, // 5 minuti
-    max: parseInt(process.env.TRAP_MAX_REQUESTS) || 50,
+    windowMs: parseInt(process.env.TRAP_WINDOW_MS || '300000', 10), // 5 minuti
+    max: parseInt(process.env.TRAP_MAX_REQUESTS || '50', 10),
     message: 'Trap endpoint rate limit exceeded',
     standardHeaders: true,
     legacyHeaders: false,
     handler: createRateLimitHandler('trap-endpoints', logger),
-    keyGenerator: (req) => `trap:${ipKeyGenerator(req)}`
+    keyGenerator: (req: any) => `trap:${ipKeyGenerator(req)}`
 });
 
 // 4. Rate limiting generale applicazione
-const applicationLimiter = (logger) => rateLimit({
+export const applicationLimiter = (logger?: any) => rateLimit({
     store: getStore(),
-    windowMs: parseInt(process.env.APP_WINDOW_MS) || 60000, // 1 minuto
-    max: parseInt(process.env.APP_MAX_REQUESTS) || 200,
+    windowMs: parseInt(process.env.APP_WINDOW_MS || '60000', 10), // 1 minuto
+    max: parseInt(process.env.APP_MAX_REQUESTS || '200', 10),
     message: 'Application rate limit exceeded',
     standardHeaders: true,
     legacyHeaders: false,
     handler: createRateLimitHandler('application', logger),
-    keyGenerator: (req) => `app:${ipKeyGenerator(req)}`
+    keyGenerator: (req: any) => `app:${ipKeyGenerator(req)}`
 });
 
 // Middleware per tracking violazioni e blacklist automatica
-const violationTracker = (logger) => {
-    return async (req, res, next) => {
+export const violationTracker = (logger?: any) => {
+    return async (req: any, res: any, next: any) => {
         const ip = req.ip;
 
         // Controlla blacklist dinamica
@@ -191,7 +191,7 @@ const violationTracker = (logger) => {
                         honeypotId: process.env.HONEYPOT_INSTANCE_ID
                     });
                 }
-            } catch (error) {
+            } catch (error: any) {
                 if (logger) {
                     logger.error('[BLACKLIST-CHECK] Redis error:', error.message);
                 }
@@ -200,7 +200,7 @@ const violationTracker = (logger) => {
 
         // Hook per intercettare risposte 429 e tracciare violazioni
         const originalSend = res.send;
-        res.send = function (data) {
+        res.send = function (data: any) {
             if (res.statusCode === 429 && redisClient) {
                 // Traccia violazione per blacklist automatica
                 (async () => {
@@ -212,10 +212,10 @@ const violationTracker = (logger) => {
                             await redisClient.expire(violationKey, 3600); // 1 ora window
                         }
 
-                        const maxViolations = parseInt(process.env.MAX_VIOLATIONS) || 5;
+                        const maxViolations = parseInt(process.env.MAX_VIOLATIONS || '5', 10);
                         if (violations >= maxViolations) {
                             // Blacklist temporanea
-                            const blacklistDuration = parseInt(process.env.BLACKLIST_DURATION) || 7200;
+                            const blacklistDuration = parseInt(process.env.BLACKLIST_DURATION || '7200', 10);
                             await redisClient.sadd('blacklisted-ips', ip);
                             await redisClient.setex(`blacklist:${ip}`, blacklistDuration, 'auto-blacklisted');
 
@@ -223,27 +223,18 @@ const violationTracker = (logger) => {
                                 logger.error(`[AUTO-BLACKLIST] IP ${ip} blacklisted for ${violations} violations`);
                             }
                         }
-                    } catch (error) {
+                    } catch (error: any) {
                         if (logger) {
                             logger.error('[VIOLATION-TRACK] Redis error:', error.message);
                         }
                     }
                 })();
             }
-            originalSend.call(this, data);
+            return originalSend.call(this, data);
         };
 
         next();
     };
 };
 
-
-module.exports = {
-    ddosProtectionLimiter,
-    criticalEndpointsLimiter,
-    trapEndpointsLimiter,
-    applicationLimiter,
-    violationTracker,
-    manualBlacklistIP,
-    redisClient
-};
+export { redisClient };

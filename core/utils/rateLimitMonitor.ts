@@ -1,21 +1,21 @@
-const { redisClient } = require('../middleware/rateLimitMiddleware');
+import { redisClient } from '../rateLimitMiddleware';
 
-class RateLimitMonitor {
-    static async getStats() {
+export default class RateLimitMonitor {
+    static async getStats(): Promise<any> {
         if (!redisClient) {
             return { error: 'Redis not available' };
         }
 
         try {
-            const stats = {
+            const stats: any = {
                 timestamp: new Date().toISOString(),
-                blacklistedIPs: await redisClient.scard('blacklisted-ips') || 0,
+                blacklistedIPs: (await redisClient.scard('blacklisted-ips')) || 0,
                 activeRateLimits: 0,
                 violationStats: {}
             };
 
             // Conta chiavi attive di rate limiting
-            const keys = await redisClient.keys('*');
+            const keys: string[] = await redisClient.keys('*');
             stats.activeRateLimits = keys.filter(k =>
                 k.startsWith('ddos:') ||
                 k.startsWith('critical:') ||
@@ -24,17 +24,17 @@ class RateLimitMonitor {
             ).length;
 
             return stats;
-        } catch (error) {
+        } catch (error: any) {
             return { error: error.message };
         }
     }
 
-    static async clearBlacklist() {
+    static async clearBlacklist(): Promise<boolean> {
         if (!redisClient) return false;
 
         try {
             await redisClient.del('blacklisted-ips');
-            const blacklistKeys = await redisClient.keys('blacklist:*');
+            const blacklistKeys: string[] = await redisClient.keys('blacklist:*');
             if (blacklistKeys.length > 0) {
                 await redisClient.del(...blacklistKeys);
             }
@@ -45,5 +45,3 @@ class RateLimitMonitor {
         }
     }
 }
-
-module.exports = RateLimitMonitor;

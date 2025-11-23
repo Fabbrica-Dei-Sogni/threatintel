@@ -4,9 +4,7 @@
 
 import mongoose from 'mongoose';
 import ConfigService from '../ConfigService';
-
-// Import JS model
-const ConfigSchema = require('../../models/ConfigSchema');
+import ConfigSchema from '../../models/ConfigSchema';
 
 describe('ConfigService', () => {
     beforeAll(async () => {

@@ -2,10 +2,10 @@ import axios from 'axios';
 import https from 'https';
 import { Request, Response, NextFunction } from 'express';
 
-// Import JS models (will be converted later)
-const Role = require('../models/auth/role');
-const User = require('../models/auth/user');
-const { uriDigitalAuth } = require('../config');
+// Import models
+import Role from '../models/auth/role';
+import User from '../models/auth/user';
+import { uriDigitalAuth } from '../config';
 
 const instance = axios.create({
     httpsAgent: new https.Agent({

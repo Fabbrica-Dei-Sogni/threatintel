@@ -6,10 +6,10 @@ import dotenv from 'dotenv';
 // Import JS dependencies
 const whois = require('whois');
 const ipinfo = require('ipinfo');
-const AbuseReport = require('../models/AbuseReportSchema');
-const IpDetails = require('../models/IpDetailsSchema');
-const AbuseIpDb = require('../models/AbuseIpDbSchema');
-const { AbuseCategoryEnum } = require('../models/AbuseCategoryEnum');
+import AbuseReport from '../models/AbuseReportSchema';
+import IpDetails from '../models/IpDetailsSchema';
+import AbuseIpDb from '../models/AbuseIpDbSchema';
+import { AbuseCategoryEnum } from '../models/AbuseCategoryEnum';
 const ipRangeCheck = require('ip-range-check');
 
 const whoisAsync = util.promisify(whois.lookup);
@@ -116,13 +116,14 @@ class IpDetailsService {
         // Recupera i report associati se esiste un riferimento a AbuseIpDb
         let abuseReports: any[] = [];
         if (ipDetails.abuseipdbId) {
-            const reports = await AbuseReport.find({ abuseIpDbId: ipDetails.abuseipdbId._id })
+            const abuseRefId = (ipDetails.abuseipdbId as any)?._id ?? ipDetails.abuseipdbId;
+            const reports = await AbuseReport.find({ abuseIpDbId: abuseRefId })
                 .sort({ reportedAt: -1 })
                 .exec();
 
             // Invertiamo l'enum in modo da avere id -> nome chiave
-            const idToNameMap = Object.entries(AbuseCategoryEnum).reduce((acc: any, [key, val]) => {
-                acc[val as string] = key;
+            const idToNameMap = Object.entries(AbuseCategoryEnum).reduce((acc: Record<string, string>, [key, val]) => {
+                acc[String(val as number)] = key;
                 return acc;
             }, {});
 

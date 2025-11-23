@@ -1,13 +1,23 @@
-const mongoose = require('mongoose');
-const crypto = require('crypto');
-require('dotenv').config();
-const ThreatLogService = require('./services/ThreatLogService').default;
-const PatternAnalysis = require('./services/PatternAnalysisService').default;
-const net = require('net');
+import mongoose from 'mongoose';
+import crypto from 'crypto';
+import dotenv from 'dotenv';
+import ThreatLogService from './services/ThreatLogService';
+import PatternAnalysis from './services/PatternAnalysisService';
+import net from 'net';
+import { Request, Response, NextFunction } from 'express';
 
+dotenv.config();
+
+type AnyReq = Request & { jndiPayload?: any; sessionID?: string };
 
 class ThreatLogger {
-    constructor(options = {}) {
+    patternAnalysisInstance: any;
+    mongoUri: string;
+    enabled: boolean;
+    geoEnabled: boolean;
+    maxBodySize: number;
+
+    constructor(options: any = {}) {
         this.patternAnalysisInstance = options.patternAnalysisInstance || new PatternAnalysis({ geoEnabled: true });
         this.mongoUri = options.mongoUri || 'mongodb://localhost:27017/threatintel';
         this.enabled = options.enabled !== false;
@@ -19,88 +29,67 @@ class ThreatLogger {
 
     async initDatabase() {
         try {
-            await mongoose.connect(this.mongoUri);
+            await mongoose.connect(this.mongoUri as string);
             console.log('[ThreatLogger] Connesso a MongoDB');
-        } catch (error) {
+        } catch (error: any) {
             console.error('[ThreatLogger] Errore connessione MongoDB:', error);
         }
     }
 
-
     middleware() {
-        return async (req, res, next) => {
+        return async (req: AnyReq, res: Response, next: NextFunction) => {
             if (!this.enabled) return next();
 
-            // --- AGGIUNTA: Salta logging per /api/ ---
-            if ((req.path || req.originalUrl || '').startsWith('/api/')) {
+            // Skip logging for /api/
+            if ((req.path || (req as any).originalUrl || '').startsWith('/api/')) {
                 return next();
             }
-            // -----------------------------------------
 
             const startTime = Date.now();
-            const requestId = crypto.randomUUID();
+            const requestId = (crypto as any).randomUUID ? (crypto as any).randomUUID() : crypto.randomBytes(16).toString('hex');
 
-            // Estrai IP reale
-            /*const ip = req.ip ||
-                req.connection.remoteAddress ||
-                req.socket.remoteAddress ||
-                req.headers['x-forwarded-for']?.split(',')[0];*/
-
-            // Funzione helper per validare IP
-            function isValidIP(ip) {
-                return net.isIP(ip) !== 0;
+            function isValidIP(ip?: string | null) {
+                return !!ip && net.isIP(ip) !== 0;
             }
 
-            // Estrai possibile IP dagli header
-            const rawIpFromHeaders = req.headers['x-forwarded-for']?.split(',')[0]?.trim() ||
-                req.headers['x-real-ip']?.trim();
+            const rawIpFromHeaders: string | undefined = (req.headers['x-forwarded-for'] as string | undefined)?.split(',')[0]?.trim() || (req.headers['x-real-ip'] as string | undefined)?.trim();
 
-            let ip = null;
-            let jndiPayload = null;
+            let ip: string | null = null;
+            let jndiPayload: string | null = null;
 
             if (rawIpFromHeaders && rawIpFromHeaders.includes('${jndi:')) {
-                // Payload JNDI sospetto isolato
                 jndiPayload = rawIpFromHeaders;
             } else if (rawIpFromHeaders && isValidIP(rawIpFromHeaders)) {
                 ip = rawIpFromHeaders;
             } else if (req.ip && isValidIP(req.ip)) {
                 ip = req.ip;
-            } else if (req.connection?.remoteAddress && isValidIP(req.connection.remoteAddress)) {
-                ip = req.connection.remoteAddress;
-            } else if (req.socket?.remoteAddress && isValidIP(req.socket.remoteAddress)) {
-                ip = req.socket.remoteAddress;
+            } else if ((req as any).connection?.remoteAddress && isValidIP((req as any).connection.remoteAddress)) {
+                ip = (req as any).connection.remoteAddress;
+            } else if ((req as any).socket?.remoteAddress && isValidIP((req as any).socket.remoteAddress)) {
+                ip = (req as any).socket.remoteAddress;
             }
 
-            //normalizzazione dell'ip qualora sia stato adulterato con il jndipayload
-            //req.ip = ip;
-            req.jndiPayload = jndiPayload;  // Aggiunta variabile payload JNDI
-
+            req.jndiPayload = jndiPayload;
 
             const dataAnalysis = await this.patternAnalysisInstance.applyAnalysis(req, ip);
-            // Genera fingerprint
-            const fingerprint = dataAnalysis.fingerprint;// this.generateFingerprint(req);
+            const fingerprint = dataAnalysis.fingerprint;
+            const analysis = dataAnalysis.analysis;
+            const geo = dataAnalysis.geo;
 
-            // Analizza richiesta
-            const analysis = dataAnalysis.analysis; // this.analyzeRequest(req);
-
-            // Ottieni geolocalizzazione
-            const geo = dataAnalysis.geo;// this.getGeoLocation(ip);
-
-            // Crea log entry
-            const logEntry = {
+            const logEntry: any = {
                 id: requestId,
                 timestamp: new Date(),
                 request: {
                     ip: ip,
-                    jndiPayload: req.jndiPayload,  // Aggiunta variabile payload JNDI
+                    jndiPayload: req.jndiPayload,
                     method: req.method,
-                    url: req.originalUrl || req.url,
-                    userAgent: req.get('User-Agent'),
-                    referer: req.get('Referer'),
-                    headers: this.sanitizeHeaders(req.headers),
+                    url: (req as any).originalUrl || req.url,
+                    userAgent: req.get && req.get('User-Agent'),
+                    referer: req.get && req.get('Referer'),
+                    headers: this.sanitizeHeaders(req.headers as any),
                     body: this.sanitizeBody(req.body),
                     query: req.query,
-                    cookies: req.cookies
+                    cookies: (req as any).cookies
                 },
                 geo: geo,
                 fingerprint: {
@@ -110,13 +99,12 @@ class ThreatLogger {
                     indicators: analysis.indicators
                 },
                 metadata: {
-                    sessionId: req.sessionID,
+                    sessionId: (req as any).sessionID,
                     isBot: analysis.isBot,
                     isCrawler: analysis.isBot
                 }
             };
 
-            // Log della risposta
             res.on('finish', async () => {
                 const responseTime = Date.now() - startTime;
 
@@ -127,19 +115,18 @@ class ThreatLogger {
                 };
 
                 try {
-                    //await new ThreatLog(logEntry).save();
                     await ThreatLogService.saveLog(logEntry);
 
                     if (analysis.suspicious && analysis.score > 10) {
-                        console.warn(`[ThreatLogger] ⚠️  Richiesta sospetta rilevata:`, JSON.stringify({
+                        console.warn('[ThreatLogger] ⚠️  Richiesta sospetta rilevata:', JSON.stringify({
                             ip: ip,
                             jndiPayload: req.jndiPayload,
-                            url: req.originalUrl,
+                            url: (req as any).originalUrl,
                             score: analysis.score,
                             indicators: analysis.indicators
                         }, null, 2));
                     }
-                } catch (error) {
+                } catch (error: any) {
                     console.error('[ThreatLogger] Errore salvataggio log:', error);
                 }
             });
@@ -148,14 +135,14 @@ class ThreatLogger {
         };
     }
 
-    sanitizeHeaders(headers) {
+    sanitizeHeaders(headers: any) {
         const sanitized = { ...headers };
         delete sanitized.authorization;
         delete sanitized.cookie;
         return sanitized;
     }
 
-    sanitizeBody(body) {
+    sanitizeBody(body: any) {
         if (!body) return {};
 
         const bodyStr = JSON.stringify(body);
@@ -166,8 +153,7 @@ class ThreatLogger {
         const sanitized = { ...body };
         ['password', 'token', 'key', 'secret'].forEach(field => {
             if (sanitized[field]) {
-                console.log("La richiesta contiene informazioni sensibili");
-                //sanitized[field] = '[MASKED]';
+                console.log('La richiesta contiene informazioni sensibili');
             }
         });
 
@@ -175,4 +161,4 @@ class ThreatLogger {
     }
 }
 
-module.exports = ThreatLogger;
+export default ThreatLogger;

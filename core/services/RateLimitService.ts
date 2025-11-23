@@ -1,7 +1,7 @@
 import { logger } from '../../logger';
 
-// Import JS model
-const RateLimitEvent = require('../models/RateLimitEventSchema');
+// Import model (TypeScript)
+import RateLimitEvent from '../models/RateLimitEventSchema';
 
 class RateLimitService {
 

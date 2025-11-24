@@ -1,5 +1,3 @@
-import fs from 'fs';
-import path from 'path';
 import dotenv from 'dotenv';
 
 console.log(`Get env variable with dotenv ...`);

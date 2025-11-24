@@ -1,3 +1,8 @@
+// MUST BE FIRST: reflect-metadata for TSyringe DI
+import "reflect-metadata";
+// Bootstrap DI container (side-effect import)
+import "./core/di/container";
+
 import dotenv from 'dotenv';
 dotenv.config();
 

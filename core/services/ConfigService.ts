@@ -1,38 +1,44 @@
+import { injectable } from 'tsyringe';
 import { logger } from '../../logger';
 import Configuration from '../models/ConfigSchema';
 
-class ConfigService {
+@injectable()
+export class ConfigService {
     /**
      * Salva o aggiorna una configurazione key-value
      * @param {string} key 
      * @param {string} value 
      */
-    static async saveConfig(key: string, value: string) {
+    async saveConfig(key: string, value: string) {
         try {
             const result = await Configuration.findOneAndUpdate(
                 { key },
                 { value },
                 { upsert: true, new: true, setDefaultsOnInsert: true }
             );
-            logger.info(`[ConfigService] saveConfig success for key=${key}`);
+            logger.info(`[ConfigService] Config saved: ${key}=${value}`);
             return result;
-        } catch (error: any) {
-            logger.error(`[ConfigService] saveConfig ERROR for key=${key}: ${error.message}`);
+        } catch (error) {
+            logger.error(`[ConfigService] Error saving config ${key}:`, error);
             throw error;
         }
     }
 
-    static async getConfigValue(key: string) {
+    /**
+     * Recupera il valore di una configurazione
+     * @param {string} key 
+     * @returns {Promise<string|null>}
+     */
+    async getConfigValue(key: string) {
         try {
             const config = await Configuration.findOne({ key });
             if (!config) {
-                logger.warn(`[ConfigService] getConfigValue: Configuration not found for key=${key}`);
+                logger.warn(`[ConfigService] Config not found: ${key}`);
                 return null;
             }
-            logger.info(`[ConfigService] getConfigValue success for key=${key}`);
             return config.value;
-        } catch (error: any) {
-            logger.error(`[ConfigService] getConfigValue ERROR for key=${key}: ${error.message}`);
+        } catch (error) {
+            logger.error(`[ConfigService] Error getting config ${key}:`, error);
             throw error;
         }
     }
@@ -41,16 +47,14 @@ class ConfigService {
      * Legge tutte le configurazioni key-value presenti
      * @returns {Promise<Array<{key:string,value:string}>>}
      */
-    static async getAllConfigs() {
+    async getAllConfigs() {
         try {
             const configs = await Configuration.find({});
             logger.info(`[ConfigService] getAllConfigs success: ${configs.length} configs retrieved`);
             return configs;
-        } catch (error: any) {
-            logger.error(`[ConfigService] getAllConfigs ERROR: ${error.message}`);
+        } catch (error) {
+            logger.error(`[ConfigService] Error getting all configs:`, error);
             throw error;
         }
     }
 }
-
-export default ConfigService;

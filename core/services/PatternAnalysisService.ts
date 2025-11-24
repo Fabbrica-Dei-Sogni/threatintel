@@ -1,11 +1,13 @@
 import { logger } from '../../logger';
 import crypto from 'crypto';
-import ConfigService from './ConfigService';
 import dotenv from 'dotenv';
 import { Request } from 'express';
+import { getComponent } from '../di/container';
+import { ConfigService } from './ConfigService';
 
 // Import JS dependencies
 const geoip = require('geoip-lite');
+const configService = getComponent(ConfigService);
 
 dotenv.config();
 
@@ -44,10 +46,10 @@ class PatternAnalysisService {
                 suspiciousReferersStr,
                 suspiciousScoresStr
             ] = await Promise.all([
-                ConfigService.getConfigValue('SUSPICIOUS_PATTERNS'),
-                ConfigService.getConfigValue('BOT_PATTERNS'),
-                ConfigService.getConfigValue('SUSPICIOUS_REFERERS'),
-                ConfigService.getConfigValue('SUSPICIOUS_SCORES')
+                configService.getConfigValue('SUSPICIOUS_PATTERNS'),
+                configService.getConfigValue('BOT_PATTERNS'),
+                configService.getConfigValue('SUSPICIOUS_REFERERS'),
+                configService.getConfigValue('SUSPICIOUS_SCORES')
             ]);
 
             // Parsing patterns in Regex

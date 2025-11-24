@@ -1,9 +1,9 @@
-import { logger } from '../../logger';
-
+import { injectable } from 'tsyringe';
 // Import model (TypeScript)
 import RateLimitEvent from '../models/RateLimitEventSchema';
 
-class RateLimitService {
+@injectable()
+export class RateLimitService {
 
     constructor() {
 
@@ -62,5 +62,3 @@ class RateLimitService {
     }
 
 }
-
-export default new RateLimitService();

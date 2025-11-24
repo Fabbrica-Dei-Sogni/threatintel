@@ -10,16 +10,22 @@ import AbuseReport from '../models/AbuseReportSchema';
 import IpDetails from '../models/IpDetailsSchema';
 import AbuseIpDb from '../models/AbuseIpDbSchema';
 import { AbuseCategoryEnum } from '../models/AbuseCategoryEnum';
+import { inject, injectable } from 'tsyringe';
+import { LOGGER_TOKEN } from '../di/tokens';
+import { Logger } from 'winston';
 const ipRangeCheck = require('ip-range-check');
 
 const whoisAsync = util.promisify(whois.lookup);
 
 dotenv.config();
 
-class IpDetailsService {
+@injectable()
+export class IpDetailsService {
     private excludedIPs: string[];
 
-    constructor() {
+    constructor(
+        @inject(LOGGER_TOKEN) private readonly logger: Logger,
+    ) {
         this.excludedIPs = this.parseExcludedIPs();
     }
 
@@ -316,4 +322,3 @@ class IpDetailsService {
     }
 
 }
-export default new IpDetailsService();

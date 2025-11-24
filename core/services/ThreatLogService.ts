@@ -1,30 +1,26 @@
-import { logger } from '../../logger';
 import dotenv from 'dotenv';
-
 // Import model
 import ThreatLog from '../models/ThreatLogSchema';
 import AttackDTO from '../models/dto/AttackDTO';
-import IpDetailsService from './IpDetailsService';
 import PatternAnalysis from './PatternAnalysisService';
-import ForensicService from './forense/ForensicService';
+import { ForensicService } from './forense/ForensicService';
+import { inject, injectable } from 'tsyringe';
+import { LOGGER_TOKEN } from '../di/tokens';
+import { Logger } from 'winston';
+import { IpDetailsService } from './IpDetailsService';
 
 dotenv.config();
 
-interface ThreatStats {
-    totalRequests: number;
-    suspiciousRequests: number;
-    uniqueIPs: string[];
-    topCountries: (string | null)[];
-    topUserAgents: (string | null)[];
-}
-
-class ThreatLogService {
-    private excludedIPs: any;
+@injectable()
+export class ThreatLogService {
     private patternAnalysisService: any;
 
-    constructor() {
+    constructor(
+        @inject(LOGGER_TOKEN) private readonly logger: Logger,
+        private readonly forensicService: ForensicService,
+        private readonly ipDetailsService: IpDetailsService,
+    ) {
         // Parse della variabile di ambiente al costruttore
-        this.excludedIPs = IpDetailsService.parseExcludedIPs();
         this.patternAnalysisService = new PatternAnalysis({ geoEnabled: true });
     }
 
@@ -32,12 +28,12 @@ class ThreatLogService {
         const ip = logEntry.request.ip;
 
         // Se IP è nella lista degli esclusi, non salvare
-        if (IpDetailsService.isIPExcluded(ip)) {
-            logger.info(`[ThreatLogger] IP ${ip} escluso dal salvataggio`);
+        if (this.ipDetailsService.isIPExcluded(ip)) {
+            this.logger.info(`[ThreatLogger] IP ${ip} escluso dal salvataggio`);
             return null;
         }
 
-        logEntry.ipDetailsId = await IpDetailsService.saveIpDetails(ip);
+        logEntry.ipDetailsId = await this.ipDetailsService.saveIpDetails(ip);
 
         const log = new ThreatLog(logEntry);
         await log.save();
@@ -93,7 +89,7 @@ class ThreatLogService {
         const sortStage = { $sort: sortFields && Object.keys(sortFields).length ? sortFields : { timestamp: -1 } };
 
         // Pipeline base condivisa: match, group, match(minLogs), replaceRoot
-        const basePipeline = await ForensicService.buildAttackGroupsBasePipeline(mongoFilters, minLogsForAttack, timeConfig);
+        const basePipeline = await this.forensicService.buildAttackGroupsBasePipeline(mongoFilters, minLogsForAttack, timeConfig);
 
         // Unico aggregate con facet che restituisce dati e conteggio
         const pipeline = [
@@ -272,7 +268,7 @@ class ThreatLogService {
             batches: []
         };
 
-        logger.info(`Totale log da processare: ${totalLogs}`);
+        this.logger.info(`Totale log da processare: ${totalLogs}`);
 
         // Processa in batch per evitare memory overflow
         for (let skip = 0; skip < totalLogs; skip += batchSize) {
@@ -280,7 +276,7 @@ class ThreatLogService {
             const batchNumber = Math.floor(skip / batchSize) + 1;
 
             try {
-                logger.info(`Processando batch ${batchNumber}...`);
+                this.logger.info(`Processando batch ${batchNumber}...`);
 
                 // Recupera batch di log dal database
                 const logs = await this.getLogs({
@@ -362,7 +358,7 @@ class ThreatLogService {
                             return updateResult;
 
                         } catch (error: any) {
-                            logger.error(`Errore rianalisi log ${logEntry._id}:`, error);
+                            this.logger.error(`Errore rianalisi log ${logEntry._id}:`, error);
                             return {
                                 status: 'error',
                                 id: logEntry._id,
@@ -393,10 +389,10 @@ class ThreatLogService {
 
                 results.batches.push(batchStats);
 
-                logger.info(`Batch ${batchNumber} completato: processati ${batchStats.processed}, aggiornati ${batchStats.updated}, errori ${batchStats.errors}`);
+                this.logger.info(`Batch ${batchNumber} completato: processati ${batchStats.processed}, aggiornati ${batchStats.updated}, errori ${batchStats.errors}`);
 
             } catch (batchError: any) {
-                logger.error(`Errore batch ${batchNumber}:`, batchError);
+                this.logger.error(`Errore batch ${batchNumber}:`, batchError);
                 errors += batchSize;
 
                 results.batches.push({
@@ -416,7 +412,7 @@ class ThreatLogService {
         results.endTime = new Date();
         results.duration = results.endTime.getTime() - results.startTime.getTime();
 
-        logger.info(`Rianalisi completata: ${processed} processati, ${updated} aggiornati, ${errors} errori`);
+        this.logger.info(`Rianalisi completata: ${processed} processati, ${updated} aggiornati, ${errors} errori`);
 
         return { message: 'Rianalisi di tutti i log completata', results };
     }
@@ -457,5 +453,3 @@ class ThreatLogService {
             .select('request.ip request.url fingerprint.score fingerprint.indicators timestamp');
     }
 }
-
-export default new ThreatLogService();

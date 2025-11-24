@@ -1,6 +1,9 @@
-import ThreatLogService from '../services/ThreatLogService';
 import { logger } from '../../logger';
 import dotenv from 'dotenv';
+import { ThreatLogService } from '../services/ThreatLogService';
+import { getComponent } from '../di/container';
+
+const threatLogService = getComponent(ThreatLogService);
 
 dotenv.config();
 
@@ -13,8 +16,8 @@ export function scheduleAnalysis() {
 
 async function analyze() {
 
-    const stats = await ThreatLogService.getStats('24h');
-    const topThreats = await ThreatLogService.getTopThreats(10);
+    const stats = await threatLogService.getStats('24h');
+    const topThreats = await threatLogService.getTopThreats(10);
 
     logger.info(`📊 Statistiche ultime 24h: ${stats.totalRequests}`);
     logger.info(`⚠️  Top minacce: ${JSON.stringify(topThreats)}`);

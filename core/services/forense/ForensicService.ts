@@ -1,6 +1,8 @@
-import { logger } from '../../../logger';
-import ConfigService from '../ConfigService';
 import dotenv from 'dotenv';
+import { inject, injectable } from 'tsyringe';
+import { LOGGER_TOKEN } from '../../di/tokens';
+import { Logger } from 'winston';
+import { ConfigService } from '../ConfigService';
 
 dotenv.config();
 
@@ -12,12 +14,16 @@ dotenv.config();
  Lo scopo è rendere il forensic context iniettabile in qualsiasi altro contesto applicativo e che non deve dipendere da come è progettata l'applicazione.
  
  */
-class ForensicService {
+@injectable()
+export class ForensicService {
     private dangerWeights: any;
     private tolleranceWeights: any;
     private initialized: Promise<void>;
 
-    constructor() {
+    constructor(
+        @inject(LOGGER_TOKEN) private readonly logger: Logger,
+        private readonly configService: ConfigService,
+    ) {
 
         this.dangerWeights = {};
         this.tolleranceWeights = {};
@@ -35,8 +41,8 @@ class ForensicService {
                 dangerWeightStr,
                 tolleranceWeightStr
             ] = await Promise.all([
-                ConfigService.getConfigValue('DANGER_WEIGHT'),
-                ConfigService.getConfigValue('TOLLERANCE_WEIGHTS'),
+                this.configService.getConfigValue('DANGER_WEIGHT'),
+                this.configService.getConfigValue('TOLLERANCE_WEIGHTS'),
             ]);
 
             // Parsing pesi
@@ -71,9 +77,9 @@ class ForensicService {
             }
             this.tolleranceWeights = { ...tollerances };
 
-            logger.info(`[ForensicService] Configurazioni pesi e tolleranze per gli attacchi caricate da DB`);
+            this.logger.info(`[ForensicService] Configurazioni pesi e tolleranze per gli attacchi caricate da DB`);
         } catch (err: any) {
-            logger.error(`[ForensicService] Errore caricamento configurazioni da DB: ${err.message}`);
+            this.logger.error(`[ForensicService] Errore caricamento configurazioni da DB: ${err.message}`);
             // fallback o rilancio errore a seconda del contesto
             // qui si potrebbe caricare default oppure propagare errore
         }
@@ -581,5 +587,3 @@ class ForensicService {
         ];
     }
 }
-
-export default new ForensicService();

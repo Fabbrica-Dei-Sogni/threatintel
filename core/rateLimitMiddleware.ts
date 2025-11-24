@@ -2,8 +2,11 @@ import rateLimit, { ipKeyGenerator } from 'express-rate-limit';
 import RedisStoreImport from 'rate-limit-redis';
 const RedisStore: any = (RedisStoreImport as any).default || RedisStoreImport;
 import Redis from 'ioredis';
-import rateLimitService from './services/RateLimitService';
 import dotenv from 'dotenv';
+import { getComponent } from './di/container';
+import { RateLimitService } from './services/RateLimitService';
+
+const rateLimitService = getComponent(RateLimitService);
 
 dotenv.config();
 

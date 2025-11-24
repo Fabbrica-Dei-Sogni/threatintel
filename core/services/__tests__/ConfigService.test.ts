@@ -1,12 +1,16 @@
 /**
- * Test suite for ConfigService (TypeScript)
+ * Test suite for ConfigService with DI (TypeScript)
  */
 
+import 'reflect-metadata';
+import { container } from 'tsyringe';
 import mongoose from 'mongoose';
-import ConfigService from '../ConfigService';
+import { ConfigService } from '../ConfigService';
 import ConfigSchema from '../../models/ConfigSchema';
 
-describe('ConfigService', () => {
+describe('ConfigService (DI)', () => {
+    let configService: ConfigService;
+
     beforeAll(async () => {
         const uri = process.env.MONGO_URI_TEST || 'mongodb://127.0.0.1:27017/test';
         await mongoose.connect(uri);
@@ -17,13 +21,17 @@ describe('ConfigService', () => {
     });
 
     beforeEach(async () => {
+        // Clear container instances and resolve fresh service
+        container.clearInstances();
+        configService = container.resolve(ConfigService);
+
         // Clear configs before each test
         await ConfigSchema.deleteMany({});
     });
 
     describe('saveConfig', () => {
         test('should save new config', async () => {
-            const saved = await ConfigService.saveConfig('test_key', 'test_value');
+            const saved = await configService.saveConfig('test_key', 'test_value');
 
             expect(saved).toBeDefined();
             expect(saved.key).toBe('test_key');
@@ -31,10 +39,10 @@ describe('ConfigService', () => {
         });
 
         test('should update existing config', async () => {
-            await ConfigService.saveConfig('test_key', 'value1');
+            await configService.saveConfig('test_key', 'value1');
 
             // Update with new value
-            const updated = await ConfigService.saveConfig('test_key', 'value2');
+            const updated = await configService.saveConfig('test_key', 'value2');
 
             expect(updated.value).toBe('value2');
 
@@ -45,11 +53,11 @@ describe('ConfigService', () => {
 
         test('should handle different value types', async () => {
             // String value
-            const str = await ConfigService.saveConfig('str_key', 'string_value');
+            const str = await configService.saveConfig('str_key', 'string_value');
             expect(str.value).toBe('string_value');
 
             // Number value (converted to string)
-            const num = await ConfigService.saveConfig('num_key', '123');
+            const num = await configService.saveConfig('num_key', '123');
             expect(num.value).toBe('123');
         });
 
@@ -58,7 +66,7 @@ describe('ConfigService', () => {
             const originalFindOneAndUpdate = ConfigSchema.findOneAndUpdate;
             ConfigSchema.findOneAndUpdate = jest.fn().mockRejectedValue(new Error('Database error'));
 
-            await expect(ConfigService.saveConfig('error_key', 'error_value')).rejects.toThrow('Database error');
+            await expect(configService.saveConfig('error_key', 'error_value')).rejects.toThrow('Database error');
 
             // Restore original method
             ConfigSchema.findOneAndUpdate = originalFindOneAndUpdate;
@@ -67,15 +75,15 @@ describe('ConfigService', () => {
 
     describe('getConfigValue', () => {
         test('should get config value by key', async () => {
-            await ConfigService.saveConfig('max_requests', '100');
+            await configService.saveConfig('max_requests', '100');
 
-            const value = await ConfigService.getConfigValue('max_requests');
+            const value = await configService.getConfigValue('max_requests');
 
             expect(value).toBe('100');
         });
 
         test('should return null for non-existent config', async () => {
-            const value = await ConfigService.getConfigValue('nonexistent_key');
+            const value = await configService.getConfigValue('nonexistent_key');
 
             expect(value).toBeNull();
         });
@@ -85,7 +93,7 @@ describe('ConfigService', () => {
             const originalFindOne = ConfigSchema.findOne;
             ConfigSchema.findOne = jest.fn().mockRejectedValue(new Error('Database error'));
 
-            await expect(ConfigService.getConfigValue('error_key')).rejects.toThrow('Database error');
+            await expect(configService.getConfigValue('error_key')).rejects.toThrow('Database error');
 
             // Restore original method
             ConfigSchema.findOne = originalFindOne;
@@ -94,11 +102,11 @@ describe('ConfigService', () => {
 
     describe('getAllConfigs', () => {
         test('should get all configs', async () => {
-            await ConfigService.saveConfig('key1', 'val1');
-            await ConfigService.saveConfig('key2', 'val2');
-            await ConfigService.saveConfig('key3', 'val3');
+            await configService.saveConfig('key1', 'val1');
+            await configService.saveConfig('key2', 'val2');
+            await configService.saveConfig('key3', 'val3');
 
-            const all = await ConfigService.getAllConfigs();
+            const all = await configService.getAllConfigs();
 
             expect(all).toHaveLength(3);
             expect(all.map((c: any) => c.key)).toContain('key1');
@@ -107,7 +115,7 @@ describe('ConfigService', () => {
         });
 
         test('should return empty array when no configs exist', async () => {
-            const all = await ConfigService.getAllConfigs();
+            const all = await configService.getAllConfigs();
 
             expect(all).toEqual([]);
         });
@@ -117,7 +125,7 @@ describe('ConfigService', () => {
             const originalFind = ConfigSchema.find;
             ConfigSchema.find = jest.fn().mockRejectedValue(new Error('Database error'));
 
-            await expect(ConfigService.getAllConfigs()).rejects.toThrow('Database error');
+            await expect(configService.getAllConfigs()).rejects.toThrow('Database error');
 
             // Restore original method
             ConfigSchema.find = originalFind;

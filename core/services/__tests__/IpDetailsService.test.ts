@@ -1,13 +1,17 @@
 /**
- * Test suite for IpDetailsService (TypeScript)
+ * Test suite for IpDetailsService with DI (TypeScript)
  */
 
+import 'reflect-metadata';
+import { container } from 'tsyringe';
 import mongoose from 'mongoose';
-import IpDetailsService from '../IpDetailsService';
+import { IpDetailsService } from '../IpDetailsService';
 import IpDetails from '../../models/IpDetailsSchema';
 import AbuseIpDb from '../../models/AbuseIpDbSchema';
 import AbuseReport from '../../models/AbuseReportSchema';
 import axios from 'axios';
+import { LOGGER_TOKEN } from '../../di/tokens';
+import { Logger } from 'winston';
 
 // Mock dependencies
 jest.mock('axios');
@@ -25,7 +29,10 @@ jest.mock('ip-range-check', () => jest.fn((ip: string, ranges: string[]) => {
     return false;
 }));
 
-describe('IpDetailsService', () => {
+describe('IpDetailsService (DI)', () => {
+    let ipDetailsService: IpDetailsService;
+    let mockLogger: any;
+
     beforeAll(async () => {
         const uri = process.env.MONGO_URI_TEST || 'mongodb://127.0.0.1:27017/test';
         if (mongoose.connection.readyState === 0) {
@@ -42,18 +49,29 @@ describe('IpDetailsService', () => {
         await AbuseIpDb.deleteMany({});
         await AbuseReport.deleteMany({});
         jest.clearAllMocks();
+
+        // Mock logger
+        mockLogger = {
+            info: jest.fn(),
+            error: jest.fn(),
+            warn: jest.fn(),
+            debug: jest.fn()
+        };
+
+        // Create service instance manually with mocked logger
+        ipDetailsService = new IpDetailsService(mockLogger as Logger);
     });
 
     describe('isIPExcluded', () => {
         test('should return true for excluded IP', () => {
-            // Manually set excluded IPs on the singleton for test purposes
-            (IpDetailsService as any).excludedIPs = ['127.0.0.1'];
-            expect(IpDetailsService.isIPExcluded('127.0.0.1')).toBe(true);
+            // Set excluded IPs
+            (ipDetailsService as any).excludedIPs = ['127.0.0.1'];
+            expect(ipDetailsService.isIPExcluded('127.0.0.1')).toBe(true);
         });
 
         test('should return false for non-excluded IP', () => {
-            (IpDetailsService as any).excludedIPs = ['127.0.0.1'];
-            expect(IpDetailsService.isIPExcluded('8.8.8.8')).toBe(false);
+            (ipDetailsService as any).excludedIPs = ['127.0.0.1'];
+            expect(ipDetailsService.isIPExcluded('8.8.8.8')).toBe(false);
         });
     });
 
@@ -72,7 +90,7 @@ describe('IpDetailsService', () => {
             });
 
             const ip = '1.2.3.4';
-            const id = await IpDetailsService.saveIpDetails(ip);
+            const id = await ipDetailsService.saveIpDetails(ip);
 
             expect(id).toBeDefined();
 
@@ -109,7 +127,7 @@ describe('IpDetailsService', () => {
                 comment: 'Test abuse report',
             });
 
-            const result = await IpDetailsService.getIpDetails(ip);
+            const result = await ipDetailsService.getIpDetails(ip);
 
             expect(result).toBeDefined();
             expect(result?.ipDetails.ip).toBe(ip);
@@ -117,7 +135,7 @@ describe('IpDetailsService', () => {
         });
 
         test('should return null for unknown IP', async () => {
-            const result = await IpDetailsService.getIpDetails('9.9.9.9');
+            const result = await ipDetailsService.getIpDetails('9.9.9.9');
             expect(result).toBeNull();
         });
     });

@@ -7,10 +7,10 @@ Wants=network-online.target docker.service
 Type=simple
 #User=www-data
 User=amodica
-WorkingDirectory=/home/amodica/workspaces/devops-procedure/common/cybersecurity/threatintel
-ExecStartPre=/bin/bash /home/amodica/workspaces/devops-procedure/common/cybersecurity/threatintel/redis/check-redis.sh
-ExecStartPre=/bin/bash /home/amodica/workspaces/devops-procedure/common/cybersecurity/threatintel/mongodb/check-mongodb.sh
-ExecStart=/usr/bin/node server.js
+WorkingDirectory=/home/amodica/workspaces/threatintel
+ExecStartPre=/bin/bash /home/amodica/workspaces/threatintel/redis/check-redis.sh
+ExecStartPre=/bin/bash /home/amodica/workspaces/threatintel/mongodb/check-mongodb.sh
+ExecStart=npm run start
 Restart=always
 RestartSec=5
 Environment=NODE_ENV=production

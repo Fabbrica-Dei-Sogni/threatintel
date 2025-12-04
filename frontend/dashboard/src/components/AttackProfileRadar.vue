@@ -42,19 +42,16 @@ const originalData = computed(() => {
 
     return [
         // Asse 1: Rischio Tecnico
-        { label: 'Rischio Tecnico', rawValue: attack.score, format: (v) => v ? v.toFixed(2) : 'N/D' },
+        { label: 'Rischio Tecnico', rawValue: attack.averageScore, format: (v) => v ? v.toFixed(2) + ' score' : 'N/D' },
 
-        // Asse 2: Velocità (RPS)
+        // Asse 2: Complessità (Tecniche Uniche)
+        { label: 'Complessità', rawValue: attack.uniqueTechCount, format: (v) => v ? v.toFixed(0) + ' tecniche' : 'N/D' },
+
+        // Asse 3: Velocità (RPS)
         { label: 'Velocità (RPS)', rawValue: attack.rps, format: (v) => v ? v.toFixed(1) + ' RPS' : 'N/D' },
 
-        // Asse 3: Complessità (Tecniche Uniche)
-        { label: 'Complessità', rawValue: attack.uniqueTech, format: (v) => v ? v.toFixed(0) + ' tecniche' : 'N/D' },
-
         // Asse 4: Persistenza (Durata)
-        { label: 'Persistenza', rawValue: attack.durationSec, format: (v) => v ? v.toFixed(0) + ' sec' : 'N/D' },
-
-        // Asse 5: Impatto Rate Limiter
-        { label: 'Rate Limit', rawValue: attack.countRateLimit, format: (v) => v ? v.toFixed(0) + ' eventi' : 'N/D' },
+        { label: 'Durata', rawValue: attack.attackDurationMinutes, format: (v) => v ? v.toFixed(0) + ' sec' : 'N/D' },
     ];
 });
 
@@ -76,8 +73,7 @@ const chartData = computed(() => {
         transformAndScale(attack.scoreNorm),         // 1. Rischio Tecnico
         transformAndScale(attack.uniqueTechNorm),    // 3. Complessità
         transformAndScale(attack.rpsNorm),          // 2. Bassa Velocità (Invertito + Trasformato)
-        transformAndScale(attack.durNormPenalized),  // 4. Persistenza
-        transformAndScale(rateLimitNorm)             // 5. Impatto Rate Limiter
+        transformAndScale(attack.attackDurationMinutes),  // 4. Persistenza
     ];
 
     return {

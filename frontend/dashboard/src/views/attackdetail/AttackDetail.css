@@ -59,14 +59,47 @@ h1 span:hover {
 
 /* Container Profilo Attacco (Radar Chart) */
 .attack-profile {
-  width: 100%;
-  max-width: 500px;
-  /* Larghezza massima del radar */
-  margin: 20px auto;
-  /* Centratura orizzontale con margini verticali */
+  /* Layout responsive con flexbox */
   display: flex;
   justify-content: center;
   align-items: center;
+
+  /* Centratura perfetta */
+  margin: 30px auto;
+}
+
+/* Media query per schermi piccoli (mobile) */
+@media (max-width: 768px) {
+  .attack-profile {
+    width: 95%;
+    max-width: 100%;
+    margin: 20px auto;
+    padding: 15px;
+    max-height: 70vh;
+  }
+}
+
+/* Media query per schermi molto grandi */
+@media (min-width: 1920px) {
+  .attack-profile {
+    max-width: 700px;
+    max-height: 700px;
+  }
+}
+
+/* Media query per schermi ultrawide */
+@media (min-aspect-ratio: 16/9) {
+  .attack-profile {
+    max-width: 50vw;
+  }
+}
+
+/* Media query per orientamento portrait */
+@media (orientation: portrait) {
+  .attack-profile {
+    width: 85%;
+    max-height: 50vh;
+  }
 }
 
 /* Container Riassunto */

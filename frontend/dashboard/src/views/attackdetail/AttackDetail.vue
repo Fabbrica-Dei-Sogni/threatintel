@@ -85,8 +85,7 @@
                             <p><strong>Method:</strong> {{ event.method || 'N/D' }}</p>
                             <p><strong>Honeypot ID:</strong> {{ event.honeypotId || 'N/D' }}</p>
                             <p><strong>Messaggio:</strong> {{ event.message || 'N/D' }}</p>
-                            <p><strong>Headers:</strong></p>
-                            <pre>{{ formatJson(event.headers) }}</pre>
+                            <HexViewer v-if="event.headers" :raw-data="event.headers" label="Headers" />
                         </div>
                     </transition>
                 </div>

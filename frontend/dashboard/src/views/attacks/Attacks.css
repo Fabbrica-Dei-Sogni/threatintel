@@ -11,7 +11,8 @@
   font-size: 24px;
   margin-bottom: 16px;
   color: #ff4c4c;
-  font-weight: 700; /* accentuato */
+  font-weight: 700;
+  /* accentuato */
   text-shadow: 0 0 6px rgba(255, 76, 76, 0.6);
 }
 
@@ -326,4 +327,94 @@
 .error {
   color: #ff704d;
   text-shadow: 0 0 10px #bf3f32;
+}
+
+
+/* --- STILI DEFCON BAR --- */
+
+.log-table td.defcon-cell {
+  padding-top: 5px;
+  padding-bottom: 5px;
+  min-width: 100px;
+  vertical-align: middle;
+}
+
+.defcon-bar-container {
+  height: 18px;
+  /* Altezza fissa per la barra */
+  width: 100%;
+  background-color: #3b3030;
+  /* Sfondo scuro del contenitore */
+  border: 1px solid #663a39;
+  border-radius: 4px;
+  overflow: hidden;
+  /* Nasconde ciò che esce dalla barra */
+  position: relative;
+}
+
+.defcon-bar-fill {
+  height: 100%;
+  /* Transizione per l'effetto dinamico quando cambiano i filtri */
+  transition: width 0.4s ease-out, background-color 0.4s ease-out;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  /* Testo a destra */
+  padding-right: 4px;
+  font-weight: 700;
+  position: relative;
+  z-index: 10;
+}
+
+.defcon-level-text {
+  color: #1e1b1a;
+  /* Colore scuro per contrastare con la barra colorata */
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  text-shadow: 0 0 2px rgba(255, 255, 255, 0.7);
+  /* Leggera ombra per leggibilità */
+}
+
+
+/* Definizioni dei Colori per Livello */
+
+/* 5: Bassa - Verde/Blu (Normale) */
+.defcon-normal {
+  background-color: #3a755d;
+}
+
+/* 4: Lieve - Giallo (Low) */
+.defcon-low {
+  background-color: #c9b45b;
+  /* Giallo sporco */
+}
+
+/* 3: Media - Arancione (Medium) */
+.defcon-medium {
+  background-color: #e68d37;
+  /* Arancione */
+}
+
+/* 2: Alta - Rosso acceso (High) */
+.defcon-high {
+  background-color: #d93025;
+  /* Rosso intenso */
+}
+
+/* 1: Critica - Rosso pulsante (Critical) */
+.defcon-critical {
+  background-color: #ff0000;
+  /* Rosso vivo */
+  animation: critical-pulse 1.5s infinite alternate;
+  box-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
+}
+
+@keyframes critical-pulse {
+  from {
+    box-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
+  }
+
+  to {
+    box-shadow: 0 0 20px rgba(255, 0, 0, 1.2), 0 0 8px rgba(255, 0, 0, 0.5);
+  }
 }

@@ -13,18 +13,16 @@
                     <DefconIndicator :level="attack.dangerLevel" :dangerScore="attack.dangerScore" />
                 </section>
             </div>
-            <div><strong>Punteggio medio:</strong> {{ attack.averageScore }}</div>
-            <div><strong>Stile:</strong> {{ attack.intensityAttack }}</div>
-            <div><strong>Tecniche utilizzate:</strong> {{ attack.attackPatterns.join(', ') }}</div>
             <div class="summary-row">
                 <div><strong>Totale Log:</strong> {{ attack.totaleLogs }}</div>
                 <div><strong>Durata:</strong> {{ attack.durataAttacco.human }}</div>
                 <div><strong>RPS:</strong> {{ attack.rps }}</div>
             </div>
-            <div class="summary-row">
-                <div><strong>Primo avvistamento:</strong> {{ formatDate(attack.firstSeen) }}</div>
-                <div><strong>Ultimo avvistamento:</strong> {{ formatDate(attack.lastSeen) }}</div>
-            </div>
+            <div><strong>Punteggio medio:</strong> {{ attack.averageScore }}</div>
+            <div><strong>Stile:</strong> {{ attack.intensityAttack }}</div>
+            <div><strong>Tecniche utilizzate:</strong> {{ attack.attackPatterns.join(', ') }}</div>
+            <div><strong>Primo avvistamento:</strong> {{ formatDate(attack.firstSeen) }}</div>
+            <div><strong>Ultimo avvistamento:</strong> {{ formatDate(attack.lastSeen) }}</div>
             <section class="attack-profile">
                 <AttackProfileRadar v-if="attack" :attackDetail="attack" />
             </section>
@@ -52,14 +50,14 @@
                             <p><strong>Url:</strong></p>
                             <pre> {{ log.request.url ?? 'N/D' }}</pre>
                             <p><strong>User Agent:</strong> {{ log.request.userAgent || 'N/D' }}</p>
-                            <p><strong>Request:</strong></p>
-                            <pre>{{ formatJson(log.request) }}</pre>
-                            <p><strong>Headers:</strong></p>
-                            <pre>{{ formatJson(log.request.headers) }}</pre>
-                            <p><strong>Body:</strong></p>
-                            <pre>{{ formatJson(log.request.body) }}</pre>
-                            <p><strong>Response:</strong></p>
-                            <pre>{{ formatJson(log.response) }}</pre>
+                            <HexViewer :raw-data="log.request" label="Full Request Dump" />
+                            <!-- 1. Headers -->
+                            <HexViewer v-if="log.request.headers" :raw-data="log.request.headers"
+                                label="Request Headers" />
+                            <!-- 2. Body -->
+                            <HexViewer v-if="log.request.body" :raw-data="log.request.body" label="Request Body" />
+                            <!-- 3. Response -->
+                            <HexViewer v-if="log.response" :raw-data="log.response" label="Response Data" />
                         </div>
                     </transition>
                 </div>
@@ -110,6 +108,7 @@ import { useRoute, useRouter } from 'vue-router'
 import dayjs from 'dayjs'
 import DefconIndicator from '../../components/DefconIndicator.vue'; // Verifica il percorso corretto
 import AttackProfileRadar from '../../components/AttackProfileRadar.vue';
+import HexViewer from '../../components/HexViewer.vue'; // <--- AGGIUNGI QUESTO
 
 // Props
 const props = defineProps({

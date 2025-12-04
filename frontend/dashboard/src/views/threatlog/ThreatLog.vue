@@ -20,6 +20,23 @@
                     </div>
                 </transition>
             </div>
+            <div class="section">
+                <div class="section-header" @click="toggles.geo = !toggles.geo">
+                    <h2>Geolocalizzazione</h2>
+                    <span class="arrow" :class="{ open: toggles.geo }"></span>
+                </div>
+                <transition name="collapse">
+                    <div v-if="toggles.geo" class="section-body">
+                        <p><strong>Paese:</strong> {{ log.geo.country || 'N/D' }}</p>
+                        <p><strong>Regione:</strong> {{ log.geo.region || 'N/D' }}</p>
+                        <p><strong>Città:</strong> {{ log.geo.city || 'N/D' }}</p>
+                        <p><strong>Coordinate:</strong> {{ log.geo.coordinates?.join(', ') || 'N/D' }}</p>
+                        <p><strong>Timezone:</strong> {{ log.geo.timezone || 'N/D' }}</p>
+                        <p><strong>ASN:</strong> {{ log.geo.asn || 'N/D' }}</p>
+                        <p><strong>ISP:</strong> {{ log.geo.isp || 'N/D' }}</p>
+                    </div>
+                </transition>
+            </div>
 
             <div class="section">
                 <div class="section-header" @click="toggles.fingerprint = !toggles.fingerprint">
@@ -48,19 +65,18 @@
                     <div v-if="toggles.request" class="section-body">
                         <p @click="goToIpDetails(log.request.ip)" class="link" style="cursor: pointer;">
                             <strong>IP:</strong> {{ log.request.ip ||
-                            'N/D' }}</p>
+                                'N/D' }}
+                        </p>
                         <p><strong>Method:</strong> {{ log.request.method || 'N/D' }}</p>
                         <p><strong>URL:</strong> {{ log.request.url || 'N/D' }}</p>
                         <p><strong>User Agent:</strong> {{ log.request.userAgent || 'N/D' }}</p>
                         <p><strong>Referer:</strong> {{ log.request.referer || 'N/D' }}</p>
-                        <p><strong>Headers:</strong></p>
-                        <pre>{{ formatJson(log.request.headers) }}</pre>
-                        <p><strong>Body:</strong></p>
-                        <pre>{{ formatJson(log.request.body) }}</pre>
-                        <p><strong>Query:</strong></p>
-                        <pre>{{ formatJson(log.request.query) }}</pre>
-                        <p><strong>Cookies:</strong></p>
-                        <pre>{{ formatJson(log.request.cookies) }}</pre>
+                        <HexViewer v-if="log.request" :raw-data="log.request" label="Request" />
+                        <HexViewer v-if="log.request.body" :raw-data="log.request.body" label="Request Body" />
+                        <HexViewer v-if="log.request.headers" :raw-data="log.request.headers" label="Headers" />
+                        <HexViewer v-if="log.response" :raw-data="log.response" label="Response Data" />
+                        <HexViewer v-if="log.response.query" :raw-data="log.response.query" label="Query" />
+                        <HexViewer v-if="log.response.cookies" :raw-data="log.response.cookies" label="Cookies" />
                     </div>
                 </transition>
             </div>
@@ -80,39 +96,6 @@
                     </div>
                 </transition>
             </div>
-
-            <div class="section">
-                <div class="section-header" @click="toggles.response = !toggles.response">
-                    <h2>Response</h2>
-                    <span class="arrow" :class="{ open: toggles.response }"></span>
-                </div>
-                <transition name="collapse">
-                    <div v-if="toggles.response" class="section-body">
-                        <p><strong>Status Code:</strong> {{ log.response.statusCode || 'N/D' }}</p>
-                        <p><strong>Response Time (ms):</strong> {{ log.response.responseTime || 'N/D' }}</p>
-                        <p><strong>Dimensione (byte):</strong> {{ log.response.size || 'N/D' }}</p>
-                    </div>
-                </transition>
-            </div>
-
-            <div class="section">
-                <div class="section-header" @click="toggles.geo = !toggles.geo">
-                    <h2>Geolocalizzazione</h2>
-                    <span class="arrow" :class="{ open: toggles.geo }"></span>
-                </div>
-                <transition name="collapse">
-                    <div v-if="toggles.geo" class="section-body">
-                        <p><strong>Paese:</strong> {{ log.geo.country || 'N/D' }}</p>
-                        <p><strong>Regione:</strong> {{ log.geo.region || 'N/D' }}</p>
-                        <p><strong>Città:</strong> {{ log.geo.city || 'N/D' }}</p>
-                        <p><strong>Coordinate:</strong> {{ log.geo.coordinates?.join(', ') || 'N/D' }}</p>
-                        <p><strong>Timezone:</strong> {{ log.geo.timezone || 'N/D' }}</p>
-                        <p><strong>ASN:</strong> {{ log.geo.asn || 'N/D' }}</p>
-                        <p><strong>ISP:</strong> {{ log.geo.isp || 'N/D' }}</p>
-                    </div>
-                </transition>
-            </div>
-
         </div>
     </div>
 </template>
@@ -122,6 +105,7 @@ import { ref, reactive, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import dayjs from 'dayjs'
 import { fetchLogById } from '../../api/index'
+import HexViewer from '../../components/HexViewer.vue'; // <--- AGGIUNGI QUESTO
 
 const route = useRoute()
 const router = useRouter()
@@ -174,68 +158,5 @@ onMounted(() => {
     load()
 })
 </script>
-
-<!--
-<script>
-import { fetchLogById } from '../../api/index';
-import { useRoute, useRouter } from 'vue-router';
-import dayjs from 'dayjs';
-
-export default {
-    name: 'ThreatLogDetails',
-    data() {
-        return {
-            id: '',
-            log: null,
-            loading: false,
-            error: false,
-            toggles: {
-                general: true,
-                fingerprint: true,
-                request: false,
-                metadata: false,
-                response: false,
-                geo: false
-            }
-        };
-    },
-    setup() {
-        const route = useRoute();
-        const router = useRouter();
-        return { route, router };
-    },
-    methods: {
-        async load() {
-            this.loading = true;
-            this.error = false;
-            try {
-                this.id = this.route.params.id;
-                const res = await fetchLogById(this.id);
-                this.log = res;
-            } catch {
-                this.error = true;
-            } finally {
-                this.loading = false;
-            }
-        },
-        formatDate(s) {
-            return s ? dayjs(s).format('DD/MM/YYYY HH:mm:ss') : 'N/D';
-        },
-        formatJson(o) {
-            return o ? JSON.stringify(o, null, 2) : 'N/D';
-        },
-        goToIpDetails(ip) {
-            this.router.push(`/ip/${ip}`);
-        },
-        goBack() {
-            this.router.back();
-        }
-    },
-    created() {
-        this.load();
-    }
-};
-</script>
--->
 
 <style scoped src="./ThreatLog.css"></style>

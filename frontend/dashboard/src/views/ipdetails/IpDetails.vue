@@ -47,7 +47,8 @@
 
             <div v-for="report in paginatedReports" :key="report._id" class="report-entry">
               <div class="report-header" @click="toggleReport(report._id)">
-                <span>{{ formatDate(report.reportedAt) }} - {{ report.categories.map(cat => cat.name).join(', ') }}</span> 
+                <span>{{ formatDate(report.reportedAt) }} - {{report.categories.map(cat => cat.name).join(', ')
+                  }}</span>
                 <span class="toggle-icon">{{ expandedReports[report._id] ? '–' : '+' }}</span>
               </div>
               <transition name="collapse">
@@ -60,21 +61,16 @@
               </transition>
             </div>
 
-            <div class="pagination-wrapper" v-if="reports.length > reportsMeta.pageSize" style="text-align: right; margin-top: 10px;">
-              <el-pagination
-                background
-                layout="prev, pager, next, sizes, total"
-                :total="reportsMeta.total"
-                :page-size="reportsMeta.pageSize"
-                :current-page="reportsMeta.page"
-                @current-change="handleReportsPageChange"
-                @size-change="handleReportsPageSizeChange"
-                :page-sizes="[5, 10, 25, 50]"
-              />
+            <div class="pagination-wrapper" v-if="reports.length > reportsMeta.pageSize"
+              style="text-align: right; margin-top: 10px;">
+              <el-pagination background layout="prev, pager, next, sizes, total" :total="reportsMeta.total"
+                :page-size="reportsMeta.pageSize" :current-page="reportsMeta.page"
+                @current-change="handleReportsPageChange" @size-change="handleReportsPageSizeChange"
+                :page-sizes="[5, 10, 25, 50]" />
             </div>
           </div>
         </transition>
-      </div>        
+      </div>
 
       <div class="section">
         <div class="section-header" @click="toggles.geo = !toggles.geo">
@@ -108,7 +104,7 @@
               @expand-change="() => { }" row-class-name="rate-limit-row" border>
               <el-table-column type="expand">
                 <template #default="{ row }">
-                  <div class="expanded-details" >
+                  <div class="expanded-details">
                     <p><strong>Headers:</strong>
                     <pre>{{ JSON.stringify(row.headers, null, 2) }}</pre>
                     </p>
@@ -153,7 +149,7 @@
             </p>
           </div>
         </transition>
-      </div>      
+      </div>
 
     </div>
   </div>
@@ -328,97 +324,5 @@ onMounted(() => {
   loadIpDetails()
 })
 </script>
-
-<!--
-<script>
-import { fetchIpDetails, fetchRateLimitSearch } from '../../api/index';
-import { useRoute, useRouter } from 'vue-router';
-import dayjs from 'dayjs';
-
-export default {
-  name: 'IpDetails',
-  data() {
-    return {
-      ip: '',
-      ipInfo: null,
-      loading: false,
-      error: false,
-      toggles: {
-        abuse: true,
-        honeypot: true,
-        geo: true,
-        ratelimit: true,
-      },
-      rateLimit: {
-        data: [],
-        loading: false,
-        page: 1,
-        pageSize: 5,
-        total: 0,
-      }
-    };
-  },
-  setup() {
-    const route = useRoute();
-    const router = useRouter();
-    return { route, router };
-  },
-  methods: {
-    async loadIpDetails() {
-      this.loading = true;
-      this.error = false;
-      try {
-        this.ip = this.route.params.ip;
-        const response = await fetchIpDetails(this.ip);
-        this.ipInfo = response;
-        if (this.ipInfo && this.ipInfo.ip) {
-          await this.loadRateLimitEvents();
-        }
-      } catch {
-        this.error = true;
-      } finally {
-        this.loading = false;
-      }
-    },
-    async loadRateLimitEvents() {
-      if (!this.ipInfo || !this.ipInfo.ip) return;
-      this.rateLimit.loading = true;
-      try {
-        const filters = { ip: this.ipInfo.ip };
-        const response = await fetchRateLimitSearch({
-          page: this.rateLimit.page,
-          pageSize: this.rateLimit.pageSize,
-          filters
-        });
-        this.rateLimit.data = response.bobjs || [];
-        this.rateLimit.total = response.total || 0;
-      } catch (error) {
-        console.error('Errore caricamento eventi RateLimit:', error);
-      } finally {
-        this.rateLimit.loading = false;
-      }
-    },
-    handlePageChange(newPage) {
-      this.rateLimit.page = newPage;
-      this.loadRateLimitEvents();
-    },
-    handlePageSizeChange(newSize) {
-      this.rateLimit.pageSize = newSize;
-      this.rateLimit.page = 1;
-      this.loadRateLimitEvents();
-    },
-    formatDate(dateStr) {
-      return dateStr ? dayjs(dateStr).format('DD/MM/YYYY HH:mm:ss') : '';
-    },
-    goBack() {
-      this.router.back();
-    }
-  },
-  created() {
-    this.loadIpDetails();
-  }
-};
-</script>
--->
 
 <style scoped src="./IpDetails.css"></style>

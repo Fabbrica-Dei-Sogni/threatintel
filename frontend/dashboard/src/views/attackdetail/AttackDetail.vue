@@ -6,26 +6,28 @@
 
         <section v-if="loading" class="loading">Caricamento dettagli attacco...</section>
         <section v-if="error" class="error">Errore nel caricamento dei dati</section>
-        <section class="attack-profile">
-            <AttackProfileRadar v-if="attack" :attackDetail="attack" />
-        </section>
         <div v-if="attack" class="attack-summary">
             <div class="summary-row">
-                <strong>Defcon:</strong>
-                <td>
+                <section>
+                    <strong>Defcon:</strong>
                     <DefconIndicator :level="attack.dangerLevel" :dangerScore="attack.dangerScore" />
-                </td>
-                <div><strong>Punteggio medio:</strong> {{ attack.averageScore }}</div>
-                <div><strong>Stile:</strong> {{ attack.intensityAttack }}</div>
+                </section>
             </div>
-            <div><strong>Totale Log:</strong> {{ attack.totaleLogs }}</div>
-            <div><strong>Durata:</strong> {{ attack.durataAttacco.human }}</div>
-            <div><strong>RPS:</strong> {{ attack.rps }}</div>
-            <div><strong>Primo avvistamento:</strong> {{ formatDate(attack.firstSeen) }}</div>
-            <div><strong>Ultimo avvistamento:</strong> {{ formatDate(attack.lastSeen) }}</div>
+            <div><strong>Punteggio medio:</strong> {{ attack.averageScore }}</div>
+            <div><strong>Stile:</strong> {{ attack.intensityAttack }}</div>
+            <div><strong>Tecniche utilizzate:</strong> {{ attack.attackPatterns.join(', ') }}</div>
             <div class="summary-row">
-                <div><strong>Tecniche utilizzate:</strong> {{ attack.attackPatterns.join(', ') }}</div>
+                <div><strong>Totale Log:</strong> {{ attack.totaleLogs }}</div>
+                <div><strong>Durata:</strong> {{ attack.durataAttacco.human }}</div>
+                <div><strong>RPS:</strong> {{ attack.rps }}</div>
             </div>
+            <div class="summary-row">
+                <div><strong>Primo avvistamento:</strong> {{ formatDate(attack.firstSeen) }}</div>
+                <div><strong>Ultimo avvistamento:</strong> {{ formatDate(attack.lastSeen) }}</div>
+            </div>
+            <section class="attack-profile">
+                <AttackProfileRadar v-if="attack" :attackDetail="attack" />
+            </section>
         </div>
         <div v-if="attack" class="attack-aggregates">
 

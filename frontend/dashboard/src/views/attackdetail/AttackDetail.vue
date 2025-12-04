@@ -6,7 +6,9 @@
 
         <section v-if="loading" class="loading">Caricamento dettagli attacco...</section>
         <section v-if="error" class="error">Errore nel caricamento dei dati</section>
-
+        <section class="attack-profile">
+            <AttackProfileRadar v-if="attack" :attackDetail="attack" />
+        </section>
         <div v-if="attack" class="attack-summary">
             <div class="summary-row">
                 <strong>Defcon:</strong>
@@ -33,7 +35,7 @@
                 <div v-for="log in paginatedLogs" :key="log.id" class="log-entry">
                     <div class="log-header" @click="toggleLog(log.id)">
                         <span>{{ formatDate(log.timestamp) }} - {{ log.request.method }} {{ log.request.url || 'N/D'
-                        }} </span>
+                            }} </span>
                         <span class="toggle-icon">{{ expanded[log.id] ? '–' : '+' }}</span>
                     </div>
                     <transition name="collapse">
@@ -105,6 +107,7 @@ import { ref, reactive, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import dayjs from 'dayjs'
 import DefconIndicator from '../../components/DefconIndicator.vue'; // Verifica il percorso corretto
+import AttackProfileRadar from '../../components/AttackProfileRadar.vue';
 
 // Props
 const props = defineProps({

@@ -57,6 +57,18 @@ h1 span:hover {
   color: #33a0ff;
 }
 
+/* Container Profilo Attacco (Radar Chart) */
+.attack-profile {
+  width: 100%;
+  max-width: 500px;
+  /* Larghezza massima del radar */
+  margin: 20px auto;
+  /* Centratura orizzontale con margini verticali */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 /* Container Riassunto */
 .attack-summary {
   margin-bottom: 30px;

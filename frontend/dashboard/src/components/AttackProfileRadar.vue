@@ -1,10 +1,10 @@
 <script setup>
 import { computed } from 'vue';
-import { Chart as ChartJS, Title, Tooltip, Legend, RadialLinearScale, PointElement, LineElement } from 'chart.js';
+import { Chart as ChartJS, Title, Tooltip, Legend, RadialLinearScale, PointElement, LineElement, Filler } from 'chart.js';
 import { Radar } from 'vue-chartjs';
 
-// Devi registrare tutti questi elementi!
-ChartJS.register(Title, Tooltip, Legend, RadialLinearScale, PointElement, LineElement);
+// Registrazione dei componenti Chart.js (incluso Filler per il riempimento!)
+ChartJS.register(Title, Tooltip, Legend, RadialLinearScale, PointElement, LineElement, Filler);
 
 // Importa il tuo componente Chart.js/Vue qui (es. RadarChart, Chart)
 // Esempio con vue-chartjs (deve essere installato: npm install vue-chartjs chart.js)
@@ -51,7 +51,7 @@ const originalData = computed(() => {
         { label: 'Velocità (RPS)', rawValue: attack.rps, format: (v) => v ? v.toFixed(1) + ' RPS' : 'N/D' },
 
         // Asse 4: Persistenza (Durata)
-        { label: 'Durata', rawValue: attack.attackDurationMinutes, format: (v) => v ? v.toFixed(0) + ' sec' : 'N/D' },
+        { label: 'Durata', rawValue: attack.attackDurationMinutes, format: (v) => v ? v.toFixed(0) + ' min' : 'N/D' },
     ];
 });
 
@@ -82,14 +82,14 @@ const chartData = computed(() => {
             {
                 label: `Profilo Attacco IP: ${attack.request.ip}`,
                 data: dataValues,
-                // Colori Verde brillante/Azzurro tipici di PES
-                backgroundColor: 'rgba(0, 255, 128, 0.3)', // Verde acqua/lime trasparente
-                borderColor: 'rgb(0, 255, 128)',           // Contorno Verde acceso
-                pointBackgroundColor: 'rgb(0, 255, 128)',  // Punti Verde acceso
-                pointBorderColor: '#000',                  // Bordo punti nero/scuro per contrasto
-                pointHoverBackgroundColor: '#fff',
-                pointHoverBorderColor: 'rgb(0, 255, 128)',
-                borderWidth: 2,
+                // Colori coordinati con AttackDetail.css (rosso-bruciato)
+                backgroundColor: 'rgba(217, 48, 37, 0.25)', // Rosso brillante semi-trasparente (#d93025)
+                borderColor: 'rgb(255, 76, 76)',            // Contorno rosso acceso (#ff4c4c)
+                pointBackgroundColor: 'rgb(255, 76, 76)',   // Punti rosso acceso
+                pointBorderColor: '#2f2825',                // Bordo punti marrone scuro (dal CSS)
+                pointHoverBackgroundColor: '#f8eee0',       // Hover color crema chiaro
+                pointHoverBorderColor: 'rgb(217, 48, 37)',  // Hover border rosso brillante
+                borderWidth: 3,
                 fill: true
             }
         ]
@@ -102,9 +102,12 @@ const chartOptions = {
     maintainAspectRatio: false,
     scales: {
         r: {
-            angleLines: { color: '#666' },
-            grid: { color: '#444' },
-            pointLabels: { color: '#AAA', font: { size: 12 } },
+            angleLines: { color: '#553c37' },           // Linee angolari marroni scure
+            grid: { color: '#3a3736' },                  // Griglia marrone scuro (dal CSS)
+            pointLabels: {
+                color: '#e6d4cf',                        // Etichette color crema (dal CSS)
+                font: { size: 13, weight: '600' }
+            },
             suggestedMin: 0,
             suggestedMax: 100, // Scala da 0 a 100%
             ticks: { display: false } // Nasconde i numeri sulla scala
@@ -131,9 +134,11 @@ const chartOptions = {
                 },
                 title: (context) => context[0].dataset.label,
             },
-            backgroundColor: 'rgba(0, 0, 0, 0.7)',
-            titleColor: '#FFF',
-            bodyColor: '#FFF',
+            backgroundColor: 'rgba(47, 40, 37, 0.95)',  // Sfondo tooltip marrone scuro (#2f2825)
+            titleColor: '#ff4c4c',                       // Titolo rosso acceso
+            bodyColor: '#f0e6d2',                        // Testo color crema
+            borderColor: '#ff4c4c',                      // Bordo rosso
+            borderWidth: 1
         }
     }
 };
@@ -152,10 +157,12 @@ const chartOptions = {
     width: 100%;
     max-width: 600px;
     margin: 20px auto;
-    padding: 15px;
-    background: #1e1e1e;
-    /* Sfondo scuro */
+    padding: 20px;
+    background: linear-gradient(180deg, #2f2825, #2b1b17 50%, #271511);
+    /* Gradient marrone-rosso scuro coordinato con AttackDetail.css */
     border-radius: 8px;
+    box-shadow: inset 0 0 20px #5a2a26, 0 4px 15px rgba(217, 48, 37, 0.3);
+    /* Box shadow interno + esterno con glow rosso */
 }
 
 .chart-note {

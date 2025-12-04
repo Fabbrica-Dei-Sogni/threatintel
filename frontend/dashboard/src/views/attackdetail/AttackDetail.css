@@ -6,13 +6,14 @@
   color: #f0e6d2;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   min-height: 100vh;
-  overflow-x: auto; /* scroll orizzontale abilitato */
+  overflow-x: auto;
+  /* scroll orizzontale abilitato */
   overflow-y: hidden;
   white-space: nowrap;
 }
 
 /* Permette wrapping normale dentro */
-.attack-detail > * {
+.attack-detail>* {
   white-space: normal;
 }
 
@@ -29,6 +30,7 @@
   box-shadow: 0 3px 10px rgba(184, 42, 31, 0.75);
   transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
 }
+
 .back-btn:hover {
   background: linear-gradient(145deg, #b82a1f, #8c1a19);
   box-shadow: 0 5px 20px rgba(204, 50, 47, 0.9);
@@ -44,11 +46,13 @@ h1 {
   text-shadow: 0 0 10px #7a1c1c;
   user-select: none;
 }
+
 h1 span {
   cursor: pointer;
   color: #6ec7ff;
   text-decoration: underline;
 }
+
 h1 span:hover {
   color: #33a0ff;
 }
@@ -59,13 +63,16 @@ h1 span:hover {
   display: flex;
   flex-direction: column;
   gap: 22px;
-  min-width: 1000px; /* garantisce spazio per tutti i dettagli */
+  min-width: 1000px;
+  /* garantisce spazio per tutti i dettagli */
 }
+
 .summary-row {
   display: flex;
   flex-wrap: wrap;
   gap: 25px;
 }
+
 .summary-row div {
   flex: 1;
   min-width: 220px;
@@ -81,9 +88,11 @@ h1 span:hover {
   border-radius: 8px;
   padding: 24px;
   box-shadow: inset 0 0 18px #5a2a26;
-  min-width: 1000px; /* per scroll orizzontale */
+  min-width: 1000px;
+  /* per scroll orizzontale */
   overflow-x: auto;
 }
+
 .logs-container h2 {
   font-size: 22px;
   margin-top: 0;
@@ -91,11 +100,13 @@ h1 span:hover {
   color: #ff4c4c;
   text-shadow: 0 0 8px #7a1c1c;
 }
+
 .log-entry {
   border-bottom: 1px solid #3a3736;
   padding: 14px 0;
   min-width: 900px;
 }
+
 .log-header {
   display: flex;
   justify-content: space-between;
@@ -105,11 +116,13 @@ h1 span:hover {
   color: #f0e6d2;
   font-size: 15px;
 }
+
 .toggle-icon {
   font-size: 20px;
   color: #ff4c4c;
   transition: transform 0.3s ease;
 }
+
 .toggle-icon.open {
   transform: rotate(180deg);
 }
@@ -127,6 +140,7 @@ h1 span:hover {
   overflow-x: auto;
   box-shadow: inset 0 0 14px #592d27;
 }
+
 .log-body pre {
   background-color: #271e1b;
   border-radius: 6px;
@@ -148,6 +162,7 @@ h1 span:hover {
   min-width: 1000px;
   overflow-x: auto;
 }
+
 .rate-limit-events-container h2 {
   font-size: 22px;
   margin-top: 0;
@@ -155,11 +170,13 @@ h1 span:hover {
   color: #ff4c4c;
   text-shadow: 0 0 8px #7a1c1c;
 }
+
 .rate-limit-event-entry {
   border-bottom: 1px solid #46342f;
   padding: 14px 0;
   min-width: 900px;
 }
+
 .event-header {
   display: flex;
   justify-content: space-between;
@@ -169,14 +186,17 @@ h1 span:hover {
   color: #f0e6d2;
   font-size: 15px;
 }
+
 .toggle-icon {
   font-size: 18px;
   color: #ff4c4c;
   transition: transform 0.2s;
 }
+
 .toggle-icon.open {
   transform: rotate(180deg);
 }
+
 .event-body {
   background-color: #2f2c2b;
   padding: 12px;
@@ -188,6 +208,7 @@ h1 span:hover {
   word-break: break-word;
   overflow-x: auto;
 }
+
 .event-body pre {
   background-color: #1f1c1b;
   padding: 8px;
@@ -206,10 +227,12 @@ h1 span:hover {
   user-select: none;
   transition: color 0.3s ease;
 }
+
 .loading {
   color: #ff4c4c;
   text-shadow: 0 0 9px #7a1a1a;
 }
+
 .error {
   color: #ff7050;
   text-shadow: 0 0 10px rgba(255, 77, 77, 0.7);

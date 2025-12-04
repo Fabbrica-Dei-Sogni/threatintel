@@ -233,13 +233,9 @@
                 <tbody>
                     <tr v-for="attack in attacks" :key="attack.id">
                         <td class="defcon-cell" :title="attack.dangerScore">
-                            <div class="defcon-bar-container">
-                                <div class="defcon-bar-fill"
-                                    :style="{ width: calculateDefconPercentage(attack.dangerLevel) + '%' }"
-                                    :class="getDefconClass(attack.dangerLevel)">
-                                    <span class="defcon-level-text">L{{ attack.dangerLevel }}</span>
-                                </div>
-                            </div>
+                        <td>
+                            <DefconIndicator :level="attack.dangerLevel" :dangerScore="attack.dangerScore" />
+                        </td>
                         </td>
                         <td>
                             <span style="display:inline-flex;align-items:center;">
@@ -294,6 +290,7 @@ import { computed, watch, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import dayjs from 'dayjs';
 import { useAttacksFilter } from '../../composable/useAttacksFilter';
+import DefconIndicator from '../../components/DefconIndicator.vue'; // Verifica il percorso corretto
 
 const props = defineProps({
     initialIp: String,
@@ -396,35 +393,6 @@ watch(inputPage, (newPage) => {
         goToInputPage();
     }, 300);
 });
-
-/**
- * Calcola la percentuale di riempimento della barra (da 0% per 5 a 100% per 1).
- * La formula è: (MaxLevel - CurrentLevel) / (MaxLevel - MinLevel) * 100
- * @param {number} level - Livello Defcon (da 1 a 5)
- * @returns {number} Percentuale di riempimento (0-100)
- */
-function calculateDefconPercentage(level) {
-    const minLevel = 1;
-    const maxLevel = 5;
-    // La gravità è inversa, quindi 5 è 0% e 1 è 100%
-    if (level < minLevel || level > maxLevel) return 0;
-
-    // Normalizzazione della scala: (5 - level) / 4 * 100
-    return ((maxLevel - level) / (maxLevel - minLevel)) * 100;
-}
-
-/**
- * Restituisce la classe CSS per il colore/stile in base al livello.
- * @param {number} level - Livello Defcon (da 1 a 5)
- * @returns {string} Classe CSS
- */
-function getDefconClass(level) {
-    if (level <= 1) return 'defcon-critical';
-    if (level === 2) return 'defcon-high';
-    if (level === 3) return 'defcon-medium';
-    if (level === 4) return 'defcon-low';
-    return 'defcon-normal'; // Livello 5 e default
-}
 
 // Funzioni per template
 function formatDate(timestamp) {

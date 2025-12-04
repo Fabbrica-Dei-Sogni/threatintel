@@ -9,21 +9,20 @@
 
         <div v-if="attack" class="attack-summary">
             <div class="summary-row">
-                <div><strong>Pericolosità:</strong> {{ attack.dangerLevel }} ({{ attack.dangerScore }})</div>
-                <div><strong>RPS:</strong> {{ attack.rps }}</div>
-                <div><strong>Durata:</strong> {{ attack.durataAttacco.human }}</div>
-            </div>
-            <div class="summary-row">
+                <strong>Defcon:</strong>
+                <td>
+                    <DefconIndicator :level="attack.dangerLevel" :dangerScore="attack.dangerScore" />
+                </td>
                 <div><strong>Punteggio medio:</strong> {{ attack.averageScore }}</div>
-                <div><strong>Totale Log:</strong> {{ attack.totaleLogs }}</div>
                 <div><strong>Stile:</strong> {{ attack.intensityAttack }}</div>
             </div>
+            <div><strong>Totale Log:</strong> {{ attack.totaleLogs }}</div>
+            <div><strong>Durata:</strong> {{ attack.durataAttacco.human }}</div>
+            <div><strong>RPS:</strong> {{ attack.rps }}</div>
+            <div><strong>Primo avvistamento:</strong> {{ formatDate(attack.firstSeen) }}</div>
+            <div><strong>Ultimo avvistamento:</strong> {{ formatDate(attack.lastSeen) }}</div>
             <div class="summary-row">
                 <div><strong>Tecniche utilizzate:</strong> {{ attack.attackPatterns.join(', ') }}</div>
-            </div>
-            <div class="summary-row">
-                <div><strong>Primo avvistamento:</strong> {{ formatDate(attack.firstSeen) }}</div>
-                <div><strong>Ultimo avvistamento:</strong> {{ formatDate(attack.lastSeen) }}</div>
             </div>
         </div>
         <div v-if="attack" class="attack-aggregates">
@@ -34,7 +33,7 @@
                 <div v-for="log in paginatedLogs" :key="log.id" class="log-entry">
                     <div class="log-header" @click="toggleLog(log.id)">
                         <span>{{ formatDate(log.timestamp) }} - {{ log.request.method }} {{ log.request.url || 'N/D'
-                            }} </span>
+                        }} </span>
                         <span class="toggle-icon">{{ expanded[log.id] ? '–' : '+' }}</span>
                     </div>
                     <transition name="collapse">
@@ -105,6 +104,7 @@
 import { ref, reactive, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import dayjs from 'dayjs'
+import DefconIndicator from '../../components/DefconIndicator.vue'; // Verifica il percorso corretto
 
 // Props
 const props = defineProps({

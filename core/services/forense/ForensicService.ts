@@ -574,10 +574,10 @@ export class ForensicService {
                     dangerLevel: {
                         $switch: {
                             branches: [
-                                { case: { $lte: ['$dangerScore', 15] }, then: 'Defcon 5' },
-                                { case: { $lte: ['$dangerScore', 30] }, then: 'Defcon 4' },
-                                { case: { $lte: ['$dangerScore', 60] }, then: 'Defcon 3' },
-                                { case: { $lte: ['$dangerScore', 85] }, then: 'Defcon 2' }
+                                { case: { $lte: ['$dangerScore', 15] }, then: '5' },
+                                { case: { $lte: ['$dangerScore', 30] }, then: '4' },
+                                { case: { $lte: ['$dangerScore', 60] }, then: '3' },
+                                { case: { $lte: ['$dangerScore', 85] }, then: '2' }
                             ],
                             default: 'Defcon 1'
                         }

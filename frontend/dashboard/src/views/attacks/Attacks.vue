@@ -102,11 +102,17 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Dettagli</th>
                         <th>
-                            <span class="label">Paese - Org</span>
-                        </th>
-                        <th>Tecniche</th>
+                            <div class="sort-control">
+                                <span class="label">Defcon</span>
+                                <button @click="toggleSort('dangerScore')" aria-label="Ordina Pericolosità"
+                                    class="sort-button">
+                                    <span v-if="getSortDirection('dangerScore') === 1">▲</span>
+                                    <span v-else-if="getSortDirection('dangerScore') === -1">▼</span>
+                                    <span v-else>⇵</span>
+                                </button>
+                            </div>
+                        </th>                        
                         <th>
                             <div class="sort-control">
                                 <span class="label">Attaccante</span>
@@ -116,7 +122,13 @@
                                     <span v-else>⇵</span>
                                 </button>
                             </div>
+                        </th>                        
+                        <th>Dettagli</th>
+                        <th>
+                            <span class="label">Paese - Org</span>
                         </th>
+                        <th>Tecniche</th>
+
                         <th>
                             <div class="sort-control">
                                 <span class="label">Stile</span>
@@ -146,17 +158,6 @@
                                     class="sort-button">
                                     <span v-if="getSortDirection('averageScore') === 1">▲</span>
                                     <span v-else-if="getSortDirection('averageScore') === -1">▼</span>
-                                    <span v-else>⇵</span>
-                                </button>
-                            </div>
-                        </th>
-                        <th>
-                            <div class="sort-control">
-                                <span class="label">Pericolosità</span>
-                                <button @click="toggleSort('dangerScore')" aria-label="Ordina Pericolosità"
-                                    class="sort-button">
-                                    <span v-if="getSortDirection('dangerScore') === 1">▲</span>
-                                    <span v-else-if="getSortDirection('dangerScore') === -1">▼</span>
                                     <span v-else>⇵</span>
                                 </button>
                             </div>
@@ -231,6 +232,15 @@
                 </thead>
                 <tbody>
                     <tr v-for="attack in attacks" :key="attack.id">
+                        <td :title="attack.dangerScore">{{ attack.dangerLevel }}</td>
+                        <td>
+                            <span style="display:inline-flex;align-items:center;">
+                                <span class="detail-link" @click="goToIpDetails(attack.request.ip)"
+                                    style="cursor:pointer;" title="Info IP">{{ attack.request.ip }}</span>
+                                <button @click.stop="setIpFilter(attack.request.ip)" class="btn-copy-ip"
+                                    title="Copia nel filtro IP ed esegui">⬇️</button>
+                            </span>
+                        </td>                        
                         <td>
                             <router-link :to="{
                                 name: 'AttackDetail',
@@ -241,18 +251,9 @@
                         </td>
                         <td>{{ attack.ipDetails.ipinfo.country }} - {{ attack.ipDetails.ipinfo.org }}</td>
                         <td class="tecniche-cell">{{ attack.attackPatterns.join(', ') }}</td>
-                        <td>
-                            <span style="display:inline-flex;align-items:center;">
-                                <span class="detail-link" @click="goToIpDetails(attack.request.ip)"
-                                    style="cursor:pointer;" title="Info IP">{{ attack.request.ip }}</span>
-                                <button @click.stop="setIpFilter(attack.request.ip)" class="btn-copy-ip"
-                                    title="Copia nel filtro IP ed esegui">⬇️</button>
-                            </span>
-                        </td>
                         <td>{{ attack.intensityAttack }}</td>
                         <td>{{ attack.rpsStyle }}</td>
                         <td>{{ attack.averageScore }}</td>
-                        <td :title="attack.dangerScore">{{ attack.dangerLevel }}</td>
                         <td>{{ attack.countRateLimit }}</td>
                         <td>{{ attack.rps }}</td>
                         <td>{{ attack.totaleLogs }}</td>

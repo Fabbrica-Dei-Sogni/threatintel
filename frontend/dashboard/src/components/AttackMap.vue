@@ -33,12 +33,6 @@ let map = null;
 let markersLayer = null;
 
 // Icons
-const attackerIcon = L.divIcon({
-    className: 'custom-div-icon',
-    html: "<div class='attacker-marker'></div>",
-    iconSize: [12, 12], // Match visual size
-    iconAnchor: [6, 6]  // Match center
-});
 
 const targetIcon = L.divIcon({
     className: 'custom-div-icon',
@@ -47,12 +41,22 @@ const targetIcon = L.divIcon({
     iconAnchor: [12, 12]
 });
 
+// 0. Defines
+const DEFCON_COLORS = {
+    5: '#1e88e5', // Blue
+    4: '#43a047', // Green
+    3: '#fdd835', // Yellow
+    2: '#e53935', // Red
+    1: '#ffffff'  // White
+};
+
+const getDefconColor = (level) => DEFCON_COLORS[level] || '#ff4444';
+
 // Custom Arrow Icon factory
-const createArrowIcon = (degree) => {
+const createArrowIcon = (degree, color) => {
     return L.divIcon({
         className: 'arrow-icon',
-        // Invert degree for CSS rotation (Clockwise) vs Math (Counter-Clockwise)
-        html: `<div style="transform: rotate(${-degree}deg); font-size: 16px; color: rgba(255, 100, 100, 0.8);">➤</div>`,
+        html: `<div style="transform: rotate(${-degree}deg); font-size: 16px; color: ${color}; text-shadow: 0 0 5px ${color};">➤</div>`,
         iconSize: [20, 20],
         iconAnchor: [10, 10]
     });
@@ -104,12 +108,13 @@ const parseLoc = (locStr) => {
 };
 
 const renderAttacks = () => {
-    if (!map || !markersLayer) return;
+    if (!map) return;
     markersLayer.clearLayers();
 
-    // 1. Draw Target (Honeypot)
     const hp = props.honeypotLocation;
-    const hpMarker = L.marker([hp.lat, hp.lng], { icon: targetIcon })
+
+    // 1. Draw Honeypot
+    L.marker([hp.lat, hp.lng], { icon: targetIcon })
         .bindPopup(`<b>${hp.label}</b>`)
         .addTo(markersLayer);
 
@@ -222,17 +227,47 @@ const renderAttacks = () => {
                 return (Math.atan2(dy, dx) * 180 / Math.PI); // Degrees, 0 is East (standard math)
             };
 
+            // Logic for Color & Width
+            const color = getDefconColor(attack.dangerLevel);
+
+            // Width based on Speed (RPS) and Intensity (Total Logs)
+            // Base width: 2
+            // RPS factor: up to +4
+            // Log factor: up to +4
+            // Max width: ~10
+            const rps = attack.rps || 0;
+            const logCount = attack.totaleLogs || 1;
+
+            let weight = 2 + (Math.min(rps, 20) / 4) + (Math.log10(logCount) * 1.5);
+            weight = Math.min(Math.max(weight, 1), 12); // Clamp between 1 and 12
+
             const ipInfo = attack.ipDetails?.ipinfo;
 
-            // Marker
-            const m = L.marker([finalLoc.lat, finalLoc.lng], { icon: attackerIcon, zIndexOffset: 100 })
+            // Marker - use colored dot if possible, or fallback to standard red for simplicity 
+            // but user asked for "color arrow", implies line/arrow specific.
+            // Let's keep marker standard but maybe add a border color?
+            // For now standard red marker is fine for "Attacker", 
+            // but maybe we can tint it? Leaflet DivIcon allows HTML.
+            // Let's create a dynamic marker icon too?
+            // User requested "arrow color", let's stick to line/arrow first.
+
+            const dynamicMarker = L.divIcon({
+                className: 'custom-div-icon',
+                html: `<div class='attacker-marker' style='background-color: ${color}; box-shadow: 0 0 8px ${color};'></div>`,
+                iconSize: [12, 12],
+                iconAnchor: [6, 6]
+            });
+
+            const m = L.marker([finalLoc.lat, finalLoc.lng], { icon: dynamicMarker, zIndexOffset: 100 })
                 .bindPopup(`
-              <div>
-                <b>${attack.request.ip}</b><br>
-                ${ipInfo.city || ''} (${ipInfo.country || '?'})<br>
-                Score: ${attack.dangerScore}
-              </div>
-            `)
+                <div>
+                    <b>${attack.request.ip}</b><br>
+                    ${ipInfo.city || ''} (${ipInfo.country || '?'})<br>
+                    Score: ${attack.dangerScore}<br>
+                    Level: ${attack.dangerLevel}<br>
+                    RPS: ${rps.toFixed(2)}
+                </div>
+                `)
                 .addTo(markersLayer);
 
             // Curve: Attacker -> Honeypot
@@ -248,12 +283,12 @@ const renderAttacks = () => {
 
             const curvePoints = getCurvePoints(finalLoc.lat, finalLoc.lng, hp.lat, hp.lng);
 
+            // Polyline with flow class
             const polyline = L.polyline(curvePoints, {
-                color: '#ff4444',
-                weight: 2, // Thicker for visibility
-                opacity: 0.7,
-                dashArray: '5, 10',
-                lineCap: 'round'
+                color: color,
+                weight: weight,
+                opacity: 0.8,
+                className: 'missile-line' // Hook for CSS animation
             }).addTo(markersLayer);
 
             // Arrow Position (e.g. at 60% of path)
@@ -269,7 +304,7 @@ const renderAttacks = () => {
             // We handle inversion in createArrowIcon.
 
             const arrowM = L.marker([arrowPosXY.y, arrowPosXY.x], {
-                icon: createArrowIcon(arrowAngle),
+                icon: createArrowIcon(arrowAngle, color),
                 interactive: false,
                 zIndexOffset: 50
             }).addTo(markersLayer);
@@ -402,5 +437,19 @@ onBeforeUnmount(() => {
     /* Reset leaflet default */
     background: transparent;
     border: none;
+}
+
+:global(.missile-line) {
+    stroke-dasharray: 8, 12;
+    /* Dash pattern */
+    animation: missile-flow 1s linear infinite;
+    /* Fast flow animation */
+}
+
+@keyframes missile-flow {
+    to {
+        stroke-dashoffset: -20;
+        /* Move dashes */
+    }
 }
 </style>

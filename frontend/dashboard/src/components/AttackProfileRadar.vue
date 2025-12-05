@@ -150,23 +150,30 @@ const chartOptions = {
 
 <template>
     <div class="radar-chart-container">
-        <Radar :data="chartData" :options="chartOptions" :height="400" :width="400" />
+        <Radar :data="chartData" :options="chartOptions" />
     </div>
 </template>
 
 <style scoped>
 .radar-chart-container {
-    height: 400px;
-    /* Altezza fissa */
+    /* Dimensioni dinamiche basate sul parent */
     width: 100%;
-    max-width: 600px;
-    margin: 20px auto;
-    padding: 20px;
+    height: 100%;
+    min-height: 250px;
+
+    /* Padding minimale per mobile */
+    padding: 10px;
+    margin: 0;
+
+    /* Styling coordinato con AttackDetail.css */
     background: linear-gradient(180deg, #2f2825, #2b1b17 50%, #271511);
-    /* Gradient marrone-rosso scuro coordinato con AttackDetail.css */
     border-radius: 8px;
     box-shadow: inset 0 0 20px #5a2a26, 0 4px 15px rgba(217, 48, 37, 0.3);
-    /* Box shadow interno + esterno con glow rosso */
+
+    /* Mantiene aspect ratio */
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .chart-note {

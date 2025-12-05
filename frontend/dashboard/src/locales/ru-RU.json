@@ -105,8 +105,10 @@
         "title": "Анализ атак во времени",
         "frequency": "Частота",
         "severity": "Распределение тяжести",
+        "duration": "Длительность",
         "frequencyLabel": "Количество атак",
-        "severityLabel": "Тяжесть атаки"
+        "severityLabel": "Тяжесть атаки",
+        "durationLabel": "Длительность атаки"
     },
     "threatLogs": {
         "title": "Панель управления Honeypot – Журналы угроз",

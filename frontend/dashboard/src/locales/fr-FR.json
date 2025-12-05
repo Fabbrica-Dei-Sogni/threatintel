@@ -105,8 +105,10 @@
         "title": "Analyse des attaques dans le temps",
         "frequency": "Fréquence",
         "severity": "Répartition de la gravité",
+        "duration": "Durée",
         "frequencyLabel": "Nombre d’attaques",
-        "severityLabel": "Gravité de l’attaque"
+        "severityLabel": "Gravité de l’attaque",
+        "durationLabel": "Durée de l’attaque"
     },
     "threatLogs": {
         "title": "Tableau de bord Honeypot – Journaux de menaces",

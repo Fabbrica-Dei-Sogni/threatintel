@@ -105,8 +105,10 @@
         "title": "Analisi Attacchi Temporale",
         "frequency": "Frequenza",
         "severity": "Distribuzione Severità",
+        "duration": "Timeline Durata",
         "frequencyLabel": "Numero Attacchi",
-        "severityLabel": "Severità Attacco"
+        "severityLabel": "Severità Attacco",
+        "durationLabel": "Durata Attacco"
     },
     "threatLogs": {
         "title": "Honeypot Dashboard – Log minacce",

@@ -45,7 +45,8 @@ const props = defineProps({
 // Visualization Modes
 const modes = [
     { label: 'attackChart.frequency', value: 'frequency' },
-    { label: 'attackChart.severity', value: 'severity' }
+    { label: 'attackChart.severity', value: 'severity' },
+    { label: 'attackChart.duration', value: 'duration' }
 ];
 const selectedMode = ref('frequency');
 
@@ -77,16 +78,62 @@ const getAggregation = (attacks) => {
     };
 };
 
+const getDefconColor = (score, alpha = 0.7) => {
+    if (score <= 15) return `rgba(30, 136, 229, ${alpha})`;   // DEFCON 5 - Blu
+    if (score <= 30) return `rgba(67, 160, 71, ${alpha})`;    // DEFCON 4 - Verde
+    if (score <= 60) return `rgba(253, 216, 53, ${alpha})`;   // DEFCON 3 - Giallo
+    if (score <= 85) return `rgba(229, 57, 53, ${alpha})`;    // DEFCON 2 - Rosso
+    return `rgba(255, 255, 255, ${alpha})`;                   // DEFCON 1 - Bianco
+};
+
 const getSeverityData = (attacks) => {
     return attacks.map(atk => ({
         x: new Date(atk.lastSeen).getTime(), // Time axis
         y: atk.dangerScore,                  // Y axis Score
-        r: 6 + Math.min(atk.totaleLogs / 10, 10), // Radius based on logs volume (clamped)
+        r: 6 + Math.min(atk.totaleLogs / 10, 20), // Radius based on logs volume (clamped)
         // Additional data for tooltip
         ip: atk.request.ip,
-        score: atk.dangerScore
+        score: atk.dangerScore,
+        logs: atk.totaleLogs
     }));
 };
+
+const getDurationData = (attacks) => {
+    // Sort logic to ensure consistent lines
+    const sorted = [...attacks].sort((a, b) => new Date(a.firstSeen) - new Date(b.firstSeen));
+    const points = [];
+
+    sorted.forEach(atk => {
+        const color = getDefconColor(atk.dangerScore);
+        const glowColor = getDefconColor(atk.dangerScore, 0.2); // Faint background
+        // Calculate dynamic radius based on total logs
+        // Minimum 4px, add log volume factor, max 15px
+        const radius = 4 + Math.min(atk.totaleLogs / 20, 15);
+
+        const commonData = {
+            ip: atk.request.ip,
+            score: atk.dangerScore,
+            color: color,
+            glowColor: glowColor,
+            duration: atk.durataAttacco?.human || 'N/A',
+            logs: atk.totaleLogs,
+            dynamicRadius: radius
+        };
+
+        points.push({
+            x: new Date(atk.firstSeen).getTime(),
+            y: atk.dangerScore,
+            ...commonData
+        });
+        points.push({
+            x: new Date(atk.lastSeen).getTime(),
+            y: atk.dangerScore,
+            ...commonData
+        });
+        // No null points to avoid interaction errors
+    });
+    return points;
+}
 
 // --- CHART DATA COMPUTED PROPERTIES ---
 
@@ -112,31 +159,9 @@ const frequencyData = computed(() => {
 const severityData = computed(() => {
     const dataPoints = getSeverityData(props.attacks);
 
-    // Dynamic coloring based on Score
-    const pointBackgroundColors = dataPoints.map(p => {
-        const s = p.y;
-
-        // DEFCON 5 - Blu (score ≤ 15)
-        if (s <= 15) return 'rgba(30, 136, 229, 0.7)';
-
-        // DEFCON 4 - Verde (15 < score ≤ 30)
-        if (s <= 30) return 'rgba(67, 160, 71, 0.7)';
-
-        // DEFCON 3 - Giallo (30 < score ≤ 60)
-        if (s <= 60) return 'rgba(253, 216, 53, 0.7)';
-
-        // DEFCON 2 - Rosso (60 < score ≤ 85)
-        if (s <= 85) return 'rgba(229, 57, 53, 0.7)';
-
-        // DEFCON 1 - Bianco (score > 85, critico)
-        return 'rgba(255, 255, 255, 0.9)';
-    });
-
-    const pointBorderColors = dataPoints.map(p => {
-        if (p.y >= 80) return '#ff4c4c';
-        if (p.y >= 50) return '#ffcc00';
-        return '#4caf50';
-    });
+    // Dynamic coloring using helper
+    const pointBackgroundColors = dataPoints.map(p => getDefconColor(p.y));
+    const pointBorderColors = dataPoints.map(p => getDefconColor(p.y)); // Same color for border
 
     return {
         datasets: [{
@@ -146,6 +171,66 @@ const severityData = computed(() => {
             borderColor: pointBorderColors,
             borderWidth: 1
         }]
+    };
+});
+
+// 3. Duration Chart Data (Line with segments)
+const durationData = computed(() => {
+    const points = getDurationData(props.attacks);
+
+    // Dataset 1: Glow/Background (Thick line)
+    const backgroundDataset = {
+        label: t('attackChart.durationLabel'),
+        data: points,
+        pointRadius: 0, // No points for background
+        pointHoverRadius: 0,
+        fill: false,
+        // Segment styling for thick background
+        segment: {
+            borderColor: ctx => {
+                const i = ctx.p0DataIndex;
+                // Even index = attack segment
+                if (i % 2 === 0) {
+                    return ctx.p0.raw ? ctx.p0.raw.glowColor : 'transparent';
+                }
+                return 'transparent';
+            },
+            borderWidth: ctx => {
+                const i = ctx.p0DataIndex;
+                if (i % 2 === 0) {
+                    // Width = Diameter = 2 * Radius
+                    return ctx.p0.raw ? ctx.p0.raw.dynamicRadius * 2 : 0;
+                }
+                return 0;
+            }
+        },
+        order: 2 // Render behind
+    };
+
+    // Dataset 2: Spine/Foreground (Thin line + dots)
+    const foregroundDataset = {
+        label: t('attackChart.durationLabel'),
+        data: points,
+        borderWidth: 2, // Thinner connecting line
+        pointRadius: (ctx) => ctx.raw ? ctx.raw.dynamicRadius : 3,
+        pointHoverRadius: (ctx) => ctx.raw ? ctx.raw.dynamicRadius + 3 : 6,
+        pointBackgroundColor: (ctx) => ctx.raw ? ctx.raw.color : '#888',
+        pointBorderColor: '#2f2825',
+        fill: false,
+        segment: {
+            borderColor: ctx => {
+                const i = ctx.p0DataIndex;
+                if (i % 2 === 0) {
+                    return ctx.p0.raw ? ctx.p0.raw.color : '#888';
+                }
+                return 'transparent';
+            }
+        },
+        order: 1 // Render on top
+    };
+
+    return {
+        datasets: [backgroundDataset, foregroundDataset]
     };
 });
 
@@ -214,6 +299,24 @@ const severityOptions = computed(() => ({
     }
 }));
 
+const durationOptions = computed(() => ({
+    ...severityOptions.value, // Reuse time-scale options
+    plugins: {
+        ...severityOptions.value.plugins,
+        tooltip: {
+            ...severityOptions.value.plugins.tooltip,
+            callbacks: {
+                label: (ctx) => {
+                    const raw = ctx.raw;
+                    // Check if raw data exists
+                    if (!raw) return '';
+                    return `IP: ${raw.ip} | Score: ${raw.y} | Logs: ${raw.logs} | Time: ${raw.duration}`;
+                }
+            }
+        }
+    }
+}));
+
 
 </script>
 
@@ -230,7 +333,8 @@ const severityOptions = computed(() => ({
 
         <div class="chart-wrapper">
             <Line v-if="selectedMode === 'frequency'" :data="frequencyData" :options="commonOptions" />
-            <Scatter v-else :data="severityData" :options="severityOptions" />
+            <Scatter v-else-if="selectedMode === 'severity'" :data="severityData" :options="severityOptions" />
+            <Line v-else :data="durationData" :options="durationOptions" />
         </div>
     </div>
 </template>

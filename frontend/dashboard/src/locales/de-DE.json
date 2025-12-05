@@ -105,8 +105,10 @@
         "title": "Zeitliche Angriffsanalyse",
         "frequency": "Häufigkeit",
         "severity": "Schweregradverteilung",
+        "duration": "Dauer",
         "frequencyLabel": "Anzahl der Angriffe",
-        "severityLabel": "Angriffsschwere"
+        "severityLabel": "Angriffsschwere",
+        "durationLabel": "Angriffsdauer"
     },
     "threatLogs": {
         "title": "Honeypot Dashboard – Bedrohungsprotokolle",

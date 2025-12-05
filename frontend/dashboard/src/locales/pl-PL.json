@@ -105,8 +105,10 @@
         "title": "Analiza ataków w czasie",
         "frequency": "Częstotliwość",
         "severity": "Rozkład dotkliwości",
+        "duration": "Czas trwania",
         "frequencyLabel": "Liczba ataków",
-        "severityLabel": "Dotkliwość ataku"
+        "severityLabel": "Dotkliwość ataku",
+        "durationLabel": "Czas trwania ataku"
     },
     "threatLogs": {
         "title": "Panel Honeypot – Dzienniki zagrożeń",

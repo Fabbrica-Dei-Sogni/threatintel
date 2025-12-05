@@ -105,8 +105,10 @@
         "title": "Attacks Analysis Over Time",
         "frequency": "Frequency",
         "severity": "Severity Distribution",
+        "duration": "Duration Timeline",
         "frequencyLabel": "Attacks Count",
-        "severityLabel": "Attack Severity"
+        "severityLabel": "Attack Severity",
+        "durationLabel": "Attack Duration"
     },
     "threatLogs": {
         "title": "Honeypot Dashboard – Threat logs",

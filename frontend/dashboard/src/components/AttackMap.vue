@@ -25,7 +25,7 @@ const props = defineProps({
     },
     honeypotLocation: {
         type: Object,
-        default: () => ({ lat: 41.9028, lng: 12.4964, label: 'Honeypot (Rome)' })
+        default: () => ({ lat: 48.8566, lng: 2.3522, label: 'Honeypot (Paris)' })
     }
 });
 

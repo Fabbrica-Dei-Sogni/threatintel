@@ -1,6 +1,6 @@
 <template>
     <div class="attack-map-wrapper">
-        <div id="map" class="map-container"></div>
+        <div ref="mapContainer" class="map-container"></div>
         <div class="map-legend" v-if="attacks.length > 0">
             <div class="legend-item">
                 <span class="dot attacker-dot"></span> {{ $t('components.map.attacker') }}
@@ -31,6 +31,7 @@ const props = defineProps({
 
 let map = null;
 let markersLayer = null;
+const mapContainer = ref(null);
 
 // Icons
 
@@ -64,12 +65,15 @@ const createArrowIcon = (degree, color) => {
 
 const initMap = () => {
     if (map) return;
+    const hp = props.honeypotLocation;
 
     // Init map
-    map = L.map('map', {
-        center: [20, 0],
-        zoom: 2,
-        minZoom: 1, // Allow wider view
+    map = L.map(mapContainer.value, {
+        center: [hp.lat, hp.lng],
+        zoom: 4,
+        minZoom: 3, // Prevent zooming out to infinity
+        maxBounds: [[-90, -180], [90, 180]], // Restrict panning to one world
+        maxBoundsViscosity: 1.0, // Sticky bounds
         scrollWheelZoom: true, // Enable scroll zoom
         zoomControl: true, // Enable zoom controls
         attributionControl: false
@@ -78,7 +82,8 @@ const initMap = () => {
     // Esri Dark Gray Canvas (Lighter Dark Theme)
     L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
         attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ',
-        maxZoom: 16
+        maxZoom: 16,
+        noWrap: true // Prevent repeating tiles
     }).addTo(map);
 
     markersLayer = L.layerGroup().addTo(map);

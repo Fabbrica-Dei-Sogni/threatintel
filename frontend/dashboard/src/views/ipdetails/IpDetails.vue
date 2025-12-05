@@ -22,13 +22,14 @@
             </button>
             <section v-if="errorReputationScore" class="error">{{ t('common.error') }}</section>
 
-            <p><strong>Score:</strong> {{ ipInfo.abuseipdbId.abuseConfidenceScore || 'N/D' }}</p>
-            <p><strong>In lista nera:</strong> {{ ipInfo.abuseipdbId.isListed || 'N/D' }}</p>
-            <p><strong>In lista bianca:</strong> {{ ipInfo.abuseipdbId.isWhitelisted || 'N/D' }}</p>
-            <p><strong>Tor?:</strong> {{ ipInfo.abuseipdbId.isTor || 'N/D' }}</p>
-            <p><strong>Report ricevuti:</strong> {{ ipInfo.abuseipdbId.totalReports || 'N/D' }}</p>
-            <p><strong>Uso:</strong> {{ ipInfo.abuseipdbId.usageType || 'N/D' }}</p>
-            <p><strong>Ultima segnalazione:</strong> {{ formatDate(ipInfo.abuseipdbId.lastReportedAt) || 'N/D' }}</p>
+            <p><strong>{{ t('ipDetails.score') }}:</strong> {{ ipInfo.abuseipdbId.abuseConfidenceScore || 'N/D' }}</p>
+            <p><strong>{{ t('ipDetails.isListed') }}:</strong> {{ ipInfo.abuseipdbId.isListed || 'N/D' }}</p>
+            <p><strong>{{ t('ipDetails.isWhitelisted') }}:</strong> {{ ipInfo.abuseipdbId.isWhitelisted || 'N/D' }}</p>
+            <p><strong>{{ t('ipDetails.isTor') }}</strong> {{ ipInfo.abuseipdbId.isTor || 'N/D' }}</p>
+            <p><strong>{{ t('ipDetails.totalReports') }}:</strong> {{ ipInfo.abuseipdbId.totalReports || 'N/D' }}</p>
+            <p><strong>{{ t('ipDetails.usage') }}:</strong> {{ ipInfo.abuseipdbId.usageType || 'N/D' }}</p>
+            <p><strong>{{ t('ipDetails.lastReportedAt') }}:</strong> {{ formatDate(ipInfo.abuseipdbId.lastReportedAt) ||
+              'N/D' }}</p>
           </div>
         </transition>
       </div>
@@ -55,8 +56,9 @@
                 <div v-if="expandedReports[report._id]" class="report-body">
                   <!--<p><strong>Categorie:</strong>  {{ report.categories.map(cat => cat.name).join(', ') }}</p>-->
                   <!--<p><strong>Reporter ID:</strong> {{ report.reporterId || 'anonimo' }}</p> -->
-                  <p><strong>Paese Reporter:</strong> {{ report.reporterCountryCode || 'N/A' }}</p>
-                  <p><strong>Commento:</strong> {{ report.comment }}</p>
+                  <p><strong>{{ t('ipDetails.reporterCountry') }}:</strong> {{ report.reporterCountryCode || 'N/A' }}
+                  </p>
+                  <p><strong>{{ t('ipDetails.comment') }}:</strong> {{ report.comment }}</p>
                 </div>
               </transition>
             </div>
@@ -80,11 +82,11 @@
         <transition name="collapse">
           <div v-if="toggles.geo" class="section-body">
             <p><strong>{{ t('ipDetails.organization') }}:</strong> {{ ipInfo.ipinfo.org || 'N/A' }}</p>
-            <p><strong>ISP:</strong> {{ ipInfo.ipinfo.hostname || 'N/A' }}</p>
+            <p><strong>{{ t('ipDetails.isp') }}:</strong> {{ ipInfo.ipinfo.hostname || 'N/A' }}</p>
             <p><strong>{{ t('ipDetails.country') }}:</strong> {{ ipInfo.ipinfo.country || 'N/A' }}</p>
             <p><strong>{{ t('ipDetails.region') }}:</strong> {{ ipInfo.ipinfo.region || 'N/A' }}</p>
             <p><strong>{{ t('ipDetails.city') }}:</strong> {{ ipInfo.ipinfo.city || 'N/A' }}</p>
-            <p><strong>Postal:</strong> {{ ipInfo.ipinfo.postal || 'N/A' }}</p>
+            <p><strong>{{ t('ipDetails.postal') }}:</strong> {{ ipInfo.ipinfo.postal || 'N/A' }}</p>
             <p><strong>{{ t('ipDetails.location') }}:</strong> {{ ipInfo.ipinfo.loc || 'N/A' }}</p>
             <p><strong>{{ t('ipDetails.timezone') }}:</strong> {{ ipInfo.ipinfo.timezone || 'N/A' }}</p>
             <p><strong>{{ t('ipDetails.additionalInfo') }}:</strong> {{ formatDate(ipInfo.enrichedAt) || 'N/A' }}</p>
@@ -95,7 +97,7 @@
       <!-- Sezione Eventi RateLimit -->
       <div class="section" v-if="rateLimit.data && rateLimit.data.length > 0">
         <div class="section-header" @click="toggles.ratelimit = !toggles.ratelimit">
-          <h2>Eventi Rate Limit associati</h2>
+          <h2>{{ t('ipDetails.rateLimitEvents') }}</h2>
           <span class="arrow" :class="{ open: toggles.ratelimit }"></span>
         </div>
         <transition name="collapse">
@@ -105,25 +107,25 @@
               <el-table-column type="expand">
                 <template #default="{ row }">
                   <div class="expanded-details">
-                    <p><strong>Headers:</strong>
+                    <p><strong>{{ t('ipDetails.headers') }}:</strong>
                     <pre>{{ JSON.stringify(row.headers, null, 2) }}</pre>
                     </p>
-                    <p><strong>Message:</strong> {{ row.message || '-' }}</p>
-                    <p><strong>Honeypot ID:</strong> {{ row.honeypotId || '-' }}</p>
-                    <p><strong>User Agent:</strong> {{ row.userAgent || '-' }}</p>
+                    <p><strong>{{ t('ipDetails.message') }}:</strong> {{ row.message || '-' }}</p>
+                    <p><strong>{{ t('ipDetails.honeypotId') }}:</strong> {{ row.honeypotId || '-' }}</p>
+                    <p><strong>{{ t('ipDetails.userAgent') }}:</strong> {{ row.userAgent || '-' }}</p>
                   </div>
                 </template>
               </el-table-column>
 
-              <el-table-column prop="timestamp" label="Timestamp" width="180">
+              <el-table-column prop="timestamp" :label="t('ipDetails.timestamp')" width="180">
                 <template #default="{ row }">
                   {{ formatDate(row.timestamp) }}
                 </template>
               </el-table-column>
-              <el-table-column prop="limitType" label="Tipo Limite" width="160" />
-              <el-table-column prop="ip" label="IP" width="140" />
-              <el-table-column prop="method" label="Method" width="90" />
-              <el-table-column prop="path" label="Path" />
+              <el-table-column prop="limitType" :label="t('ipDetails.limitType')" width="160" />
+              <el-table-column prop="ip" :label="t('ipDetails.ip')" width="140" />
+              <el-table-column prop="method" :label="t('ipDetails.method')" width="90" />
+              <el-table-column prop="path" :label="t('ipDetails.path')" />
             </el-table>
 
             <div class="pagination-wrapper" style="text-align: right; margin-top: 10px;">
@@ -137,14 +139,14 @@
 
       <div class="section">
         <div class="section-header" @click="toggles.honeypot = !toggles.honeypot">
-          <h2>Informazioni avvistamenti e whois</h2>
+          <h2>{{ t('ipDetails.fullWhois') }}</h2>
           <span class="arrow" :class="{ open: toggles.honeypot }"></span>
         </div>
         <transition name="collapse">
           <div v-if="toggles.honeypot" class="section-body">
-            <p><strong>Primo avvistamento:</strong> {{ formatDate(ipInfo.firstSeenAt) || 'N/D' }}</p>
-            <p><strong>Ultimo avvistamento:</strong> {{ formatDate(ipInfo.lastSeenAt) || 'N/D' }}</p>
-            <p><strong>Whois:</strong>
+            <p><strong>{{ t('ipDetails.firstSeen') }}:</strong> {{ formatDate(ipInfo.firstSeenAt) || 'N/D' }}</p>
+            <p><strong>{{ t('ipDetails.lastSeen') }}:</strong> {{ formatDate(ipInfo.lastSeenAt) || 'N/D' }}</p>
+            <p><strong>{{ t('ipDetails.whoisRaw') }}:</strong>
             <pre class="whois-pre">{{ JSON.stringify(ipInfo.whois_raw, null, 2) }}</pre>
             </p>
           </div>

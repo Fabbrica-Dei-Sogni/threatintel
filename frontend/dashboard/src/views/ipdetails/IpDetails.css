@@ -5,12 +5,29 @@
   border-radius: 8px;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   min-height: 100vh;
-  overflow-x: auto;  /* abilitato scroll orizzontale globale */
+  /* overflow-x allowed but not forced */
+  overflow-x: auto;
   overflow-y: hidden;
-  white-space: nowrap; /* evita wrapping globale */
+  white-space: nowrap;
+  /* evita wrapping globale */
 }
 
-.ip-details > * {
+@media (max-width: 768px) {
+  .ip-details {
+    padding: 15px 10px;
+    /* Reduced mobile padding */
+    white-space: normal;
+    /* Restore wrapping for mobile flow */
+  }
+
+  .ip-details h1 {
+    font-size: clamp(20px, 5vw, 28px);
+    white-space: normal;
+    /* Allow title to wrap */
+  }
+}
+
+.ip-details>* {
   white-space: normal;
 }
 
@@ -49,7 +66,8 @@ h1 {
   background-color: #262323;
   box-shadow: inset 0 0 14px #000000aa;
   padding: 18px;
-  overflow-x: auto; /* possibile overflow orizzontale */
+  overflow-x: auto;
+  /* possibile overflow orizzontale */
 }
 
 .section-header {
@@ -191,6 +209,27 @@ h1 {
   min-width: 720px !important;
 }
 
+/* Mobile overrides for el-table */
+@media (max-width: 768px) {
+  :deep(.el-table) {
+    min-width: 100% !important;
+    /* Force fit width */
+    width: 100% !important;
+  }
+
+  :deep(.el-table .el-table__body),
+  :deep(.el-table .el-table__header) {
+    width: 100% !important;
+  }
+
+  /* Fluid typography for table cells on mobile */
+  :deep(.el-table th),
+  :deep(.el-table td) {
+    font-size: clamp(9px, 1.8vw, 13px) !important;
+    padding: 8px 4px !important;
+  }
+}
+
 :deep(.el-table th) {
   background-color: #2f2c2b !important;
   color: #ff4c4c !important;
@@ -227,9 +266,11 @@ h1 {
   user-select: none;
   transition: color 0.3s ease;
 }
+
 .error {
   color: #ff1a1a;
 }
+
 .loading {
   text-shadow: 0 0 9px #7a1a1a;
 }

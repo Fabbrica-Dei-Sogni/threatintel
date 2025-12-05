@@ -42,6 +42,17 @@ This document outlines the implementation of responsive design for the Threat In
 - **Container Fixes**:
   - Removed fixed `min-width: 1000px` constraints from Summary and Log containers on mobile, preventing page-wide horizontal scroll bars that broke the user experience.
 
+### 4. ThreatLog Detail View (`ThreatLog.css`)
+- **Fluid Typography**: Applied `clamp()` for section headers and content text.
+- **Layout**: Reduced page and section padding to maximize content area on small screens.
+
+### 5. IpDetails View (`IpDetails.css`)
+- **Rate Limit Table**: 
+  - Overridden `min-width: 720px` constraint on `el-table`. Forced to `100%` width on mobile.
+  - Applied fluid typography to table cells (`th`, `td`) to shrink content significantly to fit the viewport (`clamp(9px, 1.8vw, 13px)`).
+- **Page Layout**: 
+  - Restored text wrapping (`white-space: normal`) for the main container on mobile to prevent titles from overflowing horizontally.
+
 ## 📱 Mobile Behavior Reference
 
 | Component | Behavior on Mobile (< 768px) |

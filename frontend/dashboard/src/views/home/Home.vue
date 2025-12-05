@@ -14,10 +14,12 @@
         <h2>{{ $t('home.recentAttacks') }}</h2>
         <ul>
           <li v-for="attack in recentAttacks" :key="attack.id">
-            <span @click="goToIpDetails(attack.request.ip)" style="cursor: pointer;">{{ attack.request.ip }}</span> - {{
-              attack.ipDetails?.ipinfo?.country }} - {{ formatDate(attack.firstSeen) }} - {{ attack.durataAttacco.human }}
-            <router-link :to="{ name: 'AttackDetail', query: { attack: encodeURIComponent(JSON.stringify(attack)) } }">{{
-              $t('common.detail') }}</router-link>
+            <CountryFlag v-if="attack.ipDetails?.ipinfo?.country" :countryCode="attack.ipDetails?.ipinfo?.country" />
+            <span @click="goToIpDetails(attack.request.ip)" style="cursor: pointer;"> - {{ attack.request.ip }}</span> -
+            {{ formatDate(attack.firstSeen) }} - {{ attack.durataAttacco.human }}
+            <router-link
+              :to="{ name: 'AttackDetail', query: { attack: encodeURIComponent(JSON.stringify(attack)) } }">{{
+                $t('common.detail') }}</router-link>
           </li>
         </ul>
         <div v-if="loadingAttacks">{{ $t('home.loadingAttacks') }}</div>
@@ -27,8 +29,13 @@
         <h2>{{ $t('home.recentLogs') }}</h2>
         <ul>
           <li v-for="log in recentLogs" :key="log._id">
-            <span @click="goToIpDetails(log.request.ip)" style="cursor: pointer;">{{ log.request.ip }}</span> - {{
-              log.ipDetailsId?.ipinfo?.country }} - {{ formatDate(log.timestamp) }} - {{ log.request.url }}
+            <CountryFlag v-if="log.ipDetailsId?.ipinfo?.country" :countryCode="log.ipDetailsId?.ipinfo?.country" />
+            <span @click="goToIpDetails(log.request.ip)" style="cursor: pointer;">
+              -
+              {{ log.request.ip }}
+            </span> -
+            {{
+              formatDate(log.timestamp) }} - {{ log.request.url }}
             <router-link :to="{ name: 'ThreatLog', params: { id: log.id } }">{{ $t('common.detail') }}</router-link>
           </li>
         </ul>
@@ -52,6 +59,7 @@ import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import dayjs from 'dayjs';
 import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
+import CountryFlag from '../../components/CountryFlag.vue'; // Import component
 
 const { t } = useI18n();
 

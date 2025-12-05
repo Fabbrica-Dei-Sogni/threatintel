@@ -20,8 +20,8 @@ export function useI18n() {
         }
     });
 
-    // Lingue disponibili
-    const availableLocales = computed(() => ['it-IT', 'en-US']);
+    // Lingue disponibili (recuperate dinamicamente da i18n)
+    const availableLocales = computed(() => i18n.availableLocales);
 
     // Funzione per cambiare lingua
     const setLocale = (newLocale: string) => {

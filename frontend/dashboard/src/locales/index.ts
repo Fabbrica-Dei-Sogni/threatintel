@@ -1,6 +1,10 @@
 import { createI18n } from 'vue-i18n';
 import itIT from './it-IT.json';
 import enUS from './en-US.json';
+import frFR from './fr-FR.json';
+import deDE from './de-DE.json';
+import plPL from './pl-PL.json';
+import ruRU from './ru-RU.json';
 
 /**
  * Rileva la lingua del browser e la mappa alle lingue supportate
@@ -17,7 +21,20 @@ function getBrowserLocale(): string {
         'en-US': 'en-US',
         'en-GB': 'en-US',
         'en-AU': 'en-US',
-        'en-CA': 'en-US'
+        'en-CA': 'en-US',
+        'fr': 'fr-FR',
+        'fr-FR': 'fr-FR',
+        'fr-BE': 'fr-FR',
+        'fr-CH': 'fr-FR',
+        'fr-CA': 'fr-FR',
+        'de': 'de-DE',
+        'de-DE': 'de-DE',
+        'de-AT': 'de-DE',
+        'de-CH': 'de-DE',
+        'pl': 'pl-PL',
+        'pl-PL': 'pl-PL',
+        'ru': 'ru-RU',
+        'ru-RU': 'ru-RU'
     };
 
     // Prova prima con il codice completo (es. "it-IT")
@@ -54,18 +71,20 @@ function getInitialLocale(): string {
     return browserLocale;
 }
 
-// Configurazione i18n
 const i18n = createI18n({
-    legacy: false, // Usa Composition API mode
-    locale: getInitialLocale(), // Lingua di default: Italiano
-    fallbackLocale: 'en-US', // Lingua di fallback
+    legacy: false,
+    locale: getInitialLocale(),
+    fallbackLocale: 'en-US',
     messages: {
         'it-IT': itIT,
-        'en-US': enUS
+        'en-US': enUS,
+        'fr-FR': frFR,
+        'de-DE': deDE,
+        'pl-PL': plPL,
+        'ru-RU': ruRU
     },
-    // Opzioni aggiuntive
-    globalInjection: true, // Abilita $t globalmente nei template
-    missingWarn: false, // Disabilita warning per chiavi mancanti in produzione
+    globalInjection: true,
+    missingWarn: false,
     fallbackWarn: false
 });
 

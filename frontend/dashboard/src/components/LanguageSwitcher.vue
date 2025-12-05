@@ -14,7 +14,11 @@ const { locale, setLocale } = useI18n();
 
 const languages = [
     { code: 'it-IT', label: 'IT', name: 'Italiano', flag: '🇮🇹' },
-    { code: 'en-US', label: 'EN', name: 'English', flag: '🇬🇧' }
+    { code: 'en-US', label: 'EN', name: 'English', flag: '🇬🇧' },
+    { code: 'fr-FR', label: 'FR', name: 'Français', flag: '🇫🇷' },
+    { code: 'de-DE', label: 'DE', name: 'Deutsch', flag: '🇩🇪' },
+    { code: 'pl-PL', label: 'PL', name: 'Polski', flag: '🇵🇱' },
+    { code: 'ru-RU', label: 'RU', name: 'Русский', flag: '🇷🇺' }
 ];
 </script>
 

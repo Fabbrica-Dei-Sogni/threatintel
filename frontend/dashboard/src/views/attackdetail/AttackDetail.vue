@@ -1,8 +1,18 @@
 <template>
     <div class="attack-detail">
         <button @click="goBack" class="back-btn">← {{ t('attackDetail.backToAttacks') }}</button>
-        <h1>{{ t('attackDetail.title') }}: <span @click="goToIpDetails(attack.request.ip)" style="cursor: pointer;">{{
-            attack.request.ip }}</span></h1>
+        <h1>{{ t('attackDetail.title') }}</h1>
+
+        <!-- Attacker Highlight Card -->
+        <div v-if="attack" class="attacker-card">
+            <div class="attacker-info">
+                <span class="attacker-label">{{ t('attackDetail.attacker') }}</span>
+                <h2 class="attacker-ip">{{ attack.request.ip }}</h2>
+            </div>
+            <button @click="goToIpDetails(attack.request.ip)" class="attacker-action-btn">
+                Analyze Profile &rarr;
+            </button>
+        </div>
 
         <section v-if="loading" class="loading">{{ t('common.loading') }}</section>
         <section v-if="error" class="error">{{ t('common.error') }}</section>
@@ -36,7 +46,7 @@
                     <div class="log-header" @click="toggleLog(log.id)">
                         <span>{{ formatDate(log.timestamp) }} - {{ log.request.method }} {{ log.request.url ||
                             t('components.radar.notAvailable')
-                        }} </span>
+                            }} </span>
                         <span class="toggle-icon">{{ expanded[log.id] ? '–' : '+' }}</span>
                     </div>
                     <transition name="collapse">
@@ -89,7 +99,7 @@
                             <p><strong>{{ t('threatLog.method') }}:</strong> {{ event.method ||
                                 t('components.radar.notAvailable') }}</p>
                             <p><strong>Honeypot ID:</strong> {{ event.honeypotId || t('components.radar.notAvailable')
-                            }}</p>
+                                }}</p>
                             <p><strong>{{ t('common.error') }}:</strong> {{ event.message ||
                                 t('components.radar.notAvailable') }}</p>
                             <HexViewer v-if="event.headers" :raw-data="event.headers" label="Headers" />

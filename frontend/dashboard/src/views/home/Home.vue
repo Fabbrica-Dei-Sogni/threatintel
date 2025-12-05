@@ -44,7 +44,7 @@
       </div>
       <div class="widget map">
         <h2>{{ $t('home.attackMap') }}</h2>
-        <div id="attack-map" style="height:300px; background:#eee;"></div>
+        <AttackMap :attacks="recentAttacks" />
       </div>
     </section>
   </div>
@@ -59,7 +59,8 @@ import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import dayjs from 'dayjs';
 import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
-import CountryFlag from '../../components/CountryFlag.vue'; // Import component
+import CountryFlag from '../../components/CountryFlag.vue';
+import AttackMap from '../../components/AttackMap.vue';
 
 const { t } = useI18n();
 

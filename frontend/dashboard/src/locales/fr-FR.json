@@ -11,6 +11,8 @@
         "search": "Rechercher",
         "filter": "Filtrer",
         "clear": "Effacer",
+        "showMap": "Afficher la carte",
+        "hideMap": "Masquer la carte",
         "prev": "Préc",
         "next": "Suiv",
         "page": "Page",
@@ -39,7 +41,7 @@
         "logRequests": "Journaux de requêtes",
         "recentAttacks": "10 dernières attaques",
         "recentLogs": "10 derniers journaux",
-        "attackMap": "Carte des attaques (à venir)",
+        "attackMap": "Carte des attaques",
         "loadingAttacks": "Chargement des attaques...",
         "errorLoadingAttacks": "Erreur de chargement des attaques",
         "loadingLogs": "Chargement des journaux...",
@@ -224,6 +226,10 @@
             "offset": "Décalage",
             "hexBytes": "Octets Hex",
             "ascii": "ASCII"
+        },
+        "map": {
+            "attacker": "Attaquant",
+            "target": "Cible"
         }
     }
 }

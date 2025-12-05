@@ -18,7 +18,9 @@
         "goToPage": "Перейти на страницу",
         "detail": "Подробности",
         "noDataFound": "Данные не найдены",
-        "analizeProfile": "Анализировать профиль"
+        "analizeProfile": "Анализировать профиль",
+        "showMap": "Показать карту",
+        "hideMap": "Скрыть карту"
     },
     "auth": {
         "login": "Войти",
@@ -39,7 +41,7 @@
         "logRequests": "Журналы запросов",
         "recentAttacks": "Последние 10 атак",
         "recentLogs": "Последние 10 журналов",
-        "attackMap": "Карта атак (скоро)",
+        "attackMap": "Карта атак",
         "loadingAttacks": "Загрузка атак...",
         "errorLoadingAttacks": "Ошибка загрузки атак",
         "loadingLogs": "Загрузка журналов...",
@@ -224,6 +226,10 @@
             "offset": "Смещение",
             "hexBytes": "Hex байты",
             "ascii": "ASCII"
+        },
+        "map": {
+            "attacker": "Атакующий",
+            "target": "Цель"
         }
     }
 }

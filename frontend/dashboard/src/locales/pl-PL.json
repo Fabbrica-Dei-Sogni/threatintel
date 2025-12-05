@@ -12,6 +12,9 @@
         "filter": "Filtruj",
         "clear": "Wyczyść",
         "prev": "Poprz",
+        "unit": "Jednostka",
+        "showMap": "Pokaż mapę",
+        "hideMap": "Ukryj mapę",
         "next": "Nast",
         "page": "Strona",
         "of": "z",
@@ -39,7 +42,7 @@
         "logRequests": "Dzienniki żądań",
         "recentAttacks": "Ostatnie 10 ataków",
         "recentLogs": "Ostatnie 10 dzienników",
-        "attackMap": "Mapa ataków (wkrótce)",
+        "attackMap": "Mapa ataków",
         "loadingAttacks": "Ładowanie ataków...",
         "errorLoadingAttacks": "Błąd ładowania ataków",
         "loadingLogs": "Ładowanie dzienników...",
@@ -224,6 +227,10 @@
             "offset": "Przesunięcie",
             "hexBytes": "Bajty Hex",
             "ascii": "ASCII"
+        },
+        "map": {
+            "attacker": "Atakujący",
+            "target": "Cel"
         }
     }
 }

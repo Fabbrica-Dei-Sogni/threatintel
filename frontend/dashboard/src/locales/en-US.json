@@ -12,6 +12,8 @@
         "filter": "Filter",
         "clear": "Clear",
         "prev": "Prev",
+        "showMap": "Show Map",
+        "hideMap": "Hide Map",
         "next": "Next",
         "page": "Page",
         "of": "of",
@@ -225,6 +227,10 @@
             "offset": "Offset",
             "hexBytes": "Hex Bytes",
             "ascii": "ASCII"
+        },
+        "map": {
+            "attacker": "Attacker",
+            "target": "Target"
         }
     }
 }

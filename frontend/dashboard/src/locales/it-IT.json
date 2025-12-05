@@ -12,6 +12,8 @@
         "filter": "Filtra",
         "clear": "Svuota",
         "prev": "Prev",
+        "showMap": "Mostra Mappa",
+        "hideMap": "Nascondi Mappa",
         "next": "Next",
         "page": "Pagina",
         "of": "di",
@@ -39,7 +41,7 @@
         "logRequests": "Log requests",
         "recentAttacks": "Ultimi 10 attacchi",
         "recentLogs": "Ultimi 10 log",
-        "attackMap": "Mappa Attacchi (prossimamente)",
+        "attackMap": "Mappa Attacchi",
         "loadingAttacks": "Caricamento attacchi...",
         "errorLoadingAttacks": "Errore caricamento attacchi",
         "loadingLogs": "Caricamento log...",
@@ -225,6 +227,10 @@
             "offset": "Offset",
             "hexBytes": "Bytes Hex",
             "ascii": "ASCII"
+        },
+        "map": {
+            "attacker": "Attaccante",
+            "target": "Obiettivo"
         }
     }
 }

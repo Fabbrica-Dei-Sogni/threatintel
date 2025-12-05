@@ -85,9 +85,6 @@
 
             </div>
         </section>
-
-        <AttackChart v-if="attacks && attacks.length > 0" :attacks="attacks" />
-
         <div class="pagination" v-if="total > pageSize">
             <button :disabled="page === 1" @click="changePage(page - 1)">{{ t('common.prev') }}</button>
             <span>{{ t('common.page') }} {{ page }} {{ t('common.of') }} {{ totalPages }}</span>
@@ -99,6 +96,18 @@
                 :max="totalPages" style="width: 60px; padding: 2px 5px;" placeholder="1" />
 
         </div>
+        <section class="map-controls" style="margin-bottom: 20px;">
+            <button class="btn-action" @click="showMap = !showMap">
+                {{ showMap ? t('common.hideMap') : t('common.showMap') }}
+            </button>
+            <transition name="fade">
+                <div v-if="showMap" class="map-section" style="margin-top: 10px;">
+                    <AttackMap :attacks="attacks" />
+                </div>
+            </transition>
+        </section>
+
+        <AttackChart v-if="attacks && attacks.length > 0" :attacks="attacks" />
 
         <section class="log-table">
             <table>
@@ -295,6 +304,11 @@
                 <button :disabled="page === 1" @click="changePage(page - 1)">{{ t('common.prev') }}</button>
                 <span>{{ t('common.page') }} {{ page }} {{ t('common.of') }} {{ totalPages }}</span>
                 <button :disabled="page === totalPages" @click="changePage(page + 1)">{{ t('common.next') }}</button>
+
+                <!-- Input per inserire pagina manualmente -->
+                <label for="pageInput" style="margin-left: 10px;">{{ t('common.goToPage') }}:</label>
+                <input class="pagination-input" id="pageInput" type="number" v-model.number="inputPage" :min="1"
+                    :max="totalPages" style="width: 60px; padding: 2px 5px;" placeholder="1" />
             </div>
 
             <div v-if="loading" class="loading">{{ t('common.loading') }}</div>
@@ -312,6 +326,7 @@ import { useI18n } from 'vue-i18n';
 import DefconIndicator from '../../components/DefconIndicator.vue'; // Verifica il percorso corretto
 import CountryFlag from '../../components/CountryFlag.vue';
 import AttackChart from '../../components/AttackChart.vue';
+import AttackMap from '../../components/AttackMap.vue';
 
 
 const { t } = useI18n();
@@ -339,6 +354,7 @@ const router = useRouter();
 
 // Variabile per salvare pagina precedente al filtro IP
 const previousPageBeforeIpFilter = ref(null);
+const showMap = ref(false);
 
 const {
     attacks,

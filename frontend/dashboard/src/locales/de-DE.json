@@ -12,6 +12,8 @@
         "filter": "Filtern",
         "clear": "Löschen",
         "prev": "Zurück",
+        "showMap": "Karte anzeigen",
+        "hideMap": "Karte ausblenden",
         "next": "Weiter",
         "page": "Seite",
         "of": "von",
@@ -39,7 +41,7 @@
         "logRequests": "Protokoll-Anfragen",
         "recentAttacks": "Letzte 10 Angriffe",
         "recentLogs": "Letzte 10 Protokolle",
-        "attackMap": "Angriffskarte (demnächst)",
+        "attackMap": "Angriffskarte",
         "loadingAttacks": "Angriffe werden geladen...",
         "errorLoadingAttacks": "Fehler beim Laden der Angriffe",
         "loadingLogs": "Protokolle werden geladen...",
@@ -224,6 +226,10 @@
             "offset": "Offset",
             "hexBytes": "Hex-Bytes",
             "ascii": "ASCII"
+        },
+        "map": {
+            "attacker": "Angreifer",
+            "target": "Ziel"
         }
     }
 }

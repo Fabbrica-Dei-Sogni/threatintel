@@ -101,6 +101,13 @@
         "rateBreach": "Rate breach",
         "attackProfile": "Profilo Attacco"
     },
+    "attackChart": {
+        "title": "Analisi Attacchi Temporale",
+        "frequency": "Frequenza",
+        "severity": "Distribuzione Severità",
+        "frequencyLabel": "Numero Attacchi",
+        "severityLabel": "Severità Attacco"
+    },
     "threatLogs": {
         "title": "Honeypot Dashboard – Log minacce",
         "dashboard": "Cruscotto",

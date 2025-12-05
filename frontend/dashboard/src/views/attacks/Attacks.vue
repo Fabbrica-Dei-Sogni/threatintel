@@ -86,6 +86,8 @@
             </div>
         </section>
 
+        <AttackChart v-if="attacks && attacks.length > 0" :attacks="attacks" />
+
         <div class="pagination" v-if="total > pageSize">
             <button :disabled="page === 1" @click="changePage(page - 1)">{{ t('common.prev') }}</button>
             <span>{{ t('common.page') }} {{ page }} {{ t('common.of') }} {{ totalPages }}</span>
@@ -308,7 +310,8 @@ import dayjs from 'dayjs';
 import { useAttacksFilter } from '../../composable/useAttacksFilter';
 import { useI18n } from 'vue-i18n';
 import DefconIndicator from '../../components/DefconIndicator.vue'; // Verifica il percorso corretto
-import CountryFlag from '../../components/CountryFlag.vue'; // Import component
+import CountryFlag from '../../components/CountryFlag.vue';
+import AttackChart from '../../components/AttackChart.vue';
 
 
 const { t } = useI18n();

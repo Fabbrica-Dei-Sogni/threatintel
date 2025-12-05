@@ -42,7 +42,17 @@
         style="width: 60px; padding: 2px 5px;" placeholder="1" />
     </div>
 
-    <ThreadLogChart v-if="logs && logs.length > 0" :logs="logs" />
+    <section class="chart-controls" style="margin-bottom: 20px;">
+      <button class="btn-action" @click="showChart = !showChart">
+        {{ showChart ? t('common.hideChart') : t('common.showChart') }}
+      </button>
+    </section>
+
+    <transition name="fade">
+      <div v-if="showChart">
+        <ThreadLogChart v-if="logs && logs.length > 0" :logs="logs" />
+      </div>
+    </transition>
 
     <section class="log-table">
       <table>
@@ -219,6 +229,7 @@ const totalPages = computed(() => Math.ceil(total.value / pageSize.value));
 
 const previousPageBeforeIpFilter = ref(null);
 const previousPageBeforeUrlFilter = ref(null);
+const showChart = ref(true); // Default visible
 
 //step 5. definire il watch sui valori che cambiano per aggiornare il router
 watch([filterIp, filterUrl, page, sortFields], ([newIp, newUrl, newPage, newSortFields]) => {

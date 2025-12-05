@@ -13,6 +13,8 @@
         "clear": "Effacer",
         "showMap": "Afficher la carte",
         "hideMap": "Masquer la carte",
+        "showChart": "Afficher le graphique",
+        "hideChart": "Masquer le graphique",
         "prev": "Préc",
         "next": "Suiv",
         "page": "Page",

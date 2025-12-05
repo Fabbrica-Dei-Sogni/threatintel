@@ -14,6 +14,8 @@
         "prev": "Zurück",
         "showMap": "Karte anzeigen",
         "hideMap": "Karte ausblenden",
+        "showChart": "Diagramm anzeigen",
+        "hideChart": "Diagramm ausblenden",
         "next": "Weiter",
         "page": "Seite",
         "of": "von",

@@ -96,10 +96,16 @@
                 :max="totalPages" style="width: 60px; padding: 2px 5px;" placeholder="1" />
 
         </div>
-        <section class="map-controls" style="margin-bottom: 20px;">
+        <section class="chart-controls" style="margin-bottom: 20px;">
             <button class="btn-action" @click="showMap = !showMap">
                 {{ showMap ? t('common.hideMap') : t('common.showMap') }}
             </button>
+            <button class="btn-action" @click="showChart = !showChart">
+                {{ showChart ? t('common.hideChart') : t('common.showChart') }}
+            </button>
+        </section>
+
+        <section class="map-controls" style="margin-bottom: 20px;">
             <transition name="fade">
                 <div v-if="showMap" class="map-section" style="margin-top: 10px;">
                     <AttackMap :attacks="attacks" />
@@ -107,7 +113,11 @@
             </transition>
         </section>
 
-        <AttackChart v-if="attacks && attacks.length > 0" :attacks="attacks" />
+        <transition name="fade">
+            <div v-if="showChart">
+                <AttackChart v-if="attacks && attacks.length > 0" :attacks="attacks" />
+            </div>
+        </transition>
 
         <section class="log-table">
             <table>
@@ -355,6 +365,7 @@ const router = useRouter();
 // Variabile per salvare pagina precedente al filtro IP
 const previousPageBeforeIpFilter = ref(null);
 const showMap = ref(false);
+const showChart = ref(true); // Default visible
 
 const {
     attacks,

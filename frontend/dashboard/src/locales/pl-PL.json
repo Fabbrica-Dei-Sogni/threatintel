@@ -15,6 +15,8 @@
         "unit": "Jednostka",
         "showMap": "Pokaż mapę",
         "hideMap": "Ukryj mapę",
+        "showChart": "Pokaż wykres",
+        "hideChart": "Ukryj wykres",
         "next": "Nast",
         "page": "Strona",
         "of": "z",

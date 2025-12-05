@@ -48,7 +48,7 @@ const modes = [
     { label: 'attackChart.severity', value: 'severity' },
     { label: 'attackChart.duration', value: 'duration' }
 ];
-const selectedMode = ref('frequency');
+const selectedMode = ref('duration');
 
 // Helper for aggregation
 const getAggregation = (attacks) => {

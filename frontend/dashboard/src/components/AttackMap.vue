@@ -3,10 +3,12 @@
         <div ref="mapContainer" class="map-container"></div>
         <div class="map-legend" v-if="attacks.length > 0">
             <div class="legend-item">
-                <span class="dot attacker-dot"></span> {{ $t('components.map.attacker') }}
-            </div>
-            <div class="legend-item">
                 <span class="dot target-dot"></span> {{ $t('components.map.target') }}
+            </div>
+            <!-- DEFCON Levels -->
+            <div v-for="(color, level) in DEFCON_LEGEND_ITEMS" :key="level" class="legend-item">
+                <span class="dot" :style="{ background: color, boxShadow: `0 0 5px ${color}` }"></span>
+                {{ getDefconLabel(level) }}
             </div>
         </div>
     </div>
@@ -14,6 +16,7 @@
 
 <script setup>
 import { onMounted, watch, ref, onBeforeUnmount } from 'vue';
+import { useI18n } from 'vue-i18n';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -49,6 +52,27 @@ const DEFCON_COLORS = {
     3: '#fdd835', // Yellow
     2: '#e53935', // Red
     1: '#ffffff'  // White
+};
+
+const DEFCON_LEGEND_ITEMS = {
+    1: DEFCON_COLORS[1],
+    2: DEFCON_COLORS[2],
+    3: DEFCON_COLORS[3],
+    4: DEFCON_COLORS[4],
+    5: DEFCON_COLORS[5]
+};
+
+const { t } = useI18n(); // Ensure t is available if not already imported from useI18n
+
+const getDefconLabel = (level) => {
+    switch (parseInt(level)) {
+        case 1: return t('components.defcon.critical');
+        case 2: return t('components.defcon.high');
+        case 3: return t('components.defcon.medium');
+        case 4: return t('components.defcon.low');
+        case 5: return t('components.defcon.peaceful');
+        default: return '';
+    }
 };
 
 const getDefconColor = (level) => DEFCON_COLORS[level] || '#ff4444';

@@ -103,6 +103,9 @@
                 <thead>
                     <tr>
                         <th>
+                            <span class="label">{{ t('attacks.table.countryOrg') }}</span>
+                        </th>
+                        <th>
                             <div class="sort-control">
                                 <span class="label">{{ t('attacks.table.defcon') }}</span>
                                 <button @click="toggleSort('dangerScore')" aria-label="Ordina Pericolosità"
@@ -114,10 +117,6 @@
                             </div>
                         </th>
                         <th>{{ t('attacks.table.techniques') }}</th>
-
-                        <th>
-                            <span class="label">{{ t('attacks.table.countryOrg') }}</span>
-                        </th>
                         <th>
                             <div class="sort-control">
                                 <span class="label">{{ t('attacks.table.attacker') }}</span>
@@ -238,13 +237,22 @@
                 </thead>
                 <tbody>
                     <tr v-for="attack in attacks" :key="attack.id">
+                        <td>
+                            <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+                                <CountryFlag v-if="attack.ipDetails.ipinfo.country"
+                                    :countryCode="attack.ipDetails.ipinfo.country" />
+                                <!--
+                                <span>{{ attack.ipDetails.ipinfo.country || '-' }}</span>
+                            -->
+                            </div>
+                        </td>
+
                         <td class="defcon-cell" :title="attack.dangerScore">
                         <td>
                             <DefconIndicator :level="attack.dangerLevel" :dangerScore="attack.dangerScore" />
                         </td>
                         </td>
                         <td class="tecniche-cell">{{ attack.attackPatterns.join(', ') }}</td>
-                        <td>{{ attack.ipDetails.ipinfo.country }}</td>
                         <td>
                             <span style="display:inline-flex;align-items:center;">
                                 <span class="detail-link" @click="goToIpDetails(attack.request.ip)"
@@ -300,6 +308,8 @@ import dayjs from 'dayjs';
 import { useAttacksFilter } from '../../composable/useAttacksFilter';
 import { useI18n } from 'vue-i18n';
 import DefconIndicator from '../../components/DefconIndicator.vue'; // Verifica il percorso corretto
+import CountryFlag from '../../components/CountryFlag.vue'; // Import component
+
 
 const { t } = useI18n();
 

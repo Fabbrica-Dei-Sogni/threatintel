@@ -46,10 +46,10 @@
       <table>
         <thead>
           <tr>
-            <th>{{ t('threatLogs.table.details') }}</th>
             <th>
               <span class="label">{{ t('threatLogs.table.countryOrg') }}</span>
             </th>
+            <th>{{ t('threatLogs.table.details') }}</th>
             <th>
               <div class="sort-control">
                 <span class="label">{{ t('threatLogs.table.ip') }}</span>
@@ -104,9 +104,16 @@
         </thead>
         <tbody>
           <tr v-for="log in logs" :key="log._id">
+            <td>
+              <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+                <CountryFlag v-if="log.ipDetailsId?.ipinfo?.country" :countryCode="log.ipDetailsId.ipinfo.country" />
+                <!--
+                <span>{{ log.ipDetailsId?.ipinfo?.country || '-' }}</span>
+              -->
+              </div>
+            </td>
             <td><button @click="goToThreatLogDetails(log.id)" style="cursor: pointer;" class="info-btn">{{
               t('common.detail') }}</button></td>
-            <td>{{ log.ipDetailsId.ipinfo.country }}</td>
             <td>
               <span style="display:inline-flex;align-items:center;">
                 <span class="info-btn" @click="goToIpDetails(log.request.ip)" style="cursor: pointer;"
@@ -154,6 +161,7 @@ import { useRouter } from 'vue-router';
 import { useLogsFilter } from '../../composable/useLogsFilter';
 import { useI18n } from 'vue-i18n';
 import dayjs from 'dayjs';
+import CountryFlag from '../../components/CountryFlag.vue'; // Import component
 
 const { t } = useI18n();
 

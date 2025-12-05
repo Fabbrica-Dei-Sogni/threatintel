@@ -181,6 +181,10 @@
   font-size: clamp(9px, 1.4vw, 16px);
   white-space: normal;
   word-wrap: break-word;
+  text-align: center;
+  /* Centering content */
+  vertical-align: middle;
+  /* Vertical centering */
 }
 
 .log-table td {
@@ -192,6 +196,10 @@
   font-size: clamp(9px, 1.3vw, 15px);
   word-wrap: break-word;
   word-break: break-all;
+  text-align: center;
+  /* Centering content */
+  vertical-align: middle;
+  /* Vertical centering */
 }
 
 /* Mobile optimizations */

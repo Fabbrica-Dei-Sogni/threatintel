@@ -235,6 +235,10 @@
   word-wrap: break-word;
   min-width: 40px;
   /* Prevent collapse */
+  text-align: center;
+  /* Centering content */
+  vertical-align: middle;
+  /* Vertical centering */
 }
 
 .log-table td {
@@ -249,6 +253,10 @@
   word-break: break-all;
   /* Force break if needed */
   white-space: normal;
+  text-align: center;
+  /* Centering content */
+  vertical-align: middle;
+  /* Vertical centering */
 }
 
 /* Mobile optimizations */

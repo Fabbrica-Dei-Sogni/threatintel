@@ -114,9 +114,22 @@ const severityData = computed(() => {
 
     // Dynamic coloring based on Score
     const pointBackgroundColors = dataPoints.map(p => {
-        if (p.y >= 80) return 'rgba(217, 48, 37, 0.7)'; // High - Red
-        if (p.y >= 50) return 'rgba(255, 153, 0, 0.7)'; // Med - Orange
-        return 'rgba(76, 175, 80, 0.7)';                // Low - Green
+        const s = p.y;
+
+        // DEFCON 5 - Blu (score ≤ 15)
+        if (s <= 15) return 'rgba(30, 136, 229, 0.7)';
+
+        // DEFCON 4 - Verde (15 < score ≤ 30)
+        if (s <= 30) return 'rgba(67, 160, 71, 0.7)';
+
+        // DEFCON 3 - Giallo (30 < score ≤ 60)
+        if (s <= 60) return 'rgba(253, 216, 53, 0.7)';
+
+        // DEFCON 2 - Rosso (60 < score ≤ 85)
+        if (s <= 85) return 'rgba(229, 57, 53, 0.7)';
+
+        // DEFCON 1 - Bianco (score > 85, critico)
+        return 'rgba(255, 255, 255, 0.9)';
     });
 
     const pointBorderColors = dataPoints.map(p => {

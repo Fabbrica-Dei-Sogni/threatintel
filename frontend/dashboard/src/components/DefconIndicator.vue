@@ -94,26 +94,39 @@ function getDefconClass(level) {
 
 
 /* Definizioni dei Colori per Livello */
+/* DEFCON 5 - Blu (normale) */
 .defcon-normal {
-    background-color: #3a755d;
+    background-color: #1e88e5;
+    /* blu medio */
 }
 
+/* DEFCON 4 - Verde (basso) */
 .defcon-low {
-    background-color: #c9b45b;
+    background-color: #43a047;
+    /* verde intenso */
 }
 
+/* DEFCON 3 - Giallo (medio) */
 .defcon-medium {
-    background-color: #e68d37;
+    background-color: #fdd835;
+    /* giallo vivace */
 }
 
+/* DEFCON 2 - Rosso (alto) */
 .defcon-high {
-    background-color: #d93025;
+    background-color: #e53935;
+    /* rosso allerta */
 }
 
+/* DEFCON 1 - Bianco (critico) */
 .defcon-critical {
-    background-color: #ff0000;
+    background-color: #ffffff;
+    /* bianco pieno */
+    color: #b71c1c;
+    /* testo rosso scuro per contrasto */
     animation: critical-pulse 1.5s infinite alternate;
-    box-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
+    box-shadow: 0 0 12px rgba(255, 255, 255, 0.9),
+        0 0 20px rgba(183, 28, 28, 0.9);
 }
 
 @keyframes critical-pulse {

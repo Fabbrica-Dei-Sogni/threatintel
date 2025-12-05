@@ -24,22 +24,23 @@
                     <DefconIndicator :level="attack.dangerLevel" :dangerScore="attack.dangerScore" />
                 </section>
             </div>
-            <!-- ... existing rows ... -->
-            <!-- Insert Map Here -->
-            <section class="attack-map-section" style="margin-top: 20px; height: 350px;">
-                <AttackMap v-if="mapAttackData.length > 0" :attacks="mapAttackData" />
-            </section>
-
+            <div><strong>{{ t('attackDetail.techniques') }}:</strong> {{ attack.attackPatterns.join(', ') }}</div>
+            <div class="summary-row">
+                <div><strong>{{ t('attackDetail.firstSeen') }}:</strong> {{ formatDate(attack.firstSeen) }}</div>
+                <div><strong>{{ t('attackDetail.lastSeen') }}:</strong> {{ formatDate(attack.lastSeen) }}</div>
+            </div>
             <div class="summary-row">
                 <div><strong>{{ t('attackDetail.totalLogs') }}:</strong> {{ attack.totaleLogs }}</div>
                 <div><strong>{{ t('attackDetail.attackDuration') }}:</strong> {{ attack.durataAttacco.human }}</div>
                 <div><strong>{{ t('attackDetail.rps') }}:</strong> {{ attack.rps }}</div>
+                <div><strong>{{ t('attackDetail.avgScore') }}:</strong> {{ attack.averageScore }}</div>
+                <div><strong>{{ t('attackDetail.style') }}:</strong> {{ attack.intensityAttack }}</div>
             </div>
-            <div><strong>{{ t('attackDetail.avgScore') }}:</strong> {{ attack.averageScore }}</div>
-            <div><strong>{{ t('attackDetail.style') }}:</strong> {{ attack.intensityAttack }}</div>
-            <div><strong>{{ t('attackDetail.techniques') }}:</strong> {{ attack.attackPatterns.join(', ') }}</div>
-            <div><strong>{{ t('attackDetail.firstSeen') }}:</strong> {{ formatDate(attack.firstSeen) }}</div>
-            <div><strong>{{ t('attackDetail.lastSeen') }}:</strong> {{ formatDate(attack.lastSeen) }}</div>
+            <!-- ... existing rows ... -->
+            <!-- Insert Map Here -->
+            <section class="attack-map-section" style="margin-top: 20px;">
+                <AttackMap v-if="mapAttackData.length > 0" :attacks="mapAttackData" />
+            </section>
             <section class="attack-profile">
                 <AttackProfileRadar v-if="attack" :attackDetail="attack" />
             </section>
@@ -53,7 +54,7 @@
                     <div class="log-header" @click="toggleLog(log.id)">
                         <span>{{ formatDate(log.timestamp) }} - {{ log.request.method }} {{ log.request.url ||
                             t('components.radar.notAvailable')
-                            }} </span>
+                        }} </span>
                         <span class="toggle-icon">{{ expanded[log.id] ? '–' : '+' }}</span>
                     </div>
                     <transition name="collapse">
@@ -107,7 +108,7 @@
                             <p><strong>{{ t('threatLog.method') }}:</strong> {{ event.method ||
                                 t('components.radar.notAvailable') }}</p>
                             <p><strong>Honeypot ID:</strong> {{ event.honeypotId || t('components.radar.notAvailable')
-                                }}</p>
+                            }}</p>
                             <p><strong>{{ t('common.error') }}:</strong> {{ event.message ||
                                 t('components.radar.notAvailable') }}</p>
                             <HexViewer v-if="event.headers" :raw-data="event.headers" label="Headers" />

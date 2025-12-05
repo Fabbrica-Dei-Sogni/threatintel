@@ -101,6 +101,13 @@
         "rateBreach": "Rate-Verstoß",
         "attackProfile": "Angriffsprofil"
     },
+    "attackChart": {
+        "title": "Zeitliche Angriffsanalyse",
+        "frequency": "Häufigkeit",
+        "severity": "Schweregradverteilung",
+        "frequencyLabel": "Anzahl der Angriffe",
+        "severityLabel": "Angriffsschwere"
+    },
     "threatLogs": {
         "title": "Honeypot Dashboard – Bedrohungsprotokolle",
         "dashboard": "Dashboard",
@@ -111,6 +118,7 @@
         "clearUrlFilter": "URL-Filter löschen",
         "noLogsFound": "Keine Protokolle gefunden",
         "errorLoadingData": "Fehler beim Laden der Daten",
+        "trafficOverTime": "Zeitliche Verkehrsanalysen",
         "table": {
             "defcon": "Defcon",
             "ip": "IP",

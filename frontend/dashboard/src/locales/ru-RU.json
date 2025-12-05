@@ -101,6 +101,13 @@
         "rateBreach": "Нарушение частоты",
         "attackProfile": "Профиль атаки"
     },
+    "attackChart": {
+        "title": "Анализ атак во времени",
+        "frequency": "Частота",
+        "severity": "Распределение тяжести",
+        "frequencyLabel": "Количество атак",
+        "severityLabel": "Тяжесть атаки"
+    },
     "threatLogs": {
         "title": "Панель управления Honeypot – Журналы угроз",
         "dashboard": "Панель управления",
@@ -111,6 +118,7 @@
         "clearUrlFilter": "Очистить фильтр URL",
         "noLogsFound": "Журналов не найдено",
         "errorLoadingData": "Ошибка загрузки данных",
+        "trafficOverTime": "Анализ трафика во времени",
         "table": {
             "defcon": "Defcon",
             "ip": "IP",

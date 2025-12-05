@@ -101,6 +101,13 @@
         "rateBreach": "Naruszenie limitu",
         "attackProfile": "Profil ataku"
     },
+    "attackChart": {
+        "title": "Analiza ataków w czasie",
+        "frequency": "Częstotliwość",
+        "severity": "Rozkład dotkliwości",
+        "frequencyLabel": "Liczba ataków",
+        "severityLabel": "Dotkliwość ataku"
+    },
     "threatLogs": {
         "title": "Panel Honeypot – Dzienniki zagrożeń",
         "dashboard": "Panel główny",
@@ -111,6 +118,7 @@
         "clearUrlFilter": "Wyczyść filtr URL",
         "noLogsFound": "Nie znaleziono dzienników",
         "errorLoadingData": "Błąd ładowania danych",
+        "trafficOverTime": "Analiza ruchu w czasie",
         "table": {
             "defcon": "Defcon",
             "ip": "IP",

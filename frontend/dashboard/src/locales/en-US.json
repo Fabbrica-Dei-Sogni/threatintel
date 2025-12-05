@@ -118,7 +118,7 @@
         "clearUrlFilter": "Clear URL filter",
         "noLogsFound": "No logs found",
         "trafficPeaks": "Traffic Peaks",
-        "trafficOverTime": "Traffic Analysis Over Time",
+        "trafficOverTime": "Traffic Over Time Analysis",
         "errorLoadingData": "Error loading data",
         "table": {
             "defcon": "Defcon",

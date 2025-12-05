@@ -101,6 +101,13 @@
         "rateBreach": "Violation de taux",
         "attackProfile": "Profil d'attaque"
     },
+    "attackChart": {
+        "title": "Analyse des attaques dans le temps",
+        "frequency": "Fréquence",
+        "severity": "Répartition de la gravité",
+        "frequencyLabel": "Nombre d’attaques",
+        "severityLabel": "Gravité de l’attaque"
+    },
     "threatLogs": {
         "title": "Tableau de bord Honeypot – Journaux de menaces",
         "dashboard": "Tableau de bord",
@@ -111,6 +118,7 @@
         "clearUrlFilter": "Effacer le filtre URL",
         "noLogsFound": "Aucun journal trouvé",
         "errorLoadingData": "Erreur de chargement des données",
+        "trafficOverTime": "Analyse du trafic dans le temps",
         "table": {
             "defcon": "Defcon",
             "ip": "IP",

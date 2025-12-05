@@ -16,6 +16,7 @@
 | [M4: Performance Optimization](#m4-performance-optimization) | ⚪ Planned | 🟡 Low | 1 settimana |
 | [M5: Security Enhancements](#m5-security-enhancements) | ⚪ Planned | 🟠 Medium | 1-2 settimane |
 | [M6: Monitoring & Observability](#m6-monitoring--observability) | ⚪ Planned | 🟡 Low | 1 settimana |
+| [M7: Frontend Enhancements](#m7-frontend-enhancements) | 🟢 In Progress (80%) | 🟠 Medium | 2 settimane |
 
 **Legenda:**
 - 🟢 In Progress
@@ -262,6 +263,36 @@
 
 ---
 
+## M7: Frontend Enhancements
+
+**Obiettivo**: Migliorare User Experience, Accessibilità e Responsività
+
+**Status**: 🟢 In Progress (80% completato)
+
+### Phase 1: Internationalization (I18n) ✅
+- [x] Setup `vue-i18n`
+- [x] Traduzione completa (IT, EN, FR, DE, ES, RU, PL)
+- [x] Language Switcher component
+- [x] Lazy loading delle traduzioni
+
+### Phase 2: Responsive Design ✅
+- [x] Mobile-first layout per pagina Ricerca Attacchi
+- [x] Mobile-first layout per pagina Threat Logs
+- [x] Dashboard & Radar Chart responsive
+- [x] Tabella con tipografia fluida (`clamp`) e fallback scroll
+
+### Phase 3: Dashboard V2 (Next)
+- [ ] Dark/Light mode toggle avanzato
+- [ ] Nuovi widget grafici (Time series attacks)
+- [ ] Miglioramento accessibilità (ARIA support)
+
+**Benefici**:
+- Supporto multilingua completo
+- Esperienza mobile nativa
+- UI moderna e adattiva
+
+---
+
 ## 📅 Timeline Stimata
 
 ```
@@ -307,6 +338,7 @@ Aprile 2026      M6 (Monitoring)
 | Performance | Baseline | ⚪ |
 | Security | Baseline | ⚪ |
 | Monitoring | Basic (Winston) | 🟡 |
+| Frontend Enhancements | 80% (I18n + Responsive) | 🟢 |
 
 ---
 

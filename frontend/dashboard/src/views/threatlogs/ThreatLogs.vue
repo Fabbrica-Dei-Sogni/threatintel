@@ -131,6 +131,8 @@
                 <span class="info-btn" @click="goToIpDetails(log.request.ip)" style="cursor: pointer;"
                   title="Info IP">{{
                     log.request.ip }}</span>
+                <button @click.stop="copyToClipboard(log.request.ip)" class="btn-copy-ip"
+                  :title="t('attacks.copyToClipboard')">📋</button>
                 <button @click.stop="setIpFilter(log.request.ip)" class="btn-copy-ip"
                   :title="t('attacks.copyToFilter')">⬇️</button>
               </span>
@@ -177,7 +179,10 @@
 import { computed, watch, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useLogsFilter } from '../../composable/useLogsFilter';
+import { useClipboard } from '../../composable/useClipboard';
 import { useI18n } from 'vue-i18n';
+
+const { copyToClipboard } = useClipboard();
 import dayjs from 'dayjs';
 import CountryFlag from '../../components/CountryFlag.vue';
 import ThreadLogChart from '../../components/ThreadLogChart.vue';

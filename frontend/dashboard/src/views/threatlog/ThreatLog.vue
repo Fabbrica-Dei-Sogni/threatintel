@@ -66,8 +66,12 @@
                 </div>
                 <transition name="collapse">
                     <div v-if="toggles.request" class="section-body">
-                        <p @click="goToIpDetails(log.request.ip)" class="link" style="cursor: pointer;">
-                            <strong>IP:</strong> {{ log.request.ip || t('components.radar.notAvailable') }}
+                        <p class="link">
+                            <strong @click="goToIpDetails(log.request.ip)" style="cursor: pointer;">IP:</strong>
+                            <span @click="goToIpDetails(log.request.ip)" style="cursor: pointer;"> {{ log.request.ip ||
+                                t('components.radar.notAvailable') }} </span>
+                            <span class="copy-btn-inline" @click.stop="copyToClipboard(log.request.ip)"
+                                title="Copia IP">📋</span>
                         </p>
                         <p><strong>{{ t('threatLog.method') }}:</strong> {{ log.request.method ||
                             t('components.radar.notAvailable') }}</p>
@@ -126,9 +130,11 @@ import { useRoute, useRouter } from 'vue-router'
 import dayjs from 'dayjs'
 import { fetchLogById } from '../../api/index'
 import { useI18n } from 'vue-i18n'
-import HexViewer from '../../components/HexViewer.vue'; // <--- AGGIUNGI QUESTO
+import HexViewer from '../../components/HexViewer.vue';
+import { useClipboard } from '../../composable/useClipboard';
 
 const { t } = useI18n();
+const { copyToClipboard } = useClipboard();
 
 const route = useRoute()
 const router = useRouter()

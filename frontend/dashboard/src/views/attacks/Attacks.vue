@@ -278,6 +278,8 @@
                             <span style="display:inline-flex;align-items:center;">
                                 <span class="detail-link" @click="goToIpDetails(attack.request.ip)"
                                     style="cursor:pointer;" title="Info IP">{{ attack.request.ip }}</span>
+                                <button @click.stop="copyToClipboard(attack.request.ip)" class="btn-copy-ip"
+                                    title="Copia negli appunti">📋</button>
                                 <button @click.stop="setIpFilter(attack.request.ip)" class="btn-copy-ip"
                                     title="Copia nel filtro IP ed esegui">⬇️</button>
                             </span>
@@ -332,14 +334,18 @@ import { computed, watch, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import dayjs from 'dayjs';
 import { useAttacksFilter } from '../../composable/useAttacksFilter';
+import { useClipboard } from '../../composable/useClipboard';
 import { useI18n } from 'vue-i18n';
-import DefconIndicator from '../../components/DefconIndicator.vue'; // Verifica il percorso corretto
+
+const { copyToClipboard } = useClipboard();
+const { t } = useI18n();
+import DefconIndicator from '../../components/DefconIndicator.vue';
 import CountryFlag from '../../components/CountryFlag.vue';
 import AttackChart from '../../components/AttackChart.vue';
 import AttackMap from '../../components/AttackMap.vue';
 
 
-const { t } = useI18n();
+
 
 const props = defineProps({
     initialIp: String,

@@ -7,7 +7,10 @@
         <div v-if="attack" class="attacker-card">
             <div class="attacker-info">
                 <span class="attacker-label">{{ t('attackDetail.attacker') }}</span>
-                <h2 class="attacker-ip">{{ attack.request.ip }}</h2>
+                <h2 class="attacker-ip">
+                    {{ attack.request.ip }}
+                    <span class="copy-btn" @click.stop="copyToClipboard(attack.request.ip)" title="Copia IP">📋</span>
+                </h2>
             </div>
             <button @click="goToIpDetails(attack.request.ip)" class="attacker-action-btn">
                 {{ t('common.analizeProfile') }} &rarr;
@@ -132,12 +135,14 @@ import { ref, reactive, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import dayjs from 'dayjs'
 import { useI18n } from 'vue-i18n'
+import { useClipboard } from '../../composable/useClipboard';
 import DefconIndicator from '../../components/DefconIndicator.vue';
 import AttackProfileRadar from '../../components/AttackProfileRadar.vue';
 import HexViewer from '../../components/HexViewer.vue';
 import AttackMap from '../../components/AttackMap.vue';
 
 const { t } = useI18n();
+const { copyToClipboard } = useClipboard();
 
 // Props
 const props = defineProps({

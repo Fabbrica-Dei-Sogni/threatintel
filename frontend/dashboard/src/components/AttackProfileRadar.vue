@@ -42,10 +42,10 @@ const originalData = computed(() => {
 
     return [
         // Asse 1: Rischio Tecnico
-        { label: 'Rischio Tecnico', rawValue: attack.averageScore, format: (v) => v ? v.toFixed(2) + ' score' : 'N/D' },
+        { label: 'Indice minaccia', rawValue: attack.averageScore, format: (v) => v ? v.toFixed(2) + ' score' : 'N/D' },
 
         // Asse 2: Complessità (Tecniche Uniche)
-        { label: 'Complessità', rawValue: attack.uniqueTechCount, format: (v) => v ? v.toFixed(0) + ' tecniche' : 'N/D' },
+        { label: 'Ampiezza', rawValue: attack.uniqueTechCount, format: (v) => v ? v.toFixed(0) + ' tecniche' : 'N/D' },
 
         // Asse 3: Velocità (RPS)
         { label: 'Velocità (RPS)', rawValue: attack.rps, format: (v) => v ? v.toFixed(1) + ' RPS' : 'N/D' },

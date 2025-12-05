@@ -31,6 +31,8 @@ const flagUrl = computed(() => {
     // w20 = width 20px, w40 = width 40px, etc.
     const code = props.countryCode.toLowerCase();
     // Using a fixed small width for table display efficiency
+    //Risorsa remota per recuperare la bandiera da visualizzare a ricerca.
+    //XXX: evolvere il recupero della bandiera con tecniche di caching efficace.
     return `https://flagcdn.com/w40/${code}.png`;
 });
 </script>

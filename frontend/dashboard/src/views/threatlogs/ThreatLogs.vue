@@ -31,6 +31,8 @@
       </div>
     </section>
 
+    <ThreadLogChart v-if="logs && logs.length > 0" :logs="logs" />
+
     <div class="pagination" v-if="total > pageSize">
       <button :disabled="page === 1" @click="changePage(page - 1)">{{ t('common.prev') }}</button>
       <span>{{ t('common.page') }} {{ page }} {{ t('common.of') }} {{ totalPages }}</span>
@@ -161,7 +163,8 @@ import { useRouter } from 'vue-router';
 import { useLogsFilter } from '../../composable/useLogsFilter';
 import { useI18n } from 'vue-i18n';
 import dayjs from 'dayjs';
-import CountryFlag from '../../components/CountryFlag.vue'; // Import component
+import CountryFlag from '../../components/CountryFlag.vue';
+import ThreadLogChart from '../../components/ThreadLogChart.vue';
 
 const { t } = useI18n();
 

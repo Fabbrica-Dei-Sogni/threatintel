@@ -110,6 +110,8 @@
         "clearIpFilter": "Svuota filtro IP",
         "clearUrlFilter": "Svuota filtro URL",
         "noLogsFound": "Nessun log trovato",
+        "trafficPeaks": "Picchi di Traffico",
+        "trafficOverTime": "Analisi Traffico Temporale",
         "errorLoadingData": "Errore nel caricamento dei dati",
         "table": {
             "defcon": "Defcon",

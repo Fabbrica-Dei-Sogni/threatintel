@@ -343,20 +343,30 @@ These can be updated following the same pattern demonstrated in the completed co
 
 ---
 
-## Created [`src/components/LanguageSwitcher.vue`](file:///home/amodica/workspaces/threatintel/frontend/dashboard/src/components/LanguageSwitcher.vue):
+### 7. LanguageSwitcher Component
+
+Created [`src/components/LanguageSwitcher.vue`](file:///home/amodica/workspaces/threatintel/frontend/dashboard/src/components/LanguageSwitcher.vue) with **elegant dropdown select design**:
 
 ```vue
 <template>
   <div class="language-switcher">
-    <button 
-      v-for="lang in languages" 
-      :key="lang.code"
-      :class="{ active: locale === lang.code }"
-      @click="setLocale(lang.code)"
-      class="lang-btn"
-    >
-      {{ lang.flag }} {{ lang.label }}
-    </button>
+    <div class="select-wrapper">
+      <span class="globe-icon">🌐</span>
+      <select 
+        v-model="locale" 
+        @change="handleChange"
+        class="lang-select"
+      >
+        <option 
+          v-for="lang in languages" 
+          :key="lang.code"
+          :value="lang.code"
+        >
+          {{ lang.flag }} {{ lang.name }}
+        </option>
+      </select>
+      <span class="arrow-icon">▼</span>
+    </div>
   </div>
 </template>
 
@@ -373,25 +383,64 @@ const languages = [
   { code: 'pl-PL', label: 'PL', name: 'Polski', flag: '🇵🇱' },
   { code: 'ru-RU', label: 'RU', name: 'Русский', flag: '🇷🇺' }
 ];
+
+const handleChange = () => {
+  setLocale(locale.value);
+};
 </script>
 
 <style scoped>
-/* Blue naval theme matching Home.vue */
-.lang-btn {
+/* Blue naval theme with custom dropdown styling */
+.select-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
   background: linear-gradient(145deg, #003366, #004080);
-  color: #e0e7ff;
+  border: 1px solid #004080;
   border-radius: 8px;
-  /* ... */
+  padding: 8px 12px;
+  box-shadow: 0 4px 8px rgba(0, 64, 128, 0.6);
+  transition: all 0.3s ease;
 }
 
-.lang-btn.active {
-  background: linear-gradient(145deg, #0059b3, #0073e6);
-  color: #ffffff;
-  font-weight: bold;
+.lang-select {
+  appearance: none;
+  background: transparent;
+  border: none;
+  color: #e0e7ff;
+  font-weight: 600;
+  cursor: pointer;
+  color-scheme: dark;
+  accent-color: #0073e6;
+}
+
+.lang-select option {
+  background-color: #002b5c !important;
+  color: #e0e7ff !important;
+}
+
+.lang-select option:checked {
+  background: #0059b3 !important;
+  color: #ffffff !important;
+  font-weight: bold !important;
 }
 </style>
 ```
 
+**Design Features:**
+- 🌐 **Globe icon** - Visual indicator for language selection
+- 📋 **Dropdown select** - Compact and professional for 6 languages
+- 🎨 **Blue naval theme** - Consistent with dashboard design
+- ✨ **Smooth animations** - Hover effects and transitions
+- 🎯 **Full language names** - Better UX with emoji flags + names (e.g., "🇮🇹 Italiano")
+- 🔧 **Custom styled** - Complete control over dropdown appearance, no white overlays
+- ▼ **Custom arrow** - Visual dropdown indicator
+
+**Advantages:**
+- ✅ More compact than 6 separate buttons
+- ✅ Scales well for additional languages
+- ✅ Professional enterprise look
+- ✅ Fully accessible and keyboard-navigable
 ---
 
 ## Summary

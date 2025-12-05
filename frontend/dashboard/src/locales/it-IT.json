@@ -17,7 +17,8 @@
         "of": "di",
         "goToPage": "Vai a pagina",
         "detail": "Dettaglio",
-        "noDataFound": "Nessun dato trovato"
+        "noDataFound": "Nessun dato trovato",
+        "analizeProfile": "Analizza profilo"
     },
     "auth": {
         "login": "Login",
@@ -132,7 +133,9 @@
         "analysis": "Analisi",
         "techniques": "Tecniche rilevate",
         "request": "Richiesta",
+        "userAgent": "User Agent",
         "method": "Metodo",
+        "metadata": "Metadata",
         "url": "URL",
         "yes": "Sì",
         "no": "No",
@@ -142,7 +145,9 @@
         "headers": "Headers",
         "body": "Body",
         "statusCode": "Status Code",
-        "dangerScore": "Danger Score"
+        "dangerScore": "Danger Score",
+        "isBot": "E' un bot?",
+        "isCrawler": "E' un crawler?"
     },
     "ipDetails": {
         "title": "Dettagli IP",

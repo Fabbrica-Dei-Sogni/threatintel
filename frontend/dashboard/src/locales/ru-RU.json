@@ -17,7 +17,8 @@
         "of": "из",
         "goToPage": "Перейти на страницу",
         "detail": "Подробности",
-        "noDataFound": "Данные не найдены"
+        "noDataFound": "Данные не найдены",
+        "analizeProfile": "Анализировать профиль"
     },
     "auth": {
         "login": "Войти",
@@ -132,7 +133,9 @@
         "analysis": "Анализ",
         "techniques": "Обнаруженные техники",
         "request": "Запрос",
+        "userAgent": "Пользовательский агент﻿",
         "method": "Метод",
+        "metadata": "Mетаданные﻿",
         "url": "URL",
         "yes": "Да",
         "no": "Нет",
@@ -142,7 +145,9 @@
         "headers": "Заголовки",
         "body": "Тело",
         "statusCode": "Код статуса",
-        "dangerScore": "Оценка опасности"
+        "dangerScore": "Оценка опасности",
+        "isBot": "Это бот?",
+        "isCrawler": "Это crawler?"
     },
     "ipDetails": {
         "title": "Детали IP",

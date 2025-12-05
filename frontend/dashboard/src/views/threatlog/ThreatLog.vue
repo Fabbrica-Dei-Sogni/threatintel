@@ -73,37 +73,49 @@
                             t('components.radar.notAvailable') }}</p>
                         <p><strong>{{ t('threatLog.url') }}:</strong> {{ log.request.url ||
                             t('components.radar.notAvailable') }}</p>
-                        <p><strong>User Agent:</strong> {{ log.request.userAgent || t('components.radar.notAvailable')
+                        <p><strong>{{ t('threatLog.userAgent') }}:</strong> {{ log.request.userAgent ||
+                            t('components.radar.notAvailable')
                             }}</p>
+                        <!--
                         <p><strong>Referer:</strong> {{ log.request.referer || t('components.radar.notAvailable') }}</p>
-                        <HexViewer v-if="log.request" :raw-data="log.request" label="Request" />
-                        <HexViewer v-if="log.request.body" :raw-data="log.request.body" label="Request Body" />
-                        <HexViewer v-if="log.request.headers" :raw-data="log.request.headers" label="Headers" />
-                        <HexViewer v-if="log.response" :raw-data="log.response" label="Response Data" />
+                    -->
+                        <HexViewer v-if="log.request" :raw-data="log.request" :label="t('threatLog.request')" />
+                        <HexViewer v-if="log.request.body" :raw-data="log.request.body" :label="t('threatLog.body')" />
+                        <HexViewer v-if="log.request.headers" :raw-data="log.request.headers"
+                            :label="t('threatLog.headers')" />
+                        <HexViewer v-if="log.response" :raw-data="log.response" :label="t('threatLog.response')" />
+                        <!-- commentati perchè forse informazioni inutili-->
+                        <!--
                         <HexViewer v-if="log.response.query" :raw-data="log.response.query" label="Query" />
                         <HexViewer v-if="log.response.cookies" :raw-data="log.response.cookies" label="Cookies" />
+                        -->
                     </div>
                 </transition>
             </div>
 
             <div class="section">
                 <div class="section-header" @click="toggles.metadata = !toggles.metadata">
-                    <h2>Metadata</h2>
+                    <h2>{{ t('threatLog.metadata') }}</h2>
                     <span class="arrow" :class="{ open: toggles.metadata }"></span>
                 </div>
                 <transition name="collapse">
                     <div v-if="toggles.metadata" class="section-body">
-                        <p><strong>Session ID:</strong> {{ log.metadata.sessionId || t('components.radar.notAvailable')
-                            }}</p>
-                        <p><strong>User Agent Parsed:</strong></p>
+                        <!--
+                       <p><strong>Session ID:</strong> {{ log.metadata.sessionId || t('components.radar.notAvailable')
+                        }}</p>
+                    -->
+                        <p><strong>{{ t('threatLog.userAgent') }}</strong></p>
                         <pre>{{ formatJson(log.metadata.userAgent_parsed) }}</pre>
-                        <p><strong>Is Bot:</strong> {{ log.metadata.isBot ? t('threatLog.yes') : t('threatLog.no') }}
+                        <p><strong>{{ t('threatLog.isBot') }}</strong> {{ log.metadata.isBot ? t('threatLog.yes') :
+                            t('threatLog.no') }}
                         </p>
-                        <p><strong>Is Crawler:</strong> {{ log.metadata.isCrawler ? t('threatLog.yes') :
+                        <p><strong>{{ t('threatLog.isCrawler') }}</strong> {{ log.metadata.isCrawler ?
+                            t('threatLog.yes') :
                             t('threatLog.no') }}</p>
                     </div>
                 </transition>
             </div>
+
         </div>
     </div>
 </template>

@@ -10,7 +10,7 @@
                 <h2 class="attacker-ip">{{ attack.request.ip }}</h2>
             </div>
             <button @click="goToIpDetails(attack.request.ip)" class="attacker-action-btn">
-                Analyze Profile &rarr;
+                {{ t('common.analizeProfile') }} &rarr;
             </button>
         </div>
 
@@ -63,14 +63,15 @@
                             <pre> {{ log.request.url ?? t('components.radar.notAvailable') }}</pre>
                             <p><strong>User Agent:</strong> {{ log.request.userAgent ||
                                 t('components.radar.notAvailable') }}</p>
-                            <HexViewer :raw-data="log.request" label="Full Request Dump" />
+                            <HexViewer :raw-data="log.request" :label="t('threatLog.request')" />
                             <!-- 1. Headers -->
                             <HexViewer v-if="log.request.headers" :raw-data="log.request.headers"
-                                label="Request Headers" />
+                                :label="t('threatLog.headers')" />
                             <!-- 2. Body -->
-                            <HexViewer v-if="log.request.body" :raw-data="log.request.body" label="Request Body" />
+                            <HexViewer v-if="log.request.body" :raw-data="log.request.body"
+                                :label="t('threatLog.body')" />
                             <!-- 3. Response -->
-                            <HexViewer v-if="log.response" :raw-data="log.response" label="Response Data" />
+                            <HexViewer v-if="log.response" :raw-data="log.response" :label="t('threatLog.response')" />
                         </div>
                     </transition>
                 </div>

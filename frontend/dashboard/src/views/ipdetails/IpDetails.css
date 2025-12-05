@@ -3,7 +3,7 @@
   background-color: #1e1c1b;
   padding: 24px 28px;
   border-radius: 8px;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
   min-height: 100vh;
   /* overflow-x allowed but not forced */
   overflow-x: auto;

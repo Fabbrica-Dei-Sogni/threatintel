@@ -113,6 +113,11 @@
                                 </button>
                             </div>
                         </th>
+                        <th>{{ t('attacks.table.techniques') }}</th>
+
+                        <th>
+                            <span class="label">{{ t('attacks.table.countryOrg') }}</span>
+                        </th>
                         <th>
                             <div class="sort-control">
                                 <span class="label">{{ t('attacks.table.attacker') }}</span>
@@ -124,11 +129,9 @@
                             </div>
                         </th>
                         <th>{{ t('attacks.table.details') }}</th>
-                        <th>
-                            <span class="label">{{ t('attacks.table.countryOrg') }}</span>
-                        </th>
-                        <th>{{ t('attacks.table.techniques') }}</th>
 
+
+                        <!--
                         <th>
                             <div class="sort-control">
                                 <span class="label">{{ t('attacks.table.style') }}</span>
@@ -140,6 +143,8 @@
                                 </button>
                             </div>
                         </th>
+                    -->
+                        <!--
                         <th>
                             <div class="sort-control">
                                 <span class="label">{{ t('attacks.table.frequency') }}</span>
@@ -151,6 +156,7 @@
                                 </button>
                             </div>
                         </th>
+                    -->
                         <th>
                             <div class="sort-control">
                                 <span class="label">{{ t('attacks.table.avgScore') }}</span>
@@ -237,6 +243,8 @@
                             <DefconIndicator :level="attack.dangerLevel" :dangerScore="attack.dangerScore" />
                         </td>
                         </td>
+                        <td class="tecniche-cell">{{ attack.attackPatterns.join(', ') }}</td>
+                        <td>{{ attack.ipDetails.ipinfo.country }}</td>
                         <td>
                             <span style="display:inline-flex;align-items:center;">
                                 <span class="detail-link" @click="goToIpDetails(attack.request.ip)"
@@ -253,10 +261,10 @@
                                 {{ t('common.detail') }}
                             </router-link>
                         </td>
-                        <td>{{ attack.ipDetails.ipinfo.country }} - {{ attack.ipDetails.ipinfo.org }}</td>
-                        <td class="tecniche-cell">{{ attack.attackPatterns.join(', ') }}</td>
+                        <!--    
                         <td>{{ attack.intensityAttack }}</td>
                         <td>{{ attack.rpsStyle }}</td>
+                    -->
                         <td>{{ attack.averageScore }}</td>
                         <td>{{ attack.countRateLimit }}</td>
                         <td>{{ attack.rps }}</td>

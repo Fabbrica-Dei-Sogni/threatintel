@@ -1,16 +1,16 @@
 <template>
     <div class="threatlog-details">
-        <button @click="goBack" class="back-btn">← Torna indietro</button>
-        <h1>Dettaglio ThreatLog: {{ id }}</h1>
+        <button @click="goBack" class="back-btn">← {{ t('threatLog.backToLogs') }}</button>
+        <h1>{{ t('threatLog.title') }}: {{ id }}</h1>
 
-        <section v-if="loading" class="loading">Caricamento dettagli...</section>
-        <section v-if="error" class="error">Errore nel caricamento dei dettagli</section>
+        <section v-if="loading" class="loading">{{ t('common.loading') }}</section>
+        <section v-if="error" class="error">{{ t('common.error') }}</section>
 
         <div v-if="log" class="sections">
 
             <div class="section">
                 <div class="section-header" @click="toggles.general = !toggles.general">
-                    <h2>Informazioni Generali</h2>
+                    <h2>{{ t('threatLog.generalInfo') }}</h2>
                     <span class="arrow" :class="{ open: toggles.general }"></span>
                 </div>
                 <transition name="collapse">
@@ -22,33 +22,36 @@
             </div>
             <div class="section">
                 <div class="section-header" @click="toggles.geo = !toggles.geo">
-                    <h2>Geolocalizzazione</h2>
+                    <h2>{{ t('threatLog.geolocation') }}</h2>
                     <span class="arrow" :class="{ open: toggles.geo }"></span>
                 </div>
                 <transition name="collapse">
                     <div v-if="toggles.geo" class="section-body">
-                        <p><strong>Paese:</strong> {{ log.geo.country || 'N/D' }}</p>
-                        <p><strong>Regione:</strong> {{ log.geo.region || 'N/D' }}</p>
-                        <p><strong>Città:</strong> {{ log.geo.city || 'N/D' }}</p>
-                        <p><strong>Coordinate:</strong> {{ log.geo.coordinates?.join(', ') || 'N/D' }}</p>
-                        <p><strong>Timezone:</strong> {{ log.geo.timezone || 'N/D' }}</p>
-                        <p><strong>ASN:</strong> {{ log.geo.asn || 'N/D' }}</p>
-                        <p><strong>ISP:</strong> {{ log.geo.isp || 'N/D' }}</p>
+                        <p><strong>{{ t('ipDetails.country') }}:</strong> {{ log.geo.country ||
+                            t('components.radar.notAvailable') }}</p>
+                        <p><strong>{{ t('ipDetails.region') }}:</strong> {{ log.geo.region ||
+                            t('components.radar.notAvailable') }}</p>
+                        <p><strong>{{ t('ipDetails.city') }}:</strong> {{ log.geo.city ||
+                            t('components.radar.notAvailable') }}</p>
+                        <p><strong>{{ t('threatLog.coordinates') }}:</strong> {{ log.geo.coordinates?.join(', ') ||
+                            t('components.radar.notAvailable') }}</p>
+                        <p><strong>{{ t('ipDetails.timezone') }}:</strong> {{ log.geo.timezone ||
+                            t('components.radar.notAvailable') }}</p>
+                        <p><strong>ASN:</strong> {{ log.geo.asn || t('components.radar.notAvailable') }}</p>
+                        <p><strong>ISP:</strong> {{ log.geo.isp || t('components.radar.notAvailable') }}</p>
                     </div>
                 </transition>
             </div>
 
             <div class="section">
                 <div class="section-header" @click="toggles.fingerprint = !toggles.fingerprint">
-                    <h2>Fingerprint</h2>
+                    <h2>{{ t('threatLog.analysis') }}</h2>
                     <span class="arrow" :class="{ open: toggles.fingerprint }"></span>
                 </div>
                 <transition name="collapse">
                     <div v-if="toggles.fingerprint" class="section-body">
-                        <p><strong>Hash:</strong> {{ log.fingerprint.hash || 'N/D' }}</p>
-                        <p><strong>Sospetto:</strong> {{ log.fingerprint.suspicious ? 'Sì' : 'No' }}</p>
-                        <p><strong>Score:</strong> {{ log.fingerprint.score ?? 'N/D' }}</p>
-                        <p><strong>Indicatori:</strong></p>
+                        <p><strong>Hash:</strong> {{ log.fingerprint.hash || t('components.radar.notAvailable') }}</p>
+                        <p><strong>{{ t('threatLog.techniques') }}:</strong></p>
                         <ul>
                             <li v-for="(ind, i) in log.fingerprint.indicators" :key="i">{{ ind }}</li>
                         </ul>
@@ -58,19 +61,21 @@
 
             <div class="section">
                 <div class="section-header" @click="toggles.request = !toggles.request">
-                    <h2>Request</h2>
+                    <h2>{{ t('threatLog.request') }}</h2>
                     <span class="arrow" :class="{ open: toggles.request }"></span>
                 </div>
                 <transition name="collapse">
                     <div v-if="toggles.request" class="section-body">
                         <p @click="goToIpDetails(log.request.ip)" class="link" style="cursor: pointer;">
-                            <strong>IP:</strong> {{ log.request.ip ||
-                                'N/D' }}
+                            <strong>IP:</strong> {{ log.request.ip || t('components.radar.notAvailable') }}
                         </p>
-                        <p><strong>Method:</strong> {{ log.request.method || 'N/D' }}</p>
-                        <p><strong>URL:</strong> {{ log.request.url || 'N/D' }}</p>
-                        <p><strong>User Agent:</strong> {{ log.request.userAgent || 'N/D' }}</p>
-                        <p><strong>Referer:</strong> {{ log.request.referer || 'N/D' }}</p>
+                        <p><strong>{{ t('threatLog.method') }}:</strong> {{ log.request.method ||
+                            t('components.radar.notAvailable') }}</p>
+                        <p><strong>{{ t('threatLog.url') }}:</strong> {{ log.request.url ||
+                            t('components.radar.notAvailable') }}</p>
+                        <p><strong>User Agent:</strong> {{ log.request.userAgent || t('components.radar.notAvailable')
+                            }}</p>
+                        <p><strong>Referer:</strong> {{ log.request.referer || t('components.radar.notAvailable') }}</p>
                         <HexViewer v-if="log.request" :raw-data="log.request" label="Request" />
                         <HexViewer v-if="log.request.body" :raw-data="log.request.body" label="Request Body" />
                         <HexViewer v-if="log.request.headers" :raw-data="log.request.headers" label="Headers" />
@@ -88,11 +93,14 @@
                 </div>
                 <transition name="collapse">
                     <div v-if="toggles.metadata" class="section-body">
-                        <p><strong>Session ID:</strong> {{ log.metadata.sessionId || 'N/D' }}</p>
+                        <p><strong>Session ID:</strong> {{ log.metadata.sessionId || t('components.radar.notAvailable')
+                            }}</p>
                         <p><strong>User Agent Parsed:</strong></p>
                         <pre>{{ formatJson(log.metadata.userAgent_parsed) }}</pre>
-                        <p><strong>Is Bot:</strong> {{ log.metadata.isBot ? 'Sì' : 'No' }}</p>
-                        <p><strong>Is Crawler:</strong> {{ log.metadata.isCrawler ? 'Sì' : 'No' }}</p>
+                        <p><strong>Is Bot:</strong> {{ log.metadata.isBot ? t('threatLog.yes') : t('threatLog.no') }}
+                        </p>
+                        <p><strong>Is Crawler:</strong> {{ log.metadata.isCrawler ? t('threatLog.yes') :
+                            t('threatLog.no') }}</p>
                     </div>
                 </transition>
             </div>
@@ -105,7 +113,10 @@ import { ref, reactive, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import dayjs from 'dayjs'
 import { fetchLogById } from '../../api/index'
+import { useI18n } from 'vue-i18n'
 import HexViewer from '../../components/HexViewer.vue'; // <--- AGGIUNGI QUESTO
+
+const { t } = useI18n();
 
 const route = useRoute()
 const router = useRouter()

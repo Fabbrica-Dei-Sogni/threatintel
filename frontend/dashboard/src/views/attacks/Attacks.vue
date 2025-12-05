@@ -1,41 +1,41 @@
 <template>
     <div class="attacchi">
-        <h1>Honeypot Dashboard – Attacchi</h1>
+        <h1>{{ t('attacks.title') }}</h1>
         <!-- Pulsante per tornare alla Home principale -->
         <div class="actions">
             <button @click="goToHome" class="btn-action">
-                Cruscotto
+                {{ t('attacks.dashboard') }}
             </button>
             <button @click="goToLogs" class="btn-action">
-                Log requests
+                {{ t('attacks.logRequests') }}
             </button>
         </div>
 
         <!-- Filtro avanzato: Minimo log per attacco -->
         <section class="filter-bar">
             <label class="min-logs-label" for="minLogsForAttack">
-                Numero minimo di log per attacco:
+                {{ t('attacks.minLogsLabel') }}
             </label>
             <el-input-number id="minLogsForAttack" v-model="minLogsForAttack" :min="1" :step="1" class="min-logs-input"
                 size="small" @input="onFilterChanged" />
         </section>
 
         <section class="time-filter">
-            <label>Filtro temporale:</label>
+            <label>{{ t('attacks.timeFilter') }}</label>
 
             <!-- Seleziona modalità -->
             <el-radio-group v-model="timeMode" size="small" @change="onFilterChanged">
-                <el-radio-button label="ago">Ultimi</el-radio-button>
-                <el-radio-button label="range">Intervallo</el-radio-button>
+                <el-radio-button label="ago">{{ t('attacks.last') }}</el-radio-button>
+                <el-radio-button label="range">{{ t('attacks.range') }}</el-radio-button>
             </el-radio-group>
 
             <!-- Solo “Ultimi X” -->
             <div v-if="timeMode === 'ago'" class="time-ago">
                 <el-input-number v-model="agoValue" :min="1" size="small" @input="onFilterChanged" />
-                <el-select v-model="agoUnit" size="small" placeholder="Unità" @change="onFilterChanged">
-                    <el-option label="Minuti" value="minutes" />
-                    <el-option label="Ore" value="hours" />
-                    <el-option label="Giorni" value="days" />
+                <el-select v-model="agoUnit" size="small" :placeholder="t('attacks.unit')" @change="onFilterChanged">
+                    <el-option :label="t('attacks.minutes')" value="minutes" />
+                    <el-option :label="t('attacks.hours')" value="hours" />
+                    <el-option :label="t('attacks.days')" value="days" />
                 </el-select>
             </div>
 
@@ -76,9 +76,9 @@
 
         <section class="filters">
             <div class="input-wrapper">
-                <input v-model="filterIp" placeholder="Filtra per IP..." @input="onFilterChanged" class="input"
+                <input v-model="filterIp" :placeholder="t('attacks.filterByIp')" @input="onFilterChanged" class="input"
                     type="text" />
-                <button v-if="filterIp" @click="clearIpFilter" class="clear-button" title="Svuota filtro IP"
+                <button v-if="filterIp" @click="clearIpFilter" class="clear-button" :title="t('attacks.clearIpFilter')"
                     type="button" aria-label="Clear IP filter">
                     ✕
                 </button>
@@ -87,12 +87,12 @@
         </section>
 
         <div class="pagination" v-if="total > pageSize">
-            <button :disabled="page === 1" @click="changePage(page - 1)">Prev</button>
-            <span>Pagina {{ page }} di {{ totalPages }}</span>
-            <button :disabled="page === totalPages" @click="changePage(page + 1)">Next</button>
+            <button :disabled="page === 1" @click="changePage(page - 1)">{{ t('common.prev') }}</button>
+            <span>{{ t('common.page') }} {{ page }} {{ t('common.of') }} {{ totalPages }}</span>
+            <button :disabled="page === totalPages" @click="changePage(page + 1)">{{ t('common.next') }}</button>
 
             <!-- Input per inserire pagina manualmente -->
-            <label for="pageInput" style="margin-left: 10px;">Vai a pagina:</label>
+            <label for="pageInput" style="margin-left: 10px;">{{ t('common.goToPage') }}:</label>
             <input class="pagination-input" id="pageInput" type="number" v-model.number="inputPage" :min="1"
                 :max="totalPages" style="width: 60px; padding: 2px 5px;" placeholder="1" />
 
@@ -104,7 +104,7 @@
                     <tr>
                         <th>
                             <div class="sort-control">
-                                <span class="label">Defcon</span>
+                                <span class="label">{{ t('attacks.table.defcon') }}</span>
                                 <button @click="toggleSort('dangerScore')" aria-label="Ordina Pericolosità"
                                     class="sort-button">
                                     <span v-if="getSortDirection('dangerScore') === 1">▲</span>
@@ -115,7 +115,7 @@
                         </th>
                         <th>
                             <div class="sort-control">
-                                <span class="label">Attaccante</span>
+                                <span class="label">{{ t('attacks.table.attacker') }}</span>
                                 <button @click="toggleSort('request.ip')" aria-label="Ordina IP" class="sort-button">
                                     <span v-if="getSortDirection('request.ip') === 1">▲</span>
                                     <span v-else-if="getSortDirection('request.ip') === -1">▼</span>
@@ -123,15 +123,15 @@
                                 </button>
                             </div>
                         </th>
-                        <th>Dettagli</th>
+                        <th>{{ t('attacks.table.details') }}</th>
                         <th>
-                            <span class="label">Paese - Org</span>
+                            <span class="label">{{ t('attacks.table.countryOrg') }}</span>
                         </th>
-                        <th>Tecniche</th>
+                        <th>{{ t('attacks.table.techniques') }}</th>
 
                         <th>
                             <div class="sort-control">
-                                <span class="label">Stile</span>
+                                <span class="label">{{ t('attacks.table.style') }}</span>
                                 <button @click="toggleSort('intensityAttack')" aria-label="Ordina Stile"
                                     class="sort-button">
                                     <span v-if="getSortDirection('intensityAttack') === 1">▲</span>
@@ -142,7 +142,7 @@
                         </th>
                         <th>
                             <div class="sort-control">
-                                <span class="label">Frequenza</span>
+                                <span class="label">{{ t('attacks.table.frequency') }}</span>
                                 <button @click="toggleSort('rpsStyle')" aria-label="Ordina Frequenza"
                                     class="sort-button">
                                     <span v-if="getSortDirection('rpsStyle') === 1">▲</span>
@@ -153,7 +153,7 @@
                         </th>
                         <th>
                             <div class="sort-control">
-                                <span class="label">Punteggio medio</span>
+                                <span class="label">{{ t('attacks.table.avgScore') }}</span>
                                 <button @click="toggleSort('averageScore')" aria-label="Ordina Punteggio medio"
                                     class="sort-button">
                                     <span v-if="getSortDirection('averageScore') === 1">▲</span>
@@ -164,7 +164,7 @@
                         </th>
                         <th>
                             <div class="sort-control">
-                                <span class="label">Rate breach</span>
+                                <span class="label">{{ t('attacks.table.rateBreach') }}</span>
                                 <button @click="toggleSort('countRateLimit')" aria-label="Ordina Rate breach"
                                     class="sort-button">
                                     <span v-if="getSortDirection('countRateLimit') === 1">▲</span>
@@ -175,7 +175,7 @@
                         </th>
                         <th title="Richieste al secondo">
                             <div class="sort-control">
-                                <span class="label">RPS</span>
+                                <span class="label">{{ t('attacks.table.rps') }}</span>
                                 <button @click="toggleSort('rps')" aria-label="Ordina RPS" class="sort-button">
                                     <span v-if="getSortDirection('rps') === 1">▲</span>
                                     <span v-else-if="getSortDirection('rps') === -1">▼</span>
@@ -185,7 +185,7 @@
                         </th>
                         <th>
                             <div class="sort-control">
-                                <span class="label">Totale Log</span>
+                                <span class="label">{{ t('attacks.table.totalLogs') }}</span>
                                 <button @click="toggleSort('totaleLogs')" aria-label="Ordina Totale Log"
                                     class="sort-button">
                                     <span v-if="getSortDirection('totaleLogs') === 1">▲</span>
@@ -196,7 +196,7 @@
                         </th>
                         <th>
                             <div class="sort-control">
-                                <span class="label">Durata Attacco</span>
+                                <span class="label">{{ t('attacks.table.attackDuration') }}</span>
                                 <button @click="toggleSort('durataAttacco.human')" aria-label="Ordina Durata Attacco"
                                     class="sort-button">
                                     <span v-if="getSortDirection('durataAttacco.human') === 1">▲</span>
@@ -208,7 +208,7 @@
 
                         <th>
                             <div class="sort-control">
-                                <span class="label">Primo avvistamento</span>
+                                <span class="label">{{ t('attacks.table.firstSeen') }}</span>
                                 <button @click="toggleSort('firstSeen')" aria-label="Ordina Primo avvistamento"
                                     class="sort-button">
                                     <span v-if="getSortDirection('firstSeen') === 1">▲</span>
@@ -219,7 +219,7 @@
                         </th>
                         <th>
                             <div class="sort-control">
-                                <span class="label">Ultimo avvistamento</span>
+                                <span class="label">{{ t('attacks.table.lastSeen') }}</span>
                                 <button @click="toggleSort('lastSeen')" aria-label="Ordina Ultimo avvistamento"
                                     class="sort-button">
                                     <span v-if="getSortDirection('lastSeen') === 1">▲</span>
@@ -250,7 +250,7 @@
                                 name: 'AttackDetail',
                                 query: { attack: encodeURIComponent(JSON.stringify(attack)) }
                             }" class="detail-link">
-                                Dettaglio
+                                {{ t('common.detail') }}
                             </router-link>
                         </td>
                         <td>{{ attack.ipDetails.ipinfo.country }} - {{ attack.ipDetails.ipinfo.org }}</td>
@@ -267,20 +267,20 @@
                     </tr>
                     <tr v-if="attacks.length === 0 && !loading">
                         <td colspan="6" style="text-align:center;">
-                            Nessun attacco trovato
+                            {{ t('attacks.noAttacksFound') }}
                         </td>
                     </tr>
                 </tbody>
             </table>
 
             <div class="pagination" v-if="total > pageSize">
-                <button :disabled="page === 1" @click="changePage(page - 1)">Prev</button>
-                <span>Pagina {{ page }} di {{ totalPages }}</span>
-                <button :disabled="page === totalPages" @click="changePage(page + 1)">Next</button>
+                <button :disabled="page === 1" @click="changePage(page - 1)">{{ t('common.prev') }}</button>
+                <span>{{ t('common.page') }} {{ page }} {{ t('common.of') }} {{ totalPages }}</span>
+                <button :disabled="page === totalPages" @click="changePage(page + 1)">{{ t('common.next') }}</button>
             </div>
 
-            <div v-if="loading" class="loading">Caricamento...</div>
-            <div v-if="error" class="error">Errore nel caricamento dei dati</div>
+            <div v-if="loading" class="loading">{{ t('common.loading') }}</div>
+            <div v-if="error" class="error">{{ t('attacks.errorLoadingData') }}</div>
         </section>
     </div>
 </template>
@@ -290,7 +290,10 @@ import { computed, watch, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import dayjs from 'dayjs';
 import { useAttacksFilter } from '../../composable/useAttacksFilter';
+import { useI18n } from 'vue-i18n';
 import DefconIndicator from '../../components/DefconIndicator.vue'; // Verifica il percorso corretto
+
+const { t } = useI18n();
 
 const props = defineProps({
     initialIp: String,

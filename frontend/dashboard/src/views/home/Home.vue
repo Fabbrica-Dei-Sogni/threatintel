@@ -1,36 +1,42 @@
 <template>
   <div class="dashboard">
-    <h1>Honeypot Dashboard</h1>
+    <div class="header-with-lang">
+      <h1>{{ $t('home.title') }}</h1>
+      <LanguageSwitcher />
+    </div>
     <section class="actions">
-      <button @click="goToAttacks" class="btn-action">Attacchi</button>
-      <button @click="goToLogs" class="btn-action">Log requests</button>
+      <button @click="goToAttacks" class="btn-action">{{ $t('home.attacks') }}</button>
+      <button @click="goToLogs" class="btn-action">{{ $t('home.logRequests') }}</button>
     </section>
 
     <section class="widgets">
       <div class="widget">
-        <h2>Ultimi 10 attacchi</h2>
+        <h2>{{ $t('home.recentAttacks') }}</h2>
         <ul>
           <li v-for="attack in recentAttacks" :key="attack.id">
-            <span @click="goToIpDetails(attack.request.ip)" style="cursor: pointer;">{{ attack.request.ip }}</span> - {{ attack.ipDetails?.ipinfo?.country }} - {{ formatDate(attack.firstSeen) }} - {{ attack.durataAttacco.human }}
-            <router-link :to="{ name:'AttackDetail', query: { attack: encodeURIComponent(JSON.stringify(attack)) } }">Dettaglio</router-link>
+            <span @click="goToIpDetails(attack.request.ip)" style="cursor: pointer;">{{ attack.request.ip }}</span> - {{
+              attack.ipDetails?.ipinfo?.country }} - {{ formatDate(attack.firstSeen) }} - {{ attack.durataAttacco.human }}
+            <router-link :to="{ name: 'AttackDetail', query: { attack: encodeURIComponent(JSON.stringify(attack)) } }">{{
+              $t('common.detail') }}</router-link>
           </li>
         </ul>
-        <div v-if="loadingAttacks">Caricamento attacchi...</div>
-        <div v-if="errorAttacks">Errore caricamento attacchi</div>
+        <div v-if="loadingAttacks">{{ $t('home.loadingAttacks') }}</div>
+        <div v-if="errorAttacks">{{ $t('home.errorLoadingAttacks') }}</div>
       </div>
       <div class="widget">
-        <h2>Ultimi 10 log</h2>
+        <h2>{{ $t('home.recentLogs') }}</h2>
         <ul>
           <li v-for="log in recentLogs" :key="log._id">
-            <span @click="goToIpDetails(log.request.ip)" style="cursor: pointer;">{{ log.request.ip }}</span> - {{ log.ipDetailsId?.ipinfo?.country }} - {{ formatDate(log.timestamp) }} - {{ log.request.url }}
-            <router-link :to="{ name:'ThreatLog', params:{ id: log.id } }">Dettaglio</router-link>
+            <span @click="goToIpDetails(log.request.ip)" style="cursor: pointer;">{{ log.request.ip }}</span> - {{
+              log.ipDetailsId?.ipinfo?.country }} - {{ formatDate(log.timestamp) }} - {{ log.request.url }}
+            <router-link :to="{ name: 'ThreatLog', params: { id: log.id } }">{{ $t('common.detail') }}</router-link>
           </li>
         </ul>
-        <div v-if="loadingLogs">Caricamento log...</div>
-        <div v-if="errorLogs">Errore caricamento log</div>
+        <div v-if="loadingLogs">{{ $t('home.loadingLogs') }}</div>
+        <div v-if="errorLogs">{{ $t('home.errorLoadingLogs') }}</div>
       </div>
       <div class="widget map">
-        <h2>Mappa Attacchi (prossimamente)</h2>
+        <h2>{{ $t('home.attackMap') }}</h2>
         <div id="attack-map" style="height:300px; background:#eee;"></div>
       </div>
     </section>
@@ -43,7 +49,11 @@ import { useLogsFilter } from '../../composable/useLogsFilter';
 import { useAttacksFilter } from '../../composable/useAttacksFilter';
 import { useRouter } from 'vue-router'
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import dayjs from 'dayjs';
+import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
+
+const { t } = useI18n();
 
 // Navigazione
 const router = useRouter()
@@ -55,12 +65,12 @@ function goToLogs() {
 }
 
 function goToIpDetails(ip) {
-    router.push(`/ip/${ip}`)
+  router.push(`/ip/${ip}`)
 }
 
 // Funzioni per template
 function formatDate(timestamp) {
-    return dayjs(timestamp).format('DD/MM/YYYY HH:mm:ss');
+  return dayjs(timestamp).format('DD/MM/YYYY HH:mm:ss');
 };
 
 // Attacchi - chiamata base: nessun filtro, prima pagina, ordina per ultimi

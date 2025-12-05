@@ -1,28 +1,28 @@
 <template>
     <div class="attack-detail">
-        <button @click="goBack" class="back-btn">← Torna indietro</button>
-        <h1>Dettaglio Attacco: <span @click="goToIpDetails(attack.request.ip)" style="cursor: pointer;">{{
+        <button @click="goBack" class="back-btn">← {{ t('attackDetail.backToAttacks') }}</button>
+        <h1>{{ t('attackDetail.title') }}: <span @click="goToIpDetails(attack.request.ip)" style="cursor: pointer;">{{
             attack.request.ip }}</span></h1>
 
-        <section v-if="loading" class="loading">Caricamento dettagli attacco...</section>
-        <section v-if="error" class="error">Errore nel caricamento dei dati</section>
+        <section v-if="loading" class="loading">{{ t('common.loading') }}</section>
+        <section v-if="error" class="error">{{ t('common.error') }}</section>
         <div v-if="attack" class="attack-summary">
             <div class="summary-row">
                 <section>
-                    <strong>Defcon:</strong>
+                    <strong>{{ t('attackDetail.defconLevel') }}:</strong>
                     <DefconIndicator :level="attack.dangerLevel" :dangerScore="attack.dangerScore" />
                 </section>
             </div>
             <div class="summary-row">
-                <div><strong>Totale Log:</strong> {{ attack.totaleLogs }}</div>
-                <div><strong>Durata:</strong> {{ attack.durataAttacco.human }}</div>
-                <div><strong>RPS:</strong> {{ attack.rps }}</div>
+                <div><strong>{{ t('attackDetail.totalLogs') }}:</strong> {{ attack.totaleLogs }}</div>
+                <div><strong>{{ t('attackDetail.attackDuration') }}:</strong> {{ attack.durataAttacco.human }}</div>
+                <div><strong>{{ t('attackDetail.rps') }}:</strong> {{ attack.rps }}</div>
             </div>
-            <div><strong>Punteggio medio:</strong> {{ attack.averageScore }}</div>
-            <div><strong>Stile:</strong> {{ attack.intensityAttack }}</div>
-            <div><strong>Tecniche utilizzate:</strong> {{ attack.attackPatterns.join(', ') }}</div>
-            <div><strong>Primo avvistamento:</strong> {{ formatDate(attack.firstSeen) }}</div>
-            <div><strong>Ultimo avvistamento:</strong> {{ formatDate(attack.lastSeen) }}</div>
+            <div><strong>{{ t('attackDetail.avgScore') }}:</strong> {{ attack.averageScore }}</div>
+            <div><strong>{{ t('attackDetail.style') }}:</strong> {{ attack.intensityAttack }}</div>
+            <div><strong>{{ t('attackDetail.techniques') }}:</strong> {{ attack.attackPatterns.join(', ') }}</div>
+            <div><strong>{{ t('attackDetail.firstSeen') }}:</strong> {{ formatDate(attack.firstSeen) }}</div>
+            <div><strong>{{ t('attackDetail.lastSeen') }}:</strong> {{ formatDate(attack.lastSeen) }}</div>
             <section class="attack-profile">
                 <AttackProfileRadar v-if="attack" :attackDetail="attack" />
             </section>
@@ -30,26 +30,29 @@
         <div v-if="attack" class="attack-aggregates">
 
             <el-card class="logs-container" v-if="attack">
-                <h2>Log Raggruppati</h2>
+                <h2>{{ t('attackDetail.logsRaggrupati') }}</h2>
 
                 <div v-for="log in paginatedLogs" :key="log.id" class="log-entry">
                     <div class="log-header" @click="toggleLog(log.id)">
-                        <span>{{ formatDate(log.timestamp) }} - {{ log.request.method }} {{ log.request.url || 'N/D'
-                            }} </span>
+                        <span>{{ formatDate(log.timestamp) }} - {{ log.request.method }} {{ log.request.url ||
+                            t('components.radar.notAvailable')
+                        }} </span>
                         <span class="toggle-icon">{{ expanded[log.id] ? '–' : '+' }}</span>
                     </div>
                     <transition name="collapse">
                         <div v-if="expanded[log.id]" class="log-body">
-                            <p><strong>Score:</strong> {{ log.fingerprint.score ?? 'N/D' }}</p>
+                            <p><strong>Score:</strong> {{ log.fingerprint.score ?? t('components.radar.notAvailable') }}
+                            </p>
                             <span v-if="log.fingerprint.score != null && log.fingerprint.score > 0">
-                                <p><strong>Indicatori:</strong></p>
+                                <p><strong>{{ t('threatLog.techniques') }}:</strong></p>
                                 <ul>
                                     <li v-for="(ind, i) in log.fingerprint.indicators" :key="i">{{ ind }}</li>
                                 </ul>
                             </span>
-                            <p><strong>Url:</strong></p>
-                            <pre> {{ log.request.url ?? 'N/D' }}</pre>
-                            <p><strong>User Agent:</strong> {{ log.request.userAgent || 'N/D' }}</p>
+                            <p><strong>{{ t('threatLog.url') }}:</strong></p>
+                            <pre> {{ log.request.url ?? t('components.radar.notAvailable') }}</pre>
+                            <p><strong>User Agent:</strong> {{ log.request.userAgent ||
+                                t('components.radar.notAvailable') }}</p>
                             <HexViewer :raw-data="log.request" label="Full Request Dump" />
                             <!-- 1. Headers -->
                             <HexViewer v-if="log.request.headers" :raw-data="log.request.headers"
@@ -70,7 +73,7 @@
             </el-card>
 
             <el-card class="rate-limit-events-container" v-if="attack.rateLimitList && attack.countRateLimit">
-                <h2>Eventi Rate Limit</h2>
+                <h2>{{ t('attackDetail.rateBreach') }}</h2>
 
                 <div v-for="event in paginatedRateLimitEvents" :key="event._id || event.id"
                     class="rate-limit-event-entry">
@@ -80,11 +83,15 @@
                     </div>
                     <transition name="collapse">
                         <div v-if="expandedEvents[event._id || event.id]" class="event-body">
-                            <p><strong>User Agent:</strong> {{ event.userAgent || 'N/D' }}</p>
+                            <p><strong>User Agent:</strong> {{ event.userAgent || t('components.radar.notAvailable') }}
+                            </p>
                             <p><strong>Path:</strong> {{ event.path }}</p>
-                            <p><strong>Method:</strong> {{ event.method || 'N/D' }}</p>
-                            <p><strong>Honeypot ID:</strong> {{ event.honeypotId || 'N/D' }}</p>
-                            <p><strong>Messaggio:</strong> {{ event.message || 'N/D' }}</p>
+                            <p><strong>{{ t('threatLog.method') }}:</strong> {{ event.method ||
+                                t('components.radar.notAvailable') }}</p>
+                            <p><strong>Honeypot ID:</strong> {{ event.honeypotId || t('components.radar.notAvailable')
+                            }}</p>
+                            <p><strong>{{ t('common.error') }}:</strong> {{ event.message ||
+                                t('components.radar.notAvailable') }}</p>
                             <HexViewer v-if="event.headers" :raw-data="event.headers" label="Headers" />
                         </div>
                     </transition>
@@ -105,9 +112,12 @@
 import { ref, reactive, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import dayjs from 'dayjs'
+import { useI18n } from 'vue-i18n'
 import DefconIndicator from '../../components/DefconIndicator.vue'; // Verifica il percorso corretto
 import AttackProfileRadar from '../../components/AttackProfileRadar.vue';
 import HexViewer from '../../components/HexViewer.vue'; // <--- AGGIUNGI QUESTO
+
+const { t } = useI18n();
 
 // Props
 const props = defineProps({

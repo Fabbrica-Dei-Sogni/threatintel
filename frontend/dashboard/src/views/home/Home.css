@@ -1,14 +1,26 @@
 .dashboard {
-  background-color: #001f3f; /* blu navale scuro */
-  color: #e0e7ff; /* testo chiaro azzurro pallido */
+  background-color: #001f3f;
+  /* blu navale scuro */
+  color: #e0e7ff;
+  /* testo chiaro azzurro pallido */
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   min-height: 100vh;
   padding: 20px;
 }
 
-h1, h2 {
-  color: #cbd5e1; /* colore titoli leggermente più chiaro, elegante */
-  text-shadow: 0 0 5px #002b5c; /* leggero alone blu scuro per contrasto */
+.header-with-lang {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+h1,
+h2 {
+  color: #cbd5e1;
+  /* colore titoli leggermente più chiaro, elegante */
+  text-shadow: 0 0 5px #002b5c;
+  /* leggero alone blu scuro per contrasto */
 }
 
 .actions {
@@ -40,7 +52,8 @@ h1, h2 {
 }
 
 .widget {
-  background-color: #00294d; /* sfondo widget più chiaro per contrasto */
+  background-color: #00294d;
+  /* sfondo widget più chiaro per contrasto */
   border-radius: 12px;
   padding: 20px;
   flex: 1 1 300px;
@@ -92,7 +105,8 @@ h1, h2 {
 }
 
 /* Messaggi di caricamento ed errore */
-.loading, .error {
+.loading,
+.error {
   color: #99bbff;
   font-style: italic;
   margin-top: 10px;

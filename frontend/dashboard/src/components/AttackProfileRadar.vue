@@ -2,9 +2,13 @@
 import { computed } from 'vue';
 import { Chart as ChartJS, Title, Tooltip, Legend, RadialLinearScale, PointElement, LineElement, Filler } from 'chart.js';
 import { Radar } from 'vue-chartjs';
+import { useI18n } from 'vue-i18n';
 
 // Registrazione dei componenti Chart.js (incluso Filler per il riempimento!)
 ChartJS.register(Title, Tooltip, Legend, RadialLinearScale, PointElement, LineElement, Filler);
+
+// i18n
+const { t } = useI18n();
 
 // Importa il tuo componente Chart.js/Vue qui (es. RadarChart, Chart)
 // Esempio con vue-chartjs (deve essere installato: npm install vue-chartjs chart.js)
@@ -42,16 +46,16 @@ const originalData = computed(() => {
 
     return [
         // Asse 1: Rischio Tecnico
-        { label: 'Indice minaccia', rawValue: attack.averageScore, format: (v) => v ? v.toFixed(2) + ' score' : 'N/D' },
+        { label: t('components.radar.threatIndex'), rawValue: attack.averageScore, format: (v) => v ? v.toFixed(2) + ` ${t('components.radar.score')}` : t('components.radar.notAvailable') },
 
         // Asse 2: Complessità (Tecniche Uniche)
-        { label: 'Ampiezza', rawValue: attack.uniqueTechCount, format: (v) => v ? v.toFixed(0) + ' tecniche' : 'N/D' },
+        { label: t('components.radar.breadth'), rawValue: attack.uniqueTechCount, format: (v) => v ? v.toFixed(0) + ` ${t('components.radar.techniques')}` : t('components.radar.notAvailable') },
 
         // Asse 3: Velocità (RPS)
-        { label: 'Velocità (RPS)', rawValue: attack.rps, format: (v) => v ? v.toFixed(1) + ' RPS' : 'N/D' },
+        { label: t('components.radar.speed'), rawValue: attack.rps, format: (v) => v ? v.toFixed(1) + ` ${t('components.radar.rps')}` : t('components.radar.notAvailable') },
 
         // Asse 4: Persistenza (Durata)
-        { label: 'Durata', rawValue: attack.attackDurationMinutes, format: (v) => v ? v.toFixed(0) + ' min' : 'N/D' },
+        { label: t('components.radar.duration'), rawValue: attack.attackDurationMinutes, format: (v) => v ? v.toFixed(0) + ` ${t('components.radar.minutes')}` : t('components.radar.notAvailable') },
     ];
 });
 
@@ -80,7 +84,7 @@ const chartData = computed(() => {
         labels: originalData.value.map(d => d.label), // Usa le etichette dell'array grezzo,
         datasets: [
             {
-                label: `Profilo Attacco IP: ${attack.request.ip}`,
+                label: `${t('components.radar.attackProfile')}: ${attack.request.ip}`,
                 data: dataValues,
                 // Colori coordinati con AttackDetail.css (rosso-bruciato)
                 backgroundColor: 'rgba(217, 48, 37, 0.25)', // Rosso brillante semi-trasparente (#d93025)

@@ -5,11 +5,11 @@
 
             <!-- Header delle colonne (00 01 02 ...) -->
             <div class="hex-row header">
-                <div class="hex-offset">Offset</div>
+                <div class="hex-offset">{{ t('components.hexViewer.offset') }}</div>
                 <div class="hex-bytes">
                     <span v-for="n in 16" :key="n">{{ (n - 1).toString(16).toUpperCase().padStart(2, '0') }}</span>
                 </div>
-                <div class="hex-ascii">Decoded Text</div>
+                <div class="hex-ascii">{{ t('components.hexViewer.ascii') }}</div>
             </div>
 
             <!-- Righe Dati -->
@@ -44,6 +44,9 @@
 
 <script setup>
 import { computed, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const props = defineProps({
     rawData: {

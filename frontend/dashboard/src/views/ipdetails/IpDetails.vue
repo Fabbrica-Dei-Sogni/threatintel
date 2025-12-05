@@ -1,26 +1,26 @@
 <template>
   <div class="ip-details">
-    <button @click="goBack" class="back-btn">← Torna indietro</button>
+    <button @click="goBack" class="back-btn">← {{ t('ipDetails.backToAttacks') }}</button>
 
-    <h1>Dettaglio IP: {{ ip }}</h1>
+    <h1>{{ t('ipDetails.title') }}: {{ ip }}</h1>
 
-    <section v-if="loading" class="loading">Caricamento dettagli...</section>
-    <section v-if="error" class="error">Errore nel caricamento dei dettagli</section>
+    <section v-if="loading" class="loading">{{ t('common.loading') }}</section>
+    <section v-if="error" class="error">{{ t('common.error') }}</section>
 
     <div v-if="ipInfo" class="sections">
       <!-- Sezioni toggle -->
       <div class="section" v-if="ipInfo.abuseipdbId">
         <div class="section-header" @click="toggles.abuse = !toggles.abuse">
-          <h2>Punteggio Reputazione (AbuseIPDB)</h2>
+          <h2>{{ t('ipDetails.additionalInfo') }}</h2>
           <span class="arrow" :class="{ open: toggles.abuse }"></span>
         </div>
         <transition name="collapse">
           <div v-if="toggles.abuse" class="section-body">
 
             <button @click="aggiornaReputationScore" :disabled="loadingReputationScore" class="update-btn">
-              {{ loadingReputationScore ? 'Caricamento...' : 'Aggiorna Reputation score' }}
+              {{ loadingReputationScore ? t('common.loading') : t('ipDetails.additionalInfo') }}
             </button>
-            <section v-if="errorReputationScore" class="error">Aggiornamento reputation score fallito.</section>
+            <section v-if="errorReputationScore" class="error">{{ t('common.error') }}</section>
 
             <p><strong>Score:</strong> {{ ipInfo.abuseipdbId.abuseConfidenceScore || 'N/D' }}</p>
             <p><strong>In lista nera:</strong> {{ ipInfo.abuseipdbId.isListed || 'N/D' }}</p>
@@ -35,20 +35,20 @@
 
       <div class="section" v-if="reports.length >= 0">
         <div class="section-header" @click="toggles.reports = !toggles.reports">
-          <h2>Reports Associati</h2>
+          <h2>{{ t('ipDetails.relatedLogs') }}</h2>
           <span class="arrow" :class="{ open: toggles.reports }"></span>
         </div>
         <transition name="collapse">
           <div v-if="toggles.reports" class="section-body">
             <button @click="aggiornaReports" :disabled="loadingReports" class="update-btn">
-              {{ loadingReports ? 'Caricamento...' : 'Aggiorna Reports' }}
+              {{ loadingReports ? t('common.loading') : t('ipDetails.relatedLogs') }}
             </button>
-            <section v-if="errorReports" class="error">Aggiornamento report fallito.</section>
+            <section v-if="errorReports" class="error">{{ t('common.error') }}</section>
 
             <div v-for="report in paginatedReports" :key="report._id" class="report-entry">
               <div class="report-header" @click="toggleReport(report._id)">
                 <span>{{ formatDate(report.reportedAt) }} - {{report.categories.map(cat => cat.name).join(', ')
-                  }}</span>
+                }}</span>
                 <span class="toggle-icon">{{ expandedReports[report._id] ? '–' : '+' }}</span>
               </div>
               <transition name="collapse">
@@ -74,20 +74,20 @@
 
       <div class="section">
         <div class="section-header" @click="toggles.geo = !toggles.geo">
-          <h2>Informazioni Geografiche</h2>
+          <h2>{{ t('ipDetails.location') }}</h2>
           <span class="arrow" :class="{ open: toggles.geo }"></span>
         </div>
         <transition name="collapse">
           <div v-if="toggles.geo" class="section-body">
-            <p><strong>Organizzazione:</strong> {{ ipInfo.ipinfo.org || 'N/A' }}</p>
+            <p><strong>{{ t('ipDetails.organization') }}:</strong> {{ ipInfo.ipinfo.org || 'N/A' }}</p>
             <p><strong>ISP:</strong> {{ ipInfo.ipinfo.hostname || 'N/A' }}</p>
-            <p><strong>Paese:</strong> {{ ipInfo.ipinfo.country || 'N/A' }}</p>
-            <p><strong>Regione:</strong> {{ ipInfo.ipinfo.region || 'N/A' }}</p>
-            <p><strong>Città:</strong> {{ ipInfo.ipinfo.city || 'N/A' }}</p>
+            <p><strong>{{ t('ipDetails.country') }}:</strong> {{ ipInfo.ipinfo.country || 'N/A' }}</p>
+            <p><strong>{{ t('ipDetails.region') }}:</strong> {{ ipInfo.ipinfo.region || 'N/A' }}</p>
+            <p><strong>{{ t('ipDetails.city') }}:</strong> {{ ipInfo.ipinfo.city || 'N/A' }}</p>
             <p><strong>Postal:</strong> {{ ipInfo.ipinfo.postal || 'N/A' }}</p>
-            <p><strong>Coordinate:</strong> {{ ipInfo.ipinfo.loc || 'N/A' }}</p>
-            <p><strong>Timezone:</strong> {{ ipInfo.ipinfo.timezone || 'N/A' }}</p>
-            <p><strong>Ultimo aggiornamento:</strong> {{ formatDate(ipInfo.enrichedAt) || 'N/A' }}</p>
+            <p><strong>{{ t('ipDetails.location') }}:</strong> {{ ipInfo.ipinfo.loc || 'N/A' }}</p>
+            <p><strong>{{ t('ipDetails.timezone') }}:</strong> {{ ipInfo.ipinfo.timezone || 'N/A' }}</p>
+            <p><strong>{{ t('ipDetails.additionalInfo') }}:</strong> {{ formatDate(ipInfo.enrichedAt) || 'N/A' }}</p>
           </div>
         </transition>
       </div>
@@ -160,6 +160,9 @@ import { ref, reactive, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import dayjs from 'dayjs'
 import { fetchIpDetails, fetchRateLimitSearch, enrichReports, enrichReputationScore } from '../../api/index'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n();
 
 const route = useRoute()
 const router = useRouter()

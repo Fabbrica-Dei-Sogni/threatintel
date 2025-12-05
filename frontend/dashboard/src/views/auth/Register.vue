@@ -1,26 +1,26 @@
 <template>
     <div class="register-container">
-        <h2>Register</h2>
+        <h2>{{ t('auth.register') }}</h2>
         <form @submit.prevent="onSubmit">
             <div>
-                <label for="username">Username</label>
+                <label for="username">{{ t('auth.username') }}</label>
                 <input v-model="username" id="username" required />
             </div>
             <div>
-                <label for="email">Email</label>
+                <label for="email">{{ t('auth.email') }}</label>
                 <input v-model="email" id="email" type="email" required />
             </div>
             <div>
-                <label for="password">Password</label>
+                <label for="password">{{ t('auth.password') }}</label>
                 <input v-model="password" id="password" type="password" required minlength="6" />
             </div>
             <button type="submit" :disabled="loading">
-                <span v-if="loading">Loading...</span>
-                <span v-else>Register</span>
+                <span v-if="loading">{{ t('auth.loadingLogin') }}</span>
+                <span v-else>{{ t('auth.register') }}</span>
             </button>
             <p v-if="error" class="error">{{ errorMessage }}</p>
         </form>
-        <router-link to="/login">Already have an account? Login here</router-link>
+        <router-link to="/login">{{ t('auth.loginHere') }}</router-link>
     </div>
 </template>
 
@@ -28,6 +28,9 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { registerUser } from '../../api/auth';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const router = useRouter();
 const username = ref('');
@@ -46,7 +49,7 @@ async function onSubmit() {
         router.push('/login');
     } catch (err) {
         error.value = true;
-        errorMessage.value = err.response?.data?.message || 'Errore durante la registrazione';
+        errorMessage.value = err.response?.data?.message || t('auth.errorRegister');
     } finally {
         loading.value = false;
     }

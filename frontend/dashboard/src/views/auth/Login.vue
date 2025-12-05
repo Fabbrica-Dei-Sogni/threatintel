@@ -1,22 +1,22 @@
 <template>
     <div class="login-container">
-        <h2>Login</h2>
+        <h2>{{ t('auth.login') }}</h2>
         <form @submit.prevent="onSubmit">
             <div>
-                <label for="username">Username</label>
+                <label for="username">{{ t('auth.username') }}</label>
                 <input v-model="username" id="username" required />
             </div>
             <div>
-                <label for="password">Password</label>
+                <label for="password">{{ t('auth.password') }}</label>
                 <input v-model="password" id="password" type="password" required minlength="6" />
             </div>
             <button type="submit" :disabled="loading">
-                <span v-if="loading">Loading...</span>
-                <span v-else>Login</span>
+                <span v-if="loading">{{ t('auth.loadingLogin') }}</span>
+                <span v-else>{{ t('auth.login') }}</span>
             </button>
             <p v-if="error" class="error">{{ errorMessage }}</p>
         </form>
-        <router-link to="/register">Register here</router-link>
+        <router-link to="/register">{{ t('auth.registerHere') }}</router-link>
     </div>
 </template>
 
@@ -24,6 +24,9 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { loginUser } from '../../api/auth';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 const router = useRouter();
 const username = ref('');
@@ -43,7 +46,7 @@ async function onSubmit() {
         router.push('/dashboard');
     } catch (err) {
         error.value = true;
-        errorMessage.value = err.response?.data?.message || 'Errore durante il login';
+        errorMessage.value = err.response?.data?.message || t('auth.errorLogin');
     } finally {
         loading.value = false;
     }

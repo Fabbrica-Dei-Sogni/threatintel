@@ -1,41 +1,43 @@
 <template>
   <div class="threatlogs">
-    <h1>Honeypot Dashboard - Log Request</h1>
+    <h1>{{ t('threatLogs.title') }}</h1>
     <!-- Pulsante per navigare alla Home -->
     <div class="actions">
       <button @click="goToHome" class="btn-action">
-        Cruscotto
+        {{ t('threatLogs.dashboard') }}
       </button>
       <button @click="goToAttacks" class="btn-action">
-        Attacchi
+        {{ t('threatLogs.attacks') }}
       </button>
-    </div>    
+    </div>
 
     <section class="filters">
       <div class="input-wrapper" style="position: relative; flex: 1; margin-right: 10px;">
-        <input v-model="filterIp" placeholder="Filtra per IP..." @input="onFilterChanged" class="input" type="text" />
-        <button v-if="filterIp" @click="clearIpFilter" class="clear-button" title="Svuota filtro IP" type="button"
-          aria-label="Clear IP filter">
+        <input v-model="filterIp" :placeholder="t('threatLogs.filterByIp')" @input="onFilterChanged" class="input"
+          type="text" />
+        <button v-if="filterIp" @click="clearIpFilter" class="clear-button" :title="t('threatLogs.clearIpFilter')"
+          type="button" aria-label="Clear IP filter">
           ✕
         </button>
 
       </div>
       <div class="input-wrapper" style="position: relative; flex: 1;">
-        <input v-model="filterUrl" placeholder="Filtra per URL..." @input="onFilterChanged" class="input" type="text" />
-        <button v-if="filterUrl" @click="clearUrlFilter" class="clear-button" title="Svuota filtro URL" type="button"
-          aria-label="Clear URL filter">
+        <input v-model="filterUrl" :placeholder="t('threatLogs.filterByUrl')" @input="onFilterChanged" class="input"
+          type="text" />
+        <button v-if="filterUrl" @click="clearUrlFilter" class="clear-button" :title="t('threatLogs.clearUrlFilter')"
+          type="button" aria-label="Clear URL filter">
           ✕
         </button>
       </div>
     </section>
 
     <div class="pagination" v-if="total > pageSize">
-      <button :disabled="page === 1" @click="changePage(page - 1)">Prev</button>
-      <span>Pagina {{ page }} di {{ totalPages }}</span>
-      <button :disabled="page === totalPages" @click="changePage(page + 1)">Next</button>
+      <button :disabled="page === 1" @click="changePage(page - 1)">{{ t('common.prev') }}</button>
+      <span>{{ t('common.page') }} {{ page }} {{ t('common.of') }} {{ totalPages }}</span>
+      <button :disabled="page === totalPages" @click="changePage(page + 1)">{{ t('common.next') }}</button>
 
       <!-- Input per inserire pagina manualmente -->
-      <label for="pageInput" style="margin-left: 10px;">Vai a pagina:</label>
+      <label for="pageInput" style="margin-left: 10px;">{{ t('common.goToPage') }}:</label>
       <input class="pagination-input" id="pageInput" type="number" v-model.number="inputPage" :min="1" :max="totalPages"
         style="width: 60px; padding: 2px 5px;" placeholder="1" />
     </div>
@@ -44,13 +46,13 @@
       <table>
         <thead>
           <tr>
-            <th>Dettagli</th>
+            <th>{{ t('threatLogs.table.details') }}</th>
             <th>
-                <span class="label">Paese - Org</span>
-            </th>             
+              <span class="label">{{ t('threatLogs.table.countryOrg') }}</span>
+            </th>
             <th>
               <div class="sort-control">
-                <span class="label">IP</span>
+                <span class="label">{{ t('threatLogs.table.ip') }}</span>
                 <button @click="toggleSort('request.ip')" aria-label="Ordina IP" class="sort-button">
                   <span v-if="getSortDirection('request.ip') === 1">▲</span>
                   <span v-else-if="getSortDirection('request.ip') === -1">▼</span>
@@ -60,7 +62,7 @@
             </th>
             <th>
               <div class="sort-control">
-                <span class="label">Score</span>
+                <span class="label">{{ t('threatLogs.table.dangerScore') }}</span>
                 <button @click="toggleSort('fingerprint.score')" aria-label="Ordina Score" class="sort-button">
                   <span v-if="getSortDirection('fingerprint.score') === 1">▲</span>
                   <span v-else-if="getSortDirection('fingerprint.score') === -1">▼</span>
@@ -70,7 +72,7 @@
             </th>
             <th>
               <div class="sort-control">
-                <span class="label">URL</span>
+                <span class="label">{{ t('threatLogs.table.url') }}</span>
                 <button @click="toggleSort('request.url')" aria-label="Ordina URL" class="sort-button">
                   <span v-if="getSortDirection('request.url') === 1">▲</span>
                   <span v-else-if="getSortDirection('request.url') === -1">▼</span>
@@ -80,7 +82,7 @@
             </th>
             <th>
               <div class="sort-control">
-                <span class="label">Metodo</span>
+                <span class="label">{{ t('threatLogs.table.method') }}</span>
                 <button @click="toggleSort('request.method')" aria-label="Ordina Metodo" class="sort-button">
                   <span v-if="getSortDirection('request.method') === 1">▲</span>
                   <span v-else-if="getSortDirection('request.method') === -1">▼</span>
@@ -90,7 +92,7 @@
             </th>
             <th>
               <div class="sort-control">
-                <span class="label">Timestamp</span>
+                <span class="label">{{ t('threatLogs.table.timestamp') }}</span>
                 <button @click="toggleSort('timestamp')" aria-label="Ordina Timestamp" class="sort-button">
                   <span v-if="getSortDirection('timestamp') === 1">▲</span>
                   <span v-else-if="getSortDirection('timestamp') === -1">▼</span>
@@ -102,8 +104,8 @@
         </thead>
         <tbody>
           <tr v-for="log in logs" :key="log._id">
-            <td><button @click="goToThreatLogDetails(log.id)" style="cursor: pointer;"
-                class="info-btn">Dettaglio</button></td>
+            <td><button @click="goToThreatLogDetails(log.id)" style="cursor: pointer;" class="info-btn">{{
+              t('common.detail') }}</button></td>
             <td>{{ log.ipDetailsId.ipinfo.country }} - {{ log.ipDetailsId.ipinfo.org }}</td>
             <td>
               <span style="display:inline-flex;align-items:center;">
@@ -111,7 +113,7 @@
                   title="Info IP">{{
                     log.request.ip }}</span>
                 <button @click.stop="setIpFilter(log.request.ip)" class="btn-copy-ip"
-                  title="Copia nel filtro IP ed esegui">⬇️</button>
+                  :title="t('attacks.copyToFilter')">⬇️</button>
               </span>
             </td>
             <td>{{ log.fingerprint.score }}</td>
@@ -120,7 +122,7 @@
               <span style="display:inline-flex;align-items:center;">
                 {{ log.request.url }}
                 <button @click.stop="setUrlFilter(log.request.url)" class="btn-copy-url"
-                  title="Copia nel filtro Url ed esegui">⬇️</button>
+                  :title="t('attacks.copyToFilter')">⬇️</button>
               </span>
 
             </td>
@@ -129,19 +131,19 @@
             <td>{{ formatDate(log.timestamp) }}</td>
           </tr>
           <tr v-if="logs.length === 0 && !loading">
-            <td colspan="5" style="text-align:center;">Nessun log trovato</td>
+            <td colspan="5" style="text-align:center;">{{ t('threatLogs.noLogsFound') }}</td>
           </tr>
         </tbody>
       </table>
 
       <div class="pagination" v-if="total > pageSize">
-        <button :disabled="page === 1" @click="changePage(page - 1)">Prev</button>
-        <span>Pagina {{ page }} di {{ totalPages }}</span>
-        <button :disabled="page === totalPages" @click="changePage(page + 1)">Next</button>
+        <button :disabled="page === 1" @click="changePage(page - 1)">{{ t('common.prev') }}</button>
+        <span>{{ t('common.page') }} {{ page }} {{ t('common.of') }} {{ totalPages }}</span>
+        <button :disabled="page === totalPages" @click="changePage(page + 1)">{{ t('common.next') }}</button>
       </div>
 
-      <div v-if="loading" class="loading">Caricamento...</div>
-      <div v-if="error" class="error">Errore nel caricamento dei dati</div>
+      <div v-if="loading" class="loading">{{ t('common.loading') }}</div>
+      <div v-if="error" class="error">{{ t('threatLogs.errorLoadingData') }}</div>
     </section>
   </div>
 </template>
@@ -150,7 +152,10 @@
 import { computed, watch, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useLogsFilter } from '../../composable/useLogsFilter';
+import { useI18n } from 'vue-i18n';
 import dayjs from 'dayjs';
+
+const { t } = useI18n();
 
 //Best practise per definire una pagina vue con un composable
 //step 0. creare il composable useLogsFilter con il necessario per la ricerca filtrata e paginata dei log
@@ -218,16 +223,16 @@ const inputPage = ref(page.value);
 
 // Sincronizza inputPage con page esternamente modificato
 watch(page, (newPage) => {
-    inputPage.value = newPage;
+  inputPage.value = newPage;
 });
 
 // Debounce semplice per evitare troppe chiamate immediate
 let debounceTimer = null;
 watch(inputPage, (newPage) => {
-    if (debounceTimer) clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(() => {
-        goToInputPage();
-    }, 300);
+  if (debounceTimer) clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(() => {
+    goToInputPage();
+  }, 300);
 });
 
 
@@ -317,13 +322,13 @@ function changePage(newPage) {
 }
 
 function goToInputPage() {
-    let targetPage = inputPage.value;
+  let targetPage = inputPage.value;
 
-    // Validazione: assicurati che sia tra 1 e totalPages
-    if (targetPage < 1) targetPage = 1;
-    if (targetPage > totalPages.value) targetPage = totalPages.value;
+  // Validazione: assicurati che sia tra 1 e totalPages
+  if (targetPage < 1) targetPage = 1;
+  if (targetPage > totalPages.value) targetPage = totalPages.value;
 
-    changePage(targetPage);
+  changePage(targetPage);
 }
 
 function formatDate(timestamp) {

@@ -106,7 +106,7 @@
           <tr v-for="log in logs" :key="log._id">
             <td><button @click="goToThreatLogDetails(log.id)" style="cursor: pointer;" class="info-btn">{{
               t('common.detail') }}</button></td>
-            <td>{{ log.ipDetailsId.ipinfo.country }} - {{ log.ipDetailsId.ipinfo.org }}</td>
+            <td>{{ log.ipDetailsId.ipinfo.country }}</td>
             <td>
               <span style="display:inline-flex;align-items:center;">
                 <span class="info-btn" @click="goToIpDetails(log.request.ip)" style="cursor: pointer;"

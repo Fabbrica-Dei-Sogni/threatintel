@@ -161,7 +161,7 @@
         "location": "Posizione",
         "additionalInfo": "Informazioni aggiuntive",
         "relatedAttacks": "Attacchi correlati",
-        "relatedLogs": "Log correlati"
+        "relatedLogs": "Reports correlati"
     },
     "components": {
         "radar": {

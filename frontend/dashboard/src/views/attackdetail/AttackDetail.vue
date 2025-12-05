@@ -17,12 +17,19 @@
         <section v-if="loading" class="loading">{{ t('common.loading') }}</section>
         <section v-if="error" class="error">{{ t('common.error') }}</section>
         <div v-if="attack" class="attack-summary">
+            <!-- Existing summary content -->
             <div class="summary-row">
                 <section>
                     <strong>{{ t('attackDetail.defconLevel') }}:</strong>
                     <DefconIndicator :level="attack.dangerLevel" :dangerScore="attack.dangerScore" />
                 </section>
             </div>
+            <!-- ... existing rows ... -->
+            <!-- Insert Map Here -->
+            <section class="attack-map-section" style="margin-top: 20px; height: 350px;">
+                <AttackMap v-if="mapAttackData.length > 0" :attacks="mapAttackData" />
+            </section>
+
             <div class="summary-row">
                 <div><strong>{{ t('attackDetail.totalLogs') }}:</strong> {{ attack.totaleLogs }}</div>
                 <div><strong>{{ t('attackDetail.attackDuration') }}:</strong> {{ attack.durataAttacco.human }}</div>
@@ -124,9 +131,10 @@ import { ref, reactive, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import dayjs from 'dayjs'
 import { useI18n } from 'vue-i18n'
-import DefconIndicator from '../../components/DefconIndicator.vue'; // Verifica il percorso corretto
+import DefconIndicator from '../../components/DefconIndicator.vue';
 import AttackProfileRadar from '../../components/AttackProfileRadar.vue';
-import HexViewer from '../../components/HexViewer.vue'; // <--- AGGIUNGI QUESTO
+import HexViewer from '../../components/HexViewer.vue';
+import AttackMap from '../../components/AttackMap.vue';
 
 const { t } = useI18n();
 
@@ -141,6 +149,10 @@ const props = defineProps({
         default: () => []
     }
 })
+
+const mapAttackData = computed(() => {
+    return props.attack ? [props.attack] : [];
+});
 
 // Router
 const route = useRoute()

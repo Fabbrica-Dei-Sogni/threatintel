@@ -112,9 +112,60 @@ h2 {
   margin-top: 10px;
 }
 
-/* Responsive */
+/* Mobile & Responsive */
 @media (max-width: 768px) {
+  .dashboard {
+    padding: 15px 10px;
+    /* Reduced padding */
+  }
+
+  .header-with-lang {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  h1 {
+    font-size: clamp(24px, 6vw, 32px);
+    /* Fluid H1 */
+    margin: 0;
+  }
+
+  h2 {
+    font-size: clamp(18px, 5vw, 24px);
+    /* Fluid H2 */
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .btn-action {
+    flex: 1 1 auto;
+    /* Grow to fill space */
+    margin-right: 0;
+    text-align: center;
+    font-size: clamp(14px, 4vw, 16px);
+    padding: 12px 10px;
+  }
+
   .widgets {
     flex-direction: column;
+  }
+
+  .widget {
+    padding: 15px;
+    /* Reduced internal padding */
+    flex: 1 1 100%;
+  }
+
+  .widget li {
+    font-size: clamp(13px, 3.5vw, 15px);
+    /* Fluid list text */
+    word-break: break-word;
+    /* Prevent overflow */
+    padding: 10px 0;
   }
 }

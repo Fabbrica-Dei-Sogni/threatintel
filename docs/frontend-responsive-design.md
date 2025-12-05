@@ -53,6 +53,11 @@ This document outlines the implementation of responsive design for the Threat In
 - **Page Layout**: 
   - Restored text wrapping (`white-space: normal`) for the main container on mobile to prevent titles from overflowing horizontally.
 
+### 6. Home View (`Home.css`)
+- **Header**: Stacked Title and Language Switcher vertically on smaller screens for cleaner layout.
+- **Buttons**: Action buttons now grow to fill available width (`flex: 1 1 auto`) and use fluid font sizing.
+- **Widgets**: Forced single-column stack on mobile. List items use `word-break: break-word` and fluid fonts to prevent overflow.
+
 ## 📱 Mobile Behavior Reference
 
 | Component | Behavior on Mobile (< 768px) |

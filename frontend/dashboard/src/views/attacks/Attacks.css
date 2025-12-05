@@ -203,8 +203,10 @@
 
 /* Tabella attacchi */
 .log-table {
-  overflow-x: auto;
+  /* Restored overflow-x as a safety net - better to scroll than hide */
   margin-top: 28px;
+  width: 100%;
+  overflow-x: auto;
 }
 
 .log-table table {
@@ -214,6 +216,8 @@
   box-shadow: 0 0 26px rgba(0, 0, 0, 0.65);
   border-radius: 14px;
   overflow: hidden;
+  /* Removed fixed layout to let browser size columns based on content */
+  /* table-layout: fixed; */
 }
 
 .log-table th {
@@ -224,6 +228,13 @@
   letter-spacing: 0.8px;
   border-bottom: 2px solid #663a39;
   user-select: none;
+  /* Fluid font size for headers */
+  font-size: clamp(9px, 1.3vw, 16px);
+  white-space: normal;
+  /* Allow wrapping */
+  word-wrap: break-word;
+  min-width: 40px;
+  /* Prevent collapse */
 }
 
 .log-table td {
@@ -232,6 +243,35 @@
   border-bottom: 1px solid #4b312f;
   transition: background 0.3s ease;
   font-size: 15px;
+  /* Fluid font size for cells */
+  font-size: clamp(9px, 1.3vw, 15px);
+  word-wrap: break-word;
+  word-break: break-all;
+  /* Force break if needed */
+  white-space: normal;
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+
+  .log-table th,
+  .log-table td {
+    padding: 6px 4px;
+    letter-spacing: 0;
+  }
+
+  .log-table th .label {
+    display: block;
+  }
+
+  .attacchi {
+    padding: 10px;
+  }
+
+  .btn-action {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
 }
 
 .log-table tr:hover td {
@@ -299,9 +339,24 @@
   border: 1px solid #c68a8a;
   border-radius: 5px;
   font-size: 0.9rem;
+  /* Fluid font for mobile to match table cells */
+  font-size: clamp(8px, 1.1vw, 0.9rem);
   font-weight: 600;
   text-decoration: none;
   transition: all 0.3s ease;
+  white-space: nowrap;
+  /* Prevent vertical stacking */
+}
+
+@media (max-width: 768px) {
+  .detail-link {
+    padding: 2px 4px;
+    /* Reduced padding for mobile */
+    white-space: nowrap;
+    /* Force single line, rely on font shrink */
+    font-size: clamp(6px, 1.1vw, 0.9rem);
+    /* Allow smaller font minimum */
+  }
 }
 
 .detail-link:hover {

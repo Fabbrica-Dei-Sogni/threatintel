@@ -11,9 +11,9 @@
 }
 
 /* Titolo principale e area fissa */
-.threatlogs > h1,
-.threatlogs > .actions,
-.threatlogs > .filters {
+.threatlogs>h1,
+.threatlogs>.actions,
+.threatlogs>.filters {
   position: sticky;
   top: 0;
   z-index: 100;
@@ -23,7 +23,7 @@
   border-bottom: 1px solid #3f261f;
 }
 
-.threatlogs > h1 {
+.threatlogs>h1 {
   margin: 0 0 12px 0;
   padding-left: 4px;
   padding-right: 4px;
@@ -63,6 +63,8 @@
 
 /* === FILTRI === */
 
+/* === FILTRI === */
+
 .filters {
   display: flex;
   flex-wrap: wrap;
@@ -79,8 +81,24 @@
 
 .input-wrapper {
   position: relative;
-  flex: 1 1;
+  flex: 1 1 200px;
+  /* Allow shrinking/growing */
   box-sizing: border-box;
+  min-width: 0;
+  /* Important for flex items to shrink below content size */
+}
+
+/* Mobile Filter Stack */
+@media (max-width: 768px) {
+  .filters {
+    flex-direction: column;
+  }
+
+  .input-wrapper {
+    width: 100%;
+    margin-right: 0 !important;
+    /* Override inline styles if any */
+  }
 }
 
 .filters .input {
@@ -133,8 +151,9 @@
   margin-top: 0;
   width: 100%;
   flex-grow: 1;
-  overflow-y: auto;
-  padding-right: 8px;
+  /* Removed overflow-y: auto to let page scroll normally on mobile if needed, or handle per component */
+  padding-right: 0;
+  /* Remove padding */
   box-sizing: border-box;
 }
 
@@ -145,6 +164,8 @@
   overflow: hidden;
   background: linear-gradient(160deg, #3f2a1d, #2f1c14);
   box-shadow: 0 0 25px rgba(0, 0, 0, 0.6);
+  table-layout: fixed;
+  /* Fixed layout for control */
 }
 
 .log-table th {
@@ -156,6 +177,10 @@
   text-shadow: 0 0 4px rgba(0, 0, 0, 0.6);
   border-bottom: 2px solid #624236;
   user-select: none;
+  /* Fluid font sizing */
+  font-size: clamp(9px, 1.4vw, 16px);
+  white-space: normal;
+  word-wrap: break-word;
 }
 
 .log-table td {
@@ -163,6 +188,32 @@
   padding: 10px 15px;
   border-bottom: 1px solid #4d3630;
   transition: background 0.2s ease;
+  /* Fluid font sizing */
+  font-size: clamp(9px, 1.3vw, 15px);
+  word-wrap: break-word;
+  word-break: break-all;
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .threatlogs {
+    padding: 10px;
+  }
+
+  .log-table th,
+  .log-table td {
+    padding: 6px 3px;
+  }
+
+  /* Stack headers if highly needed, but table structure usually kept. 
+     Just ensuring text wraps */
+
+  /* Allow URL cell to shrink on mobile */
+  td.url-cell {
+    width: auto !important;
+    min-width: unset !important;
+    max-width: none !important;
+  }
 }
 
 .log-table tr:hover td {
@@ -177,9 +228,23 @@
   padding: 5px 10px;
   border-radius: 4px;
   font-size: 13px;
+  /* Fluid font size */
+  font-size: clamp(8px, 1.2vw, 13px);
   font-weight: 600;
   cursor: pointer;
   transition: background 0.3s ease, transform 0.2s ease;
+  white-space: nowrap;
+  /* Prevent vertical stacking */
+}
+
+@media (max-width: 768px) {
+  .log-table .info-btn {
+    padding: 3px 5px;
+    white-space: nowrap;
+    /* Force single line */
+    font-size: clamp(6px, 1.2vw, 13px);
+    /* Allow smaller font minimum */
+  }
 }
 
 .log-table .info-btn:hover {

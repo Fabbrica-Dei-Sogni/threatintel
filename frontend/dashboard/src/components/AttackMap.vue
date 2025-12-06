@@ -95,8 +95,8 @@ const initMap = () => {
     map = L.map(mapContainer.value, {
         center: [hp.lat, hp.lng],
         zoom: 4,
-        minZoom: 3, // Prevent zooming out to infinity
-        maxBounds: [[-90, -180], [90, 180]], // Restrict panning to one world
+        minZoom: 3, // Prevent zooming out to infinity (width ~2048px, covers most screens)
+        maxBounds: [[-85, -180], [85, 180]], // Restrict to standard web mercator limits
         maxBoundsViscosity: 1.0, // Sticky bounds
         scrollWheelZoom: true, // Enable scroll zoom
         zoomControl: true, // Enable zoom controls
@@ -369,8 +369,14 @@ onBeforeUnmount(() => {
 .attack-map-wrapper {
     position: relative;
     width: 100%;
+    /* Limita la larghezza al mondo intero a Zoom 3 (256px * 2^3 = 2048px). 
+       Oltre questa larghezza, con noWrap:true, si vedrebbero aree grigie. */
+    max-width: 2048px;
+    margin: 0 auto;
+    /* Centra il container se lo schermo è più grande */
     height: 400px;
-    background: #1e1e1e;
+    background: #191919;
+    /* Match Esri Dark Gray tile background */
     border-radius: 8px;
     overflow: hidden;
 }

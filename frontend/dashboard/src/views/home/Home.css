@@ -90,13 +90,10 @@ h2 {
 }
 
 .widget.map {
-  background-color: #002244;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  color: #bbccff;
-  font-style: italic;
 }
 
 #attack-map {

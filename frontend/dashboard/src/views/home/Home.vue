@@ -42,11 +42,12 @@
         <div v-if="loadingLogs">{{ $t('home.loadingLogs') }}</div>
         <div v-if="errorLogs">{{ $t('home.errorLoadingLogs') }}</div>
       </div>
-      <div class="widget map">
-        <h2>{{ $t('home.attackMap') }}</h2>
-        <AttackMap :attacks="recentAttacks" />
-      </div>
     </section>
+    <section class="widget map">
+      <h2>{{ $t('home.attackMap') }}</h2>
+      <AttackMap :attacks="recentAttacks" />
+    </section>
+
   </div>
 </template>
 

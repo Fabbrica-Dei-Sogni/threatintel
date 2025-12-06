@@ -88,7 +88,6 @@ function getDefconClass(level) {
 .defcon-level-text {
     color: #1e1b1a;
     font-size: 11px;
-    letter-spacing: 0.5px;
     text-shadow: 0 0 2px rgba(255, 255, 255, 0.7);
 }
 

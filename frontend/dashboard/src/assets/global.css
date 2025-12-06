@@ -9,7 +9,7 @@ body {
 
   /* Global text glow for "attractive" terminal look */
   text-shadow: 0 0 2px rgba(240, 230, 210, 0.3);
-  letter-spacing: 0.5px;
+  letter-spacing: -0.5px;
 }
 
 button,

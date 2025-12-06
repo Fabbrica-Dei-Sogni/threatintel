@@ -47,7 +47,6 @@ h1 {
   font-weight: 700;
   text-shadow: 0 0 10px rgba(255, 76, 76, 0.6);
   user-select: none;
-  letter-spacing: -1px;
 }
 
 /* New Attacker Card Design */
@@ -229,7 +228,6 @@ h1 {
   font-size: 16px;
   font-weight: 600;
   color: #e6d4cf;
-  letter-spacing: 0.02em;
 }
 
 /* Mobile: ridurre min-width per adattare al viewport */

@@ -86,7 +86,7 @@
     },
     "attackDetail": {
         "title": "Angriffsdetail",
-        "backToAttacks": "Zurück zu Angriffen",
+        "backToAttacks": "Zurück",
         "attacker": "Angreifer",
         "country": "Land",
         "organization": "Organisation",

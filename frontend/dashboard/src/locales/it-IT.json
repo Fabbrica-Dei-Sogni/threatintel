@@ -86,7 +86,7 @@
     },
     "attackDetail": {
         "title": "Dettaglio Attacco",
-        "backToAttacks": "Torna agli attacchi",
+        "backToAttacks": "Torna indietro",
         "attacker": "Attaccante",
         "country": "Paese",
         "organization": "Organizzazione",
@@ -166,7 +166,7 @@
     },
     "ipDetails": {
         "title": "Dettagli IP",
-        "backToAttacks": "Torna agli attacchi",
+        "backToAttacks": "Torna indietro",
         "ipAddress": "Indirizzo IP",
         "country": "Paese",
         "city": "Città",

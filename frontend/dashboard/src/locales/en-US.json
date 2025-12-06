@@ -86,7 +86,7 @@
     },
     "attackDetail": {
         "title": "Attack Detail",
-        "backToAttacks": "Back to attacks",
+        "backToAttacks": "Back to logs",
         "attacker": "Attacker",
         "country": "Country",
         "organization": "Organization",
@@ -141,7 +141,7 @@
     },
     "threatLog": {
         "title": "ThreatLog Details",
-        "backToLogs": "Back to logs",
+        "backToLogs": "Back",
         "generalInfo": "General Information",
         "geolocation": "Geolocation",
         "coordinates": "Coordinates",
@@ -166,7 +166,7 @@
     },
     "ipDetails": {
         "title": "IP Details",
-        "backToAttacks": "Back to attacks",
+        "backToAttacks": "Back",
         "ipAddress": "IP Address",
         "country": "Country",
         "city": "City",

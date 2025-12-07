@@ -28,7 +28,11 @@ const props = defineProps({
     },
     honeypotLocation: {
         type: Object,
-        default: () => ({ lat: 48.8566, lng: 2.3522, label: 'Honeypot (Paris)' })
+        default: () => ({
+            lat: Number(import.meta.env.VITE_HONEYPOT_LOCATION_LAT) || 48.8566,
+            lng: Number(import.meta.env.VITE_HONEYPOT_LOCATION_LON) || 2.3522,
+            label: import.meta.env.VITE_HONEYPOT_NAME || 'Honeypot (Paris)'
+        })
     }
 });
 

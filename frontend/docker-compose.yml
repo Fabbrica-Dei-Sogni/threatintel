@@ -3,9 +3,12 @@ services:
     build:
       context: ./dashboard
       args:
-        VITE_APP_API_URL: "https://alessandromodica.com:2443/honeypot"  
+        VITE_APP_API_URL: "https://alessandromodica.com:2443/honeypot"
+        VITE_HONEYPOT_LOCATION_LAT: "48.8566"
+        VITE_HONEYPOT_LOCATION_LON: "2.3522"
+        VITE_HONEYPOT_NAME: "Honeypot (Paris)"
     ports:
       - "127.0.0.1:8180:80"
     restart: unless-stopped
     extra_hosts:
-      - "host.docker.internal:host-gateway"    
+      - "host.docker.internal:host-gateway"

@@ -85,6 +85,9 @@
 
             </div>
         </section>
+        <div v-if="loading" class="loading">{{ t('common.loading') }}</div>
+        <div v-if="error" class="error">{{ t('attacks.errorLoadingData') }}</div>
+
         <div class="pagination" v-if="total > pageSize">
             <button :disabled="page === 1" @click="changePage(page - 1)">{{ t('common.prev') }}</button>
             <span>{{ t('common.page') }} {{ page }} {{ t('common.of') }} {{ totalPages }}</span>
@@ -311,8 +314,6 @@
                     </tr>
                 </tbody>
             </table>
-            <div v-if="loading" class="loading">{{ t('common.loading') }}</div>
-            <div v-if="error" class="error">{{ t('attacks.errorLoadingData') }}</div>
         </section>
     </div>
     <div class="pagination" v-if="total > pageSize">

@@ -9,6 +9,8 @@
         "type-check": "vue-tsc --noEmit"
     },
     "dependencies": {
+        "@capacitor/android": "^8.0.0",
+        "@capacitor/core": "^8.0.0",
         "axios": "^1.4.0",
         "chart.js": "^4.4.0",
         "chartjs-adapter-dayjs-4": "^1.0.4",
@@ -22,6 +24,7 @@
         "vue-router": "^4.3.4"
     },
     "devDependencies": {
+        "@capacitor/cli": "^8.0.0",
         "@types/leaflet": "^1.9.21",
         "@types/node": "^24.5.2",
         "@vitejs/plugin-vue": "^6.0.1",

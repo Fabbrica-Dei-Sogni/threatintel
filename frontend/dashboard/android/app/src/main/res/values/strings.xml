@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">honeypot-dashboard</string>
+    <string name="title_activity_main">honeypot-dashboard</string>
+    <string name="package_name">alessandromodica.com</string>
+    <string name="custom_url_scheme">alessandromodica.com</string>
+</resources>

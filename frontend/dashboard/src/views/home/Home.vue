@@ -56,7 +56,7 @@
 import { useLogsFilter } from '../../composable/useLogsFilter';
 import { useAttacksFilter } from '../../composable/useAttacksFilter';
 import { useRouter } from 'vue-router'
-import { computed } from 'vue'
+import { computed, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import dayjs from 'dayjs';
 import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
@@ -103,9 +103,18 @@ const {
 
 const recentLogs = computed(() => logs.value.slice(0, 10))
 
-// Carica i dati solo una volta per la dashboard
-fetchAttacks()
-fetchLogs()
+import { useProfileStore } from '../../stores/profiles';
+
+const profileStore = useProfileStore();
+
+// Carica i dati solo una volta per la dashboard, ma ricarica se cambia il profilo
+const loadAll = () => {
+  fetchAttacks();
+  fetchLogs();
+};
+
+onMounted(loadAll);
+watch(() => profileStore.activeProfileId, loadAll);
 </script>
 
 <style scoped src="./Home.css"></style>

@@ -10,6 +10,7 @@ import Register from '../views/auth/Register.vue';
 import ThreatLog from '../views/threatlog/ThreatLog.vue';
 import Attacks from '../views/attacks/Attacks.vue';
 import AttackDetail from '../views/attackdetail/AttackDetail.vue';
+import Settings from '../views/settings/Settings.vue';
 
 // Le tipizzazioni sulle props passate via router sono opzionali e possono essere affinate man mano che si tipizza la codebase
 
@@ -81,6 +82,7 @@ const routes: RouteRecordRaw[] = [
     { path: '/threatlog/:id', name: 'ThreatLog', component: ThreatLog, props: true },
     { path: '/login', name: 'Login', component: Login },
     { path: '/register', name: 'Register', component: Register },
+    { path: '/settings', name: 'Settings', component: Settings },
 ];
 
 const router = createRouter({

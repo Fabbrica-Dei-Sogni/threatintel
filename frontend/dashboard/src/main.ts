@@ -6,6 +6,10 @@ import ElementPlus from 'element-plus';
 import 'element-plus/dist/index.css';
 import './assets/global.css';
 import i18n from './locales/index';
+import { registerSW } from 'virtual:pwa-register';
+
+// Registrazione automatica del Service Worker per la PWA
+registerSW({ immediate: true });
 
 const pinia = createPinia();
 

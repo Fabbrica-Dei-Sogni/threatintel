@@ -8,12 +8,12 @@
             ]
         },
         "types": [
-            "vite/client"
+            "vite/client",
+            "vite-plugin-pwa/client"
         ],
         "allowJs": true,
         "checkJs": false,
         "strict": false,
-
         "skipLibCheck": true, // Evita controlli sui tipi delle librerie
         "esModuleInterop": true, // Migliore compatibilità moduli ES/CommonJS
         "allowSyntheticDefaultImports": true,

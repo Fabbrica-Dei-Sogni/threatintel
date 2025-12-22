@@ -15,10 +15,13 @@
 </template>
 
 <script setup>
-import { onMounted, watch, ref, onBeforeUnmount } from 'vue';
+import { onMounted, watch, ref, onBeforeUnmount, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useProfileStore } from '../stores/profiles';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+
+const profileStore = useProfileStore();
 
 const props = defineProps({
     attacks: {
@@ -28,11 +31,7 @@ const props = defineProps({
     },
     honeypotLocation: {
         type: Object,
-        default: () => ({
-            lat: Number(import.meta.env.VITE_HONEYPOT_LOCATION_LAT) || 48.8566,
-            lng: Number(import.meta.env.VITE_HONEYPOT_LOCATION_LON) || 2.3522,
-            label: import.meta.env.VITE_HONEYPOT_NAME || 'Honeypot (Paris)'
-        })
+        default: null
     }
 });
 
@@ -91,9 +90,15 @@ const createArrowIcon = (degree, color) => {
     });
 };
 
+const currentHoneypotLocation = computed(() => ({
+    lat: props.honeypotLocation?.lat ?? profileStore.activeProfile.lat,
+    lng: props.honeypotLocation?.lng ?? profileStore.activeProfile.lon,
+    label: props.honeypotLocation?.label ?? profileStore.activeProfile.name
+}));
+
 const initMap = () => {
     if (map) return;
-    const hp = props.honeypotLocation;
+    const hp = currentHoneypotLocation.value;
 
     // Init map
     map = L.map(mapContainer.value, {
@@ -120,6 +125,14 @@ const initMap = () => {
     renderAttacks();
 };
 
+watch(currentHoneypotLocation, (newVal) => {
+    if (map) {
+        map.setView([newVal.lat, newVal.lng]);
+        renderAttacks();
+    }
+});
+
+
 const calculateAngle = (lat1, lng1, lat2, lng2) => {
     // Simple angle calculation for bearing
     const y = Math.sin(lng2 - lng1) * Math.cos(lat2);
@@ -144,7 +157,7 @@ const renderAttacks = () => {
     if (!map) return;
     markersLayer.clearLayers();
 
-    const hp = props.honeypotLocation;
+    const hp = currentHoneypotLocation.value;
 
     // 1. Draw Honeypot
     L.marker([hp.lat, hp.lng], { icon: targetIcon })

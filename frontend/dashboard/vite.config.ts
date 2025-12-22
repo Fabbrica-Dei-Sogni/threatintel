@@ -7,7 +7,8 @@ export default defineConfig({
         vue(),
         VitePWA({
             registerType: 'autoUpdate',
-            includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
+            injectRegister: 'auto',
+            includeAssets: ['honey.png'],
             manifest: {
                 name: 'Threat Intel Dashboard',
                 short_name: 'ThreatIntel',
@@ -15,7 +16,9 @@ export default defineConfig({
                 theme_color: '#1a1a1a',
                 background_color: '#1a1a1a',
                 display: 'standalone',
-                start_url: '.',
+                scope: '/',
+                start_url: '/',
+                orientation: 'portrait',
                 icons: [
                     {
                         src: 'pwa-192x192.png',

@@ -85,6 +85,25 @@
           </div>
         </section>
 
+        <section class="settings-section" v-if="canInstallPwa">
+          <h3 class="section-title">App & PWA</h3>
+          <div class="pwa-card">
+            <div class="pwa-info">
+              <h4>Installa Dashboard</h4>
+              <p>Accedi più velocemente installando l'applicazione sul tuo dispositivo.</p>
+            </div>
+            <button v-if="canInstallPwa" class="btn btn-primary btn-pwa" @click="handleInstallPwa">
+              Installa App
+            </button>
+            <div v-else-if="isAppInstalled" class="pwa-badge pwa-installed">
+              L'app è già installata sul dispositivo
+            </div>
+            <div v-else class="pwa-badge">
+              In attesa del segnale dal browser...
+            </div>
+          </div>
+        </section>
+
         <div class="actions">
           <button v-if="!isDefault" class="btn btn-danger btn-delete-profile" @click="handleDelete">Elimina
             Profilo</button>
@@ -150,6 +169,22 @@ const resetForm = () => {
 
 onMounted(resetForm);
 watch(() => profileStore.activeProfileId, resetForm);
+
+// PWA Logic
+const canInstallPwa = ref(!!(window as any).deferredPwaPrompt);
+const isAppInstalled = ref(!!(window as any).isPwaInstalled);
+
+const handleInstallPwa = async () => {
+  const promptEvent = (window as any).deferredPwaPrompt;
+  if (!promptEvent) return;
+
+  promptEvent.prompt();
+  const { outcome } = await promptEvent.userChoice;
+  if (outcome === 'accepted') {
+    (window as any).deferredPwaPrompt = null;
+    canInstallPwa.value = false;
+  }
+};
 
 const createNewProfile = () => {
   const id = profileStore.addProfile({
@@ -251,6 +286,14 @@ const initMap = () => {
 
 onMounted(() => {
   initMap();
+  window.addEventListener('pwa-prompt-available', () => {
+    canInstallPwa.value = true;
+  });
+
+  window.addEventListener('pwa-installed-success', () => {
+    isAppInstalled.value = true;
+    canInstallPwa.value = false;
+  });
 });
 
 onBeforeUnmount(() => {
@@ -503,6 +546,42 @@ const goBack = () => {
   z-index: 1;
 }
 
+.pwa-card {
+  background: rgba(var(--primary-rgb), 0.1);
+  border: 1px solid rgba(var(--primary-rgb), 0.2);
+  border-radius: 12px;
+  padding: 1rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.pwa-info h4 {
+  margin: 0 0 0.2rem 0;
+  font-size: 1rem;
+}
+
+.pwa-info p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.pwa-badge {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  opacity: 0.6;
+  font-style: italic;
+}
+
+.pwa-installed {
+  color: var(--primary-color);
+  opacity: 1;
+  font-weight: 500;
+  font-style: normal;
+}
+
 label {
   display: block;
   margin-bottom: 0.6rem;
@@ -705,7 +784,7 @@ input:focus {
   .btn-delete-profile {
     margin-top: 1rem;
   }
-  
+
   .settings-map {
     height: 200px;
   }

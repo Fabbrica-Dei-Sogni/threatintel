@@ -304,7 +304,7 @@ const goBack = () => {
 
 <style scoped>
 .settings-container {
-  padding: 2rem;
+  padding: 1.5rem;
   min-height: 100vh;
   color: var(--text-color);
   background-color: var(--bg-color);
@@ -313,17 +313,18 @@ const goBack = () => {
 .settings-layout {
   display: flex;
   gap: 2rem;
-  max-width: 1000px;
+  max-width: 1100px;
   margin: 0 auto;
 }
 
 .profiles-sidebar {
-  flex: 0 0 250px;
+  flex: 0 0 280px;
   background-color: var(--card-bg);
   border: 1px solid var(--border-color);
-  border-radius: 12px;
+  border-radius: 16px;
   padding: 1.5rem;
   height: fit-content;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
 }
 
 .sidebar-header {
@@ -376,10 +377,23 @@ const goBack = () => {
 .settings-card {
   flex: 1;
   background-color: var(--card-bg);
-  padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 2.5rem;
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
   border: 1px solid var(--border-color);
+  position: relative;
+  overflow: hidden;
+}
+
+.settings-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(to right, var(--primary-color), #3b82f6);
+  opacity: 0.8;
 }
 
 .settings-header {
@@ -499,20 +513,27 @@ label {
 
 input {
   width: 100%;
-  padding: 0.85rem 1rem;
-  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  border-radius: 10px;
   border: 1px solid var(--border-color);
-  background-color: var(--bg-color);
+  background-color: rgba(255, 255, 255, 0.03);
   color: var(--text-color);
-  font-size: 0.95rem;
-  transition: all 0.2s;
+  font-size: 1rem;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+input:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  background-color: rgba(255, 255, 255, 0.05);
 }
 
 input:focus {
   outline: none;
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.15);
-  background-color: rgba(var(--primary-rgb), 0.02);
+  box-shadow: 0 0 0 4px rgba(var(--primary-rgb), 0.15), inset 0 2px 4px rgba(0, 0, 0, 0.05);
+  background-color: rgba(255, 255, 255, 0.07);
+  transform: translateY(-1px);
 }
 
 .help-text {
@@ -617,13 +638,76 @@ input:focus {
   width: 100%;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 992px) {
   .settings-layout {
     flex-direction: column;
+    gap: 1.5rem;
   }
 
   .profiles-sidebar {
     flex: none;
+    width: 100%;
+  }
+
+  .profile-list {
+    display: flex;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .profile-list li {
+    flex: 0 0 auto;
+    margin-bottom: 0;
+    min-width: 140px;
+  }
+}
+
+@media (max-width: 640px) {
+  .settings-container {
+    padding: 1rem;
+  }
+
+  .settings-card {
+    padding: 1.5rem;
+  }
+
+  .settings-header {
+    margin-bottom: 2rem;
+  }
+
+  .setting-row {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .input-group {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .actions {
+    flex-direction: column-reverse;
+    gap: 0.75rem;
+    align-items: stretch;
+  }
+
+  .spacer {
+    display: none;
+  }
+
+  .btn {
+    width: 100%;
+  }
+
+  .btn-delete-profile {
+    margin-top: 1rem;
+  }
+  
+  .settings-map {
+    height: 200px;
   }
 }
 </style>

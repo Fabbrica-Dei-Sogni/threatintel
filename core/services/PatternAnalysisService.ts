@@ -34,10 +34,10 @@ class PatternAnalysisService {
         this.suspiciousScores = {};
 
         // Promessa di inizializzazione che sarà completata al caricamento da DB
-        this.initialized = this._initFromDB();
+        this.initialized = this.loadConfigFromDB();
     }
 
-    async _initFromDB() {
+    async loadConfigFromDB() {
         try {
             // Carica configurazioni chiave-valore
             const [

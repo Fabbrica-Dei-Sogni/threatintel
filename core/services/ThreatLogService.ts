@@ -253,6 +253,8 @@ export class ThreatLogService {
 
     async analyzeLogs({ batchSize = 100, updateDatabase = true }) {
 
+        await this.patternAnalysisService.loadConfigFromDB();
+
         // Conta totale log da processare
         const totalLogs = await this.countLogs({});
         let processed = 0;

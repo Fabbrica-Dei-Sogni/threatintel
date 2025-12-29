@@ -309,9 +309,9 @@ const renderAttacks = () => {
                 <div>
                     <b>${attack.request.ip}</b><br>
                     ${ipInfo.city || ''} (${ipInfo.country || '?'})<br>
-                    Score: ${attack.dangerScore}<br>
-                    Level: ${attack.dangerLevel}<br>
-                    RPS: ${rps.toFixed(2)}
+                    ${t('ipDetails.score')}: ${attack.dangerScore}<br>
+                    ${t('components.defcon.level')}: ${attack.dangerLevel}<br>
+                    ${t('components.radar.rps')}: ${rps.toFixed(2)}
                 </div>
                 `)
                 .addTo(markersLayer);

@@ -268,6 +268,9 @@
         "configDeleted": "Configurazione eliminata con successo",
         "confirmDeleteTitle": "Conferma Eliminazione",
         "confirmDeleteMessage": "Sei sicuro di voler eliminare la configurazione \"{key}\"?",
+        "reanalyzeAll": "Rianalizza Log",
+        "confirmReanalyze": "Sei sicuro di voler rianalizzare tutti i log esistenti con la configurazione attuale? Questa operazione potrebbe richiedere tempo.",
+        "reanalyzeSuccess": "Rianalisi completata: {analyzed} log analizzati, {updated} aggiornati.",
         "types": {
             "list": "Lista",
             "keyvalue": "Chiave-Valore",

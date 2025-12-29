@@ -267,6 +267,9 @@
         "configDeleted": "Configuration supprimée avec succès",
         "confirmDeleteTitle": "Confirmer la Suppression",
         "confirmDeleteMessage": "Êtes-vous sûr de vouloir supprimer la configuration \"{key}\" ?",
+        "reanalyzeAll": "Réanalyser les logs",
+        "confirmReanalyze": "Êtes-vous sûr de vouloir réanalyser tous i logs existants avec la configuration actuelle ? Cette opération peut prendre du temps.",
+        "reanalyzeSuccess": "Réanalyse terminée : {analyzed} logs analysés, {updated} mis à jour.",
         "types": {
             "list": "Liste",
             "keyvalue": "Clé-Valeur",

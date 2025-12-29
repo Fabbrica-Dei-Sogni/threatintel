@@ -27,14 +27,25 @@
                     class="search-input" />
                 <button v-if="searchQuery" class="clear-search-btn" @click="searchQuery = ''">×</button>
             </div>
-            <button class="btn btn-primary btn-new" @click="openNewConfigModal">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="12" y1="5" x2="12" y2="19"></line>
-                    <line x1="5" y1="12" x2="19" y2="12"></line>
-                </svg>
-                {{ $t('config.newConfig') }}
-            </button>
+            <div class="actions-group">
+                <button class="btn btn-warning btn-reanalyze" @click="handleReanalyze" :disabled="saving">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path
+                            d="M21.5 2v6h-6M2.5 22v-6h6M2 12c0-4.4 3.6-8 8-8 3.3 0 6.2 2 7.4 5M22 12c0 4.4-3.6 8-8 8-3.3 0-6.2-2-7.4-5">
+                        </path>
+                    </svg>
+                    {{ $t('config.reanalyzeAll') }}
+                </button>
+                <button class="btn btn-primary btn-new" @click="openNewConfigModal">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    {{ $t('config.newConfig') }}
+                </button>
+            </div>
         </div>
 
         <!-- Loading State -->
@@ -135,7 +146,8 @@ const {
     searchQuery,
     loadConfigs,
     upsertConfig,
-    removeConfig
+    removeConfig,
+    reanalyzeAll
 } = useConfig();
 
 // State per nuovo config
@@ -185,6 +197,15 @@ async function handleDelete(key: string) {
     const success = await removeConfig(key);
     if (success) {
         showSuccess(t('config.configDeleted'));
+    }
+}
+
+async function handleReanalyze() {
+    if (!confirm(t('config.confirmReanalyze'))) return;
+
+    const result = await reanalyzeAll();
+    if (result) {
+        showSuccess(t('config.reanalyzeSuccess', { analyzed: result.analyzed, updated: result.updated }));
     }
 }
 

@@ -1,5 +1,5 @@
 import { ref, computed, watch } from 'vue';
-import { fetchAllConfigs, saveConfig, deleteConfig, searchConfigs, type ConfigItem } from '../api/config';
+import { fetchAllConfigs, saveConfig, deleteConfig, searchConfigs, reanalyzeAllLogs, type ConfigItem } from '../api/config';
 
 /**
  * Composable per la gestione delle configurazioni honeypot
@@ -108,6 +108,24 @@ export function useConfig() {
     }
 
     /**
+     * Esegue la rianalisi di tutti i log
+     */
+    async function reanalyzeAll(): Promise<{ analyzed: number, updated: number, errors: number } | null> {
+        saving.value = true;
+        error.value = null;
+        try {
+            const result = await reanalyzeAllLogs();
+            return result;
+        } catch (err: any) {
+            error.value = err.response?.data?.details || err.message || 'Errore durante la rianalisi dei log';
+            console.error('[useConfig] reanalyzeAll error:', err);
+            return null;
+        } finally {
+            saving.value = false;
+        }
+    }
+
+    /**
      * Determina il tipo di valore (lista o testo semplice)
      */
     function getValueType(value: string): 'list' | 'keyvalue' | 'text' {
@@ -155,6 +173,7 @@ export function useConfig() {
         upsertConfig,
         removeConfig,
         search,
+        reanalyzeAll,
         // Helpers
         getValueType,
         valueToTags,

@@ -20,6 +20,7 @@ Le API sono esposte tramite `configroutes.ts` e utilizzano `ConfigService.ts` pe
 | POST | `/config` | Crea o aggiorna una configurazione |
 | DELETE | `/config/:key` | Elimina una configurazione per chiave |
 | POST | `/config/search` | Cerca configurazioni per chiave o valore |
+| POST | `/reanalyze-all` | Avvia la rianalisi di tutti i log esistenti |
 
 **Schema dati:**
 ```typescript
@@ -86,6 +87,7 @@ const {
     upsertConfig,      // Crea/aggiorna configurazione
     removeConfig,      // Elimina configurazione
     search,            // Ricerca sul backend
+    reanalyzeAll,      // Avvia la rianalisi globale dei log
     getValueType,      // Determina tipo valore (list/keyvalue/text)
     valueToTags,       // Converte stringa → array tag
     tagsToValue        // Converte array tag → stringa
@@ -168,11 +170,16 @@ Qualsiasi altro formato di valore.
 1. Clicca sull'**icona cestino** (🗑) sulla card
 2. Conferma l'eliminazione nel dialog
 
-### Cercare Configurazioni
+### Rianalizzare i Log
 
-- Usa la **barra di ricerca** in alto
-- Cerca per chiave o valore
-- I risultati si aggiornano in tempo reale
+Dopo aver modificato le configurazioni critiche (es. pattern sospetti o score di pericolo), è consigliabile rinfrescare l'intelligence dei log esistenti:
+
+1. Clicca sul pulsante **Rianalizza Log** (icona refresh 🔄) in alto a destra
+2. Conferma l'operazione nel popup
+3. Attendi il completamento (verrà mostrata una notifica con il numero di log analizzati e aggiornati)
+
+> [!NOTE]
+> Questa operazione viene eseguita in background sul server e potrebbe richiedere tempo se il numero di log è molto elevato.
 
 ## Internazionalizzazione
 

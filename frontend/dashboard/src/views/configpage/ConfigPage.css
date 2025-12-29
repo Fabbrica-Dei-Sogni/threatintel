@@ -113,6 +113,11 @@
   color: var(--text-color);
 }
 
+.actions-group {
+  display: flex;
+  gap: 0.75rem;
+}
+
 /* Buttons */
 .btn {
   padding: 0.75rem 1.5rem;
@@ -143,6 +148,12 @@
   box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.25);
 }
 
+.btn-warning {
+  background-color: #f59e0b;
+  color: #111827;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
+}
+
 .btn-secondary {
   background: transparent;
   border-color: var(--border-color);
@@ -153,7 +164,8 @@
   background: rgba(255, 255, 255, 0.05);
 }
 
-.btn-new {
+.btn-new,
+.btn-reanalyze {
   white-space: nowrap;
 }
 

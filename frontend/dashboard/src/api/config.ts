@@ -95,3 +95,18 @@ export async function searchConfigs(query: string): Promise<ConfigItem[]> {
         throw error;
     }
 }
+
+/**
+ * Avvia la rianalisi di tutti i log esistenti
+ */
+export async function reanalyzeAllLogs(batchSize: number = 200, updateDatabase: boolean = true): Promise<{ analyzed: number, updated: number, errors: number }> {
+    try {
+        console.log('[reanalyzeAllLogs] Starting reanalysis of all logs');
+        const response = await apiClient.post('/reanalyze-all', { batchSize, updateDatabase }, { timeout: 0 });
+        console.log('[reanalyzeAllLogs] Response status:', response.status);
+        return response.data;
+    } catch (error) {
+        console.error('[reanalyzeAllLogs] Error:', error);
+        throw error;
+    }
+}

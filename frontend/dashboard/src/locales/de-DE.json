@@ -267,6 +267,9 @@
         "configDeleted": "Konfiguration erfolgreich gelöscht",
         "confirmDeleteTitle": "Löschen bestätigen",
         "confirmDeleteMessage": "Sind Sie sicher, dass Sie die Konfiguration \"{key}\" löschen möchten?",
+        "reanalyzeAll": "Protokolle reanalysieren",
+        "confirmReanalyze": "Sind Sie sicher, dass Sie alle vorhandenen Protokolle mit der aktuellen Konfiguration reanalysieren möchten? Dieser Vorgang kann einige Zeit in Anspruch nehmen.",
+        "reanalyzeSuccess": "Reanalyse abgeschlossen: {analyzed} Protokolle analysiert, {updated} aktualisiert.",
         "types": {
             "list": "Liste",
             "keyvalue": "Schlüssel-Wert",

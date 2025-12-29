@@ -234,5 +234,44 @@
             "attacker": "Attacker",
             "target": "Target"
         }
+    },
+    "nav": {
+        "menu": "Menu",
+        "menuTitle": "Navigation",
+        "dashboard": "Dashboard",
+        "attacks": "Attacks",
+        "logs": "Log Requests",
+        "configuration": "Configuration",
+        "settings": "Settings"
+    },
+    "config": {
+        "title": "Honeypot Configuration",
+        "searchPlaceholder": "Search configurations...",
+        "newConfig": "New Configuration",
+        "newConfigTitle": "Create New Configuration",
+        "editConfig": "Edit Configuration",
+        "keyLabel": "Key",
+        "keyPlaceholder": "E.G. PATTERN_NAME",
+        "keyHelp": "Uppercase letters, numbers and underscores only",
+        "valueLabel": "Value",
+        "valuePlaceholder": "Enter value",
+        "valuePlaceholderNew": "Comma-separated values or text",
+        "valueHelp": "For lists, separate values with commas. For key:value use the format KEY:VALUE,KEY2:VALUE2",
+        "addTagPlaceholder": "Add tag...",
+        "textPlaceholder": "Enter text...",
+        "noConfigs": "No configurations found",
+        "noSearchResults": "No results for this search",
+        "createFirst": "Create first configuration",
+        "retry": "Retry",
+        "configCreated": "Configuration created successfully",
+        "configSaved": "Configuration saved successfully",
+        "configDeleted": "Configuration deleted successfully",
+        "confirmDeleteTitle": "Confirm Deletion",
+        "confirmDeleteMessage": "Are you sure you want to delete the configuration \"{key}\"?",
+        "types": {
+            "list": "List",
+            "keyvalue": "Key-Value",
+            "text": "Text"
+        }
     }
 }

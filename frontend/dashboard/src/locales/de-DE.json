@@ -233,5 +233,44 @@
             "attacker": "Angreifer",
             "target": "Ziel"
         }
+    },
+    "nav": {
+        "menu": "Menü",
+        "menuTitle": "Navigation",
+        "dashboard": "Dashboard",
+        "attacks": "Angriffe",
+        "logs": "Protokoll-Anfragen",
+        "configuration": "Konfiguration",
+        "settings": "Einstellungen"
+    },
+    "config": {
+        "title": "Honeypot-Konfiguration",
+        "searchPlaceholder": "Konfigurationen durchsuchen...",
+        "newConfig": "Neue Konfiguration",
+        "newConfigTitle": "Neue Konfiguration erstellen",
+        "editConfig": "Konfiguration bearbeiten",
+        "keyLabel": "Schlüssel",
+        "keyPlaceholder": "Z.B. PATTERN_NAME",
+        "keyHelp": "Nur Großbuchstaben, Zahlen und Unterstriche",
+        "valueLabel": "Wert",
+        "valuePlaceholder": "Wert eingeben",
+        "valuePlaceholderNew": "Kommagetrennte Werte oder Text",
+        "valueHelp": "Für Listen: Werte mit Komma trennen. Für Schlüssel:Wert: Format SCHLÜSSEL:WERT,SCHLÜSSEL2:WERT2",
+        "addTagPlaceholder": "Tag hinzufügen...",
+        "textPlaceholder": "Text eingeben...",
+        "noConfigs": "Keine Konfigurationen gefunden",
+        "noSearchResults": "Keine Ergebnisse für diese Suche",
+        "createFirst": "Erste Konfiguration erstellen",
+        "retry": "Erneut versuchen",
+        "configCreated": "Konfiguration erfolgreich erstellt",
+        "configSaved": "Konfiguration erfolgreich gespeichert",
+        "configDeleted": "Konfiguration erfolgreich gelöscht",
+        "confirmDeleteTitle": "Löschen bestätigen",
+        "confirmDeleteMessage": "Sind Sie sicher, dass Sie die Konfiguration \"{key}\" löschen möchten?",
+        "types": {
+            "list": "Liste",
+            "keyvalue": "Schlüssel-Wert",
+            "text": "Text"
+        }
     }
 }

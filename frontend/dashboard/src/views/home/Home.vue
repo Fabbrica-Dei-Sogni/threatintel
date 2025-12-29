@@ -1,5 +1,6 @@
 <template>
   <div class="dashboard">
+    <ConfigMenuButton />
     <div class="header-with-lang">
       <h1>{{ $t('home.title') }}</h1>
       <LanguageSwitcher />
@@ -62,6 +63,7 @@ import dayjs from 'dayjs';
 import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
 import CountryFlag from '../../components/CountryFlag.vue';
 import AttackMap from '../../components/AttackMap.vue';
+import ConfigMenuButton from '../../components/ConfigMenuButton.vue';
 
 const { t } = useI18n();
 

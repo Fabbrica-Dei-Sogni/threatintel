@@ -234,5 +234,44 @@
             "attacker": "Atakujący",
             "target": "Cel"
         }
+    },
+    "nav": {
+        "menu": "Menu",
+        "menuTitle": "Nawigacja",
+        "dashboard": "Panel główny",
+        "attacks": "Ataki",
+        "logs": "Dzienniki żądań",
+        "configuration": "Konfiguracja",
+        "settings": "Ustawienia"
+    },
+    "config": {
+        "title": "Konfiguracja Honeypota",
+        "searchPlaceholder": "Szukaj konfiguracji...",
+        "newConfig": "Nowa Konfiguracja",
+        "newConfigTitle": "Utwórz Nową Konfigurację",
+        "editConfig": "Edytuj Konfigurację",
+        "keyLabel": "Klucz",
+        "keyPlaceholder": "NP. PATTERN_NAME",
+        "keyHelp": "Tylko wielkie litery, cyfry i podkreślenia",
+        "valueLabel": "Wartość",
+        "valuePlaceholder": "Wprowadź wartość",
+        "valuePlaceholderNew": "Wartości oddzielone przecinkiem lub tekst",
+        "valueHelp": "Dla list oddziel wartości przecinkami. Dla klucz:wartość użyj formatu KLUCZ:WARTOŚĆ,KLUCZ2:WARTOŚĆ2",
+        "addTagPlaceholder": "Dodaj tag...",
+        "textPlaceholder": "Wprowadź tekst...",
+        "noConfigs": "Nie znaleziono konfiguracji",
+        "noSearchResults": "Brak wyników dla tego wyszukiwania",
+        "createFirst": "Utwórz pierwszą konfigurację",
+        "retry": "Ponów",
+        "configCreated": "Konfiguracja utworzona pomyślnie",
+        "configSaved": "Konfiguracja zapisana pomyślnie",
+        "configDeleted": "Konfiguracja usunięta pomyślnie",
+        "confirmDeleteTitle": "Potwierdź Usunięcie",
+        "confirmDeleteMessage": "Czy na pewno chcesz usunąć konfigurację \"{key}\"?",
+        "types": {
+            "list": "Lista",
+            "keyvalue": "Klucz-Wartość",
+            "text": "Tekst"
+        }
     }
 }

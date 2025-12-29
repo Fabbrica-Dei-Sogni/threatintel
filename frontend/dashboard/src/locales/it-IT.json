@@ -234,5 +234,44 @@
             "attacker": "Attaccante",
             "target": "Obiettivo"
         }
+    },
+    "nav": {
+        "menu": "Menu",
+        "menuTitle": "Navigazione",
+        "dashboard": "Dashboard",
+        "attacks": "Attacchi",
+        "logs": "Log Richieste",
+        "configuration": "Configurazione",
+        "settings": "Impostazioni"
+    },
+    "config": {
+        "title": "Configurazione Honeypot",
+        "searchPlaceholder": "Cerca configurazioni...",
+        "newConfig": "Nuova Configurazione",
+        "newConfigTitle": "Crea Nuova Configurazione",
+        "editConfig": "Modifica Configurazione",
+        "keyLabel": "Chiave",
+        "keyPlaceholder": "ES. PATTERN_NAME",
+        "keyHelp": "Solo lettere maiuscole, numeri e underscore",
+        "valueLabel": "Valore",
+        "valuePlaceholder": "Inserisci valore",
+        "valuePlaceholderNew": "Valori separati da virgola o testo",
+        "valueHelp": "Per liste, separa i valori con virgola. Per chiave:valore usa il formato CHIAVE:VALORE,CHIAVE2:VALORE2",
+        "addTagPlaceholder": "Aggiungi tag...",
+        "textPlaceholder": "Inserisci testo...",
+        "noConfigs": "Nessuna configurazione trovata",
+        "noSearchResults": "Nessun risultato per questa ricerca",
+        "createFirst": "Crea la prima configurazione",
+        "retry": "Riprova",
+        "configCreated": "Configurazione creata con successo",
+        "configSaved": "Configurazione salvata con successo",
+        "configDeleted": "Configurazione eliminata con successo",
+        "confirmDeleteTitle": "Conferma Eliminazione",
+        "confirmDeleteMessage": "Sei sicuro di voler eliminare la configurazione \"{key}\"?",
+        "types": {
+            "list": "Lista",
+            "keyvalue": "Chiave-Valore",
+            "text": "Testo"
+        }
     }
 }

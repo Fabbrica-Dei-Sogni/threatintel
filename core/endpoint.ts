@@ -7,15 +7,18 @@ import ratelimitroutes from './apis/ratelimitroutes';
 import threatroutes from './apis/threatroutes';
 import routes from './apis/routes';
 import managelimitroutes from './apis/managelimitroutes';
+import configroutes from './apis/configroutes';
 import { getComponent } from './di/container';
 import { ThreatLogService } from "./services/ThreatLogService";
 import { IpDetailsService } from "./services/IpDetailsService";
 import { RateLimitService } from "./services/RateLimitService";
+import { ConfigService } from "./services/ConfigService";
 import { ThreatLogger } from "./threatLogger";
 
 const threatLogService = getComponent(ThreatLogService);
 const ipDetailsService = getComponent(IpDetailsService);
 const rateLimitService = getComponent(RateLimitService);
+const configService = getComponent(ConfigService);
 
 const threatLogger = getComponent(ThreatLogger);
 
@@ -32,6 +35,9 @@ router.use('/', ratelimitroutes(logger, rateLimitService));
 
 // api dashboard per analizzare i dati
 router.use('/', threatroutes(logger, threatLogService, ipDetailsService));
+
+// API configurazione
+router.use('/', configroutes(logger, configService));
 
 //api honeypot per esporre finti servizi http
 router.use('/', routes(logger));

@@ -57,4 +57,46 @@ export class ConfigService {
             throw error;
         }
     }
+
+    /**
+     * Elimina una configurazione tramite chiave
+     * @param {string} key 
+     * @returns {Promise<boolean>}
+     */
+    async deleteConfig(key: string) {
+        try {
+            const result = await Configuration.findOneAndDelete({ key });
+            if (result) {
+                logger.info(`[ConfigService] Config deleted: ${key}`);
+                return true;
+            }
+            logger.warn(`[ConfigService] Config not found for deletion: ${key}`);
+            return false;
+        } catch (error) {
+            logger.error(`[ConfigService] Error deleting config ${key}:`, error);
+            throw error;
+        }
+    }
+
+    /**
+     * Ricerca configurazioni per chiave o valore
+     * @param {string} query 
+     * @returns {Promise<Array<{key:string,value:string}>>}
+     */
+    async searchConfigs(query: string) {
+        try {
+            const searchRegex = new RegExp(query, 'i');
+            const configs = await Configuration.find({
+                $or: [
+                    { key: searchRegex },
+                    { value: searchRegex }
+                ]
+            });
+            logger.info(`[ConfigService] searchConfigs success: ${configs.length} configs found for query "${query}"`);
+            return configs;
+        } catch (error) {
+            logger.error(`[ConfigService] Error searching configs with query "${query}":`, error);
+            throw error;
+        }
+    }
 }

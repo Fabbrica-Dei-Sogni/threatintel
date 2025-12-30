@@ -1,6 +1,9 @@
 <template>
   <div class="threatlogs">
-    <h1>{{ t('threatLogs.title') }}</h1>
+    <div class="header-top">
+      <h1>{{ t('threatLogs.title') }}</h1>
+      <LanguageSwitcher />
+    </div>
     <!-- Pulsante per navigare alla Home -->
     <div class="actions">
       <button @click="goToHome" class="btn-action">
@@ -186,6 +189,7 @@ const { copyToClipboard } = useClipboard();
 import dayjs from 'dayjs';
 import CountryFlag from '../../components/CountryFlag.vue';
 import ThreadLogChart from '../../components/ThreadLogChart.vue';
+import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
 
 const { t } = useI18n();
 

@@ -12,6 +12,7 @@
                 </button>
                 <h1 class="page-title">{{ $t('config.title') }}</h1>
             </div>
+            <LanguageSwitcher />
         </header>
 
         <!-- Toolbar -->

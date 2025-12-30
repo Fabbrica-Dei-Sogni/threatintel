@@ -1,5 +1,15 @@
 <template>
   <div class="settings-container">
+    <div class="header-top">
+      <button class="back-btn" @click="goBack" title="Indietro">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+      </button>
+      <LanguageSwitcher />
+    </div>
     <div class="settings-layout">
       <!-- Sidebar Profili -->
       <aside class="profiles-sidebar">
@@ -25,13 +35,6 @@
       <main class="settings-card">
         <div class="settings-header">
           <div class="header-left">
-            <button class="back-btn" @click="goBack" title="Indietro">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="19" y1="12" x2="5" y2="12"></line>
-                <polyline points="12 19 5 12 12 5"></polyline>
-              </svg>
-            </button>
             <h2 class="settings-title">{{ isDefault ? 'Profilo Predefinito' : 'Modifica Profilo' }}</h2>
           </div>
         </div>
@@ -131,6 +134,7 @@ import 'leaflet/dist/leaflet.css';
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
+import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
 
 // Override default icon configuration
 delete (L.Icon.Default.prototype as any)._getIconUrl;

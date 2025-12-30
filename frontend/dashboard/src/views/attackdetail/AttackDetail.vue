@@ -1,6 +1,9 @@
 <template>
     <div class="attack-detail">
-        <button @click="goBack" class="back-btn">← {{ t('attackDetail.backToAttacks') }}</button>
+        <div class="header-top">
+            <button @click="goBack" class="back-btn">← {{ t('attackDetail.backToAttacks') }}</button>
+            <LanguageSwitcher />
+        </div>
         <h1>{{ t('attackDetail.title') }}</h1>
 
         <!-- Attacker Highlight Card -->
@@ -140,6 +143,7 @@ import DefconIndicator from '../../components/DefconIndicator.vue';
 import AttackProfileRadar from '../../components/AttackProfileRadar.vue';
 import HexViewer from '../../components/HexViewer.vue';
 import AttackMap from '../../components/AttackMap.vue';
+import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
 
 const { t } = useI18n();
 const { copyToClipboard } = useClipboard();

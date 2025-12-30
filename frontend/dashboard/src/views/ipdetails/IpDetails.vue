@@ -1,6 +1,9 @@
 <template>
   <div class="ip-details">
-    <button @click="goBack" class="back-btn">← {{ t('ipDetails.backToAttacks') }}</button>
+    <div class="header-top">
+      <button @click="goBack" class="back-btn">← {{ t('ipDetails.backToAttacks') }}</button>
+      <LanguageSwitcher />
+    </div>
 
     <h1>{{ t('ipDetails.title') }}: {{ ip }}</h1>
 
@@ -49,7 +52,7 @@
             <div v-for="report in paginatedReports" :key="report._id" class="report-entry">
               <div class="report-header" @click="toggleReport(report._id)">
                 <span>{{ formatDate(report.reportedAt) }} - {{report.categories.map(cat => cat.name).join(', ')
-                }}</span>
+                  }}</span>
                 <span class="toggle-icon">{{ expandedReports[report._id] ? '–' : '+' }}</span>
               </div>
               <transition name="collapse">
@@ -163,6 +166,7 @@ import { useRoute, useRouter } from 'vue-router'
 import dayjs from 'dayjs'
 import { fetchIpDetails, fetchRateLimitSearch, enrichReports, enrichReputationScore } from '../../api/index'
 import { useI18n } from 'vue-i18n'
+import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
 
 const { t } = useI18n();
 

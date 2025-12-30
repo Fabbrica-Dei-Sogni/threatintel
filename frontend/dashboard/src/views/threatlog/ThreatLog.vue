@@ -1,6 +1,9 @@
 <template>
     <div class="threatlog-details">
-        <button @click="goBack" class="back-btn">← {{ t('threatLog.backToLogs') }}</button>
+        <div class="header-top">
+            <button @click="goBack" class="back-btn">← {{ t('threatLog.backToLogs') }}</button>
+            <LanguageSwitcher />
+        </div>
         <h1>{{ t('threatLog.title') }}: {{ id }}</h1>
 
         <section v-if="loading" class="loading">{{ t('common.loading') }}</section>
@@ -79,7 +82,7 @@
                             t('components.radar.notAvailable') }}</p>
                         <p><strong>{{ t('threatLog.userAgent') }}:</strong> {{ log.request.userAgent ||
                             t('components.radar.notAvailable')
-                            }}</p>
+                        }}</p>
                         <!--
                         <p><strong>Referer:</strong> {{ log.request.referer || t('components.radar.notAvailable') }}</p>
                     -->
@@ -132,6 +135,7 @@ import { fetchLogById } from '../../api/index'
 import { useI18n } from 'vue-i18n'
 import HexViewer from '../../components/HexViewer.vue';
 import { useClipboard } from '../../composable/useClipboard';
+import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
 
 const { t } = useI18n();
 const { copyToClipboard } = useClipboard();

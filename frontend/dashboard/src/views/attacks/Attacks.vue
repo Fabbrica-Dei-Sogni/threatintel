@@ -1,6 +1,9 @@
 <template>
     <div class="attacchi">
-        <h1>{{ t('attacks.title') }}</h1>
+        <div class="header-top">
+            <h1>{{ t('attacks.title') }}</h1>
+            <LanguageSwitcher />
+        </div>
         <!-- Pulsante per tornare alla Home principale -->
         <div class="actions">
             <button @click="goToHome" class="btn-action">
@@ -342,6 +345,7 @@ import DefconIndicator from '../../components/DefconIndicator.vue';
 import CountryFlag from '../../components/CountryFlag.vue';
 import AttackChart from '../../components/AttackChart.vue';
 import AttackMap from '../../components/AttackMap.vue';
+import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
 
 
 

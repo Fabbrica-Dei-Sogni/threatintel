@@ -2,7 +2,7 @@ import dotenv from 'dotenv';
 // Import model
 import ThreatLog from '../models/ThreatLogSchema';
 import AttackDTO from '../models/dto/AttackDTO';
-import PatternAnalysis from './PatternAnalysisService';
+import PatternAnalysisService from './PatternAnalysisService';
 import { ForensicService } from './forense/ForensicService';
 import { inject, injectable } from 'tsyringe';
 import { LOGGER_TOKEN } from '../di/tokens';
@@ -13,15 +13,16 @@ dotenv.config();
 
 @injectable()
 export class ThreatLogService {
-    private patternAnalysisService: any;
+    //private patternAnalysisService: any;
 
     constructor(
         @inject(LOGGER_TOKEN) private readonly logger: Logger,
         private readonly forensicService: ForensicService,
         private readonly ipDetailsService: IpDetailsService,
+        private readonly patternAnalysisService: PatternAnalysisService,
     ) {
         // Parse della variabile di ambiente al costruttore
-        this.patternAnalysisService = new PatternAnalysis({ geoEnabled: true });
+        //this.patternAnalysisService = new PatternAnalysis({ geoEnabled: true });
     }
 
     async saveLog(logEntry: any) {

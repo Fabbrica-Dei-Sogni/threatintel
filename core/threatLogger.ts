@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import crypto from 'crypto';
 import dotenv from 'dotenv';
-import PatternAnalysis from './services/PatternAnalysisService';
+import PatternAnalysisService from './services/PatternAnalysisService';
 import net from 'net';
 import { Request, Response, NextFunction } from 'express';
 import { ThreatLogService } from './services/ThreatLogService';
@@ -9,16 +9,18 @@ import { mongoUri } from './config';
 import { inject, singleton } from 'tsyringe';
 import { LOGGER_TOKEN } from './di/tokens';
 import { Logger } from 'winston';
+import { getComponent } from './di/container';
 dotenv.config();
 
 type AnyReq = Request & { jndiPayload?: any; sessionID?: string };
+const patternAnalysisService = getComponent(PatternAnalysisService);
 
 @singleton()
 export class ThreatLogger {
 
     //TODO: rendere parametrizzabile questo set di configurazione per il threat logger
     config = {
-        patternAnalysisInstance: new PatternAnalysis({ geoEnabled: true }),
+        patternAnalysisInstance: patternAnalysisService,
         mongoUri: mongoUri,
         enabled: true,
         geoEnabled: true,
@@ -36,7 +38,7 @@ export class ThreatLogger {
         private readonly threatLogService: ThreatLogService,
     ) {
 
-        this.patternAnalysisInstance = this.config.patternAnalysisInstance || new PatternAnalysis({ geoEnabled: true });
+        this.patternAnalysisInstance = this.config.patternAnalysisInstance || patternAnalysisService;
         this.mongoUri = this.config.mongoUri || 'mongodb://localhost:27017/threatintel';
         this.enabled = this.config.enabled !== false;
         this.geoEnabled = this.config.geoEnabled !== false;

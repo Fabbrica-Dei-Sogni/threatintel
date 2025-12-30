@@ -1,9 +1,11 @@
-import { logger } from '../../logger';
 import crypto from 'crypto';
 import dotenv from 'dotenv';
 import { Request } from 'express';
 import { getComponent } from '../di/container';
 import { ConfigService } from './ConfigService';
+import { inject, injectable } from 'tsyringe';
+import { LOGGER_TOKEN } from '../di/tokens';
+import { Logger } from 'winston';
 
 // Import JS dependencies
 const geoip = require('geoip-lite');
@@ -17,7 +19,8 @@ interface RequestAnalysisResult {
     geo: any;
 }
 
-class PatternAnalysisService {
+@injectable()
+export class PatternAnalysisService {
     private geoEnabled: boolean;
     private suspiciousPatterns: RegExp[];
     private botPatterns: RegExp[];
@@ -25,9 +28,10 @@ class PatternAnalysisService {
     private suspiciousScores: any;
     private initialized: Promise<void>;
 
-    constructor(options: any = {}) {
+    constructor(@inject(LOGGER_TOKEN) private readonly logger: Logger,) {
 
-        this.geoEnabled = options.geoEnabled !== false;
+        //XXX: si imposta la geolocalizzazione sempre attiva. fornire un sistema per parametrizzarlo qualora sia necessario in futuro.
+        this.geoEnabled = true;// options.geoEnabled !== false;
         this.suspiciousPatterns = [];
         this.botPatterns = [];
         this.suspiciousReferers = [];
@@ -98,9 +102,9 @@ class PatternAnalysisService {
             };
             this.suspiciousScores = { ...defaultScores, ...scores };
 
-            logger.info(`[ThreatLogger] Configurazioni pattern caricate da DB`);
+            this.logger.info(`[ThreatLogger] Configurazioni pattern caricate da DB`);
         } catch (err: any) {
-            logger.error(`[ThreatLogger] Errore caricamento configurazioni da DB: ${err.message}`);
+            this.logger.error(`[ThreatLogger] Errore caricamento configurazioni da DB: ${err.message}`);
             // fallback o rilancio errore a seconda del contesto
             // qui si potrebbe caricare default oppure propagare errore
         }

@@ -46,30 +46,43 @@ onMounted(() => {
 
 .floating-settings {
   position: fixed;
-  bottom: 20px;
-  right: 20px;
-  width: 50px;
-  height: 50px;
-  background-color: var(--primary-color, #4CAF50);
-  color: white;
+  bottom: 24px;
+  right: 24px;
+  width: 54px;
+  height: 54px;
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+  color: #ffb74d;
+  /* Colore ambra/arancio caldo */
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   z-index: 1000;
-  transition: transform 0.2s, opacity 0.2s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
   text-decoration: none;
 }
 
 .floating-settings:hover {
-  transform: scale(1.1);
-  opacity: 0.9;
+  background: rgba(255, 255, 255, 0.08);
+  border-color: #ffb74d;
+  color: #1a1a1a;
+  background-color: #ffb74d;
+  transform: scale(1.1) translateY(-2px);
+  box-shadow: 0 12px 40px rgba(255, 183, 77, 0.3), 0 0 20px rgba(255, 183, 77, 0.2);
 }
 
 .floating-settings svg {
-  width: 28px;
-  height: 28px;
+  width: 26px;
+  height: 26px;
+  transition: transform 0.3s ease;
+}
+
+.floating-settings:hover svg {
+  transform: rotate(45deg);
 }
 </style>

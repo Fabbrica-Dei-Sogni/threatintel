@@ -3,4 +3,4 @@ coverage
 dist
 logs
 redis-data
-redis/redisinsight-data/*
+redisinsight-data

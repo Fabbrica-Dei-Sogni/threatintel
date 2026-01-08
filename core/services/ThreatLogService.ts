@@ -36,8 +36,14 @@ export class ThreatLogService {
 
         logEntry.ipDetailsId = await this.ipDetailsService.saveIpDetails(ip);
 
-        const log = new ThreatLog(logEntry);
-        await log.save();
+        // Utilizziamo findOneAndUpdate con upsert per rendere l'operazione atomica.
+        // Questo previene errori E11000 se arrivano log duplicati (es. SSH backfill) nello stesso istante.
+        const log = await ThreatLog.findOneAndUpdate(
+            { id: logEntry.id },
+            { $set: logEntry },
+            { upsert: true, new: true, setDefaultsOnInsert: true }
+        );
+
         return log;
     }
 

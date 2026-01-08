@@ -95,7 +95,18 @@ export class IpDetailsService {
             ipDetails.firstSeenAt = now;
             ipDetails.lastSeenAt = now;
 
-            await ipDetails.save();
+            try {
+                await ipDetails.save();
+            } catch (err: any) {
+                // Se nel frattempo un altro processo ha creato il record (Race Condition),
+                // recuperiamo quello esistente invece di lanciare errore.
+                if (err.code === 11000) {
+                    this.logger.info(`[IpDetailsService] Conflitto di creazione per ${ip}, recupero record esistente.`);
+                    const existing = await IpDetails.findOne({ ip });
+                    if (existing) return existing._id;
+                }
+                throw err;
+            }
         }
 
 
@@ -312,11 +323,30 @@ export class IpDetailsService {
         };
     }
 
-    ipinfoPromise(ip: string) {
+    private ipinfoPromise(ip: string): Promise<any> {
         return new Promise((resolve) => {
-            ipinfo(ip, {}, (err: any, c: any) => {
-                if (err) return resolve(null);
-                resolve(c);
+            this.logger.debug(`[IpDetailsService] Avvio lookup ipinfo per: ${ip}`);
+
+            const token = process.env.IPINFO_TOKEN;
+            const options = token ? { token: token } : {};
+
+            ipinfo(ip, options, (err: any, data: any) => {
+                if (err) {
+                    this.logger.warn(`[IpDetailsService] Fallimento lookup ipinfo per ${ip}:`, err);
+                    return resolve(null);
+                }
+
+                // Logghiamo i dati principali ricevuti per debug
+                this.logger.info(`[IpDetailsService] Lookup ipinfo riuscito per ${ip}`, {
+                    ip: data.ip,
+                    city: data.city,
+                    region: data.region,
+                    country: data.country,
+                    org: data.org,
+                    loc: data.loc
+                });
+
+                resolve(data);
             });
         });
     }

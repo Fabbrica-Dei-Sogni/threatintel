@@ -83,6 +83,9 @@ export class IpDetailsService {
 
             //rieseguire l'enrichment del reputation score ogni volta
             await ipDetails.save();
+
+            return ipDetails._id;
+
         }
         else {
 
@@ -91,11 +94,35 @@ export class IpDetailsService {
             const enrichedData = await this.enrichIpData(ip); // <-- la tua funzione ipinfo/whois
 
             //TODO: eseguire l'enrichment del reputation score ogni volta
-            ipDetails = new IpDetails({ ip, ...enrichedData, abuseipdbId: saveAbuseDoc?._id || null });
+            /*ipDetails = new IpDetails({ ip, ...enrichedData, abuseipdbId: saveAbuseDoc?._id || null });
             ipDetails.firstSeenAt = now;
-            ipDetails.lastSeenAt = now;
+            ipDetails.lastSeenAt = now;*/
 
-            try {
+            // 2. Prepari i dati come oggetto semplice (POJO)
+            const payload = {
+                ip,
+                ...enrichedData,
+                abuseipdbId: saveAbuseDoc?._id || null,
+                lastSeenAt: now
+            };
+
+            // 3. Esegui findOneAndUpdate con upsert: true
+            // - $set: aggiorna i campi definiti (se esiste o crea nuovo)
+            // - $setOnInsert: imposta firstSeenAt SOLO se sta creando un nuovo documento            
+            const result = await IpDetails.findOneAndUpdate(
+                { ip },
+                {
+                    $set: payload,
+                    $setOnInsert: { firstSeenAt: now }
+                },
+                { upsert: true, new: true, setDefaultsOnInsert: true }
+            );
+
+            // 4. Ritorni l'ID del risultato (che sia stato appena creato o trovato)
+            return result._id;
+
+            //soluzione legacy con try catch
+            /*try {
                 await ipDetails.save();
             } catch (err: any) {
                 // Se nel frattempo un altro processo ha creato il record (Race Condition),
@@ -106,21 +133,10 @@ export class IpDetailsService {
                     if (existing) return existing._id;
                 }
                 throw err;
-            }
+            }*/
         }
 
 
-        //TODO: integrare l'enrichment del reputation score dal provider abuse
-        //ip details avra una sezione dedicata per tracciare i dati del reputation score
-        //la sezione è uno schema dedicato reputationscore ed è associato per riferimento all'ipdetails
-
-        //l'enrichment del reputation score viene aggiornato ogni volta che arriva una richiesta
-        //gestire nel fingerprints della richiesta il reputation score corrente al momento della richiesta con almeno una lista di 10 report segnalati.
-        //queste info di reputation sono legate alla richiesta, nell'abuse dell'ip il reputation score puo variare nel tempo.
-
-
-        //await ipDetails.save();
-        return ipDetails._id;
     }
 
     async getIpDetails(ip: string) {

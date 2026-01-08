@@ -82,6 +82,19 @@ export class IpDetailsService {
             }
 
             //rieseguire l'enrichment del reputation score ogni volta
+            // Se i dati ipinfo sono mancanti O se contengono un errore di rate limit, riprova
+            if (!ipDetails.ipinfo ||
+                (ipDetails.ipinfo && ((ipDetails.ipinfo as any).status === 429 || ((ipDetails.ipinfo as any).error && (ipDetails.ipinfo as any).error.title === 'Rate limit exceeded')))
+            ) {
+                const enrichedData = await this.enrichIpData(ip);
+                if (enrichedData.ipinfo) {
+                    ipDetails.ipinfo = enrichedData.ipinfo;
+                }
+                if (enrichedData.whois_raw) {
+                    ipDetails.whois_raw = enrichedData.whois_raw;
+                }
+            }
+
             await ipDetails.save();
 
             return ipDetails._id;
@@ -347,20 +360,26 @@ export class IpDetailsService {
             const options = token ? { token: token } : {};
 
             ipinfo(ip, options, (err: any, data: any) => {
+
                 if (err) {
+                    // Gestione specifica per Rate Limit: Ritorniamo l'errore per il frontend, 
+                    // ma lo logghiamo per poterlo intercettare nel findOrCreate
+                    if (err.status === 429 || (err.error && err.error.title === 'Rate limit exceeded')) {
+                        this.logger.warn(`[IpDetailsService] Rate limit superato per ipinfo su IP ${ip}. Salvo l'errore per riprovare in futuro.`);
+                        // Ritorniamo l'oggetto errore invece di null, così il frontend lo riceve
+                        return resolve(err);
+                    }
+
                     this.logger.warn(`[IpDetailsService] Fallimento lookup ipinfo per ${ip}:`, err);
                     return resolve(null);
                 }
 
-                // Logghiamo i dati principali ricevuti per debug
-                this.logger.info(`[IpDetailsService] Lookup ipinfo riuscito per ${ip}`, {
-                    ip: data.ip,
-                    city: data.city,
-                    region: data.region,
-                    country: data.country,
-                    org: data.org,
-                    loc: data.loc
-                });
+                // Controllo se ipinfo ha restituito l'errore nel campo data invece che in err
+                if (data && (data.status === 429 || (data.error && data.error.title === 'Rate limit exceeded'))) {
+                    this.logger.warn(`[IpDetailsService] Rate limit superato per ipinfo su IP ${ip} (in data). Salvo l'errore per riprovare in futuro.`);
+                    // Ritorniamo data (che contiene l'errore) invece di null
+                    return resolve(data);
+                }
 
                 resolve(data);
             });

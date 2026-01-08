@@ -52,6 +52,8 @@ export interface IThreatLog extends Document {
     response?: IResponse;
     metadata?: IMetadata;
     ipDetailsId?: Types.ObjectId | null;
+    //il campo protocol per differenziare tipi di richieste diverse da http e ssh e altri futuri
+    protocol?: string;
 }
 
 const RequestSchema: Schema = new Schema({
@@ -105,7 +107,9 @@ const ThreatLogSchema: Schema = new Schema({
     fingerprint: FingerprintSchema,
     response: ResponseSchema,
     metadata: MetadataSchema,
-    ipDetailsId: { type: Schema.Types.ObjectId, ref: 'IpDetails', default: null }
+    ipDetailsId: { type: Schema.Types.ObjectId, ref: 'IpDetails', default: null },
+    //il campo protocol per differenziare tipi di richieste diverse da http e ssh e altri futuri
+    protocol: { type: String, default: 'http' }
 });
 
 const ThreatLog: Model<IThreatLog> = mongoose.model<IThreatLog>('ThreatLog', ThreatLogSchema);

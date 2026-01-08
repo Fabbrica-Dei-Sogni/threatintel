@@ -14,6 +14,8 @@ import { scheduleAnalysis } from './core/tools/analyze';
 import path from 'path';
 import { port } from './core/config';
 import api from './core/endpoint';
+import { getComponent } from './core/di/container';
+import { SshLogService } from './core/services/SshLogService';
 
 const app = express();
 
@@ -55,5 +57,9 @@ app.listen(Number(PORT), '127.0.0.1', () => {
     logger.info(`📊 Dashboard statistiche: http://localhost:${PORT}/api/stats`);
     logger.info(`🕸️  Landing page: http://localhost:${PORT}/`);
 });
+
+//XXX: verificare il corretto funzionamento del servizio di logging ssh per ora disattivato.
+//const sshLogService = getComponent(SshLogService);
+//sshLogService.startMonitoring().catch(err => logger.error('Errore avvio SSH monitoring:', err));
 
 scheduleAnalysis();

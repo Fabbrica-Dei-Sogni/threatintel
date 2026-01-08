@@ -1,4 +1,5 @@
 export default class AttackDTO {
+    protocol?: string;
     // Original fields from the JS DTO (all optional for flexibility)
     _id?: string;
     timestamp?: string;

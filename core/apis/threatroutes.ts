@@ -4,7 +4,7 @@ import { uriDigitalAuth } from '../config';
 
 dotenv.config();
 
-export default (logger: any, threatLoggerService: any, ipDetailsService: any) => {
+export default (logger: any, threatLoggerService: any, ipDetailsService: any, sshLogService: any) => {
     const router = express.Router();
 
     router.get('/api/stats', /*verifyToken,*/ async (req, res) => {
@@ -168,8 +168,12 @@ export default (logger: any, threatLoggerService: any, ipDetailsService: any) =>
 
         try {
             const { batchSize = 100, updateDatabase = true } = req.body;
-            const result = await threatLoggerService.analyzeLogs({ batchSize, updateDatabase });
-            res.json(result);
+            //analisi log http
+            const resultHttp = await threatLoggerService.analyzeLogs({ batchSize, updateDatabase });
+            //analisi log ssh
+            const resultSsh = await sshLogService.analyzeSshLogs(batchSize);
+
+            res.json({ http: resultHttp, ssh: resultSsh });
         } catch (err: any) {
             logger.error('Errore durante rianalisi di tutti i log:', err);
             res.status(err.status || 500).json({ error: 'Errore durante rianalisi di tutti i log', details: err.message });

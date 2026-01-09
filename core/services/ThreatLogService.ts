@@ -262,8 +262,18 @@ export class ThreatLogService {
 
         await this.patternAnalysisService.loadConfigFromDB();
 
+        // Filtro per recuperare solo log HTTP (o quelli senza protocollo specificato, legacy)
+        // Escludendo quindi SSH o altri flussi futuri
+        const httpFilter = {
+            $or: [
+                { protocol: 'http' },
+                { protocol: { $exists: false } },
+                { protocol: null }
+            ]
+        };
+
         // Conta totale log da processare
-        const totalLogs = await this.countLogs({});
+        const totalLogs = await this.countLogs(httpFilter);
         let processed = 0;
         let updated = 0;
         let errors = 0;
@@ -277,7 +287,7 @@ export class ThreatLogService {
             batches: []
         };
 
-        this.logger.info(`Totale log da processare: ${totalLogs}`);
+        this.logger.info(`Totale log HTTP da processare: ${totalLogs}`);
 
         // Processa in batch per evitare memory overflow
         for (let skip = 0; skip < totalLogs; skip += batchSize) {
@@ -291,7 +301,7 @@ export class ThreatLogService {
                 const logs = await this.getLogs({
                     page: batchNumber,
                     pageSize: batchSize,
-                    filters: {}
+                    filters: httpFilter
                 });
 
                 const batchResults = await Promise.allSettled(

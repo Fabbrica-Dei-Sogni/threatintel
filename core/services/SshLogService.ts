@@ -5,21 +5,61 @@ import { Logger } from 'winston';
 import { ThreatLogService } from './ThreatLogService';
 import PatternAnalysisService from './PatternAnalysisService';
 import crypto from 'crypto';
+import { ConfigService } from './ConfigService';
 
 @singleton()
 export class SshLogService {
     private journalProcess: any = null;
+    private failedPasswordScore: number = 15;
+    private invalidUserScore: number = 25;
+    private initialized: Promise<void>;
+
+    // Const keys for config
+    private readonly SSH_FAILED_PASSWORD = 'SSH_FAILED_PASSWORD';
+    private readonly SSH_INVALID_USER = 'SSH_INVALID_USER';
 
     constructor(
         @inject(LOGGER_TOKEN) private readonly logger: Logger,
         private readonly threatLogService: ThreatLogService,
-        private readonly patternAnalysisService: PatternAnalysisService
-    ) { }
+        private readonly patternAnalysisService: PatternAnalysisService,
+        private readonly configService: ConfigService
+    ) {
+        this.initialized = this.loadConfigFromDB();
+    }
+
+
+    async loadConfigFromDB() {
+        try {
+            // Carica configurazioni chiave-valore
+            const [
+                scoreFailedPwd,
+                scoreInvalidUser,
+            ] = await Promise.all([
+                this.configService.getConfigValue(this.SSH_FAILED_PASSWORD),
+                this.configService.getConfigValue(this.SSH_INVALID_USER),
+            ]);
+
+            if (scoreFailedPwd) this.failedPasswordScore = parseInt(scoreFailedPwd, 10);
+            if (scoreInvalidUser) this.invalidUserScore = parseInt(scoreInvalidUser, 10);
+
+            this.logger.info(`[SshLogService] Configurazione caricata: SSH_FAILED_PASSWORD=${this.failedPasswordScore}, SSH_INVALID_USER=${this.invalidUserScore}`);
+
+
+        } catch (err: any) {
+            this.logger.error(`[SshLogService] Errore caricamento configurazioni da DB: ${err.message}`);
+            // fallback o rilancio errore a seconda del contesto
+            // qui si potrebbe caricare default oppure propagare errore
+        }
+    }
 
     /**
      * Avvia il monitoraggio in tempo reale dei log SSH tramite journalctl.
      */
     async startMonitoring() {
+
+        //inizializza il caricamenti degli score 
+        await this.initialized;
+
         if (this.journalProcess) {
             this.logger.warn('[SshLogService] Monitoraggio già attivo.');
             return;
@@ -162,14 +202,14 @@ export class SshLogService {
             user = failedMatch[1];
             ip = failedMatch[2];
             type = 'Failed';
-            score = 15;
-            indicators = ['SSH_FAILED_PASSWORD'];
+            score = this.failedPasswordScore;
+            indicators = [this.SSH_FAILED_PASSWORD];
         } else if (invalidMatch) {
             user = invalidMatch[1];
             ip = invalidMatch[2];
             type = 'Invalid';
-            score = 25;
-            indicators = ['SSH_INVALID_USER'];
+            score = this.invalidUserScore;
+            indicators = [this.SSH_INVALID_USER];
         }
         /*else if (acceptedMatch) {
             user = acceptedMatch[1];
@@ -184,6 +224,73 @@ export class SshLogService {
             await this.saveAsThreatLog(ip, user, type, message, score, indicators, entry.__CURSOR);
         } else {
             this.logger.warn(`[SshLogService] La riga ha superato il filtro iniziale ma la Regex non ha estratto i dati: ${message}`);
+        }
+    }
+
+    async analyzeSshLogs(batchSize: number = 100) {
+        this.logger.info('[SshLogService] Avvio ricalcolo score SSH...');
+
+        //carica i valori da db
+        await this.loadConfigFromDB();
+
+        let page = 1;
+        let processed = 0;
+        let updated = 0;
+        let total = 0;
+
+        try {
+            // Prima conta totale per log
+            total = await this.threatLogService.countLogs({ protocol: 'ssh' });
+            this.logger.info(`[SshLogService] Trovati ${total} log SSH da analizzare.`);
+
+            while (processed < total) {
+                const logs = await this.threatLogService.getLogs({
+                    page,
+                    pageSize: batchSize,
+                    filters: { protocol: 'ssh' }
+                });
+
+                if (logs.length === 0) break;
+
+                for (const log of logs) {
+                    const sshEvent = log.request?.headers?.['ssh-event'];
+                    let newScore = 0;
+                    let newIndicators: string[] = [];
+                    let shouldUpdate = false;
+
+                    if (sshEvent === 'Failed') {
+                        newScore = this.failedPasswordScore;
+                        newIndicators = [this.SSH_FAILED_PASSWORD];
+                        shouldUpdate = true;
+                    } else if (sshEvent === 'Invalid') {
+                        newScore = this.invalidUserScore;
+                        newIndicators = [this.SSH_INVALID_USER];
+                        shouldUpdate = true;
+                    }
+
+                    if (shouldUpdate) {
+                        // Aggiorna solo se score o indicatori sono diversi (opzionale, ma efficiente)
+                        // In questo caso forziamo l'aggiornamento per allineare tutto
+                        log.fingerprint.score = newScore;
+                        log.fingerprint.indicators = newIndicators;
+                        log.fingerprint.suspicious = newScore > 0;
+
+                        await this.threatLogService.saveLog(log);
+                        updated++;
+                    }
+                }
+
+                processed += logs.length;
+                this.logger.info(`[SshLogService] Processati ${processed}/${total} log...`);
+                page++;
+            }
+
+            this.logger.info(`[SshLogService] Ricalcolo completato. Aggiornati ${updated} log su ${total}.`);
+            return { processed, updated, total };
+
+        } catch (err: any) {
+            this.logger.error('[SshLogService] Errore durante il ricalcolo score SSH', err);
+            throw err;
         }
     }
 

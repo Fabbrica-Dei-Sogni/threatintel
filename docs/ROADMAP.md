@@ -17,6 +17,7 @@
 | [M5: Security Enhancements](#m5-security-enhancements) | ⚪ Planned | 🟠 Medium | 1-2 settimane |
 | [M6: Monitoring & Observability](#m6-monitoring--observability) | ⚪ Planned | 🟡 Low | 1 settimana |
 | [M7: Frontend Enhancements](#m7-frontend-enhancements) | 🟢 In Progress (80%) | 🟠 Medium | 2 settimane |
+| [M8: Log Analysis & Hardening](#m8-log-analysis--hardening) | 🟢 In Progress (40%) | 🔴 High | 1-2 settimane |
 
 **Legenda:**
 - 🟢 In Progress
@@ -291,6 +292,29 @@
 - Supporto multilingua completo
 - Esperienza mobile nativa
 - UI moderna e adattiva
+
+---
+
+## M8: Log Analysis & Hardening
+
+**Obiettivo**: Estendere capacità di analisi e ricalcolo score per diversi protocolli
+
+**Status**: 🟢 In Progress (40%)
+
+### Phase 1: SSH Log Integration ✅
+- [x] Fix type mismatch (string vs number) for scores
+- [x] Make SSH scores configurable via DB
+- [x] Implement `analyzeSshLogs` for historical recalibration
+- [x] Integration test for SSH recalibration
+
+### Phase 2: HTTP Log Refinement ✅
+- [x] Filter `analyzeLogs` to target only HTTP protocol
+- [x] Handle legacy logs with missing protocol field
+
+### Phase 3: Future Protocols (Next)
+- [ ] Abstract analysis engine for generic protocols
+- [ ] Add support for FTP/SMTP logs
+- [ ] Unified dashboard for cross-protocol correlation
 
 ---
 

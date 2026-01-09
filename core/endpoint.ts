@@ -14,8 +14,10 @@ import { IpDetailsService } from "./services/IpDetailsService";
 import { RateLimitService } from "./services/RateLimitService";
 import { ConfigService } from "./services/ConfigService";
 import { ThreatLogger } from "./threatLogger";
+import { SshLogService } from "./services/SshLogService";
 
 const threatLogService = getComponent(ThreatLogService);
+const sshLogService = getComponent(SshLogService);
 const ipDetailsService = getComponent(IpDetailsService);
 const rateLimitService = getComponent(RateLimitService);
 const configService = getComponent(ConfigService);
@@ -34,7 +36,7 @@ router.use(threatLogger.middleware());
 router.use('/', ratelimitroutes(logger, rateLimitService));
 
 // api dashboard per analizzare i dati
-router.use('/', threatroutes(logger, threatLogService, ipDetailsService));
+router.use('/', threatroutes(logger, threatLogService, ipDetailsService, sshLogService));
 
 // API configurazione
 router.use('/', configroutes(logger, configService));

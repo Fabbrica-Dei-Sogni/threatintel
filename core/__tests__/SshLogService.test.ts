@@ -117,4 +117,22 @@ describe('SshLogService', () => {
             })
         }));
     });
+
+    it('should use __REALTIME_TIMESTAMP for log timestamp if available', async () => {
+        (service as any).failedPasswordScore = 50;
+
+        const entry = {
+            MESSAGE: 'Failed password for root from 192.168.1.1 port 22 ssh2',
+            __CURSOR: 'cursor123',
+            __REALTIME_TIMESTAMP: '1767962508879405' // Microseconds
+        };
+
+        const expectedTimestamp = new Date(1767962508879); // Milliseconds
+
+        await (service as any).processEntry(entry);
+
+        expect(mockThreatLogService.saveLog).toHaveBeenCalledWith(expect.objectContaining({
+            timestamp: expectedTimestamp
+        }));
+    });
 });

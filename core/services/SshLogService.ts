@@ -221,7 +221,25 @@ export class SshLogService {
 
         if (ip) {
             this.logger.info(`[SshLogService] Match riuscito! Tipo: ${type}, User: ${user}, IP: ${ip}`);
-            await this.saveAsThreatLog(ip, user, type, message, score, indicators, entry.__CURSOR);
+
+            // Estrazione Timestamp:
+            // 1. __REALTIME_TIMESTAMP (microsecondi) dalla entry grezza del journal (più preciso)
+            // 2. SYSLOG_TIMESTAMP (parsing testo) come fallback
+            // 3. Date.now() come ultimo fallback
+
+            let logDate = new Date();
+
+            if (entry.__REALTIME_TIMESTAMP) {
+                // __REALTIME_TIMESTAMP è in microsecondi, convertiamo in millisecondi
+                const timestampMs = parseInt(entry.__REALTIME_TIMESTAMP, 10) / 1000;
+                logDate = new Date(timestampMs);
+            } else if (entry.SYSLOG_TIMESTAMP) {
+                // SYSLOG_TIMESTAMP non ha l'anno (es: "Jan 9 12:41:48") -> fallback rozzo
+                // Meglio non affidarsi troppo a questo se possibile
+                logDate = new Date(entry.SYSLOG_TIMESTAMP);
+            }
+
+            await this.saveAsThreatLog(ip, user, type, message, score, indicators, entry.__CURSOR, logDate);
         } else {
             this.logger.warn(`[SshLogService] La riga ha superato il filtro iniziale ma la Regex non ha estratto i dati: ${message}`);
         }
@@ -294,7 +312,7 @@ export class SshLogService {
         }
     }
 
-    private async saveAsThreatLog(ip: string, user: string, type: string, rawMessage: string, score: number, indicators: string[], cursor?: string) {
+    private async saveAsThreatLog(ip: string, user: string, type: string, rawMessage: string, score: number, indicators: string[], cursor?: string, logDate: Date = new Date()) {
         const geo = this.patternAnalysisService.getGeoLocation(ip);
 
         // Usiamo il __CURSOR del journal come ID deterministico per evitare duplicati in caso di riavvio o backfill
@@ -308,7 +326,7 @@ export class SshLogService {
         // Mappatura dei dati SSH sul modello ThreatLog esistente
         const logEntry: any = {
             id: requestId,
-            timestamp: new Date(),
+            timestamp: logDate,
             protocol: 'ssh',
             request: {
                 ip: ip,

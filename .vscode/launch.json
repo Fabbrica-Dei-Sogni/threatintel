@@ -10,6 +10,16 @@
             "name": "Threatlog Backend",
             "port": 9229,
             "restart": true
+        },
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "Threatlog Frontend (Chrome)",
+            "url": "http://localhost:5173",
+            "webRoot": "${workspaceFolder}/frontend/dashboard/src",
+            "sourceMapPathOverrides": {
+                "webpack:///./src/*": "${webRoot}/*"
+            }
         }
     ]
 }

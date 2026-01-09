@@ -1,5 +1,11 @@
 import express from 'express';
 import { ConfigService } from '../services/ConfigService';
+import { getComponent } from '../di/container';
+import { SshLogService } from '../services/SshLogService';
+import PatternAnalysisService from '../services/PatternAnalysisService';
+
+const sshLogService = getComponent(SshLogService);
+const patternAnalysisService = getComponent(PatternAnalysisService);
 
 export default (logger: any, configService: ConfigService) => {
     const router = express.Router();
@@ -33,6 +39,11 @@ export default (logger: any, configService: ConfigService) => {
 
         try {
             const result = await configService.saveConfig(key, value);
+
+            //carico i parametri da db dopo aver salvato le configurazioni.
+            sshLogService.loadConfigFromDB();
+            patternAnalysisService.loadConfigFromDB();
+
             res.json(result);
         } catch (err: any) {
             logger.error(`Errore salvataggio configurazione ${key}:`, err);

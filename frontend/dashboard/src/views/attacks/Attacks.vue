@@ -39,40 +39,17 @@
                     <el-option :label="t('attacks.minutes')" value="minutes" />
                     <el-option :label="t('attacks.hours')" value="hours" />
                     <el-option :label="t('attacks.days')" value="days" />
+                    <el-option :label="t('attacks.months')" value="months" />
+                    <el-option :label="t('attacks.years')" value="years" />
                 </el-select>
             </div>
 
             <!-- Intervallo “From–To” -->
             <div v-else class="time-range">
 
-                <!-- DatePicker intervallo -->
-                <!--
-                <section class="filter-bar">
-                    <label>Seleziona intervallo data:</label>
-                    <el-config-provider :locale="it">
-                        <el-date-picker v-model="dateRange" type="daterange" start-placeholder="Data inizio"
-                            end-placeholder="Data fine" value-format="yyyy-MM-dd" format="MMMM dd, yyyy"
-                            popper-class="custom-date-picker" @change="onFilterChanged" unlink-panels
-                            style="max-width: 360px;" />
-                    </el-config-provider>
-
-                </section>
-                
-                <span>Da</span>
-                <el-input-number v-model="fromValue" :min="1" size="small" @input="onFilterChanged" />
-                <el-select v-model="fromUnit" size="small" @change="onFilterChanged">
-                    <el-option label="Minuti" value="minutes" />
-                    <el-option label="Ore" value="hours" />
-                    <el-option label="Giorni" value="days" />
-                </el-select>
-                <span>a</span>
-                <el-input-number v-model="toValue" :min="1" size="small" @input="onFilterChanged" />
-                <el-select v-model="toUnit" size="small" @change="onFilterChanged">
-                    <el-option label="Minuti" value="minutes" />
-                    <el-option label="Ore" value="hours" />
-                    <el-option label="Giorni" value="days" />
-                </el-select>
-                -->
+                <el-date-picker v-model="dateRange" type="daterange" :start-placeholder="t('attacks.startDate')"
+                    :end-placeholder="t('attacks.endDate')" value-format="YYYY-MM-DD" format="DD/MM/YYYY"
+                    @change="onFilterChanged" unlink-panels size="small" :teleported="true" />
 
             </div>
         </section>

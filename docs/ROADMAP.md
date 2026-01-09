@@ -16,8 +16,8 @@
 | [M4: Performance Optimization](#m4-performance-optimization) | ⚪ Planned | 🟡 Low | 1 settimana |
 | [M5: Security Enhancements](#m5-security-enhancements) | ⚪ Planned | 🟠 Medium | 1-2 settimane |
 | [M6: Monitoring & Observability](#m6-monitoring--observability) | ⚪ Planned | 🟡 Low | 1 settimana |
-| [M7: Frontend Enhancements](#m7-frontend-enhancements) | 🟢 In Progress (80%) | 🟠 Medium | 2 settimane |
-| [M8: Log Analysis & Hardening](#m8-log-analysis--hardening) | 🟢 In Progress (40%) | 🔴 High | 1-2 settimane |
+| [M7: Frontend Enhancements](#m7-frontend-enhancements) | 🟢 In Progress (90%) | 🟠 Medium | 2 settimane |
+| [M8: Log Analysis & Hardening](#m8-log-analysis--hardening) | 🟢 In Progress (60%) | 🔴 High | 1-2 settimane |
 
 **Legenda:**
 - 🟢 In Progress
@@ -288,6 +288,12 @@
 - [ ] Nuovi widget grafici (Time series attacks)
 - [ ] Miglioramento accessibilità (ARIA support)
 
+### Phase 4: Data Visualization & Filtering ✅
+- [x] Date Range Picker per filtri temporali
+- [x] Supporto "Mesi" (months) e "Anni" (years) nei filtri temporali
+- [x] Backend support per range temporali personalizzati
+- [x] Fix date parsing per string inputs
+
 **Benefici**:
 - Supporto multilingua completo
 - Esperienza mobile nativa
@@ -311,7 +317,12 @@
 - [x] Filter `analyzeLogs` to target only HTTP protocol
 - [x] Handle legacy logs with missing protocol field
 
-### Phase 3: Future Protocols (Next)
+### Phase 3: Forensic & Time Analysis ✅
+- [x] Supporto filtri avanzati (Mesi, Range) in `ForensicService`
+- [x] Fix calcolo timestamp `toDate` (end of day)
+- [x] Unit/Integration tests per filtri temporali
+
+### Phase 4: Future Protocols (Next)
 - [ ] Abstract analysis engine for generic protocols
 - [ ] Add support for FTP/SMTP logs
 - [ ] Unified dashboard for cross-protocol correlation
@@ -365,5 +376,5 @@ Aprile 2026      M6 (Monitoring)
 
 ---
 
-**Ultimo aggiornamento**: 2025-12-29  
+**Ultimo aggiornamento**: 2026-01-09
 **Prossimo checkpoint**: Migrazione altri servizi Phase 4

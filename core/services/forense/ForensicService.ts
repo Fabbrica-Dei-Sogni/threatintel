@@ -96,26 +96,49 @@ export class ForensicService {
         if (timeConfig) {
             const now = new Date();
 
+            // Helper for date parsing
+            const parseDate = (d: any) => {
+                if (d instanceof Date) return d;
+                if (typeof d === 'string') {
+                    const parsed = new Date(d);
+                    return isNaN(parsed.getTime()) ? null : parsed;
+                }
+                return null;
+            };
+
             // Gestione intervallo da fromDate e toDate (prioritaria se presenti)
             if (timeConfig.fromDate && timeConfig.toDate) {
-                // Assumendo la struttura { dataInizio: Date }
-                timeAgo = timeConfig.fromDate instanceof Date ? timeConfig.fromDate : null;
-                timeToStart = timeConfig.toDate instanceof Date ? timeConfig.toDate : null;
+                timeAgo = parseDate(timeConfig.fromDate);
+                const toDateParsed = parseDate(timeConfig.toDate);
+                if (toDateParsed) {
+                    // End of day for toDate if it came from date picker string
+                    toDateParsed.setHours(23, 59, 59, 999);
+                    timeToStart = toDateParsed;
+                }
             } else if (timeConfig.fromDate) {
-                timeAgo = timeConfig.fromDate instanceof Date ? timeConfig.fromDate : null;
+                timeAgo = parseDate(timeConfig.fromDate);
             } else if (timeConfig.toDate) {
-                timeToStart = timeConfig.toDate instanceof Date ? timeConfig.toDate : null;
+                const toDateParsed = parseDate(timeConfig.toDate);
+                if (toDateParsed) {
+                    toDateParsed.setHours(23, 59, 59, 999);
+                    timeToStart = toDateParsed;
+                }
             }
             else {
 
                 // Caso 1: Solo periodo finale (timeAgo) - dal passato ad ora
-                if (timeConfig.minutes || timeConfig.hours || timeConfig.days) {
+                if (timeConfig.minutes || timeConfig.hours || timeConfig.days || timeConfig.months || timeConfig.years) {
                     if (timeConfig.minutes) {
                         timeAgo = new Date(now.getTime() - (timeConfig.minutes * 60 * 1000));
                     } else if (timeConfig.hours) {
                         timeAgo = new Date(now.getTime() - (timeConfig.hours * 60 * 60 * 1000));
                     } else if (timeConfig.days) {
                         timeAgo = new Date(now.getTime() - (timeConfig.days * 24 * 60 * 60 * 1000));
+                    } else if (timeConfig.months) {
+                        timeAgo = new Date(now.getTime() - (timeConfig.months * 30 * 24 * 60 * 60 * 1000));
+                    } else if (timeConfig.years) {
+                        // Years: approximate as 365 days
+                        timeAgo = new Date(now.getTime() - (timeConfig.years * 365 * 24 * 60 * 60 * 1000));
                     }
                 }
 

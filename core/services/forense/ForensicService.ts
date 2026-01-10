@@ -7,12 +7,13 @@ import { ConfigService } from '../ConfigService';
 dotenv.config();
 
 /**
+ * @deprecated Use ForensicPipelineService instead.
  * Il servizio è studiato per implementare metodi che agiscano sui dati presenti su mongodb e/o redis.
- Qualsiasi pipeline di aggregazione o query (ndr prompt) che ha obiettivi di analisi forense dei dati, viene gestito in questo servizio.
-
- Per policy questo servizio non dipende da nessun'altro servizio e, lui stesso puo essere messo in dipendenza da tutti gli altri servizi.
- Lo scopo è rendere il forensic context iniettabile in qualsiasi altro contesto applicativo e che non deve dipendere da come è progettata l'applicazione.
- 
+ * Qualsiasi pipeline di aggregazione o query (ndr prompt) che ha obiettivi di analisi forense dei dati, viene gestito in questo servizio.
+ *
+ * Per policy questo servizio non dipende da nessun'altro servizio e, lui stesso puo essere messo in dipendenza da tutti gli altri servizi.
+ * Lo scopo è rendere il forensic context iniettabile in qualsiasi altro contesto applicativo e che non deve dipendere da come è progettata l'applicazione.
+ * 
  */
 @injectable()
 export class ForensicService {
@@ -85,6 +86,9 @@ export class ForensicService {
         }
     }
 
+    /**
+     * @deprecated Use ForensicPipelineService.buildStandardPipeline instead.
+     */
     // Metodo privato per costruire la pipeline base condivisa
     async buildAttackGroupsBasePipeline(mongoFilters: any, minLogsForAttack: number, timeConfig: any = null) {
         // Aspetta che l'inizializzazione sia completata

@@ -4,6 +4,7 @@ import ThreatLog from '../models/ThreatLogSchema';
 import AttackDTO from '../models/dto/AttackDTO';
 import PatternAnalysisService from './PatternAnalysisService';
 import { ForensicService } from './forense/ForensicService';
+import { ForensicPipelineService } from './forense/ForensicPipelineService';
 import { inject, injectable } from 'tsyringe';
 import { LOGGER_TOKEN } from '../di/tokens';
 import { Logger } from 'winston';
@@ -18,6 +19,7 @@ export class ThreatLogService {
     constructor(
         @inject(LOGGER_TOKEN) private readonly logger: Logger,
         private readonly forensicService: ForensicService,
+        private readonly forensicPipelineService: ForensicPipelineService,
         private readonly ipDetailsService: IpDetailsService,
         private readonly patternAnalysisService: PatternAnalysisService,
     ) {
@@ -76,12 +78,13 @@ export class ThreatLogService {
 
 
     /**
+     * @deprecated
      * Recupera linearmente degli attacchi con min log per attacco di 3
      * Ritorna in una sola aggregazione sia gli item paginati che il totale risultato dal filtro
      * @param {*} param0 
      * @returns 
      */
-    async getAttacks({
+    async getAttacksLegacy({
         page = 1,
         pageSize = 20,
         filters = {},
@@ -120,6 +123,86 @@ export class ThreatLogService {
                         },
                         // Ordinamento e paginazione
                         //{ $sort: { timestamp: -1 } },
+                        sortStage,
+                        { $skip: skip },
+                        { $limit: pageSize }
+                    ],
+                    totale: [
+                        // Conta quanti documenti escono dallo replaceRoot
+                        { $count: 'totalCount' }
+                    ]
+                }
+            },
+            // Estrai il conteggio dal facet
+            {
+                $addFields: {
+                    totalCount: { $arrayElemAt: ['$totale.totalCount', 0] }
+                }
+            },
+            // Proietta solo i campi che servono
+            {
+                $project: {
+                    dati: 1,
+                    totalCount: 1
+                }
+            }
+        ];
+
+
+        const [result] = await ThreatLog.aggregate(pipeline);
+
+        const attacks: AttackDTO[] = result.dati;
+
+
+        return {
+            items: attacks,
+            totalCount: result.totalCount || 0
+        };
+    }
+
+    /**
+     * Versione V2 di getAttacks che utilizza la nuova ForensicPipelineService (Builder Pattern).
+     * @param param0 
+     * @returns 
+     */
+    async getAttacks({
+        page = 1,
+        pageSize = 20,
+        filters = {},
+        minLogsForAttack = 10,
+        timeConfig = {},
+        sortFields = null
+    }: any = {}) {
+        const skip = (page - 1) * pageSize;
+        const mongoFilters = this.buildRegExpFilter(filters);
+
+        // Costruisci sort dinamico
+        const sortStage = { $sort: sortFields && Object.keys(sortFields).length ? sortFields : { timestamp: -1 } };
+
+        // Pipeline base costruita col nuovo Builder
+        const basePipeline = await this.forensicPipelineService.buildStandardPipeline(mongoFilters, minLogsForAttack, timeConfig);
+
+        // Unico aggregate con facet che restituisce dati e conteggio
+        const pipeline = [
+            ...basePipeline,
+            {
+                $facet: {
+                    dati: [
+                        // Lookup e popolazione
+                        {
+                            $lookup: {
+                                from: 'ipdetails',
+                                localField: 'ipDetailsId',
+                                foreignField: '_id',
+                                as: 'ipDetails'
+                            }
+                        },
+                        {
+                            $addFields: {
+                                ipDetails: { $arrayElemAt: ['$ipDetails', 0] }
+                            }
+                        },
+                        // Ordinamento e paginazione
                         sortStage,
                         { $skip: skip },
                         { $limit: pageSize }

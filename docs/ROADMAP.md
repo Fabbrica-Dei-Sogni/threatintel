@@ -208,7 +208,7 @@
 ### Tasks
 - [ ] Profile MongoDB queries (slow queries)
 - [ ] Add database indexes where needed
-- [ ] Optimize aggregation pipelines in `ForensicService`
+- [x] Optimize aggregation pipelines in `ForensicService` (See: [Architecture](./forensic-pipeline-architecture.md))
 - [ ] Implement query result caching (Redis)
 - [ ] Optimize rate limiter Redis operations
 - [ ] Add database connection pooling optimization

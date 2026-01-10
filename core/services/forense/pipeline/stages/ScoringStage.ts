@@ -171,7 +171,16 @@ export class ScoringStage implements PipelineStage {
                                             // peso sullo score medio dell'attacco
                                             { $multiply: ['$scoreNorm', dWeights.scoreNorm] },
                                             // peso sul numero di tecniche usate nell'attacco
-                                            { $multiply: ['$uniqueTechNorm', dWeights.uniqueTechNorm] }
+                                            { $multiply: ['$uniqueTechNorm', dWeights.uniqueTechNorm] },
+
+                                            // [NEW] Advanced Analysis Scores (Behavioral Boosting)
+                                            // A differenza dei pesi precedenti che sono "pesati" (moltiplicati per un fattore < 1),
+                                            // questi sono "bonus" diretti aggiunti al punteggio base.
+                                            // Dividiamo per 100 perché il punteggio base è calcolato su scala unitaria (0-1) e poi moltiplicato per 100 fuori.
+                                            // Esempio: sequenceRiskScore=50 -> aggiunge 0.5 al totale unitario -> +50 al dangerScore finale.
+                                            { $divide: [{ $ifNull: ['$sequenceRiskScore', 0] }, 100] },
+                                            { $divide: [{ $ifNull: ['$payloadRiskScore', 0] }, 100] },
+                                            { $divide: [{ $ifNull: ['$toolRiskScore', 0] }, 100] }
                                         ]
                                     }
                                 ]
@@ -186,10 +195,10 @@ export class ScoringStage implements PipelineStage {
                     dangerLevel: {
                         $switch: {
                             branches: [
-                                { case: { $lte: ['$dangerScore', 15] }, then: 5 },
-                                { case: { $lte: ['$dangerScore', 30] }, then: 4 },
-                                { case: { $lte: ['$dangerScore', 60] }, then: 3 },
-                                { case: { $lte: ['$dangerScore', 85] }, then: 2 }
+                                { case: { $lte: ['$dangerScore', 20] }, then: 5 },
+                                { case: { $lte: ['$dangerScore', 40] }, then: 4 },
+                                { case: { $lte: ['$dangerScore', 65] }, then: 3 },
+                                { case: { $lte: ['$dangerScore', 80] }, then: 2 }
                             ],
                             default: 1
                         }

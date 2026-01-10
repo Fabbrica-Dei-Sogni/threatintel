@@ -10,6 +10,9 @@ import { MatchFilterStage } from './pipeline/stages/MatchFilterStage';
 import { GroupingStage } from './pipeline/stages/GroupingStage';
 import { AttackStatsStage } from './pipeline/stages/AttackStatsStage';
 import { ScoringStage } from './pipeline/stages/ScoringStage';
+import { SequenceAnalysisStage } from './pipeline/stages/SequenceAnalysisStage';
+import { PayloadAnalysisStage } from './pipeline/stages/PayloadAnalysisStage';
+import { FingerprintAnalysisStage } from './pipeline/stages/FingerprintAnalysisStage';
 
 dotenv.config();
 
@@ -21,6 +24,8 @@ dotenv.config();
 export class ForensicPipelineService {
     private dangerWeights: any;
     private tolleranceWeights: any;
+    private suspiciousPatterns: string[] = [];
+    private suspiciousReferers: string[] = [];
     private initialized: Promise<void>;
 
     constructor(
@@ -38,17 +43,25 @@ export class ForensicPipelineService {
         try {
             const [
                 dangerWeightStr,
-                tolleranceWeightStr
+                tolleranceWeightStr,
+                suspPatternsStr,
+                suspReferersStr
             ] = await Promise.all([
                 this.configService.getConfigValue('DANGER_WEIGHT'),
                 this.configService.getConfigValue('TOLLERANCE_WEIGHTS'),
+                this.configService.getConfigValue('SUSPICIOUS_PATTERNS'),
+                this.configService.getConfigValue('SUSPICIOUS_REFERERS'),
             ]);
 
             // Parsing logic (duplicata dal servizio originale per isolamento)
             this.dangerWeights = this.parseConfig(dangerWeightStr);
             this.tolleranceWeights = this.parseConfig(tolleranceWeightStr);
 
-            this.logger.info(`[ForensicPipelineService] Configurazioni caricate da DB`);
+            // Parsing Liste (CSV based)
+            this.suspiciousPatterns = suspPatternsStr ? suspPatternsStr.split(',').map((s: string) => s.trim()).filter(Boolean) : [];
+            this.suspiciousReferers = suspReferersStr ? suspReferersStr.split(',').map((s: string) => s.trim()).filter(Boolean) : [];
+
+            this.logger.info(`[ForensicPipelineService] Configurazioni caricate da DB: Patterns=${this.suspiciousPatterns.length}, Referers=${this.suspiciousReferers.length}`);
         } catch (err: any) {
             this.logger.error(`[ForensicPipelineService] Errore caricamento configurazioni: ${err.message}`);
         }
@@ -89,6 +102,10 @@ export class ForensicPipelineService {
             .addStage(new MatchFilterStage(mongoFilters))
             .addStage(new GroupingStage(minLogsForAttack))
             .addStage(new AttackStatsStage(this.tolleranceWeights))
+            // Advanced Analysis Stages (Added for behavioral analysis)
+            .addStage(new SequenceAnalysisStage())
+            .addStage(new PayloadAnalysisStage(this.suspiciousPatterns))
+            .addStage(new FingerprintAnalysisStage(this.suspiciousReferers))
             .addStage(new ScoringStage(this.dangerWeights, this.tolleranceWeights))
             .build();
     }

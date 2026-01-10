@@ -56,6 +56,21 @@ Each stage implements the `PipelineStage` interface and encapsulates a specific 
     - `averageScore`: Average threat score of the logs.
     - `attackPatterns`: Distinct fingerprint indicators found in the logs.
 
+#### `SequenceAnalysisStage` (New)
+- **Purpose**: Detects logical attack chains and behavioral anomalies.
+- **Output**: `$addFields` with `sequenceRiskScore`.
+- **Logic**: Sorts logs by time and finds patterns like "Brute Force Success" (repeated failures followed by success).
+
+#### `PayloadAnalysisStage` (New)
+- **Purpose**: Scans request bodies and URLs for IoCs.
+- **Output**: `$addFields` with `payloadRiskScore`.
+- **Logic**: Regex matching for keywords like `wget`, `curl`, `/etc/passwd`.
+
+#### `FingerprintAnalysisStage` (New)
+- **Purpose**: Identifies automated tools via User-Agent analysis.
+- **Output**: `$addFields` with `toolRiskScore`.
+- **Logic**: Matches User-Agents against known scanner signatures (`masscan`, `sqlmap`).
+
 #### `ScoringStage`
 - **Purpose**: Assigns a `dangerScore` and `dangerLevel` based on calculated metrics.
 - **Output**: `$addFields` stages.

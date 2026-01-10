@@ -29,6 +29,8 @@ describe('Forensic Pipeline Service Test', () => {
         mockConfigService.getConfigValue.mockImplementation((key: string) => {
             if (key === 'DANGER_WEIGHT') return Promise.resolve(null);
             if (key === 'TOLLERANCE_WEIGHTS') return Promise.resolve(null);
+            if (key === 'SUSPICIOUS_PATTERNS') return Promise.resolve('test_malware,cmd.exe');
+            if (key === 'SUSPICIOUS_REFERERS') return Promise.resolve('bad_tool,curl');
             return Promise.resolve(null);
         });
 
@@ -91,14 +93,39 @@ describe('Forensic Pipeline Service Test', () => {
         const scoringStageIndex = statsStages.findIndex(s => s.$addFields && s.$addFields.intensityAttack);
         const scoringStage = statsStages[scoringStageIndex];
 
-        // Check intensityAttack uses simplified logic (not inline divide)
+        // Check intensityAttack uses simplified logic
         const intensitySwitch = scoringStage!.$addFields.intensityAttack.$switch;
         const firstBranch = intensitySwitch.branches[0];
-        // The condition should reference $attackDurationMinutes directly
-        // Structure: { $and: [ { $lt: ['$attackDurationMinutes', 5] }, ... ] }
         const cond = firstBranch.case.$and[0];
-        // We expect cond.$lt to be ['$attackDurationMinutes', 5]
         const ltArg = cond.$lt;
         expect(ltArg[0]).toBe('$attackDurationMinutes');
+
+        // [NEW] Verify Advanced Analysis Stages presence
+        // Check for Sequence Analysis (logsSorted)
+        const sequenceStage = statsStages.find(s => s.$addFields && s.$addFields.logsSorted);
+        expect(sequenceStage).toBeDefined();
+
+        // Check for Payload Analysis (payloadAnalysis)
+        const payloadStage = statsStages.find(s => s.$addFields && s.$addFields.payloadAnalysis);
+        expect(payloadStage).toBeDefined();
+
+        // Check for Fingerprint Analysis (fingerprintAnalysis)
+        const fingerprintStage = statsStages.find(s => s.$addFields && s.$addFields.fingerprintAnalysis);
+        expect(fingerprintStage).toBeDefined();
+
+        // Verify ScoringStage includes new risk scores
+        const dangerScoreStage = statsStages.find(s => s.$addFields && s.$addFields.dangerScore);
+        const dangerCalc = dangerScoreStage!.$addFields.dangerScore.$round[0].$multiply[1].$add;
+        // Should have base 4 items + 3 new items = 7
+        expect(dangerCalc.length).toBeGreaterThanOrEqual(7);
+
+        // Verify Defcon Thresholds (20, 40, 65, 80)
+        const dangerLevelStage = statsStages.find(s => s.$addFields && s.$addFields.dangerLevel);
+        const switchBranches = dangerLevelStage!.$addFields.dangerLevel.$switch.branches;
+
+        expect(switchBranches[0].case.$lte[1]).toBe(20); // Defcon 5
+        expect(switchBranches[1].case.$lte[1]).toBe(40); // Defcon 4
+        expect(switchBranches[2].case.$lte[1]).toBe(65); // Defcon 3
+        expect(switchBranches[3].case.$lte[1]).toBe(80); // Defcon 2
     });
 });

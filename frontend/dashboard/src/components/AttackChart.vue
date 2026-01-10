@@ -78,11 +78,11 @@ const getAggregation = (attacks) => {
     };
 };
 
-const getDefconColor = (score, alpha = 0.7) => {
-    if (score <= 15) return `rgba(30, 136, 229, ${alpha})`;   // DEFCON 5 - Blu
-    if (score <= 30) return `rgba(67, 160, 71, ${alpha})`;    // DEFCON 4 - Verde
-    if (score <= 60) return `rgba(253, 216, 53, ${alpha})`;   // DEFCON 3 - Giallo
-    if (score <= 85) return `rgba(229, 57, 53, ${alpha})`;    // DEFCON 2 - Rosso
+const getDefconColor = (level, alpha = 0.7) => {
+    if (level === 5) return `rgba(30, 136, 229, ${alpha})`;   // DEFCON 5 - Blu
+    if (level === 4) return `rgba(67, 160, 71, ${alpha})`;    // DEFCON 4 - Verde
+    if (level === 3) return `rgba(253, 216, 53, ${alpha})`;   // DEFCON 3 - Giallo
+    if (level === 2) return `rgba(229, 57, 53, ${alpha})`;    // DEFCON 2 - Rosso
     return `rgba(255, 255, 255, ${alpha})`;                   // DEFCON 1 - Bianco
 };
 
@@ -94,6 +94,7 @@ const getSeverityData = (attacks) => {
         // Additional data for tooltip
         ip: atk.request.ip,
         score: atk.dangerScore,
+        level: atk.dangerLevel, // [FIX] Include dangerLevel
         logs: atk.totaleLogs
     }));
 };
@@ -104,8 +105,8 @@ const getDurationData = (attacks) => {
     const points = [];
 
     sorted.forEach(atk => {
-        const color = getDefconColor(atk.dangerScore);
-        const glowColor = getDefconColor(atk.dangerScore, 0.2); // Faint background
+        const color = getDefconColor(atk.dangerLevel); // [FIX] Use dangerLevel
+        const glowColor = getDefconColor(atk.dangerLevel, 0.2); // [FIX] Use dangerLevel
         // Calculate dynamic radius based on total logs
         // Minimum 4px, add log volume factor, max 15px
         const radius = 4 + Math.min(atk.totaleLogs / 20, 15);
@@ -160,8 +161,8 @@ const severityData = computed(() => {
     const dataPoints = getSeverityData(props.attacks);
 
     // Dynamic coloring using helper
-    const pointBackgroundColors = dataPoints.map(p => getDefconColor(p.y));
-    const pointBorderColors = dataPoints.map(p => getDefconColor(p.y)); // Same color for border
+    const pointBackgroundColors = dataPoints.map(p => getDefconColor(p.level));
+    const pointBorderColors = dataPoints.map(p => getDefconColor(p.level)); // Same color for border
 
     return {
         datasets: [{

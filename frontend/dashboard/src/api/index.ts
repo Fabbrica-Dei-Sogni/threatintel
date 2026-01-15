@@ -20,7 +20,7 @@ export const getApiUrl = (): string => {
 
 const apiClient = axios.create({
     baseURL: getApiUrl(),
-    timeout: 8000,
+    timeout: 30000,
 });
 
 // Interceptor per gestire cambiamenti a runtime

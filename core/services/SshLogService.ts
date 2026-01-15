@@ -66,7 +66,7 @@ export class SshLogService {
         }
 
         // Prima di avviare il monitoraggio real-time, proviamo a recuperare i log recenti (es. ultime 24h)
-        await this.backfillLogs('5 hour ago');
+        await this.backfillLogs('3 hour ago');
 
         this.logger.info('[SshLogService] Avvio monitoraggio log SSH (journalctl -u ssh)...');
 

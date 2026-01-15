@@ -12,7 +12,24 @@ export class GroupingStage implements PipelineStage {
                     // Mantieni la struttura del primo log come "rappresentante" del gruppo
                     representative: { $first: '$$ROOT' },
                     // Aggiungi i 3 campi richiesti
-                    logsRaggruppati: { $push: '$$ROOT' },
+                    logsRaggruppati: {
+                        $push: {
+                            _id: '$_id',
+                            timestamp: '$timestamp',
+                            request: {
+                                method: '$request.method',
+                                url: '$request.url',
+                                ip: '$request.ip'
+                            },
+                            response: {
+                                statusCode: '$response.statusCode'
+                            },
+                            fingerprint: '$fingerprint',
+                            // Includiamo altri campi metadata leggeri se presenti
+                            session_id: '$session_id',
+                            metadata: '$metadata'
+                        }
+                    },
                     totaleLogs: { $sum: 1 },
                     firstSeen: { $min: '$timestamp' },
                     lastSeen: { $max: '$timestamp' },

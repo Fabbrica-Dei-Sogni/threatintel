@@ -14,10 +14,13 @@
             </button>
         </div>
 
+        <!-- Filtro protocollo -->
+        <section class="protocol-filter-section">
+            <ProtocolSelector v-model="filterProtocol" :options="['http', 'ssh']" />
+        </section>
+
         <!-- Filtro avanzato: Minimo log per attacco -->
         <section class="filter-bar">
-            <ProtocolSelector v-model="filterProtocol" :options="['http', 'ssh']" />
-            
             <label class="min-logs-label" for="minLogsForAttack">
                 {{ t('attacks.minLogsLabel') }}
             </label>

@@ -434,3 +434,9 @@
   color: #ff704d;
   text-shadow: 0 0 10px #bf3f32;
 }
+
+.protocol-filter-section {
+  margin-bottom: 15px;
+  display: flex;
+  justify-content: flex-start;
+}

@@ -15,6 +15,7 @@
     </div>
 
     <section class="filters">
+      <ProtocolSelector v-model="filterProtocol" :options="['http', 'ssh']" />
       <div class="input-wrapper" style="position: relative; flex: 1; margin-right: 10px;">
         <input v-model="filterIp" :placeholder="t('threatLogs.filterByIp')" @input="onFilterChanged" class="input"
           type="text" />
@@ -184,6 +185,7 @@ import { useRouter } from 'vue-router';
 import { useLogsFilter } from '../../composable/useLogsFilter';
 import { useClipboard } from '../../composable/useClipboard';
 import { useI18n } from 'vue-i18n';
+import ProtocolSelector from '../../components/common/ProtocolSelector.vue';
 
 const { copyToClipboard } = useClipboard();
 import dayjs from 'dayjs';
@@ -201,6 +203,7 @@ const { t } = useI18n();
 const props = defineProps({
   initialIp: String,
   initialUrl: String,
+  initialProtocol: { type: String, default: 'http' },
   initialPage: {
     type: Number,
     default: 1,
@@ -219,6 +222,7 @@ const router = useRouter();
 const {
   filterIp,
   filterUrl,
+  filterProtocol,
   sortFields,
   page,
   logs,
@@ -230,7 +234,7 @@ const {
   onFilterChanged,
   toggleSort,
   getSortDirection
-} = useLogsFilter(props.initialIp, props.initialUrl, props.initialPage, props.initialSortFields);
+} = useLogsFilter(props.initialIp, props.initialUrl, props.initialProtocol, props.initialPage, props.initialSortFields);
 
 //step 4. definire eventuali valori di tipo computer che cambiano a seconda il cambio dei valori
 // Computed
@@ -241,12 +245,13 @@ const previousPageBeforeUrlFilter = ref(null);
 const showChart = ref(true); // Default visible
 
 //step 5. definire il watch sui valori che cambiano per aggiornare il router
-watch([filterIp, filterUrl, page, sortFields], ([newIp, newUrl, newPage, newSortFields]) => {
+watch([filterIp, filterUrl, filterProtocol, page, sortFields], ([newIp, newUrl, newProto, newPage, newSortFields]) => {
   router.replace({
     name: 'ThreatLogs',
     query: {
       ip: newIp || undefined,
       url: newUrl || undefined,
+      protocol: newProto !== 'http' ? newProto : undefined,
       page: newPage > 1 ? newPage : undefined,
       sortFields: newSortFields ? JSON.stringify(newSortFields) : undefined
     },

@@ -63,6 +63,13 @@ h2 {
   color: #d1d9ff;
 }
 
+.widget-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
 .widget ul {
   list-style: none;
   padding-left: 0;

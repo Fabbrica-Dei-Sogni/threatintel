@@ -287,6 +287,8 @@
 - [ ] Dark/Light mode toggle avanzato
 - [ ] Nuovi widget grafici (Time series attacks)
 - [ ] Miglioramento accessibilità (ARIA support)
+- [x] Protocol Selectors in Dashboard Widgets
+- [x] Dashboard CSS Restoration & Theming
 
 ### Phase 4: Data Visualization & Filtering ✅
 - [x] Date Range Picker per filtri temporali
@@ -325,7 +327,8 @@
 ### Phase 4: Future Protocols (Next)
 - [ ] Abstract analysis engine for generic protocols
 - [ ] Add support for FTP/SMTP logs
-- [ ] Unified dashboard for cross-protocol correlation
+- [x] Unified dashboard for cross-protocol correlation (HTTP/SSH)
+- [x] Protocol Selection UI Components
 
 ---
 

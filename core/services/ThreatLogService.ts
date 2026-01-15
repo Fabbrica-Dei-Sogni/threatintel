@@ -244,7 +244,19 @@ export class ThreatLogService {
         const mongoFilters: any = {};
 
         for (const [key, value] of Object.entries(filters)) {
-            if (typeof value === 'string' && value.trim() !== '') {
+            if (key === 'protocol') {
+                if (value === 'http') {
+                    // Logica specifica per HTTP: include 'http', null, o campo mancante
+                    mongoFilters.$or = [
+                        { protocol: 'http' },
+                        { protocol: { $exists: false } },
+                        { protocol: null }
+                    ];
+                } else if (value && typeof value === 'string') {
+                    // Per altri protocolli (es. ssh), ricerca esatta
+                    mongoFilters[key] = value;
+                }
+            } else if (typeof value === 'string' && value.trim() !== '') {
                 // Operatore regex case-insensitive 'like'-style
                 mongoFilters[key] = { $regex: value, $options: 'i' };
             } else {

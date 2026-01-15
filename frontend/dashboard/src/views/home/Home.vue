@@ -12,7 +12,10 @@
 
     <section class="widgets">
       <div class="widget">
-        <h2>{{ $t('home.recentAttacks') }}</h2>
+        <div class="widget-header">
+          <h2>{{ $t('home.recentAttacks') }}</h2>
+          <ProtocolSelector v-model="selectedAttackProtocol" :options="['http', 'ssh']" theme="dark" />
+        </div>
         <ul>
           <li v-for="attack in recentAttacks" :key="attack.id">
             <CountryFlag v-if="attack.ipDetails?.ipinfo?.country" :countryCode="attack.ipDetails?.ipinfo?.country" />
@@ -27,7 +30,10 @@
         <div v-if="errorAttacks">{{ $t('home.errorLoadingAttacks') }}</div>
       </div>
       <div class="widget">
-        <h2>{{ $t('home.recentLogs') }}</h2>
+        <div class="widget-header">
+          <h2>{{ $t('home.recentLogs') }}</h2>
+          <ProtocolSelector v-model="selectedLogProtocol" :options="['http', 'ssh']" theme="dark" />
+        </div>
         <ul>
           <li v-for="log in recentLogs" :key="log._id">
             <CountryFlag v-if="log.ipDetailsId?.ipinfo?.country" :countryCode="log.ipDetailsId?.ipinfo?.country" />
@@ -57,13 +63,14 @@
 import { useLogsFilter } from '../../composable/useLogsFilter';
 import { useAttacksFilter } from '../../composable/useAttacksFilter';
 import { useRouter } from 'vue-router'
-import { computed, onMounted, watch } from 'vue'
+import { computed, onMounted, watch, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import dayjs from 'dayjs';
 import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
 import CountryFlag from '../../components/CountryFlag.vue';
 import AttackMap from '../../components/AttackMap.vue';
 import ConfigMenuButton from '../../components/ConfigMenuButton.vue';
+import ProtocolSelector from '../../components/common/ProtocolSelector.vue';
 
 const { t } = useI18n();
 
@@ -85,13 +92,16 @@ function formatDate(timestamp) {
   return dayjs(timestamp).format('DD/MM/YYYY HH:mm:ss');
 };
 
+const selectedAttackProtocol = ref('http');
+const selectedLogProtocol = ref('http');
+
 // Attacchi - chiamata base: nessun filtro, prima pagina, ordina per ultimi
 const {
   attacks,
   loading: loadingAttacks,
   error: errorAttacks,
   fetchData: fetchAttacks
-} = useAttacksFilter('', 1, 10, 'ago', 10, 'days', null, 60, 'days', 0, 'days', { firstSeen: -1 })
+} = useAttacksFilter('', selectedAttackProtocol, 1, 10, 'ago', 10, 'days', null, 60, 'days', 0, 'days', { firstSeen: -1 })
 
 const recentAttacks = computed(() => attacks.value.slice(0, 10))
 
@@ -101,7 +111,7 @@ const {
   loading: loadingLogs,
   error: errorLogs,
   fetchData: fetchLogs
-} = useLogsFilter('', '', 1, { timestamp: -1 })
+} = useLogsFilter('', '', selectedLogProtocol, 1, { timestamp: -1 })
 
 const recentLogs = computed(() => logs.value.slice(0, 10))
 

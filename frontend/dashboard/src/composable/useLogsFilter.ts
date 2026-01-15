@@ -11,12 +11,14 @@ import type { FetchSearchParams, FetchSearchResponse, Log } from '@/models/LogDT
 export function useLogsFilter(
     initialIp: string = '',
     initialUrl: string = '',
+    initialProtocol: string = 'http',
     initialPage: number = 1,
     initialSortFields: SortFields | null = null
 ) {
     // Reattivi
     const filterIp: Ref<string> = ref(initialIp);
     const filterUrl: Ref<string> = ref(initialUrl);
+    const filterProtocol: Ref<string> = ref(initialProtocol);
     const page: Ref<number> = ref(initialPage);
     const pageSize: Ref<number> = ref(20);
     const logs: Ref<Log[]> = ref([]);
@@ -35,6 +37,7 @@ export function useLogsFilter(
             const filters: Record<string, string> = {};
             if (filterIp.value) filters['request.ip'] = filterIp.value;
             if (filterUrl.value) filters['request.url'] = filterUrl.value;
+            if (filterProtocol.value) filters['protocol'] = filterProtocol.value;
 
             const params: FetchSearchParams = {
                 page: page.value,
@@ -42,7 +45,7 @@ export function useLogsFilter(
                 filters,
                 sortFields: Object.keys(sortFields.value).length > 0 ? sortFields.value : null
             };
-            
+
             const data: FetchSearchResponse = await fetchSearch(params);
 
             logs.value = data.logs;
@@ -57,7 +60,7 @@ export function useLogsFilter(
     }
 
     // Watchers
-    watch([filterIp, filterUrl], () => {
+    watch([filterIp, filterUrl, filterProtocol], () => {
         //page.value = 1;
         fetchData();
     });
@@ -73,7 +76,7 @@ export function useLogsFilter(
         }
         filterTimer.value = setTimeout(() => {
             if (resetPage) {
-            page.value = 1;
+                page.value = 1;
             }
             fetchData();
         }, 400);
@@ -108,6 +111,7 @@ export function useLogsFilter(
     return {
         filterIp,
         filterUrl,
+        filterProtocol,
         sortFields,
         page,
         pageSize,

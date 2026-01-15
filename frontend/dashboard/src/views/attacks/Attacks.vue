@@ -16,6 +16,8 @@
 
         <!-- Filtro avanzato: Minimo log per attacco -->
         <section class="filter-bar">
+            <ProtocolSelector v-model="filterProtocol" :options="['http', 'ssh']" />
+            
             <label class="min-logs-label" for="minLogsForAttack">
                 {{ t('attacks.minLogsLabel') }}
             </label>
@@ -318,6 +320,7 @@ import { useI18n } from 'vue-i18n';
 
 const { copyToClipboard } = useClipboard();
 const { t } = useI18n();
+import ProtocolSelector from '../../components/common/ProtocolSelector.vue';
 import DefconIndicator from '../../components/DefconIndicator.vue';
 import CountryFlag from '../../components/CountryFlag.vue';
 import AttackChart from '../../components/AttackChart.vue';
@@ -329,6 +332,7 @@ import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
 
 const props = defineProps({
     initialIp: String,
+    initialProtocol: { type: String, default: 'http' },
     initialPage: Number,
     initialMinLogsForAttack: Number,
     initTimeMode: String,
@@ -356,6 +360,7 @@ const showChart = ref(true); // Default visible
 const {
     attacks,
     filterIp,
+    filterProtocol,
     sortFields,
     minLogsForAttack,
     page,
@@ -377,6 +382,7 @@ const {
     getSortDirection
 } = useAttacksFilter(
     props.initialIp,
+    props.initialProtocol,
     props.initialPage,
     props.initialMinLogsForAttack,
     props.initTimeMode,
@@ -393,13 +399,15 @@ const {
 const totalPages = computed(() => Math.ceil(total.value / pageSize.value));
 
 // Aggiorna URL query con router.replace al cambiamento dei filtri
+// Aggiorna URL query con router.replace al cambiamento dei filtri
 watch(
-    [filterIp, minLogsForAttack, timeMode, agoValue, agoUnit, dateRange, fromValue, fromUnit, toValue, toUnit, page, sortFields],
-    ([nip, nmin, ntMode, ngaoVal, ngaoUnit, ndRange, nFromVal, nFromUnit, nToVal, nToUnit, nPage, newSortFields]) => {
+    [filterIp, filterProtocol, minLogsForAttack, timeMode, agoValue, agoUnit, dateRange, fromValue, fromUnit, toValue, toUnit, page, sortFields],
+    ([nip, nproto, nmin, ntMode, ngaoVal, ngaoUnit, ndRange, nFromVal, nFromUnit, nToVal, nToUnit, nPage, newSortFields]) => {
         router.replace({
             name: 'Attacks',
             query: {
                 ip: nip,
+                protocol: nproto !== 'http' ? nproto : undefined,
                 page: nPage > 1 ? nPage : undefined,
                 minLogsForAttack: nmin !== 2 ? nmin : 10,
                 timeMode: ntMode,

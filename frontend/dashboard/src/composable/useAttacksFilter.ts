@@ -7,6 +7,7 @@ import type { AttackLog, FetchAttackSearchParams, FetchAttackSearchResponse } fr
 
 export function useAttacksFilter(
     initialIp: string,
+    initialProtocol: string = 'http',
     initialPage: number,
     initialMinLogsForAttack: number,
     initialTimeMode: 'ago' | 'range',
@@ -21,6 +22,7 @@ export function useAttacksFilter(
 ) {
     const attacks: Ref<AttackLog[]> = ref([]);
     const filterIp: Ref<string> = ref(initialIp);
+    const filterProtocol: Ref<string> = ref(initialProtocol);
     const minLogsForAttack: Ref<number> = ref(initialMinLogsForAttack);
     const page: Ref<number> = ref(initialPage);
 
@@ -48,6 +50,7 @@ export function useAttacksFilter(
 
         const filters: Record<string, string> = {};
         if (filterIp.value) filters['request.ip'] = filterIp.value;
+        if (filterProtocol.value) filters['protocol'] = filterProtocol.value;
 
         let timeConfig: TimeConfig = null;
         if (timeMode.value === 'ago') {
@@ -88,6 +91,7 @@ export function useAttacksFilter(
     watch(
         [
             filterIp,
+            filterProtocol,
             minLogsForAttack,
             timeMode,
             agoValue,
@@ -141,6 +145,7 @@ export function useAttacksFilter(
     return {
         attacks,
         filterIp,
+        filterProtocol,
         sortFields,
         minLogsForAttack,
         page,

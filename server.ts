@@ -60,6 +60,7 @@ app.listen(Number(PORT), '127.0.0.1', () => {
 
 //XXX: verificare il corretto funzionamento del servizio di logging ssh per ora disattivato.
 const sshLogService = getComponent(SshLogService);
-sshLogService.startMonitoring().catch(err => logger.error('Errore avvio SSH monitoring:', err));
+//XXX: disattivato provvisoriamente il servizio di logging ssh per motivi di performance su grandi volumi di dati.
+//sshLogService.startMonitoring().catch(err => logger.error('Errore avvio SSH monitoring:', err));
 
 scheduleAnalysis();

@@ -205,7 +205,7 @@ async function handleReanalyze() {
 
     const result = await reanalyzeAll();
     if (result) {
-        showSuccess(t('config.reanalyzeSuccess', { analyzed: result.analyzed, updated: result.updated }));
+        showSuccess(t('config.reanalyzeSuccess', { analyzed: result.analyzed, updated: result.updated, errors: result.errors }));
     }
 }
 

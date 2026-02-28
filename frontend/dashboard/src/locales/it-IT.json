@@ -274,7 +274,7 @@
         "confirmDeleteMessage": "Sei sicuro di voler eliminare la configurazione \"{key}\"?",
         "reanalyzeAll": "Rianalizza Log",
         "confirmReanalyze": "Sei sicuro di voler rianalizzare tutti i log esistenti con la configurazione attuale? Questa operazione potrebbe richiedere tempo.",
-        "reanalyzeSuccess": "Rianalisi completata: {analyzed} log analizzati, {updated} aggiornati.",
+        "reanalyzeSuccess": "Rianalisi completata: {analyzed} log analizzati, {updated} aggiornati, {errors} in errore.",
         "types": {
             "list": "Lista",
             "keyvalue": "Chiave-Valore",

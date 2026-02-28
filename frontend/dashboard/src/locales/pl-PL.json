@@ -274,7 +274,7 @@
         "confirmDeleteMessage": "Czy na pewno chcesz usunąć konfigurację \"{key}\"?",
         "reanalyzeAll": "Ponownie przeanalizuj logi",
         "confirmReanalyze": "Czy na pewno chcesz ponownie przeanalizować wszystkie istniejące logi przy użyciu bieżącej konfiguracji? Ta operacja może zająć trochę czasu.",
-        "reanalyzeSuccess": "Ponowna analiza zakończona: przeanalizowano {analyzed} logów, zaktualizowano {updated}.",
+        "reanalyzeSuccess": "Ponowna analiza zakończona: przeanalizowano {analyzed} logów, zaktualizowano {updated}, {errors} błędzie.",
         "types": {
             "list": "Lista",
             "keyvalue": "Klucz-Wartość",

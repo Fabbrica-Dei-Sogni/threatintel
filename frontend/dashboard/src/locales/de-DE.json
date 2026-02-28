@@ -273,7 +273,7 @@
         "confirmDeleteMessage": "Sind Sie sicher, dass Sie die Konfiguration \"{key}\" löschen möchten?",
         "reanalyzeAll": "Protokolle reanalysieren",
         "confirmReanalyze": "Sind Sie sicher, dass Sie alle vorhandenen Protokolle mit der aktuellen Konfiguration reanalysieren möchten? Dieser Vorgang kann einige Zeit in Anspruch nehmen.",
-        "reanalyzeSuccess": "Reanalyse abgeschlossen: {analyzed} Protokolle analysiert, {updated} aktualisiert.",
+        "reanalyzeSuccess": "Reanalyse abgeschlossen: {analyzed} Protokolle analysiert, {updated} aktualisiert, {errors} fehler.",
         "types": {
             "list": "Liste",
             "keyvalue": "Schlüssel-Wert",

@@ -104,7 +104,14 @@ export async function reanalyzeAllLogs(batchSize: number = 200, updateDatabase: 
         console.log('[reanalyzeAllLogs] Starting reanalysis of all logs');
         const response = await apiClient.post('/reanalyze-all', { batchSize, updateDatabase }, { timeout: 0 });
         console.log('[reanalyzeAllLogs] Response status:', response.status);
-        return response.data;
+        let data = response.data;
+        //gestione soltanto dei log http, quelli ssh richiede un analisi di performance in piu
+        return {
+            analyzed: data.http.results.processed,
+            updated: data.http.results.updated,
+            errors: data.http.results.errors
+        }
+
     } catch (error) {
         console.error('[reanalyzeAllLogs] Error:', error);
         throw error;

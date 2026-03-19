@@ -1,0 +1,32 @@
+services:
+  cowrie:
+    image: cowrie/cowrie:latest
+    container_name: cowrie-honeypot
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:2323:2223"
+    volumes:
+      # Configurazione principale
+      - ./etc/cowrie.cfg:/cowrie/cowrie-git/etc/cowrie.cfg:ro
+      - ./etc/userdb.txt:/cowrie/cowrie-git/etc/userdb.txt:ro
+      # Banner pre-login e motd post-login
+      - ./etc/issue:/cowrie/cowrie-git/honeyfs/etc/issue:ro
+      - ./etc/motd:/cowrie/cowrie-git/honeyfs/etc/motd:ro
+      # txtcmds — risposte statiche ai comandi
+      - ./txtcmds/bin/ps:/cowrie/cowrie-git/share/cowrie/txtcmds/bin/ps:ro
+      - ./txtcmds/bin/netstat:/cowrie/cowrie-git/share/cowrie/txtcmds/bin/netstat:ro
+      - ./txtcmds/usr/bin/last:/cowrie/cowrie-git/share/cowrie/txtcmds/usr/bin/last:ro
+      # Log e download (persistenza)
+      - cowrie_logs:/cowrie/var/log/cowrie
+      - cowrie_downloads:/cowrie/var/lib/cowrie/downloads
+    networks:
+      - cowrie_net
+
+volumes:
+  cowrie_logs:
+  cowrie_downloads:
+
+
+networks:
+  cowrie_net:
+    driver: bridge

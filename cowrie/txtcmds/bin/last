@@ -1,0 +1,9 @@
+root     pts/0        218.92.0.14      Thu Mar 19 04:31   still logged in
+root     pts/1        61.177.172.8     Wed Mar 18 23:12 - 23:44  (00:32)
+root     pts/0        58.218.200.5     Wed Mar 18 19:08 - 21:15  (02:07)
+admin    pts/2        103.41.167.22    Tue Mar 17 11:23 - 11:41  (00:18)
+root     pts/0        218.92.0.14      Mon Mar 16 02:17 - 06:33  (04:16)
+root     pts/0        111.200.150.90   Sun Mar 15 17:44 - 17:51  (00:07)
+reboot   system boot  2.6.32-696.el6   Fri Jan 12 08:01          (65+12:34)
+
+wtmp begins Fri Jan 12 08:01:22 2026

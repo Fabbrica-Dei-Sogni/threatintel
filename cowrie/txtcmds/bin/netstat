@@ -1,0 +1,12 @@
+Active Internet connections (w/o servers)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State
+tcp        0      0 mail01:smtp             posta.comune.it:38210   ESTABLISHED
+tcp        0      0 mail01:www              151.23.44.12:52341      ESTABLISHED
+tcp        0      0 mail01:www              88.14.201.3:49821       TIME_WAIT
+tcp        0     52 mail01:telnet           218.92.0.14:4471        ESTABLISHED
+tcp        0      0 mail01:ssh              10.0.0.2:54300          ESTABLISHED
+Active UNIX domain sockets (w/o servers)
+Proto RefCnt Flags       Type       State         I-Node Path
+unix  2      [ ]         DGRAM                    7134   /dev/log
+unix  3      [ ]         STREAM     CONNECTED     8891   /var/run/mysql/mysql.sock
+unix  2      [ ]         DGRAM                    6820   /var/run/nscd/socket

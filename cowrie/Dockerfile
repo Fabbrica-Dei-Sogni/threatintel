@@ -12,5 +12,10 @@ COPY --from=builder /busybox /bin/busybox
 # Usiamo la forma exec di RUN poichè la shell /bin/sh non esiste ancora!
 # Questo comando genera i symlink classici (ls, sh, cat, grep, ecc.) puntandoli a busybox
 RUN ["/bin/busybox", "--install", "-s", "/bin"]
+
+# HOTFIX COWRIE: Convertiamo la lettura text-mode in binary-mode per risolvere IOError sui TTYLogs con charset non-ASCII!
+RUN sed -i 's/open(event\["ttylog"\]) as ttylog:/open(event\["ttylog"\], "rb") as ttylog:/g' /cowrie/cowrie-git/src/cowrie/output/mongodb.py && \
+    sed -i 's/ttylog\.read()\.encode()\.hex()/ttylog.read().hex()/g' /cowrie/cowrie-git/src/cowrie/output/mongodb.py
+
 # Torniamo all'utente originale di Cowrie per sicurezza
 USER cowrie

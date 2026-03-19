@@ -1,6 +1,6 @@
 services:
   cowrie:
-    image: cowrie/cowrie:latest
+    build: .
     container_name: cowrie-honeypot
     restart: unless-stopped
     ports:

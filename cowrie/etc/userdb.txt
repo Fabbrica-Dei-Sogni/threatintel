@@ -2,11 +2,28 @@
 # Format: username:uid:password
 # Use * as wildcard password (accepts anything)
 # Use ! prefix to reject
-root:0:*              # Accept root with any other password
-root:0:!root          # Reject root login with password "root"
-root:0:!123456        # Reject these common passwords
+
+# Root account: reject trivial passwords, accept the rest
+root:0:!root
+root:0:!123456
+root:0:*
+
+# Admin account: reject trivial passwords, accept the rest
+admin:0:!admin
 admin:0:*
-admin:0:admin
-admin:0:password
-ubuntu:1000:ubuntu
+
+# Telecamere Dahua / IoT
+666666:0:666666
+888888:0:888888
 pi:1000:raspberry
+ubnt:1000:ubnt
+
+# Default accettati specifici
+tomcat:1000:tomcat
+apache:1000:apache
+ubuntu:1000:ubuntu
+
+# Catch-all generici
+guest:1000:guest
+test:1000:test
+support:1000:support

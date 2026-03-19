@@ -16,17 +16,17 @@ services:
       - ./txtcmds/bin/ps:/cowrie/cowrie-git/share/cowrie/txtcmds/bin/ps:ro
       - ./txtcmds/bin/netstat:/cowrie/cowrie-git/share/cowrie/txtcmds/bin/netstat:ro
       - ./txtcmds/usr/bin/last:/cowrie/cowrie-git/share/cowrie/txtcmds/usr/bin/last:ro
-      # Log e download (persistenza)
-      - cowrie_logs:/cowrie/var/log/cowrie
-      - cowrie_downloads:/cowrie/var/lib/cowrie/downloads
+      # Log e download (persistenza originale tramite named volumes Docker)
+      - cowrie_logs:/cowrie/cowrie-git/var/log/cowrie
+      - cowrie_downloads:/cowrie/cowrie-git/var/lib/cowrie/downloads
     networks:
-      - cowrie_net
+      - threatintel_network
 
 volumes:
   cowrie_logs:
   cowrie_downloads:
 
-
 networks:
-  cowrie_net:
-    driver: bridge
+  threatintel_network:
+    name: threat-intelligence-suite_network-threatintel
+    external: true

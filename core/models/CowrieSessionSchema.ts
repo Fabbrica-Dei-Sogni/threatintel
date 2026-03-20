@@ -1,0 +1,46 @@
+import mongoose, { Document, Model, Schema, Types } from 'mongoose';
+
+export interface ICowrieSession extends Document {
+    system?: string;
+    eventid?: string;
+    src_ip?: string;
+    src_port?: number;
+    dst_ip?: string;
+    dst_port?: number;
+    session: string;
+    protocol?: string;
+    message?: string;
+    time?: number;
+    sensor?: string;
+    uuid?: string;
+    timestamp?: string;
+    starttime?: string;
+    endtime?: string;
+    sshversion?: string | null;
+    termsize?: string | null;
+    ipDetailsId?: Types.ObjectId | null;
+}
+
+const CowrieSessionSchema: Schema = new Schema({
+    system: String,
+    eventid: String,
+    src_ip: String,
+    src_port: Number,
+    dst_ip: String,
+    dst_port: Number,
+    session: { type: String, unique: true, required: true },
+    protocol: String,
+    message: String,
+    time: Number,
+    sensor: String,
+    uuid: String,
+    timestamp: String,
+    starttime: String,
+    endtime: String,
+    sshversion: { type: String, default: null },
+    termsize: { type: String, default: null },
+    ipDetailsId: { type: Schema.Types.ObjectId, ref: 'IpDetails', default: null }
+}, { collection: 'sessions', strict: false }); // strict: false allows any unexpected fields from cowrie
+
+export const CowrieSession: Model<ICowrieSession> = mongoose.model<ICowrieSession>('CowrieSession', CowrieSessionSchema);
+export default CowrieSession;

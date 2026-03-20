@@ -47,7 +47,8 @@
         "loadingAttacks": "Caricamento attacchi...",
         "errorLoadingAttacks": "Errore caricamento attacchi",
         "loadingLogs": "Caricamento log...",
-        "errorLoadingLogs": "Errore caricamento log"
+        "errorLoadingLogs": "Errore caricamento log",
+        "telnet": "Honeypot Telnet"
     },
     "attacks": {
         "title": "Honeypot Dashboard – Attacchi",
@@ -279,6 +280,36 @@
             "list": "Lista",
             "keyvalue": "Chiave-Valore",
             "text": "Testo"
+        }
+    },
+    "cowrie": {
+        "sessions": {
+            "title": "🛡️ Sessioni Telnet Honeypot",
+            "backToDashboard": "← Dashboard",
+            "loading": "Intercettazione Dati Honeypot...",
+            "emptyState": "Nessuna attività honeypot rilevata.",
+            "errorLoad": "Caricamento sessioni fallito. Assicurati che il backend sia attivo.",
+            "table": {
+                "ip": "IP Sorgente",
+                "country": "Paese",
+                "startTime": "Ora Inizio",
+                "duration": "Durata",
+                "exploration": "Esplorazione",
+                "viewTimeline": "👁️ Vedi Timeline"
+            }
+        },
+        "attackDetail": {
+            "title": "Timeline Operativa",
+            "subtitle": "Sessione Obiettivo",
+            "rawEvents": "Eventi Raw",
+            "backToSessions": "← Torna al Database",
+            "hostileIp": "IP Ostile",
+            "timeWindow": "Finestra Temporale",
+            "origin": "Origine",
+            "loading": "Decrittazione Stream Timeline...",
+            "errorSync": "Sincronizzazione timeline fallita. Nodo remoto non disponibile.",
+            "emptyState": "L'intercettore non ha rilevato payload per questa traccia.",
+            "unknownEvent": "Evento Sconosciuto"
         }
     }
 }

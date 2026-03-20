@@ -15,12 +15,14 @@ import { RateLimitService } from "./services/RateLimitService";
 import { ConfigService } from "./services/ConfigService";
 import { ThreatLogger } from "./threatLogger";
 import { SshLogService } from "./services/SshLogService";
+import { CowrieController } from "./controllers/CowrieController";
 
 const threatLogService = getComponent(ThreatLogService);
 const sshLogService = getComponent(SshLogService);
 const ipDetailsService = getComponent(IpDetailsService);
 const rateLimitService = getComponent(RateLimitService);
 const configService = getComponent(ConfigService);
+const cowrieController = getComponent(CowrieController);
 
 const threatLogger = getComponent(ThreatLogger);
 
@@ -40,6 +42,10 @@ router.use('/', threatroutes(logger, threatLogService, ipDetailsService, sshLogS
 
 // API configurazione
 router.use('/', configroutes(logger, configService));
+
+// API Honeypot Telnet (Cowrie) - DEVE STARE PRIMA DELLE ROTTE CATCH-ALL!
+import cowrieroutes from './apis/cowrieroutes';
+router.use('/', cowrieroutes(logger, cowrieController));
 
 //api honeypot per esporre finti servizi http
 router.use('/', routes(logger));

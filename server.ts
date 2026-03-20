@@ -16,6 +16,7 @@ import { port } from './core/config';
 import api from './core/endpoint';
 import { getComponent } from './core/di/container';
 import { SshLogService } from './core/services/SshLogService';
+import { CowrieService } from './core/services/CowrieService';
 
 const app = express();
 
@@ -62,5 +63,9 @@ app.listen(Number(PORT), '127.0.0.1', () => {
 const sshLogService = getComponent(SshLogService);
 //XXX: disattivato provvisoriamente il servizio di logging ssh per motivi di performance su grandi volumi di dati.
 sshLogService.startMonitoring().catch(err => logger.error('Errore avvio SSH monitoring:', err));
+
+// Avvio job in background di Cowrie per arricchimento Geo-IP degli accessi Telnet
+const cowrieService = getComponent(CowrieService);
+cowrieService.startEnrichmentJob();
 
 scheduleAnalysis();

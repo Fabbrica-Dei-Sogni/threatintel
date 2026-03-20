@@ -48,7 +48,8 @@
         "loadingAttacks": "Ładowanie ataków...",
         "errorLoadingAttacks": "Błąd ładowania ataków",
         "loadingLogs": "Ładowanie dzienników...",
-        "errorLoadingLogs": "Błąd ładowania dzienników"
+        "errorLoadingLogs": "Błąd ładowania dzienników",
+        "telnet": "Honeypot Telnet"
     },
     "attacks": {
         "title": "Panel Honeypot – Ataki",
@@ -279,6 +280,36 @@
             "list": "Lista",
             "keyvalue": "Klucz-Wartość",
             "text": "Tekst"
+        }
+    },
+    "cowrie": {
+        "sessions": {
+            "title": "🛡️ Sesje Telnet Honeypot",
+            "backToDashboard": "← Panel",
+            "loading": "Przechwytywanie danych Honeypot...",
+            "emptyState": "Nie wykryto jeszcze żadnej aktywności honeypot.",
+            "errorLoad": "Nie udało się załadować sesji Telnet. Upewnij się, że backend działa.",
+            "table": {
+                "ip": "IP źródłowe",
+                "country": "Kraj",
+                "startTime": "Czas rozpoczęcia",
+                "duration": "Czas trwania",
+                "exploration": "Eksploracja",
+                "viewTimeline": "👁️ Zobacz Timeline"
+            }
+        },
+        "attackDetail": {
+            "title": "Oś czasu operacji",
+            "subtitle": "Sesja docelowa misji",
+            "rawEvents": "Surowe zdarzenia",
+            "backToSessions": "← Powrót do bazy danych",
+            "hostileIp": "Wrogie IP",
+            "timeWindow": "Okno czasowe",
+            "origin": "Pochodzenie",
+            "loading": "Deszyfrowanie strumieni osi czasu...",
+            "errorSync": "Nie udało się zsynchronizować osi czasu sesji. Węzeł zdalny niedostępny.",
+            "emptyState": "Interceptor nie wykrył żadnych zdarzeń ładunku dla tego śladu.",
+            "unknownEvent": "Nieznane zdarzenie"
         }
     }
 }

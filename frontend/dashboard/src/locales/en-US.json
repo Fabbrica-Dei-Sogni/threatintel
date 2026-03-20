@@ -47,7 +47,8 @@
         "loadingAttacks": "Loading attacks...",
         "errorLoadingAttacks": "Error loading attacks",
         "loadingLogs": "Loading logs...",
-        "errorLoadingLogs": "Error loading logs"
+        "errorLoadingLogs": "Error loading logs",
+        "telnet": "Honeypot Telnet"
     },
     "attacks": {
         "title": "Honeypot Dashboard – Attacks",
@@ -279,6 +280,36 @@
             "list": "List",
             "keyvalue": "Key-Value",
             "text": "Text"
+        }
+    },
+    "cowrie": {
+        "sessions": {
+            "title": "🛡️ Telnet Honeypot Sessions",
+            "backToDashboard": "← Dashboard",
+            "loading": "Intercepting Honeypot Data...",
+            "emptyState": "No honeypot activity detected yet.",
+            "errorLoad": "Failed to load Telnet sessions. Ensure the backend is running.",
+            "table": {
+                "ip": "Source IP",
+                "country": "Country",
+                "startTime": "Start Time",
+                "duration": "Duration",
+                "exploration": "Exploration",
+                "viewTimeline": "👁️ View Timeline"
+            }
+        },
+        "attackDetail": {
+            "title": "Operation Timeline",
+            "subtitle": "Mission Target Session",
+            "rawEvents": "Raw Events",
+            "backToSessions": "← Return to Databank",
+            "hostileIp": "Hostile IP",
+            "timeWindow": "Time Window",
+            "origin": "Origin",
+            "loading": "Decrypting Timeline Streams...",
+            "errorSync": "Failed to synchronize session timeline. Remote node unavailable.",
+            "emptyState": "Interceptor picked up no payload events for this trace.",
+            "unknownEvent": "Unknown Event"
         }
     }
 }

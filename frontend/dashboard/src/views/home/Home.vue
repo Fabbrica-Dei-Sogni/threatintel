@@ -8,6 +8,7 @@
     <section class="actions">
       <button @click="goToAttacks" class="btn-action">{{ $t('home.attacks') }}</button>
       <button @click="goToLogs" class="btn-action">{{ $t('home.logRequests') }}</button>
+      <button @click="goToTelnet" class="btn-action">{{ $t('home.telnet') }}</button>
     </section>
 
     <section class="widgets">
@@ -81,6 +82,9 @@ function goToAttacks() {
 }
 function goToLogs() {
   router.push('/threatlogs')
+}
+function goToTelnet() {
+  router.push('/telnet-sessions')
 }
 
 function goToIpDetails(ip) {

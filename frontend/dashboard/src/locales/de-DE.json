@@ -47,7 +47,8 @@
         "loadingAttacks": "Angriffe werden geladen...",
         "errorLoadingAttacks": "Fehler beim Laden der Angriffe",
         "loadingLogs": "Protokolle werden geladen...",
-        "errorLoadingLogs": "Fehler beim Laden der Protokolle"
+        "errorLoadingLogs": "Fehler beim Laden der Protokolle",
+        "telnet": "Honeypot Telnet"
     },
     "attacks": {
         "title": "Honeypot Dashboard – Angriffe",
@@ -278,6 +279,36 @@
             "list": "Liste",
             "keyvalue": "Schlüssel-Wert",
             "text": "Text"
+        }
+    },
+    "cowrie": {
+        "sessions": {
+            "title": "🛡️ Telnet-Honeypot-Sitzungen",
+            "backToDashboard": "← Dashboard",
+            "loading": "Abfangen von Honeypot-Daten...",
+            "emptyState": "Noch keine Honeypot-Aktivität erkannt.",
+            "errorLoad": "Laden der Telnet-Sitzungen fehlgeschlagen. Stellen Sie sicher, dass das Backend läuft.",
+            "table": {
+                "ip": "Quell-IP",
+                "country": "Land",
+                "startTime": "Startzeit",
+                "duration": "Dauer",
+                "exploration": "Exploration",
+                "viewTimeline": "👁️ Timeline anzeigen"
+            }
+        },
+        "attackDetail": {
+            "title": "Operations-Timeline",
+            "subtitle": "Missions-Ziel-Sitzung",
+            "rawEvents": "Rohereignisse",
+            "backToSessions": "← Zurück zur Datenbank",
+            "hostileIp": "Feindliche IP",
+            "timeWindow": "Zeitfenster",
+            "origin": "Herkunft",
+            "loading": "Entschlüsselung der Timeline-Streams...",
+            "errorSync": "Synchronisierung der Sitzungs-Timeline fehlgeschlagen. Remote-Knoten nicht verfügbar.",
+            "emptyState": "Der Interceptor hat keine Payload-Ereignisse für diese Spur erfasst.",
+            "unknownEvent": "Unbekanntes Ereignis"
         }
     }
 }

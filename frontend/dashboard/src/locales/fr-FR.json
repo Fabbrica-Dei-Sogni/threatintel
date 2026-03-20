@@ -47,7 +47,8 @@
         "loadingAttacks": "Chargement des attaques...",
         "errorLoadingAttacks": "Erreur de chargement des attaques",
         "loadingLogs": "Chargement des journaux...",
-        "errorLoadingLogs": "Erreur de chargement des journaux"
+        "errorLoadingLogs": "Erreur de chargement des journaux",
+        "telnet": "Honeypot Telnet"
     },
     "attacks": {
         "title": "Tableau de bord Honeypot – Attaques",
@@ -278,6 +279,36 @@
             "list": "Liste",
             "keyvalue": "Clé-Valeur",
             "text": "Texte"
+        }
+    },
+    "cowrie": {
+        "sessions": {
+            "title": "🛡️ Sessions Honeypot Telnet",
+            "backToDashboard": "← Tableau de bord",
+            "loading": "Interception des données Honeypot...",
+            "emptyState": "Aucune activité honeypot détectée pour le moment.",
+            "errorLoad": "Échec du chargement des sessions Telnet. Vérifiez que le backend est en cours d'exécution.",
+            "table": {
+                "ip": "IP Source",
+                "country": "Pays",
+                "startTime": "Heure de début",
+                "duration": "Durée",
+                "exploration": "Exploration",
+                "viewTimeline": "👁️ Voir la Timeline"
+            }
+        },
+        "attackDetail": {
+            "title": "Timeline des Opérations",
+            "subtitle": "Session Cible",
+            "rawEvents": "Événements Bruts",
+            "backToSessions": "← Retour à la Banque de Données",
+            "hostileIp": "IP Hostile",
+            "timeWindow": "Fenêtre Temporelle",
+            "origin": "Origine",
+            "loading": "Décryptage des flux de la Timeline...",
+            "errorSync": "Échec de la synchronisation de la timeline de session. Nœud distant indisponible.",
+            "emptyState": "L'intercepteur n'a récupéré aucun événement de payload per cette trace.",
+            "unknownEvent": "Événement Inconnu"
         }
     }
 }

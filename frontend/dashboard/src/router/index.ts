@@ -12,6 +12,8 @@ import Attacks from '../views/attacks/Attacks.vue';
 import AttackDetail from '../views/attackdetail/AttackDetail.vue';
 import Settings from '../views/settings/Settings.vue';
 import ConfigPage from '../views/configpage/ConfigPage.vue';
+import CowrieSessions from '../views/cowriesessions/CowrieSessions.vue';
+import CowrieAttackDetail from '../views/cowriesessiondetail/CowrieAttackDetail.vue';
 
 // Le tipizzazioni sulle props passate via router sono opzionali e possono essere affinate man mano che si tipizza la codebase
 
@@ -85,6 +87,16 @@ const routes: RouteRecordRaw[] = [
     { path: '/register', name: 'Register', component: Register },
     { path: '/config', name: 'Config', component: ConfigPage },
     { path: '/settings', name: 'Settings', component: Settings },
+    {
+        path: '/telnet-sessions',
+        name: 'CowrieSessions',
+        component: CowrieSessions,
+        props: (route: RouteLocationNormalized) => ({
+            initialPage: route.query.page ? parseInt(route.query.page as string) : 1,
+            initialLimit: route.query.limit ? parseInt(route.query.limit as string) : 20,
+        }),
+    },
+    { path: '/telnet-attack-detail/:id', name: 'CowrieAttackDetail', component: CowrieAttackDetail },
 ];
 
 const router = createRouter({

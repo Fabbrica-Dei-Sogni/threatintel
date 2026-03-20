@@ -209,3 +209,37 @@ export async function enrichReputationScore(ip: string): Promise<any> {
         throw error;
     }
 }
+
+// ==========================
+// COWRIE TELNET API WRAPPERS
+// ==========================
+
+export async function fetchCowrieSessions(page = 1, limit = 20): Promise<any> {
+    try {
+        const response = await apiClient.get('/cowrie/sessions', { params: { page, limit } });
+        return response.data;
+    } catch (error) {
+        console.error('[fetchCowrieSessions] Error:', error);
+        throw error;
+    }
+}
+
+export async function fetchCowrieSessionDetails(sessionId: string): Promise<any> {
+    try {
+        const response = await apiClient.get(`/cowrie/sessions/${sessionId}`);
+        return response.data;
+    } catch (error) {
+        console.error('[fetchCowrieSessionDetails] Error:', error);
+        throw error;
+    }
+}
+
+export async function fetchCowrieSessionEvents(sessionId: string): Promise<any> {
+    try {
+        const response = await apiClient.get(`/cowrie/sessions/${sessionId}/events`);
+        return response.data;
+    } catch (error) {
+        console.error('[fetchCowrieSessionEvents] Error:', error);
+        throw error;
+    }
+}

@@ -294,8 +294,8 @@
   font-weight: 700;
   border-bottom: 2px solid #663a39;
   user-select: none;
-  /* Fluid font size for headers */
-  font-size: clamp(9px, 1.3vw, 16px);
+  /* Fluid font size for headers - increased minimum for mobile readability */
+  font-size: clamp(11px, 1.3vw, 16px);
   white-space: nowrap;
   /* Force single line */
   min-width: 40px;
@@ -312,8 +312,8 @@
   border-bottom: 1px solid #4b312f;
   transition: background 0.3s ease;
   font-size: 15px;
-  /* Fluid font size for cells */
-  font-size: clamp(9px, 1.3vw, 15px);
+  /* Fluid font size for cells - increased minimum for mobile readability */
+  font-size: clamp(11px, 1.3vw, 15px);
   white-space: nowrap;
   /* Force single line for compact rows */
   text-align: center;
@@ -420,12 +420,12 @@
 
 @media (max-width: 768px) {
   .detail-link {
-    padding: 2px 4px;
-    /* Reduced padding for mobile */
+    padding: 4px 8px;
+    /* Improved padding for touch targets */
     white-space: nowrap;
-    /* Force single line, rely on font shrink */
-    font-size: clamp(6px, 1.1vw, 0.9rem);
-    /* Allow smaller font minimum */
+    /* Force single line */
+    font-size: 11px;
+    /* Fixed readable size on mobile */
   }
 }
 

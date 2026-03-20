@@ -12,9 +12,9 @@
     </section>
 
     <section class="intel-center">
-      <!-- Blocco Principale: Mappa e Attacchi in Simbiosi -->
-      <div class="primary-intel glass-card">
-        <div class="list-side">
+      <!-- Blocco Principale: Mappa e Attacchi in Simbiosi (Separati in due card per coerenza) -->
+      <div class="primary-intel">
+        <div class="list-side glass-card">
           <div class="widget-header">
             <h2>{{ $t('home.recentAttacks') }}</h2>
             <ProtocolSelector v-model="selectedAttackProtocol" :options="['http', 'ssh', 'https']" theme="dark" />
@@ -33,7 +33,7 @@
           <div v-if="loadingAttacks" class="loading">{{ $t('home.loadingAttacks') }}</div>
           <div v-if="errorAttacks" class="error">{{ $t('home.errorLoadingAttacks') }}</div>
         </div>
-        <div class="map-side">
+        <div class="map-side glass-card">
           <div class="widget-header">
             <h2><span class="pulse">📡</span> {{ $t('home.attackMap') }}</h2>
           </div>

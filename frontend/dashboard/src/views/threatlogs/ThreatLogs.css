@@ -165,9 +165,8 @@
   margin-top: 0;
   width: 100%;
   flex-grow: 1;
-  /* Removed overflow-y: auto to let page scroll normally on mobile if needed, or handle per component */
+  overflow-x: auto; /* Enable horizontal scroll for small screens */
   padding-right: 0;
-  /* Remove padding */
   box-sizing: border-box;
 }
 
@@ -190,8 +189,8 @@
   text-shadow: 0 0 4px rgba(0, 0, 0, 0.6);
   border-bottom: 2px solid #624236;
   user-select: none;
-  /* Fluid font sizing */
-  font-size: clamp(9px, 1.4vw, 16px);
+  /* Fluid font sizing - increased minimum */
+  font-size: clamp(11px, 1.4vw, 16px);
   white-space: normal;
   word-wrap: break-word;
   text-align: center;
@@ -205,8 +204,8 @@
   padding: 10px 15px;
   border-bottom: 1px solid #4d3630;
   transition: background 0.2s ease;
-  /* Fluid font sizing */
-  font-size: clamp(9px, 1.3vw, 15px);
+  /* Fluid font sizing - increased minimum */
+  font-size: clamp(11px, 1.3vw, 15px);
   word-wrap: break-word;
   word-break: break-all;
   text-align: center;
@@ -260,11 +259,11 @@
 
 @media (max-width: 768px) {
   .log-table .info-btn {
-    padding: 3px 5px;
+    padding: 4px 8px;
     white-space: nowrap;
     /* Force single line */
-    font-size: clamp(6px, 1.2vw, 13px);
-    /* Allow smaller font minimum */
+    font-size: 11px;
+    /* Readable fixed size on mobile */
   }
 }
 

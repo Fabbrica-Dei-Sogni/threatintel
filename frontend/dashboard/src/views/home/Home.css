@@ -74,9 +74,16 @@ h1 {
 
 .list-side {
   flex: 3;
+  padding: 0; /* Clear padding if any inherited */
   display: flex;
   flex-direction: column;
-  min-width: 320px;
+  min-width: min(100%, 320px); /* Evita overflow su schermi mini */
+}
+
+@media (max-width: 480px) {
+  .list-side {
+    min-width: 0;
+  }
 }
 
 .scroll-list {
@@ -90,7 +97,7 @@ h1 {
 /* Secondary Intel: Logs + Sessions */
 .secondary-intel {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 350px), 1fr));
   gap: 25px;
 }
 
@@ -123,8 +130,16 @@ li {
   display: flex;
   align-items: center;
   gap: 12px;
-  flex-wrap: nowrap; /* Evita il salto di riga caos */
+  flex-wrap: nowrap; /* Default for desktop */
   width: 100%;
+}
+
+@media (max-width: 768px) {
+  li {
+    flex-wrap: wrap; 
+    gap: 4px 12px;
+    padding: 10px 0;
+  }
 }
 
 li:hover {
@@ -139,8 +154,16 @@ li:last-child {
 .time-ago {
   color: #88aaff;
   font-size: 0.8em;
-  flex: 0 0 135px; /* Larghezza fissa per stabilità */
+  flex: 0 0 135px; /* Larghezza fissa per stabilità su desktop */
   white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .time-ago {
+    flex: 0 1 auto; 
+    min-width: 120px;
+    font-size: 0.75em;
+  }
 }
 
 .url-hint {
@@ -153,12 +176,26 @@ li:last-child {
   white-space: nowrap;
 }
 
+@media (max-width: 480px) {
+  .url-hint {
+    display: none; /* Nascondi URL su schermi molto piccoli per salvare spazio */
+  }
+}
+
 .ip-link {
   color: #88aaff;
   font-weight: 700;
   cursor: pointer;
-  flex: 0 0 115px; /* Larghezza fissa per l'IP */
+  flex: 0 0 115px; /* Larghezza fissa per desktop */
   font-family: 'JetBrains Mono', monospace;
+}
+
+@media (max-width: 768px) {
+  .ip-link {
+    flex: 0 0 auto; 
+    min-width: 110px;
+    font-size: 0.9em;
+  }
 }
 
 .ip-link:hover {
@@ -172,6 +209,16 @@ li a {
   font-size: 0.85em;
   margin-left: auto;
   font-weight: 500;
+  padding: 4px 8px;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 4px;
+}
+
+@media (max-width: 768px) {
+  li a {
+    margin-left: 0;
+    flex: 0 0 auto;
+  }
 }
 
 li a:hover {
@@ -224,8 +271,8 @@ li a:hover {
 }
 
 @media (max-width: 768px) {
-  .dashboard { padding: 15px; }
-  .header-with-lang { padding-left: 55px; }
-  .secondary-intel { grid-template-columns: 1fr; }
+  .dashboard { padding: 10px; }
+  .header-with-lang { padding-left: 50px; margin-bottom: 15px; }
+  .secondary-intel { grid-template-columns: 1fr; gap: 15px; }
   .map-side { height: 300px; }
 }

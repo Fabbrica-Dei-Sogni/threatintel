@@ -4,7 +4,7 @@ services:
     container_name: cowrie-honeypot
     restart: unless-stopped
     ports:
-      - "127.0.0.1:2323:2223"
+      - "23:2223"
     volumes:
       # Configurazione principale
       - ./etc/cowrie.cfg:/cowrie/cowrie-git/etc/cowrie.cfg:ro

@@ -68,6 +68,19 @@
     margin-bottom: 30px;
 }
 
+.session-map-section {
+    margin-bottom: 30px;
+    height: 400px;
+    padding: 0;
+    overflow: hidden;
+}
+
+@media (max-width: 800px) {
+    .session-map-section {
+        height: 300px;
+    }
+}
+
 .info-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));

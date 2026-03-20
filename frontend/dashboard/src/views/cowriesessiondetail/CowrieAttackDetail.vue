@@ -29,6 +29,11 @@
             </div>
         </div>
 
+        <!-- Mappa della Sessione -->
+        <section class="session-map-section glass-card" v-if="sessionDetails && !loading">
+            <AttackMap v-if="mapAttackData.length > 0" :attacks="mapAttackData" />
+        </section>
+
         <div v-if="loading" class="loading">{{ $t('cowrie.attackDetail.loading') }}</div>
         
         <div v-if="error" class="error-box">{{ error }}</div>
@@ -77,12 +82,13 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import dayjs from 'dayjs';
 import { useI18n } from '../../composable/useI18n';
 import { useClipboard } from '../../composable/useClipboard';
 import { fetchCowrieSessionDetails, fetchCowrieSessionEvents } from '../../api';
+import AttackMap from '../../components/AttackMap.vue';
 import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
 
 const { t } = useI18n();
@@ -95,6 +101,22 @@ const sessionDetails = ref(null);
 const events = ref([]);
 const loading = ref(true);
 const error = ref(null);
+
+const mapAttackData = computed(() => {
+    if (!sessionDetails.value) return [];
+    const s = sessionDetails.value;
+    return [{
+        ...s,
+        id: s._id || s.session,
+        request: { ip: s.src_ip },
+        ipDetails: s.ipDetailsId,
+        dangerLevel: 2, // Hostile
+        dangerScore: 0,
+        rps: 0,
+        totaleLogs: s.eventCount || 1,
+        firstSeen: s.starttime
+    }];
+});
 
 const fetchSessionData = async () => {
     loading.value = true;

@@ -11,68 +11,76 @@
       <button @click="goToTelnet" class="btn-action">{{ $t('home.telnet') }}</button>
     </section>
 
-    <section class="widgets">
-      <div class="widget">
-        <div class="widget-header">
-          <h2>{{ $t('home.recentAttacks') }}</h2>
-          <ProtocolSelector v-model="selectedAttackProtocol" :options="['http', 'ssh']" theme="dark" />
+    <section class="intel-center">
+      <!-- Blocco Principale: Mappa e Attacchi in Simbiosi -->
+      <div class="primary-intel glass-card">
+        <div class="list-side">
+          <div class="widget-header">
+            <h2>{{ $t('home.recentAttacks') }}</h2>
+            <ProtocolSelector v-model="selectedAttackProtocol" :options="['http', 'ssh']" theme="dark" />
+          </div>
+          <ul class="scroll-list">
+            <li v-for="attack in recentAttacks" :key="attack.id">
+              <CountryFlag v-if="attack.ipDetails?.ipinfo?.country" :countryCode="attack.ipDetails?.ipinfo?.country" />
+              <span @click="goToIpDetails(attack.request.ip)" class="ip-link">{{ attack.request.ip }}</span>
+              <span class="time-ago">- {{ formatDate(attack.firstSeen) }}</span>
+              <router-link
+                :to="{ name: 'AttackDetail', query: { attack: encodeURIComponent(JSON.stringify(attack)) } }">
+                {{ $t('common.detail') }}
+              </router-link>
+            </li>
+          </ul>
+          <div v-if="loadingAttacks" class="loading">{{ $t('home.loadingAttacks') }}</div>
+          <div v-if="errorAttacks" class="error">{{ $t('home.errorLoadingAttacks') }}</div>
         </div>
-        <ul>
-          <li v-for="attack in recentAttacks" :key="attack.id">
-            <CountryFlag v-if="attack.ipDetails?.ipinfo?.country" :countryCode="attack.ipDetails?.ipinfo?.country" />
-            <span @click="goToIpDetails(attack.request.ip)" style="cursor: pointer;"> - {{ attack.request.ip }}</span> -
-            {{ formatDate(attack.firstSeen) }} - {{ attack.durataAttacco.human }}
-            <router-link
-              :to="{ name: 'AttackDetail', query: { attack: encodeURIComponent(JSON.stringify(attack)) } }">{{
-                $t('common.detail') }}</router-link>
-          </li>
-        </ul>
-        <div v-if="loadingAttacks">{{ $t('home.loadingAttacks') }}</div>
-        <div v-if="errorAttacks">{{ $t('home.errorLoadingAttacks') }}</div>
-      </div>
-      <div class="widget">
-        <div class="widget-header">
-          <h2>{{ $t('home.recentLogs') }}</h2>
-          <ProtocolSelector v-model="selectedLogProtocol" :options="['http', 'ssh']" theme="dark" />
+        <div class="map-side">
+          <div class="widget-header">
+            <h2><span class="pulse">📡</span> {{ $t('home.attackMap') }}</h2>
+          </div>
+          <AttackMap :attacks="recentAttacks" />
         </div>
-        <ul>
-          <li v-for="log in recentLogs" :key="log._id">
-            <CountryFlag v-if="log.ipDetailsId?.ipinfo?.country" :countryCode="log.ipDetailsId?.ipinfo?.country" />
-            <span @click="goToIpDetails(log.request.ip)" style="cursor: pointer;">
-              -
-              {{ log.request.ip }}
-            </span> -
-            {{
-              formatDate(log.timestamp) }} - {{ log.request.url }}
-            <router-link :to="{ name: 'ThreatLog', params: { id: log.id } }">{{ $t('common.detail') }}</router-link>
-          </li>
-        </ul>
-        <div v-if="loadingLogs">{{ $t('home.loadingLogs') }}</div>
-        <div v-if="errorLogs">{{ $t('home.errorLoadingLogs') }}</div>
       </div>
-      <div class="widget">
-        <div class="widget-header">
-          <h2>{{ $t('home.recentSessions') }}</h2>
+
+      <!-- Blocco Secondario: Log e Sessioni -->
+      <div class="secondary-intel">
+        <div class="widget glass-card">
+          <div class="widget-header">
+            <h2>{{ $t('home.recentLogs') }}</h2>
+            <ProtocolSelector v-model="selectedLogProtocol" :options="['http', 'ssh']" theme="dark" />
+          </div>
+          <ul>
+            <li v-for="log in recentLogs" :key="log._id">
+              <CountryFlag v-if="log.ipDetailsId?.ipinfo?.country" :countryCode="log.ipDetailsId.ipinfo.country" />
+              <span @click="goToIpDetails(log.request.ip)" class="ip-link">{{ log.request.ip }}</span>
+              <span class="time-ago">- {{ formatDate(log.timestamp) }}</span>
+              <span class="url-hint">- {{ log.request.url }}</span>
+              <router-link :to="{ name: 'ThreatLog', params: { id: log.id } }">{{ $t('common.detail') }}</router-link>
+            </li>
+          </ul>
+          <div v-if="loadingLogs" class="loading">{{ $t('home.loadingLogs') }}</div>
+          <div v-if="errorLogs" class="error">{{ $t('home.errorLoadingLogs') }}</div>
         </div>
-        <ul>
-          <li v-for="session in recentSessions" :key="session.session">
-            <CountryFlag v-if="session.ipDetailsId?.ipinfo?.country" :countryCode="session.ipDetailsId.ipinfo.country" />
-            <span @click="goToIpDetails(session.src_ip)" style="cursor: pointer;"> - {{ session.src_ip }}</span> -
-            {{ formatDate(session.starttime) }}
-            <router-link :to="{ name: 'CowrieAttackDetail', params: { id: session.session } }">{{
-                $t('common.detail') }}</router-link>
-          </li>
-          <li v-if="recentSessions.length === 0 && !loadingSessions">
-            {{ $t('common.noDataFound') }}
-          </li>
-        </ul>
-        <div v-if="loadingSessions">{{ $t('home.loadingSessions') }}</div>
-        <div v-if="errorSessions">{{ $t('home.errorLoadingSessions') }}</div>
+
+        <div class="widget glass-card">
+          <div class="widget-header">
+            <h2>{{ $t('home.recentSessions') }}</h2>
+          </div>
+          <ul>
+            <li v-for="session in recentSessions" :key="session.session">
+              <CountryFlag v-if="session.ipDetailsId?.ipinfo?.country" :countryCode="session.ipDetailsId.ipinfo.country" />
+              <span @click="goToIpDetails(session.src_ip)" class="ip-link">{{ session.src_ip }}</span>
+              <span class="time-ago">- {{ formatDate(session.starttime) }}</span>
+              <router-link :to="{ name: 'CowrieAttackDetail', params: { id: session.session } }">{{
+                  $t('common.detail') }}</router-link>
+            </li>
+            <li v-if="recentSessions.length === 0 && !loadingSessions">
+              {{ $t('common.noDataFound') }}
+            </li>
+          </ul>
+          <div v-if="loadingSessions" class="loading">{{ $t('home.loadingSessions') }}</div>
+          <div v-if="errorSessions" class="error">{{ $t('home.errorLoadingSessions') }}</div>
+        </div>
       </div>
-    </section>
-    <section class="widget map">
-      <h2>{{ $t('home.attackMap') }}</h2>
-      <AttackMap :attacks="recentAttacks" />
     </section>
 
   </div>

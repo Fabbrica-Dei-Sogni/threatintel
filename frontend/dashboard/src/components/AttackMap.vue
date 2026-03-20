@@ -359,10 +359,11 @@ const renderAttacks = () => {
         });
     });
 
-    // Fit bounds if we have points, but don't zoom in too much
-    if (props.attacks.length > 0) {
-        map.fitBounds(validBounds, { padding: [50, 50], maxZoom: 12 });
-    }
+    // Center on Honeypot
+    map.setView([hp.lat, hp.lng], map.getZoom());
+    
+    // Optional: we could calculate a zoom that fits most attacks while keeping HP centered, 
+    // but the user explicitly requested the target to be at the center.
 };
 
 onMounted(() => {

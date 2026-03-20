@@ -1,14 +1,13 @@
 <template>
-    <div class="cowrie-detail">
-        <div class="header-with-lang">
+    <div class="cowrie-detail attacchi">
+        <div class="header-top">
             <h1><span class="pulse">🔴</span> {{ $t('cowrie.attackDetail.title') }}</h1>
             <LanguageSwitcher />
         </div>
-        <p class="subtitle">{{ $t('cowrie.attackDetail.subtitle') }}: <span class="hash">{{ sessionId }}</span> ({{ $t('cowrie.attackDetail.rawEvents') }}: {{ events.length }})</p>
-        
         <div class="actions">
             <button @click="$router.back()" class="btn-action">{{ $t('cowrie.attackDetail.backToSessions') }}</button>
         </div>
+        <p class="subtitle">{{ $t('cowrie.attackDetail.subtitle') }}: <span class="hash">{{ sessionId }}</span> ({{ $t('cowrie.attackDetail.rawEvents') }}: {{ events.length }})</p>
 
         <div class="glass-card info-card" v-if="sessionDetails">
             <div class="info-grid">
@@ -27,10 +26,7 @@
             </div>
         </div>
 
-        <div v-if="loading" class="loading-state">
-            <div class="spinner"></div>
-            <span>{{ $t('cowrie.attackDetail.loading') }}</span>
-        </div>
+        <div v-if="loading" class="loading">{{ $t('cowrie.attackDetail.loading') }}</div>
         
         <div v-if="error" class="error-box">{{ error }}</div>
 

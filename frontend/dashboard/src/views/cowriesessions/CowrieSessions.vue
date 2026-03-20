@@ -1,6 +1,6 @@
 <template>
-    <div class="cowrie-sessions">
-        <div class="header-with-lang">
+    <div class="cowrie-sessions attacchi">
+        <div class="header-top">
             <h1>{{ $t('cowrie.sessions.title') }}</h1>
             <LanguageSwitcher />
         </div>
@@ -8,22 +8,17 @@
             <button @click="$router.push('/')" class="btn-action">{{ $t('cowrie.sessions.backToDashboard') }}</button>
         </div>
 
-        <div v-if="loading" class="loading-state">
-            <div class="spinner"></div>
-            <span>{{ $t('cowrie.sessions.loading') }}</span>
-        </div>
-
-        <div v-if="error" class="error-box">{{ error }}</div>
+        <div v-if="loading" class="loading">{{ $t('cowrie.sessions.loading') }}</div>
+        <div v-if="error" class="error">{{ error }}</div>
 
         <!-- Pagination superiore -->
-        <div class="pagination cyber-pagination top-pagination" v-if="totalPages > 1 && !loading && !error">
-            <button :disabled="page === 1" @click="changePage(page - 1)">◄ {{ $t('common.prev') }}</button>
-            <span class="page-indicator">{{ $t('common.page') }} <span class="highlight">{{ page }}</span> {{
-                $t('common.of') }} {{ totalPages }}</span>
-            <button :disabled="page === totalPages" @click="changePage(page + 1)">{{ $t('common.next') }} ►</button>
+        <div class="pagination" v-if="totalPages > 1 && !loading && !error">
+            <button :disabled="page === 1" @click="changePage(page - 1)">{{ $t('common.prev') }}</button>
+            <span>{{ $t('common.page') }} {{ page }} {{ $t('common.of') }} {{ totalPages }}</span>
+            <button :disabled="page === totalPages" @click="changePage(page + 1)">{{ $t('common.next') }}</button>
         </div>
 
-        <section class="log-table cyber-container" v-if="!loading && !error">
+        <section class="log-table" v-if="!loading && !error">
             <table>
                 <thead>
                     <tr>

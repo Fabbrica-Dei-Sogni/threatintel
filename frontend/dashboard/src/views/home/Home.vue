@@ -12,7 +12,7 @@
     </section>
 
     <section class="intel-center">
-      <!-- Blocco Principale: Mappa e Attacchi in Simbiosi (Separati in due card per coerenza) -->
+      <!-- Blocco Attacchi -->
       <div class="primary-intel">
         <div class="list-side glass-card">
           <div class="widget-header">
@@ -41,7 +41,36 @@
         </div>
       </div>
 
-      <!-- Blocco Secondario: Log e Sessioni -->
+      <!-- Blocco Sessioni Telnet (Mappa + Lista) -->
+      <div class="primary-intel">
+        <div class="list-side glass-card">
+          <div class="widget-header">
+            <h2>{{ $t('home.recentSessions') }}</h2>
+          </div>
+          <ul class="scroll-list">
+            <li v-for="session in recentSessions" :key="session.session">
+              <CountryFlag v-if="session.ipDetailsId?.ipinfo?.country" :countryCode="session.ipDetailsId.ipinfo.country" />
+              <span @click="goToIpDetails(session.src_ip)" class="ip-link">{{ session.src_ip }}</span>
+              <span class="time-ago">- {{ formatDate(session.starttime) }}</span>
+              <router-link :to="{ name: 'CowrieAttackDetail', params: { id: session.session } }">{{
+                  $t('common.detail') }}</router-link>
+            </li>
+            <li v-if="recentSessions.length === 0 && !loadingSessions">
+              {{ $t('common.noDataFound') }}
+            </li>
+          </ul>
+          <div v-if="loadingSessions" class="loading">{{ $t('home.loadingSessions') }}</div>
+          <div v-if="errorSessions" class="error">{{ $t('home.errorLoadingSessions') }}</div>
+        </div>
+        <div class="map-side glass-card">
+          <div class="widget-header">
+            <h2><span class="pulse">📡</span> {{ $t('home.sessionsMap') }}</h2>
+          </div>
+          <AttackMap :attacks="recentSessionsNormalized" />
+        </div>
+      </div>
+
+      <!-- Blocco Secondario: Log e Log-Requests -->
       <div class="secondary-intel">
         <div class="widget glass-card">
           <div class="widget-header">
@@ -59,26 +88,6 @@
           </ul>
           <div v-if="loadingLogs" class="loading">{{ $t('home.loadingLogs') }}</div>
           <div v-if="errorLogs" class="error">{{ $t('home.errorLoadingLogs') }}</div>
-        </div>
-
-        <div class="widget glass-card">
-          <div class="widget-header">
-            <h2>{{ $t('home.recentSessions') }}</h2>
-          </div>
-          <ul>
-            <li v-for="session in recentSessions" :key="session.session">
-              <CountryFlag v-if="session.ipDetailsId?.ipinfo?.country" :countryCode="session.ipDetailsId.ipinfo.country" />
-              <span @click="goToIpDetails(session.src_ip)" class="ip-link">{{ session.src_ip }}</span>
-              <span class="time-ago">- {{ formatDate(session.starttime) }}</span>
-              <router-link :to="{ name: 'CowrieAttackDetail', params: { id: session.session } }">{{
-                  $t('common.detail') }}</router-link>
-            </li>
-            <li v-if="recentSessions.length === 0 && !loadingSessions">
-              {{ $t('common.noDataFound') }}
-            </li>
-          </ul>
-          <div v-if="loadingSessions" class="loading">{{ $t('home.loadingSessions') }}</div>
-          <div v-if="errorSessions" class="error">{{ $t('home.errorLoadingSessions') }}</div>
         </div>
       </div>
     </section>
@@ -155,6 +164,18 @@ const {
 } = useCowrieSessions(1, 10);
 
 const recentSessions = computed(() => sessions.value.slice(0, 10))
+
+const recentSessionsNormalized = computed(() => recentSessions.value.map(s => ({
+  ...s,
+  id: s._id,
+  request: { ip: s.src_ip },
+  ipDetails: s.ipDetailsId,
+  dangerLevel: 2, // High severity for hostile sessions
+  dangerScore: 0,
+  rps: 0,
+  totaleLogs: s.eventCount || 1,
+  firstSeen: s.starttime
+})));
 
 import { useProfileStore } from '../../stores/profiles';
 

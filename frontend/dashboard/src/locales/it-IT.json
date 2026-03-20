@@ -44,6 +44,7 @@
         "recentAttacks": "Ultimi 10 attacchi",
         "recentLogs": "Ultimi 10 log",
         "attackMap": "Mappa Attacchi",
+        "sessionsMap": "Mappa Sessioni Telnet",
         "loadingAttacks": "Caricamento attacchi...",
         "errorLoadingAttacks": "Errore caricamento attacchi",
         "loadingLogs": "Caricamento log...",

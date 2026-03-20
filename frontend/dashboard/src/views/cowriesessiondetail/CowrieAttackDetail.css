@@ -99,6 +99,36 @@
     font-family: monospace;
 }
 
+.ip-link {
+    color: #ff8c8c;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: underline dotted;
+    transition: color 0.3s ease;
+}
+
+.ip-link:hover {
+    color: #ff4c4c;
+    text-shadow: 0 0 8px rgba(255, 76, 76, 0.5);
+}
+
+.btn-copy-mini {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 2px;
+    opacity: 0.6;
+    transition: opacity 0.2s, transform 0.2s;
+    margin-left: 8px;
+    vertical-align: middle;
+}
+
+.btn-copy-mini:hover {
+    opacity: 1;
+    transform: scale(1.2);
+}
+
 /* Timeline */
 .timeline-container {
     margin-top: 40px;

@@ -13,7 +13,10 @@
             <div class="info-grid">
                 <div class="info-item">
                     <span class="label">{{ $t('cowrie.attackDetail.hostileIp') }}</span>
-                    <span class="value ip">{{ sessionDetails.src_ip }}</span>
+                    <span class="value ip">
+                        <span class="ip-link" @click="goToIpDetails(sessionDetails.src_ip)" title="Info IP">{{ sessionDetails.src_ip }}</span>
+                        <button @click.stop="copyToClipboard(sessionDetails.src_ip)" class="btn-copy-mini" title="Copia">📋</button>
+                    </span>
                 </div>
                 <div class="info-item">
                     <span class="label">{{ $t('cowrie.attackDetail.timeWindow') }}</span>
@@ -75,14 +78,17 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import dayjs from 'dayjs';
 import { useI18n } from '../../composable/useI18n';
+import { useClipboard } from '../../composable/useClipboard';
 import { fetchCowrieSessionDetails, fetchCowrieSessionEvents } from '../../api';
 import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
 
 const { t } = useI18n();
+const { copyToClipboard } = useClipboard();
 const route = useRoute();
+const router = useRouter();
 const sessionId = route.params.id;
 
 const sessionDetails = ref(null);
@@ -120,6 +126,13 @@ const fetchSessionData = async () => {
 const formatDate = (dateStr) => {
     if (!dateStr) return '-';
     return dayjs(dateStr).format('DD/MM/YYYY HH:mm:ss');
+};
+
+const goToIpDetails = (ip) => {
+    router.push({
+        name: 'IpDetails',
+        params: { ip }
+    });
 };
 
 const formatEventName = (eventId) => {

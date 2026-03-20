@@ -283,7 +283,7 @@
     },
     "cowrie": {
         "sessions": {
-            "title": "🛡️ Sessions Honeypot Telnet",
+            "title": "Sessions Honeypot Telnet",
             "backToDashboard": "← Tableau de bord",
             "loading": "Interception des données Honeypot...",
             "emptyState": "Aucune activité honeypot détectée pour le moment.",

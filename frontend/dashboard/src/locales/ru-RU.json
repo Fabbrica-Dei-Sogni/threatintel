@@ -283,7 +283,7 @@
     },
     "cowrie": {
         "sessions": {
-            "title": "🛡️ Сессии Telnet Honeypot",
+            "title": "Сессии Telnet Honeypot",
             "backToDashboard": "← Панель",
             "loading": "Перехват данных Honeypot...",
             "emptyState": "Активность honeypot пока не обнаружена.",

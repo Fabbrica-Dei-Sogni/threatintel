@@ -23,14 +23,28 @@
   border-bottom: 1px solid #3f261f;
 }
 
-.threatlogs>h1 {
-  margin: 0 0 12px 0;
-  padding-left: 4px;
-  padding-right: 4px;
-  color: #f0e6d2;
-  text-shadow: 0 0 6px #7a4c43;
+.header-top h1 {
+  font-size: 24px;
+  color: #ff4c4c;
   font-weight: 700;
-  font-size: 28px;
+  text-shadow: 0 0 6px rgba(255, 76, 76, 0.6);
+  margin: 0;
+  display: flex;
+  align-items: center;
+}
+
+.animated-icon {
+    display: inline-block;
+    margin-right: 12px;
+}
+
+.pulse-log {
+    animation: pulse-log 2s infinite ease-in-out;
+}
+
+@keyframes pulse-log {
+    0%, 100% { transform: translateY(0); opacity: 0.8; }
+    50% { transform: translateY(-4px); opacity: 1; filter: drop-shadow(0 0 8px #ff4c4c); }
 }
 
 /* === PULSANTI === */

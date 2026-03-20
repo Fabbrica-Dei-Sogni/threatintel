@@ -284,7 +284,7 @@
     },
     "cowrie": {
         "sessions": {
-            "title": "🛡️ Telnet Honeypot Sessions",
+            "title": "Telnet Honeypot Sessions",
             "backToDashboard": "← Dashboard",
             "loading": "Intercepting Honeypot Data...",
             "emptyState": "No honeypot activity detected yet.",

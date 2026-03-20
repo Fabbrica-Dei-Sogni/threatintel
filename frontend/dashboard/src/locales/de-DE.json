@@ -283,7 +283,7 @@
     },
     "cowrie": {
         "sessions": {
-            "title": "🛡️ Telnet-Honeypot-Sitzungen",
+            "title": "Telnet-Honeypot-Sitzungen",
             "backToDashboard": "← Dashboard",
             "loading": "Abfangen von Honeypot-Daten...",
             "emptyState": "Noch keine Honeypot-Aktivität erkannt.",

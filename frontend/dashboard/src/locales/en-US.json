@@ -54,7 +54,7 @@
         "telnet": "Honeypot Telnet"
     },
     "attacks": {
-        "title": "Honeypot Dashboard – Attacks",
+        "title": "Attacks",
         "dashboard": "Dashboard",
         "logRequests": "Log requests",
         "minLogsLabel": "Minimum number of logs per attack:",
@@ -123,7 +123,7 @@
         "durationLabel": "Attack Duration"
     },
     "threatLogs": {
-        "title": "Honeypot Dashboard – Threat logs",
+        "title": "Threat logs",
         "dashboard": "Dashboard",
         "attacks": "Attacks",
         "filterByIp": "Filter by IP...",
@@ -287,7 +287,7 @@
     },
     "cowrie": {
         "sessions": {
-            "title": "Telnet Honeypot Sessions",
+            "title": "Telnet Sessions",
             "backToDashboard": "← Dashboard",
             "loading": "Intercepting Honeypot Data...",
             "emptyState": "No honeypot activity detected yet.",

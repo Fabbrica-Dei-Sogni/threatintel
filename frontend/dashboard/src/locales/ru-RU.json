@@ -51,7 +51,7 @@
         "telnet": "Honeypot Telnet"
     },
     "attacks": {
-        "title": "Панель управления Honeypot – Атаки",
+        "title": "Атаки",
         "dashboard": "Панель управления",
         "logRequests": "Журналы запросов",
         "minLogsLabel": "Минимальное количество журналов на атаку:",
@@ -120,7 +120,7 @@
         "durationLabel": "Длительность атаки"
     },
     "threatLogs": {
-        "title": "Панель управления Honeypot – Журналы угроз",
+        "title": "Журналы угроз",
         "dashboard": "Панель управления",
         "attacks": "Атаки",
         "filterByIp": "Фильтр по IP...",
@@ -283,7 +283,7 @@
     },
     "cowrie": {
         "sessions": {
-            "title": "Сессии Telnet Honeypot",
+            "title": "Сессии Telnet",
             "backToDashboard": "← Панель",
             "loading": "Перехват данных Honeypot...",
             "emptyState": "Активность honeypot пока не обнаружена.",

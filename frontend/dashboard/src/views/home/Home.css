@@ -82,6 +82,7 @@ h1 {
 .scroll-list {
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden; /* Evita la scrollbar orizzontale fastidiosa */
   padding-right: 10px;
   margin-top: 10px;
 }
@@ -111,6 +112,7 @@ ul {
   list-style: none;
   padding: 0;
   margin-top: 10px;
+  overflow-x: hidden; /* Protezione globale per scrollbar orizzontali */
 }
 
 li {

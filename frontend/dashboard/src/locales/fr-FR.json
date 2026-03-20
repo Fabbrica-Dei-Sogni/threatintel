@@ -51,7 +51,7 @@
         "telnet": "Honeypot Telnet"
     },
     "attacks": {
-        "title": "Tableau de bord Honeypot – Attaques",
+        "title": "Attaques",
         "dashboard": "Tableau de bord",
         "logRequests": "Journaux de requêtes",
         "minLogsLabel": "Nombre minimum de journaux par attaque:",
@@ -120,7 +120,7 @@
         "durationLabel": "Durée de l’attaque"
     },
     "threatLogs": {
-        "title": "Tableau de bord Honeypot – Journaux de menaces",
+        "title": "Journaux de menaces",
         "dashboard": "Tableau de bord",
         "attacks": "Attaques",
         "filterByIp": "Filtrer par IP...",
@@ -283,7 +283,7 @@
     },
     "cowrie": {
         "sessions": {
-            "title": "Sessions Honeypot Telnet",
+            "title": "Sessions Telnet",
             "backToDashboard": "← Tableau de bord",
             "loading": "Interception des données Honeypot...",
             "emptyState": "Aucune activité honeypot détectée pour le moment.",

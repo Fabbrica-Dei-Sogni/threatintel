@@ -36,8 +36,9 @@
                     <div class="time-marker">{{ formatTimeOnly(event.timestamp) }}</div>
                     <div class="node-icon" :class="getEventTypeClass(event.eventid)">
                         <i v-if="event.eventid.includes('login')">🔑</i>
-                        <i v-else-if="event.eventid.includes('command')">>_</i>
+                        <i v-else-if="event.eventid.includes('command')">💻</i>
                         <i v-else-if="event.eventid.includes('download')">📦</i>
+                        <i v-else-if="event.eventid.includes('log.closed')">📼</i>
                         <i v-else>📡</i>
                     </div>
                     <div class="node-content glass-card">
@@ -51,9 +52,17 @@
                             <span class="auth-label">USER:</span> {{ event.username }} <br>
                             <span class="auth-label">PASS:</span> {{ event.password }}
                         </div>
-                        <div v-if="event.shasum" class="dl-payload">
+                        <div v-if="event.shasum && !event.ttylog" class="dl-payload">
                             <div class="dl-url">URL: {{ event.url }}</div>
                             <div class="dl-sha">SHA: {{ event.shasum }}</div>
+                        </div>
+                        <div v-if="event.ttylog" class="ttylog-payload">
+                            <div class="tty-header">🎬 Session Recording Captured</div>
+                            <div class="tty-meta">
+                                <span>Size: {{ (event.size / 1024).toFixed(2) }} KB</span> | 
+                                <span>Duration: {{ event.duration }}s</span>
+                            </div>
+                            <div class="tty-hex-preview">{{ event.ttylog.substring(0, 100) }}...</div>
                         </div>
                     </div>
                 </li>

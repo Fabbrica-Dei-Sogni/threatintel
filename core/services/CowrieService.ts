@@ -4,6 +4,9 @@ import { Logger } from 'winston';
 import { IpDetailsService } from './IpDetailsService';
 import CowrieSession from '../models/CowrieSessionSchema';
 import CowrieEvent from '../models/CowrieEventSchema';
+import CowrieAuth from '../models/CowrieAuthSchema';
+import CowrieInput from '../models/CowrieInputSchema';
+import CowrieTtyLog from '../models/CowrieTtyLogSchema';
 
 @singleton()
 export class CowrieService {
@@ -97,17 +100,36 @@ export class CowrieService {
 
     /**
      * API: Recupera la timeline di TUTTI gli eventi per una specifica sessione
+     * Combina i dati dalle collezioni: event, auth, input, ttylog
      */
     async getSessionEvents(sessionId: string) {
         const id = (sessionId || '').trim();
-        this.logger.info(`[CowrieService] Searching events for session: "${id}"`);
+        this.logger.info(`[CowrieService] Aggregating multi-collection forensic events for session: "${id}"`);
         
-        // Usa l'index creato sul campo 'session'
-        const events = await CowrieEvent.find({ session: id })
-            .sort({ time: 1 }) // Ordine cronologico CRESCENTE per disegnare la timeline
-            .exec();
+        // Esegue query parallele su tutte le collezioni forensi
+        const [genericEvents, authEvents, inputEvents, ttyLogs] = await Promise.all([
+            CowrieEvent.find({ session: id }).lean().exec(),
+            CowrieAuth.find({ session: id }).lean().exec(),
+            CowrieInput.find({ session: id }).lean().exec(),
+            CowrieTtyLog.find({ session: id }).lean().exec()
+        ]);
 
-        this.logger.info(`[CowrieService] Found ${events?.length || 0} events for session "${id}"`);
-        return events || [];
+        // Unifica tutti i record in un unico array
+        const allEvents = [
+            ...(genericEvents || []),
+            ...(authEvents || []),
+            ...(inputEvents || []),
+            ...(ttyLogs || [])
+        ];
+
+        // Ordinamento cronologico strettamente crescente
+        allEvents.sort((a: any, b: any) => {
+            const timeA = new Date(a.timestamp || 0).getTime();
+            const timeB = new Date(b.timestamp || 0).getTime();
+            return timeA - timeB;
+        });
+
+        this.logger.info(`[CowrieService] Found ${allEvents.length} total forensic events for session "${id}"`);
+        return allEvents;
     }
 }

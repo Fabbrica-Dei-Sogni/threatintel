@@ -9,48 +9,47 @@ import routes from './apis/routes';
 import managelimitroutes from './apis/managelimitroutes';
 import configroutes from './apis/configroutes';
 import { getComponent } from './di/container';
-import { ThreatLogService } from "./services/ThreatLogService";
-import { IpDetailsService } from "./services/IpDetailsService";
-import { RateLimitService } from "./services/RateLimitService";
-import { ConfigService } from "./services/ConfigService";
 import { ThreatLogger } from "./threatLogger";
-import { SshLogService } from "./services/SshLogService";
 import { CowrieController } from "./controllers/CowrieController";
+import { ThreatController } from "./controllers/ThreatController";
+import { ConfigController } from "./controllers/ConfigController";
+import { RateLimitController } from "./controllers/RateLimitController";
+import { ManageLimitController } from "./controllers/ManageLimitController";
+import { FakeLoginController } from "./controllers/FakeLoginController";
 
-const threatLogService = getComponent(ThreatLogService);
-const sshLogService = getComponent(SshLogService);
-const ipDetailsService = getComponent(IpDetailsService);
-const rateLimitService = getComponent(RateLimitService);
-const configService = getComponent(ConfigService);
+// Instantiate controllers via DI container
+const threatController = getComponent(ThreatController);
+const configController = getComponent(ConfigController);
+const rateLimitController = getComponent(RateLimitController);
+const manageLimitController = getComponent(ManageLimitController);
+const fakeLoginController = getComponent(FakeLoginController);
 const cowrieController = getComponent(CowrieController);
 
 const threatLogger = getComponent(ThreatLogger);
 
 const router = express.Router();
 
-
 // Configurazione Threat Logger
-
 // **IMPORTANTE: Il middleware di threat logging deve essere PRIMO**
 router.use(threatLogger.middleware());
 
-//api ratelimit per ottenere informazioni dal rate limiter redis
-router.use('/', ratelimitroutes(logger, rateLimitService));
+// API Dashboards e statistiche
+router.use('/', threatroutes(threatController));
 
-// api dashboard per analizzare i dati
-router.use('/', threatroutes(logger, threatLogService, ipDetailsService, sshLogService));
+// API Rate Limit (Redis)
+router.use('/', ratelimitroutes(rateLimitController));
 
-// API configurazione
-router.use('/', configroutes(logger, configService));
+// API Configurazione
+router.use('/', configroutes(configController));
 
-// API Honeypot Telnet (Cowrie) - DEVE STARE PRIMA DELLE ROTTE CATCH-ALL!
+// API Honeypot Telnet (Cowrie)
 import cowrieroutes from './apis/cowrieroutes';
 router.use('/', cowrieroutes(logger, cowrieController));
 
-//api honeypot per esporre finti servizi http
-router.use('/', routes(logger));
+// API Honeypot Trap e Fake Login
+router.use('/', routes(logger, fakeLoginController));
 
-//api honeypot per esporre finti servizi http
-router.use('/', managelimitroutes(logger));
+// API Gestione Limiti (Blacklist manuale)
+router.use('/', managelimitroutes(manageLimitController));
 
 export default router;

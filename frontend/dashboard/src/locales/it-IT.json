@@ -123,6 +123,13 @@
         "severityLabel": "Severità Attacco",
         "durationLabel": "Durata Attacco"
     },
+    "sessionChart": {
+        "title": "Analisi Sessioni Telnet nel Tempo",
+        "frequency": "Frequenza Sessioni",
+        "activity": "Attività (Eventi)",
+        "frequencyLabel": "Numero Sessioni",
+        "activityLabel": "Intensità (Codice Eventi)"
+    },
     "threatLogs": {
         "title": "Log minacce",
         "dashboard": "Cruscotto",
@@ -289,7 +296,7 @@
     "cowrie": {
         "sessions": {
             "title": "Sessioni Telnet",
-            "backToDashboard": "← Dashboard",
+            "backToDashboard": "Cruscotto",
             "loading": "Intercettazione Dati Honeypot...",
             "emptyState": "Nessuna attività honeypot rilevata.",
             "errorLoad": "Caricamento sessioni fallito. Assicurati che il backend sia attivo.",

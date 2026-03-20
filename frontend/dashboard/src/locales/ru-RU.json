@@ -119,6 +119,13 @@
         "severityLabel": "Тяжесть атаки",
         "durationLabel": "Длительность атаки"
     },
+    "sessionChart": {
+        "title": "Анализ сессий Telnet во времени",
+        "frequency": "Частота сессий",
+        "activity": "Активность (События)",
+        "frequencyLabel": "Количество сессий",
+        "activityLabel": "Интенсивность (Количество событий)"
+    },
     "threatLogs": {
         "title": "Журналы угроз",
         "dashboard": "Панель управления",
@@ -284,7 +291,7 @@
     "cowrie": {
         "sessions": {
             "title": "Сессии Telnet",
-            "backToDashboard": "← Панель",
+            "backToDashboard": "Панель управления",
             "loading": "Перехват данных Honeypot...",
             "emptyState": "Активность honeypot пока не обнаружена.",
             "errorLoad": "Не удалось загрузить сессии Telnet. Убедитесь, что бэкэнд запущен.",

@@ -123,6 +123,13 @@
         "severityLabel": "Attack Severity",
         "durationLabel": "Attack Duration"
     },
+    "sessionChart": {
+        "title": "Telnet Sessions Analysis Over Time",
+        "frequency": "Sessions Frequency",
+        "activity": "Activity (Events)",
+        "frequencyLabel": "Number of Sessions",
+        "activityLabel": "Intensity (Event Count)"
+    },
     "threatLogs": {
         "title": "Threat logs",
         "dashboard": "Dashboard",
@@ -289,7 +296,7 @@
     "cowrie": {
         "sessions": {
             "title": "Telnet Sessions",
-            "backToDashboard": "← Dashboard",
+            "backToDashboard": "Dashboard",
             "loading": "Intercepting Honeypot Data...",
             "emptyState": "No honeypot activity detected yet.",
             "errorLoad": "Failed to load Telnet sessions. Ensure the backend is running.",

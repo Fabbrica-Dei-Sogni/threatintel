@@ -119,6 +119,13 @@
         "severityLabel": "Angriffsschwere",
         "durationLabel": "Angriffsdauer"
     },
+    "sessionChart": {
+        "title": "Analyse der Telnet-Sitzungen im Zeitverlauf",
+        "frequency": "Sitzungshäufigkeit",
+        "activity": "Aktivität (Ereignisse)",
+        "frequencyLabel": "Anzahl der Sitzungen",
+        "activityLabel": "Intensität (Anzahl der Ereignisse)"
+    },
     "threatLogs": {
         "title": "Bedrohungsprotokolle",
         "dashboard": "Dashboard",
@@ -284,7 +291,7 @@
     "cowrie": {
         "sessions": {
             "title": "Telnet-Sitzungen",
-            "backToDashboard": "← Dashboard",
+            "backToDashboard": "Dashboard",
             "loading": "Abfangen von Honeypot-Daten...",
             "emptyState": "Noch keine Honeypot-Aktivität erkannt.",
             "errorLoad": "Laden der Telnet-Sitzungen fehlgeschlagen. Stellen Sie sicher, dass das Backend läuft.",

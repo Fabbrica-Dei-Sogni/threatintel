@@ -119,6 +119,13 @@
         "severityLabel": "Gravité de l’attaque",
         "durationLabel": "Durée de l’attaque"
     },
+    "sessionChart": {
+        "title": "Analyse des sessions Telnet dans le temps",
+        "frequency": "Fréquence des sessions",
+        "activity": "Activité (Événements)",
+        "frequencyLabel": "Nombre de sessions",
+        "activityLabel": "Intensité (Nombre d'événements)"
+    },
     "threatLogs": {
         "title": "Journaux de menaces",
         "dashboard": "Tableau de bord",
@@ -284,7 +291,7 @@
     "cowrie": {
         "sessions": {
             "title": "Sessions Telnet",
-            "backToDashboard": "← Tableau de bord",
+            "backToDashboard": "Tableau de bord",
             "loading": "Interception des données Honeypot...",
             "emptyState": "Aucune activité honeypot détectée pour le moment.",
             "errorLoad": "Échec du chargement des sessions Telnet. Vérifiez que le backend est en cours d'exécution.",

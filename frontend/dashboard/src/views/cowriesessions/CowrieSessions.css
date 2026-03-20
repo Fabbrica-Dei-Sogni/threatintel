@@ -37,9 +37,26 @@
 }
 
 .actions {
-    margin-bottom: 20px;
+    margin-bottom: 25px;
     display: flex;
-    gap: 16px;
+    gap: 15px;
+}
+
+.chart-actions {
+    justify-content: flex-start;
+}
+
+.chart-section {
+    width: 100%;
+    margin-bottom: 25px;
+}
+
+.loading-mini {
+    text-align: center;
+    color: #94a3b8;
+    padding: 20px;
+    font-size: 0.9em;
+    font-style: italic;
 }
 
 .btn-action {
@@ -68,6 +85,17 @@
     align-items: center;
     gap: 18px;
     margin: 28px 0;
+}
+
+.map-section,
+.chart-section {
+    background-color: rgba(60, 30, 28, 0.4);
+    border: 1px solid rgba(255, 76, 76, 0.2);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(8px);
 }
 
 .pagination button {

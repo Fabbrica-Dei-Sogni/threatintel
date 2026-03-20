@@ -48,6 +48,9 @@
         "errorLoadingAttacks": "Errore caricamento attacchi",
         "loadingLogs": "Caricamento log...",
         "errorLoadingLogs": "Errore caricamento log",
+        "recentSessions": "Ultime 10 sessioni Telnet",
+        "loadingSessions": "Caricamento sessioni...",
+        "errorLoadingSessions": "Errore caricamento sessioni",
         "telnet": "Honeypot Telnet"
     },
     "attacks": {

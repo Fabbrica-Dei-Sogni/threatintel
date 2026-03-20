@@ -48,6 +48,9 @@
         "errorLoadingAttacks": "Error loading attacks",
         "loadingLogs": "Loading logs...",
         "errorLoadingLogs": "Error loading logs",
+        "recentSessions": "Last 10 Telnet sessions",
+        "loadingSessions": "Loading sessions...",
+        "errorLoadingSessions": "Error loading sessions",
         "telnet": "Honeypot Telnet"
     },
     "attacks": {

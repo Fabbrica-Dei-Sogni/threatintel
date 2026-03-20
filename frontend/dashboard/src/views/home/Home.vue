@@ -50,6 +50,25 @@
         <div v-if="loadingLogs">{{ $t('home.loadingLogs') }}</div>
         <div v-if="errorLogs">{{ $t('home.errorLoadingLogs') }}</div>
       </div>
+      <div class="widget">
+        <div class="widget-header">
+          <h2>{{ $t('home.recentSessions') }}</h2>
+        </div>
+        <ul>
+          <li v-for="session in recentSessions" :key="session.session">
+            <CountryFlag v-if="session.ipDetailsId?.ipinfo?.country" :countryCode="session.ipDetailsId.ipinfo.country" />
+            <span @click="goToIpDetails(session.src_ip)" style="cursor: pointer;"> - {{ session.src_ip }}</span> -
+            {{ formatDate(session.starttime) }}
+            <router-link :to="{ name: 'CowrieAttackDetail', params: { id: session.session } }">{{
+                $t('common.detail') }}</router-link>
+          </li>
+          <li v-if="recentSessions.length === 0 && !loadingSessions">
+            {{ $t('common.noDataFound') }}
+          </li>
+        </ul>
+        <div v-if="loadingSessions">{{ $t('home.loadingSessions') }}</div>
+        <div v-if="errorSessions">{{ $t('home.errorLoadingSessions') }}</div>
+      </div>
     </section>
     <section class="widget map">
       <h2>{{ $t('home.attackMap') }}</h2>
@@ -63,6 +82,7 @@
 // Import composable customizzati
 import { useLogsFilter } from '../../composable/useLogsFilter';
 import { useAttacksFilter } from '../../composable/useAttacksFilter';
+import { useCowrieSessions } from '../../composable/useCowrieSessions';
 import { useRouter } from 'vue-router'
 import { computed, onMounted, watch, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -109,7 +129,6 @@ const {
 
 const recentAttacks = computed(() => attacks.value.slice(0, 10))
 
-// Log - chiamata base: nessun filtro, prima pagina, ordina per ultimi
 const {
   logs,
   loading: loadingLogs,
@@ -119,6 +138,16 @@ const {
 
 const recentLogs = computed(() => logs.value.slice(0, 10))
 
+// Sessioni Telnet - ultime 10
+const {
+  sessions,
+  loading: loadingSessions,
+  error: errorSessions,
+  fetchData: fetchSessions
+} = useCowrieSessions(1, 10);
+
+const recentSessions = computed(() => sessions.value.slice(0, 10))
+
 import { useProfileStore } from '../../stores/profiles';
 
 const profileStore = useProfileStore();
@@ -127,6 +156,7 @@ const profileStore = useProfileStore();
 const loadAll = () => {
   fetchAttacks();
   fetchLogs();
+  fetchSessions();
 };
 
 onMounted(loadAll);

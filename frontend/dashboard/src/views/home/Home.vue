@@ -55,7 +55,7 @@
               <router-link :to="{ name: 'CowrieAttackDetail', params: { id: session.session } }">{{
                   $t('common.detail') }}</router-link>
             </li>
-            <li v-if="recentSessions.length === 0 && !loadingSessions">
+            <li v-if="recentSessions.length === 0 && !loadingSessions" class="no-data">
               {{ $t('common.noDataFound') }}
             </li>
           </ul>

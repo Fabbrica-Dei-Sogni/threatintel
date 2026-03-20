@@ -33,7 +33,6 @@
         <section class="timeline-container" v-if="!loading && !error">
             <ul class="cyber-timeline">
                 <li v-for="(event, index) in events" :key="event._id" class="timeline-node" :style="{ animationDelay: `${index * 0.1}s` }">
-                    <div class="time-marker">{{ formatTimeOnly(event.timestamp) }}</div>
                     <div class="node-icon" :class="getEventTypeClass(event.eventid)">
                         <i v-if="event.eventid.includes('login')">🔑</i>
                         <i v-else-if="event.eventid.includes('command')">💻</i>
@@ -121,11 +120,6 @@ const fetchSessionData = async () => {
 const formatDate = (dateStr) => {
     if (!dateStr) return '-';
     return dayjs(dateStr).format('DD/MM/YYYY HH:mm:ss');
-};
-
-const formatTimeOnly = (dateStr) => {
-    if (!dateStr) return '-';
-    return dayjs(dateStr).format('HH:mm:ss');
 };
 
 const formatEventName = (eventId) => {

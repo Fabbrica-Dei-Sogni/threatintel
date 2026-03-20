@@ -16,7 +16,7 @@
 
         <!-- Filtro protocollo -->
         <section class="protocol-filter-section">
-            <ProtocolSelector v-model="filterProtocol" :options="['http', 'ssh']" />
+            <ProtocolSelector v-model="filterProtocol" :options="['http', 'ssh', 'https']" />
         </section>
 
         <!-- Filtro avanzato: Minimo log per attacco -->

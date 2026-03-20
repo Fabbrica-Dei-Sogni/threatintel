@@ -37,7 +37,7 @@
         "errorRegister": "Error during registration"
     },
     "home": {
-        "title": "Honeypot Dashboard",
+        "title": "Dashboard",
         "dashboard": "Dashboard",
         "attacks": "Attacks",
         "logRequests": "Log requests",
@@ -51,7 +51,7 @@
         "recentSessions": "Last 10 Telnet sessions",
         "loadingSessions": "Loading sessions...",
         "errorLoadingSessions": "Error loading sessions",
-        "telnet": "Honeypot Telnet"
+        "telnet": "Telnet"
     },
     "attacks": {
         "title": "Attacks",
@@ -305,7 +305,7 @@
             "title": "Operation Timeline",
             "subtitle": "Mission Target Session",
             "rawEvents": "Raw Events",
-            "backToSessions": "← Return to Databank",
+            "backToSessions": "← Back",
             "hostileIp": "Hostile IP",
             "timeWindow": "Time Window",
             "origin": "Origin",

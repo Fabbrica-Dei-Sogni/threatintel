@@ -15,7 +15,7 @@
     </div>
 
     <section class="filters">
-      <ProtocolSelector v-model="filterProtocol" :options="['http', 'ssh']" />
+      <ProtocolSelector v-model="filterProtocol" :options="['http', 'ssh', 'https']" />
       <div class="input-wrapper" style="position: relative; flex: 1; margin-right: 10px;">
         <input v-model="filterIp" :placeholder="t('threatLogs.filterByIp')" @input="onFilterChanged" class="input"
           type="text" />

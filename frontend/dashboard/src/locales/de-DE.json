@@ -37,7 +37,7 @@
         "errorRegister": "Fehler bei der Registrierung"
     },
     "home": {
-        "title": "Honeypot Dashboard",
+        "title": "Dashboard",
         "dashboard": "Dashboard",
         "attacks": "Angriffe",
         "logRequests": "Protokoll-Anfragen",
@@ -48,7 +48,7 @@
         "errorLoadingAttacks": "Fehler beim Laden der Angriffe",
         "loadingLogs": "Protokolle werden geladen...",
         "errorLoadingLogs": "Fehler beim Laden der Protokolle",
-        "telnet": "Honeypot Telnet"
+        "telnet": "Telnet"
     },
     "attacks": {
         "title": "Angriffe",
@@ -301,7 +301,7 @@
             "title": "Operations-Timeline",
             "subtitle": "Missions-Ziel-Sitzung",
             "rawEvents": "Rohereignisse",
-            "backToSessions": "← Zurück zur Datenbank",
+            "backToSessions": "← Zurück",
             "hostileIp": "Feindliche IP",
             "timeWindow": "Zeitfenster",
             "origin": "Herkunft",

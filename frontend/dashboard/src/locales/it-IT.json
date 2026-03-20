@@ -37,7 +37,7 @@
         "errorRegister": "Errore durante la registrazione"
     },
     "home": {
-        "title": "Honeypot Dashboard",
+        "title": "Dashboard",
         "dashboard": "Cruscotto",
         "attacks": "Attacchi",
         "logRequests": "Log requests",
@@ -51,7 +51,7 @@
         "recentSessions": "Ultime 10 sessioni Telnet",
         "loadingSessions": "Caricamento sessioni...",
         "errorLoadingSessions": "Errore caricamento sessioni",
-        "telnet": "Honeypot Telnet"
+        "telnet": "Telnet"
     },
     "attacks": {
         "title": "Attacchi",
@@ -305,7 +305,7 @@
             "title": "Timeline Operativa",
             "subtitle": "Sessione Obiettivo",
             "rawEvents": "Eventi Raw",
-            "backToSessions": "← Torna al Database",
+            "backToSessions": "← Torna indietro",
             "hostileIp": "IP Ostile",
             "timeWindow": "Finestra Temporale",
             "origin": "Origine",

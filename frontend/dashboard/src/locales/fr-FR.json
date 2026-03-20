@@ -37,7 +37,7 @@
         "errorRegister": "Erreur lors de l'inscription"
     },
     "home": {
-        "title": "Tableau de bord Honeypot",
+        "title": "Tableau de bord",
         "dashboard": "Tableau de bord",
         "attacks": "Attaques",
         "logRequests": "Journaux de requêtes",
@@ -48,7 +48,7 @@
         "errorLoadingAttacks": "Erreur de chargement des attaques",
         "loadingLogs": "Chargement des journaux...",
         "errorLoadingLogs": "Erreur de chargement des journaux",
-        "telnet": "Honeypot Telnet"
+        "telnet": "Telnet"
     },
     "attacks": {
         "title": "Attaques",
@@ -301,7 +301,7 @@
             "title": "Timeline des Opérations",
             "subtitle": "Session Cible",
             "rawEvents": "Événements Bruts",
-            "backToSessions": "← Retour à la Banque de Données",
+            "backToSessions": "← Retour",
             "hostileIp": "IP Hostile",
             "timeWindow": "Fenêtre Temporelle",
             "origin": "Origine",

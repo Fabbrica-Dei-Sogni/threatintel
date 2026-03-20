@@ -38,7 +38,7 @@
         "errorRegister": "Błąd podczas rejestracji"
     },
     "home": {
-        "title": "Panel Honeypot",
+        "title": "Panel",
         "dashboard": "Panel główny",
         "attacks": "Ataki",
         "logRequests": "Dzienniki żądań",
@@ -49,7 +49,7 @@
         "errorLoadingAttacks": "Błąd ładowania ataków",
         "loadingLogs": "Ładowanie dzienników...",
         "errorLoadingLogs": "Błąd ładowania dzienników",
-        "telnet": "Honeypot Telnet"
+        "telnet": "Telnet"
     },
     "attacks": {
         "title": "Ataki",
@@ -302,7 +302,7 @@
             "title": "Oś czasu operacji",
             "subtitle": "Sesja docelowa misji",
             "rawEvents": "Surowe zdarzenia",
-            "backToSessions": "← Powrót do bazy danych",
+            "backToSessions": "← Powrót",
             "hostileIp": "Wrogie IP",
             "timeWindow": "Okno czasowe",
             "origin": "Pochodzenie",

@@ -19,7 +19,7 @@ const props = defineProps({
     },
     options: {
         type: Array as () => string[],
-        default: () => ["http", "ssh"],
+        default: () => ["http", "ssh", "https"],
     },
     theme: {
         type: String,

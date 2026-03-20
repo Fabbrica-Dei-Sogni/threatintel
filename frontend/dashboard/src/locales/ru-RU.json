@@ -37,7 +37,7 @@
         "errorRegister": "Ошибка регистрации"
     },
     "home": {
-        "title": "Панель управления Honeypot",
+        "title": "Панель управления",
         "dashboard": "Панель управления",
         "attacks": "Атаки",
         "logRequests": "Журналы запросов",
@@ -48,7 +48,7 @@
         "errorLoadingAttacks": "Ошибка загрузки атак",
         "loadingLogs": "Загрузка журналов...",
         "errorLoadingLogs": "Ошибка загрузки журналов",
-        "telnet": "Honeypot Telnet"
+        "telnet": "Telnet"
     },
     "attacks": {
         "title": "Атаки",
@@ -301,7 +301,7 @@
             "title": "Хронология операции",
             "subtitle": "Целевая сессия миссии",
             "rawEvents": "Сырые события",
-            "backToSessions": "← Вернуться в банк данных",
+            "backToSessions": "← Назад",
             "hostileIp": "Враждебный IP",
             "timeWindow": "Временное окно",
             "origin": "Происхождение",

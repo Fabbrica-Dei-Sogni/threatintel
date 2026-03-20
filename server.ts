@@ -17,6 +17,7 @@ import api from './core/endpoint';
 import { getComponent } from './core/di/container';
 import { SshLogService } from './core/services/SshLogService';
 import { CowrieService } from './core/services/CowrieService';
+import { NginxLogService } from './core/services/NginxLogService';
 
 const app = express();
 
@@ -67,5 +68,9 @@ sshLogService.startMonitoring().catch(err => logger.error('Errore avvio SSH moni
 // Avvio job in background di Cowrie per arricchimento Geo-IP degli accessi Telnet
 const cowrieService = getComponent(CowrieService);
 cowrieService.startEnrichmentJob();
+
+// Avvio monitoraggio log Nginx (HTTPS - solo URI sospetti)
+const nginxLogService = getComponent(NginxLogService);
+nginxLogService.startMonitoring().catch(err => logger.error('[NginxLogService] Errore avvio:', err));
 
 scheduleAnalysis();

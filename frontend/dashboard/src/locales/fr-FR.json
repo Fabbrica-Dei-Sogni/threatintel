@@ -22,7 +22,9 @@
         "goToPage": "Aller à la page",
         "detail": "Détail",
         "noDataFound": "Aucune donnée trouvée",
-        "analizeProfile": "Analyser le profil"
+        "analizeProfile": "Analyser le profil",
+        "copyToClipboard": "Copier dans le presse-papiers",
+        "copyToFilter": "Copier dans le filtre IP et exécuter"
     },
     "auth": {
         "login": "Connexion",
@@ -295,6 +297,8 @@
             "loading": "Interception des données Honeypot...",
             "emptyState": "Aucune activité honeypot détectée pour le moment.",
             "errorLoad": "Échec du chargement des sessions Telnet. Vérifiez que le backend est en cours d'exécution.",
+            "filterByIp": "Filtrer par IP...",
+            "clearIpFilter": "Effacer le filtre IP",
             "table": {
                 "ip": "IP Source",
                 "country": "Pays",

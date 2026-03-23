@@ -22,7 +22,9 @@
         "goToPage": "Gehe zu Seite",
         "detail": "Detail",
         "noDataFound": "Keine Daten gefunden",
-        "analizeProfile": "Analysiere Profil"
+        "analizeProfile": "Profil analysieren",
+        "copyToClipboard": "In die Zwischenablage kopieren",
+        "copyToFilter": "In IP-Filter kopieren und ausführen"
     },
     "auth": {
         "login": "Anmelden",
@@ -295,6 +297,8 @@
             "loading": "Abfangen von Honeypot-Daten...",
             "emptyState": "Noch keine Honeypot-Aktivität erkannt.",
             "errorLoad": "Laden der Telnet-Sitzungen fehlgeschlagen. Stellen Sie sicher, dass das Backend läuft.",
+            "filterByIp": "Nach IP filtern...",
+            "clearIpFilter": "IP-Filter löschen",
             "table": {
                 "ip": "Quell-IP",
                 "country": "Land",

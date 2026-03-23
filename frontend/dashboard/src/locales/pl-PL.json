@@ -23,7 +23,9 @@
         "goToPage": "Przejdź do strony",
         "detail": "Szczegóły",
         "noDataFound": "Nie znaleziono danych",
-        "analizeProfile": "Analiza profilu"
+        "analizeProfile": "Analiza profilu",
+        "copyToClipboard": "Kopiuj do schowka",
+        "copyToFilter": "Kopiuj do filtra IP i wykonaj"
     },
     "auth": {
         "login": "Zaloguj się",
@@ -296,6 +298,8 @@
             "loading": "Przechwytywanie danych Honeypot...",
             "emptyState": "Nie wykryto jeszcze żadnej aktywności honeypot.",
             "errorLoad": "Nie udało się załadować sesji Telnet. Upewnij się, że backend działa.",
+            "filterByIp": "Filtruj według IP...",
+            "clearIpFilter": "Wyczyść filtr IP",
             "table": {
                 "ip": "IP źródłowe",
                 "country": "Kraj",

@@ -17,7 +17,10 @@ export class CowrieController {
             const page = parseInt(req.query.page as string) || 1;
             const limit = parseInt(req.query.limit as string) || 20;
             const sortStr = req.query.sort as string;
+            const filtersStr = req.query.filters as string;
+
             let sort: Record<string, any> = { timestamp: -1 };
+            let filters: any = {};
 
             if (sortStr) {
                 try {
@@ -27,7 +30,15 @@ export class CowrieController {
                 }
             }
 
-            const result = await this.cowrieService.getSessions(page, limit, sort);
+            if (filtersStr) {
+                try {
+                    filters = JSON.parse(filtersStr);
+                } catch (e) {
+                    this.logger.warn(`[CowrieController] Failed to parse filters query: ${filtersStr}`);
+                }
+            }
+
+            const result = await this.cowrieService.getSessions(page, limit, sort, filters);
             res.status(200).json(result);
         } catch (error: any) {
             this.logger.error(`[CowrieController] Error in getSessions: ${error.message}`);

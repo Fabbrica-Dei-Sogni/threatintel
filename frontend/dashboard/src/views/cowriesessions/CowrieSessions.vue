@@ -14,6 +14,17 @@
             </button>
         </div>
 
+        <section class="filters">
+            <div class="input-wrapper">
+                <input v-model="filterIp" :placeholder="$t('cowrie.sessions.filterByIp')" @input="onFilterChanged" 
+                    class="input" type="text" />
+                <button v-if="filterIp" @click="clearIpFilter" class="clear-button"
+                    :title="$t('cowrie.sessions.clearIpFilter')" type="button" aria-label="Clear IP filter">
+                    ✕
+                </button>
+            </div>
+        </section>
+
         <!-- Sezione Mappa -->
         <transition name="fade">
             <div v-if="showMap" class="map-section">
@@ -86,7 +97,9 @@
                                     {{ session.src_ip }}
                                 </span>
                                 <button @click.stop="copyToClipboard(session.src_ip)" class="btn-copy-mini"
-                                    title="Copia">📋</button>
+                                    :title="$t('common.copyToClipboard')">📋</button>
+                                <button @click.stop="setIpFilter(session.src_ip)" class="btn-copy-mini"
+                                    :title="$t('common.copyToFilter')">⬇️</button>
                             </span>
                         </td>
                         <td>
@@ -135,13 +148,16 @@ import AttackMap from '../../components/AttackMap.vue';
 const props = defineProps({
     initialPage: { type: Number, default: 1 },
     initialLimit: { type: Number, default: 20 },
-    initialSortFields: { type: Object, default: () => ({ timestamp: -1 }) }
+    initialSortFields: { type: Object, default: () => ({ timestamp: -1 }) },
+    initialIp: { type: String, default: '' }
 });
 
 const { t } = useI18n();
 const { copyToClipboard } = useClipboard();
 const router = useRouter();
 
+// Variabile per salvare pagina precedente al filtro IP
+const previousPageBeforeIpFilter = ref(null);
 // Stato per le visualizzazioni
 const showChart = ref(true);
 const showMap = ref(false);
@@ -202,25 +218,51 @@ const {
     page,
     limit,
     sortFields,
+    filterIp,
     totalPages,
     loading,
     error,
     fetchData,
+    onFilterChanged,
     toggleSort,
     getSortDirection
-} = useCowrieSessions(props.initialPage, props.initialLimit, props.initialSortFields);
+} = useCowrieSessions(
+    props.initialPage, 
+    props.initialLimit, 
+    props.initialSortFields,
+    props.initialIp
+);
 
 // Sincronizza l'URL quando cambia lo stato
-watch([page, limit, sortFields], ([newPage, newLimit, newSort]) => {
+watch([page, limit, sortFields, filterIp], ([newPage, newLimit, newSort, newIp]) => {
     router.replace({
         name: 'CowrieSessions',
         query: {
             page: newPage > 1 ? newPage : undefined,
             limit: newLimit !== 20 ? newLimit : undefined,
-            sortFields: newSort ? JSON.stringify(newSort) : undefined
+            sortFields: newSort ? JSON.stringify(newSort) : undefined,
+            ip: newIp || undefined
         }
     });
 });
+
+function setIpFilter(ip) {
+    if (!filterIp.value) {
+        previousPageBeforeIpFilter.value = page.value;
+    }
+    filterIp.value = ip;
+    page.value = 1;
+    onFilterChanged();
+}
+
+function clearIpFilter() {
+    filterIp.value = '';
+    if (previousPageBeforeIpFilter.value !== null) {
+        page.value = previousPageBeforeIpFilter.value;
+        previousPageBeforeIpFilter.value = null;
+    }
+    onFilterChanged();
+}
 
 const changePage = (p) => {
     if (p >= 1 && p <= totalPages.value) {

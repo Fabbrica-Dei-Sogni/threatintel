@@ -22,7 +22,9 @@
         "showMap": "Показать карту",
         "hideMap": "Скрыть карту",
         "showChart": "Показать график",
-        "hideChart": "Скрыть график"
+        "hideChart": "Скрыть график",
+        "copyToClipboard": "Копировать в буфер обмена",
+        "copyToFilter": "Копировать в фильтр IP и выполнить"
     },
     "auth": {
         "login": "Войти",
@@ -295,6 +297,8 @@
             "loading": "Перехват данных Honeypot...",
             "emptyState": "Активность honeypot пока не обнаружена.",
             "errorLoad": "Не удалось загрузить сессии Telnet. Убедитесь, что бэкэнд запущен.",
+            "filterByIp": "Фильтр по IP...",
+            "clearIpFilter": "Очистить фильтр IP",
             "table": {
                 "ip": "IP-адрес источника",
                 "country": "Страна",

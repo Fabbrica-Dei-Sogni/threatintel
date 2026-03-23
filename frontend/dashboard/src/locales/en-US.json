@@ -22,7 +22,9 @@
         "goToPage": "Go to page",
         "detail": "Detail",
         "noDataFound": "No data found",
-        "analizeProfile": "Analize profile"
+        "analizeProfile": "Analyze profile",
+        "copyToClipboard": "Copy to clipboard",
+        "copyToFilter": "Copy to IP filter and execute"
     },
     "auth": {
         "login": "Login",
@@ -300,6 +302,8 @@
             "loading": "Intercepting Honeypot Data...",
             "emptyState": "No honeypot activity detected yet.",
             "errorLoad": "Failed to load Telnet sessions. Ensure the backend is running.",
+            "filterByIp": "Filter by IP...",
+            "clearIpFilter": "Clear IP filter",
             "table": {
                 "ip": "Source IP",
                 "country": "Country",

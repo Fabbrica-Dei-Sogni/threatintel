@@ -22,7 +22,9 @@
         "goToPage": "Vai a pagina",
         "detail": "Dettaglio",
         "noDataFound": "Nessun dato trovato",
-        "analizeProfile": "Analizza profilo"
+        "analizeProfile": "Analizza profilo",
+        "copyToClipboard": "Copia negli appunti",
+        "copyToFilter": "Copia nel filtro IP ed esegui"
     },
     "auth": {
         "login": "Login",
@@ -300,6 +302,8 @@
             "loading": "Intercettazione Dati Honeypot...",
             "emptyState": "Nessuna attività honeypot rilevata.",
             "errorLoad": "Caricamento sessioni fallito. Assicurati che il backend sia attivo.",
+            "filterByIp": "Filtra per IP...",
+            "clearIpFilter": "Svuota filtro IP",
             "table": {
                 "ip": "IP Sorgente",
                 "country": "Paese",

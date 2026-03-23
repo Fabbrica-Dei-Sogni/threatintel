@@ -7,25 +7,33 @@ import type { CowrieSession, FetchCowrieSessionsResponse } from '../models/Cowri
 export function useCowrieSessions(
     initialPage: number = 1,
     initialLimit: number = 20,
-    initialSortFields: any = { timestamp: -1 }
+    initialSortFields: any = { timestamp: -1 },
+    initialIp: string = ''
 ) {
     const sessions: Ref<CowrieSession[]> = ref([]);
     const page: Ref<number> = ref(initialPage);
     const limit: Ref<number> = ref(initialLimit);
     const sortFields: Ref<any> = ref(initialSortFields);
+    const filterIp: Ref<string> = ref(initialIp);
     const totalPages: Ref<number> = ref(1);
     const total: Ref<number> = ref(0);
     const loading: Ref<boolean> = ref(false);
     const error: Ref<string | null> = ref(null);
 
+    const filterTimer = ref<ReturnType<typeof setTimeout> | null>(null);
+
     async function fetchData(): Promise<void> {
         loading.value = true;
         error.value = null;
         try {
+            const filters: any = {};
+            if (filterIp.value) filters.src_ip = filterIp.value;
+
             const response: FetchCowrieSessionsResponse = await fetchCowrieSessions(
                 page.value, 
                 limit.value, 
-                sortFields.value
+                sortFields.value,
+                filters
             );
             sessions.value = response.data || [];
             total.value = response.total || 0;
@@ -38,29 +46,33 @@ export function useCowrieSessions(
         }
     }
 
-    watch(page, () => {
+    watch([page, limit, sortFields], () => {
         fetchData();
     });
 
-    watch(limit, () => {
-        page.value = 1;
-        fetchData();
+    watch(filterIp, () => {
+        onFilterChanged();
     });
 
-    watch(sortFields, () => {
-        // page.value = 1; // Uncommment if you want to reset page on sort
-        fetchData();
-    });
+    function onFilterChanged(resetPage: boolean = true): void {
+        if (filterTimer.value) clearTimeout(filterTimer.value);
+        filterTimer.value = setTimeout(() => {
+            if (resetPage) page.value = 1;
+            fetchData();
+        }, 400);
+    }
 
     function toggleSort(field: string): void {
         const currentDirection = sortFields.value?.[field];
 
         if (currentDirection === undefined) {
-            sortFields.value = { [field]: 1 }; // Replace other sorts for simplicity, or merge
+            sortFields.value = { ...sortFields.value, [field]: 1 };
         } else if (currentDirection === 1) {
-            sortFields.value = { [field]: -1 };
+            sortFields.value = { ...sortFields.value, [field]: -1 };
         } else {
-            sortFields.value = { timestamp: -1 }; // Reset to default
+            const newSort = { ...sortFields.value };
+            delete newSort[field];
+            sortFields.value = Object.keys(newSort).length ? newSort : null;
         }
         fetchData();
     }
@@ -74,11 +86,13 @@ export function useCowrieSessions(
         page,
         limit,
         sortFields,
+        filterIp,
         totalPages,
         total,
         loading,
         error,
         fetchData,
+        onFilterChanged,
         toggleSort,
         getSortDirection
     };

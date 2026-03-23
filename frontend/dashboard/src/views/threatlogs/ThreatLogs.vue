@@ -136,9 +136,9 @@
                   title="Info IP">{{
                     log.request.ip }}</span>
                 <button @click.stop="copyToClipboard(log.request.ip)" class="btn-copy-ip"
-                  :title="t('attacks.copyToClipboard')">📋</button>
+                  :title="t('common.copyToClipboard')">📋</button>
                 <button @click.stop="setIpFilter(log.request.ip)" class="btn-copy-ip"
-                  :title="t('attacks.copyToFilter')">⬇️</button>
+                  :title="t('common.copyToFilter')">⬇️</button>
               </span>
             </td>
             <td>{{ log.fingerprint.score }}</td>
@@ -147,7 +147,7 @@
               <span style="display:inline-flex;align-items:center;">
                 {{ log.request.url }}
                 <button @click.stop="setUrlFilter(log.request.url)" class="btn-copy-url"
-                  :title="t('attacks.copyToFilter')">⬇️</button>
+                  :title="t('common.copyToFilter')">⬇️</button>
               </span>
 
             </td>

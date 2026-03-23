@@ -68,11 +68,18 @@ export class CowrieService {
     /**
      * API: Recupera le sessioni paginate assieme ai dati IP arricchiti
      */
-    async getSessions(page: number = 1, limit: number = 20, sort: Record<string, any> = { timestamp: -1 }) {
+    async getSessions(
+        page: number = 1,
+        limit: number = 20,
+        sort: Record<string, any> = { timestamp: -1 },
+        filters: any = {}
+    ) {
         const skip = (page - 1) * limit;
-        const total = await CowrieSession.countDocuments();
+        const mongoFilters = this.buildRegExpFilter(filters);
         
-        const sessions = await CowrieSession.find()
+        const total = await this.countSessions(filters);
+        
+        const sessions = await CowrieSession.find(mongoFilters)
             .sort(sort)
             .skip(skip)
             .limit(limit)
@@ -86,6 +93,24 @@ export class CowrieService {
             total,
             totalPages: Math.ceil(total / limit)
         };
+    }
+
+    async countSessions(filters: any = {}) {
+        const mongoFilters = this.buildRegExpFilter(filters);
+        return await CowrieSession.countDocuments(mongoFilters);
+    }
+
+    private buildRegExpFilter(filters: any) {
+        const mongoFilters: any = {};
+        for (const [key, value] of Object.entries(filters)) {
+            if (typeof value === 'string' && value.trim() !== '') {
+                // Operatore regex case-insensitive 'like'-style
+                mongoFilters[key] = { $regex: value, $options: 'i' };
+            } else if (value !== undefined && value !== null) {
+                mongoFilters[key] = value;
+            }
+        }
+        return mongoFilters;
     }
 
     /**

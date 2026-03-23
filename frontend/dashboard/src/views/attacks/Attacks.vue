@@ -267,9 +267,9 @@
                                 <span class="detail-link" @click="goToIpDetails(attack.request.ip)"
                                     style="cursor:pointer;" title="Info IP">{{ attack.request.ip }}</span>
                                 <button @click.stop="copyToClipboard(attack.request.ip)" class="btn-copy-ip"
-                                    title="Copia negli appunti">📋</button>
+                                    :title="t('common.copyToClipboard')">📋</button>
                                 <button @click.stop="setIpFilter(attack.request.ip)" class="btn-copy-ip"
-                                    title="Copia nel filtro IP ed esegui">⬇️</button>
+                                    :title="t('common.copyToFilter')">⬇️</button>
                             </span>
                         </td>
                         <td>

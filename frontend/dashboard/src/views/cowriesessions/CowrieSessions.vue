@@ -45,10 +45,19 @@
         <div v-if="error" class="error">{{ error }}</div>
 
         <!-- Pagination superiore -->
-        <div class="pagination" v-if="totalPages > 1 && !loading && !error">
-            <button :disabled="page === 1" @click="changePage(page - 1)">{{ $t('common.prev') }}</button>
-            <span>{{ $t('common.page') }} {{ page }} {{ $t('common.of') }} {{ totalPages }}</span>
-            <button :disabled="page === totalPages" @click="changePage(page + 1)">{{ $t('common.next') }}</button>
+        <div class="pagination cyber-pagination" v-if="totalPages > 1">
+            <button :disabled="page === 1" @click="changePage(page - 1)">◄ {{ $t('common.prev') }}</button>
+            <span class="pagination-info">
+                {{ $t('common.page') }} {{ page }} {{ $t('common.of') }} {{ totalPages }}
+            </span>
+            <button :disabled="page === totalPages" @click="changePage(page + 1)">{{ $t('common.next') }} ►</button>
+
+            <!-- Input per inserire pagina manualmente -->
+            <div class="page-input-container">
+                <label for="pageInput">{{ $t('common.goToPage') }}:</label>
+                <input class="pagination-input" id="pageInput" type="number" v-model.number="inputPage" :min="1"
+                    :max="totalPages" placeholder="1" />
+            </div>
         </div>
 
         <section class="log-table" v-if="!loading && !error">
@@ -138,9 +147,17 @@
 
         <div class="pagination cyber-pagination" v-if="totalPages > 1">
             <button :disabled="page === 1" @click="changePage(page - 1)">◄ {{ $t('common.prev') }}</button>
-            <span class="page-indicator">{{ $t('common.page') }} <span class="highlight">{{ page }}</span> {{
-                $t('common.of') }} {{ totalPages }}</span>
+            <span class="pagination-info">
+                {{ $t('common.page') }} {{ page }} {{ $t('common.of') }} {{ totalPages }}
+            </span>
             <button :disabled="page === totalPages" @click="changePage(page + 1)">{{ $t('common.next') }} ►</button>
+
+            <!-- Input per inserire pagina manualmente -->
+            <div class="page-input-container">
+                <label for="pageInputBottom">{{ $t('common.goToPage') }}:</label>
+                <input class="pagination-input" id="pageInputBottom" type="number" v-model.number="inputPage" :min="1"
+                    :max="totalPages" placeholder="1" />
+            </div>
         </div>
     </div>
 </template>
@@ -310,7 +327,34 @@ const computeDuration = (start, end) => {
     return `${diff}s`;
 };
 
+// Sincronizza inputPage con page esternamente modificato (es. bottoni Prev/Next)
+const inputPage = ref(page.value);
+watch(page, (newPage) => {
+    inputPage.value = newPage;
+});
+
+// Debounce semplice per evitare troppe chiamate immediate mentre l'utente scrive
+let debounceTimer = null;
+watch(inputPage, (newPage) => {
+    if (debounceTimer) clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
+        goToInputPage();
+    }, 500);
+});
+
+function goToInputPage() {
+    let targetPage = inputPage.value;
+    if (!targetPage) return;
+
+    // Validazione: assicurati che sia tra 1 e totalPages
+    if (targetPage < 1) targetPage = 1;
+    if (targetPage > totalPages.value) targetPage = totalPages.value;
+
+    changePage(targetPage);
+}
+
 onMounted(() => {
+    // Chiamata iniziale
     fetchData();
     fetchChartData();
 });

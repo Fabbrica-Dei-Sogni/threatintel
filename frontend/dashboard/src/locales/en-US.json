@@ -129,8 +129,11 @@
         "title": "Telnet Sessions Analysis Over Time",
         "frequency": "Sessions Frequency",
         "activity": "Activity (Events)",
-        "frequencyLabel": "Number of Sessions",
-        "activityLabel": "Intensity (Event Count)"
+        "frequencyLabel": "Sessions Frequency",
+        "activityLabel": "Intensity (Event Count)",
+        "ip": "IP",
+        "events": "Events",
+        "duration": "Duration"
     },
     "threatLogs": {
         "title": "Threat logs",
@@ -311,7 +314,8 @@
                 "duration": "Duration",
                 "events": "Events",
                 "exploration": "Exploration",
-                "viewTimeline": "👁️ View Timeline"
+                "viewTimeline": "👁️ View Timeline",
+                "infoIp": "IP Info"
             }
         },
         "attackDetail": {
@@ -325,7 +329,16 @@
             "loading": "Decrypting Timeline Streams...",
             "errorSync": "Failed to synchronize session timeline. Remote node unavailable.",
             "emptyState": "Interceptor picked up no payload events for this trace.",
-            "unknownEvent": "Unknown Event"
+            "unknownEvent": "Unknown Event",
+            "infoIp": "IP Info",
+            "copy": "Copy",
+            "user": "USER",
+            "pass": "PASSWORD",
+            "url": "URL",
+            "sha": "SHA",
+            "sessionCaptured": "🎬 Session Recording Captured",
+            "size": "Size",
+            "duration": "Duration"
         }
     }
 }

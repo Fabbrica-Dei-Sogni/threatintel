@@ -37,7 +37,7 @@ export function useCowrieSessions(
             sessions.value = response.sessions || [];
             total.value = response.total || 0;
         } catch (err) {
-            error.value = "Failed to load Telnet sessions. Ensure the backend is running.";
+            error.value = "error_fetching_sessions";
             console.error('Error fetching cowrie sessions:', err);
         } finally {
             loading.value = false;

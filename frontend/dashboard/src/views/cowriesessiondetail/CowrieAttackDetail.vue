@@ -14,8 +14,8 @@
                 <div class="info-item">
                     <span class="label">{{ $t('cowrie.attackDetail.hostileIp') }}</span>
                     <span class="value ip">
-                        <span class="ip-link" @click="goToIpDetails(sessionDetails.src_ip)" title="Info IP">{{ sessionDetails.src_ip }}</span>
-                        <button @click.stop="copyToClipboard(sessionDetails.src_ip)" class="btn-copy-mini" title="Copia">📋</button>
+                        <span class="ip-link" @click="goToIpDetails(sessionDetails.src_ip)" :title="$t('cowrie.attackDetail.infoIp')">{{ sessionDetails.src_ip }}</span>
+                        <button @click.stop="copyToClipboard(sessionDetails.src_ip)" class="btn-copy-mini" :title="$t('cowrie.attackDetail.copy')">📋</button>
                     </span>
                 </div>
                 <div class="info-item">
@@ -56,18 +56,18 @@
                             <span class="prompt">root@honeypot:~#</span> <span class="cmd-text">{{ event.input }}</span>
                         </div>
                         <div v-if="event.username" class="auth-payload" :class="event.eventid.includes('failed') ? 'failed' : 'success'">
-                            <span class="auth-label">USER:</span> {{ event.username }} <br>
-                            <span class="auth-label">PASS:</span> {{ event.password }}
+                            <span class="auth-label">{{ $t('cowrie.attackDetail.user') }}:</span> {{ event.username }} <br>
+                            <span class="auth-label">{{ $t('cowrie.attackDetail.pass') }}:</span> {{ event.password }}
                         </div>
                         <div v-if="event.shasum && !event.ttylog" class="dl-payload">
-                            <div class="dl-url">URL: {{ event.url }}</div>
-                            <div class="dl-sha">SHA: {{ event.shasum }}</div>
+                            <div class="dl-url">{{ $t('cowrie.attackDetail.url') }}: {{ event.url }}</div>
+                            <div class="dl-sha">{{ $t('cowrie.attackDetail.sha') }}: {{ event.shasum }}</div>
                         </div>
                         <div v-if="event.ttylog" class="ttylog-payload">
-                            <div class="tty-header">🎬 Session Recording Captured</div>
+                            <div class="tty-header">{{ $t('cowrie.attackDetail.sessionCaptured') }}</div>
                             <div class="tty-meta">
-                                <span>Size: {{ (event.size / 1024).toFixed(2) }} KB</span> | 
-                                <span>Duration: {{ event.duration }}s</span>
+                                <span>{{ $t('cowrie.attackDetail.size') }}: {{ (event.size / 1024).toFixed(2) }} KB</span> | 
+                                <span>{{ $t('cowrie.attackDetail.duration') }}: {{ event.duration }}s</span>
                             </div>
                             <div class="tty-hex-preview">{{ event.ttylog.substring(0, 100) }}...</div>
                         </div>

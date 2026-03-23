@@ -46,10 +46,14 @@
         "recentAttacks": "10 dernières attaques",
         "recentLogs": "10 derniers journaux",
         "attackMap": "Carte des attaques",
+        "sessionsMap": "Carte des sessions Telnet",
         "loadingAttacks": "Chargement des attaques...",
         "errorLoadingAttacks": "Erreur de chargement des attaques",
         "loadingLogs": "Chargement des journaux...",
         "errorLoadingLogs": "Erreur de chargement des journaux",
+        "recentSessions": "10 dernières sessions Telnet",
+        "loadingSessions": "Chargement des sessions...",
+        "errorLoadingSessions": "Erreur de chargement des sessions",
         "telnet": "Telnet"
     },
     "attacks": {
@@ -126,7 +130,10 @@
         "frequency": "Fréquence des sessions",
         "activity": "Activité (Événements)",
         "frequencyLabel": "Nombre de sessions",
-        "activityLabel": "Intensité (Nombre d'événements)"
+        "activityLabel": "Intensité (Nombre d'événements)",
+        "ip": "IP",
+        "events": "Événements",
+        "duration": "Durée"
     },
     "threatLogs": {
         "title": "Journaux de menaces",
@@ -306,7 +313,8 @@
                 "duration": "Durée",
                 "events": "Événements",
                 "exploration": "Exploration",
-                "viewTimeline": "👁️ Voir la Timeline"
+                "viewTimeline": "👁️ Voir la Timeline",
+                "infoIp": "Infos IP"
             }
         },
         "attackDetail": {
@@ -320,7 +328,16 @@
             "loading": "Décryptage des flux de la Timeline...",
             "errorSync": "Échec de la synchronisation de la timeline de session. Nœud distant indisponible.",
             "emptyState": "L'intercepteur n'a récupéré aucun événement de payload per cette trace.",
-            "unknownEvent": "Événement Inconnu"
+            "unknownEvent": "Événement Inkonnu",
+            "infoIp": "Infos IP",
+            "copy": "Copier",
+            "user": "UTILISATEUR",
+            "pass": "MOT DE PASSE",
+            "url": "URL",
+            "sha": "SHA",
+            "sessionCaptured": "🎬 Enregistrement de session capturé",
+            "size": "Taille",
+            "duration": "Durée"
         }
     }
 }

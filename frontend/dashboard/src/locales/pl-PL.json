@@ -47,10 +47,14 @@
         "recentAttacks": "Ostatnie 10 ataków",
         "recentLogs": "Ostatnie 10 dzienników",
         "attackMap": "Mapa ataków",
+        "sessionsMap": "Mapa sesji Telnet",
         "loadingAttacks": "Ładowanie ataków...",
         "errorLoadingAttacks": "Błąd ładowania ataków",
         "loadingLogs": "Ładowanie dzienników...",
         "errorLoadingLogs": "Błąd ładowania dzienników",
+        "recentSessions": "Ostatnie 10 sesji Telnet",
+        "loadingSessions": "Ładowanie sesji...",
+        "errorLoadingSessions": "Błąd ładowania sesji",
         "telnet": "Telnet"
     },
     "attacks": {
@@ -127,7 +131,10 @@
         "frequency": "Częstotliwość sesji",
         "activity": "Aktywność (Zdarzenia)",
         "frequencyLabel": "Liczba sesji",
-        "activityLabel": "Intensywność (Liczba zdarzeń)"
+        "activityLabel": "Intensywność (Liczba zdarzeń)",
+        "ip": "IP",
+        "events": "Zdarzenia",
+        "duration": "Czas trwania"
     },
     "threatLogs": {
         "title": "Dzienniki zagrożeń",
@@ -307,7 +314,8 @@
                 "duration": "Czas trwania",
                 "events": "Zdarzenia",
                 "exploration": "Eksploracja",
-                "viewTimeline": "👁️ Zobacz Timeline"
+                "viewTimeline": "👁️ Zobacz Timeline",
+                "infoIp": "Informacje o IP"
             }
         },
         "attackDetail": {
@@ -321,7 +329,16 @@
             "loading": "Deszyfrowanie strumieni osi czasu...",
             "errorSync": "Nie udało się zsynchronizować osi czasu sesji. Węzeł zdalny niedostępny.",
             "emptyState": "Interceptor nie wykrył żadnych zdarzeń ładunku dla tego śladu.",
-            "unknownEvent": "Nieznane zdarzenie"
+            "unknownEvent": "Nieznane zdarzenie",
+            "infoIp": "Informacje o IP",
+            "copy": "Kopiuj",
+            "user": "UŻYTKOWNIK",
+            "pass": "HASŁO",
+            "url": "URL",
+            "sha": "SHA",
+            "sessionCaptured": "🎬 Nagranie sesji przechwycone",
+            "size": "Rozmiar",
+            "duration": "Czas trwania"
         }
     }
 }

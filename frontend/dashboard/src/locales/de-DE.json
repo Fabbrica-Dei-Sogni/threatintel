@@ -46,10 +46,14 @@
         "recentAttacks": "Letzte 10 Angriffe",
         "recentLogs": "Letzte 10 Protokolle",
         "attackMap": "Angriffskarte",
+        "sessionsMap": "Telnet-Sitzungskarte",
         "loadingAttacks": "Angriffe werden geladen...",
         "errorLoadingAttacks": "Fehler beim Laden der Angriffe",
         "loadingLogs": "Protokolle werden geladen...",
         "errorLoadingLogs": "Fehler beim Laden der Protokolle",
+        "recentSessions": "Letzte 10 Telnet-Sitzungen",
+        "loadingSessions": "Sitzungen werden geladen...",
+        "errorLoadingSessions": "Fehler beim Laden der Sitzungen",
         "telnet": "Telnet"
     },
     "attacks": {
@@ -126,7 +130,10 @@
         "frequency": "Sitzungshäufigkeit",
         "activity": "Aktivität (Ereignisse)",
         "frequencyLabel": "Anzahl der Sitzungen",
-        "activityLabel": "Intensität (Anzahl der Ereignisse)"
+        "activityLabel": "Intensität (Anzahl der Ereignisse)",
+        "ip": "IP",
+        "events": "Ereignisse",
+        "duration": "Dauer"
     },
     "threatLogs": {
         "title": "Bedrohungsprotokolle",
@@ -306,7 +313,8 @@
                 "duration": "Dauer",
                 "events": "Ereignisse",
                 "exploration": "Exploration",
-                "viewTimeline": "👁️ Timeline anzeigen"
+                "viewTimeline": "👁️ Timeline anzeigen",
+                "infoIp": "IP-Info"
             }
         },
         "attackDetail": {
@@ -320,7 +328,16 @@
             "loading": "Entschlüsselung der Timeline-Streams...",
             "errorSync": "Synchronisierung der Sitzungs-Timeline fehlgeschlagen. Remote-Knoten nicht verfügbar.",
             "emptyState": "Der Interceptor hat keine Payload-Ereignisse für diese Spur erfasst.",
-            "unknownEvent": "Unbekanntes Ereignis"
+            "unknownEvent": "Unbekanntes Ereignis",
+            "infoIp": "IP-Info",
+            "copy": "Kopieren",
+            "user": "BENUTZER",
+            "pass": "PASSWORT",
+            "url": "URL",
+            "sha": "SHA",
+            "sessionCaptured": "🎬 Sitzungsaufzeichnung erfasst",
+            "size": "Größe",
+            "duration": "Dauer"
         }
     }
 }

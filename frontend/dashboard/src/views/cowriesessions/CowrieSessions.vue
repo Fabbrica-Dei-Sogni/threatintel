@@ -19,7 +19,7 @@
                 <input v-model="filterIp" :placeholder="$t('cowrie.sessions.filterByIp')" @input="onFilterChanged" 
                     class="input" type="text" />
                 <button v-if="filterIp" @click="clearIpFilter" class="clear-button"
-                    :title="$t('cowrie.sessions.clearIpFilter')" type="button" aria-label="Clear IP filter">
+                    :title="$t('cowrie.sessions.clearIpFilter')" type="button" :aria-label="$t('cowrie.sessions.clearIpFilter')">
                     ✕
                 </button>
             </div>
@@ -41,7 +41,7 @@
         </transition>
 
         <div v-if="loading" class="loading">{{ $t('cowrie.sessions.loading') }}</div>
-        <div v-if="error" class="error">{{ error }}</div>
+        <div v-if="error" class="error">{{ $t('cowrie.sessions.errorLoad') }}</div>
 
         <!-- Pagination superiore -->
         <div class="pagination cyber-pagination" v-if="totalPages > 1">
@@ -111,7 +111,7 @@
                     <tr v-for="session in sessions" :key="session.session" class="cyber-row">
                         <td class="ip-cell">
                             <span class="ip-container">
-                                <span class="ip-link" @click="goToIpDetails(session.src_ip)" title="Info IP">
+                                <span class="ip-link" @click="goToIpDetails(session.src_ip)" :title="$t('cowrie.sessions.table.infoIp')">
                                     {{ session.src_ip }}
                                 </span>
                                 <button @click.stop="copyToClipboard(session.src_ip)" class="btn-copy-mini"

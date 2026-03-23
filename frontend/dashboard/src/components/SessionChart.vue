@@ -170,7 +170,7 @@ const activityOptions = computed(() => ({
             callbacks: {
                 label: (ctx) => {
                     const raw = ctx.raw;
-                    return `IP: ${raw.ip} | Eventi: ${raw.y} | Durata: ${raw.duration}`;
+                    return `${t('sessionChart.ip')}: ${raw.ip} | ${t('sessionChart.events')}: ${raw.y} | ${t('sessionChart.duration')}: ${raw.duration}`;
                 }
             }
         }

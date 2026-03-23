@@ -130,7 +130,10 @@
         "frequency": "Frequenza Sessioni",
         "activity": "Attività (Eventi)",
         "frequencyLabel": "Numero Sessioni",
-        "activityLabel": "Intensità (Codice Eventi)"
+        "activityLabel": "Intensità (Codice Eventi)",
+        "ip": "IP",
+        "events": "Eventi",
+        "duration": "Durata"
     },
     "threatLogs": {
         "title": "Log minacce",
@@ -311,7 +314,8 @@
                 "duration": "Durata",
                 "events": "Eventi",
                 "exploration": "Esplorazione",
-                "viewTimeline": "👁️ Vedi Timeline"
+                "viewTimeline": "👁️ Vedi Timeline",
+                "infoIp": "Informazioni IP"
             }
         },
         "attackDetail": {
@@ -325,7 +329,16 @@
             "loading": "Decrittazione Stream Timeline...",
             "errorSync": "Sincronizzazione timeline fallita. Nodo remoto non disponibile.",
             "emptyState": "L'intercettore non ha rilevato payload per questa traccia.",
-            "unknownEvent": "Evento Sconosciuto"
+            "unknownEvent": "Evento Sconosciuto",
+            "infoIp": "Informazioni IP",
+            "copy": "Copia",
+            "user": "UTENTE",
+            "pass": "PASSWORD",
+            "url": "URL",
+            "sha": "SHA",
+            "sessionCaptured": "🎬 Registrazione Sessione Catturata",
+            "size": "Dimensione",
+            "duration": "Durata"
         }
     }
 }

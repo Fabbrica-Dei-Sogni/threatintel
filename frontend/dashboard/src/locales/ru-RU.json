@@ -46,10 +46,14 @@
         "recentAttacks": "Последние 10 атак",
         "recentLogs": "Последние 10 журналов",
         "attackMap": "Карта атак",
+        "sessionsMap": "Карта сессий Telnet",
         "loadingAttacks": "Загрузка атак...",
         "errorLoadingAttacks": "Ошибка загрузки атак",
         "loadingLogs": "Загрузка журналов...",
         "errorLoadingLogs": "Ошибка загрузки журналов",
+        "recentSessions": "Последние 10 сессий Telnet",
+        "loadingSessions": "Загрузка сессий...",
+        "errorLoadingSessions": "Ошибка загрузки сессий",
         "telnet": "Telnet"
     },
     "attacks": {
@@ -126,7 +130,10 @@
         "frequency": "Частота сессий",
         "activity": "Активность (События)",
         "frequencyLabel": "Количество сессий",
-        "activityLabel": "Интенсивность (Количество событий)"
+        "activityLabel": "Интенсивность (Количество событий)",
+        "ip": "IP",
+        "events": "События",
+        "duration": "Длительность"
     },
     "threatLogs": {
         "title": "Журналы угроз",
@@ -306,7 +313,8 @@
                 "duration": "Длительность",
                 "events": "События",
                 "exploration": "Исследование",
-                "viewTimeline": "👁️ Посмотреть Timeline"
+                "viewTimeline": "👁️ Посмотреть Timeline",
+                "infoIp": "Информация об IP"
             }
         },
         "attackDetail": {
@@ -320,7 +328,16 @@
             "loading": "Дешифровка потоков хронологии...",
             "errorSync": "Не удалось синхронизировать временную шкалу сессии. Удаленный узел недоступен.",
             "emptyState": "Перехватчик не обнаружил событий полезной нагрузки для этой трассировки.",
-            "unknownEvent": "Неизвестное событие"
+            "unknownEvent": "Неизвестное событие",
+            "infoIp": "Информация об IP",
+            "copy": "Копировать",
+            "user": "ПОЛЬЗОВАТЕЛЬ",
+            "pass": "ПАРОЛЬ",
+            "url": "URL",
+            "sha": "SHA",
+            "sessionCaptured": "🎬 Запись сессии захвачена",
+            "size": "Размер",
+            "duration": "Длительность"
         }
     }
 }

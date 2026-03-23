@@ -28,16 +28,15 @@
         <!-- Sezione Mappa -->
         <transition name="fade">
             <div v-if="showMap" class="map-section">
-                <div v-if="loadingChart" class="loading-mini">{{ $t('common.loading') }}</div>
-                <AttackMap v-else :attacks="mapSessions" />
+                <!-- Mostriamo i dati basandoci sulle sessioni caricate nella tabella -->
+                <AttackMap :attacks="mapSessions" />
             </div>
         </transition>
-
         <!-- Sezione Grafico Temporale -->
         <transition name="fade">
             <div v-if="showChart" class="chart-section">
-                <div v-if="loadingChart" class="loading-mini">{{ $t('common.loading') }}</div>
-                <SessionChart v-else :sessions="chartSessions" />
+                 <!-- Mostriamo i dati basandoci sulle sessioni caricate nella tabella -->
+                <SessionChart v-if="sessions && sessions.length > 0" :sessions="sessions" />
             </div>
         </transition>
 
@@ -188,28 +187,25 @@ const router = useRouter();
 
 // Variabile per salvare pagina precedente al filtro IP
 const previousPageBeforeIpFilter = ref(null);
-// Stato per le visualizzazioni
+// Stato per le visualizzazioni (toggle visibilità)
 const showChart = ref(true);
 const showMap = ref(false);
-const chartSessions = ref([]);
-const loadingChart = ref(false);
 
 const totalPages = computed(() => Math.ceil(total.value / pageSize.value) || 1);
 
 // Trasformazione dei dati per il componente AttackMap
+// Ora usa le sessioni rettive che cambiano ad ogni cambio di pagina/filtri
 const mapSessions = computed(() => {
-    return chartSessions.value.map(s => ({
+    return sessions.value.map(s => ({
         id: s._id,
         request: { ip: s.src_ip },
         ipDetails: {
             ipinfo: {
-                // Leaflet si aspetta 'loc' come stringa "lat,lng"
                 loc: s.ipDetailsId?.ipinfo?.loc || "0,0",
                 city: s.ipDetailsId?.ipinfo?.city || "",
                 country: s.ipDetailsId?.ipinfo?.country || ""
             }
         },
-        // Mappiamo l'intensità della sessione su un livello di pericolo fittizio per la colorazione della mappa
         dangerLevel: (s.eventCount || 0) > 20 ? 2 : ((s.eventCount || 0) > 5 ? 3 : 5),
         dangerScore: s.eventCount || 0,
         rps: 0,
@@ -217,32 +213,12 @@ const mapSessions = computed(() => {
     }));
 });
 
-async function fetchChartData() {
-    if (chartSessions.value.length > 0) return;
-    loadingChart.value = true;
-    try {
-        // Recuperiamo un numero maggiore di sessioni (es. 100) per un grafico/mappa significativo
-        const response = await fetchCowrieSessions(1, 100);
-        chartSessions.value = response.sessions || [];
-    } catch (err) {
-        console.error('Errore durante il caricamento dei dati delle visualizzazioni:', err);
-    } finally {
-        loadingChart.value = false;
-    }
-}
-
 function toggleChart() {
     showChart.value = !showChart.value;
-    if (showChart.value) {
-        fetchChartData();
-    }
 }
 
 function toggleMap() {
     showMap.value = !showMap.value;
-    if (showMap.value) {
-        fetchChartData();
-    }
 }
 
 const {
@@ -356,7 +332,6 @@ function goToInputPage() {
 onMounted(() => {
     // Chiamata iniziale
     fetchData();
-    fetchChartData();
 });
 </script>
 

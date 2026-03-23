@@ -56,15 +56,15 @@
             <el-card class="logs-container" v-if="attack">
                 <h2>{{ t('attackDetail.logsRaggrupati') }}</h2>
 
-                <div v-for="log in paginatedLogs" :key="log.id" class="log-entry">
-                    <div class="log-header" @click="toggleLog(log.id)">
+                <div v-for="log in paginatedLogs" :key="log._id || log.id" class="log-entry">
+                    <div class="log-header" @click="toggleLog(log._id || log.id)">
                         <span>{{ formatDate(log.timestamp) }} - {{ log.request.method }} {{ log.request.url ||
                             t('components.radar.notAvailable')
                         }} </span>
-                        <span class="toggle-icon">{{ expanded[log.id] ? '–' : '+' }}</span>
+                        <span class="toggle-icon">{{ expanded[log._id || log.id] ? '–' : '+' }}</span>
                     </div>
                     <transition name="collapse">
-                        <div v-if="expanded[log.id]" class="log-body">
+                        <div v-if="expanded[log._id || log.id]" class="log-body">
                             <p><strong>{{ t('common.score') }}:</strong> {{ log.fingerprint.score ?? t('common.notAvailable') }}
                             </p>
                             <span v-if="log.fingerprint.score != null && log.fingerprint.score > 0">

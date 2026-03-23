@@ -68,13 +68,12 @@ export class CowrieService {
     /**
      * API: Recupera le sessioni paginate assieme ai dati IP arricchiti
      */
-    async getSessions(page: number = 1, limit: number = 20) {
+    async getSessions(page: number = 1, limit: number = 20, sort: Record<string, any> = { timestamp: -1 }) {
         const skip = (page - 1) * limit;
         const total = await CowrieSession.countDocuments();
         
-        // Ordinamento per data decrescente (le più recenti prima)
         const sessions = await CowrieSession.find()
-            .sort({ timestamp: -1 })
+            .sort(sort)
             .skip(skip)
             .limit(limit)
             .populate('ipDetailsId')

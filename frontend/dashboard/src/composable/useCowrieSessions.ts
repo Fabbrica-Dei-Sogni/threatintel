@@ -6,11 +6,13 @@ import type { CowrieSession, FetchCowrieSessionsResponse } from '../models/Cowri
 
 export function useCowrieSessions(
     initialPage: number = 1,
-    initialLimit: number = 20
+    initialLimit: number = 20,
+    initialSortFields: any = { timestamp: -1 }
 ) {
     const sessions: Ref<CowrieSession[]> = ref([]);
     const page: Ref<number> = ref(initialPage);
     const limit: Ref<number> = ref(initialLimit);
+    const sortFields: Ref<any> = ref(initialSortFields);
     const totalPages: Ref<number> = ref(1);
     const total: Ref<number> = ref(0);
     const loading: Ref<boolean> = ref(false);
@@ -20,7 +22,11 @@ export function useCowrieSessions(
         loading.value = true;
         error.value = null;
         try {
-            const response: FetchCowrieSessionsResponse = await fetchCowrieSessions(page.value, limit.value);
+            const response: FetchCowrieSessionsResponse = await fetchCowrieSessions(
+                page.value, 
+                limit.value, 
+                sortFields.value
+            );
             sessions.value = response.data || [];
             total.value = response.total || 0;
             totalPages.value = response.totalPages || 1;
@@ -41,14 +47,39 @@ export function useCowrieSessions(
         fetchData();
     });
 
+    watch(sortFields, () => {
+        // page.value = 1; // Uncommment if you want to reset page on sort
+        fetchData();
+    });
+
+    function toggleSort(field: string): void {
+        const currentDirection = sortFields.value?.[field];
+
+        if (currentDirection === undefined) {
+            sortFields.value = { [field]: 1 }; // Replace other sorts for simplicity, or merge
+        } else if (currentDirection === 1) {
+            sortFields.value = { [field]: -1 };
+        } else {
+            sortFields.value = { timestamp: -1 }; // Reset to default
+        }
+        fetchData();
+    }
+
+    function getSortDirection(field: string): number {
+        return sortFields.value?.[field] || 0;
+    }
+
     return {
         sessions,
         page,
         limit,
+        sortFields,
         totalPages,
         total,
         loading,
         error,
-        fetchData
+        fetchData,
+        toggleSort,
+        getSortDirection
     };
 }

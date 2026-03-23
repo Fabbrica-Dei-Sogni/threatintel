@@ -44,10 +44,37 @@
             <table>
                 <thead>
                     <tr>
-                        <th>{{ $t('cowrie.sessions.table.ip') }}</th>
+                        <th class="sortable-th">
+                            <div class="sort-control">
+                                <span class="label">{{ $t('cowrie.sessions.table.ip') }}</span>
+                                <button @click="toggleSort('src_ip')" class="sort-button">
+                                    <span v-if="getSortDirection('src_ip') === 1">▲</span>
+                                    <span v-else-if="getSortDirection('src_ip') === -1">▼</span>
+                                    <span v-else>⇵</span>
+                                </button>
+                            </div>
+                        </th>
                         <th>{{ $t('cowrie.sessions.table.country') }}</th>
-                        <th>{{ $t('cowrie.sessions.table.startTime') }}</th>
-                        <th>{{ $t('cowrie.sessions.table.duration') }}</th>
+                        <th class="sortable-th">
+                            <div class="sort-control">
+                                <span class="label">{{ $t('cowrie.sessions.table.startTime') }}</span>
+                                <button @click="toggleSort('timestamp')" class="sort-button">
+                                    <span v-if="getSortDirection('timestamp') === 1">▲</span>
+                                    <span v-else-if="getSortDirection('timestamp') === -1">▼</span>
+                                    <span v-else>⇵</span>
+                                </button>
+                            </div>
+                        </th>
+                        <th class="sortable-th">
+                            <div class="sort-control">
+                                <span class="label">{{ $t('cowrie.sessions.table.duration') }}</span>
+                                <button @click="toggleSort('time')" class="sort-button">
+                                    <span v-if="getSortDirection('time') === 1">▲</span>
+                                    <span v-else-if="getSortDirection('time') === -1">▼</span>
+                                    <span v-else>⇵</span>
+                                </button>
+                            </div>
+                        </th>
                         <th>{{ $t('cowrie.sessions.table.exploration') }}</th>
                     </tr>
                 </thead>
@@ -107,7 +134,8 @@ import AttackMap from '../../components/AttackMap.vue';
 
 const props = defineProps({
     initialPage: { type: Number, default: 1 },
-    initialLimit: { type: Number, default: 20 }
+    initialLimit: { type: Number, default: 20 },
+    initialSortFields: { type: Object, default: () => ({ timestamp: -1 }) }
 });
 
 const { t } = useI18n();
@@ -173,19 +201,23 @@ const {
     sessions,
     page,
     limit,
+    sortFields,
     totalPages,
     loading,
     error,
-    fetchData
-} = useCowrieSessions(props.initialPage, props.initialLimit);
+    fetchData,
+    toggleSort,
+    getSortDirection
+} = useCowrieSessions(props.initialPage, props.initialLimit, props.initialSortFields);
 
 // Sincronizza l'URL quando cambia lo stato
-watch([page, limit], ([newPage, newLimit]) => {
+watch([page, limit, sortFields], ([newPage, newLimit, newSort]) => {
     router.replace({
         name: 'CowrieSessions',
         query: {
             page: newPage > 1 ? newPage : undefined,
-            limit: newLimit !== 20 ? newLimit : undefined
+            limit: newLimit !== 20 ? newLimit : undefined,
+            sortFields: newSort ? JSON.stringify(newSort) : undefined
         }
     });
 });

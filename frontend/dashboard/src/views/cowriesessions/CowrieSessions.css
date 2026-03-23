@@ -275,3 +275,38 @@
         font-size: 13px;
     }
 }
+
+.sort-control {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #f9d8d8;
+    user-select: none;
+    justify-content: center;
+    width: 100%;
+}
+
+.sort-button {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #fabcbc;
+    font-size: 14px;
+    line-height: 1;
+    padding: 2px;
+    display: flex;
+    align-items: center;
+    transition: color 0.3s ease;
+}
+
+.sort-button:hover {
+    color: #ff7070;
+}
+
+.sortable-th {
+    cursor: pointer;
+}
+
+.sortable-th:hover {
+    background: rgba(255, 76, 76, 0.1);
+}

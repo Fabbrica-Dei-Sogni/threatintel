@@ -304,6 +304,7 @@
                 "country": "Страна",
                 "startTime": "Время начала",
                 "duration": "Длительность",
+                "events": "События",
                 "exploration": "Исследование",
                 "viewTimeline": "👁️ Посмотреть Timeline"
             }

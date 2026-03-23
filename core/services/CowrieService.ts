@@ -70,28 +70,118 @@ export class CowrieService {
      */
     async getSessions(
         page: number = 1,
-        limit: number = 20,
+        pageSize: number = 20,
         sort: Record<string, any> = { timestamp: -1 },
         filters: any = {}
     ) {
-        const skip = (page - 1) * limit;
+        const skip = (page - 1) * pageSize;
         const mongoFilters = this.buildRegExpFilter(filters);
         
-        const total = await this.countSessions(filters);
-        
-        const sessions = await CowrieSession.find(mongoFilters)
-            .sort(sort)
-            .skip(skip)
-            .limit(limit)
-            .populate('ipDetailsId')
-            .exec();
+        // Costruisci sort stage coerente col formato di Mongoose
+        const sortStage = { $sort: sort && Object.keys(sort).length > 0 ? sort : { timestamp: -1 } };
+
+        const pipeline = [
+            { $match: mongoFilters },
+            // Conteggio eventi da collezioni multiple tramite lookup performanti (sub-pipelines)
+            {
+                $lookup: {
+                    from: 'event',
+                    let: { sessId: '$session' },
+                    pipeline: [
+                        { $match: { $expr: { $eq: ['$session', '$$sessId'] } } },
+                        { $count: 'cnt' }
+                    ],
+                    as: 'cnt_event'
+                }
+            },
+            {
+                $lookup: {
+                    from: 'auth',
+                    let: { sessId: '$session' },
+                    pipeline: [
+                        { $match: { $expr: { $eq: ['$session', '$$sessId'] } } },
+                        { $count: 'cnt' }
+                    ],
+                    as: 'cnt_auth'
+                }
+            },
+            {
+                $lookup: {
+                    from: 'input',
+                    let: { sessId: '$session' },
+                    pipeline: [
+                        { $match: { $expr: { $eq: ['$session', '$$sessId'] } } },
+                        { $count: 'cnt' }
+                    ],
+                    as: 'cnt_input'
+                }
+            },
+            {
+                $lookup: {
+                    from: 'ttylog',
+                    let: { sessId: '$session' },
+                    pipeline: [
+                        { $match: { $expr: { $eq: ['$session', '$$sessId'] } } },
+                        { $count: 'cnt' }
+                    ],
+                    as: 'cnt_ttylog'
+                }
+            },
+            // Somma dei conteggi (gestendo i casi null tramite ifNull)
+            {
+                $addFields: {
+                    eventCount: {
+                        $add: [
+                            { $ifNull: [{ $arrayElemAt: ['$cnt_event.cnt', 0] }, 0] },
+                            { $ifNull: [{ $arrayElemAt: ['$cnt_auth.cnt', 0] }, 0] },
+                            { $ifNull: [{ $arrayElemAt: ['$cnt_input.cnt', 0] }, 0] },
+                            { $ifNull: [{ $arrayElemAt: ['$cnt_ttylog.cnt', 0] }, 0] }
+                        ]
+                    }
+                }
+            },
+            // Faceting per ottenere sia i dati paginati che il conteggio totale in un'unica chiamata
+            {
+                $facet: {
+                    data: [
+                        // Popolazione IpDetails
+                        {
+                            $lookup: {
+                                from: 'ipdetails',
+                                localField: 'ipDetailsId',
+                                foreignField: '_id',
+                                as: 'ipDetails'
+                            }
+                        },
+                        {
+                            $addFields: {
+                                ipDetailsId: { $arrayElemAt: ['$ipDetails', 0] }
+                            }
+                        },
+                        // Ordinamento, skip e limit
+                        sortStage,
+                        { $skip: skip },
+                        { $limit: Number(pageSize) }
+                    ],
+                    total: [
+                        { $count: 'count' }
+                    ]
+                }
+            },
+            // Proiezione finale per pulire lo schema di ritorno
+            {
+                $project: {
+                    sessions: '$data',
+                    totalCount: { $arrayElemAt: ['$total.count', 0] }
+                }
+            }
+        ];
+
+        const [result] = await CowrieSession.aggregate(pipeline).exec();
 
         return {
-            data: sessions,
-            page,
-            limit,
-            total,
-            totalPages: Math.ceil(total / limit)
+            sessions: result?.sessions || [],
+            totalCount: result?.totalCount || 0
         };
     }
 

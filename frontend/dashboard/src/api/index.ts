@@ -214,9 +214,9 @@ export async function enrichReputationScore(ip: string): Promise<any> {
 // COWRIE TELNET API WRAPPERS
 // ==========================
 
-export async function fetchCowrieSessions(page = 1, limit = 20, sortFields: any = null, filters: any = null): Promise<any> {
+export async function fetchCowrieSessions(page = 1, pageSize = 20, sortFields: any = null, filters: any = null): Promise<any> {
     try {
-        const params: any = { page, limit };
+        const params: any = { page, pageSize };
         if (sortFields) {
             params.sort = JSON.stringify(sortFields);
         }

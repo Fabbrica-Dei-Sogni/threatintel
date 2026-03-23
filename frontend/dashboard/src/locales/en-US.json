@@ -309,6 +309,7 @@
                 "country": "Country",
                 "startTime": "Start Time",
                 "duration": "Duration",
+                "events": "Events",
                 "exploration": "Exploration",
                 "viewTimeline": "👁️ View Timeline"
             }

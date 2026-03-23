@@ -304,6 +304,7 @@
                 "country": "Land",
                 "startTime": "Startzeit",
                 "duration": "Dauer",
+                "events": "Ereignisse",
                 "exploration": "Exploration",
                 "viewTimeline": "👁️ Timeline anzeigen"
             }

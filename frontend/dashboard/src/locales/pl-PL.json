@@ -305,6 +305,7 @@
                 "country": "Kraj",
                 "startTime": "Czas rozpoczęcia",
                 "duration": "Czas trwania",
+                "events": "Zdarzenia",
                 "exploration": "Eksploracja",
                 "viewTimeline": "👁️ Zobacz Timeline"
             }

@@ -86,6 +86,16 @@
                                 </button>
                             </div>
                         </th>
+                        <th class="sortable-th">
+                            <div class="sort-control">
+                                <span class="label">{{ $t('cowrie.sessions.table.events') }}</span>
+                                <button @click="toggleSort('eventCount')" class="sort-button">
+                                    <span v-if="getSortDirection('eventCount') === 1">▲</span>
+                                    <span v-else-if="getSortDirection('eventCount') === -1">▼</span>
+                                    <span v-else>⇵</span>
+                                </button>
+                            </div>
+                        </th>
                         <th>{{ $t('cowrie.sessions.table.exploration') }}</th>
                     </tr>
                 </thead>
@@ -109,6 +119,9 @@
                         </td>
                         <td class="time-cell">{{ formatDate(session.starttime) }}</td>
                         <td class="duration-cell">{{ computeDuration(session.starttime, session.endtime) }}</td>
+                        <td class="events-cell">
+                             {{ session.eventCount || 0 }}
+                        </td>
                         <td>
                             <router-link :to="{ name: 'CowrieAttackDetail', params: { id: session.session } }"
                                 class="detail-btn">
@@ -117,7 +130,7 @@
                         </td>
                     </tr>
                     <tr v-if="sessions.length === 0">
-                        <td colspan="5" class="empty-state">{{ $t('cowrie.sessions.emptyState') }}</td>
+                        <td colspan="6" class="empty-state">{{ $t('cowrie.sessions.emptyState') }}</td>
                     </tr>
                 </tbody>
             </table>
@@ -147,7 +160,7 @@ import AttackMap from '../../components/AttackMap.vue';
 
 const props = defineProps({
     initialPage: { type: Number, default: 1 },
-    initialLimit: { type: Number, default: 20 },
+    initialPageSize: { type: Number, default: 20 },
     initialSortFields: { type: Object, default: () => ({ timestamp: -1 }) },
     initialIp: { type: String, default: '' }
 });
@@ -163,6 +176,8 @@ const showChart = ref(true);
 const showMap = ref(false);
 const chartSessions = ref([]);
 const loadingChart = ref(false);
+
+const totalPages = computed(() => Math.ceil(total.value / pageSize.value) || 1);
 
 // Trasformazione dei dati per il componente AttackMap
 const mapSessions = computed(() => {
@@ -191,7 +206,7 @@ async function fetchChartData() {
     try {
         // Recuperiamo un numero maggiore di sessioni (es. 100) per un grafico/mappa significativo
         const response = await fetchCowrieSessions(1, 100);
-        chartSessions.value = response.data || [];
+        chartSessions.value = response.sessions || [];
     } catch (err) {
         console.error('Errore durante il caricamento dei dati delle visualizzazioni:', err);
     } finally {
@@ -216,10 +231,10 @@ function toggleMap() {
 const {
     sessions,
     page,
-    limit,
+    pageSize,
     sortFields,
     filterIp,
-    totalPages,
+    total,
     loading,
     error,
     fetchData,
@@ -228,18 +243,18 @@ const {
     getSortDirection
 } = useCowrieSessions(
     props.initialPage, 
-    props.initialLimit, 
+    props.initialPageSize, 
     props.initialSortFields,
     props.initialIp
 );
 
 // Sincronizza l'URL quando cambia lo stato
-watch([page, limit, sortFields, filterIp], ([newPage, newLimit, newSort, newIp]) => {
+watch([page, pageSize, sortFields, filterIp], ([newPage, newPageSize, newSort, newIp]) => {
     router.replace({
         name: 'CowrieSessions',
         query: {
             page: newPage > 1 ? newPage : undefined,
-            limit: newLimit !== 20 ? newLimit : undefined,
+            pageSize: newPageSize !== 20 ? newPageSize : undefined,
             sortFields: newSort ? JSON.stringify(newSort) : undefined,
             ip: newIp || undefined
         }
@@ -277,7 +292,7 @@ const goToIpDetails = (ip) => {
         query: {
             // Passiamo lo stato per poter tornare indietro (anche se IpDetails usa router.back)
             returnPage: page.value,
-            returnLimit: limit.value
+            returnLimit: pageSize.value
         }
     });
 };

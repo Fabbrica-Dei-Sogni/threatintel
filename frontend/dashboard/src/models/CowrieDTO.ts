@@ -33,9 +33,8 @@ export interface CowrieEvent {
 }
 
 export interface FetchCowrieSessionsResponse {
-    data: CowrieSession[];
+    sessions: CowrieSession[];
     total: number;
     page: number;
-    limit: number;
-    totalPages: number;
+    pageSize: number;
 }

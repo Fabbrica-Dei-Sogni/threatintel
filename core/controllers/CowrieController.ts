@@ -15,7 +15,7 @@ export class CowrieController {
     async getSessions(req: Request, res: Response): Promise<void> {
         try {
             const page = parseInt(req.query.page as string) || 1;
-            const limit = parseInt(req.query.limit as string) || 20;
+            const pageSize = parseInt(req.query.pageSize as string) || 20;
             const sortStr = req.query.sort as string;
             const filtersStr = req.query.filters as string;
 
@@ -38,8 +38,15 @@ export class CowrieController {
                 }
             }
 
-            const result = await this.cowrieService.getSessions(page, limit, sort, filters);
-            res.status(200).json(result);
+            const { sessions } = await this.cowrieService.getSessions(page, pageSize, sort, filters);
+            const total = await this.cowrieService.countSessions(filters);
+
+            res.status(200).json({
+                sessions,
+                total,
+                page,
+                pageSize
+            });
         } catch (error: any) {
             this.logger.error(`[CowrieController] Error in getSessions: ${error.message}`);
             res.status(500).json({ error: 'Failed to fetch telnet sessions.' });

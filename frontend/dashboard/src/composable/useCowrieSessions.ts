@@ -7,15 +7,14 @@ import type { CowrieSession, FetchCowrieSessionsResponse } from '../models/Cowri
 export function useCowrieSessions(
     initialPage: number = 1,
     initialLimit: number = 20,
-    initialSortFields: any = { timestamp: -1 },
+    initialSortFields: any = {},
     initialIp: string = ''
 ) {
     const sessions: Ref<CowrieSession[]> = ref([]);
     const page: Ref<number> = ref(initialPage);
-    const limit: Ref<number> = ref(initialLimit);
+    const pageSize: Ref<number> = ref(initialLimit);
     const sortFields: Ref<any> = ref(initialSortFields);
     const filterIp: Ref<string> = ref(initialIp);
-    const totalPages: Ref<number> = ref(1);
     const total: Ref<number> = ref(0);
     const loading: Ref<boolean> = ref(false);
     const error: Ref<string | null> = ref(null);
@@ -31,13 +30,12 @@ export function useCowrieSessions(
 
             const response: FetchCowrieSessionsResponse = await fetchCowrieSessions(
                 page.value, 
-                limit.value, 
+                pageSize.value, 
                 sortFields.value,
                 filters
             );
-            sessions.value = response.data || [];
+            sessions.value = response.sessions || [];
             total.value = response.total || 0;
-            totalPages.value = response.totalPages || 1;
         } catch (err) {
             error.value = "Failed to load Telnet sessions. Ensure the backend is running.";
             console.error('Error fetching cowrie sessions:', err);
@@ -46,7 +44,7 @@ export function useCowrieSessions(
         }
     }
 
-    watch([page, limit, sortFields], () => {
+    watch([page, pageSize, sortFields], () => {
         fetchData();
     });
 
@@ -84,10 +82,9 @@ export function useCowrieSessions(
     return {
         sessions,
         page,
-        limit,
+        pageSize,
         sortFields,
         filterIp,
-        totalPages,
         total,
         loading,
         error,

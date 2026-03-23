@@ -366,3 +366,7 @@
 .sortable-th:hover {
     background: rgba(255, 76, 76, 0.1);
 }
+
+.events-cell {
+    text-align: center;
+}

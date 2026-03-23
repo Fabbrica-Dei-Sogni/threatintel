@@ -93,7 +93,7 @@ const routes: RouteRecordRaw[] = [
         component: CowrieSessions,
         props: (route: RouteLocationNormalized) => ({
             initialPage: route.query.page ? parseInt(route.query.page as string) : 1,
-            initialLimit: route.query.limit ? parseInt(route.query.limit as string) : 20,
+            initialPageSize: route.query.pageSize ? parseInt(route.query.pageSize as string) : 20,
             initialSortFields: route.query.sortFields ? JSON.parse(route.query.sortFields as string) : undefined,
             initialIp: typeof route.query.ip === 'string' ? route.query.ip : '',
         }),

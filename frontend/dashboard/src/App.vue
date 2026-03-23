@@ -3,7 +3,7 @@
     <router-view />
 
     <!-- Floating Settings Button -->
-    <router-link to="/settings" class="floating-settings" title="Impostazioni">
+    <router-link to="/settings" class="floating-settings" :title="t('nav.settings')">
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="3"></circle>
@@ -17,6 +17,9 @@
 
 <script setup lang="ts">
 import { onMounted } from 'vue';
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n();
 
 onMounted(() => {
   // Controlla se l'app è già in modalità standalone (installata)

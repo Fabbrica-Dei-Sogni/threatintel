@@ -108,6 +108,13 @@ export function useLogsFilter(
         return sortFields.value[field] || 0;
     }
 
+    function getSortClass(field: string): string {
+        const dir = getSortDirection(field);
+        if (dir === 1) return 'sorted-asc';
+        if (dir === -1) return 'sorted-desc';
+        return '';
+    }
+
     return {
         filterIp,
         filterUrl,
@@ -123,5 +130,6 @@ export function useLogsFilter(
         onFilterChanged,
         toggleSort,
         getSortDirection,
+        getSortClass,
     };
 }

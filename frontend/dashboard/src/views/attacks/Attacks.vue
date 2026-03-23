@@ -60,15 +60,12 @@
         </section>
 
         <section class="filters">
-            <div class="input-wrapper">
-                <input v-model="filterIp" :placeholder="t('attacks.filterByIp')" @input="onFilterChanged" class="input"
-                    type="text" />
-                <button v-if="filterIp" @click="clearIpFilter" class="clear-button" :title="t('attacks.clearIpFilter')"
-                    type="button" aria-label="Clear IP filter">
-                    ✕
-                </button>
-
-            </div>
+            <div class="filter-item search-box">
+            <input type="text" v-model="filterIp" :placeholder="t('attacks.filterByIp')" class="ip-input" @input="onFilterChanged" />
+            <button v-if="filterIp" @click="clearIpFilter" class="clear-btn" :aria-label="t('attacks.clearIpFilter')">
+              ×
+            </button>
+          </div>
         </section>
         <div v-if="loading" class="loading">{{ t('common.loading') }}</div>
         <div v-if="error" class="error">{{ t('attacks.errorLoadingData') }}</div>
@@ -114,17 +111,10 @@
                         <th>
                             <span class="label">{{ t('attacks.table.countryOrg') }}</span>
                         </th>
-                        <th>
-                            <div class="sort-control">
-                                <span class="label">{{ t('attacks.table.defcon') }}</span>
-                                <button @click="toggleSort('dangerScore')" aria-label="Ordina Pericolosità"
-                                    class="sort-button">
-                                    <span v-if="getSortDirection('dangerScore') === 1">▲</span>
-                                    <span v-else-if="getSortDirection('dangerScore') === -1">▼</span>
-                                    <span v-else>⇵</span>
-                                </button>
-                            </div>
-                        </th>
+                        <th class="sortable" @click="toggleSort('dangerScore')">
+              {{ t('attacks.table.defcon') }}
+              <span class="sort-icon" :class="getSortClass('dangerScore')" :aria-label="t('sorting.sortDanger')"></span>
+            </th>
                         <th>{{ t('attacks.table.techniques') }}</th>
                         <th>
                             <div class="sort-control">
@@ -141,9 +131,10 @@
 
                         <!--
                         <th>
-                            <div class="sort-control">
-                                <span class="label">{{ t('attacks.table.style') }}</span>
-                                <button @click="toggleSort('intensityAttack')" aria-label="Ordina Stile"
+                            <div class="org-info">
+                    <span class="org-name">{{ attacker.org || t('common.notAvailable') }}</span>
+                  </div>
+              <button @click="toggleSort('intensityAttack')" aria-label="Ordina Stile"
                                     class="sort-button">
                                     <span v-if="getSortDirection('intensityAttack') === 1">▲</span>
                                     <span v-else-if="getSortDirection('intensityAttack') === -1">▼</span>
@@ -165,83 +156,34 @@
                             </div>
                         </th>
                     -->
-                        <th>
-                            <div class="sort-control">
-                                <span class="label">{{ t('attacks.table.avgScore') }}</span>
-                                <button @click="toggleSort('averageScore')" aria-label="Ordina Punteggio medio"
-                                    class="sort-button">
-                                    <span v-if="getSortDirection('averageScore') === 1">▲</span>
-                                    <span v-else-if="getSortDirection('averageScore') === -1">▼</span>
-                                    <span v-else>⇵</span>
-                                </button>
-                            </div>
-                        </th>
-                        <th>
-                            <div class="sort-control">
-                                <span class="label">{{ t('attacks.table.rateBreach') }}</span>
-                                <button @click="toggleSort('countRateLimit')" aria-label="Ordina Rate breach"
-                                    class="sort-button">
-                                    <span v-if="getSortDirection('countRateLimit') === 1">▲</span>
-                                    <span v-else-if="getSortDirection('countRateLimit') === -1">▼</span>
-                                    <span v-else>⇵</span>
-                                </button>
-                            </div>
-                        </th>
-                        <th title="Richieste al secondo">
-                            <div class="sort-control">
-                                <span class="label">{{ t('attacks.table.rps') }}</span>
-                                <button @click="toggleSort('rps')" aria-label="Ordina RPS" class="sort-button">
-                                    <span v-if="getSortDirection('rps') === 1">▲</span>
-                                    <span v-else-if="getSortDirection('rps') === -1">▼</span>
-                                    <span v-else>⇵</span>
-                                </button>
-                            </div>
-                        </th>
-                        <th>
-                            <div class="sort-control">
-                                <span class="label">{{ t('attacks.table.totalLogs') }}</span>
-                                <button @click="toggleSort('totaleLogs')" aria-label="Ordina Totale Log"
-                                    class="sort-button">
-                                    <span v-if="getSortDirection('totaleLogs') === 1">▲</span>
-                                    <span v-else-if="getSortDirection('totaleLogs') === -1">▼</span>
-                                    <span v-else>⇵</span>
-                                </button>
-                            </div>
-                        </th>
-                        <th>
-                            <div class="sort-control">
-                                <span class="label">{{ t('attacks.table.attackDuration') }}</span>
-                                <button @click="toggleSort('durataAttacco.human')" aria-label="Ordina Durata Attacco"
-                                    class="sort-button">
-                                    <span v-if="getSortDirection('durataAttacco.human') === 1">▲</span>
-                                    <span v-else-if="getSortDirection('durataAttacco.human') === -1">▼</span>
-                                    <span v-else>⇵</span>
-                                </button>
-                            </div>
-                        </th>
-
-                        <th>
-                            <div class="sort-control">
-                                <span class="label">{{ t('attacks.table.firstSeen') }}</span>
-                                <button @click="toggleSort('firstSeen')" aria-label="Ordina Primo avvistamento"
-                                    class="sort-button">
-                                    <span v-if="getSortDirection('firstSeen') === 1">▲</span>
-                                    <span v-else-if="getSortDirection('firstSeen') === -1">▼</span>
-                                    <span v-else>⇵</span>
-                                </button>
-                            </div>
-                        </th>
-                        <th>
-                            <div class="sort-control">
-                                <span class="label">{{ t('attacks.table.lastSeen') }}</span>
-                                <button @click="toggleSort('lastSeen')" aria-label="Ordina Ultimo avvistamento"
-                                    class="sort-button">
-                                    <span v-if="getSortDirection('lastSeen') === 1">▲</span>
-                                    <span v-else-if="getSortDirection('lastSeen') === -1">▼</span>
-                                    <span v-else>⇵</span>
-                                </button>
-                            </div>
-                        </th>
+                        <th class="sortable" @click="toggleSort('averageScore')">
+              {{ t('attacks.table.avgScore') }}
+              <span class="sort-icon" :class="getSortClass('averageScore')" :aria-label="t('sorting.sortAvgScore')"></span>
+            </th>
+            <th class="sortable" @click="toggleSort('countRateLimit')">
+              {{ t('attacks.table.rateBreach') }}
+              <span class="sort-icon" :class="getSortClass('countRateLimit')" :aria-label="t('sorting.sortRateBreach')"></span>
+            </th>
+            <th class="sortable" @click="toggleSort('rps')">
+              {{ t('attacks.table.rps') }}
+              <span class="sort-icon" :class="getSortClass('rps')" :aria-label="t('sorting.sortRPS')"></span>
+            </th>
+            <th class="sortable" @click="toggleSort('totaleLogs')">
+              {{ t('attacks.table.totalLogs') }}
+              <span class="sort-icon" :class="getSortClass('totaleLogs')" :aria-label="t('sorting.sortTotalLogs')"></span>
+            </th>
+            <th class="sortable" @click="toggleSort('durataAttacco.human')">
+              {{ t('attacks.table.attackDuration') }}
+              <span class="sort-icon" :class="getSortClass('durataAttacco.human')" :aria-label="t('sorting.sortDuration')"></span>
+            </th>
+            <th class="sortable" @click="toggleSort('firstSeen')">
+              {{ t('attacks.table.firstSeen') }}
+              <span class="sort-icon" :class="getSortClass('firstSeen')" :aria-label="t('sorting.sortFirstSeen')"></span>
+            </th>
+            <th class="sortable" @click="toggleSort('lastSeen')">
+              {{ t('attacks.table.lastSeen') }}
+              <span class="sort-icon" :class="getSortClass('lastSeen')" :aria-label="t('sorting.sortLastSeen')"></span>
+            </th>
                     </tr>
                 </thead>
                 <tbody>
@@ -265,7 +207,7 @@
                         <td>
                             <span style="display:inline-flex;align-items:center;">
                                 <span class="detail-link" @click="goToIpDetails(attack.request.ip)"
-                                    style="cursor:pointer;" title="Info IP">{{ attack.request.ip }}</span>
+                                    style="cursor:pointer;" :title="t('common.infoIp')">{{ attack.request.ip }}</span>
                                 <button @click.stop="copyToClipboard(attack.request.ip)" class="btn-copy-ip"
                                     :title="t('common.copyToClipboard')">📋</button>
                                 <button @click.stop="setIpFilter(attack.request.ip)" class="btn-copy-ip"
@@ -382,7 +324,8 @@ const {
     fetchData,
     onFilterChanged,
     toggleSort,
-    getSortDirection
+    getSortDirection,
+    getSortClass
 } = useAttacksFilter(
     props.initialIp,
     props.initialProtocol,

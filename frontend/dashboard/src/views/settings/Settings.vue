@@ -1,7 +1,7 @@
 <template>
   <div class="settings-container">
     <div class="header-top">
-      <button class="back-btn" @click="goBack" title="Indietro">
+      <button class="back-btn" @click="goBack" :title="t('common.back')">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <line x1="19" y1="12" x2="5" y2="12"></line>
@@ -14,12 +14,12 @@
       <!-- Sidebar Profili -->
       <aside class="profiles-sidebar">
         <div class="sidebar-header">
-          <h3>Profili</h3>
+          <h3>{{ t('settings.profiles') }}</h3>
         </div>
         <ul class="profile-list">
           <li :class="{ active: profileStore.activeProfileId === 'default' || !profileStore.activeProfileId }"
             @click="profileStore.setActiveProfile(null)">
-            <span class="profile-name">Bersaglio Default</span>
+            <span class="profile-name">{{ t('settings.defaultProfile') }}</span>
           </li>
           <li v-for="p in profileStore.profiles" :key="p.id" :class="{ active: profileStore.activeProfileId === p.id }"
             @click="profileStore.setActiveProfile(p.id)">
@@ -27,7 +27,7 @@
           </li>
         </ul>
         <button class="btn btn-outline btn-full btn-new-profile" @click="createNewProfile">
-          <span>+ Nuovo Profilo</span>
+          <span>+ {{ t('settings.newProfile') }}</span>
         </button>
       </aside>
 
@@ -35,85 +35,85 @@
       <main class="settings-card">
         <div class="settings-header">
           <div class="header-left">
-            <h2 class="settings-title">{{ isDefault ? 'Profilo Predefinito' : 'Modifica Profilo' }}</h2>
+            <h2 class="settings-title">{{ isDefault ? t('settings.defaultProfileTitle') : t('settings.editProfileTitle') }}</h2>
           </div>
         </div>
 
         <section class="settings-section">
-          <h3 class="section-title">Informazioni Generali</h3>
+          <h3 class="section-title">{{ t('settings.generalInfo') }}</h3>
           <div class="setting-item">
-            <label for="name">Nome Honeypot</label>
-            <input type="text" id="name" v-model="form.name" placeholder="Esempio: Honeypot Milano" />
+            <label for="name">{{ t('settings.honeypotName') }}</label>
+            <input type="text" id="name" v-model="form.name" :placeholder="t('settings.honeypotName')" />
           </div>
 
           <div class="setting-item">
-            <label for="apiUrl">API URL</label>
-            <input type="text" id="apiUrl" v-model="form.apiUrl" placeholder="https://example.com/honeypot" />
-            <p class="help-text">URL del backend per questo profilo.</p>
+            <label for="apiUrl">{{ t('settings.apiUrl') }}</label>
+            <input type="text" id="apiUrl" v-model="form.apiUrl" :placeholder="t('settings.apiUrl')" />
+            <p class="help-text">{{ t('settings.apiUrlHelp') }}</p>
           </div>
         </section>
 
         <section class="settings-section">
-          <h3 class="section-title">Posizione e Geolocalizzazione</h3>
+          <h3 class="section-title">{{ t('settings.locationGeoloc') }}</h3>
 
           <div class="geolocation-tool">
             <div class="setting-item">
-              <label>Configura da IP (automatico)</label>
+              <label>{{ t('settings.configFromIp') }}</label>
               <div class="input-group">
-                <input type="text" v-model="ipToGeolocate" placeholder="Inserisci IP (es: 8.8.8.8)"
+                <input type="text" v-model="ipToGeolocate" :placeholder="t('settings.configFromIp')"
                   @keyup.enter="handleGeolocate" />
                 <button class="btn btn-accent" @click="handleGeolocate" :disabled="isGeolocating">
-                  {{ isGeolocating ? 'Ricerca...' : 'Trova Posizione' }}
+                  {{ isGeolocating ? t('settings.finding') : t('settings.findPosition') }}
                 </button>
               </div>
-              <p class="help-text">Recupera coordinate e nome dal servizio ipinfo.</p>
+              <p class="help-text">{{ t('settings.geolocHelp') }}</p>
             </div>
 
             <div class="map-selection-wrapper">
-              <label>Selezione sulla Mappa</label>
+              <label>{{ t('settings.mapSelection') }}</label>
               <div ref="mapContainer" class="settings-map"></div>
-              <p class="help-text">Clicca sulla mappa o trascina il marker per impostare le coordinate.</p>
+              <p class="help-text">{{ t('settings.mapHelp') }}</p>
             </div>
           </div>
 
           <div class="setting-row">
             <div class="setting-item">
-              <label for="lat">Latitudine</label>
+              <label for="lat">{{ t('settings.latitude') }}</label>
               <input type="number" id="lat" v-model.number="form.lat" step="0.0001" />
             </div>
             <div class="setting-item">
-              <label for="lon">Longitudine</label>
+              <label for="lon">{{ t('settings.longitude') }}</label>
               <input type="number" id="lon" v-model.number="form.lon" step="0.0001" />
             </div>
           </div>
         </section>
 
         <section class="settings-section" v-if="canInstallPwa">
-          <h3 class="section-title">App & PWA</h3>
+          <h3 class="section-title">{{ t('settings.appPwa') }}</h3>
           <div class="pwa-card">
             <div class="pwa-info">
-              <h4>Installa Dashboard</h4>
-              <p>Accedi più velocemente installando l'applicazione sul tuo dispositivo.</p>
+              <h4>{{ t('settings.installDashboard') }}</h4>
+              <p>{{ t('settings.installHelp') }}</p>
             </div>
             <button v-if="canInstallPwa" class="btn btn-primary btn-pwa" @click="handleInstallPwa">
-              Installa App
+              {{ t('settings.installApp') }}
             </button>
             <div v-else-if="isAppInstalled" class="pwa-badge pwa-installed">
-              L'app è già installata sul dispositivo
+              {{ t('settings.appInstalled') }}
             </div>
             <div v-else class="pwa-badge">
-              In attesa del segnale dal browser...
+              {{ t('settings.waitingBrowser') }}
             </div>
           </div>
         </section>
 
         <div class="actions">
-          <button v-if="!isDefault" class="btn btn-danger btn-delete-profile" @click="handleDelete">Elimina
-            Profilo</button>
+          <button v-if="!isDefault" class="btn btn-danger btn-delete-profile" @click="handleDelete">{{
+            t('settings.deleteProfile') }}</button>
           <div class="spacer"></div>
-          <button v-if="!isDefault" class="btn btn-secondary" @click="resetForm">Annulla</button>
-          <button v-else class="btn btn-secondary" @click="resetToDefault">Reset a Fabbrica</button>
-          <button class="btn btn-primary" @click="handleSave">Salva Profilo</button>
+          <button v-if="!isDefault" class="btn btn-secondary" @click="resetForm">{{ t('common.cancel') }}</button>
+          <button v-else class="btn btn-secondary" @click="resetToDefault">{{ t('settings.resetToFactory') }}</button>
+          <button class="btn btn-primary" @click="handleSave">{{ t('settings.saveProfile') }}</button>
         </div>
 
         <div v-if="successMessage" class="success-msg">{{ successMessage }}</div>
@@ -127,6 +127,7 @@
 import { ref, watch, computed, reactive, onMounted, onBeforeUnmount } from 'vue';
 import { useRouter } from 'vue-router';
 import { useProfileStore } from '../../stores/profiles';
+import { useI18n } from 'vue-i18n';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -146,6 +147,7 @@ L.Icon.Default.mergeOptions({
 
 const router = useRouter();
 const profileStore = useProfileStore();
+const { t } = useI18n();
 
 const successMessage = ref('');
 const error = ref('');
@@ -192,7 +194,7 @@ const handleInstallPwa = async () => {
 
 const createNewProfile = () => {
   const id = profileStore.addProfile({
-    name: 'Nuovo Honeypot',
+    name: t('settings.newProfile'),
     apiUrl: profileStore.activeProfile.apiUrl,
     lat: 0,
     lon: 0
@@ -202,7 +204,7 @@ const createNewProfile = () => {
 
 const handleGeolocate = async () => {
   if (!ipToGeolocate.value) {
-    error.value = 'Inserisci un indirizzo IP';
+    error.value = t('settings.errorIp');
     return;
   }
 
@@ -211,7 +213,7 @@ const handleGeolocate = async () => {
 
   try {
     const response = await fetch(`https://ipinfo.io/${ipToGeolocate.value}/json`);
-    if (!response.ok) throw new Error('Errore nel recupero dati IP');
+    if (!response.ok) throw new Error(t('settings.errorIpData'));
 
     const data = await response.json();
     if (data.loc) {
@@ -226,24 +228,24 @@ const handleGeolocate = async () => {
       } else if (data.city && data.org) {
         name = `${data.city} (${data.org.split(' ').slice(1).join(' ')})`;
       } else {
-        name = data.org || data.city || 'Honeypot Remoto';
+        name = data.org || data.city || t('settings.newProfile');
       }
       form.name = name;
 
-      successMessage.value = 'Coordinate e nome recuperati!';
+      successMessage.value = t('settings.successGeoloc');
       setTimeout(() => successMessage.value = '', 3000);
     } else {
-      throw new Error('Coordinate non trovate per questo IP');
+      throw new Error(t('settings.errorCoordsNotFound'));
     }
   } catch (err: any) {
-    error.value = err.message || 'Errore durante la geolocalizzazione';
+    error.value = err.message || t('settings.errorGeolocalizing');
   } finally {
     isGeolocating.value = false;
   }
 };
 
 const handleDelete = () => {
-  if (confirm(`Sei sicuro di voler eliminare il profilo "${form.name}"?`)) {
+  if (confirm(t('settings.deleteConfirm', { name: form.name }))) {
     profileStore.deleteProfile(profileStore.activeProfileId!);
   }
 };
@@ -323,13 +325,13 @@ const handleSave = () => {
   successMessage.value = '';
 
   if (!form.name || !form.apiUrl) {
-    error.value = 'Nome e API URL sono richiesti';
+    error.value = t('settings.errorRequired');
     return;
   }
 
   // Pass activeProfileId directly. The store will handle 'default' -> new entry conversion
   profileStore.updateProfile(profileStore.activeProfileId, { ...form });
-  successMessage.value = 'Profilo salvato correttamente!';
+  successMessage.value = t('settings.successSave');
 
   setTimeout(() => {
     successMessage.value = '';
@@ -337,7 +339,7 @@ const handleSave = () => {
 };
 
 const resetToDefault = () => {
-  if (confirm('Sei sicuro di voler resettare il profilo predefinito ai valori iniziali?')) {
+  if (confirm(t('settings.resetConfirm'))) {
     localStorage.removeItem('api_url');
     window.location.reload();
   }

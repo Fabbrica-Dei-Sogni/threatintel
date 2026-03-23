@@ -12,7 +12,7 @@
                 <span class="attacker-label">{{ t('attackDetail.attacker') }}</span>
                 <h2 class="attacker-ip">
                     {{ attack.request.ip }}
-                    <span class="copy-btn" @click.stop="copyToClipboard(attack.request.ip)" title="Copia IP">📋</span>
+                    <span class="copy-btn" @click.stop="copyToClipboard(attack.request.ip)" :title="t('common.copyIp')">📋</span>
                 </h2>
             </div>
             <button @click="goToIpDetails(attack.request.ip)" class="attacker-action-btn">
@@ -65,7 +65,7 @@
                     </div>
                     <transition name="collapse">
                         <div v-if="expanded[log.id]" class="log-body">
-                            <p><strong>Score:</strong> {{ log.fingerprint.score ?? t('components.radar.notAvailable') }}
+                            <p><strong>{{ t('common.score') }}:</strong> {{ log.fingerprint.score ?? t('common.notAvailable') }}
                             </p>
                             <span v-if="log.fingerprint.score != null && log.fingerprint.score > 0">
                                 <p><strong>{{ t('threatLog.techniques') }}:</strong></p>
@@ -74,9 +74,9 @@
                                 </ul>
                             </span>
                             <p><strong>{{ t('threatLog.url') }}:</strong></p>
-                            <pre> {{ log.request.url ?? t('components.radar.notAvailable') }}</pre>
-                            <p><strong>User Agent:</strong> {{ log.request.userAgent ||
-                                t('components.radar.notAvailable') }}</p>
+                            <pre> {{ log.request.url ?? t('common.notAvailable') }}</pre>
+                            <p><strong>{{ t('threatLog.userAgent') }}:</strong> {{ log.request.userAgent ||
+                                t('common.notAvailable') }}</p>
                             <HexViewer :raw-data="log.request" :label="t('threatLog.request')" />
                             <!-- 1. Headers -->
                             <HexViewer v-if="log.request.headers" :raw-data="log.request.headers"
@@ -108,16 +108,16 @@
                     </div>
                     <transition name="collapse">
                         <div v-if="expandedEvents[event._id || event.id]" class="event-body">
-                            <p><strong>User Agent:</strong> {{ event.userAgent || t('components.radar.notAvailable') }}
+                            <p><strong>{{ t('threatLog.userAgent') }}:</strong> {{ event.userAgent || t('common.notAvailable') }}
                             </p>
-                            <p><strong>Path:</strong> {{ event.path }}</p>
+                            <p><strong>{{ t('common.path') }}:</strong> {{ event.path }}</p>
                             <p><strong>{{ t('threatLog.method') }}:</strong> {{ event.method ||
-                                t('components.radar.notAvailable') }}</p>
-                            <p><strong>Honeypot ID:</strong> {{ event.honeypotId || t('components.radar.notAvailable')
+                                t('common.notAvailable') }}</p>
+                            <p><strong>{{ t('common.honeypotId') }}:</strong> {{ event.honeypotId || t('common.notAvailable')
                             }}</p>
                             <p><strong>{{ t('common.error') }}:</strong> {{ event.message ||
-                                t('components.radar.notAvailable') }}</p>
-                            <HexViewer v-if="event.headers" :raw-data="event.headers" label="Headers" />
+                                t('common.notAvailable') }}</p>
+                            <HexViewer v-if="event.headers" :raw-data="event.headers" :label="t('threatLog.headers')" />
                         </div>
                     </transition>
                 </div>
@@ -191,11 +191,11 @@ const paginatedRateLimitEvents = computed(() => {
 
 // Methods
 function formatDate(ts) {
-    return ts ? dayjs(ts).format('DD/MM/YYYY HH:mm:ss') : 'N/D'
+    return ts ? dayjs(ts).format('DD/MM/YYYY HH:mm:ss') : t('common.notAvailable')
 }
 
 function formatJson(obj) {
-    return obj ? JSON.stringify(obj, null, 2) : 'N/D'
+    return obj ? JSON.stringify(obj, null, 2) : t('common.notAvailable')
 }
 
 function toggleLog(id) {

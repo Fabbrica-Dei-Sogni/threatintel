@@ -16,14 +16,11 @@
 
     <section class="filters">
       <ProtocolSelector v-model="filterProtocol" :options="['http', 'ssh', 'https']" />
-      <div class="input-wrapper" style="position: relative; flex: 1; margin-right: 10px;">
-        <input v-model="filterIp" :placeholder="t('threatLogs.filterByIp')" @input="onFilterChanged" class="input"
-          type="text" />
-        <button v-if="filterIp" @click="clearIpFilter" class="clear-button" :title="t('threatLogs.clearIpFilter')"
-          type="button" aria-label="Clear IP filter">
-          ✕
+      <div class="filter-item search-box" style="position: relative; flex: 1; margin-right: 10px;">
+        <input type="text" v-model="filterIp" :placeholder="t('threatLogs.filterByIp')" @input="onFilterChanged" class="ip-input" />
+        <button v-if="filterIp" @click="clearIpFilter" class="clear-btn" :aria-label="t('threatLogs.clearIpFilter')">
+          ×
         </button>
-
       </div>
       <div class="input-wrapper" style="position: relative; flex: 1;">
         <input v-model="filterUrl" :placeholder="t('threatLogs.filterByUrl')" @input="onFilterChanged" class="input"
@@ -66,55 +63,25 @@
               <span class="label">{{ t('threatLogs.table.countryOrg') }}</span>
             </th>
             <th>{{ t('threatLogs.table.details') }}</th>
-            <th>
-              <div class="sort-control">
-                <span class="label">{{ t('threatLogs.table.ip') }}</span>
-                <button @click="toggleSort('request.ip')" aria-label="Ordina IP" class="sort-button">
-                  <span v-if="getSortDirection('request.ip') === 1">▲</span>
-                  <span v-else-if="getSortDirection('request.ip') === -1">▼</span>
-                  <span v-else>⇵</span>
-                </button>
-              </div>
+            <th class="sortable" @click="toggleSort('request.ip')">
+              {{ t('threatLogs.table.ip') }}
+              <span class="sort-icon" :class="getSortClass('request.ip')" :aria-label="t('sorting.sortIp')"></span>
             </th>
-            <th>
-              <div class="sort-control">
-                <span class="label">{{ t('threatLogs.table.dangerScore') }}</span>
-                <button @click="toggleSort('fingerprint.score')" aria-label="Ordina Score" class="sort-button">
-                  <span v-if="getSortDirection('fingerprint.score') === 1">▲</span>
-                  <span v-else-if="getSortDirection('fingerprint.score') === -1">▼</span>
-                  <span v-else>⇵</span>
-                </button>
-              </div>
+            <th class="sortable" @click="toggleSort('fingerprint.score')">
+              {{ t('threatLogs.table.dangerScore') }}
+              <span class="sort-icon" :class="getSortClass('fingerprint.score')" :aria-label="t('sorting.sortScore')"></span>
             </th>
-            <th>
-              <div class="sort-control">
-                <span class="label">{{ t('threatLogs.table.url') }}</span>
-                <button @click="toggleSort('request.url')" aria-label="Ordina URL" class="sort-button">
-                  <span v-if="getSortDirection('request.url') === 1">▲</span>
-                  <span v-else-if="getSortDirection('request.url') === -1">▼</span>
-                  <span v-else>⇵</span>
-                </button>
-              </div>
+            <th class="sortable" @click="toggleSort('request.url')">
+              {{ t('threatLogs.table.url') }}
+              <span class="sort-icon" :class="getSortClass('request.url')" :aria-label="t('sorting.sortUrl')"></span>
             </th>
-            <th>
-              <div class="sort-control">
-                <span class="label">{{ t('threatLogs.table.method') }}</span>
-                <button @click="toggleSort('request.method')" aria-label="Ordina Metodo" class="sort-button">
-                  <span v-if="getSortDirection('request.method') === 1">▲</span>
-                  <span v-else-if="getSortDirection('request.method') === -1">▼</span>
-                  <span v-else>⇵</span>
-                </button>
-              </div>
+            <th class="sortable" @click="toggleSort('request.method')">
+              {{ t('threatLogs.table.method') }}
+              <span class="sort-icon" :class="getSortClass('request.method')" :aria-label="t('sorting.sortMethod')"></span>
             </th>
-            <th>
-              <div class="sort-control">
-                <span class="label">{{ t('threatLogs.table.timestamp') }}</span>
-                <button @click="toggleSort('timestamp')" aria-label="Ordina Timestamp" class="sort-button">
-                  <span v-if="getSortDirection('timestamp') === 1">▲</span>
-                  <span v-else-if="getSortDirection('timestamp') === -1">▼</span>
-                  <span v-else>⇵</span>
-                </button>
-              </div>
+            <th class="sortable" @click="toggleSort('timestamp')">
+              {{ t('threatLogs.table.timestamp') }}
+              <span class="sort-icon" :class="getSortClass('timestamp')" :aria-label="t('sorting.sortTimestamp')"></span>
             </th>
           </tr>
         </thead>
@@ -123,9 +90,9 @@
             <td>
               <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
                 <CountryFlag v-if="log.ipDetailsId?.ipinfo?.country" :countryCode="log.ipDetailsId.ipinfo.country" />
-                <!--
-                <span>{{ log.ipDetailsId?.ipinfo?.country || '-' }}</span>
-              -->
+                <div class="org-info">
+                  <span class="org-name" :title="log.ipDetailsId?.ipinfo?.org">{{ log.ipDetailsId?.ipinfo?.org || t('common.notAvailable') }}</span>
+                </div>
               </div>
             </td>
             <td><button @click="goToThreatLogDetails(log.id)" style="cursor: pointer;" class="info-btn">{{
@@ -133,7 +100,7 @@
             <td>
               <span style="display:inline-flex;align-items:center;">
                 <span class="info-btn" @click="goToIpDetails(log.request.ip)" style="cursor: pointer;"
-                  title="Info IP">{{
+                  :title="t('common.infoIp')">{{
                     log.request.ip }}</span>
                 <button @click.stop="copyToClipboard(log.request.ip)" class="btn-copy-ip"
                   :title="t('common.copyToClipboard')">📋</button>
@@ -156,7 +123,7 @@
             <td>{{ formatDate(log.timestamp) }}</td>
           </tr>
           <tr v-if="logs.length === 0 && !loading">
-            <td colspan="5" style="text-align:center;">{{ t('threatLogs.noLogsFound') }}</td>
+            <td colspan="7" style="text-align:center;">{{ t('threatLogs.noLogsFound') }}</td>
           </tr>
         </tbody>
       </table>
@@ -180,7 +147,7 @@
 </template>
 
 <script setup>
-import { computed, watch, ref } from 'vue';
+import { computed, watch, ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useLogsFilter } from '../../composable/useLogsFilter';
 import { useClipboard } from '../../composable/useClipboard';
@@ -233,7 +200,7 @@ const {
   fetchData,
   onFilterChanged,
   toggleSort,
-  getSortDirection
+  getSortClass // Changed from getSortDirection to getSortClass
 } = useLogsFilter(props.initialIp, props.initialUrl, props.initialProtocol, props.initialPage, props.initialSortFields);
 
 //step 4. definire eventuali valori di tipo computer che cambiano a seconda il cambio dei valori

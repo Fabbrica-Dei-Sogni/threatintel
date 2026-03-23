@@ -18,8 +18,8 @@
                 </div>
                 <transition name="collapse">
                     <div v-if="toggles.general" class="section-body">
-                        <p><strong>ID:</strong> {{ log.id }}</p>
-                        <p><strong>Timestamp:</strong> {{ formatDate(log.timestamp) }}</p>
+                        <p><strong>{{ t('common.id') }}:</strong> {{ log.id }}</p>
+                        <p><strong>{{ t('common.timestamp') }}:</strong> {{ formatDate(log.timestamp) }}</p>
                     </div>
                 </transition>
             </div>
@@ -31,17 +31,17 @@
                 <transition name="collapse">
                     <div v-if="toggles.geo" class="section-body">
                         <p><strong>{{ t('ipDetails.country') }}:</strong> {{ log.geo.country ||
-                            t('components.radar.notAvailable') }}</p>
+                            t('common.notAvailable') }}</p>
                         <p><strong>{{ t('ipDetails.region') }}:</strong> {{ log.geo.region ||
-                            t('components.radar.notAvailable') }}</p>
+                            t('common.notAvailable') }}</p>
                         <p><strong>{{ t('ipDetails.city') }}:</strong> {{ log.geo.city ||
-                            t('components.radar.notAvailable') }}</p>
+                            t('common.notAvailable') }}</p>
                         <p><strong>{{ t('threatLog.coordinates') }}:</strong> {{ log.geo.coordinates?.join(', ') ||
-                            t('components.radar.notAvailable') }}</p>
+                            t('common.notAvailable') }}</p>
                         <p><strong>{{ t('ipDetails.timezone') }}:</strong> {{ log.geo.timezone ||
-                            t('components.radar.notAvailable') }}</p>
-                        <p><strong>ASN:</strong> {{ log.geo.asn || t('components.radar.notAvailable') }}</p>
-                        <p><strong>ISP:</strong> {{ log.geo.isp || t('components.radar.notAvailable') }}</p>
+                            t('common.notAvailable') }}</p>
+                        <p><strong>ASN:</strong> {{ log.geo.asn || t('common.notAvailable') }}</p>
+                        <p><strong>ISP:</strong> {{ log.geo.isp || t('common.notAvailable') }}</p>
                     </div>
                 </transition>
             </div>
@@ -53,7 +53,7 @@
                 </div>
                 <transition name="collapse">
                     <div v-if="toggles.fingerprint" class="section-body">
-                        <p><strong>Hash:</strong> {{ log.fingerprint.hash || t('components.radar.notAvailable') }}</p>
+                        <p><strong>{{ t('threatLog.hash') }}:</strong> {{ log.fingerprint.hash || t('common.notAvailable') }}</p>
                         <p><strong>{{ t('threatLog.techniques') }}:</strong></p>
                         <ul>
                             <li v-for="(ind, i) in log.fingerprint.indicators" :key="i">{{ ind }}</li>
@@ -70,18 +70,18 @@
                 <transition name="collapse">
                     <div v-if="toggles.request" class="section-body">
                         <p class="link">
-                            <strong @click="goToIpDetails(log.request.ip)" style="cursor: pointer;">IP:</strong>
+                            <strong @click="goToIpDetails(log.request.ip)" style="cursor: pointer;">{{ t('common.ip') }}:</strong>
                             <span @click="goToIpDetails(log.request.ip)" style="cursor: pointer;"> {{ log.request.ip ||
-                                t('components.radar.notAvailable') }} </span>
+                                t('common.notAvailable') }} </span>
                             <span class="copy-btn-inline" @click.stop="copyToClipboard(log.request.ip)"
-                                title="Copia IP">📋</span>
+                                :title="t('common.copyIp')">📋</span>
                         </p>
                         <p><strong>{{ t('threatLog.method') }}:</strong> {{ log.request.method ||
-                            t('components.radar.notAvailable') }}</p>
+                            t('common.notAvailable') }}</p>
                         <p><strong>{{ t('threatLog.url') }}:</strong> {{ log.request.url ||
-                            t('components.radar.notAvailable') }}</p>
+                            t('common.notAvailable') }}</p>
                         <p><strong>{{ t('threatLog.userAgent') }}:</strong> {{ log.request.userAgent ||
-                            t('components.radar.notAvailable')
+                            t('common.notAvailable')
                         }}</p>
                         <!--
                         <p><strong>Referer:</strong> {{ log.request.referer || t('components.radar.notAvailable') }}</p>
@@ -108,7 +108,7 @@
                 <transition name="collapse">
                     <div v-if="toggles.metadata" class="section-body">
                         <!--
-                       <p><strong>Session ID:</strong> {{ log.metadata.sessionId || t('components.radar.notAvailable')
+                       <p><strong>{{ t('threatLog.sessionId') }}:</strong> {{ log.metadata.sessionId || t('common.notAvailable')
                         }}</p>
                     -->
                         <p><strong>{{ t('threatLog.userAgent') }}</strong></p>
@@ -172,11 +172,11 @@ async function load() {
 }
 
 function formatDate(s) {
-    return s ? dayjs(s).format('DD/MM/YYYY HH:mm:ss') : 'N/D'
+    return s ? dayjs(s).format('DD/MM/YYYY HH:mm:ss') : t('common.notAvailable')
 }
 
 function formatJson(o) {
-    return o ? JSON.stringify(o, null, 2) : 'N/D'
+    return o ? JSON.stringify(o, null, 2) : t('common.notAvailable')
 }
 
 function goToIpDetails(ip) {

@@ -142,6 +142,13 @@ export function useAttacksFilter(
         return sortFields.value?.[field] || 0;
     }
 
+    function getSortClass(field: string): string {
+        const dir = getSortDirection(field);
+        if (dir === 1) return 'sorted-asc';
+        if (dir === -1) return 'sorted-desc';
+        return '';
+    }
+
     return {
         attacks,
         filterIp,
@@ -165,5 +172,6 @@ export function useAttacksFilter(
         onFilterChanged,
         toggleSort,
         getSortDirection,
+        getSortClass,
     };
 }

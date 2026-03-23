@@ -111,7 +111,7 @@
                     <tr v-for="session in sessions" :key="session.session" class="cyber-row">
                         <td class="ip-cell">
                             <span class="ip-container">
-                                <span class="ip-link" @click="goToIpDetails(session.src_ip)" :title="$t('cowrie.sessions.table.infoIp')">
+                                <span class="ip-link" @click="goToIpDetails(session.src_ip)" :title="$t('common.infoIp')">
                                     {{ session.src_ip }}
                                 </span>
                                 <button @click.stop="copyToClipboard(session.src_ip)" class="btn-copy-mini"

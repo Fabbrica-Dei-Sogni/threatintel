@@ -14,7 +14,7 @@
                 <div class="info-item">
                     <span class="label">{{ $t('cowrie.attackDetail.hostileIp') }}</span>
                     <span class="value ip">
-                        <span class="ip-link" @click="goToIpDetails(sessionDetails.src_ip)" :title="$t('cowrie.attackDetail.infoIp')">{{ sessionDetails.src_ip }}</span>
+                        <span class="ip-link" @click="goToIpDetails(sessionDetails.src_ip)" :title="$t('common.infoIp')">{{ sessionDetails.src_ip }}</span>
                         <button @click.stop="copyToClipboard(sessionDetails.src_ip)" class="btn-copy-mini" :title="$t('cowrie.attackDetail.copy')">📋</button>
                     </span>
                 </div>
@@ -146,7 +146,7 @@ const fetchSessionData = async () => {
 };
 
 const formatDate = (dateStr) => {
-    if (!dateStr) return '-';
+    if (!dateStr) return t('common.notAvailable');
     return dayjs(dateStr).format('DD/MM/YYYY HH:mm:ss');
 };
 

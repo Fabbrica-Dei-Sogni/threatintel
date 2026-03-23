@@ -3,10 +3,16 @@ import { CowrieService } from '../services/CowrieService';
 import { IpDetailsService } from '../services/IpDetailsService';
 import CowrieSession from '../models/CowrieSessionSchema';
 import CowrieEvent from '../models/CowrieEventSchema';
+import CowrieAuth from '../models/CowrieAuthSchema';
+import CowrieInput from '../models/CowrieInputSchema';
+import CowrieTtyLog from '../models/CowrieTtyLogSchema';
 
 // Mocks
 jest.mock('../models/CowrieSessionSchema');
 jest.mock('../models/CowrieEventSchema');
+jest.mock('../models/CowrieAuthSchema');
+jest.mock('../models/CowrieInputSchema');
+jest.mock('../models/CowrieTtyLogSchema');
 jest.mock('winston', () => ({
     Logger: jest.fn().mockImplementation(() => ({
         info: jest.fn(),
@@ -45,30 +51,73 @@ describe('CowrieService', () => {
     });
 
     describe('getSessions()', () => {
-        it('should return paginated sessions', async () => {
-            const mockSessions = [{ session: 'abc', src_ip: '10.0.0.1' }];
-            const totalCount = 1;
+        it('should return paginated sessions with eventCount using aggregate', async () => {
+            const mockAggregateResult = [{
+                sessions: [
+                    { session: 'abc', src_ip: '10.0.0.1', eventCount: 5 }
+                ],
+                totalCount: 1
+            }];
 
-            (CowrieSession.countDocuments as jest.Mock).mockResolvedValue(totalCount);
-            
-            const populateMock = jest.fn().mockReturnValue({
-                exec: jest.fn().mockResolvedValue(mockSessions)
+            const aggregateMock = jest.fn().mockReturnValue({
+                exec: jest.fn().mockResolvedValue(mockAggregateResult)
             });
-            const limitMock = jest.fn().mockReturnValue({ populate: populateMock });
-            const skipMock = jest.fn().mockReturnValue({ limit: limitMock });
-            const sortMock = jest.fn().mockReturnValue({ skip: skipMock });
-            (CowrieSession.find as jest.Mock).mockReturnValue({ sort: sortMock });
+            (CowrieSession.aggregate as jest.Mock).mockReturnValue(aggregateMock());
+
+            const result = await cowrieService.getSessions(1, 10, { eventCount: -1 }, { src_ip: '10.0.0.1' });
+
+            expect(result).toEqual({
+                sessions: mockAggregateResult[0].sessions,
+                totalCount: 1
+            });
+            expect(CowrieSession.aggregate).toHaveBeenCalled();
+            
+            // Verify pipeline contains match and addFields for eventCount
+            const pipeline = (CowrieSession.aggregate as jest.Mock).mock.calls[0][0];
+            expect(pipeline).toContainEqual(expect.objectContaining({ $match: expect.any(Object) }));
+            expect(pipeline).toContainEqual(expect.objectContaining({ $addFields: expect.objectContaining({ eventCount: expect.any(Object) }) }));
+        });
+
+        it('should return empty array if aggregate returns nothing', async () => {
+            (CowrieSession.aggregate as jest.Mock).mockReturnValue({
+                exec: jest.fn().mockResolvedValue([])
+            });
 
             const result = await cowrieService.getSessions(1, 10);
 
             expect(result).toEqual({
-                data: mockSessions,
-                page: 1,
-                limit: 10,
-                total: 1,
-                totalPages: 1
+                sessions: [],
+                totalCount: 0
             });
-            expect(CowrieSession.find).toHaveBeenCalled();
+        });
+    });
+
+    describe('getSessions()', () => {
+        // ... (previous tests)
+    });
+
+    describe('countSessions()', () => {
+        it('should return total count of documents with filter', async () => {
+            (CowrieSession.countDocuments as jest.Mock).mockResolvedValue(42);
+            const result = await cowrieService.countSessions({ src_ip: '1.2.3.4' });
+            expect(result).toBe(42);
+            expect(CowrieSession.countDocuments).toHaveBeenCalledWith(expect.objectContaining({
+                src_ip: { $regex: '1.2.3.4', $options: 'i' }
+            }));
+        });
+    });
+
+    describe('getSessionDetails()', () => {
+        it('should return session details by id', async () => {
+            const mockSession = { session: 'xyz', src_ip: '1.1.1.1' };
+            const populateMock = jest.fn().mockReturnValue({
+                exec: jest.fn().mockResolvedValue(mockSession)
+            });
+            (CowrieSession.findOne as jest.Mock).mockReturnValue({ populate: populateMock });
+
+            const result = await cowrieService.getSessionDetails('xyz');
+            expect(result).toEqual(mockSession);
+            expect(CowrieSession.findOne).toHaveBeenCalledWith({ session: 'xyz' });
         });
     });
 
@@ -80,13 +129,16 @@ describe('CowrieService', () => {
             ];
 
             const execMock = jest.fn().mockResolvedValue(mockEvents);
-            const sortMock = jest.fn().mockReturnValue({ exec: execMock });
-            (CowrieEvent.find as jest.Mock).mockReturnValue({ sort: sortMock });
+            const leanMock = jest.fn().mockReturnValue({ exec: execMock });
+            (CowrieEvent.find as jest.Mock).mockReturnValue({ lean: leanMock });
+            (CowrieAuth.find as jest.Mock).mockReturnValue({ lean: leanMock });
+            (CowrieInput.find as jest.Mock).mockReturnValue({ lean: leanMock });
+            (CowrieTtyLog.find as jest.Mock).mockReturnValue({ lean: leanMock });
 
             const result = await cowrieService.getSessionEvents('sess-hash-123');
 
             expect(CowrieEvent.find).toHaveBeenCalledWith({ session: 'sess-hash-123' });
-            expect(result).toEqual(mockEvents);
+            expect(result).toEqual([...mockEvents, ...mockEvents, ...mockEvents, ...mockEvents]);
         });
     });
 

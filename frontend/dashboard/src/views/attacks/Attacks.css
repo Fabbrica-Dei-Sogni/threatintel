@@ -1,18 +1,38 @@
 .attacchi {
   padding: 25px 30px;
-  background-color: #1e1b1a;
   color: #f0e6d2;
-
+  background: linear-gradient(180deg, #1e1b1a, #2b1b17 35%, #1c0d09);
   min-height: 100vh;
-  /* cromatura attuale mantenuta */
+  display: flex;
+  flex-direction: column;
+}
+
+.header-top,
+.actions,
+.filters-container {
+  position: sticky;
+  z-index: 100;
+  background-color: #1e1b1a;
+  padding-top: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #3f261f;
+}
+
+.header-top { top: 0; }
+.actions { top: 56px; }
+.filters-container { top: 112px; margin-bottom: 24px !important; }
+
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .attacchi h1 {
   font-size: 24px;
-  margin-bottom: 16px;
+  margin: 0;
   color: #ff4c4c;
   font-weight: 700;
-  /* accentuato */
   text-shadow: 0 0 6px rgba(255, 76, 76, 0.6);
   display: flex;
   align-items: center;
@@ -36,9 +56,9 @@
 }
 
 .actions {
-  margin-bottom: 20px;
   display: flex;
   gap: 16px;
+  margin: 0;
 }
 
 .btn-action {
@@ -61,89 +81,66 @@
   transition: background-color 0.4s ease, box-shadow 0.4s ease, transform 0.2s ease;
 }
 
-/* Filtri */
-.filter-bar {
+/* Filtri Combinati */
+.filters-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background: rgba(30, 27, 26, 0.4);
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid #3f261f;
+  margin-bottom: 24px;
+}
+
+.filter-row {
   display: flex;
   align-items: center;
-  gap: 14px;
-  background-color: #262323;
-  padding: 14px 20px;
-  border-radius: 8px;
-  margin-bottom: 20px;
-  font-weight: 600;
-  color: #f2a1a1;
-  font-size: 15px;
+  gap: 20px;
+  flex-wrap: wrap;
 }
 
-.time-filter {
+.filter-item {
   display: flex;
-  flex-wrap: wrap;
-  gap: 14px;
   align-items: center;
-  margin-bottom: 20px;
-  color: #f2a1a1;
+  gap: 12px;
 }
 
-.time-filter label {
+.min-logs-label {
   font-weight: 600;
-  user-select: none;
+  color: #f2a1a1;
+  white-space: nowrap;
 }
 
-.time-ago .el-input-number,
-.time-range .el-input-number {
-  min-width: 110px;
-  background-color: #490909 !important;
-  color: #f2c7c7 !important;
-  border-radius: 8px !important;
-  box-shadow: inset 0 0 12px #370909;
+.search-box {
+  position: relative;
+  flex-grow: 1;
+  max-width: 400px;
 }
 
-.time-ago .el-select,
-.time-range .el-select {
-  width: 120px;
-  min-width: unset;
-  background-color: #490909 !important;
-  color: #f2c7c7 !important;
-  border-radius: 8px !important;
-  box-shadow: inset 0 0 12px #370909;
+.ip-input {
+  width: 100%;
+  padding: 8px 36px 8px 12px;
+  background: #2b1b17;
+  border: 1px solid #4f3b33;
+  border-radius: 6px;
+  color: #f3e7d5;
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.4);
 }
 
-/* Date Range Picker styling */
-.time-range .el-date-editor {
-  --el-date-editor-width: 280px;
-  background-color: #490909 !important;
-  border-radius: 8px !important;
-  box-shadow: inset 0 0 12px #370909;
-  border: 1px solid #6b3a38 !important;
+.time-filter-group {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    color: #f2a1a1;
+    font-weight: 600;
 }
 
-.time-range .el-date-editor .el-range-input {
-  background-color: transparent !important;
-  color: #f2c7c7 !important;
-}
-
-.time-range .el-date-editor .el-range-separator {
-  color: #f2a1a1 !important;
-}
-
-.time-range .el-date-editor .el-range__icon {
-  color: #f2a1a1 !important;
-}
-
-.time-ago .el-select .el-input__inner,
-.time-range .el-select .el-input__inner {
-  padding-left: 12px;
-  padding-right: 24px;
-}
-
-/* Sezione filtro IP / URL */
-.filters {
-  display: flex;
-  gap: 14px;
-  margin-bottom: 22px;
-  justify-content: center;
-  flex-wrap: wrap;
-  max-width: 100%;
+.time-ago-wrapper, .time-range-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
 .input-wrapper {
@@ -173,7 +170,7 @@
 }
 
 /* Pulsante X cancella filtro */
-.clear-button {
+.clear-btn {
   position: absolute;
   right: 12px;
   top: 50%;
@@ -188,12 +185,12 @@
   z-index: 20;
 }
 
-.clear-button:hover {
+.clear-btn:hover {
   color: #ff4c4c;
 }
 
-/* Paginazione */
-.pagination {
+/* Paginazione Cyber Standardizzata */
+.cyber-pagination {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -201,7 +198,7 @@
   margin: 28px 0;
 }
 
-.pagination button {
+.cyber-pagination button {
   background: linear-gradient(160deg, #3a2724, #2b1b17);
   border: 1px solid #5f3d39;
   border-radius: 8px;
@@ -212,20 +209,39 @@
   transition: background 0.3s ease, transform 0.2s ease;
 }
 
-.pagination button:hover:not(:disabled) {
+.cyber-pagination button:hover:not(:disabled) {
   background: linear-gradient(160deg, #592622, #4a1f1b);
   transform: translateY(-2px);
   box-shadow: 0 0 8px #ff4c4c99;
 }
 
-.pagination button:disabled {
+.cyber-pagination button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
 
+.pagination-info {
+  font-weight: 600;
+  color: #f3dad9;
+  user-select: none;
+}
+
+.page-input-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: 10px;
+}
+
+.page-input-container label {
+  font-weight: 600;
+  color: #f2a1a1;
+  user-select: none;
+}
+
 .pagination-input {
   width: 60px;
-  padding: 9px 12px;
+  padding: 8px 12px;
   background: #3f2622;
   border: 1px solid #5c3b37;
   border-radius: 8px;

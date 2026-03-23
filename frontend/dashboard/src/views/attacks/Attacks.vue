@@ -14,72 +14,63 @@
             </button>
         </div>
 
-        <!-- Filtro protocollo -->
-        <section class="protocol-filter-section">
-            <ProtocolSelector v-model="filterProtocol" :options="['http', 'ssh', 'https']" />
-        </section>
+        <!-- Filtri Combinati -->
+        <section class="filters-container">
+            <div class="filter-row main-filters">
+                <ProtocolSelector v-model="filterProtocol" :options="['http', 'ssh', 'https']" />
+                
+                <div class="filter-item min-logs">
+                    <label class="min-logs-label" for="minLogsForAttack">{{ t('attacks.minLogsLabel') }}</label>
+                    <el-input-number id="minLogsForAttack" v-model="minLogsForAttack" :min="1" :step="1" class="min-logs-input" size="small" @input="onFilterChanged" />
+                </div>
 
-        <!-- Filtro avanzato: Minimo log per attacco -->
-        <section class="filter-bar">
-            <label class="min-logs-label" for="minLogsForAttack">
-                {{ t('attacks.minLogsLabel') }}
-            </label>
-            <el-input-number id="minLogsForAttack" v-model="minLogsForAttack" :min="1" :step="1" class="min-logs-input"
-                size="small" @input="onFilterChanged" />
-        </section>
-
-        <section class="time-filter">
-            <label>{{ t('attacks.timeFilter') }}</label>
-
-            <!-- Seleziona modalità -->
-            <el-radio-group v-model="timeMode" size="small" @change="onFilterChanged">
-                <el-radio-button label="ago">{{ t('attacks.last') }}</el-radio-button>
-                <el-radio-button label="range">{{ t('attacks.range') }}</el-radio-button>
-            </el-radio-group>
-
-            <!-- Solo “Ultimi X” -->
-            <div v-if="timeMode === 'ago'" class="time-ago">
-                <el-input-number v-model="agoValue" :min="1" size="small" @input="onFilterChanged" />
-                <el-select v-model="agoUnit" size="small" :placeholder="t('attacks.unit')" @change="onFilterChanged">
-                    <el-option :label="t('attacks.minutes')" value="minutes" />
-                    <el-option :label="t('attacks.hours')" value="hours" />
-                    <el-option :label="t('attacks.days')" value="days" />
-                    <el-option :label="t('attacks.months')" value="months" />
-                    <el-option :label="t('attacks.years')" value="years" />
-                </el-select>
+                <div class="filter-item search-box">
+                    <input type="text" v-model="filterIp" :placeholder="t('attacks.filterByIp')" class="ip-input" @input="onFilterChanged" />
+                    <button v-if="filterIp" @click="clearIpFilter" class="clear-btn" :aria-label="t('attacks.clearIpFilter')">×</button>
+                </div>
             </div>
 
-            <!-- Intervallo “From–To” -->
-            <div v-else class="time-range">
+            <div class="filter-row secondary-filters">
+                <div class="time-filter-group">
+                    <label>{{ t('attacks.timeFilter') }}</label>
+                    <el-radio-group v-model="timeMode" size="small" @change="onFilterChanged">
+                        <el-radio-button label="ago">{{ t('attacks.last') }}</el-radio-button>
+                        <el-radio-button label="range">{{ t('attacks.range') }}</el-radio-button>
+                    </el-radio-group>
 
-                <el-date-picker v-model="dateRange" type="daterange" :start-placeholder="t('attacks.startDate')"
-                    :end-placeholder="t('attacks.endDate')" value-format="YYYY-MM-DD" format="DD/MM/YYYY"
-                    @change="onFilterChanged" unlink-panels size="small" :teleported="true" />
+                    <div v-if="timeMode === 'ago'" class="time-ago-wrapper">
+                        <el-input-number v-model="agoValue" :min="1" size="small" @input="onFilterChanged" />
+                        <el-select v-model="agoUnit" size="small" :placeholder="t('attacks.unit')" @change="onFilterChanged">
+                            <el-option :label="t('attacks.minutes')" value="minutes" />
+                            <el-option :label="t('attacks.hours')" value="hours" />
+                            <el-option :label="t('attacks.days')" value="days" />
+                            <el-option :label="t('attacks.months')" value="months" />
+                            <el-option :label="t('attacks.years')" value="years" />
+                        </el-select>
+                    </div>
 
+                    <div v-else class="time-range-wrapper">
+                        <el-date-picker v-model="dateRange" type="daterange" :start-placeholder="t('attacks.startDate')"
+                            :end-placeholder="t('attacks.endDate')" value-format="YYYY-MM-DD" format="DD/MM/YYYY"
+                            @change="onFilterChanged" unlink-panels size="small" :teleported="true" />
+                    </div>
+                </div>
             </div>
-        </section>
-
-        <section class="filters">
-            <div class="filter-item search-box">
-            <input type="text" v-model="filterIp" :placeholder="t('attacks.filterByIp')" class="ip-input" @input="onFilterChanged" />
-            <button v-if="filterIp" @click="clearIpFilter" class="clear-btn" :aria-label="t('attacks.clearIpFilter')">
-              ×
-            </button>
-          </div>
         </section>
         <div v-if="loading" class="loading">{{ t('common.loading') }}</div>
         <div v-if="error" class="error">{{ t('attacks.errorLoadingData') }}</div>
 
-        <div class="pagination" v-if="total > pageSize">
-            <button :disabled="page === 1" @click="changePage(page - 1)">{{ t('common.prev') }}</button>
-            <span>{{ t('common.page') }} {{ page }} {{ t('common.of') }} {{ totalPages }}</span>
-            <button :disabled="page === totalPages" @click="changePage(page + 1)">{{ t('common.next') }}</button>
+        <div class="pagination cyber-pagination" v-if="total > pageSize">
+            <button :disabled="page === 1" @click="changePage(page - 1)">◄ {{ t('common.prev') }}</button>
+            <span class="pagination-info">{{ t('common.page') }} {{ page }} {{ t('common.of') }} {{ totalPages }}</span>
+            <button :disabled="page === totalPages" @click="changePage(page + 1)">{{ t('common.next') }} ►</button>
 
             <!-- Input per inserire pagina manualmente -->
-            <label for="pageInput" style="margin-left: 10px;">{{ t('common.goToPage') }}:</label>
-            <input class="pagination-input" id="pageInput" type="number" v-model.number="inputPage" :min="1"
-                :max="totalPages" style="width: 60px; padding: 2px 5px;" placeholder="1" />
-
+            <div class="page-input-container">
+                <label for="pageInput">{{ t('common.goToPage') }}:</label>
+                <input class="pagination-input" id="pageInput" type="number" v-model.number="inputPage" :min="1"
+                    :max="totalPages" placeholder="1" />
+            </div>
         </div>
         <section class="chart-controls" style="margin-bottom: 20px;">
             <button class="btn-action" @click="showMap = !showMap">
@@ -243,15 +234,16 @@
             </table>
         </section>
     </div>
-    <div class="pagination" v-if="total > pageSize">
-        <button :disabled="page === 1" @click="changePage(page - 1)">{{ t('common.prev') }}</button>
-        <span>{{ t('common.page') }} {{ page }} {{ t('common.of') }} {{ totalPages }}</span>
-        <button :disabled="page === totalPages" @click="changePage(page + 1)">{{ t('common.next') }}</button>
+    <div class="pagination cyber-pagination" v-if="total > pageSize">
+        <button :disabled="page === 1" @click="changePage(page - 1)">◄ {{ t('common.prev') }}</button>
+        <span class="pagination-info">{{ t('common.page') }} {{ page }} {{ t('common.of') }} {{ totalPages }}</span>
+        <button :disabled="page === totalPages" @click="changePage(page + 1)">{{ t('common.next') }} ►</button>
 
-        <!-- Input per inserire pagina manualmente -->
-        <label for="pageInput" style="margin-left: 10px;">{{ t('common.goToPage') }}:</label>
-        <input class="pagination-input" id="pageInput" type="number" v-model.number="inputPage" :min="1"
-            :max="totalPages" style="width: 60px; padding: 2px 5px;" placeholder="1" />
+        <div class="page-input-container">
+            <label for="pageInputBottom">{{ t('common.goToPage') }}:</label>
+            <input class="pagination-input" id="pageInputBottom" type="number" v-model.number="inputPage" :min="1"
+                :max="totalPages" placeholder="1" />
+        </div>
     </div>
 </template>
 

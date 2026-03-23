@@ -14,33 +14,36 @@
       </button>
     </div>
 
-    <section class="filters">
-      <ProtocolSelector v-model="filterProtocol" :options="['http', 'ssh', 'https']" />
-      <div class="filter-item search-box" style="position: relative; flex: 1; margin-right: 10px;">
-        <input type="text" v-model="filterIp" :placeholder="t('threatLogs.filterByIp')" @input="onFilterChanged" class="ip-input" />
-        <button v-if="filterIp" @click="clearIpFilter" class="clear-btn" :aria-label="t('threatLogs.clearIpFilter')">
-          ×
-        </button>
-      </div>
-      <div class="input-wrapper" style="position: relative; flex: 1;">
-        <input v-model="filterUrl" :placeholder="t('threatLogs.filterByUrl')" @input="onFilterChanged" class="input"
-          type="text" />
-        <button v-if="filterUrl" @click="clearUrlFilter" class="clear-button" :title="t('threatLogs.clearUrlFilter')"
-          type="button" aria-label="Clear URL filter">
-          ✕
-        </button>
+    <section class="filters-container">
+      <div class="filter-row main-filters">
+        <ProtocolSelector v-model="filterProtocol" :options="['http', 'ssh', 'https']" />
+        <div class="filter-item search-box">
+          <input type="text" v-model="filterIp" :placeholder="t('threatLogs.filterByIp')" @input="onFilterChanged" class="ip-input" />
+          <button v-if="filterIp" @click="clearIpFilter" class="clear-btn" :aria-label="t('threatLogs.clearIpFilter')">
+            ×
+          </button>
+        </div>
+        <div class="filter-item search-box url-search">
+          <input v-model="filterUrl" :placeholder="t('threatLogs.filterByUrl')" @input="onFilterChanged" class="ip-input"
+            type="text" />
+          <button v-if="filterUrl" @click="clearUrlFilter" class="clear-btn" :title="t('threatLogs.clearUrlFilter')"
+            type="button" aria-label="Clear URL filter">
+            ✕
+          </button>
+        </div>
       </div>
     </section>
 
-    <div class="pagination" v-if="total > pageSize">
-      <button :disabled="page === 1" @click="changePage(page - 1)">{{ t('common.prev') }}</button>
-      <span>{{ t('common.page') }} {{ page }} {{ t('common.of') }} {{ totalPages }}</span>
-      <button :disabled="page === totalPages" @click="changePage(page + 1)">{{ t('common.next') }}</button>
+    <div class="pagination cyber-pagination" v-if="total > pageSize">
+      <button :disabled="page === 1" @click="changePage(page - 1)">◄ {{ t('common.prev') }}</button>
+      <span class="pagination-info">{{ t('common.page') }} {{ page }} {{ t('common.of') }} {{ totalPages }}</span>
+      <button :disabled="page === totalPages" @click="changePage(page + 1)">{{ t('common.next') }} ►</button>
 
-      <!-- Input per inserire pagina manualmente -->
-      <label for="pageInput" style="margin-left: 10px;">{{ t('common.goToPage') }}:</label>
-      <input class="pagination-input" id="pageInput" type="number" v-model.number="inputPage" :min="1" :max="totalPages"
-        style="width: 60px; padding: 2px 5px;" placeholder="1" />
+      <div class="page-input-container">
+        <label for="pageInput">{{ t('common.goToPage') }}:</label>
+        <input class="pagination-input" id="pageInput" type="number" v-model.number="inputPage" :min="1" :max="totalPages"
+          placeholder="1" />
+      </div>
     </div>
 
     <section class="chart-controls" style="margin-bottom: 20px;">
@@ -128,16 +131,16 @@
         </tbody>
       </table>
 
-      <div class="pagination" v-if="total > pageSize">
-        <button :disabled="page === 1" @click="changePage(page - 1)">{{ t('common.prev') }}</button>
-        <span>{{ t('common.page') }} {{ page }} {{ t('common.of') }} {{ totalPages }}</span>
-        <button :disabled="page === totalPages" @click="changePage(page + 1)">{{ t('common.next') }}</button>
+      <div class="pagination cyber-pagination" v-if="total > pageSize">
+        <button :disabled="page === 1" @click="changePage(page - 1)">◄ {{ t('common.prev') }}</button>
+        <span class="pagination-info">{{ t('common.page') }} {{ page }} {{ t('common.of') }} {{ totalPages }}</span>
+        <button :disabled="page === totalPages" @click="changePage(page + 1)">{{ t('common.next') }} ►</button>
 
-        <!-- Input per inserire pagina manualmente -->
-        <label for="pageInput" style="margin-left: 10px;">{{ t('common.goToPage') }}:</label>
-        <input class="pagination-input" id="pageInput" type="number" v-model.number="inputPage" :min="1"
-          :max="totalPages" style="width: 60px; padding: 2px 5px;" placeholder="1" />
-
+        <div class="page-input-container">
+          <label for="pageInputBottom">{{ t('common.goToPage') }}:</label>
+          <input class="pagination-input" id="pageInputBottom" type="number" v-model.number="inputPage" :min="1"
+            :max="totalPages" placeholder="1" />
+        </div>
       </div>
 
       <div v-if="loading" class="loading">{{ t('common.loading') }}</div>

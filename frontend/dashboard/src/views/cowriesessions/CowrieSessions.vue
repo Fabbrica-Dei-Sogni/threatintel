@@ -14,14 +14,16 @@
             </button>
         </div>
 
-        <section class="filters">
-            <div class="input-wrapper">
-                <input v-model="filterIp" :placeholder="$t('cowrie.sessions.filterByIp')" @input="onFilterChanged" 
-                    class="input" type="text" />
-                <button v-if="filterIp" @click="clearIpFilter" class="clear-button"
-                    :title="$t('cowrie.sessions.clearIpFilter')" type="button" :aria-label="$t('cowrie.sessions.clearIpFilter')">
-                    ✕
-                </button>
+        <section class="filters-container">
+            <div class="filter-row main-filters">
+                <div class="input-wrapper">
+                    <input v-model="filterIp" :placeholder="$t('cowrie.sessions.filterByIp')" @input="onFilterChanged" 
+                        class="input" type="text" />
+                    <button v-if="filterIp" @click="clearIpFilter" class="clear-btn"
+                        :title="$t('cowrie.sessions.clearIpFilter')" type="button" :aria-label="$t('cowrie.sessions.clearIpFilter')">
+                        ✕
+                    </button>
+                </div>
             </div>
         </section>
 

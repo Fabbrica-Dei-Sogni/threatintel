@@ -66,7 +66,7 @@
           <div class="widget-header">
             <h2><span class="pulse">📡</span> {{ $t('home.sessionsMap') }}</h2>
           </div>
-          <AttackMap :attacks="recentSessionsNormalized" />
+          <AttackMap :attacks="recentSessionsNormalized" :showLegend="false" />
         </div>
       </div>
 

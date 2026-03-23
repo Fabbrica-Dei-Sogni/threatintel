@@ -1,7 +1,7 @@
 <template>
     <div class="attack-map-wrapper">
         <div ref="mapContainer" class="map-container"></div>
-        <div class="map-legend" v-if="attacks.length > 0">
+        <div class="map-legend" v-if="attacks.length > 0 && showLegend">
             <div class="legend-item">
                 <span class="dot target-dot"></span> {{ $t('components.map.target') }}
             </div>
@@ -32,6 +32,10 @@ const props = defineProps({
     honeypotLocation: {
         type: Object,
         default: null
+    },
+    showLegend: {
+        type: Boolean,
+        default: true
     }
 });
 

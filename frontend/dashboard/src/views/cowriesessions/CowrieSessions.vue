@@ -29,7 +29,7 @@
         <transition name="fade">
             <div v-if="showMap" class="map-section">
                 <!-- Mostriamo i dati basandoci sulle sessioni caricate nella tabella -->
-                <AttackMap :attacks="mapSessions" />
+                <AttackMap :attacks="mapSessions" :showLegend="false" />
             </div>
         </transition>
         <!-- Sezione Grafico Temporale -->
@@ -206,7 +206,7 @@ const mapSessions = computed(() => {
                 country: s.ipDetailsId?.ipinfo?.country || ""
             }
         },
-        dangerLevel: (s.eventCount || 0) > 20 ? 2 : ((s.eventCount || 0) > 5 ? 3 : 5),
+        dangerLevel: 2, // Always red for Telnet sessions as requested
         dangerScore: s.eventCount || 0,
         rps: 0,
         totaleLogs: s.eventCount || 0

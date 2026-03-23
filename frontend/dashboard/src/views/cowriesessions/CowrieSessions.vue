@@ -4,14 +4,8 @@
             <h1><span class="animated-icon pulse-shield">🛡️</span> {{ $t('cowrie.sessions.title') }}</h1>
             <LanguageSwitcher />
         </div>
-        <div class="actions chart-actions">
+        <div class="actions">
             <button @click="$router.push('/')" class="btn-action">{{ $t('cowrie.sessions.backToDashboard') }}</button>
-            <button @click="toggleMap" class="btn-action">
-                {{ showMap ? $t('common.hideMap') : $t('common.showMap') }}
-            </button>
-            <button @click="toggleChart" class="btn-action">
-                {{ showChart ? $t('common.hideChart') : $t('common.showChart') }}
-            </button>
         </div>
 
         <section class="filters-container">
@@ -26,21 +20,6 @@
                 </div>
             </div>
         </section>
-
-        <!-- Sezione Mappa -->
-        <transition name="fade">
-            <div v-if="showMap" class="map-section">
-                <!-- Mostriamo i dati basandoci sulle sessioni caricate nella tabella -->
-                <AttackMap :attacks="mapSessions" :showLegend="false" />
-            </div>
-        </transition>
-        <!-- Sezione Grafico Temporale -->
-        <transition name="fade">
-            <div v-if="showChart" class="chart-section">
-                 <!-- Mostriamo i dati basandoci sulle sessioni caricate nella tabella -->
-                <SessionChart v-if="sessions && sessions.length > 0" :sessions="sessions" />
-            </div>
-        </transition>
 
         <div v-if="loading" class="loading">{{ $t('cowrie.sessions.loading') }}</div>
         <div v-if="error" class="error">{{ $t('cowrie.sessions.errorLoad') }}</div>
@@ -60,6 +39,30 @@
                     :max="totalPages" placeholder="1" />
             </div>
         </div>
+
+        <section class="chart-controls" style="margin-bottom: 20px;">
+            <button @click="toggleMap" class="btn-action">
+                {{ showMap ? $t('common.hideMap') : $t('common.showMap') }}
+            </button>
+            <button @click="toggleChart" class="btn-action">
+                {{ showChart ? $t('common.hideChart') : $t('common.showChart') }}
+            </button>
+        </section>
+
+        <!-- Sezione Mappa -->
+        <transition name="fade">
+            <div v-if="showMap" class="map-section">
+                <!-- Mostriamo i dati basandoci sulle sessioni caricate nella tabella -->
+                <AttackMap :attacks="mapSessions" :showLegend="false" />
+            </div>
+        </transition>
+        <!-- Sezione Grafico Temporale -->
+        <transition name="fade">
+            <div v-if="showChart" class="chart-section">
+                 <!-- Mostriamo i dati basandoci sulle sessioni caricate nella tabella -->
+                <SessionChart v-if="sessions && sessions.length > 0" :sessions="sessions" />
+            </div>
+        </transition>
 
         <section class="log-table" v-if="!loading && !error">
             <table>

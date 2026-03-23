@@ -59,7 +59,10 @@
     gap: 15px;
 }
 
-.chart-actions {
+.chart-controls {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
     justify-content: flex-start;
 }
 

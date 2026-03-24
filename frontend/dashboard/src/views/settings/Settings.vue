@@ -1,13 +1,16 @@
 <template>
   <div class="settings-container">
     <div class="header-top">
-      <button class="back-btn" @click="goBack" :title="t('common.back')">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="19" y1="12" x2="5" y2="12"></line>
-          <polyline points="12 19 5 12 12 5"></polyline>
-        </svg>
-      </button>
+      <div class="header-left">
+        <button class="back-btn" @click="goBack" :title="t('common.back')">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+        </button>
+        <h1 class="page-title">{{ t('nav.settings') }}</h1>
+      </div>
       <LanguageSwitcher />
     </div>
     <div class="settings-layout">
@@ -353,10 +356,29 @@ const goBack = () => {
 
 <style scoped>
 .settings-container {
-  padding: 1.5rem;
+  padding: 25px 30px;
   min-height: 100vh;
-  color: var(--text-color);
-  background-color: var(--bg-color);
+  color: #e0e7ff;
+  background-color: #001f3f;
+  --text-color: #e0e7ff;
+  --border-color: rgba(136, 170, 255, 0.2);
+  --card-bg: #00294d;
+  --primary-color: #3b82f6;
+  --primary-rgb: 59, 130, 246;
+}
+
+.header-top {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background-color: #001f3f;
+  padding-top: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
 }
 
 .settings-layout {
@@ -471,8 +493,8 @@ const goBack = () => {
   border: 1px solid var(--border-color);
   color: var(--text-color);
   cursor: pointer;
-  padding: 8px;
-  border-radius: 8px;
+  padding: 10px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;

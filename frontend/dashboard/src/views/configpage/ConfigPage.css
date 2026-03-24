@@ -1,18 +1,28 @@
 .config-page {
   min-height: 100vh;
-  padding: 1.5rem;
-  background-color: var(--bg-color);
-  color: var(--text-color);
+  padding: 25px 30px;
+  background-color: #001f3f;
+  color: #e0e7ff;
+  --text-color: #e0e7ff;
+  --border-color: rgba(136, 170, 255, 0.2);
+  --card-bg: #00294d;
+  --primary-color: #3b82f6;
+  --primary-rgb: 59, 130, 246;
 }
 
 /* Header */
-.page-header {
+.header-top {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background-color: #001f3f;
+  padding-top: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-color);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem;
-  padding-bottom: 1.5rem;
-  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 30px;
 }
 
 .header-left {
@@ -41,12 +51,9 @@
 
 .page-title {
   margin: 0;
-  font-size: 1.75rem;
+  font-size: 1.5rem;
   font-weight: 700;
-  background: linear-gradient(135deg, var(--text-color) 0%, var(--primary-color) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #cbd5e1;
 }
 
 /* Toolbar */

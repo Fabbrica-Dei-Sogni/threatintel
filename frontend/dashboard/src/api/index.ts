@@ -128,6 +128,31 @@ export async function fetchAttackSearch({
     }
 }
 
+export async function fetchAttackDetail({
+    ip,
+    minLogsForAttack,
+    timeConfig = {},
+}: {
+    ip: string;
+    minLogsForAttack: number;
+    timeConfig: any;
+}): Promise<any> {
+    console.log('[fetchAttackDetail] Params:', { ip, minLogsForAttack, timeConfig });
+    try {
+        const response = await apiClient.post<any>('/attack/details', {
+            ip,
+            minLogsForAttack,
+            timeConfig,
+        });
+
+        console.log('[fetchAttackDetail] Response status:', response.status);
+        return response.data;
+    } catch (error) {
+        console.error('[fetchAttackDetail] Error:', error);
+        throw error;
+    }
+}
+
 export async function fetchRateLimitSearch({
     page = 1,
     pageSize = 20,

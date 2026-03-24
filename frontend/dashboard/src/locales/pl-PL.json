@@ -126,7 +126,8 @@
         "style": "Styl",
         "frequency": "Częstotliwość",
         "rateBreach": "Naruszenie limitu",
-        "attackProfile": "Profil ataku"
+        "attackProfile": "Profil ataku",
+        "searchUrlPlaceholder": "Filtruj według adresu URL..."
     },
     "attackChart": {
         "title": "Analiza ataków w czasie",

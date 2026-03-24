@@ -206,7 +206,14 @@
                         <td>
                             <router-link :to="{
                                 name: 'AttackDetail',
-                                query: { attack: encodeURIComponent(JSON.stringify(attack)) }
+                                params: { ip: attack.request.ip },
+                                query: {
+                                    minLogsForAttack: minLogsForAttack,
+                                    timeMode: timeMode,
+                                    agoValue: agoValue,
+                                    agoUnit: agoUnit,
+                                    dateRange: dateRange
+                                }
                             }" class="detail-link">
                                 {{ t('common.detail') }}
                             </router-link>

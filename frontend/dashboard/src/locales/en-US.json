@@ -125,7 +125,8 @@
         "style": "Style",
         "frequency": "Frequency",
         "rateBreach": "Rate breach",
-        "attackProfile": "Attack Profile"
+        "attackProfile": "Attack Profile",
+        "searchUrlPlaceholder": "Filter by URL..."
     },
     "attackChart": {
         "title": "Attacks Analysis Over Time",

@@ -1,5 +1,28 @@
 /* === STRUTTURA BASE === */
 
+.logs-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.url-search-input {
+    width: 300px;
+    min-width: 200px;
+}
+
+:deep(.el-input__wrapper) {
+    background-color: rgba(255, 255, 255, 0.05);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+}
+
+:deep(.el-input__inner) {
+    color: #e6e6e6;
+}
+
 .attack-detail {
   padding: 24px 28px;
   background: linear-gradient(180deg, #271511, #2b1b17 35%, #1c0d09);

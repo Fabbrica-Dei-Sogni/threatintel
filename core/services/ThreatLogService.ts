@@ -244,6 +244,42 @@ export class ThreatLogService {
         };
     }
 
+    async getAttackDetail({
+        ip,
+        minLogsForAttack = 10,
+        timeConfig = {}
+    }: {
+        ip: string;
+        minLogsForAttack?: number;
+        timeConfig?: any;
+    }) {
+        const mongoFilters = { 'request.ip': ip };
+
+        // Pipeline base costruita col nuovo Builder
+        const basePipeline = await this.forensicPipelineService.buildStandardPipeline(mongoFilters, minLogsForAttack, timeConfig);
+
+        const pipeline = [
+            ...basePipeline,
+            {
+                $lookup: {
+                    from: 'ipdetails',
+                    localField: 'ipDetailsId',
+                    foreignField: '_id',
+                    as: 'ipDetails'
+                }
+            },
+            {
+                $addFields: {
+                    ipDetails: { $arrayElemAt: ['$ipDetails', 0] }
+                }
+            }
+        ];
+
+        const [attack] = await ThreatLog.aggregate(pipeline).allowDiskUse(true);
+
+        return attack || null;
+    }
+
     buildRegExpFilter(filters: any) {
         const mongoFilters: any = {};
 

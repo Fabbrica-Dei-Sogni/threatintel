@@ -14,6 +14,7 @@ import Settings from '../views/settings/Settings.vue';
 import ConfigPage from '../views/configpage/ConfigPage.vue';
 import CowrieSessions from '../views/cowriesessions/CowrieSessions.vue';
 import CowrieAttackDetail from '../views/cowriesessiondetail/CowrieAttackDetail.vue';
+import { useRoute } from 'vue-router';
 
 // Le tipizzazioni sulle props passate via router sono opzionali e possono essere affinate man mano che si tipizza la codebase
 
@@ -72,13 +73,16 @@ const routes: RouteRecordRaw[] = [
         }),
     },
     {
-        path: '/attack-detail',
+        path: '/attack-detail/:ip',
         name: 'AttackDetail',
         component: AttackDetail,
         props: (route: RouteLocationNormalized) => ({
-            attack: route.query.attack
-                ? JSON.parse(decodeURIComponent(route.query.attack as string))
-                : null,
+            ip: route.params.ip,
+            minLogsForAttack: route.query.minLogsForAttack ? parseInt(route.query.minLogsForAttack as string) : 10,
+            timeMode: route.query.timeMode || 'ago',
+            agoValue: route.query.agoValue ? parseInt(route.query.agoValue as string) : 1,
+            agoUnit: route.query.agoUnit || 'days',
+            dateRange: route.query.dateRange || [null, null],
         }),
     },
     { path: '/ip/:ip', name: 'IpDetails', component: IpDetails, props: true },

@@ -37,7 +37,16 @@
                 <span @click="goToIpDetails(attack.request.ip)" class="ip-link">{{ attack.request.ip }}</span>
                 <div class="column-spacer"></div>
                 <router-link
-                  :to="{ name: 'AttackDetail', query: { attack: encodeURIComponent(JSON.stringify(attack)) } }">
+                  :to="{ 
+                    name: 'AttackDetail', 
+                    params: { ip: attack.request.ip },
+                    query: {
+                        minLogsForAttack: 10,
+                        timeMode: 'ago',
+                        agoValue: 90,
+                        agoUnit: 'days'
+                    }
+                  }">
                   {{ $t('common.detail') }}
                 </router-link>
               </li>

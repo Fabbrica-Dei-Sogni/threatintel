@@ -8,6 +8,7 @@ export default (threatController: ThreatController) => {
     router.get('/api/logs', (req, res) => threatController.getLogs(req, res));
     router.post('/api/search', (req, res) => threatController.searchLogs(req, res));
     router.post('/api/attack/search', (req, res) => threatController.searchAttacks(req, res));
+    router.post('/api/attack/details', (req, res) => threatController.getAttackDetails(req, res));
     router.get('/api/logs/:id', (req, res) => threatController.getLogById(req, res));
     router.get('/api/reputationscore/:ip', (req, res) => threatController.getReputationScore(req, res));
     router.post('/api/enrichreports/:ip', (req, res) => threatController.enrichReports(req, res));

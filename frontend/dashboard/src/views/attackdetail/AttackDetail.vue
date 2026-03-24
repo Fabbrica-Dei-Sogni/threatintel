@@ -20,9 +20,10 @@
             </button>
         </div>
 
-        <section v-if="loading" class="loading">{{ t('common.loading') }}</section>
-        <section v-if="error" class="error">{{ t('common.error') }}</section>
-        <div v-if="attack" class="attack-summary">
+        <div v-if="loading" class="loading">{{ t('common.loading') }}</div>
+        <div v-if="error" class="error">{{ error }}</div>
+
+        <div v-if="attack && !loading" class="attack-summary">
             <!-- Existing summary content -->
             <div class="summary-row">
                 <section>
@@ -51,10 +52,19 @@
                 <AttackProfileRadar v-if="attack" :attackDetail="attack" />
             </section>
         </div>
-        <div v-if="attack" class="attack-aggregates">
+        <div v-if="attack && !loading" class="attack-aggregates">
 
             <el-card class="logs-container" v-if="attack">
-                <h2>{{ t('attackDetail.logsRaggrupati') }}</h2>
+                <div class="logs-header-row">
+                    <h2>{{ t('attackDetail.logsRaggrupati') }}</h2>
+                    <el-input 
+                        v-model="searchUrl" 
+                        :placeholder="t('attackDetail.searchUrlPlaceholder')"
+                        class="url-search-input"
+                        clearable
+                        prefix-icon="Search"
+                    />
+                </div>
 
                 <div v-for="log in paginatedLogs" :key="log._id || log.id" class="log-entry">
                     <div class="log-header" @click="toggleLog(log._id || log.id)">
@@ -93,9 +103,9 @@
                     </transition>
                 </div>
 
-                <div class="pagination-wrapper" v-if="attack.logsRaggruppati.length > pageSize">
+                <div class="pagination-wrapper" v-if="filteredLogs.length > pageSize">
                     <el-pagination background layout="prev, pager, next" :current-page="currentPage"
-                        :page-size="pageSize" :total="attack.logsRaggruppati.length"
+                        :page-size="pageSize" :total="filteredLogs.length"
                         @current-change="page => currentPage = page" />
                 </div>
             </el-card>
@@ -137,7 +147,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import dayjs from 'dayjs'
 import { useI18n } from 'vue-i18n'
@@ -147,24 +157,46 @@ import AttackProfileRadar from '../../components/AttackProfileRadar.vue';
 import HexViewer from '../../components/HexViewer.vue';
 import AttackMap from '../../components/AttackMap.vue';
 import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
+import { Search } from '@element-plus/icons-vue';
+import { fetchAttackDetail } from '../../api';
 
 const { t } = useI18n();
 const { copyToClipboard } = useClipboard();
 
 // Props
 const props = defineProps({
-    attack: {
-        type: Object,
+    ip: {
+        type: String,
         required: true
     },
-    rateLimitEvents: {
+    minLogsForAttack: {
+        type: Number,
+        default: 10
+    },
+    timeMode: {
+        type: String,
+        default: 'ago'
+    },
+    agoValue: {
+        type: Number,
+        default: 1
+    },
+    agoUnit: {
+        type: String,
+        default: 'days'
+    },
+    dateRange: {
         type: Array,
-        default: () => []
+        default: () => [null, null]
     }
 })
 
+const attack = ref(null)
+const loading = ref(true)
+const error = ref(null)
+
 const mapAttackData = computed(() => {
-    return props.attack ? [props.attack] : [];
+    return attack.value ? [attack.value] : [];
 });
 
 // Router
@@ -178,16 +210,30 @@ const currentPage = ref(1)
 const pageSize = ref(5)
 const currentPageEvents = ref(1)
 const pageSizeEvents = ref(5)
+const searchUrl = ref('')
+
+// Reset page when search changes
+watch(searchUrl, () => {
+    currentPage.value = 1
+})
 
 // Computed properties
+const filteredLogs = computed(() => {
+    const objs = attack.value?.logsRaggruppati || []
+    if (!searchUrl.value) return objs
+    return objs.filter(log => 
+        (log.request?.url || '').toLowerCase().includes(searchUrl.value.toLowerCase())
+    )
+})
+
 const paginatedLogs = computed(() => {
-    const objs = props.attack.logsRaggruppati || []
+    const objs = filteredLogs.value
     const start = (currentPage.value - 1) * pageSize.value
     return objs.slice(start, start + pageSize.value)
 })
 
 const paginatedRateLimitEvents = computed(() => {
-    const objs = props.attack.rateLimitList || []
+    const objs = attack.value?.rateLimitList || []
     const start = (currentPageEvents.value - 1) * pageSizeEvents.value
     return objs.slice(start, start + pageSizeEvents.value)
 })
@@ -219,6 +265,32 @@ function goToIpDetails(ip) {
 function goBack() {
     router.back()
 }
+
+const loadAttackData = async () => {
+    loading.value = true
+    error.value = null
+    try {
+        const timeConfig = {
+            mode: props.timeMode,
+            agoValue: props.agoValue,
+            agoUnit: props.agoUnit,
+            dateRange: props.dateRange
+        }
+        const data = await fetchAttackDetail({
+            ip: props.ip,
+            minLogsForAttack: props.minLogsForAttack,
+            timeConfig
+        })
+        attack.value = data
+    } catch (err) {
+        console.error('Error fetching attack detail:', err)
+        error.value = t('common.error')
+    } finally {
+        loading.value = false
+    }
+}
+
+onMounted(loadAttackData)
 </script>
 
 <!--

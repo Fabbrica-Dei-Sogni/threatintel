@@ -125,7 +125,8 @@
         "style": "Stile",
         "frequency": "Frequenza",
         "rateBreach": "Rate breach",
-        "attackProfile": "Profilo Attacco"
+        "attackProfile": "Profilo Attacco",
+        "searchUrlPlaceholder": "Filtra per URL..."
     },
     "attackChart": {
         "title": "Analisi Attacchi Temporale",

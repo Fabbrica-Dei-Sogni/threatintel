@@ -125,7 +125,8 @@
         "style": "Stil",
         "frequency": "Häufigkeit",
         "rateBreach": "Rate-Verstoß",
-        "attackProfile": "Angriffsprofil"
+        "attackProfile": "Angriffsprofil",
+        "searchUrlPlaceholder": "Nach URL filtern..."
     },
     "attackChart": {
         "title": "Zeitliche Angriffsanalyse",

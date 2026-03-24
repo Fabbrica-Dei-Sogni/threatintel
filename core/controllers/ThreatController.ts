@@ -96,6 +96,34 @@ export class ThreatController {
         }
     }
 
+    // POST /api/attack/details
+    async getAttackDetails(req: Request, res: Response): Promise<void> {
+        this.logger.info(`[ThreatController] Requesting attack details for IP ${req.body.ip}`);
+        try {
+            const { ip, minLogsForAttack = 10, timeConfig = {} } = req.body;
+            if (!ip) {
+                res.status(400).json({ error: 'IP mancante' });
+                return;
+            }
+
+            const attack = await this.threatLogService.getAttackDetail({ 
+                ip, 
+                minLogsForAttack: parseInt(minLogsForAttack), 
+                timeConfig 
+            });
+
+            if (!attack) {
+                res.status(404).json({ error: 'Attacco non trovato' });
+                return;
+            }
+
+            res.json(attack);
+        } catch (err: any) {
+            this.logger.error('[ThreatController] Error fetching attack details:', err);
+            res.status(500).json({ error: 'Errore durante il recupero del dettaglio attacco' });
+        }
+    }
+
     // GET /api/logs/:id
     async getLogById(req: Request, res: Response): Promise<void> {
         this.logger.info(`[ThreatController] Requesting log ${req.params.id}`);

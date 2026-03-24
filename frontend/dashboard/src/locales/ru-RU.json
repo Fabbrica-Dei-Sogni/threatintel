@@ -125,7 +125,8 @@
         "style": "Стиль",
         "frequency": "Частота",
         "rateBreach": "Нарушение частоты",
-        "attackProfile": "Профиль атаки"
+        "attackProfile": "Профиль атаки",
+        "searchUrlPlaceholder": "Фильтровать по URL..."
     },
     "attackChart": {
         "title": "Анализ атак во времени",

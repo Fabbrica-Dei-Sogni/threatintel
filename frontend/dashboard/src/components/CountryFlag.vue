@@ -1,7 +1,11 @@
 <template>
-    <div class="country-flag" v-if="countryCode" :title="tooltip || countryCode">
-        <img :src="flagUrl" :alt="countryCode" class="flag-img" @error="hasError = true" v-if="!hasError" />
-        <span v-else class="flag-fallback">{{ countryCode }}</span>
+    <div class="country-flag" :title="tooltip || (countryCode ? countryCode : 'Global/Unknown')">
+        <template v-if="countryCode && !hasError">
+            <img :src="flagUrl" :alt="countryCode" class="flag-img" @error="hasError = true" />
+        </template>
+        <div v-else class="flag-placeholder">
+            <span class="placeholder-icon">🌐</span>
+        </div>
     </div>
 </template>
 
@@ -11,7 +15,7 @@ import { computed, ref, watch } from 'vue';
 const props = defineProps({
     countryCode: {
         type: String,
-        required: true
+        default: null
     },
     tooltip: {
         type: String,
@@ -31,12 +35,7 @@ watch(() => props.countryCode, () => {
 
 const flagUrl = computed(() => {
     if (!props.countryCode) return '';
-    // flagcdn uses lowercase 2-letter codes. 
-    // w20 = width 20px, w40 = width 40px, etc.
     const code = props.countryCode.toLowerCase();
-    // Using a fixed small width for table display efficiency
-    //Risorsa remota per recuperare la bandiera da visualizzare a ricerca.
-    //XXX: evolvere il recupero della bandiera con tecniche di caching efficace.
     return `https://flagcdn.com/w40/${code}.png`;
 });
 </script>
@@ -47,20 +46,31 @@ const flagUrl = computed(() => {
     align-items: center;
     justify-content: center;
     vertical-align: middle;
+    width: 24px;
+    height: 18px;
 }
 
 .flag-img {
     height: auto;
     width: 24px;
-    /* Default width */
     border-radius: 2px;
     box-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
     object-fit: cover;
 }
 
-.flag-fallback {
-    font-weight: bold;
-    font-size: 0.8em;
-    color: #ccc;
+.flag-placeholder {
+    width: 24px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(136, 170, 255, 0.1);
+    border-radius: 2px;
+    border: 1px dashed rgba(136, 170, 255, 0.3);
+}
+
+.placeholder-icon {
+    font-size: 11px;
+    opacity: 0.7;
 }
 </style>

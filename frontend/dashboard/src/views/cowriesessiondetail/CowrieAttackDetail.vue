@@ -31,7 +31,7 @@
 
         <!-- Mappa della Sessione -->
         <section class="session-map-section glass-card" v-if="sessionDetails && !loading">
-            <AttackMap v-if="mapAttackData.length > 0" :attacks="mapAttackData" />
+            <AttackMap v-if="mapAttackData.length > 0" :attacks="mapAttackData" :showLegend="false" />
         </section>
 
         <div v-if="loading" class="loading">{{ $t('cowrie.attackDetail.loading') }}</div>

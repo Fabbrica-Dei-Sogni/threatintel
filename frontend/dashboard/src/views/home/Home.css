@@ -124,7 +124,7 @@ h1 {
   /* padding: 0 rimosso per usare quello di .glass-card */
   display: flex;
   flex-direction: column;
-  min-width: 420px; /* Leggermente aumentato */
+  min-width: 0; /* Permette alla card di restringersi per reattività */
 }
 
 .widget-header {
@@ -160,30 +160,120 @@ ul {
 
 li {
   border-bottom: 1px solid rgba(136, 170, 255, 0.08);
-  padding: 14px 5px; /* Aggiunto padding laterale interno al listato */
+  padding: 10px 15px;
   font-size: 0.9em;
   color: #cbd5e1;
-  display: grid;
-  grid-template-columns: 30px 110px 130px 1fr 75px;
-  align-items: center;
-  gap: 15px;
-  width: 100%;
+  display: flex !important; /* Flexbox è più stabile della griglia per elementi pulsanti */
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 20px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
   transition: background 0.2s ease;
+  contain: layout;
+  transform: translateZ(0); /* Isola l'intera riga dalla ricomposizione globale */
+}
+
+/* Isolamento Dimensionale (Nulla può spostare queste colonne) */
+.indicator-group { 
+  flex: 0 0 60px !important; 
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.ip-link { 
+  flex: 0 0 120px !important; 
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.column-spacer, .interaction-count { 
+  flex: 1 !important; 
+  min-width: 0;
+}
+
+/* Allineamento forzato e ancoraggio GPU dell'azione */
+li > a:last-child {
+  flex: 0 0 80px !important;
+  text-align: right !important;
+  justify-self: flex-end !important;
+  transform: translateZ(0); /* Ancora il pulsante nel proprio layer hardware personalizzato */
+  font-weight: 600;
+  color: #88aaff;
+}
+
+.column-spacer {
+  height: 1px;
+}
+
+.column-spacer {
+  grid-column: 3;
+}
+
+.indicator-group {
+  grid-column: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: flex-start;
+  position: relative;
+  cursor: help;
+}
+
+/* Custom Tooltip - Posizionato lateralmente a destra per non essere mai tagliato dai bordi sopra/sotto */
+.indicator-group[data-url-tooltip]:not([data-url-tooltip=""]):hover::after,
+.indicator-group[data-url-tooltip]:not([data-url-tooltip=""]):active::after {
+  content: attr(data-url-tooltip);
+  position: absolute;
+  top: 50%;
+  left: 110%; /* Spostato a destra delle icone */
+  transform: translateY(-50%);
+  background: rgba(15, 23, 42, 0.95);
+  color: #f1f5f9;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-family: 'JetBrains Mono', monospace;
+  white-space: pre; /* Consente le riga multipla con \n */
+  z-index: 1000;
+  border: 1px solid rgba(136, 170, 255, 0.3);
+  box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+  backdrop-filter: blur(4px);
+  opacity: 1; /* Assicuriamoci che sia visibile */
+}
+
+/* Freccia del tooltip (ora laterale) */
+.indicator-group[data-url-tooltip]:not([data-url-tooltip=""]):hover::before,
+.indicator-group[data-url-tooltip]:not([data-url-tooltip=""]):active::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 105%;
+  transform: translateY(-50%);
+  border-width: 6px;
+  border-style: solid;
+  border-color: transparent rgba(15, 23, 42, 0.95) transparent transparent;
+  z-index: 1000;
+  pointer-events: none;
 }
 
 .defcon-mini {
-  max-width: 120px;
-  justify-self: stretch;
+  justify-self: center;
 }
 
 .interaction-count, .activity-hint {
-  font-size: 0.8em;
+  font-size: 0.75em;
   color: #94a3b8;
-  font-weight: 500;
-  background: rgba(0, 0, 0, 0.2);
-  padding: 2px 8px;
-  border-radius: 10px;
+  font-weight: 600;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 1px 6px;
+  border-radius: 6px;
   justify-self: start;
+  border: 1px solid rgba(136, 170, 255, 0.1);
+  white-space: nowrap;
 }
 
 .high-interaction {
@@ -192,25 +282,11 @@ li {
   border: 1px solid rgba(251, 191, 36, 0.2);
 }
 
-@media (max-width: 1024px) {
-  li {
-    grid-template-columns: auto 90px 130px 1fr auto;
-    gap: 6px;
-  }
-}
-
-@media (max-width: 768px) {
-  li {
-    display: flex; /* Torna a flex per il wrap su mobile */
-    flex-wrap: wrap; 
-    gap: 4px 12px;
-    padding: 10px 0;
-  }
-}
+/* Rimossi vecchi media query ridondanti */
 
 li:hover {
-  background: rgba(255, 255, 255, 0.02);
-  padding-left: 5px;
+  background: rgba(255, 255, 255, 0.04);
+  /* padding-left rimosso per evitare spostamenti nel pulsante dettaglio */
 }
 
 li:last-child {
@@ -232,13 +308,7 @@ li.no-data {
   white-space: nowrap;
 }
 
-@media (max-width: 768px) {
-  .time-ago {
-    flex: 0 1 auto; 
-    min-width: 120px;
-    font-size: 0.75em;
-  }
-}
+/* Rimosso media query duplicato */
 
 .country-flag {
   grid-column: 1;
@@ -361,7 +431,17 @@ li a:hover {
 
 .error { color: #f87171; }
 
-/* Responsive */
+/* Responsive Unificato */
+@media (max-width: 1300px) {
+  .primary-intel {
+    flex-direction: column;
+    min-height: auto;
+  }
+  .map-side { height: 400px; }
+  .list-side { height: 350px; }
+}
+
+/* Responsive Unificato */
 @media (max-width: 1300px) {
   .primary-intel {
     flex-direction: column;
@@ -374,6 +454,53 @@ li a:hover {
 @media (max-width: 768px) {
   .dashboard { padding: 10px; }
   .header-with-lang { padding-left: 50px; margin-bottom: 15px; }
-  .secondary-intel { grid-template-columns: 1fr; gap: 15px; }
+  .secondary-intel { grid-template-columns: 1fr !important; gap: 15px; }
   .map-side { height: 300px; }
+
+  /* Correzione strutturale per mobile per evitare strabordamenti */
+  .list-side, .widget, .glass-card {
+    min-width: 0 !important;
+    width: 100% !important;
+    padding: 15px !important;
+    box-sizing: border-box !important;
+  }
+
+  li {
+    display: flex !important;
+    justify-content: space-between !important;
+    flex-wrap: nowrap !important;
+    gap: 8px !important;
+    width: 100% !important;
+    padding: 12px 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  .ip-link {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 0.85em;
+  }
+
+  .indicator-group {
+    flex-shrink: 0;
+  }
+
+  li > a:last-child {
+    flex-shrink: 0;
+    font-size: 0.85em;
+    min-width: 75px; /* Garantisce allineamento pulsante */
+    text-align: right;
+  }
+
+  .column-spacer {
+    display: none;
+  }
+
+  .interaction-count {
+    font-size: 0.7em;
+    padding: 1px 4px;
+  }
 }

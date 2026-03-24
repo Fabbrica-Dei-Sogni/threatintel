@@ -58,9 +58,12 @@
 
                 <div v-for="log in paginatedLogs" :key="log._id || log.id" class="log-entry">
                     <div class="log-header" @click="toggleLog(log._id || log.id)">
-                        <span>{{ formatDate(log.timestamp) }} - {{ log.request.method }} {{ log.request.url ||
-                            t('components.radar.notAvailable')
-                        }} </span>
+                        <span>{{ formatDate(log.timestamp) }} - {{ log.request.method }} 
+                            <span v-if="log.metadata?.eventCount > 1" style="color: #ffb86c; font-size: 0.9em; margin-left: 5px; font-weight: bold;">
+                                (x{{ log.metadata.eventCount }})
+                            </span>
+                            {{ log.request.url || t('components.radar.notAvailable') }} 
+                        </span>
                         <span class="toggle-icon">{{ expanded[log._id || log.id] ? '–' : '+' }}</span>
                     </div>
                     <transition name="collapse">

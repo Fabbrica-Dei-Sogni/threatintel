@@ -246,10 +246,10 @@ export class ForensicService {
                     representative: { $first: '$$ROOT' },
                     // Aggiungi i 3 campi richiesti
                     logsRaggruppati: { $push: '$$ROOT' },
-                    totaleLogs: { $sum: 1 },
+                    totaleLogs: { $sum: { $ifNull: ['$metadata.eventCount', 1] } },
                     firstSeen: { $min: '$timestamp' },
                     lastSeen: { $max: '$timestamp' },
-                    sumScore: { $sum: '$fingerprint.score' }        // Somma di tutti i valori di score
+                    sumScore: { $sum: { $multiply: ['$fingerprint.score', { $ifNull: ['$metadata.eventCount', 1] }] } }
                 }
             },
             // Stage per il recupero dei ratelimit events

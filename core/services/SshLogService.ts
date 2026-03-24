@@ -19,6 +19,11 @@ export class SshLogService implements ILongRunningService {
     private invalidUserScore: number = 25;
     private initialized: Promise<void>;
 
+    // Buffer for batching SSH logs
+    private sshBatchBuffer: Map<string, any> = new Map();
+    private bufferFlushInterval: NodeJS.Timeout | null = null;
+    private readonly FLUSH_INTERVAL_MS = 60000; // 60 seconds
+
     // Const keys for config
     private readonly SSH_FAILED_PASSWORD = ThreatIndicator.SSH_FAILED_PASSWORD;
     private readonly SSH_INVALID_USER = ThreatIndicator.SSH_INVALID_USER;
@@ -124,6 +129,11 @@ export class SshLogService implements ILongRunningService {
                 this.status = ServiceStatus.FAILED;
             });
 
+            // Start buffer flush interval
+            if (!this.bufferFlushInterval) {
+                this.bufferFlushInterval = setInterval(() => this.flushBuffer(), this.FLUSH_INTERVAL_MS);
+            }
+
             this.status = ServiceStatus.RUNNING;
         } catch (err: any) {
             this.logger.error(`[SshLogService] Errore critico durante lo startup: ${err.message}`);
@@ -171,8 +181,10 @@ export class SshLogService implements ILongRunningService {
                 }
             });
 
-            proc.on('close', () => {
+            proc.on('close', async () => {
                 this.logger.info(`[SshLogService] Recupero log pregressi completato. Elaborate ${processedCount} righe.`);
+                // Flush the buffer immediately after backfill
+                await this.flushBuffer();
                 resolve();
             });
 
@@ -191,6 +203,11 @@ export class SshLogService implements ILongRunningService {
             this.journalProcess.kill();
             this.journalProcess = null;
             this.logger.info('[SshLogService] Monitoraggio SSH fermato.');
+        }
+        if (this.bufferFlushInterval) {
+            clearInterval(this.bufferFlushInterval);
+            this.bufferFlushInterval = null;
+            this.flushBuffer(); // Eseguiamo un ultimo flush sincrono (o quasi) per non perdere dati
         }
         this.status = ServiceStatus.IDLE;
     }
@@ -262,9 +279,19 @@ export class SshLogService implements ILongRunningService {
                 logDate = new Date(entry.SYSLOG_TIMESTAMP);
             }
 
-            await this.saveAsThreatLog(ip, user, type, message, score, indicators, entry.__CURSOR, logDate);
-        } else {
-            this.logger.warn(`[SshLogService] La riga ha superato il filtro iniziale ma la Regex non ha estratto i dati: ${message}`);
+            const batchKey = `${ip}_${user}_${type}`;
+            if (this.sshBatchBuffer.has(batchKey)) {
+                const existing = this.sshBatchBuffer.get(batchKey)!;
+                existing.count++;
+                existing.logDate = logDate; // aggiorno con l'ultima data vista
+                if (entry.__CURSOR) existing.cursor = entry.__CURSOR;
+                // tenere tracce raw
+                if (existing.rawMessages.length < 5) existing.rawMessages.push(message);
+            } else {
+                this.sshBatchBuffer.set(batchKey, {
+                    ip, user, type, score, indicators, cursor: entry.__CURSOR, logDate, count: 1, rawMessages: [message]
+                });
+            }
         }
     }
 
@@ -335,7 +362,7 @@ export class SshLogService implements ILongRunningService {
         }
     }
 
-    private async saveAsThreatLog(ip: string, user: string, type: string, rawMessage: string, score: number, indicators: string[], cursor?: string, logDate: Date = new Date()) {
+    private async saveAsThreatLog(ip: string, user: string, type: string, rawMessage: string, score: number, indicators: string[], cursor?: string, logDate: Date = new Date(), eventCount: number = 1) {
         const geo = this.patternAnalysisService.getGeoLocation(ip);
 
         // Usiamo il __CURSOR del journal come ID deterministico per evitare duplicati in caso di riavvio o backfill
@@ -372,6 +399,7 @@ export class SshLogService implements ILongRunningService {
             metadata: {
                 isBot: false,
                 isCrawler: false,
+                eventCount: eventCount,
                 sshInfo: {
                     user,
                     type,
@@ -386,5 +414,34 @@ export class SshLogService implements ILongRunningService {
         } catch (err) {
             this.logger.error('[SshLogService] Errore nel salvataggio del log SSH come ThreatLog', err);
         }
+    }
+
+    private async flushBuffer() {
+        if (this.sshBatchBuffer.size === 0) return;
+
+        const entriesToFlush = Array.from(this.sshBatchBuffer.values());
+        this.sshBatchBuffer.clear();
+
+        this.logger.info(`[SshLogService] Flushing buffer... Saving ${entriesToFlush.length} aggregated SSH events to DB.`);
+
+        const promises = entriesToFlush.map(async (entry) => {
+            const sampleRawLog = entry.count > 1
+                ? `[Aggregated ${entry.count} events]\nLast message: ${entry.rawMessages[entry.rawMessages.length - 1]}`
+                : entry.rawMessages[0];
+
+            await this.saveAsThreatLog(
+                entry.ip,
+                entry.user,
+                entry.type,
+                sampleRawLog,
+                entry.score,
+                entry.indicators,
+                entry.cursor,
+                entry.logDate,
+                entry.count
+            );
+        });
+
+        await Promise.allSettled(promises);
     }
 }

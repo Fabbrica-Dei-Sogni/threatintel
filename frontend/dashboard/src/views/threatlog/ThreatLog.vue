@@ -111,6 +111,7 @@
                        <p><strong>{{ t('threatLog.sessionId') }}:</strong> {{ log.metadata.sessionId || t('common.notAvailable')
                         }}</p>
                     -->
+                        <p v-if="log.metadata?.eventCount > 1"><strong>Aggregated Events:</strong> {{ log.metadata.eventCount }}</p>
                         <p><strong>{{ t('threatLog.userAgent') }}</strong></p>
                         <pre>{{ formatJson(log.metadata.userAgent_parsed) }}</pre>
                         <p><strong>{{ t('threatLog.isBot') }}</strong> {{ log.metadata.isBot ? t('threatLog.yes') :

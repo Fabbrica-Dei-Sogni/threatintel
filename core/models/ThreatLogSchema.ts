@@ -41,6 +41,7 @@ export interface IMetadata {
     userAgent_parsed?: Record<string, any>;
     isBot?: boolean;
     isCrawler?: boolean;
+    eventCount?: number;
 }
 
 export interface IThreatLog extends Document {
@@ -96,7 +97,8 @@ const MetadataSchema: Schema = new Schema({
     sessionId: String,
     userAgent_parsed: Schema.Types.Mixed,
     isBot: Boolean,
-    isCrawler: Boolean
+    isCrawler: Boolean,
+    eventCount: { type: Number, default: 1 }
 }, { _id: false });
 
 const ThreatLogSchema: Schema = new Schema({

@@ -22,6 +22,7 @@ dotenv.config();
 @injectable()
 export class IpDetailsService {
     private excludedIPs: string[];
+    private pendingLookups: Map<string, Promise<any>> = new Map();
 
     constructor(
         @inject(LOGGER_TOKEN) private readonly logger: Logger,
@@ -64,6 +65,19 @@ export class IpDetailsService {
     }
 
     async findOrCreate(ip: string, updateReputationScore = false) {
+        if (this.pendingLookups.has(ip)) {
+            this.logger.debug(`[IpDetailsService] Richiesta simultanea per l'IP ${ip}. Attendo la promise già in corso per evitare chiamate API multiple.`);
+            return this.pendingLookups.get(ip);
+        }
+
+        const promise = this._findOrCreateImpl(ip, updateReputationScore)
+            .finally(() => this.pendingLookups.delete(ip));
+
+        this.pendingLookups.set(ip, promise);
+        return promise;
+    }
+
+    private async _findOrCreateImpl(ip: string, updateReputationScore = false) {
         let ipDetails = await IpDetails.findOne({ ip });
         const now = new Date();
 
@@ -344,9 +358,9 @@ export class IpDetailsService {
                     // Gestione specifica per Rate Limit: Ritorniamo l'errore per il frontend, 
                     // ma lo logghiamo per poterlo intercettare nel findOrCreate
                     if (err.status === 429 || (err.error && err.error.title === 'Rate limit exceeded')) {
-                        this.logger.warn(`[IpDetailsService] Rate limit superato per ipinfo su IP ${ip}. Salvo l'errore per riprovare in futuro.`);
-                        // Ritorniamo l'oggetto errore invece di null, così il frontend lo riceve
-                        return resolve(err);
+                        this.logger.warn(`[IpDetailsService] Rate limit superato per ipinfo su IP ${ip}. Ignoro l'errore per salvare il log minimale.`);
+                        // Ritorniamo null per ignorare l'errore e salvare il log minimale
+                        return resolve(null);
                     }
 
                     this.logger.warn(`[IpDetailsService] Fallimento lookup ipinfo per ${ip}:`, err);
@@ -355,9 +369,9 @@ export class IpDetailsService {
 
                 // Controllo se ipinfo ha restituito l'errore nel campo data invece che in err
                 if (data && (data.status === 429 || (data.error && data.error.title === 'Rate limit exceeded'))) {
-                    this.logger.warn(`[IpDetailsService] Rate limit superato per ipinfo su IP ${ip} (in data). Salvo l'errore per riprovare in futuro.`);
-                    // Ritorniamo data (che contiene l'errore) invece di null
-                    return resolve(data);
+                    this.logger.warn(`[IpDetailsService] Rate limit superato per ipinfo su IP ${ip} (in data). Ignoro l'errore per salvare il log minimale.`);
+                    // Ritorniamo null per ignorare l'errore
+                    return resolve(null);
                 }
 
                 resolve(data);

@@ -16,7 +16,7 @@
 
     <section class="filters-container">
       <div class="filter-row main-filters">
-        <ProtocolSelector v-model="filterProtocol" :options="['http', 'ssh', 'https']" />
+        <ProtocolSelector v-model="filterProtocol" :options="['http', 'https']" />
         <div class="filter-item search-box">
           <input type="text" v-model="filterIp" :placeholder="t('threatLogs.filterByIp')" @input="onFilterChanged" class="ip-input" />
           <button v-if="filterIp" @click="clearIpFilter" class="clear-btn" :aria-label="t('threatLogs.clearIpFilter')">

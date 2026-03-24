@@ -65,76 +65,90 @@ h1 {
   transform: translateY(-1px);
 }
 
-/* Intel Center Layout (Manteniamo l'unione efficace tra mappa e attacchi) */
+/* Intel Center Layout */
 .intel-center {
   display: flex;
   flex-direction: column;
-  gap: 25px;
+  gap: 40px;
+}
+
+.domain-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.domain-title {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #88aaff;
+  letter-spacing: 1.5px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 12px;
+  padding-left: 5px; /* Pignolone: align with cards */
+  border-bottom: 2px solid rgba(136, 170, 255, 0.1);
+  margin-bottom: 15px;
+}
+
+.domain-title .icon {
+  font-size: 1.4rem;
 }
 
 .glass-card {
-  background-color: #00294d; /* Colore originale dei widget */
+  background-color: rgba(0, 41, 77, 0.6);
   border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 0 15px rgba(0, 45, 90, 0.7);
+  padding: 25px; /* Aumentato padding interno */
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   color: #d1d9ff;
   border: 1px solid rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(8px);
 }
 
-/* Primary Intel: Map + Attacks List (Simbiosi armoniosa) */
+/* Primary Intel */
 .primary-intel {
   display: flex;
-  gap: 25px;
-  min-height: 500px;
+  gap: 30px; /* Aumentato gap tra colonna lista e mappa */
+  min-height: 400px;
 }
 
 .map-side {
-  flex: 1;
+  flex: 1.2;
   display: flex;
   flex-direction: column;
 }
 
 .list-side {
-  flex: 2;
-  padding: 0; /* Clear padding if any inherited */
+  flex: 1;
+  /* padding: 0 rimosso per usare quello di .glass-card */
   display: flex;
   flex-direction: column;
-  min-width: min(100%, 360px); /* Aumentato per evitare clipping della griglia */
+  min-width: 420px; /* Leggermente aumentato */
 }
 
-@media (max-width: 480px) {
-  .list-side {
-    min-width: 0;
-  }
+.widget-header {
+  margin-bottom: 25px; /* Aumentato per separare meglio dal listato */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.widget-header h3 {
+  font-size: 1.1rem;
+  margin: 0;
+  padding-left: 0; /* Allineamento testo fine */
+  color: #f1f5f9;
+  font-weight: 800;
+  letter-spacing: 0.5px;
 }
 
 .scroll-list {
   flex: 1;
   overflow-y: auto;
-  overflow-x: hidden; /* Evita la scrollbar orizzontale fastidiosa */
-  padding-right: 10px;
-  margin-top: 10px;
-}
-
-/* Secondary Intel: Logs + Sessions */
-.secondary-intel {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 350px), 1fr));
-  gap: 25px;
-}
-
-/* Common Widget Styles */
-.widget-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 15px;
-}
-
-h2 {
-  font-size: 1.1rem;
-  margin: 0;
-  color: #cbd5e1;
+  overflow-x: hidden;
+  padding-right: 12px;
+  /* Rimosso margin-top eccessivo se già c'è il widget-header margin */
 }
 
 ul {
@@ -145,16 +159,37 @@ ul {
 }
 
 li {
-  border-bottom: 1px solid #004080;
-  padding: 12px 0;
+  border-bottom: 1px solid rgba(136, 170, 255, 0.08);
+  padding: 14px 5px; /* Aggiunto padding laterale interno al listato */
   font-size: 0.9em;
-  color: #d1d9ff;
+  color: #cbd5e1;
   display: grid;
-  /* Grid: Flag (auto) | IP (100px) | Time (140px) | URL/Misc (1fr) | Action (auto) */
-  grid-template-columns: auto 100px 140px 1fr auto;
+  grid-template-columns: 30px 110px 130px 1fr 75px;
   align-items: center;
-  gap: 8px; /* Ridotto il gap per risparmiare spazio */
+  gap: 15px;
   width: 100%;
+  transition: background 0.2s ease;
+}
+
+.defcon-mini {
+  max-width: 120px;
+  justify-self: stretch;
+}
+
+.interaction-count, .activity-hint {
+  font-size: 0.8em;
+  color: #94a3b8;
+  font-weight: 500;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 2px 8px;
+  border-radius: 10px;
+  justify-self: start;
+}
+
+.high-interaction {
+  color: #fbbf24;
+  background: rgba(251, 191, 36, 0.1);
+  border: 1px solid rgba(251, 191, 36, 0.2);
 }
 
 @media (max-width: 1024px) {

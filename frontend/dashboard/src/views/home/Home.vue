@@ -15,88 +15,100 @@
     </section>
 
     <section class="intel-center">
-      <!-- Blocco Attacchi -->
-      <div class="primary-intel">
-        <div class="list-side glass-card">
-          <div class="widget-header">
-            <h2>{{ $t('home.recentAttacks') }}</h2>
-            <ProtocolSelector v-model="selectedAttackProtocol" :options="['http', 'ssh', 'https']" theme="dark" />
+      <!-- DOMINIO: NATIVE SERVER PROTECTION -->
+      <div class="domain-section">
+        <h2 class="domain-title"><span class="icon">🛡️</span> NATIVE SERVER PROTECTION</h2>
+        
+        <div class="primary-intel">
+          <div class="list-side glass-card">
+            <div class="widget-header">
+              <h3>{{ $t('home.recentAttacks') }}</h3>
+              <ProtocolSelector v-model="selectedAttackProtocol" :options="['http', 'https']" theme="dark" />
+            </div>
+            <ul class="scroll-list">
+              <li v-for="attack in recentAttacks" :key="attack.id">
+                <CountryFlag v-if="attack.ipDetails?.ipinfo?.country" 
+                  :countryCode="attack.ipDetails.ipinfo.country" 
+                  :tooltip="`${attack.ipDetails.ipinfo.country} - ${attack.ipDetails.ipinfo.org || t('common.notAvailable')}`" />
+                <span @click="goToIpDetails(attack.request.ip)" class="ip-link">{{ attack.request.ip }}</span>
+                <span class="time-ago">{{ formatDate(attack.firstSeen) }}</span>
+                <DefconIndicator :level="attack.dangerLevel" :dangerScore="attack.dangerScore" class="defcon-mini" />
+                <router-link
+                  :to="{ name: 'AttackDetail', query: { attack: encodeURIComponent(JSON.stringify(attack)) } }">
+                  {{ $t('common.detail') }}
+                </router-link>
+              </li>
+            </ul>
+            <div v-if="loadingAttacks" class="loading">{{ $t('home.loadingAttacks') }}</div>
+            <div v-if="errorAttacks" class="error">{{ $t('home.errorLoadingAttacks') }}</div>
           </div>
-          <ul class="scroll-list">
-            <li v-for="attack in recentAttacks" :key="attack.id">
-              <CountryFlag v-if="attack.ipDetails?.ipinfo?.country" 
-                :countryCode="attack.ipDetails.ipinfo.country" 
-                :tooltip="`${attack.ipDetails.ipinfo.country} - ${attack.ipDetails.ipinfo.org || t('common.notAvailable')}`" />
-              <span @click="goToIpDetails(attack.request.ip)" class="ip-link">{{ attack.request.ip }}</span>
-              <span class="time-ago">- {{ formatDate(attack.firstSeen) }}</span>
-              <router-link
-                :to="{ name: 'AttackDetail', query: { attack: encodeURIComponent(JSON.stringify(attack)) } }">
-                {{ $t('common.detail') }}
-              </router-link>
-            </li>
-          </ul>
-          <div v-if="loadingAttacks" class="loading">{{ $t('home.loadingAttacks') }}</div>
-          <div v-if="errorAttacks" class="error">{{ $t('home.errorLoadingAttacks') }}</div>
+          <div class="map-side glass-card">
+            <div class="widget-header">
+              <h3><span class="pulse">📡</span> {{ $t('home.attackMap') }}</h3>
+            </div>
+            <AttackMap :attacks="recentAttacks" />
+          </div>
         </div>
-        <div class="map-side glass-card">
-          <div class="widget-header">
-            <h2><span class="pulse">📡</span> {{ $t('home.attackMap') }}</h2>
+
+        <div class="secondary-intel" style="margin-top: 25px;">
+          <div class="widget glass-card">
+            <div class="widget-header">
+              <h3>{{ $t('home.recentLogs') }}</h3>
+              <ProtocolSelector v-model="selectedLogProtocol" :options="['http', 'https']" theme="dark" />
+            </div>
+            <ul class="scroll-list">
+              <li v-for="log in recentLogs" :key="log._id">
+                <CountryFlag v-if="log.ipDetailsId?.ipinfo?.country" 
+                  :countryCode="log.ipDetailsId.ipinfo.country" 
+                  :tooltip="`${log.ipDetailsId.ipinfo.country} - ${log.ipDetailsId.ipinfo.org || t('common.notAvailable')}`" />
+                <span @click="goToIpDetails(log.request.ip)" class="ip-link">{{ log.request.ip }}</span>
+                <span class="time-ago">{{ formatDate(log.timestamp) }}</span>
+                <span class="url-hint">{{ log.request.url }}</span>
+                <router-link :to="{ name: 'ThreatLog', params: { id: log.id } }">{{ $t('common.detail') }}</router-link>
+              </li>
+            </ul>
+            <div v-if="loadingLogs" class="loading">{{ $t('home.loadingLogs') }}</div>
+            <div v-if="errorLogs" class="error">{{ $t('home.errorLoadingLogs') }}</div>
           </div>
-          <AttackMap :attacks="recentAttacks" />
         </div>
       </div>
 
-      <!-- Blocco Sessioni Telnet (Mappa + Lista) -->
-      <div class="primary-intel">
-        <div class="list-side glass-card">
-          <div class="widget-header">
-            <h2>{{ $t('home.recentSessions') }}</h2>
+      <!-- DOMINIO: HONEYPOT INTELLIGENCE -->
+      <div class="domain-section" style="margin-top: 40px;">
+        <h2 class="domain-title"><span class="icon">🔍</span> HONEYPOT INTELLIGENCE</h2>
+        
+        <div class="primary-intel">
+          <div class="list-side glass-card">
+            <div class="widget-header">
+              <h3>{{ $t('home.recentSessions') }}</h3>
+            </div>
+            <ul class="scroll-list">
+              <li v-for="session in recentSessions" :key="session.session" class="session-item">
+                <CountryFlag v-if="session.ipDetailsId?.ipinfo?.country" 
+                  :countryCode="session.ipDetailsId.ipinfo.country" 
+                  :tooltip="`${session.ipDetailsId.ipinfo.country} - ${session.ipDetailsId.ipinfo.org || t('common.notAvailable')}`" />
+                <span @click="goToIpDetails(session.src_ip)" class="ip-link">{{ session.src_ip }}</span>
+                <span class="time-ago">{{ formatDate(session.starttime) }}</span>
+                <span class="interaction-count" :class="{ 'high-interaction': (session.eventCount || 0) > 5 }">
+                   {{ session.eventCount || 0 }} {{ $t('sessionChart.events').toLowerCase() }}
+                </span>
+                <router-link :to="{ name: 'CowrieAttackDetail', params: { id: session.session } }">
+                  {{ $t('common.detail') }}
+                </router-link>
+              </li>
+              <li v-if="recentSessions.length === 0 && !loadingSessions" class="no-data">
+                {{ $t('common.noDataFound') }}
+              </li>
+            </ul>
+            <div v-if="loadingSessions" class="loading">{{ $t('home.loadingSessions') }}</div>
+            <div v-if="errorSessions" class="error">{{ $t('home.errorLoadingSessions') }}</div>
           </div>
-          <ul class="scroll-list">
-            <li v-for="session in recentSessions" :key="session.session">
-              <CountryFlag v-if="session.ipDetailsId?.ipinfo?.country" 
-                :countryCode="session.ipDetailsId.ipinfo.country" 
-                :tooltip="`${session.ipDetailsId.ipinfo.country} - ${session.ipDetailsId.ipinfo.org || t('common.notAvailable')}`" />
-              <span @click="goToIpDetails(session.src_ip)" class="ip-link">{{ session.src_ip }}</span>
-              <span class="time-ago">- {{ formatDate(session.starttime) }}</span>
-              <router-link :to="{ name: 'CowrieAttackDetail', params: { id: session.session } }">{{
-                  $t('common.detail') }}</router-link>
-            </li>
-            <li v-if="recentSessions.length === 0 && !loadingSessions" class="no-data">
-              {{ $t('common.noDataFound') }}
-            </li>
-          </ul>
-          <div v-if="loadingSessions" class="loading">{{ $t('home.loadingSessions') }}</div>
-          <div v-if="errorSessions" class="error">{{ $t('home.errorLoadingSessions') }}</div>
-        </div>
-        <div class="map-side glass-card">
-          <div class="widget-header">
-            <h2><span class="pulse">📡</span> {{ $t('home.sessionsMap') }}</h2>
+          <div class="map-side glass-card">
+            <div class="widget-header">
+              <h3><span class="pulse">📡</span> {{ $t('home.sessionsMap') }}</h3>
+            </div>
+            <AttackMap :attacks="recentSessionsNormalized" :showLegend="false" />
           </div>
-          <AttackMap :attacks="recentSessionsNormalized" :showLegend="false" />
-        </div>
-      </div>
-
-      <!-- Blocco Secondario: Log e Log-Requests -->
-      <div class="secondary-intel">
-        <div class="widget glass-card">
-          <div class="widget-header">
-            <h2>{{ $t('home.recentLogs') }}</h2>
-            <ProtocolSelector v-model="selectedLogProtocol" :options="['http', 'ssh', 'https']" theme="dark" />
-          </div>
-          <ul>
-            <li v-for="log in recentLogs" :key="log._id">
-              <CountryFlag v-if="log.ipDetailsId?.ipinfo?.country" 
-                :countryCode="log.ipDetailsId.ipinfo.country" 
-                :tooltip="`${log.ipDetailsId.ipinfo.country} - ${log.ipDetailsId.ipinfo.org || t('common.notAvailable')}`" />
-              <span @click="goToIpDetails(log.request.ip)" class="ip-link">{{ log.request.ip }}</span>
-              <span class="time-ago">- {{ formatDate(log.timestamp) }}</span>
-              <span class="url-hint">- {{ log.request.url }}</span>
-              <router-link :to="{ name: 'ThreatLog', params: { id: log.id } }">{{ $t('common.detail') }}</router-link>
-            </li>
-          </ul>
-          <div v-if="loadingLogs" class="loading">{{ $t('home.loadingLogs') }}</div>
-          <div v-if="errorLogs" class="error">{{ $t('home.errorLoadingLogs') }}</div>
         </div>
       </div>
     </section>
@@ -118,6 +130,7 @@ import CountryFlag from '../../components/CountryFlag.vue';
 import AttackMap from '../../components/AttackMap.vue';
 import ConfigMenuButton from '../../components/ConfigMenuButton.vue';
 import ProtocolSelector from '../../components/common/ProtocolSelector.vue';
+import DefconIndicator from '../../components/DefconIndicator.vue';
 
 const { t } = useI18n();
 
@@ -151,7 +164,7 @@ const {
   loading: loadingAttacks,
   error: errorAttacks,
   fetchData: fetchAttacks
-} = useAttacksFilter('', selectedAttackProtocol, 1, 10, 'ago', 10, 'days', null, 60, 'days', 0, 'days', { firstSeen: -1 })
+} = useAttacksFilter('', selectedAttackProtocol, 1, 10, 'ago', 90, 'days', null, 60, 'days', 0, 'days', { firstSeen: -1 })
 
 const recentAttacks = computed(() => attacks.value.slice(0, 10))
 

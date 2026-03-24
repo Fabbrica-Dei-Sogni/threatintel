@@ -94,11 +94,11 @@
         <tbody>
           <tr v-for="log in logs" :key="log._id">
             <td>
-              <div style="display: flex; align-items: center; justify-content: center;">
-                <CountryFlag v-if="log.ipDetailsId?.ipinfo?.country" 
-                  :countryCode="log.ipDetailsId.ipinfo.country" 
-                  :tooltip="`${log.ipDetailsId.ipinfo.country} - ${log.ipDetailsId.ipinfo.org || t('common.notAvailable')}`" />
-              </div>
+                <div style="display: flex; justify-content: center; align-items: center; min-width: 30px;">
+                  <CountryFlag
+                    :countryCode="log.ipDetailsId?.ipinfo?.country" 
+                    :tooltip="log.ipDetailsId?.ipinfo ? `${log.ipDetailsId.ipinfo.country} - ${log.ipDetailsId.ipinfo.org || t('common.notAvailable')}` : t('common.notAvailable')" />
+                </div>
             </td>
             <td><button @click="goToThreatLogDetails(log.id)" style="cursor: pointer;" class="info-btn">{{
               t('common.detail') }}</button></td>

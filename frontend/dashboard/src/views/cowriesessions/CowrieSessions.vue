@@ -115,10 +115,10 @@
                 <tbody>
                     <tr v-for="session in sessions" :key="session.session" class="cyber-row">
                         <td>
-                            <CountryFlag v-if="session.ipDetailsId?.ipinfo"
-                                :countryCode="session.ipDetailsId.ipinfo.country"
-                                :tooltip="`${session.ipDetailsId.ipinfo.country} - ${session.ipDetailsId.ipinfo.org || $t('common.notAvailable')}`" />
-                            <span v-else class="dimmed">-</span>
+                            <CountryFlag 
+                                :countryCode="session.ipDetailsId?.ipinfo?.country" 
+                                :tooltip="session.ipDetailsId?.ipinfo ? `${session.ipDetailsId.ipinfo.country} - ${session.ipDetailsId.ipinfo.org || t('common.notAvailable')}` : t('common.notAvailable')"
+                                size="small" />
                         </td>
                         <td class="ip-cell">
                             <span class="ip-container">

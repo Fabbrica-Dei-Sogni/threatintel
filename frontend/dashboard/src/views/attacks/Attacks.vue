@@ -181,9 +181,9 @@
                     <tr v-for="attack in attacks" :key="attack.id">
                         <td>
                             <div style="display: flex; align-items: center; justify-content: center;">
-                                <CountryFlag v-if="attack.ipDetails.ipinfo.country"
-                                    :countryCode="attack.ipDetails.ipinfo.country" 
-                                    :tooltip="`${attack.ipDetails.ipinfo.country} - ${attack.ipDetails.ipinfo.org || t('common.notAvailable')}`" />
+                                <CountryFlag
+                                    :countryCode="attack.ipDetails?.ipinfo?.country" 
+                                    :tooltip="attack.ipDetails?.ipinfo ? `${attack.ipDetails.ipinfo.country} - ${attack.ipDetails.ipinfo.org || t('common.notAvailable')}` : t('common.notAvailable')" />
                             </div>
                         </td>
 

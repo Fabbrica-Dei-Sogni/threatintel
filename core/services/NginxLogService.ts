@@ -24,6 +24,7 @@ const DEFAULT_SUSPICIOUS_PATTERNS = [
 ];
 
 import { ILongRunningService, ServiceStatus } from '../types/lifecycle';
+import { ThreatIndicator } from '../types/indicators';
 
 @singleton()
 export class NginxLogService implements ILongRunningService {

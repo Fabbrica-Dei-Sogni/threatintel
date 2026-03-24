@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
 // Import model
-import ThreatLog from '../models/ThreatLogSchema';
+import ThreatLog, { IThreatLog } from '../models/ThreatLogSchema';
 import AttackDTO from '../models/dto/AttackDTO';
 import PatternAnalysisService from './PatternAnalysisService';
 import { ForensicService } from './forense/ForensicService';
@@ -9,6 +9,9 @@ import { inject, injectable } from 'tsyringe';
 import { LOGGER_TOKEN } from '../di/tokens';
 import { Logger } from 'winston';
 import { IpDetailsService } from './IpDetailsService';
+import { LogFilters } from '../types/threat-log.types';
+import { ThreatIndicator } from '../types/indicators';
+import { Types } from 'mongoose';
 
 dotenv.config();
 
@@ -27,8 +30,9 @@ export class ThreatLogService {
         //this.patternAnalysisService = new PatternAnalysis({ geoEnabled: true });
     }
 
-    async saveLog(logEntry: any) {
-        const ip = logEntry.request.ip;
+    async saveLog(logEntry: Partial<IThreatLog>) {
+        const ip = logEntry.request?.ip;
+        if (!ip) return null;
 
         // Se IP è nella lista degli esclusi, non salvare
         if (this.ipDetailsService.isIPExcluded(ip)) {
@@ -52,10 +56,10 @@ export class ThreatLogService {
     // Puoi aggiungere qui altri metodi di lettura/scrittura su ThreatLog
 
     // Lista log paginata e filtrata
-    async getLogs({ page = 1, pageSize = 20, filters = {}, sortFields = { timestamp: -1 } }: any = {}) {
+    async getLogs({ page = 1, pageSize = 20, filters = {}, sortFields = { timestamp: -1 } }: { page?: number, pageSize?: number, filters?: LogFilters | any, sortFields?: any } = {}) {
         const skip = (page - 1) * pageSize;
 
-        const mongoFilters = this.buildRegExpFilter(filters);
+        const mongoFilters = this.buildRegExpFilter(filters as any);
 
         // Se non c'è ordinamento, default a timestamp discendente
         const sortQuery = sortFields && Object.keys(sortFields).length > 0 ? sortFields : { timestamp: -1 };
@@ -280,7 +284,7 @@ export class ThreatLogService {
     }
 
     // Aggiorna tutti i log per quell'IP, impostando il riferimento al record IpDetails
-    async assignIpDetailsToLogs(ip: string, ipDetailsId: any) {
+    async assignIpDetailsToLogs(ip: string, ipDetailsId: Types.ObjectId) {
         return await ThreatLog.updateMany(
             { 'request.ip': ip },
             { $set: { ipDetailsId } }

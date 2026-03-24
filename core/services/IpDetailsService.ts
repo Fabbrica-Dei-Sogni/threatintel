@@ -65,63 +65,59 @@ export class IpDetailsService {
 
     async findOrCreate(ip: string, updateReputationScore = false) {
         let ipDetails = await IpDetails.findOne({ ip });
-        let now = new Date();
+        const now = new Date();
 
-        let saveAbuseDoc: any = null;
-        //gestire il caso in se l'ip gia esiste, aggiornare il nuovo campo lastSeen
-        //se è la prima volta definito il nuovo campo firstSeen
+        // Configurazione caching
+        const maxAgeHours = parseInt(process.env.IP_CACHE_MAX_AGE_HOURS || '24', 10);
+        const maxAgeMs = maxAgeHours * 60 * 60 * 1000;
+
+        // Verifica se i dati sono scaduti o mancanti
+        const isCacheExpired = !ipDetails || !ipDetails.enrichedAt || (now.getTime() - new Date(ipDetails.enrichedAt).getTime() > maxAgeMs);
+        const shouldEnrich = isCacheExpired || updateReputationScore;
+
         if (ipDetails) {
-
-            //aggiorna sempre lastSeen
+            // Aggiorna sempre l'ultimo avvistamento
             ipDetails.lastSeenAt = now;
 
+            if (shouldEnrich) {
+                this.logger.info(`[IpDetailsService] Cache scaduta o aggiornamento richiesto per ${ip}. Avvio enrichment...`);
+                
+                // 1. AbuseIPDB enrichment
+                const saveAbuseDoc = await this.getAndSaveAbuseIpDb(ip);
+                if (saveAbuseDoc) {
+                    ipDetails.abuseipdbId = saveAbuseDoc._id;
+                }
 
-            if (!ipDetails.abuseipdbId || updateReputationScore) {
-                saveAbuseDoc = await this.getAndSaveAbuseIpDb(ip);
-                ipDetails.abuseipdbId = saveAbuseDoc?._id;
-            }
-
-            //rieseguire l'enrichment del reputation score ogni volta
-            // Se i dati ipinfo sono mancanti O se contengono un errore di rate limit, riprova
-            if (!ipDetails.ipinfo ||
-                (ipDetails.ipinfo && ((ipDetails.ipinfo as any).status === 429 || ((ipDetails.ipinfo as any).error && (ipDetails.ipinfo as any).error.title === 'Rate limit exceeded')))
-            ) {
+                // 2. IPInfo & Whois enrichment
                 const enrichedData = await this.enrichIpData(ip);
-                if (enrichedData.ipinfo) {
+                if (enrichedData.ipinfo && !((enrichedData.ipinfo as any).status === 429)) {
                     ipDetails.ipinfo = enrichedData.ipinfo;
                 }
                 if (enrichedData.whois_raw) {
                     ipDetails.whois_raw = enrichedData.whois_raw;
                 }
+                
+                ipDetails.enrichedAt = now;
             }
 
             await ipDetails.save();
-
             return ipDetails._id;
+        } else {
+            this.logger.info(`[IpDetailsService] Primo avvistamento per ${ip}. Esecuzione enrichment completo...`);
+            
+            // Primo enrichment obbligatorio
+            const saveAbuseDoc = await this.getAndSaveAbuseIpDb(ip);
+            const enrichedData = await this.enrichIpData(ip);
 
-        }
-        else {
-
-            // Enrichment asincrono
-            saveAbuseDoc = await this.getAndSaveAbuseIpDb(ip);
-            const enrichedData = await this.enrichIpData(ip); // <-- la tua funzione ipinfo/whois
-
-            //TODO: eseguire l'enrichment del reputation score ogni volta
-            /*ipDetails = new IpDetails({ ip, ...enrichedData, abuseipdbId: saveAbuseDoc?._id || null });
-            ipDetails.firstSeenAt = now;
-            ipDetails.lastSeenAt = now;*/
-
-            // 2. Prepari i dati come oggetto semplice (POJO)
             const payload = {
                 ip,
                 ...enrichedData,
                 abuseipdbId: saveAbuseDoc?._id || null,
-                lastSeenAt: now
+                lastSeenAt: now,
+                enrichedAt: now
             };
 
-            // 3. Esegui findOneAndUpdate con upsert: true
-            // - $set: aggiorna i campi definiti (se esiste o crea nuovo)
-            // - $setOnInsert: imposta firstSeenAt SOLO se sta creando un nuovo documento            
+            // Utilizziamo findOneAndUpdate con upsert per gestire eventuali race conditions
             const result = await IpDetails.findOneAndUpdate(
                 { ip },
                 {
@@ -131,25 +127,8 @@ export class IpDetailsService {
                 { upsert: true, new: true, setDefaultsOnInsert: true }
             );
 
-            // 4. Ritorni l'ID del risultato (che sia stato appena creato o trovato)
             return result._id;
-
-            //soluzione legacy con try catch
-            /*try {
-                await ipDetails.save();
-            } catch (err: any) {
-                // Se nel frattempo un altro processo ha creato il record (Race Condition),
-                // recuperiamo quello esistente invece di lanciare errore.
-                if (err.code === 11000) {
-                    this.logger.info(`[IpDetailsService] Conflitto di creazione per ${ip}, recupero record esistente.`);
-                    const existing = await IpDetails.findOne({ ip });
-                    if (existing) return existing._id;
-                }
-                throw err;
-            }*/
         }
-
-
     }
 
     async getIpDetails(ip: string) {

@@ -5,6 +5,8 @@ import { ConfigService } from './ConfigService';
 import { inject, injectable } from 'tsyringe';
 import { LOGGER_TOKEN } from '../di/tokens';
 import { Logger } from 'winston';
+import { ThreatIndicator } from '../types/indicators';
+import { AnalysisResult, GeoLocation } from '../types/threat-log.types';
 
 // Import JS dependencies
 import * as geoip from 'geoip-lite';
@@ -13,8 +15,8 @@ dotenv.config();
 
 interface RequestAnalysisResult {
     fingerprint: string;
-    analysis: any;
-    geo: any;
+    analysis: AnalysisResult;
+    geo: GeoLocation | Record<string, any>;
 }
 
 @injectable()
@@ -183,47 +185,46 @@ export class PatternAnalysisService {
         return sanitized;
     }
 
-    analyze(fullUrl: string, userAgent: string, bodyStr: string, referer: string, method: string, queryStr: string, requestToAnalyze: any, jndiPayload?: string) {
-        const suspicious: string[] = [];
+    analyze(fullUrl: string, userAgent: string, bodyStr: string, referer: string, method: string, queryStr: string, requestToAnalyze: any, jndiPayload?: string): AnalysisResult {
+        const indicators: string[] = [];
         let score = 0;
-        //0. analisi preliminare su controlli speciali di dogana
-        //verificare se esiste l'header impostato dall'nginx della vps su cui traccia la provenienza da un altra porta
+
+        // 0. analisi preliminare su controlli speciali di dogana
         Object.keys(requestToAnalyze.headers).forEach(headerName => {
             if (headerName.toLowerCase() === 'x-server-port') {
-                suspicious.push(`ALT_PORT:${requestToAnalyze.headers[headerName]}`);
-                score += this.suspiciousScores.ALT_PORT;
+                indicators.push(`${ThreatIndicator.ALT_PORT}:${requestToAnalyze.headers[headerName]}`);
+                score += this.suspiciousScores[ThreatIndicator.ALT_PORT];
             }
         });
+
         // 1. Pattern sospetti in URL
         this.suspiciousPatterns.forEach(pattern => {
             if (pattern.test(fullUrl)) {
-                suspicious.push(`URL_PATTERN:${pattern.source}`);
-                score += this.suspiciousScores.URL_PATTERN;
+                indicators.push(`${ThreatIndicator.URL_PATTERN}:${pattern.source}`);
+                score += this.suspiciousScores[ThreatIndicator.URL_PATTERN];
             }
         });
 
         // 2. Pattern sospetti nel body
         this.suspiciousPatterns.forEach(pattern => {
             if (pattern.test(bodyStr)) {
-                suspicious.push(`BODY_PATTERN:${pattern.source}`);
-                score += this.suspiciousScores.BODY_PATTERN;
+                indicators.push(`${ThreatIndicator.BODY_PATTERN}:${pattern.source}`);
+                score += this.suspiciousScores[ThreatIndicator.BODY_PATTERN];
             }
         });
 
-
         // 3. User-Agent mancante o troppo corto
         if (!userAgent) {
-            suspicious.push('MISSING_USER_AGENT');
-            score += this.suspiciousScores.MISSING_USER_AGENT;
+            indicators.push(ThreatIndicator.MISSING_USER_AGENT);
+            score += this.suspiciousScores[ThreatIndicator.MISSING_USER_AGENT];
         } else if (userAgent.length < 10) {
-            suspicious.push('SHORT_USER_AGENT');
-            score += this.suspiciousScores.SHORT_USER_AGENT;
-        }
-        else {
+            indicators.push(ThreatIndicator.SHORT_USER_AGENT);
+            score += this.suspiciousScores[ThreatIndicator.SHORT_USER_AGENT];
+        } else {
             this.suspiciousReferers.forEach(pattern => {
                 if (pattern.test(userAgent)) {
-                    suspicious.push(`SUSPICIOUS_REFERER:${pattern.source}`);
-                    score += this.suspiciousScores.SUSPICIOUS_REFERER;
+                    indicators.push(`${ThreatIndicator.SUSPICIOUS_REFERER}:${pattern.source}`);
+                    score += this.suspiciousScores[ThreatIndicator.SUSPICIOUS_REFERER];
                 }
             });
         }
@@ -231,37 +232,38 @@ export class PatternAnalysisService {
         // 4. User-Agent da bot/crawler
         this.botPatterns.forEach(pattern => {
             if (pattern.test(userAgent)) {
-                suspicious.push(`BOT_USER_AGENT:${pattern.source}`);
-                score += this.suspiciousScores.BOT_USER_AGENT;
+                indicators.push(`${ThreatIndicator.BOT_USER_AGENT}:${pattern.source}`);
+                score += this.suspiciousScores[ThreatIndicator.BOT_USER_AGENT];
             }
         });
-        // Verifica bot/crawler
-        //const isBot = this.botPatterns.some(pattern => pattern.test(userAgent));
 
         // 5. Referer sospetto
         this.suspiciousReferers.forEach(pattern => {
             if (referer && pattern.test(referer)) {
-                suspicious.push(`SUSPICIOUS_REFERER:${pattern.source}`);
-                score += this.suspiciousScores.SUSPICIOUS_REFERER;
+                indicators.push(`${ThreatIndicator.SUSPICIOUS_REFERER}:${pattern.source}`);
+                score += this.suspiciousScores[ThreatIndicator.SUSPICIOUS_REFERER];
             }
         });
+
         if (jndiPayload) {
-            suspicious.push(`SUSPICIOUS_REFERER:JNDI_PAYLOAD[${jndiPayload}]`);
-            //aggiungo un valore piu alto ad un jndiPayload, in futuro gestiro meglio questo punteggio
-            score += this.suspiciousScores.SUSPICIOUS_REFERER + 15;
+            indicators.push(`${ThreatIndicator.JNDI_PAYLOAD}[${jndiPayload}]`);
+            score += this.suspiciousScores[ThreatIndicator.SUSPICIOUS_REFERER] + 15;
         }
 
         // 6. Metodo HTTP anomalo
         if (!['GET', 'POST', 'HEAD'].includes(method)) {
-            suspicious.push('UNCOMMON_METHOD');
-            score += this.suspiciousScores.UNCOMMON_METHOD;
+            indicators.push(ThreatIndicator.UNCOMMON_METHOD);
+            score += this.suspiciousScores[ThreatIndicator.UNCOMMON_METHOD];
         }
 
+        const tags = Array.from(new Set(indicators.map(s => s.split(':')[0].toLowerCase())));
+
         return {
-            suspicious: score > 0,
             score,
-            indicators: suspicious,
-            isBot: suspicious.some(i => i.startsWith('BOT_USER_AGENT'))
+            tags,
+            indicators,
+            suspicious: score > 0,
+            isBot: indicators.some(i => i.startsWith(ThreatIndicator.BOT_USER_AGENT))
         };
     }
 

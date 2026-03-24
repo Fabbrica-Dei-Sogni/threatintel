@@ -8,6 +8,7 @@ import crypto from 'crypto';
 import { ConfigService } from './ConfigService';
 
 import { ILongRunningService, ServiceStatus } from '../types/lifecycle';
+import { ThreatIndicator } from '../types/indicators';
 
 @singleton()
 export class SshLogService implements ILongRunningService {
@@ -19,8 +20,8 @@ export class SshLogService implements ILongRunningService {
     private initialized: Promise<void>;
 
     // Const keys for config
-    private readonly SSH_FAILED_PASSWORD = 'SSH_FAILED_PASSWORD';
-    private readonly SSH_INVALID_USER = 'SSH_INVALID_USER';
+    private readonly SSH_FAILED_PASSWORD = ThreatIndicator.SSH_FAILED_PASSWORD;
+    private readonly SSH_INVALID_USER = ThreatIndicator.SSH_INVALID_USER;
 
     constructor(
         @inject(LOGGER_TOKEN) private readonly logger: Logger,

@@ -3,13 +3,13 @@ import express from 'express';
 import request from 'supertest';
 import mongoose from 'mongoose';
 import configroutes from '../configroutes';
-import { ConfigService } from '../../services/ConfigService';
+import { ConfigController } from '../../controllers/ConfigController';
 import Configuration from '../../models/ConfigSchema';
 import { container } from 'tsyringe';
 
 describe('ConfigRoutes API', () => {
     let app: express.Application;
-    let configService: ConfigService;
+    let configController: ConfigController;
 
     beforeAll(async () => {
         const uri = process.env.MONGO_URI_TEST || 'mongodb://127.0.0.1:27017/test-routes';
@@ -18,14 +18,9 @@ describe('ConfigRoutes API', () => {
         app = express();
         app.use(express.json());
 
-        configService = container.resolve(ConfigService);
-        const loggerMock = {
-            info: jest.fn(),
-            error: jest.fn(),
-            warn: jest.fn()
-        };
+        configController = container.resolve(ConfigController);
 
-        app.use('/', configroutes(loggerMock, configService));
+        app.use('/', configroutes(configController));
     });
 
     afterAll(async () => {

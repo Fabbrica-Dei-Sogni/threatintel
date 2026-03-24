@@ -4,8 +4,8 @@ import axios from 'axios';
 import dotenv from 'dotenv';
 
 // Import JS dependencies
-const whois = require('whois');
-const ipinfo = require('ipinfo');
+import * as whois from 'whois';
+import ipinfo from 'ipinfo';
 import AbuseReport from '../models/AbuseReportSchema';
 import IpDetails from '../models/IpDetailsSchema';
 import AbuseIpDb from '../models/AbuseIpDbSchema';
@@ -13,7 +13,7 @@ import { AbuseCategoryEnum } from '../models/AbuseCategoryEnum';
 import { inject, injectable } from 'tsyringe';
 import { LOGGER_TOKEN } from '../di/tokens';
 import { Logger } from 'winston';
-const ipRangeCheck = require('ip-range-check');
+import ipRangeCheck from 'ip-range-check';
 
 const whoisAsync = util.promisify(whois.lookup);
 

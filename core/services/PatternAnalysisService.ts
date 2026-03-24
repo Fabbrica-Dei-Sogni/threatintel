@@ -7,7 +7,7 @@ import { LOGGER_TOKEN } from '../di/tokens';
 import { Logger } from 'winston';
 
 // Import JS dependencies
-const geoip = require('geoip-lite');
+import * as geoip from 'geoip-lite';
 
 dotenv.config();
 

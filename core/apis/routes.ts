@@ -1,22 +1,16 @@
 import express from 'express';
-import {
-    ddosProtectionLimiter,
-    applicationLimiter,
-    violationTracker,
-    criticalEndpointsLimiter,
-    trapEndpointsLimiter
-} from '../rateLimitMiddleware';
+import { RateLimitMiddleware } from '../rateLimitMiddleware';
 import { FakeLoginController } from '../controllers/FakeLoginController';
 
-export default (logger: any, fakeLoginController: FakeLoginController) => {
+export default (logger: any, fakeLoginController: FakeLoginController, rateLimitMiddleware: RateLimitMiddleware) => {
     const router = express.Router();
 
-    router.use(violationTracker(logger));
-    router.use(ddosProtectionLimiter(logger));
-    router.use(applicationLimiter(logger));
+    router.use(rateLimitMiddleware.violationTracker());
+    router.use(rateLimitMiddleware.ddosProtectionLimiter());
+    router.use(rateLimitMiddleware.applicationLimiter());
 
-    router.get('/', criticalEndpointsLimiter(logger), (req, res) => fakeLoginController.showFakeLogin(req, res));
-    router.post('/login', criticalEndpointsLimiter(logger), (req, res) => fakeLoginController.handleFakeLogin(req, res));
+    router.get('/', rateLimitMiddleware.criticalEndpointsLimiter(), (req, res) => fakeLoginController.showFakeLogin(req, res));
+    router.post('/login', rateLimitMiddleware.criticalEndpointsLimiter(), (req, res) => fakeLoginController.handleFakeLogin(req, res));
 
     const commonEndpoints = (process.env.COMMON_ENDPOINTS || '')
         .split(',')
@@ -26,7 +20,7 @@ export default (logger: any, fakeLoginController: FakeLoginController) => {
     if (commonEndpoints.length) logger.info(`[routes] COMMON_ENDPOINTS caricati: ${commonEndpoints.join(', ')}`);
 
     commonEndpoints.forEach(endpoint => {
-        router.all(endpoint, trapEndpointsLimiter(logger), (req, res) => fakeLoginController.handleTrap(req, res));
+        router.all(endpoint, rateLimitMiddleware.trapEndpointsLimiter(), (req, res) => fakeLoginController.handleTrap(req, res));
     });
 
     router.use('*', (req, res) => fakeLoginController.handleNotFound(req, res));

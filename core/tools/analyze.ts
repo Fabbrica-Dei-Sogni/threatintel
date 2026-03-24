@@ -1,47 +1,58 @@
-import { logger } from '../../logger';
-import dotenv from 'dotenv';
+import { inject, singleton } from 'tsyringe';
 import { ThreatLogService } from '../services/ThreatLogService';
-import { getComponent } from '../di/container';
-
-const threatLogService = getComponent(ThreatLogService);
-
+import { LOGGER_TOKEN } from '../di/tokens';
+import { Logger } from 'winston';
+import dotenv from 'dotenv';
 dotenv.config();
 
-const timeoutAnalyze = parseInterval(process.env.ANALYZE_INTERVAL || '5m');
+@singleton()
+export class AnalysisService {
+    private timeoutAnalyze: number;
 
-export function scheduleAnalysis() {
-    setInterval(analyze, timeoutAnalyze);
-    analyze();
-}
+    constructor(
+        @inject(LOGGER_TOKEN) private readonly logger: Logger,
+        private readonly threatLogService: ThreatLogService
+    ) {
+        this.timeoutAnalyze = this.parseInterval(process.env.ANALYZE_INTERVAL || '5m');
+    }
 
-async function analyze() {
+    public scheduleAnalysis() {
+        setInterval(() => this.analyze(), this.timeoutAnalyze);
+        this.analyze();
+    }
 
-    const stats = await threatLogService.getStats('24h');
-    const topThreats = await threatLogService.getTopThreats(10);
+    private async analyze() {
+        try {
+            const stats = await this.threatLogService.getStats('24h');
+            const topThreats = await this.threatLogService.getTopThreats(10);
 
-    logger.info(`📊 Statistiche ultime 24h: ${stats.totalRequests}`);
-    logger.info(`⚠️  Top minacce: ${JSON.stringify(topThreats)}`);
-}
+            this.logger.info(`📊 Statistiche ultime 24h: ${stats.totalRequests}`);
+            this.logger.info(`⚠️  Top minacce: ${JSON.stringify(topThreats)}`);
+        } catch (error) {
+            this.logger.error('Errore durante l\'analisi periodica:', error);
+        }
+    }
 
-function parseInterval(val: string, defaultUnit = 's'): number {
-    if (!val) throw new Error('Interval value is required');
+    private parseInterval(val: string, defaultUnit = 's'): number {
+        if (!val) throw new Error('Interval value is required');
 
-    // Riconosce formato tipo '5m', '30s', o anche solo '120'
-    const match = /^(\d+)\s*([a-zA-Z]*)$/.exec(val.trim());
-    if (!match) throw new Error('Invalid interval format');
+        // Riconosce formato tipo '5m', '30s', o anche solo '120'
+        const match = /^(\d+)\s*([a-zA-Z]*)$/.exec(val.trim());
+        if (!match) throw new Error('Invalid interval format');
 
-    const [, num, unit] = match;
-    const value = parseInt(num, 10);
+        const [, num, unit] = match;
+        const value = parseInt(num, 10);
 
-    switch ((unit || defaultUnit).toLowerCase()) {
-        case 'm':
-        case 'min':
-            return value * 60 * 1000;
-        case 's':
-        case 'sec':
-        case '':
-            return value * 1000; // default a secondi se manca unità
-        default:
-            throw new Error(`Unità non supportata: "${unit}"`);
+        switch ((unit || defaultUnit).toLowerCase()) {
+            case 'm':
+            case 'min':
+                return value * 60 * 1000;
+            case 's':
+            case 'sec':
+            case '':
+                return value * 1000; // default a secondi se manca unità
+            default:
+                throw new Error(`Unità non supportata: "${unit}"`);
+        }
     }
 }

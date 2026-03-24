@@ -1,13 +1,14 @@
 import { Request, Response } from 'express';
 import { inject, singleton } from 'tsyringe';
-import { manualBlacklistIP } from '../rateLimitMiddleware';
+import { RateLimitMiddleware } from '../rateLimitMiddleware';
 import { LOGGER_TOKEN } from '../di/tokens';
 import { Logger } from 'winston';
 
 @singleton()
 export class ManageLimitController {
     constructor(
-        @inject(LOGGER_TOKEN) private logger: Logger
+        @inject(LOGGER_TOKEN) private logger: Logger,
+        private rateLimitMiddleware: RateLimitMiddleware
     ) {}
 
     // POST /api/blacklist-ip
@@ -19,7 +20,7 @@ export class ManageLimitController {
         }
 
         try {
-            await manualBlacklistIP(ip);
+            await this.rateLimitMiddleware.manualBlacklistIP(ip);
             res.status(200).json({ message: `IP ${ip} inserito con successo in blacklist.` });
         } catch (error: any) {
             this.logger.error(`[ManageLimitController] Errore durante inserimento IP ${ip}: ${error.message}`);

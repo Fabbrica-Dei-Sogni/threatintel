@@ -1,7 +1,6 @@
 import crypto from 'crypto';
 import dotenv from 'dotenv';
 import { Request } from 'express';
-import { getComponent } from '../di/container';
 import { ConfigService } from './ConfigService';
 import { inject, injectable } from 'tsyringe';
 import { LOGGER_TOKEN } from '../di/tokens';
@@ -9,7 +8,6 @@ import { Logger } from 'winston';
 
 // Import JS dependencies
 const geoip = require('geoip-lite');
-const configService = getComponent(ConfigService);
 
 dotenv.config();
 
@@ -28,7 +26,10 @@ export class PatternAnalysisService {
     private suspiciousScores: any;
     private initialized: Promise<void>;
 
-    constructor(@inject(LOGGER_TOKEN) private readonly logger: Logger,) {
+    constructor(
+        @inject(LOGGER_TOKEN) private readonly logger: Logger,
+        private readonly configService: ConfigService
+    ) {
 
         //XXX: si imposta la geolocalizzazione sempre attiva. fornire un sistema per parametrizzarlo qualora sia necessario in futuro.
         this.geoEnabled = true;// options.geoEnabled !== false;
@@ -50,10 +51,10 @@ export class PatternAnalysisService {
                 suspiciousReferersStr,
                 suspiciousScoresStr
             ] = await Promise.all([
-                configService.getConfigValue('SUSPICIOUS_PATTERNS'),
-                configService.getConfigValue('BOT_PATTERNS'),
-                configService.getConfigValue('SUSPICIOUS_REFERERS'),
-                configService.getConfigValue('SUSPICIOUS_SCORES')
+                this.configService.getConfigValue('SUSPICIOUS_PATTERNS'),
+                this.configService.getConfigValue('BOT_PATTERNS'),
+                this.configService.getConfigValue('SUSPICIOUS_REFERERS'),
+                this.configService.getConfigValue('SUSPICIOUS_SCORES')
             ]);
 
             // Parsing patterns in Regex

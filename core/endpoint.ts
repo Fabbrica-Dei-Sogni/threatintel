@@ -26,6 +26,8 @@ const fakeLoginController = getComponent(FakeLoginController);
 const cowrieController = getComponent(CowrieController);
 
 const threatLogger = getComponent(ThreatLogger);
+import { RateLimitMiddleware } from "./rateLimitMiddleware";
+const rateLimitMiddleware = getComponent(RateLimitMiddleware);
 
 const router = express.Router();
 
@@ -47,7 +49,7 @@ import cowrieroutes from './apis/cowrieroutes';
 router.use('/', cowrieroutes(logger, cowrieController));
 
 // API Honeypot Trap e Fake Login
-router.use('/', routes(logger, fakeLoginController));
+router.use('/', routes(logger, fakeLoginController, rateLimitMiddleware));
 
 // API Gestione Limiti (Blacklist manuale)
 router.use('/', managelimitroutes(manageLimitController));

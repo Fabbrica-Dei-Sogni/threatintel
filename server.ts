@@ -10,7 +10,7 @@ import { logger } from './logger';
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
-import { scheduleAnalysis } from './core/tools/analyze';
+import { AnalysisService } from './core/tools/analyze';
 import path from 'path';
 import { port } from './core/config';
 import api from './core/endpoint';
@@ -73,4 +73,5 @@ cowrieService.startEnrichmentJob();
 const nginxLogService = getComponent(NginxLogService);
 nginxLogService.startMonitoring().catch(err => logger.error('[NginxLogService] Errore avvio:', err));
 
-scheduleAnalysis();
+const analysisService = getComponent(AnalysisService);
+analysisService.scheduleAnalysis();

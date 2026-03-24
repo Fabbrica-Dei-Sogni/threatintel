@@ -153,7 +153,7 @@ export class ThreatLogService {
         ];
 
 
-        const [result] = await ThreatLog.aggregate(pipeline);
+        const [result] = await ThreatLog.aggregate(pipeline).allowDiskUse(true);
 
         const attacks: AttackDTO[] = result.dati;
 
@@ -233,7 +233,7 @@ export class ThreatLogService {
         ];
 
 
-        const [result] = await ThreatLog.aggregate(pipeline);
+        const [result] = await ThreatLog.aggregate(pipeline).allowDiskUse(true);
 
         const attacks: AttackDTO[] = result.dati;
 

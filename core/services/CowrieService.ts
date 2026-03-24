@@ -198,7 +198,7 @@ export class CowrieService implements ILongRunningService {
             }
         ];
 
-        const [result] = await CowrieSession.aggregate(pipeline).exec();
+        const [result] = await CowrieSession.aggregate(pipeline).allowDiskUse(true).exec();
 
         return {
             sessions: result?.sessions || [],

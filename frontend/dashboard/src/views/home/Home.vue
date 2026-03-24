@@ -23,7 +23,7 @@
           <div class="list-side glass-card">
             <div class="widget-header">
               <h3>{{ $t('home.recentAttacks') }}</h3>
-              <ProtocolSelector v-model="selectedAttackProtocol" :options="['http', 'https']" theme="dark" />
+              <ProtocolSelector v-model="selectedAttackProtocol" :options="['http', 'https', 'ssh']" theme="dark" />
             </div>
             <ul class="scroll-list">
               <li v-for="attack in recentAttacks" :key="attack.id">
@@ -54,7 +54,7 @@
           <div class="widget glass-card">
             <div class="widget-header">
               <h3>{{ $t('home.recentLogs') }}</h3>
-              <ProtocolSelector v-model="selectedLogProtocol" :options="['http', 'https']" theme="dark" />
+              <ProtocolSelector v-model="selectedLogProtocol" :options="['http', 'https', 'ssh']" theme="dark" />
             </div>
             <ul class="scroll-list">
               <li v-for="log in recentLogs" :key="log._id">

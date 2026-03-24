@@ -1,14 +1,17 @@
 <template>
   <div class="dashboard">
-    <ConfigMenuButton />
-    <div class="header-with-lang">
-      <h1>{{ $t('home.title') }}</h1>
+    <div class="header-top">
+      <h1>
+        <ConfigMenuButton inline class="animated-icon pulse-cog" />
+        {{ t('home.title') }}
+      </h1>
       <LanguageSwitcher />
     </div>
+
     <section class="actions">
-      <button @click="goToAttacks" class="btn-action">{{ $t('home.attacks') }}</button>
-      <button @click="goToLogs" class="btn-action">{{ $t('home.logRequests') }}</button>
-      <button @click="goToTelnet" class="btn-action">{{ $t('home.telnet') }}</button>
+      <button @click="goToAttacks" class="btn-action">{{ t('home.attacks') }}</button>
+      <button @click="goToLogs" class="btn-action">{{ t('home.logRequests') }}</button>
+      <button @click="goToTelnet" class="btn-action">{{ t('home.telnet') }}</button>
     </section>
 
     <section class="intel-center">

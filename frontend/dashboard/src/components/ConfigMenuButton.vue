@@ -1,7 +1,7 @@
 <template>
-    <div class="config-menu">
-        <!-- Config Button (hamburger style, fixed position) -->
-        <button class="config-btn" @click="goToConfig" :title="$t('nav.configuration')">
+    <div :class="['config-menu', { 'is-inline': inline }]">
+        <!-- Config Button (hamburger style) -->
+        <button class="config-btn" @click="goToConfig" :title="t('nav.configuration')">
             <span class="hamburger-line"></span>
             <span class="hamburger-line"></span>
             <span class="hamburger-line"></span>
@@ -13,6 +13,10 @@
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 
+const props = defineProps<{
+    inline?: boolean
+}>();
+
 const { t } = useI18n();
 const router = useRouter();
 
@@ -22,11 +26,29 @@ function goToConfig() {
 </script>
 
 <style scoped>
-.config-menu {
+.config-menu:not(.is-inline) {
     position: fixed;
     top: 20px;
     left: 20px;
     z-index: 1001;
+}
+
+.is-inline {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.is-inline .config-btn {
+    width: 36px;
+    height: 36px;
+    padding: 6px;
+    gap: 4px;
+    border-radius: 8px;
+}
+
+.is-inline .hamburger-line {
+    width: 18px;
+    height: 2px;
 }
 
 .config-btn {
@@ -70,7 +92,7 @@ function goToConfig() {
 
 /* Responsive */
 @media (max-width: 640px) {
-    .config-menu {
+    .config-menu:not(.is-inline) {
         top: 12px;
         left: 12px;
     }

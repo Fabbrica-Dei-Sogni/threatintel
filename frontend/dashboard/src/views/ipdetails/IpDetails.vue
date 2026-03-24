@@ -25,12 +25,18 @@
             </button>
             <section v-if="errorReputationScore" class="error">{{ t('common.error') }}</section>
 
-            <p><strong>{{ t('ipDetails.score') }}:</strong> {{ ipInfo.abuseipdbId.abuseConfidenceScore || t('common.notAvailable') }}</p>
-            <p><strong>{{ t('ipDetails.isListed') }}:</strong> {{ ipInfo.abuseipdbId.isListed || t('common.notAvailable') }}</p>
-            <p><strong>{{ t('ipDetails.isWhitelisted') }}:</strong> {{ ipInfo.abuseipdbId.isWhitelisted || t('common.notAvailable') }}</p>
-            <p><strong>{{ t('ipDetails.isTor') }}</strong> {{ ipInfo.abuseipdbId.isTor || t('common.notAvailable') }}</p>
-            <p><strong>{{ t('ipDetails.totalReports') }}:</strong> {{ ipInfo.abuseipdbId.totalReports || t('common.notAvailable') }}</p>
-            <p><strong>{{ t('ipDetails.usage') }}:</strong> {{ ipInfo.abuseipdbId.usageType || t('common.notAvailable') }}</p>
+            <p><strong>{{ t('ipDetails.score') }}:</strong> {{ ipInfo.abuseipdbId.abuseConfidenceScore ||
+              t('common.notAvailable') }}</p>
+            <p><strong>{{ t('ipDetails.isListed') }}:</strong> {{ ipInfo.abuseipdbId.isListed ||
+              t('common.notAvailable') }}</p>
+            <p><strong>{{ t('ipDetails.isWhitelisted') }}:</strong> {{ ipInfo.abuseipdbId.isWhitelisted ||
+              t('common.notAvailable') }}</p>
+            <p><strong>{{ t('ipDetails.isTor') }}</strong> {{ ipInfo.abuseipdbId.isTor || t('common.notAvailable') }}
+            </p>
+            <p><strong>{{ t('ipDetails.totalReports') }}:</strong> {{ ipInfo.abuseipdbId.totalReports ||
+              t('common.notAvailable') }}</p>
+            <p><strong>{{ t('ipDetails.usage') }}:</strong> {{ ipInfo.abuseipdbId.usageType || t('common.notAvailable')
+              }}</p>
             <p><strong>{{ t('ipDetails.lastReportedAt') }}:</strong> {{ formatDate(ipInfo.abuseipdbId.lastReportedAt) ||
               t('common.notAvailable') }}</p>
           </div>
@@ -52,7 +58,7 @@
             <div v-for="report in paginatedReports" :key="report._id" class="report-entry">
               <div class="report-header" @click="toggleReport(report._id)">
                 <span>{{ formatDate(report.reportedAt) }} - {{report.categories.map(cat => cat.name).join(', ')
-                  }}</span>
+                }}</span>
                 <button class="action-btn copy" @click="copyToClipboard(report._id)"
                   :title="t('common.copyToClipboard')">
                   <span v-if="!copied">📋</span>
@@ -64,7 +70,8 @@
                 <div v-if="expandedReports[report._id]" class="report-body">
                   <!--<p><strong>Categorie:</strong>  {{ report.categories.map(cat => cat.name).join(', ') }}</p>-->
                   <!--<p><strong>Reporter ID:</strong> {{ report.reporterId || 'anonimo' }}</p> -->
-                  <p><strong>{{ t('ipDetails.reporterCountry') }}:</strong> {{ report.reporterCountryCode || t('common.notAvailable') }}
+                  <p><strong>{{ t('ipDetails.reporterCountry') }}:</strong> {{ report.reporterCountryCode ||
+                    t('common.notAvailable') }}
                   </p>
                   <p><strong>{{ t('ipDetails.comment') }}:</strong> {{ report.comment }}</p>
                 </div>
@@ -90,39 +97,39 @@
         <transition name="collapse">
           <div v-if="toggles.geo" class="section-body">
             <p>
-              <span class="detail-label">{{ t('ipDetails.organization') }}</span>
+              <span class="detail-label">{{ t('ipDetails.organization') }}: </span>
               <span class="detail-value">{{ ipInfo.ipinfo?.org || t('common.notAvailable') }}</span>
             </p>
             <p>
-              <span class="detail-label">{{ t('ipDetails.isp') }}</span>
+              <span class="detail-label">{{ t('ipDetails.isp') }}: </span>
               <span class="detail-value">{{ ipInfo.ipinfo?.hostname || t('common.notAvailable') }}</span>
             </p>
             <p>
-              <span class="detail-label">{{ t('ipDetails.country') }}</span>
+              <span class="detail-label">{{ t('ipDetails.country') }}: </span>
               <span class="detail-value">{{ ipInfo.ipinfo?.country || t('common.notAvailable') }}</span>
             </p>
             <p>
-              <span class="detail-label">{{ t('ipDetails.region') }}</span>
+              <span class="detail-label">{{ t('ipDetails.region') }}: </span>
               <span class="detail-value">{{ ipInfo.ipinfo?.region || t('common.notAvailable') }}</span>
             </p>
             <p>
-              <span class="detail-label">{{ t('ipDetails.city') }}</span>
+              <span class="detail-label">{{ t('ipDetails.city') }}: </span>
               <span class="detail-value">{{ ipInfo.ipinfo?.city || t('common.notAvailable') }}</span>
             </p>
             <p>
-              <span class="detail-label">{{ t('ipDetails.postal') }}</span>
+              <span class="detail-label">{{ t('ipDetails.postal') }}: </span>
               <span class="detail-value">{{ ipInfo.ipinfo?.postal || t('common.notAvailable') }}</span>
             </p>
             <p>
-              <span class="detail-label">{{ t('ipDetails.location') }}</span>
+              <span class="detail-label">{{ t('ipDetails.location') }}: </span>
               <span class="detail-value">{{ ipInfo.ipinfo?.loc || t('common.notAvailable') }}</span>
             </p>
             <p>
-              <span class="detail-label">{{ t('ipDetails.timezone') }}</span>
+              <span class="detail-label">{{ t('ipDetails.timezone') }}: </span>
               <span class="detail-value">{{ ipInfo.ipinfo?.timezone || t('common.notAvailable') }}</span>
             </p>
             <p>
-              <span class="detail-label">{{ t('ipDetails.additionalInfo') }}</span>
+              <span class="detail-label">{{ t('ipDetails.additionalInfo') }}: </span>
               <span class="detail-value">{{ formatDate(ipInfo.enrichedAt) || t('common.notAvailable') }}</span>
             </p>
           </div>
@@ -179,8 +186,12 @@
         </div>
         <transition name="collapse">
           <div v-if="toggles.honeypot" class="section-body">
-            <p><strong>{{ t('ipDetails.firstSeen') }}:</strong> {{ formatDate(ipInfo.firstSeenAt) || t('common.notAvailable') }}</p>
-            <p><strong>{{ t('ipDetails.lastSeen') }}:</strong> {{ formatDate(ipInfo.lastSeenAt) || t('common.notAvailable') }}</p>
+            <p><strong>{{ t('ipDetails.firstSeen') }}:</strong> {{ formatDate(ipInfo.firstSeenAt) ||
+              t('common.notAvailable')
+              }}</p>
+            <p><strong>{{ t('ipDetails.lastSeen') }}:</strong> {{ formatDate(ipInfo.lastSeenAt) ||
+              t('common.notAvailable') }}
+            </p>
             <p><strong>{{ t('ipDetails.whoisRaw') }}:</strong>
             <pre class="whois-pre">{{ JSON.stringify(ipInfo.whois_raw, null, 2) }}</pre>
             </p>

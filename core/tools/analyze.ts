@@ -5,9 +5,14 @@ import { Logger } from 'winston';
 import dotenv from 'dotenv';
 dotenv.config();
 
+import { ILongRunningService, ServiceStatus } from '../types/lifecycle';
+
 @singleton()
-export class AnalysisService {
+export class AnalysisService implements ILongRunningService {
+    public readonly serviceName = 'AnalysisService';
+    private status: ServiceStatus = ServiceStatus.IDLE;
     private timeoutAnalyze: number;
+    private intervalId: NodeJS.Timeout | null = null;
 
     constructor(
         @inject(LOGGER_TOKEN) private readonly logger: Logger,
@@ -16,9 +21,27 @@ export class AnalysisService {
         this.timeoutAnalyze = this.parseInterval(process.env.ANALYZE_INTERVAL || '5m');
     }
 
-    public scheduleAnalysis() {
-        setInterval(() => this.analyze(), this.timeoutAnalyze);
-        this.analyze();
+    public getStatus(): ServiceStatus {
+        return this.status;
+    }
+
+    public async start() {
+        this.status = ServiceStatus.STARTING;
+        if (this.intervalId) {
+            this.status = ServiceStatus.RUNNING;
+            return;
+        }
+        this.intervalId = setInterval(() => this.analyze(), this.timeoutAnalyze);
+        await this.analyze();
+        this.status = ServiceStatus.RUNNING;
+    }
+
+    public stop() {
+        if (this.intervalId) {
+            clearInterval(this.intervalId);
+            this.intervalId = null;
+        }
+        this.status = ServiceStatus.IDLE;
     }
 
     private async analyze() {

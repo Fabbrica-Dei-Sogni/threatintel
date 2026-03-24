@@ -5,3 +5,4 @@ import { InjectionToken } from "tsyringe";
  * Use these exported symbols as tokens for `@inject(...)` and for container registration.
  */
 export const LOGGER_TOKEN: InjectionToken<any> = Symbol("Logger");
+export const LIFECYCLE_MANAGER_TOKEN = Symbol("LifecycleManager");

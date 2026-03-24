@@ -23,8 +23,12 @@ const DEFAULT_SUSPICIOUS_PATTERNS = [
     /(<script|javascript:|onerror=|onload=)/i,                // XSS
 ];
 
+import { ILongRunningService, ServiceStatus } from '../types/lifecycle';
+
 @singleton()
-export class NginxLogService {
+export class NginxLogService implements ILongRunningService {
+    public readonly serviceName = 'NginxLogService';
+    private status: ServiceStatus = ServiceStatus.IDLE;
     private journalProcess: any = null;
     private suspiciousPatterns: RegExp[];
 
@@ -62,12 +66,18 @@ export class NginxLogService {
         return this.suspiciousPatterns.some(pattern => pattern.test(url));
     }
 
+    public getStatus(): ServiceStatus {
+        return this.status;
+    }
+
     /**
      * Avvia il monitoraggio in tempo reale dei log Nginx tramite journalctl.
      */
-    async startMonitoring() {
+    async start() {
+        this.status = ServiceStatus.STARTING;
         if (this.journalProcess) {
             this.logger.warn('[NginxLogService] Monitoraggio già attivo.');
+            this.status = ServiceStatus.RUNNING;
             return;
         }
 
@@ -96,8 +106,22 @@ export class NginxLogService {
         this.journalProcess.on('close', (code: number) => {
             this.logger.warn(`[NginxLogService] Processo terminato (code ${code}). Riavvio in 10s...`);
             this.journalProcess = null;
-            setTimeout(() => this.startMonitoring(), 10000);
+            setTimeout(() => this.start(), 10000);
         });
+
+        this.status = ServiceStatus.RUNNING;
+    }
+
+    /**
+     * Ferma il monitoraggio.
+     */
+    stop() {
+        if (this.journalProcess) {
+            this.journalProcess.kill();
+            this.journalProcess = null;
+            this.logger.info('[NginxLogService] Monitoraggio Nginx fermato.');
+        }
+        this.status = ServiceStatus.IDLE;
     }
 
     /**

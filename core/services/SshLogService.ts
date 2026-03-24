@@ -7,8 +7,12 @@ import PatternAnalysisService from './PatternAnalysisService';
 import crypto from 'crypto';
 import { ConfigService } from './ConfigService';
 
+import { ILongRunningService, ServiceStatus } from '../types/lifecycle';
+
 @singleton()
-export class SshLogService {
+export class SshLogService implements ILongRunningService {
+    public readonly serviceName = 'SshLogService';
+    private status: ServiceStatus = ServiceStatus.IDLE;
     private journalProcess: any = null;
     private failedPasswordScore: number = 15;
     private invalidUserScore: number = 25;
@@ -52,62 +56,79 @@ export class SshLogService {
         }
     }
 
+    public getStatus(): ServiceStatus {
+        return this.status;
+    }
+
     /**
      * Avvia il monitoraggio in tempo reale dei log SSH tramite journalctl.
      */
-    async startMonitoring() {
+    async start() {
+        this.status = ServiceStatus.STARTING;
+        try {
+            //inizializza il caricamenti degli score 
+            await this.initialized;
 
-        //inizializza il caricamenti degli score 
-        await this.initialized;
+            if (this.journalProcess) {
+                this.logger.warn('[SshLogService] Monitoraggio già attivo.');
+                this.status = ServiceStatus.RUNNING;
+                return;
+            }
 
-        if (this.journalProcess) {
-            this.logger.warn('[SshLogService] Monitoraggio già attivo.');
-            return;
-        }
+            // Prima di avviare il monitoraggio real-time, proviamo a recuperare i log recenti (es. ultime 24h)
+            await this.backfillLogs('3 hour ago');
 
-        // Prima di avviare il monitoraggio real-time, proviamo a recuperare i log recenti (es. ultime 24h)
-        await this.backfillLogs('3 hour ago');
+            this.logger.info('[SshLogService] Avvio monitoraggio log SSH (journalctl -u ssh)...');
 
-        this.logger.info('[SshLogService] Avvio monitoraggio log SSH (journalctl -u ssh)...');
+            // Utilizziamo SYSLOG_IDENTIFIER=sshd invece di -u ssh perché è più universale tra le varie distro
+            // e spesso più accessibile se l'unità è configurata in modo particolare.
+            this.journalProcess = spawn('journalctl', ['SYSLOG_IDENTIFIER=sshd', '-f', '-o', 'json', '-n', '0']);
 
-        // Utilizziamo SYSLOG_IDENTIFIER=sshd invece di -u ssh perché è più universale tra le varie distro
-        // e spesso più accessibile se l'unità è configurata in modo particolare.
-        this.journalProcess = spawn('journalctl', ['SYSLOG_IDENTIFIER=sshd', '-f', '-o', 'json', '-n', '0']);
+            this.journalProcess.stdout.on('data', (data: Buffer) => {
+                const dataStr = data.toString();
+                const lines = dataStr.split('\n');
 
-        this.journalProcess.stdout.on('data', (data: Buffer) => {
-            const dataStr = data.toString();
-            const lines = dataStr.split('\n');
-
-            for (const line of lines) {
-                if (!line.trim()) continue;
-                try {
-                    const entry = JSON.parse(line);
-                    this.processEntry(entry);
-                } catch (err) {
-                    this.logger.error('[SshLogService] Errore nel parsing della riga del journal', { error: err, line });
+                for (const line of lines) {
+                    if (!line.trim()) continue;
+                    try {
+                        const entry = JSON.parse(line);
+                        this.processEntry(entry);
+                    } catch (err) {
+                        this.logger.error('[SshLogService] Errore nel parsing della riga del journal', { error: err, line });
+                    }
                 }
-            }
-        });
+            });
 
-        this.journalProcess.stderr.on('data', (data: Buffer) => {
-            const errorMsg = data.toString();
-            if (errorMsg.includes('not seeing messages from other users')) {
-                this.logger.error('[SshLogService] 🛑 PERMESSI INSUFFICIENTI: Il sistema non ha il permesso di leggere i log di altri utenti (sshd).');
-                this.logger.error('[SshLogService] 💡 Eseguire: "sudo usermod -aG systemd-journal $USER" e riavviare il server.');
-            } else {
-                this.logger.error(`[SshLogService] journalctl stderr: ${errorMsg}`);
-            }
-        });
+            this.journalProcess.stderr.on('data', (data: Buffer) => {
+                const errorMsg = data.toString();
+                if (errorMsg.includes('not seeing messages from other users')) {
+                    this.logger.error('[SshLogService] 🛑 PERMESSI INSUFFICIENTI: Il sistema non ha il permesso di leggere i log di altri utenti (sshd).');
+                    this.logger.error('[SshLogService] 💡 Eseguire: "sudo usermod -aG systemd-journal $USER" e riavviare il server.');
+                } else {
+                    this.logger.error(`[SshLogService] journalctl stderr: ${errorMsg}`);
+                }
+            });
 
-        this.journalProcess.on('close', (code: number) => {
-            this.logger.warn(`[SshLogService] Il processo journalctl è terminato con codice ${code}. Riavvio in 10 secondi...`);
-            this.journalProcess = null;
-            setTimeout(() => this.startMonitoring(), 10000);
-        });
+            this.journalProcess.on('close', (code: number) => {
+                this.logger.warn(`[SshLogService] Il processo journalctl è terminato con codice ${code}. Riavvio in 10 secondi...`);
+                this.journalProcess = null;
+                // Se era in RUNNING o FAILED, proviamo a farlo ripartire
+                if (this.status !== ServiceStatus.IDLE) {
+                    setTimeout(() => this.start(), 10000);
+                }
+            });
 
-        this.journalProcess.on('error', (err: Error) => {
-            this.logger.error('[SshLogService] Errore critico nel processo journalctl', err);
-        });
+            this.journalProcess.on('error', (err: Error) => {
+                this.logger.error('[SshLogService] Errore critico nel processo journalctl', err);
+                this.status = ServiceStatus.FAILED;
+            });
+
+            this.status = ServiceStatus.RUNNING;
+        } catch (err: any) {
+            this.logger.error(`[SshLogService] Errore critico durante lo startup: ${err.message}`);
+            this.status = ServiceStatus.FAILED;
+            throw err;
+        }
     }
 
     /**
@@ -119,11 +140,11 @@ export class SshLogService {
 
         return new Promise<void>((resolve) => {
             // Usiamo lo stesso identificatore del monitoraggio real-time
-            const process = spawn('journalctl', ['SYSLOG_IDENTIFIER=sshd', '--since', since, '-o', 'json', '--no-pager']);
+            const proc = spawn('journalctl', ['SYSLOG_IDENTIFIER=sshd', '--since', since, '-o', 'json', '--no-pager']);
             let buffer = '';
             let processedCount = 0;
 
-            process.stdout.on('data', (data) => {
+            proc.stdout.on('data', (data) => {
                 buffer += data.toString();
                 const lines = buffer.split('\n');
                 buffer = lines.pop() || '';
@@ -140,7 +161,7 @@ export class SshLogService {
                 }
             });
 
-            process.stderr.on('data', (data) => {
+            proc.stderr.on('data', (data) => {
                 const errorMsg = data.toString();
                 if (errorMsg.includes('not seeing messages from other users')) {
                     this.logger.error('[SshLogService] 🛑 PERMESSI INSUFFICIENTI (Backfill): Non posso caricare lo storico senza il gruppo "systemd-journal".');
@@ -149,12 +170,12 @@ export class SshLogService {
                 }
             });
 
-            process.on('close', () => {
+            proc.on('close', () => {
                 this.logger.info(`[SshLogService] Recupero log pregressi completato. Elaborate ${processedCount} righe.`);
                 resolve();
             });
 
-            process.on('error', (err) => {
+            proc.on('error', (err) => {
                 this.logger.error('[SshLogService] Errore durante il backfill dei log SSH', err);
                 resolve();
             });
@@ -164,12 +185,13 @@ export class SshLogService {
     /**
      * Ferma il monitoraggio.
      */
-    stopMonitoring() {
+    stop() {
         if (this.journalProcess) {
             this.journalProcess.kill();
             this.journalProcess = null;
             this.logger.info('[SshLogService] Monitoraggio SSH fermato.');
         }
+        this.status = ServiceStatus.IDLE;
     }
 
     private async processEntry(entry: any) {

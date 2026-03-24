@@ -19,6 +19,8 @@ import { SshLogService } from './core/services/SshLogService';
 import { CowrieService } from './core/services/CowrieService';
 import { NginxLogService } from './core/services/NginxLogService';
 
+import { LifecycleManager } from './core/services/LifecycleManager';
+
 const app = express();
 
 
@@ -54,24 +56,24 @@ app.set('trust proxy', true);
 app.use(api);
 
 const PORT = port;
-app.listen(Number(PORT), '127.0.0.1', () => {
+app.listen(Number(PORT), '127.0.0.1', async () => {
     logger.info(`🚀 Server threat intelligence avviato su porta ${PORT}`);
     logger.info(`📊 Dashboard statistiche: http://localhost:${PORT}/api/stats`);
     logger.info(`🕸️  Landing page: http://localhost:${PORT}/`);
+
+    // Bootstrap dei servizi in background tramite LifecycleManager
+    try {
+        const lifecycleManager = getComponent(LifecycleManager);
+        
+        // Registrazione servizi
+        lifecycleManager.register(getComponent(SshLogService));
+        lifecycleManager.register(getComponent(NginxLogService));
+        lifecycleManager.register(getComponent(CowrieService));
+        lifecycleManager.register(getComponent(AnalysisService));
+
+        // Avvio sequenza di bootstrap (non blocca l'ascolto del server)
+        await lifecycleManager.boot();
+    } catch (err) {
+        logger.error('❌ Errore critico durante il bootstrap dei servizi:', err);
+    }
 });
-
-//XXX: verificare il corretto funzionamento del servizio di logging ssh per ora disattivato.
-const sshLogService = getComponent(SshLogService);
-//XXX: disattivato provvisoriamente il servizio di logging ssh per motivi di performance su grandi volumi di dati.
-sshLogService.startMonitoring().catch(err => logger.error('Errore avvio SSH monitoring:', err));
-
-// Avvio job in background di Cowrie per arricchimento Geo-IP degli accessi Telnet
-const cowrieService = getComponent(CowrieService);
-cowrieService.startEnrichmentJob();
-
-// Avvio monitoraggio log Nginx (HTTPS - solo URI sospetti)
-const nginxLogService = getComponent(NginxLogService);
-nginxLogService.startMonitoring().catch(err => logger.error('[NginxLogService] Errore avvio:', err));
-
-const analysisService = getComponent(AnalysisService);
-analysisService.scheduleAnalysis();

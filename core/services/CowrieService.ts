@@ -8,8 +8,12 @@ import CowrieAuth from '../models/CowrieAuthSchema';
 import CowrieInput from '../models/CowrieInputSchema';
 import CowrieTtyLog from '../models/CowrieTtyLogSchema';
 
+import { ILongRunningService, ServiceStatus } from '../types/lifecycle';
+
 @singleton()
-export class CowrieService {
+export class CowrieService implements ILongRunningService {
+    public readonly serviceName = 'CowrieService';
+    private status: ServiceStatus = ServiceStatus.IDLE;
     private enrichmentInterval: NodeJS.Timeout | null = null;
 
     constructor(
@@ -17,18 +21,35 @@ export class CowrieService {
         private readonly ipDetailsService: IpDetailsService
     ) {}
 
+    public getStatus(): ServiceStatus {
+        return this.status;
+    }
+
     /**
      * Avvia il cron job per arricchire le sessioni sprovviste di Geo-Location
      */
-    startEnrichmentJob() {
-        if (this.enrichmentInterval) return;
+    async start() {
+        this.status = ServiceStatus.STARTING;
+        if (this.enrichmentInterval) {
+            this.status = ServiceStatus.RUNNING;
+            return;
+        }
         this.logger.info('[CowrieService] Avvio job di arricchimento IP in background (ogni 2 minuti).');
         
         // Esegue periodicamente per catturare record inseriti bypassando Node.js
         this.enrichmentInterval = setInterval(() => this.enrichSessions(), 2 * 60 * 1000);
         
         // Esecuzione immediata all'avvio
-        this.enrichSessions();
+        await this.enrichSessions();
+        this.status = ServiceStatus.RUNNING;
+    }
+
+    stop() {
+        if (this.enrichmentInterval) {
+            clearInterval(this.enrichmentInterval);
+            this.enrichmentInterval = null;
+        }
+        this.status = ServiceStatus.IDLE;
     }
 
     private async enrichSessions() {

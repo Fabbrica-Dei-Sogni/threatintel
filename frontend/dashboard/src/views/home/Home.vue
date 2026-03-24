@@ -24,7 +24,9 @@
           </div>
           <ul class="scroll-list">
             <li v-for="attack in recentAttacks" :key="attack.id">
-              <CountryFlag v-if="attack.ipDetails?.ipinfo?.country" :countryCode="attack.ipDetails?.ipinfo?.country" />
+              <CountryFlag v-if="attack.ipDetails?.ipinfo?.country" 
+                :countryCode="attack.ipDetails.ipinfo.country" 
+                :tooltip="`${attack.ipDetails.ipinfo.country} - ${attack.ipDetails.ipinfo.org || t('common.notAvailable')}`" />
               <span @click="goToIpDetails(attack.request.ip)" class="ip-link">{{ attack.request.ip }}</span>
               <span class="time-ago">- {{ formatDate(attack.firstSeen) }}</span>
               <router-link
@@ -52,7 +54,9 @@
           </div>
           <ul class="scroll-list">
             <li v-for="session in recentSessions" :key="session.session">
-              <CountryFlag v-if="session.ipDetailsId?.ipinfo?.country" :countryCode="session.ipDetailsId.ipinfo.country" />
+              <CountryFlag v-if="session.ipDetailsId?.ipinfo?.country" 
+                :countryCode="session.ipDetailsId.ipinfo.country" 
+                :tooltip="`${session.ipDetailsId.ipinfo.country} - ${session.ipDetailsId.ipinfo.org || t('common.notAvailable')}`" />
               <span @click="goToIpDetails(session.src_ip)" class="ip-link">{{ session.src_ip }}</span>
               <span class="time-ago">- {{ formatDate(session.starttime) }}</span>
               <router-link :to="{ name: 'CowrieAttackDetail', params: { id: session.session } }">{{
@@ -82,7 +86,9 @@
           </div>
           <ul>
             <li v-for="log in recentLogs" :key="log._id">
-              <CountryFlag v-if="log.ipDetailsId?.ipinfo?.country" :countryCode="log.ipDetailsId.ipinfo.country" />
+              <CountryFlag v-if="log.ipDetailsId?.ipinfo?.country" 
+                :countryCode="log.ipDetailsId.ipinfo.country" 
+                :tooltip="`${log.ipDetailsId.ipinfo.country} - ${log.ipDetailsId.ipinfo.org || t('common.notAvailable')}`" />
               <span @click="goToIpDetails(log.request.ip)" class="ip-link">{{ log.request.ip }}</span>
               <span class="time-ago">- {{ formatDate(log.timestamp) }}</span>
               <span class="url-hint">- {{ log.request.url }}</span>

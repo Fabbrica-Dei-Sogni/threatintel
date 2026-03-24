@@ -1,5 +1,5 @@
 <template>
-    <div class="country-flag" v-if="countryCode" :title="countryCode">
+    <div class="country-flag" v-if="countryCode" :title="tooltip || countryCode">
         <img :src="flagUrl" :alt="countryCode" class="flag-img" @error="hasError = true" v-if="!hasError" />
         <span v-else class="flag-fallback">{{ countryCode }}</span>
     </div>
@@ -12,6 +12,10 @@ const props = defineProps({
     countryCode: {
         type: String,
         required: true
+    },
+    tooltip: {
+        type: String,
+        default: ''
     },
     size: {
         type: String, // 'small' i.e. 20px height, 'normal'

@@ -68,6 +68,7 @@
             <table>
                 <thead>
                     <tr>
+                        <th>{{ $t('cowrie.sessions.table.country') }}</th>
                         <th class="sortable-th">
                             <div class="sort-control">
                                 <span class="label">{{ $t('cowrie.sessions.table.ip') }}</span>
@@ -78,7 +79,6 @@
                                 </button>
                             </div>
                         </th>
-                        <th>{{ $t('cowrie.sessions.table.country') }}</th>
                         <th class="sortable-th">
                             <div class="sort-control">
                                 <span class="label">{{ $t('cowrie.sessions.table.startTime') }}</span>
@@ -114,6 +114,12 @@
                 </thead>
                 <tbody>
                     <tr v-for="session in sessions" :key="session.session" class="cyber-row">
+                        <td>
+                            <CountryFlag v-if="session.ipDetailsId?.ipinfo"
+                                :countryCode="session.ipDetailsId.ipinfo.country"
+                                :tooltip="`${session.ipDetailsId.ipinfo.country} - ${session.ipDetailsId.ipinfo.org || $t('common.notAvailable')}`" />
+                            <span v-else class="dimmed">-</span>
+                        </td>
                         <td class="ip-cell">
                             <span class="ip-container">
                                 <span class="ip-link" @click="goToIpDetails(session.src_ip)" :title="$t('common.infoIp')">
@@ -124,11 +130,6 @@
                                 <button @click.stop="setIpFilter(session.src_ip)" class="btn-copy-mini"
                                     :title="$t('common.copyToFilter')">⬇️</button>
                             </span>
-                        </td>
-                        <td>
-                            <CountryFlag v-if="session.ipDetailsId?.ipinfo?.country"
-                                :countryCode="session.ipDetailsId.ipinfo.country" />
-                            <span v-else class="dimmed">-</span>
                         </td>
                         <td class="time-cell">{{ formatDate(session.starttime) }}</td>
                         <td class="duration-cell">{{ computeDuration(session.starttime, session.endtime) }}</td>

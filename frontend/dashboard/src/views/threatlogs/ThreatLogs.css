@@ -119,8 +119,26 @@
 
 .actions {
   display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
   gap: 16px;
-  margin-bottom: 0;
+  margin-bottom: 25px;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 179, 0, 0.1);
+}
+
+.nav-actions {
+    display: flex;
+    gap: 16px;
+}
+
+.view-controls {
+    display: flex;
+    gap: 12px;
+    align-items: center;
 }
 
 .btn-action {

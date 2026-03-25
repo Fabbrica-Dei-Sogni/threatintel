@@ -31,10 +31,23 @@
 .actions { 
     top: 56px; 
     display: flex; 
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
     gap: 16px; 
     margin: 0; 
-    padding-left: 24px;
-    padding-right: 24px;
+    padding: 12px 24px;
+}
+
+.nav-actions {
+    display: flex;
+    gap: 16px;
+}
+
+.view-controls {
+    display: flex;
+    gap: 12px;
+    align-items: center;
 }
 
 .filters-container { 
@@ -73,18 +86,7 @@
     50% { transform: scale(1.1) rotate(2deg); opacity: 1; filter: drop-shadow(0 0 12px #00FF41); }
 }
 
-.actions {
-    margin-bottom: 25px;
-    display: flex;
-    gap: 15px;
-}
 
-.chart-controls {
-    display: flex;
-    gap: 15px;
-    margin-bottom: 20px;
-    justify-content: flex-start;
-}
 
 .chart-section {
     width: 100%;

@@ -6,12 +6,17 @@
     </div>
     <!-- Pulsante per navigare alla Home -->
     <div class="actions">
-      <button @click="goToHome" class="btn-action">
-        {{ t('threatLogs.dashboard') }}
-      </button>
-      <button @click="goToAttacks" class="btn-action">
-        {{ t('threatLogs.attacks') }}
-      </button>
+      <div class="nav-actions">
+        <button @click="goToHome" class="btn-action">
+          {{ t('threatLogs.dashboard') }}
+        </button>
+        <button @click="goToAttacks" class="btn-action">
+          {{ t('threatLogs.attacks') }}
+        </button>
+      </div>
+      <div class="view-controls">
+        <ViewToggle v-model="showChart" :label="t('common.showChart')" theme="amber" />
+      </div>
     </div>
 
     <section class="filters-container">
@@ -38,11 +43,6 @@
     <div v-if="loading" class="loading">{{ t('common.loading') }}</div>
     <div v-if="error" class="error">{{ t('threatLogs.errorLoadingData') }}</div>
 
-    <section class="chart-controls" style="margin-bottom: 20px;">
-      <button class="btn-action" @click="showChart = !showChart">
-        {{ showChart ? t('common.hideChart') : t('common.showChart') }}
-      </button>
-    </section>
 
     <transition name="fade">
       <div v-if="showChart">
@@ -203,6 +203,7 @@ import { useLogsFilter } from '../../composable/useLogsFilter';
 import { useClipboard } from '../../composable/useClipboard';
 import { useI18n } from 'vue-i18n';
 import ProtocolSelector from '../../components/common/ProtocolSelector.vue';
+import ViewToggle from '../../components/common/ViewToggle.vue';
 import dayjs from 'dayjs';
 import CountryFlag from '../../components/CountryFlag.vue';
 import ThreadLogChart from '../../components/ThreadLogChart.vue';

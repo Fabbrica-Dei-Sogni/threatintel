@@ -6,12 +6,18 @@
         </div>
         <!-- Pulsante per tornare alla Home principale -->
         <div class="actions">
-            <button @click="goToHome" class="btn-action">
-                {{ t('attacks.dashboard') }}
-            </button>
-            <button @click="goToLogs" class="btn-action">
-                {{ t('attacks.logRequests') }}
-            </button>
+            <div class="nav-actions">
+                <button @click="goToHome" class="btn-action">
+                    {{ t('attacks.dashboard') }}
+                </button>
+                <button @click="goToLogs" class="btn-action">
+                    {{ t('attacks.logRequests') }}
+                </button>
+            </div>
+            <div class="view-controls">
+                <ViewToggle v-model="showMap" :label="t('common.showMap')" theme="magma" />
+                <ViewToggle v-model="showChart" :label="t('common.showChart')" theme="magma" />
+            </div>
         </div>
 
         <!-- Filtri Combinati -->
@@ -63,14 +69,6 @@
         <div v-if="loading" class="loading">{{ t('common.loading') }}</div>
         <div v-if="error" class="error">{{ t('attacks.errorLoadingData') }}</div>
 
-        <section class="chart-controls" style="margin-bottom: 20px;">
-            <button class="btn-action" @click="showMap = !showMap">
-                {{ showMap ? t('common.hideMap') : t('common.showMap') }}
-            </button>
-            <button class="btn-action" @click="showChart = !showChart">
-                {{ showChart ? t('common.hideChart') : t('common.showChart') }}
-            </button>
-        </section>
 
         <section class="map-controls" style="margin-bottom: 20px;">
             <transition name="fade">
@@ -344,6 +342,7 @@ import { useI18n } from 'vue-i18n';
 const { copyToClipboard } = useClipboard();
 const { t } = useI18n();
 import ProtocolSelector from '../../components/common/ProtocolSelector.vue';
+import ViewToggle from '../../components/common/ViewToggle.vue';
 import DefconIndicator from '../../components/DefconIndicator.vue';
 import CountryFlag from '../../components/CountryFlag.vue';
 import AttackChart from '../../components/AttackChart.vue';

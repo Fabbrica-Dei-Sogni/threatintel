@@ -5,7 +5,13 @@
             <LanguageSwitcher />
         </div>
         <div class="actions">
-            <button @click="$router.push('/')" class="btn-action">{{ $t('cowrie.sessions.backToDashboard') }}</button>
+            <div class="nav-actions">
+                <button @click="$router.push('/')" class="btn-action">{{ $t('cowrie.sessions.backToDashboard') }}</button>
+            </div>
+            <div class="view-controls">
+                <ViewToggle v-model="showMap" :label="$t('common.showMap')" theme="jade" />
+                <ViewToggle v-model="showChart" :label="$t('common.showChart')" theme="jade" />
+            </div>
         </div>
 
         <section class="filters-container">
@@ -25,14 +31,6 @@
         <div v-if="loading" class="loading">{{ $t('cowrie.sessions.loading') }}</div>
         <div v-if="error" class="error">{{ $t('cowrie.sessions.errorLoad') }}</div>
 
-        <section class="chart-controls" style="margin-bottom: 20px;">
-            <button @click="toggleMap" class="btn-action">
-                {{ showMap ? $t('common.hideMap') : $t('common.showMap') }}
-            </button>
-            <button @click="toggleChart" class="btn-action">
-                {{ showChart ? $t('common.hideChart') : $t('common.showChart') }}
-            </button>
-        </section>
 
         <!-- Sezione Mappa -->
         <transition name="fade">
@@ -189,6 +187,8 @@ import CountryFlag from '../../components/CountryFlag.vue';
 import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
 import SessionChart from '../../components/SessionChart.vue';
 import AttackMap from '../../components/AttackMap.vue';
+import ViewToggle from '../../components/common/ViewToggle.vue';
+import ViewToggle from '../../components/common/ViewToggle.vue';
 
 const props = defineProps({
     initialPage: { type: Number, default: 1 },

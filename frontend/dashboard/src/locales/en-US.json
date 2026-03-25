@@ -289,7 +289,11 @@
         "fullWhois": "Full Whois",
         "firstSeen": "First seen",
         "lastSeen": "Last seen",
-        "whoisRaw": "Whois"
+        "whoisRaw": "Whois",
+        "forceRefresh": "Force IP Refresh",
+        "noAbuseData": "Waiting for AbuseIPDB enrichment...",
+        "refreshSuccess": "IP data successfully updated!",
+        "refreshError": "Error while updating IP data"
     },
     "components": {
         "radar": {

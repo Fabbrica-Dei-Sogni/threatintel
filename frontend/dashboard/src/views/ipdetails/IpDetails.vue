@@ -2,17 +2,23 @@
   <div class="ip-details">
     <div class="header-top">
       <button @click="goBack" class="back-btn">← {{ t('ipDetails.backToAttacks') }}</button>
+      <button @click="forzaArricchimento" :disabled="loadingEnrich" class="refresh-btn">
+        <span v-if="loadingEnrich" class="spinner"></span>
+        {{ loadingEnrich ? t('common.loading') : t('ipDetails.forceRefresh') }}
+      </button>
       <LanguageSwitcher />
     </div>
 
-    <h1>{{ t('ipDetails.title') }}: {{ ip }}</h1>
+    <div class="header-main">
+      <h1>{{ t('ipDetails.title') }}: {{ ip }}</h1>
+    </div>
 
     <section v-if="loading" class="loading">{{ t('common.loading') }}</section>
     <section v-if="error" class="error">{{ t('common.error') }}</section>
 
     <div v-if="ipInfo" class="sections">
       <!-- Sezioni toggle -->
-      <div class="section" v-if="ipInfo.abuseipdbId">
+      <div class="section">
         <div class="section-header" @click="toggles.abuse = !toggles.abuse">
           <h2>{{ t('ipDetails.additionalInfo') }}</h2>
           <span class="arrow" :class="{ open: toggles.abuse }"></span>
@@ -20,25 +26,32 @@
         <transition name="collapse">
           <div v-if="toggles.abuse" class="section-body">
 
-            <button @click="aggiornaReputationScore" :disabled="loadingReputationScore" class="update-btn">
-              {{ loadingReputationScore ? t('common.loading') : t('ipDetails.additionalInfo') }}
-            </button>
-            <section v-if="errorReputationScore" class="error">{{ t('common.error') }}</section>
+            <div v-if="ipInfo.abuseipdbId">
+              <button @click="aggiornaReputationScore" :disabled="loadingReputationScore" class="update-btn">
+                {{ loadingReputationScore ? t('common.loading') : t('ipDetails.additionalInfo') }}
+              </button>
+              <section v-if="errorReputationScore" class="error">{{ t('common.error') }}</section>
 
-            <p><strong>{{ t('ipDetails.score') }}:</strong> {{ ipInfo.abuseipdbId.abuseConfidenceScore ||
-              t('common.notAvailable') }}</p>
-            <p><strong>{{ t('ipDetails.isListed') }}:</strong> {{ ipInfo.abuseipdbId.isListed ||
-              t('common.notAvailable') }}</p>
-            <p><strong>{{ t('ipDetails.isWhitelisted') }}:</strong> {{ ipInfo.abuseipdbId.isWhitelisted ||
-              t('common.notAvailable') }}</p>
-            <p><strong>{{ t('ipDetails.isTor') }}</strong> {{ ipInfo.abuseipdbId.isTor || t('common.notAvailable') }}
-            </p>
-            <p><strong>{{ t('ipDetails.totalReports') }}:</strong> {{ ipInfo.abuseipdbId.totalReports ||
-              t('common.notAvailable') }}</p>
-            <p><strong>{{ t('ipDetails.usage') }}:</strong> {{ ipInfo.abuseipdbId.usageType || t('common.notAvailable')
+              <p><strong>{{ t('ipDetails.score') }}:</strong> {{ ipInfo.abuseipdbId.abuseConfidenceScore ||
+                t('common.notAvailable') }}</p>
+              <p><strong>{{ t('ipDetails.isListed') }}:</strong> {{ ipInfo.abuseipdbId.isListed ||
+                t('common.notAvailable') }}</p>
+              <p><strong>{{ t('ipDetails.isWhitelisted') }}:</strong> {{ ipInfo.abuseipdbId.isWhitelisted ||
+                t('common.notAvailable') }}</p>
+              <p><strong>{{ t('ipDetails.isTor') }}</strong> {{ ipInfo.abuseipdbId.isTor || t('common.notAvailable') }}
+              </p>
+              <p><strong>{{ t('ipDetails.totalReports') }}:</strong> {{ ipInfo.abuseipdbId.totalReports ||
+                t('common.notAvailable') }}</p>
+              <p><strong>{{ t('ipDetails.usage') }}:</strong> {{ ipInfo.abuseipdbId.usageType ||
+                t('common.notAvailable')
               }}</p>
-            <p><strong>{{ t('ipDetails.lastReportedAt') }}:</strong> {{ formatDate(ipInfo.abuseipdbId.lastReportedAt) ||
-              t('common.notAvailable') }}</p>
+              <p><strong>{{ t('ipDetails.lastReportedAt') }}:</strong> {{ formatDate(ipInfo.abuseipdbId.lastReportedAt)
+                ||
+                t('common.notAvailable') }}</p>
+            </div>
+            <div v-else class="empty-placeholder">
+              {{ t('ipDetails.noAbuseData') }}
+            </div>
           </div>
         </transition>
       </div>
@@ -210,6 +223,7 @@ import dayjs from 'dayjs'
 import { fetchIpDetails, fetchRateLimitSearch, enrichReports, enrichReputationScore } from '../../api/index'
 import { useI18n } from 'vue-i18n'
 import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
+import { ElMessage } from 'element-plus';
 
 const { t } = useI18n();
 
@@ -219,6 +233,7 @@ const router = useRouter()
 const ip = ref('')
 const ipInfo = ref(null)
 const loading = ref(false)
+const loadingEnrich = ref(false)
 const error = ref(false)
 const copied = ref(false);
 
@@ -298,17 +313,33 @@ async function aggiornaReputationScore() {
   try {
 
     const response = await enrichReputationScore(ip.value);
-
+    ElMessage.success(t('ipDetails.refreshSuccess'));
     loadIpDetails();
 
   } catch (err) {
     errorReputationScore.value = true;
+    ElMessage.error(t('ipDetails.refreshError'));
     setTimeout(() => {
       errorReputationScore.value = false;
     }, 2500);
 
   } finally {
     loadingReputationScore.value = false;
+  }
+}
+
+async function forzaArricchimento() {
+  if (!ip.value || !ip.value.trim()) return;
+  loadingEnrich.value = true;
+  try {
+    await enrichReputationScore(ip.value);
+    ElMessage.success(t('ipDetails.refreshSuccess'));
+    await loadIpDetails();
+  } catch (err) {
+    console.error('Errore arricchimento forzato:', err);
+    ElMessage.error(t('ipDetails.refreshError'));
+  } finally {
+    loadingEnrich.value = false;
   }
 }
 

@@ -104,14 +104,23 @@ export class IpDetailsService {
 
                 // 2. IPInfo & Whois enrichment
                 const enrichedData = await this.enrichIpData(ip);
-                if (enrichedData.ipinfo && !((enrichedData.ipinfo as any).status === 429)) {
+                
+                // Gestione specifica 429: Se ipinfo è fallito per rate limit, non aggiorniamo enrichedAt
+                // in modo da permettere un retry al prossimo avvistamento senza aspettare 24h.
+                const isIpInfoRateLimited = enrichedData.ipinfo && (enrichedData.ipinfo as any).status === 429;
+
+                if (enrichedData.ipinfo && !isIpInfoRateLimited) {
                     ipDetails.ipinfo = enrichedData.ipinfo;
                 }
                 if (enrichedData.whois_raw) {
                     ipDetails.whois_raw = enrichedData.whois_raw;
                 }
                 
-                ipDetails.enrichedAt = now;
+                if (!isIpInfoRateLimited) {
+                    ipDetails.enrichedAt = now;
+                } else {
+                    this.logger.warn(`[IpDetailsService] Enrichment parziale per ${ip} causa rate limit. Prossimo retry automatico abilitato.`);
+                }
             }
 
             await ipDetails.save();
@@ -122,13 +131,16 @@ export class IpDetailsService {
             // Primo enrichment obbligatorio
             const saveAbuseDoc = await this.getAndSaveAbuseIpDb(ip);
             const enrichedData = await this.enrichIpData(ip);
+            const isIpInfoRateLimited = enrichedData.ipinfo && (enrichedData.ipinfo as any).status === 429;
 
             const payload = {
                 ip,
                 ...enrichedData,
                 abuseipdbId: saveAbuseDoc?._id || null,
                 lastSeenAt: now,
-                enrichedAt: now
+                // Se siamo in rate limit, non impostiamo enrichedAt o lo mettiamo a null
+                // per scatenare il retry automatico alla prossima chiamata.
+                enrichedAt: isIpInfoRateLimited ? null : now
             };
 
             // Utilizziamo findOneAndUpdate con upsert per gestire eventuali race conditions
@@ -140,6 +152,10 @@ export class IpDetailsService {
                 },
                 { upsert: true, new: true, setDefaultsOnInsert: true }
             );
+
+            if (isIpInfoRateLimited) {
+                this.logger.warn(`[IpDetailsService] Primo salvataggio per ${ip} con arricchimento parziale (Rate Limit).`);
+            }
 
             return result._id;
         }
@@ -358,9 +374,9 @@ export class IpDetailsService {
                     // Gestione specifica per Rate Limit: Ritorniamo l'errore per il frontend, 
                     // ma lo logghiamo per poterlo intercettare nel findOrCreate
                     if (err.status === 429 || (err.error && err.error.title === 'Rate limit exceeded')) {
-                        this.logger.warn(`[IpDetailsService] Rate limit superato per ipinfo su IP ${ip}. Ignoro l'errore per salvare il log minimale.`);
-                        // Ritorniamo null per ignorare l'errore e salvare il log minimale
-                        return resolve(null);
+                        this.logger.warn(`[IpDetailsService] Rate limit superato per ipinfo su IP ${ip}. Segnalo errore per retry.`);
+                        // Ritorniamo un oggetto con lo status per permettere al chiamante di decidere
+                        return resolve({ status: 429, error: 'Rate limit exceeded' });
                     }
 
                     this.logger.warn(`[IpDetailsService] Fallimento lookup ipinfo per ${ip}:`, err);
@@ -369,9 +385,9 @@ export class IpDetailsService {
 
                 // Controllo se ipinfo ha restituito l'errore nel campo data invece che in err
                 if (data && (data.status === 429 || (data.error && data.error.title === 'Rate limit exceeded'))) {
-                    this.logger.warn(`[IpDetailsService] Rate limit superato per ipinfo su IP ${ip} (in data). Ignoro l'errore per salvare il log minimale.`);
-                    // Ritorniamo null per ignorare l'errore
-                    return resolve(null);
+                    this.logger.warn(`[IpDetailsService] Rate limit superato per ipinfo su IP ${ip} (in data). Segnalo errore per retry.`);
+                    // Ritorniamo l'oggetto errore invece di null
+                    return resolve({ status: 429, error: 'Rate limit exceeded' });
                 }
 
                 resolve(data);

@@ -290,7 +290,11 @@
         "fullWhois": "Whois completo",
         "firstSeen": "Primo avvistamento",
         "lastSeen": "Ultimo avvistamento",
-        "whoisRaw": "Whois"
+        "whoisRaw": "Whois",
+        "forceRefresh": "Aggiorna Dati IP",
+        "noAbuseData": "In attesa di arricchimento AbuseIPDB...",
+        "refreshSuccess": "Dati IP aggiornati correttamente!",
+        "refreshError": "Errore durante l'aggiornamento dei dati IP"
     },
     "components": {
         "radar": {

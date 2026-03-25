@@ -207,10 +207,12 @@ const activityOptions = computed(() => ({
 <style scoped>
 .session-chart-container {
     width: 100%;
+    max-width: 100%;          /* Prevent escape from parent */
+    box-sizing: border-box;   /* Include padding in width calc */
+    overflow: hidden;         /* Hard clamp */
     margin-bottom: 25px;
     padding: 20px;
     position: relative;
-    overflow: hidden;
 }
 
 .chart-header {
@@ -218,6 +220,8 @@ const activityOptions = computed(() => ({
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 10px;
 }
 
 .title-with-icon {
@@ -232,7 +236,7 @@ const activityOptions = computed(() => ({
 
 h3 {
     margin: 0;
-    font-size: 1.1rem;
+    font-size: clamp(0.95rem, 1.5vw, 1.1rem);
     font-weight: 600;
     color: #00FF41;
     letter-spacing: 0.5px;
@@ -242,6 +246,7 @@ h3 {
     position: relative;
     height: 320px;
     width: 100%;
+    overflow: hidden;         /* Canvas boundary */
 }
 
 .no-data-overlay {

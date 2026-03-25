@@ -148,6 +148,9 @@ const chartOptions = {
 <style scoped>
 .thread-log-chart-container {
     width: 100%;
+    max-width: 100%;          /* Prevent escape from parent */
+    box-sizing: border-box;   /* Include padding in width calc */
+    overflow: hidden;         /* Hard clamp */
     margin-bottom: 20px;
     background: rgba(26, 20, 10, 0.4);
     border-radius: 8px;
@@ -159,7 +162,7 @@ const chartOptions = {
 h3 {
     color: #FFB300;
     margin: 0 0 15px 0;
-    font-size: 1.1rem;
+    font-size: clamp(0.95rem, 1.5vw, 1.1rem);
     font-weight: 600;
 }
 
@@ -167,5 +170,6 @@ h3 {
     position: relative;
     height: 300px;
     width: 100%;
+    overflow: hidden;         /* Canvas boundary */
 }
 </style>

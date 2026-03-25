@@ -24,7 +24,7 @@ const props = defineProps({
     theme: {
         type: String,
         default: "light",
-        validator: (value: string) => ["light", "dark"].includes(value),
+        validator: (value: string) => ["light", "dark", "magma", "amber"].includes(value),
     },
 });
 
@@ -75,27 +75,57 @@ function selectProtocol(proto: string) {
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-/* Dark Theme (Dashboard) */
+/* Dark Theme (Generic Dashboard Default) */
 .options.theme-dark {
     background-color: rgba(0, 30, 60, 0.5);
-    /* Sfondo più scuro ma traslucido per integrarsi col widget */
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
-
 .options.theme-dark .option-btn {
     color: #b0c4de;
-    /* Azzurrino chiaro per contrasto */
 }
-
 .options.theme-dark .option-btn:hover {
     background-color: rgba(255, 255, 255, 0.1);
     color: #fff;
 }
-
 .options.theme-dark .option-btn.active {
     background-color: #0056b3;
-    /* Blu brillante per il tasto attivo */
     color: #ffffff;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Magma Theme (Attacks View) */
+.options.theme-magma {
+    background-color: #2b1b17;
+    border: 1px solid #4f3b33;
+}
+.options.theme-magma .option-btn {
+    color: #e0bbbb;
+}
+.options.theme-magma .option-btn:hover {
+    background-color: rgba(255, 76, 76, 0.1);
+    color: #ff4c4c;
+}
+.options.theme-magma .option-btn.active {
+    background-color: #d93025;
+    color: #ffffff;
+    box-shadow: 0 1px 4px rgba(217, 48, 37, 0.4);
+}
+
+/* Amber Theme (Threat Logs View) */
+.options.theme-amber {
+    background-color: rgba(26, 20, 10, 0.6);
+    border: 1px solid rgba(255, 179, 0, 0.3);
+}
+.options.theme-amber .option-btn {
+    color: #cbb8a5;
+}
+.options.theme-amber .option-btn:hover {
+    background-color: rgba(255, 179, 0, 0.1);
+    color: #FFB300;
+}
+.options.theme-amber .option-btn.active {
+    background-color: #FF8F00;
+    color: #0A0605;
+    box-shadow: 0 1px 4px rgba(255, 143, 0, 0.4);
 }
 </style>

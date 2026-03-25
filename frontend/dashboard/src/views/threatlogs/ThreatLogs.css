@@ -77,11 +77,18 @@
 .ip-input {
   width: 100%;
   padding: 8px 36px 8px 12px;
-  background: #2b1b17;
-  border: 1px solid #4f3b33;
+  background: rgba(26, 20, 10, 0.6);
+  border: 1px solid rgba(255, 179, 0, 0.3);
   border-radius: 6px;
   color: #f3e7d5;
   box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.4);
+  transition: all 0.3s ease;
+}
+
+.ip-input:focus {
+  outline: none;
+  border-color: #FFB300;
+  box-shadow: 0 0 8px rgba(255, 179, 0, 0.4);
 }
 
 .header-top h1 {

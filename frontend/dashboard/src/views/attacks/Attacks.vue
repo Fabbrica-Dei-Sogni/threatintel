@@ -17,7 +17,7 @@
         <!-- Filtri Combinati -->
         <section class="filters-container">
             <div class="filter-row main-filters">
-                <ProtocolSelector v-model="filterProtocol" :options="['http', 'https', 'ssh']" />
+                <ProtocolSelector v-model="filterProtocol" :options="['http', 'https', 'ssh']" theme="magma" />
 
                 <div class="filter-item min-logs">
                     <label class="min-logs-label" for="minLogsForAttack">{{ t('attacks.minLogsLabel') }}</label>

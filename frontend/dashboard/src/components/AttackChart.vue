@@ -343,6 +343,9 @@ const durationOptions = computed(() => ({
 <style scoped>
 .attack-chart-container {
     width: 100%;
+    max-width: 100%;          /* Prevent escape from parent */
+    box-sizing: border-box;   /* Include padding in width calc */
+    overflow: hidden;         /* Hard clamp — nothing escapes */
     margin-bottom: 20px;
     background: linear-gradient(180deg, #2f2825, #2b1b17 50%, #271511);
     border-radius: 8px;
@@ -356,12 +359,14 @@ const durationOptions = computed(() => ({
     justify-content: space-between;
     align-items: center;
     margin-bottom: 15px;
+    flex-wrap: wrap;
+    gap: 8px;
 }
 
 h3 {
     color: #e6d4cf;
     margin: 0;
-    font-size: 1.1rem;
+    font-size: clamp(0.95rem, 1.5vw, 1.1rem);
     font-weight: 600;
 }
 
@@ -369,5 +374,6 @@ h3 {
     position: relative;
     height: 300px;
     width: 100%;
+    overflow: hidden;         /* Belt + suspenders for the canvas */
 }
 </style>

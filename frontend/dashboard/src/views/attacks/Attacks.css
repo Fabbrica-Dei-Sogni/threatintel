@@ -60,7 +60,66 @@
   font-weight: 700;
   text-shadow: 0 0 6px rgba(255, 76, 76, 0.6);
   display: flex;
-  align-items: center;
+}
+
+/* =========================================
+   PHASE 13: RESPONSIVE ELEMENT PLUS DEEP OVERRIDES (Dark Theme)
+   ========================================= */
+
+/* Base Inputs, Selects, Date Pickers */
+:deep(.el-input__wrapper),
+:deep(.el-select__wrapper) {
+  background-color: #2b1b17 !important;
+  box-shadow: 0 0 0 1px #4f3b33 inset !important;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+:deep(.el-input__inner) {
+  color: #f3e7d5 !important;
+}
+
+:deep(.el-input__wrapper.is-focus),
+:deep(.el-select__wrapper.is-focus) {
+  box-shadow: 0 0 0 1px #ff4c4c inset !important;
+}
+
+/* Radio Buttons */
+:deep(.el-radio-button__inner) {
+  background-color: #2b1b17 !important;
+  border-color: #4f3b33 !important;
+  color: #e0bbbb !important;
+  box-shadow: none !important;
+  transition: all 0.3s ease;
+}
+
+:deep(.el-radio-button:first-child .el-radio-button__inner) {
+  border-left: 1px solid #4f3b33 !important;
+}
+
+:deep(.el-radio-button__original-radio:checked + .el-radio-button__inner) {
+  background-color: #d93025 !important;
+  border-color: #d93025 !important;
+  color: #ffffff !important;
+  box-shadow: -1px 0 0 0 #d93025 !important;
+}
+
+:deep(.el-radio-button__inner:hover) {
+  color: #ff4c4c !important;
+}
+
+/* Input Number Controls */
+:deep(.el-input-number__decrease),
+:deep(.el-input-number__increase) {
+  background-color: #342220 !important;
+  border-color: #4f3b33 !important;
+  color: #e0bbbb !important;
+  transition: all 0.3s ease;
+}
+
+:deep(.el-input-number__decrease:hover),
+:deep(.el-input-number__increase:hover) {
+  color: #ff4c4c !important;
 }
 
 .animated-icon {

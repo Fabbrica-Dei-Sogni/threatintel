@@ -63,9 +63,13 @@
                 <SessionChart v-if="sessions && sessions.length > 0" :sessions="sessions" />
             </div>
         </transition>
+        <!-- Top Scrollbar Sync Wrapper -->
+        <div class="top-scrollbar-wrapper" ref="topScrollRef" v-show="!loading && !error">
+            <div class="top-scrollbar-content" :style="{ width: tableWidth + 'px' }"></div>
+        </div>
 
-        <section class="log-table" v-if="!loading && !error">
-            <table>
+        <section class="log-table" ref="tableScrollRef" v-show="!loading && !error">
+            <table ref="tableRef">
                 <thead>
                     <tr>
                         <th>{{ $t('cowrie.sessions.table.country') }}</th>
@@ -168,7 +172,7 @@
 </template>
 
 <script setup>
-import { onMounted, watch, ref, computed } from 'vue';
+import { onMounted, watch, ref, computed, nextTick, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import dayjs from 'dayjs';
 import { useI18n } from '../../composable/useI18n';
@@ -190,6 +194,28 @@ const props = defineProps({
 const { t } = useI18n();
 const { copyToClipboard } = useClipboard();
 const router = useRouter();
+
+// Dual Scrollbar Sync Support
+const topScrollRef = ref(null);
+const tableScrollRef = ref(null);
+const tableRef = ref(null);
+const tableWidth = ref(1400);
+
+const syncScroll = (source, target) => {
+    if (!source || !target) return;
+    target.scrollLeft = source.scrollLeft;
+};
+
+const handleTopScroll = () => syncScroll(topScrollRef.value, tableScrollRef.value);
+const handleTableScroll = () => syncScroll(tableScrollRef.value, topScrollRef.value);
+
+const updateTableWidth = () => {
+    nextTick(() => {
+        if (tableRef.value) {
+            tableWidth.value = tableRef.value.scrollWidth;
+        }
+    });
+};
 
 // Variabile per salvare pagina precedente al filtro IP
 const previousPageBeforeIpFilter = ref(null);
@@ -336,9 +362,29 @@ function goToInputPage() {
 }
 
 onMounted(() => {
+    if (topScrollRef.value && tableScrollRef.value) {
+        topScrollRef.value.addEventListener('scroll', handleTopScroll);
+        tableScrollRef.value.addEventListener('scroll', handleTableScroll);
+    }
+    updateTableWidth();
+
+    // Resize periodic check
+    const interval = setInterval(updateTableWidth, 1000);
+    onUnmounted(() => clearInterval(interval));
+
     // Chiamata iniziale
     fetchData();
 });
+
+onUnmounted(() => {
+    if (topScrollRef.value) topScrollRef.value.removeEventListener('scroll', handleTopScroll);
+    if (tableScrollRef.value) tableScrollRef.value.removeEventListener('scroll', handleTableScroll);
+});
+
+// Watch data changes
+watch(() => sessions.value, () => {
+    setTimeout(updateTableWidth, 200);
+}, { deep: true });
 </script>
 
 <style scoped src="./CowrieSessions.css"></style>

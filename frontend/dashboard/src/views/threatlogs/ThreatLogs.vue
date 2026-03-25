@@ -62,8 +62,13 @@
       </div>
     </div>
 
-    <section class="log-table">
-      <table>
+    <!-- Top Scrollbar Sync Wrapper -->
+    <div class="top-scrollbar-wrapper" ref="topScrollRef">
+      <div class="top-scrollbar-content" :style="{ width: tableWidth + 'px' }"></div>
+    </div>
+
+    <section class="log-table" ref="tableScrollRef">
+      <table ref="tableRef">
         <thead>
           <tr>
             <th>
@@ -180,51 +185,36 @@
             :max="totalPages" placeholder="1" />
         </div>
       </div>
-
     </section>
   </div>
 </template>
 
 <script setup>
-import { computed, watch, ref, onMounted } from 'vue';
+import { computed, watch, ref, onMounted, onUnmounted, nextTick } from 'vue';
 import { useRouter } from 'vue-router';
 import { useLogsFilter } from '../../composable/useLogsFilter';
 import { useClipboard } from '../../composable/useClipboard';
 import { useI18n } from 'vue-i18n';
 import ProtocolSelector from '../../components/common/ProtocolSelector.vue';
-
-const { copyToClipboard } = useClipboard();
 import dayjs from 'dayjs';
 import CountryFlag from '../../components/CountryFlag.vue';
 import ThreadLogChart from '../../components/ThreadLogChart.vue';
 import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
 
 const { t } = useI18n();
+const { copyToClipboard } = useClipboard();
+const router = useRouter();
 
-//Best practise per definire una pagina vue con un composable
-//step 0. creare il composable useLogsFilter con il necessario per la ricerca filtrata e paginata dei log
-
-//step 1. definire le proprieta iniziali che al cambio di stato devono essere notificate durante la navigazione
 // Props iniziali
 const props = defineProps({
   initialIp: String,
   initialUrl: String,
   initialProtocol: { type: String, default: 'http' },
-  initialPage: {
-    type: Number,
-    default: 1,
-  },
-  initialSortFields: {
-    type: Object,
-    default: () => ({}),  // default ordinamento
-  }
+  initialPage: { type: Number, default: 1 },
+  initialSortFields: { type: Object, default: () => ({}) }
 });
 
-//step 2. istanziare il router 
-// Router
-const router = useRouter();
-
-//step 3. esporre i dati gestiti dal composable fornendo i valori props di init
+// State
 const {
   filterIp,
   filterUrl,
@@ -239,19 +229,54 @@ const {
   fetchData,
   onFilterChanged,
   toggleSort,
-  getSortDirection,
-  getSortClass
+  getSortDirection
 } = useLogsFilter(props.initialIp, props.initialUrl, props.initialProtocol, props.initialPage, props.initialSortFields);
 
-//step 4. definire eventuali valori di tipo computer che cambiano a seconda il cambio dei valori
-// Computed
-const totalPages = computed(() => Math.ceil(total.value / pageSize.value));
-
+const totalPages = computed(() => Math.ceil(total.value / pageSize.value) || 1);
 const previousPageBeforeIpFilter = ref(null);
-const previousPageBeforeUrlFilter = ref(null);
-const showChart = ref(true); // Default visible
+const showChart = ref(true);
+const inputPage = ref(page.value);
 
-//step 5. definire il watch sui valori che cambiano per aggiornare il router
+// Dual Scrollbar Sync Support
+const topScrollRef = ref(null);
+const tableScrollRef = ref(null);
+const tableRef = ref(null);
+const tableWidth = ref(1400);
+
+const syncScroll = (source, target) => {
+  if (!source || !target) return;
+  target.scrollLeft = source.scrollLeft;
+};
+
+const handleTopScroll = () => syncScroll(topScrollRef.value, tableScrollRef.value);
+const handleTableScroll = () => syncScroll(tableScrollRef.value, topScrollRef.value);
+
+const updateTableWidth = () => {
+  nextTick(() => {
+    if (tableRef.value) {
+      tableWidth.value = tableRef.value.scrollWidth;
+    }
+  });
+};
+
+// Lifecycle
+onMounted(() => {
+  if (topScrollRef.value && tableScrollRef.value) {
+    topScrollRef.value.addEventListener('scroll', handleTopScroll);
+    tableScrollRef.value.addEventListener('scroll', handleTableScroll);
+  }
+  updateTableWidth();
+  const interval = setInterval(updateTableWidth, 1000);
+  onUnmounted(() => clearInterval(interval));
+  fetchData();
+});
+
+onUnmounted(() => {
+  if (topScrollRef.value) topScrollRef.value.removeEventListener('scroll', handleTopScroll);
+  if (tableScrollRef.value) tableScrollRef.value.removeEventListener('scroll', handleTableScroll);
+});
+
+// Watches
 watch([filterIp, filterUrl, filterProtocol, page, sortFields], ([newIp, newUrl, newProto, newPage, newSortFields]) => {
   router.replace({
     name: 'ThreatLogs',
@@ -265,17 +290,10 @@ watch([filterIp, filterUrl, filterProtocol, page, sortFields], ([newIp, newUrl, 
   });
 });
 
-//step 6. definire tutti quei metodi necessari alla pagina di solito che usano il router o dati computed come totalPage
-// Funzioni di navigazione
-
-const inputPage = ref(page.value);
-
-// Sincronizza inputPage con page esternamente modificato
 watch(page, (newPage) => {
   inputPage.value = newPage;
 });
 
-// Debounce semplice per evitare troppe chiamate immediate
 let debounceTimer = null;
 watch(inputPage, (newPage) => {
   if (debounceTimer) clearTimeout(debounceTimer);
@@ -284,85 +302,65 @@ watch(inputPage, (newPage) => {
   }, 300);
 });
 
+watch(() => logs.value, () => {
+  setTimeout(updateTableWidth, 200);
+}, { deep: true });
 
-function goToAttacks() {
-  router.push('/attacks');
+// Methods
+function goToInputPage() {
+  let targetPage = inputPage.value;
+  if (!targetPage) return;
+  if (targetPage < 1) targetPage = 1;
+  if (targetPage > totalPages.value) targetPage = totalPages.value;
+  if (targetPage !== page.value) page.value = targetPage;
 }
 
 function goToHome() {
   router.push('/');
 }
 
+function goToAttacks() {
+  router.push('/attacks');
+}
+
 function goToIpDetails(ip) {
-  router.push({
-    name: 'IpDetails',
-    params: { ip },
-    query: {
-      ip: filterIp.value,
-      url: filterUrl.value,
-      page: page.value,
-      sortFields: sortFields.value
-    },
-  });
+  router.push({ name: 'IpDetails', params: { ip } });
 }
 
 function goToThreatLogDetails(id) {
-  router.push({
-    name: 'ThreatLog',
-    params: { id },
-    query: {
-      ip: filterIp.value,
-      url: filterUrl.value,
-      page: page.value,
-      sortFields: sortFields.value
-    },
-  });
+  router.push({ name: 'ThreatLog', params: { id } });
 }
 
 function setIpFilter(ip) {
-
-  if (!filterIp.value) {
-    previousPageBeforeIpFilter.value = page.value;
-  }
-
-  filterIp.value = ip;        // Imposta il filtro
-  page.value = 1;             // Torna alla pagina 1 se serve
-  onFilterChanged();          // Applica il filtro
+  if (!filterIp.value) previousPageBeforeIpFilter.value = page.value;
+  filterIp.value = ip;
+  page.value = 1;
+  onFilterChanged();
 }
 
 function clearIpFilter() {
   filterIp.value = '';
-
   if (previousPageBeforeIpFilter.value !== null) {
     page.value = previousPageBeforeIpFilter.value;
     previousPageBeforeIpFilter.value = null;
   }
-
-  onFilterChanged(false);
-}
-
-function setUrlFilter(ip) {
-
-  if (!filterUrl.value) {
-    previousPageBeforeUrlFilter.value = page.value;
-  }
-
-  filterUrl.value = ip;        // Imposta il filtro
-  page.value = 1;             // Torna alla pagina 1 se serve
-  onFilterChanged();          // Applica il filtro
+  onFilterChanged();
 }
 
 function clearUrlFilter() {
   filterUrl.value = '';
-
-  if (previousPageBeforeUrlFilter.value !== null) {
-    page.value = previousPageBeforeUrlFilter.value;
-    previousPageBeforeUrlFilter.value = null;
-  }
-
-  onFilterChanged(false);
+  onFilterChanged();
 }
 
+function setUrlFilter(url) {
+  filterUrl.value = url;
+  page.value = 1;
+  onFilterChanged();
+}
+
+function formatDate(date) {
+  return dayjs(date).format('YYYY-MM-DD HH:mm:ss');
+}
 
 function changePage(newPage) {
   if (newPage >= 1 && newPage <= totalPages.value) {
@@ -370,22 +368,7 @@ function changePage(newPage) {
   }
 }
 
-function goToInputPage() {
-  let targetPage = inputPage.value;
-
-  // Validazione: assicurati che sia tra 1 e totalPages
-  if (targetPage < 1) targetPage = 1;
-  if (targetPage > totalPages.value) targetPage = totalPages.value;
-
-  changePage(targetPage);
-}
-
-function formatDate(timestamp) {
-  return dayjs(timestamp).format('DD/MM/YYYY HH:mm:ss');
-}
-
-
-//step 7. eseguire la chiamata iniziale per il primo rendering dei dati
+// Fetch iniziale
 fetchData();
 </script>
 

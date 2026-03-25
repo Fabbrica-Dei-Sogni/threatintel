@@ -19,9 +19,30 @@
   border-bottom: 1px solid rgba(255, 179, 0, 0.2);
 }
 
-.header-top { top: 0; display: flex; justify-content: space-between; align-items: center; }
-.actions { top: 56px; display: flex; gap: 16px; margin: 0; }
-.filters-container { top: 112px; margin-bottom: 24px !important; }
+.header-top { 
+  top: 0; 
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center; 
+  padding-left: 24px;
+  padding-right: 24px;
+}
+
+.actions { 
+  top: 56px; 
+  display: flex; 
+  gap: 16px; 
+  margin: 0; 
+  padding-left: 24px;
+  padding-right: 24px;
+}
+
+.filters-container { 
+  top: 112px; 
+  margin-bottom: 24px !important; 
+  padding: 16px 24px;
+  border-radius: 12px;
+}
 
 /* Filtri Combinati */
 .filters-container {
@@ -91,10 +112,8 @@
 
 .actions {
   display: flex;
-  gap: 15px;
+  gap: 16px;
   margin-bottom: 0;
-  padding-left: 4px;
-  padding-right: 4px;
 }
 
 .btn-action {

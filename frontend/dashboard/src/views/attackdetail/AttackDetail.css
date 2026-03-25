@@ -25,14 +25,11 @@
 
 .attack-detail {
   padding: 24px 28px;
-  background: linear-gradient(180deg, #271511, #2b1b17 35%, #1c0d09);
-  color: #f0e6d2;
-
+  background-color: #0A0605; /* Obsidian Deep */
+  color: #F0E6D2;
   min-height: 100vh;
-  overflow-x: auto;
-  /* scroll orizzontale abilitato */
-  overflow-y: hidden;
-  white-space: nowrap;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Permette wrapping normale dentro */
@@ -42,23 +39,20 @@
 
 /* Pulsante Torna Indietro */
 .back-btn {
-  background: linear-gradient(145deg, #d93025, #b82a1f);
-  color: #f8eee0;
+  background: linear-gradient(135deg, #E62117, #B71C1C);
+  color: #fff;
   border: none;
-  border-radius: 8px;
-  padding: 8px 16px;
   font-weight: 700;
-  font-size: 14px;
-  cursor: pointer;
-  box-shadow: 0 3px 10px rgba(184, 42, 31, 0.75);
-  transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
-  text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 1.5px;
+  padding: 10px 24px;
+  box-shadow: 0 4px 15px rgba(230, 33, 23, 0.4);
+  transition: all 0.3s ease;
+  border-radius: 4px;
 }
 
 .back-btn:hover {
-  background: linear-gradient(145deg, #b82a1f, #8c1a19);
-  box-shadow: 0 5px 20px rgba(204, 50, 47, 0.9);
+  background: linear-gradient(135deg, #FF4C4C, #E62117);
+  box-shadow: 0 6px 20px rgba(230, 33, 23, 0.6);
   transform: translateY(-2px);
 }
 
@@ -77,14 +71,13 @@ h1 {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: linear-gradient(135deg, #3c1e1c 0%, #2f1615 100%);
-  border: 1px solid #5a2a26;
-  border-left: 5px solid #ff4c4c;
-  /* Accent highlight */
-  border-radius: 8px;
-  padding: 20px 24px;
+  background: linear-gradient(135deg, #1A0F0D 0%, #0A0605 100%);
+  border: 1px solid rgba(230, 33, 23, 0.3);
+  border-left: 6px solid #E62117;
+  border-radius: 12px;
+  padding: 24px 30px;
   margin-bottom: 30px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
   position: relative;
   overflow: hidden;
 }
@@ -108,7 +101,6 @@ h1 {
 
 .attacker-label {
   font-size: 11px;
-  text-transform: uppercase;
   letter-spacing: 2px;
   color: #ff9999;
   font-weight: 700;
@@ -145,7 +137,6 @@ h1 {
   color: #ff4c4c;
   padding: 8px 16px;
   font-weight: 600;
-  text-transform: uppercase;
   font-size: 13px;
   letter-spacing: 1px;
   cursor: pointer;
@@ -177,21 +168,22 @@ h1 {
 
 /* Container Profilo Attacco (Radar Chart) */
 .attack-profile {
-  /* Layout responsive con flexbox */
   display: flex;
   justify-content: center;
   align-items: center;
-
-  /* Margini minimali */
-  margin: 10px auto;
+  margin: 20px auto;
   padding: 0;
-
-  /* Dimensionamento responsivo basato su viewport */
   width: min(95vw, 500px);
   height: min(95vw, 500px);
-
-  /* Mantiene proporzione quadrata */
   aspect-ratio: 1 / 1;
+  position: relative;
+  background: radial-gradient(circle, rgba(230, 33, 23, 0.05) 0%, transparent 70%);
+  border-radius: 50%;
+}
+
+@keyframes radar-scan {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to { transform: translate(-50%, -50%) rotate(360deg); }
 }
 
 /* Media query per mobile - massima visibilità */
@@ -263,12 +255,13 @@ h1 {
 
 /* Logs Raggruppati */
 .logs-container {
-  background-color: #2f2825;
-  border-radius: 8px;
+  background: rgba(26, 15, 13, 0.6);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(230, 33, 23, 0.15);
+  border-radius: 12px;
   padding: 24px;
-  box-shadow: inset 0 0 18px #5a2a26;
+  box-shadow: 0 15px 45px rgba(0, 0, 0, 0.5);
   min-width: 1000px;
-  /* per scroll orizzontale */
   overflow-x: auto;
 }
 
@@ -310,8 +303,10 @@ h1 {
   align-items: center;
   cursor: pointer;
   font-weight: 700;
-  color: #f0e6d2;
+  color: #fff;
   font-size: 15px;
+  font-family: 'Outfit', sans-serif;
+  letter-spacing: 0.5px;
 }
 
 .toggle-icon {
@@ -325,17 +320,14 @@ h1 {
 }
 
 .log-body {
-  background-color: #2f2c2b;
-  padding: 16px;
-  margin-top: 12px;
+  background-color: #050303; /* Deep black terminal background */
+  padding: 20px;
+  margin-top: 15px;
   border-radius: 8px;
-  color: #dedbd5;
+  color: #E6D4CF;
   font-family: 'Source Code Pro', monospace;
-  word-wrap: break-word;
-  word-break: break-word;
-  white-space: pre-wrap;
-  overflow-x: auto;
-  box-shadow: inset 0 0 14px #592d27;
+  border: 1px solid rgba(230, 33, 23, 0.2);
+  box-shadow: inset 0 0 20px rgba(230, 33, 23, 0.05);
 }
 
 .log-body pre {
@@ -351,11 +343,13 @@ h1 {
 
 /* Rate Limit Eventi */
 .rate-limit-events-container {
-  background: #2f2927;
-  border-radius: 8px;
+  background: rgba(26, 15, 13, 0.6);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(230, 33, 23, 0.15);
+  border-radius: 12px;
   padding: 24px;
   margin-top: 30px;
-  box-shadow: inset 0 0 20px #582c27;
+  box-shadow: 0 15px 45px rgba(0, 0, 0, 0.5);
   min-width: 1000px;
   overflow-x: auto;
 }

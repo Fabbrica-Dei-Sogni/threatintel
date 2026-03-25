@@ -1,7 +1,7 @@
 <template>
     <div class="attacchi">
         <div class="header-top">
-            <h1><span class="animated-icon pulse-radar">📡</span> {{ t('attacks.title') }}</h1>
+            <h1><span class="animated-icon pulse-magma">📡</span> {{ t('attacks.title') }}</h1>
             <LanguageSwitcher />
         </div>
         <!-- Pulsante per tornare alla Home principale -->

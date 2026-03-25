@@ -4,13 +4,14 @@
             <button @click="goBack" class="back-btn">← {{ t('attackDetail.backToAttacks') }}</button>
             <LanguageSwitcher />
         </div>
-        <h1>{{ t('attackDetail.title') }}</h1>
+        <h1><span class="animated-icon pulse-magma">🛰️</span> {{ t('attackDetail.title') }}</h1>
 
         <!-- Attacker Highlight Card -->
         <div v-if="attack" class="attacker-card">
             <div class="attacker-info">
                 <span class="attacker-label">{{ t('attackDetail.attacker') }}</span>
                 <h2 class="attacker-ip">
+                    <span class="animated-icon pulse-magma" style="font-size: 0.8em;">🎯</span>
                     {{ attack.request.ip }}
                     <span class="copy-btn" @click.stop="copyToClipboard(attack.request.ip)" :title="t('common.copyIp')">📋</span>
                 </h2>

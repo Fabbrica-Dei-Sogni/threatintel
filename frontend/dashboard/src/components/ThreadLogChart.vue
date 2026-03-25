@@ -73,12 +73,12 @@ const chartData = computed(() => {
             {
                 label: t('threatLogs.trafficPeaks') || 'Traffic Peaks',
                 data: dataValues,
-                borderColor: '#ff4c4c',            // Red from AttackProfileRadar
-                backgroundColor: 'rgba(217, 48, 37, 0.25)', // Semi-transparent red
-                pointBackgroundColor: '#ff4c4c',
-                pointBorderColor: '#2f2825',       // Dark brown
-                pointHoverBackgroundColor: '#f8eee0',
-                pointHoverBorderColor: '#d93025',
+                borderColor: '#FFB300',            // Amber
+                backgroundColor: 'rgba(255, 179, 0, 0.2)', // Semi-transparent amber
+                pointBackgroundColor: '#FFD700',   // Gold
+                pointBorderColor: '#0A0605',       // Obsidian
+                pointHoverBackgroundColor: '#FFFFFF',
+                pointHoverBorderColor: '#FFD700',
                 fill: true,
                 tension: 0.4, // Smooth curve
                 borderWidth: 2
@@ -95,10 +95,10 @@ const chartOptions = {
             display: false // Hide legend if only one dataset
         },
         tooltip: {
-            backgroundColor: 'rgba(47, 40, 37, 0.95)',
-            titleColor: '#ff4c4c',
-            bodyColor: '#f0e6d2',
-            borderColor: '#ff4c4c',
+            backgroundColor: 'rgba(26, 20, 10, 0.95)',
+            titleColor: '#FFB300',
+            bodyColor: '#F4EBD0',
+            borderColor: '#FFB300',
             borderWidth: 1,
             callbacks: {
                 label: (context) => `Requests: ${context.parsed.y}`
@@ -107,27 +107,27 @@ const chartOptions = {
         title: {
             display: false,
             text: t('threatLogs.trafficOverTime') || 'Network Traffic Over Time',
-            color: '#e6d4cf'
+            color: '#FFB300'
         }
     },
     scales: {
         x: {
             grid: {
-                color: '#3a3736',
+                color: 'rgba(255, 179, 0, 0.1)',
                 display: true
             },
             ticks: {
-                color: '#e6d4cf',
+                color: '#BBA685',
                 maxTicksLimit: 10
             }
         },
         y: {
             grid: {
-                color: '#3a3736',
+                color: 'rgba(255, 179, 0, 0.1)',
                 display: true
             },
             ticks: {
-                color: '#e6d4cf',
+                color: '#BBA685',
                 precision: 0
             },
             beginAtZero: true
@@ -149,15 +149,15 @@ const chartOptions = {
 .thread-log-chart-container {
     width: 100%;
     margin-bottom: 20px;
-    background: linear-gradient(180deg, #2f2825, #2b1b17 50%, #271511);
+    background: rgba(26, 20, 10, 0.4);
     border-radius: 8px;
     padding: 15px;
-    box-shadow: inset 0 0 20px #5a2a26, 0 4px 15px rgba(217, 48, 37, 0.3);
-    border: 1px solid #5a2a26;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 179, 0, 0.15);
 }
 
 h3 {
-    color: #e6d4cf;
+    color: #FFB300;
     margin: 0 0 15px 0;
     font-size: 1.1rem;
     font-weight: 600;

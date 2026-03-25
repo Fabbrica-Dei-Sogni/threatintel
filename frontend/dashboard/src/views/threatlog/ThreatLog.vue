@@ -1,10 +1,10 @@
 <template>
     <div class="threatlog-details">
         <div class="header-top">
-            <button @click="goBack" class="back-btn">← {{ t('threatLog.backToLogs') }}</button>
+            <button @click="goBack" class="back-btn">📋 {{ t('threatLog.backToLogs') }}</button>
             <LanguageSwitcher />
         </div>
-        <h1>{{ t('threatLog.title') }}: {{ id }}</h1>
+        <h1><span class="animated-icon pulse-amber">🗄️</span> {{ t('threatLog.title') }}: {{ id }}</h1>
 
         <section v-if="loading" class="loading">{{ t('common.loading') }}</section>
         <section v-if="error" class="error">{{ t('common.error') }}</section>
@@ -13,7 +13,7 @@
 
             <div class="section">
                 <div class="section-header" @click="toggles.general = !toggles.general">
-                    <h2>{{ t('threatLog.generalInfo') }}</h2>
+                    <h2><span>📑</span> {{ t('threatLog.generalInfo') }}</h2>
                     <span class="arrow" :class="{ open: toggles.general }"></span>
                 </div>
                 <transition name="collapse">
@@ -25,7 +25,7 @@
             </div>
             <div class="section">
                 <div class="section-header" @click="toggles.geo = !toggles.geo">
-                    <h2>{{ t('threatLog.geolocation') }}</h2>
+                    <h2><span>🛰️</span> {{ t('threatLog.geolocation') }}</h2>
                     <span class="arrow" :class="{ open: toggles.geo }"></span>
                 </div>
                 <transition name="collapse">
@@ -48,7 +48,7 @@
 
             <div class="section">
                 <div class="section-header" @click="toggles.fingerprint = !toggles.fingerprint">
-                    <h2>{{ t('threatLog.analysis') }}</h2>
+                    <h2><span>🔍</span> {{ t('threatLog.analysis') }}</h2>
                     <span class="arrow" :class="{ open: toggles.fingerprint }"></span>
                 </div>
                 <transition name="collapse">
@@ -64,7 +64,7 @@
 
             <div class="section">
                 <div class="section-header" @click="toggles.request = !toggles.request">
-                    <h2>{{ t('threatLog.request') }}</h2>
+                    <h2><span>📡</span> {{ t('threatLog.request') }}</h2>
                     <span class="arrow" :class="{ open: toggles.request }"></span>
                 </div>
                 <transition name="collapse">
@@ -102,7 +102,7 @@
 
             <div class="section">
                 <div class="section-header" @click="toggles.metadata = !toggles.metadata">
-                    <h2>{{ t('threatLog.metadata') }}</h2>
+                    <h2><span>⚙️</span> {{ t('threatLog.metadata') }}</h2>
                     <span class="arrow" :class="{ open: toggles.metadata }"></span>
                 </div>
                 <transition name="collapse">

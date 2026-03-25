@@ -52,7 +52,6 @@
                             <el-option :label="t('attacks.years')" value="years" />
                         </el-select>
                     </div>
-
                     <div v-else class="time-range-wrapper">
                         <el-date-picker v-model="dateRange" type="daterange" :start-placeholder="t('attacks.startDate')"
                             :end-placeholder="t('attacks.endDate')" value-format="YYYY-MM-DD" format="DD/MM/YYYY"

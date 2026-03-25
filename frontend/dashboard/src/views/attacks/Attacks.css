@@ -287,17 +287,47 @@
 .time-filter-group {
   display: flex;
   align-items: center;
-  gap: 14px;
-  flex-wrap: wrap;
+  gap: 12px;
+  flex-wrap: nowrap; /* Keep label and radio-group side-by-side */
   color: #f2a1a1;
   font-weight: 600;
+  max-width: 100%;
+}
+
+@media (max-width: 600px) {
+  .time-filter-group {
+    flex-wrap: wrap; /* Only wrap on very small screens to avoid overflow */
+    gap: 8px;
+  }
 }
 
 .time-ago-wrapper,
 .time-range-wrapper {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
+  flex: 1 1 auto; /* Grow/shrink to fill space */
+  min-width: 0;   /* Essential for flexing components */
+}
+
+/* Surgical Date-Picker Shrinkage */
+:deep(.el-date-editor--daterange.el-input__wrapper) {
+  flex: 1 1 auto !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 400px;
+  padding: 0 8px !important;
+}
+
+:deep(.el-range-input) {
+  width: 40% !important;
+  min-width: 0 !important;
+  background: transparent !important;
+}
+
+:deep(.el-range-separator) {
+  padding: 0 4px !important;
+  flex: 0 0 auto !important;
 }
 
 .input-wrapper {

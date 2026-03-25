@@ -95,8 +95,13 @@
             </div>
         </transition>
 
-        <section class="log-table">
-            <table>
+        <!-- Top Scrollbar Sync Wrapper -->
+        <div class="top-scrollbar-wrapper" ref="topScrollRef">
+            <div class="top-scrollbar-content" :style="{ width: tableWidth + 'px' }"></div>
+        </div>
+
+        <section class="log-table" ref="tableScrollRef">
+            <table ref="tableRef">
                 <thead>
                     <tr>
                         <th>
@@ -301,7 +306,7 @@
 </template>
 
 <script setup>
-import { computed, watch, ref } from 'vue';
+import { computed, watch, ref, onMounted, onUnmounted, nextTick } from 'vue';
 import { useRouter } from 'vue-router';
 import dayjs from 'dayjs';
 import { useAttacksFilter } from '../../composable/useAttacksFilter';
@@ -496,6 +501,51 @@ function changePage(newPage) {
         page.value = newPage;
     }
 }
+
+
+// Dual Scrollbar Localization Support
+const topScrollRef = ref(null);
+const tableScrollRef = ref(null);
+const tableRef = ref(null);
+const tableWidth = ref(1400);
+
+const syncScroll = (source, target) => {
+    if (!source || !target) return;
+    target.scrollLeft = source.scrollLeft;
+};
+
+const handleTopScroll = () => syncScroll(topScrollRef.value, tableScrollRef.value);
+const handleTableScroll = () => syncScroll(tableScrollRef.value, topScrollRef.value);
+
+const updateTableWidth = () => {
+    nextTick(() => {
+        if (tableRef.value) {
+            tableWidth.value = tableRef.value.scrollWidth;
+        }
+    });
+};
+
+onMounted(() => {
+    if (topScrollRef.value && tableScrollRef.value) {
+        topScrollRef.value.addEventListener('scroll', handleTopScroll);
+        tableScrollRef.value.addEventListener('scroll', handleTableScroll);
+    }
+    updateTableWidth();
+    
+    // Resize periodic check to handle dynamic content
+    const interval = setInterval(updateTableWidth, 1000);
+    onUnmounted(() => clearInterval(interval));
+});
+
+onUnmounted(() => {
+    if (topScrollRef.value) topScrollRef.value.removeEventListener('scroll', handleTopScroll);
+    if (tableScrollRef.value) tableScrollRef.value.removeEventListener('scroll', handleTableScroll);
+});
+
+// Watch data changes (safely at the end)
+watch(() => attacks.value, () => {
+    setTimeout(updateTableWidth, 200);
+}, { deep: true });
 
 // Fetch iniziale
 fetchData();

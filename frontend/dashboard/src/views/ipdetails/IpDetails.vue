@@ -10,7 +10,13 @@
     </div>
 
     <div class="header-main">
-      <h1>{{ t('ipDetails.title') }}: {{ ip }}</h1>
+      <h1>
+        <span class="animated-icon pulse-cobalt">🔍</span> {{ t('ipDetails.title') }}: {{ ip }}
+        <button class="action-btn copy-ip-btn" @click="copyToClipboard(ip)" :title="t('common.copyToClipboard')">
+          <span v-if="!copiedIp">📋</span>
+          <span v-else>✅</span>
+        </button>
+      </h1>
     </div>
 
     <section v-if="loading" class="loading">{{ t('common.loading') }}</section>
@@ -20,7 +26,7 @@
       <!-- Sezioni toggle -->
       <div class="section">
         <div class="section-header" @click="toggles.abuse = !toggles.abuse">
-          <h2>{{ t('ipDetails.additionalInfo') }}</h2>
+          <h2><span class="animated-icon pulse-cobalt" style="font-size: 0.9em;">🛡️</span> {{ t('ipDetails.additionalInfo') }}</h2>
           <span class="arrow" :class="{ open: toggles.abuse }"></span>
         </div>
         <transition name="collapse">
@@ -58,7 +64,7 @@
 
       <div class="section" v-if="reports.length >= 0">
         <div class="section-header" @click="toggles.reports = !toggles.reports">
-          <h2>{{ t('ipDetails.relatedLogs') }}</h2>
+          <h2><span class="animated-icon pulse-cobalt" style="font-size: 0.9em;">📊</span> {{ t('ipDetails.relatedLogs') }}</h2>
           <span class="arrow" :class="{ open: toggles.reports }"></span>
         </div>
         <transition name="collapse">
@@ -72,17 +78,17 @@
               <div class="report-header" @click="toggleReport(report._id)">
                 <span>{{ formatDate(report.reportedAt) }} - {{report.categories.map(cat => cat.name).join(', ')
                 }}</span>
-                <button class="action-btn copy" @click="copyToClipboard(report._id)"
-                  :title="t('common.copyToClipboard')">
-                  <span v-if="!copied">📋</span>
-                  <span v-else>✅</span>
-                </button>
                 <span class="toggle-icon">{{ expandedReports[report._id] ? '–' : '+' }}</span>
               </div>
               <transition name="collapse">
                 <div v-if="expandedReports[report._id]" class="report-body">
-                  <!--<p><strong>Categorie:</strong>  {{ report.categories.map(cat => cat.name).join(', ') }}</p>-->
-                  <!--<p><strong>Reporter ID:</strong> {{ report.reporterId || 'anonimo' }}</p> -->
+                  <div class="report-actions">
+                    <button class="action-btn copy" @click.stop="copyToClipboard(report.comment, report._id)"
+                      :title="t('common.copyToClipboard')">
+                      <span v-if="!copiedIds[report._id]">📋</span>
+                      <span v-else>✅</span>
+                    </button>
+                  </div>
                   <p><strong>{{ t('ipDetails.reporterCountry') }}:</strong> {{ report.reporterCountryCode ||
                     t('common.notAvailable') }}
                   </p>
@@ -104,7 +110,7 @@
 
       <div class="section">
         <div class="section-header" @click="toggles.geo = !toggles.geo">
-          <h2>{{ t('ipDetails.location') }}</h2>
+          <h2><span class="animated-icon pulse-cobalt" style="font-size: 0.9em;">🛰️</span> {{ t('ipDetails.location') }}</h2>
           <span class="arrow" :class="{ open: toggles.geo }"></span>
         </div>
         <transition name="collapse">
@@ -152,7 +158,7 @@
       <!-- Sezione Eventi RateLimit -->
       <div class="section" v-if="rateLimit.data && rateLimit.data.length > 0">
         <div class="section-header" @click="toggles.ratelimit = !toggles.ratelimit">
-          <h2>{{ t('ipDetails.rateLimitEvents') }}</h2>
+          <h2><span class="animated-icon pulse-cobalt" style="font-size: 0.9em;">⚠️</span> {{ t('ipDetails.rateLimitEvents') }}</h2>
           <span class="arrow" :class="{ open: toggles.ratelimit }"></span>
         </div>
         <transition name="collapse">
@@ -235,7 +241,8 @@ const ipInfo = ref(null)
 const loading = ref(false)
 const loadingEnrich = ref(false)
 const error = ref(false)
-const copied = ref(false);
+const copiedIds = reactive({});
+const copiedIp = ref(false);
 
 
 const loadingReputationScore = ref(false);
@@ -275,6 +282,51 @@ const paginatedReports = computed(() => {
 
 function toggleReport(id) {
   expandedReports[id] = !expandedReports[id];
+}
+
+async function copyToClipboard(text, id) {
+  if (!text) return;
+  try {
+    let successful = false;
+
+    // Modern API
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText(text);
+      successful = true;
+    } else {
+      // Fallback for older browsers or non-secure contexts
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      textArea.style.position = "fixed";
+      textArea.style.left = "-9999px";
+      textArea.style.top = "0";
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      successful = document.execCommand('copy');
+      document.body.removeChild(textArea);
+    }
+
+    if (successful) {
+      if (id) {
+        copiedIds[id] = true;
+        setTimeout(() => {
+          copiedIds[id] = false;
+        }, 2000);
+      } else {
+        copiedIp.value = true;
+        setTimeout(() => {
+          copiedIp.value = false;
+        }, 2000);
+        ElMessage.success(t('common.copied') + ': ' + text);
+      }
+    } else {
+      throw new Error('Copy command failed');
+    }
+  } catch (err) {
+    console.error('Copy failed:', err);
+    ElMessage.error(t('common.copyError'));
+  }
 }
 
 function handleReportsPageChange(page) {

@@ -11,10 +11,11 @@
         <section class="filters-container">
             <div class="filter-row main-filters">
                 <div class="input-wrapper">
-                    <input v-model="filterIp" :placeholder="$t('cowrie.sessions.filterByIp')" @input="onFilterChanged" 
+                    <input v-model="filterIp" :placeholder="$t('cowrie.sessions.filterByIp')" @input="onFilterChanged"
                         class="input" type="text" />
                     <button v-if="filterIp" @click="clearIpFilter" class="clear-btn"
-                        :title="$t('cowrie.sessions.clearIpFilter')" type="button" :aria-label="$t('cowrie.sessions.clearIpFilter')">
+                        :title="$t('cowrie.sessions.clearIpFilter')" type="button"
+                        :aria-label="$t('cowrie.sessions.clearIpFilter')">
                         ✕
                     </button>
                 </div>
@@ -23,22 +24,6 @@
 
         <div v-if="loading" class="loading">{{ $t('cowrie.sessions.loading') }}</div>
         <div v-if="error" class="error">{{ $t('cowrie.sessions.errorLoad') }}</div>
-
-        <!-- Pagination superiore -->
-        <div class="pagination cyber-pagination" v-if="totalPages > 1">
-            <button :disabled="page === 1" @click="changePage(page - 1)">◄ {{ $t('common.prev') }}</button>
-            <span class="pagination-info">
-                {{ $t('common.page') }} {{ page }} {{ $t('common.of') }} {{ totalPages }}
-            </span>
-            <button :disabled="page === totalPages" @click="changePage(page + 1)">{{ $t('common.next') }} ►</button>
-
-            <!-- Input per inserire pagina manualmente -->
-            <div class="page-input-container">
-                <label for="pageInput">{{ $t('common.goToPage') }}:</label>
-                <input class="pagination-input" id="pageInput" type="number" v-model.number="inputPage" :min="1"
-                    :max="totalPages" placeholder="1" />
-            </div>
-        </div>
 
         <section class="chart-controls" style="margin-bottom: 20px;">
             <button @click="toggleMap" class="btn-action">
@@ -59,10 +44,26 @@
         <!-- Sezione Grafico Temporale -->
         <transition name="fade">
             <div v-if="showChart" class="chart-section">
-                 <!-- Mostriamo i dati basandoci sulle sessioni caricate nella tabella -->
+                <!-- Mostriamo i dati basandoci sulle sessioni caricate nella tabella -->
                 <SessionChart v-if="sessions && sessions.length > 0" :sessions="sessions" />
             </div>
         </transition>
+
+        <!-- Pagination superiore -->
+        <div class="pagination cyber-pagination" v-if="totalPages > 1">
+            <button :disabled="page === 1" @click="changePage(page - 1)">◄ {{ $t('common.prev') }}</button>
+            <span class="pagination-info">
+                {{ $t('common.page') }} {{ page }} {{ $t('common.of') }} {{ totalPages }}
+            </span>
+            <button :disabled="page === totalPages" @click="changePage(page + 1)">{{ $t('common.next') }} ►</button>
+
+            <!-- Input per inserire pagina manualmente -->
+            <div class="page-input-container">
+                <label for="pageInput">{{ $t('common.goToPage') }}:</label>
+                <input class="pagination-input" id="pageInput" type="number" v-model.number="inputPage" :min="1"
+                    :max="totalPages" placeholder="1" />
+            </div>
+        </div>
         <!-- Top Scrollbar Sync Wrapper -->
         <div class="top-scrollbar-wrapper" ref="topScrollRef" v-show="!loading && !error">
             <div class="top-scrollbar-content" :style="{ width: tableWidth + 'px' }"></div>
@@ -119,14 +120,14 @@
                 <tbody>
                     <tr v-for="session in sessions" :key="session.session" class="cyber-row">
                         <td>
-                            <CountryFlag 
-                                :countryCode="session.ipDetailsId?.ipinfo?.country" 
+                            <CountryFlag :countryCode="session.ipDetailsId?.ipinfo?.country"
                                 :tooltip="session.ipDetailsId?.ipinfo ? `${session.ipDetailsId.ipinfo.country} - ${session.ipDetailsId.ipinfo.org || t('common.notAvailable')}` : t('common.notAvailable')"
                                 size="small" />
                         </td>
                         <td class="ip-cell">
                             <span class="ip-container">
-                                <span class="ip-link" @click="goToIpDetails(session.src_ip)" :title="$t('common.infoIp')">
+                                <span class="ip-link" @click="goToIpDetails(session.src_ip)"
+                                    :title="$t('common.infoIp')">
                                     {{ session.src_ip }}
                                 </span>
                                 <button @click.stop="copyToClipboard(session.src_ip)" class="btn-copy-mini"
@@ -138,7 +139,7 @@
                         <td class="time-cell">{{ formatDate(session.starttime) }}</td>
                         <td class="duration-cell">{{ computeDuration(session.starttime, session.endtime) }}</td>
                         <td class="events-cell">
-                             {{ session.eventCount || 0 }}
+                            {{ session.eventCount || 0 }}
                         </td>
                         <td>
                             <router-link :to="{ name: 'CowrieAttackDetail', params: { id: session.session } }"
@@ -267,8 +268,8 @@ const {
     toggleSort,
     getSortDirection
 } = useCowrieSessions(
-    props.initialPage, 
-    props.initialPageSize, 
+    props.initialPage,
+    props.initialPageSize,
     props.initialSortFields,
     props.initialIp
 );

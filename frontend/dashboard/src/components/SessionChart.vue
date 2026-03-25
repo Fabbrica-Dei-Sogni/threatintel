@@ -74,11 +74,11 @@ const frequencyData = computed(() => {
         datasets: [{
             label: t('sessionChart.frequencyLabel'),
             data: Array.from(map.values()),
-            borderColor: '#ff4c4c',
-            backgroundColor: 'rgba(255, 76, 76, 0.2)',
+            borderColor: '#00FF41',
+            backgroundColor: 'rgba(0, 255, 65, 0.2)',
             fill: true,
             tension: 0.4,
-            pointBackgroundColor: '#ff4c4c',
+            pointBackgroundColor: '#00FF41',
             pointRadius: 4
         }]
     };
@@ -97,8 +97,8 @@ const activityData = computed(() => {
         datasets: [{
             label: t('sessionChart.activityLabel'),
             data: dataPoints,
-            backgroundColor: 'rgba(255, 140, 140, 0.7)',
-            borderColor: 'rgba(255, 76, 76, 1)',
+            backgroundColor: 'rgba(0, 255, 65, 0.7)',
+            borderColor: 'rgba(51, 255, 51, 1)',
             borderWidth: 1,
             pointRadius: (ctx) => {
                 const val = ctx.raw ? ctx.raw.y : 0;
@@ -113,26 +113,26 @@ const activityData = computed(() => {
 const commonOptions = {
     responsive: true,
     maintainAspectRatio: false,
-    color: '#f0e6d2',
+    color: '#00FF41',
     plugins: {
         legend: { display: false },
         tooltip: {
-            backgroundColor: 'rgba(30, 27, 26, 0.95)',
-            titleColor: '#ff4c4c',
-            bodyColor: '#f0e6d2',
-            borderColor: '#ff4c4c',
+            backgroundColor: 'rgba(0, 30, 0, 0.95)',
+            titleColor: '#00FF41',
+            bodyColor: '#F0FAD0',
+            borderColor: '#00FF41',
             borderWidth: 1,
             padding: 10
         }
     },
     scales: {
         x: {
-            grid: { color: 'rgba(255, 76, 76, 0.05)' },
-            ticks: { color: '#f0e6d2' }
+            grid: { color: 'rgba(0, 255, 65, 0.1)' },
+            ticks: { color: '#BBA685' }
         },
         y: {
-            grid: { color: 'rgba(255, 76, 76, 0.05)' },
-            ticks: { color: '#f0e6d2' },
+            grid: { color: 'rgba(0, 255, 65, 0.1)' },
+            ticks: { color: '#BBA685' },
             beginAtZero: true
         }
     }
@@ -150,8 +150,8 @@ const activityOptions = computed(() => ({
                     day: 'MMM DD'
                 }
             },
-            grid: { color: 'rgba(255, 76, 76, 0.05)' },
-            ticks: { color: '#f0e6d2' }
+            grid: { color: 'rgba(0, 255, 65, 0.1)' },
+            ticks: { color: '#BBA685' }
         },
         y: {
             ...commonOptions.scales.y,
@@ -234,7 +234,7 @@ h3 {
     margin: 0;
     font-size: 1.1rem;
     font-weight: 600;
-    color: #e2e8f0;
+    color: #00FF41;
     letter-spacing: 0.5px;
 }
 

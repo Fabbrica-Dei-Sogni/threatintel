@@ -1,7 +1,7 @@
 <template>
     <div class="cowrie-detail attacchi">
         <div class="header-top">
-            <h1><span class="pulse">🔴</span> {{ $t('cowrie.attackDetail.title') }}</h1>
+            <h1><span class="animated-icon pulse-jade">👾</span> {{ $t('cowrie.attackDetail.title') }}</h1>
             <LanguageSwitcher />
         </div>
         <div class="actions">

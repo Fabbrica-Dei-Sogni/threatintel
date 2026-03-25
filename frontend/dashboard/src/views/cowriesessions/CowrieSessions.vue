@@ -6,7 +6,8 @@
         </div>
         <div class="actions">
             <div class="nav-actions">
-                <button @click="$router.push('/')" class="btn-action">{{ $t('cowrie.sessions.backToDashboard') }}</button>
+                <button @click="$router.push('/')" class="btn-action">{{ $t('cowrie.sessions.backToDashboard')
+                    }}</button>
             </div>
             <div class="view-controls">
                 <ViewToggle v-model="showMap" :label="$t('common.showMap')" theme="jade" />
@@ -187,7 +188,6 @@ import CountryFlag from '../../components/CountryFlag.vue';
 import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
 import SessionChart from '../../components/SessionChart.vue';
 import AttackMap from '../../components/AttackMap.vue';
-import ViewToggle from '../../components/common/ViewToggle.vue';
 import ViewToggle from '../../components/common/ViewToggle.vue';
 
 const props = defineProps({

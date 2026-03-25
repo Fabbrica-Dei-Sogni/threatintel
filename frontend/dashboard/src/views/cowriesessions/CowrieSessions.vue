@@ -225,9 +225,11 @@ const updateTableWidth = () => {
 
 // Variabile per salvare pagina precedente al filtro IP
 const previousPageBeforeIpFilter = ref(null);
-// Stato per le visualizzazioni (toggle visibilità)
-const showChart = ref(true);
-const showMap = ref(false);
+
+import { useViewSettingsStore } from '../../stores/viewSettings';
+import { storeToRefs } from 'pinia';
+const viewStore = useViewSettingsStore();
+const { sessionsShowMap: showMap, sessionsShowChart: showChart } = storeToRefs(viewStore);
 
 const totalPages = computed(() => Math.ceil(total.value / pageSize.value) || 1);
 

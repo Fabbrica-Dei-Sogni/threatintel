@@ -242,7 +242,11 @@ const {
 
 const totalPages = computed(() => Math.ceil(total.value / pageSize.value) || 1);
 const previousPageBeforeIpFilter = ref(null);
-const showChart = ref(true);
+
+import { useViewSettingsStore } from '../../stores/viewSettings';
+import { storeToRefs } from 'pinia';
+const viewStore = useViewSettingsStore();
+const { logsShowChart: showChart } = storeToRefs(viewStore);
 const inputPage = ref(page.value);
 
 // Dual Scrollbar Sync Support

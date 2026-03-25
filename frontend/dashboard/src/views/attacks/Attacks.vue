@@ -376,8 +376,11 @@ const router = useRouter();
 
 // Variabile per salvare pagina precedente al filtro IP
 const previousPageBeforeIpFilter = ref(null);
-const showMap = ref(false);
-const showChart = ref(true); // Default visible
+
+import { useViewSettingsStore } from '../../stores/viewSettings';
+import { storeToRefs } from 'pinia';
+const viewStore = useViewSettingsStore();
+const { attacksShowMap: showMap, attacksShowChart: showChart } = storeToRefs(viewStore);
 
 const {
     attacks,

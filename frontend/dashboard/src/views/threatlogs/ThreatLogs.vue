@@ -69,25 +69,55 @@
               <span class="label">{{ t('threatLogs.table.countryOrg') }}</span>
             </th>
             <th>{{ t('threatLogs.table.details') }}</th>
-            <th class="sortable" @click="toggleSort('request.ip')">
-              {{ t('threatLogs.table.ip') }}
-              <span class="sort-icon" :class="getSortClass('request.ip')" :aria-label="t('sorting.sortIp')"></span>
+            <th class="sortable-th">
+              <div class="sort-control">
+                <span class="label">{{ t('threatLogs.table.ip') }}</span>
+                <button @click="toggleSort('request.ip')" :aria-label="t('sorting.sortIp')" class="sort-button">
+                  <span v-if="getSortDirection('request.ip') === 1">▲</span>
+                  <span v-else-if="getSortDirection('request.ip') === -1">▼</span>
+                  <span v-else>⇵</span>
+                </button>
+              </div>
             </th>
-            <th class="sortable" @click="toggleSort('fingerprint.score')">
-              {{ t('threatLogs.table.dangerScore') }}
-              <span class="sort-icon" :class="getSortClass('fingerprint.score')" :aria-label="t('sorting.sortScore')"></span>
+            <th class="sortable-th">
+              <div class="sort-control">
+                <span class="label">{{ t('threatLogs.table.dangerScore') }}</span>
+                <button @click="toggleSort('fingerprint.score')" :aria-label="t('sorting.sortScore')" class="sort-button">
+                  <span v-if="getSortDirection('fingerprint.score') === 1">▲</span>
+                  <span v-else-if="getSortDirection('fingerprint.score') === -1">▼</span>
+                  <span v-else>⇵</span>
+                </button>
+              </div>
             </th>
-            <th class="sortable" @click="toggleSort('request.url')">
-              {{ t('threatLogs.table.url') }}
-              <span class="sort-icon" :class="getSortClass('request.url')" :aria-label="t('sorting.sortUrl')"></span>
+            <th class="sortable-th">
+              <div class="sort-control">
+                <span class="label">{{ t('threatLogs.table.url') }}</span>
+                <button @click="toggleSort('request.url')" :aria-label="t('sorting.sortUrl')" class="sort-button">
+                  <span v-if="getSortDirection('request.url') === 1">▲</span>
+                  <span v-else-if="getSortDirection('request.url') === -1">▼</span>
+                  <span v-else>⇵</span>
+                </button>
+              </div>
             </th>
-            <th class="sortable" @click="toggleSort('request.method')">
-              {{ t('threatLogs.table.method') }}
-              <span class="sort-icon" :class="getSortClass('request.method')" :aria-label="t('sorting.sortMethod')"></span>
+            <th class="sortable-th">
+              <div class="sort-control">
+                <span class="label">{{ t('threatLogs.table.method') }}</span>
+                <button @click="toggleSort('request.method')" :aria-label="t('sorting.sortMethod')" class="sort-button">
+                  <span v-if="getSortDirection('request.method') === 1">▲</span>
+                  <span v-else-if="getSortDirection('request.method') === -1">▼</span>
+                  <span v-else>⇵</span>
+                </button>
+              </div>
             </th>
-            <th class="sortable" @click="toggleSort('timestamp')">
-              {{ t('threatLogs.table.timestamp') }}
-              <span class="sort-icon" :class="getSortClass('timestamp')" :aria-label="t('sorting.sortTimestamp')"></span>
+            <th class="sortable-th">
+              <div class="sort-control">
+                <span class="label">{{ t('threatLogs.table.timestamp') }}</span>
+                <button @click="toggleSort('timestamp')" :aria-label="t('sorting.sortTimestamp')" class="sort-button">
+                  <span v-if="getSortDirection('timestamp') === 1">▲</span>
+                  <span v-else-if="getSortDirection('timestamp') === -1">▼</span>
+                  <span v-else>⇵</span>
+                </button>
+              </div>
             </th>
           </tr>
         </thead>
@@ -208,7 +238,8 @@ const {
   fetchData,
   onFilterChanged,
   toggleSort,
-  getSortClass // Changed from getSortDirection to getSortClass
+  getSortDirection,
+  getSortClass
 } = useLogsFilter(props.initialIp, props.initialUrl, props.initialProtocol, props.initialPage, props.initialSortFields);
 
 //step 4. definire eventuali valori di tipo computer che cambiano a seconda il cambio dei valori

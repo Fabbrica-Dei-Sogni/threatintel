@@ -316,6 +316,7 @@
   /* Centering content */
   vertical-align: middle;
   /* Vertical centering */
+  white-space: nowrap;
 }
 
 .log-table td {
@@ -376,30 +377,6 @@
   color: #f0dede;
 }
 
-.sort-control {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  color: #f9d8d8;
-  user-select: none;
-}
-
-.sort-button {
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  color: #fabcbc;
-  font-size: 15px;
-  line-height: 1;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  transition: color 0.3s ease;
-}
-
-.sort-button:hover {
-  color: #ff7070;
-}
 
 .btn-copy-ip,
 .btn-copy-url {

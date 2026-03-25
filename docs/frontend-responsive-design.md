@@ -58,6 +58,19 @@ This document outlines the implementation of responsive design for the Threat In
 - **Buttons**: Action buttons now grow to fill available width (`flex: 1 1 auto`) and use fluid font sizing.
 - **Widgets**: Forced single-column stack on mobile. List items use `word-break: break-word` and fluid fonts to prevent overflow.
 
+### 7. Unified Sorting & UI Alignment (March 2026)
+- **Sorting Icons**: 
+  - Retired the legacy `sort-icon` (CSS-driven) pattern in favor of a robust, explicit structure.
+  - Each sortable header now uses a `sort-control` wrapper with a nested `sort-button`.
+  - This ensures icons (`▲`, `▼`, `⇵`) are consistently rendered and accessible across all views.
+- **Global CSS Refactoring**:
+  - Moved all shared sorting styles to `src/assets/global.css`.
+  - Standardized `sort-button` size to `15px` for a premium, accessible touch target.
+  - Implemented a uniform `linear-gradient` hover effect for all sortable headers.
+- **Impact**: 
+  - Reduced CSS fragmentation across `Attacks`, `ThreatLogs`, and `CowrieSessions`.
+  - Guaranteed visual parity between the Attack Table and the Cowrie Session Table.
+
 ## 📱 Mobile Behavior Reference
 
 | Component | Behavior on Mobile (< 768px) |

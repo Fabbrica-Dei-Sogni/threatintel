@@ -38,3 +38,39 @@ textarea {
   opacity: 0;
   transform: translateY(-10px);
 }
+
+/* --- Global Table Sorting Styles --- */
+.sort-control {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    user-select: none;
+}
+
+.sort-button {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #fabcbc;
+    font-size: 15px;
+    padding: 0;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    transition: color 0.3s ease;
+}
+
+.sort-button:hover {
+    color: #ff7070;
+}
+
+.sortable-th {
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.sortable-th:hover {
+    background: linear-gradient(180deg, #624236, #53382b) !important;
+}

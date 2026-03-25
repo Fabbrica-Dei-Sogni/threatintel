@@ -13,11 +13,11 @@
 | [M1: TypeScript Migration](#m1-typescript-migration) | ✅ Completed | 🔴 High | 2-3 settimane |
 | [M2: Dependency Injection](#m2-dependency-injection) | ✅ Completed | 🟠 Medium | 1-2 settimane |
 | [M3: Test Suite Expansion](#m3-test-suite-expansion) | ✅ Completed | 🔴 High | 3-4 settimane |
-| [M4: Performance Optimization](#m4-performance-optimization) | ⚪ Planned | 🟡 Low | 1 settimana |
+| [M4: Performance Optimization](#m4-performance-optimization) | 🟢 In Progress (30%) | 🟡 Low | 1 settimana |
 | [M5: Security Enhancements](#m5-security-enhancements) | ⚪ Planned | 🟠 Medium | 1-2 settimane |
 | [M6: Monitoring & Observability](#m6-monitoring--observability) | ⚪ Planned | 🟡 Low | 1 settimana |
-| [M7: Frontend Enhancements](#m7-frontend-enhancements) | 🟢 In Progress (90%) | 🟠 Medium | 2 settimane |
-| [M8: Log Analysis & Hardening](#m8-log-analysis--hardening) | 🟢 In Progress (60%) | 🔴 High | 1-2 settimane |
+| [M7: Frontend Enhancements](#m7-frontend-enhancements) | 🟢 In Progress (95%) | 🟠 Medium | 2 settimane |
+| [M8: Log Analysis & Hardening](#m8-log-analysis--hardening) | ✅ Completed | 🔴 High | 1-2 settimane |
 
 **Legenda:**
 - 🟢 In Progress
@@ -207,8 +207,10 @@
 
 ### Tasks
 - [ ] Profile MongoDB queries (slow queries)
-- [ ] Add database indexes where needed
+- [x] Add database indexes where needed (e.g., `lastChecked` in `IpDetails`)
 - [x] Optimize aggregation pipelines in `ForensicService` (See: [Architecture](./forensic-pipeline-architecture.md))
+- [x] Enable MongoDB `allowDiskUse` for complex sorting/aggregation (`c22a9a6`)
+- [x] Enhance IP lookup concurrency and rate limit handling (`647db10`)
 - [ ] Implement query result caching (Redis)
 - [ ] Optimize rate limiter Redis operations
 - [ ] Add database connection pooling optimization
@@ -284,11 +286,12 @@
 - [x] Tabella con tipografia fluida (`clamp`) e fallback scroll
 
 ### Phase 3: Dashboard V2 (Next)
-- [ ] Dark/Light mode toggle avanzato
-- [ ] Nuovi widget grafici (Time series attacks)
-- [ ] Miglioramento accessibilità (ARIA support)
-- [x] Protocol Selectors in Dashboard Widgets
-- [x] Dashboard CSS Restoration & Theming
+- [x] Dashboard CSS Restoration & Sorting Icons Harmonization ✅
+- [x] DefconIndicator 'Dot Mode' with animations & pulse effect (`c04dae3`)
+- [x] Latest attacks widgets refactored to Flexbox for better mobile performance (`c04dae3`)
+- [x] AttackDetail page refactored for dynamic IP-based fetching (`9dd6700`)
+- [x] Sticky headers, refined button aesthetics, and filter container optimization (`85c42f6`)
+- [x] Dashboard UI Harmonization (Attacks, Logs, Session Telnet) ✅
 
 ### Phase 4: Data Visualization & Filtering ✅
 - [x] Date Range Picker per filtri temporali
@@ -307,7 +310,7 @@
 
 **Obiettivo**: Estendere capacità di analisi e ricalcolo score per diversi protocolli
 
-**Status**: 🟢 In Progress (40%)
+**Status**: ✅ Completed
 
 ### Phase 1: SSH Log Integration ✅
 - [x] Fix type mismatch (string vs number) for scores
@@ -323,6 +326,8 @@
 - [x] Supporto filtri avanzati (Mesi, Range) in `ForensicService`
 - [x] Fix calcolo timestamp `toDate` (end of day)
 - [x] Unit/Integration tests per filtri temporali
+- [x] Defcon Threshold Calibration & Recalibration logic (`07b6cbe4`)
+- [x] SSH Log Aggregation with event counting & detailed metadata (`647db10`)
 
 ### Phase 4: Future Protocols (Next)
 - [ ] Abstract analysis engine for generic protocols
@@ -375,9 +380,9 @@ Aprile 2026      M6 (Monitoring)
 | Performance | Baseline | ⚪ |
 | Security | Baseline | ⚪ |
 | Monitoring | Basic (Winston) | 🟡 |
-| Frontend Enhancements | 80% (I18n + Responsive) | 🟢 |
+| Frontend Enhancements | 95% (I18n + Responsive + UI Alignment + Widgets) | 🟢 |
 
 ---
 
-**Ultimo aggiornamento**: 2026-01-09
-**Prossimo checkpoint**: Migrazione altri servizi Phase 4
+**Ultimo aggiornamento**: 2026-03-25
+**Prossimo checkpoint**: M7 Phase 3 Dashboard V2 completion

@@ -18,14 +18,15 @@
       <div class="filter-row main-filters">
         <ProtocolSelector v-model="filterProtocol" :options="['http', 'https', 'ssh']" />
         <div class="filter-item search-box">
-          <input type="text" v-model="filterIp" :placeholder="t('threatLogs.filterByIp')" @input="onFilterChanged" class="ip-input" />
+          <input type="text" v-model="filterIp" :placeholder="t('threatLogs.filterByIp')" @input="onFilterChanged"
+            class="ip-input" />
           <button v-if="filterIp" @click="clearIpFilter" class="clear-btn" :aria-label="t('threatLogs.clearIpFilter')">
             ×
           </button>
         </div>
         <div class="filter-item search-box url-search">
-          <input v-model="filterUrl" :placeholder="t('threatLogs.filterByUrl')" @input="onFilterChanged" class="ip-input"
-            type="text" />
+          <input v-model="filterUrl" :placeholder="t('threatLogs.filterByUrl')" @input="onFilterChanged"
+            class="ip-input" type="text" />
           <button v-if="filterUrl" @click="clearUrlFilter" class="clear-btn" :title="t('threatLogs.clearUrlFilter')"
             type="button" aria-label="Clear URL filter">
             ✕
@@ -36,18 +37,6 @@
 
     <div v-if="loading" class="loading">{{ t('common.loading') }}</div>
     <div v-if="error" class="error">{{ t('threatLogs.errorLoadingData') }}</div>
-
-    <div class="pagination cyber-pagination" v-if="total > pageSize">
-      <button :disabled="page === 1" @click="changePage(page - 1)">◄ {{ t('common.prev') }}</button>
-      <span class="pagination-info">{{ t('common.page') }} {{ page }} {{ t('common.of') }} {{ totalPages }}</span>
-      <button :disabled="page === totalPages" @click="changePage(page + 1)">{{ t('common.next') }} ►</button>
-
-      <div class="page-input-container">
-        <label for="pageInput">{{ t('common.goToPage') }}:</label>
-        <input class="pagination-input" id="pageInput" type="number" v-model.number="inputPage" :min="1" :max="totalPages"
-          placeholder="1" />
-      </div>
-    </div>
 
     <section class="chart-controls" style="margin-bottom: 20px;">
       <button class="btn-action" @click="showChart = !showChart">
@@ -60,6 +49,18 @@
         <ThreadLogChart v-if="logs && logs.length > 0" :logs="logs" />
       </div>
     </transition>
+
+    <div class="pagination cyber-pagination" v-if="total > pageSize">
+      <button :disabled="page === 1" @click="changePage(page - 1)">◄ {{ t('common.prev') }}</button>
+      <span class="pagination-info">{{ t('common.page') }} {{ page }} {{ t('common.of') }} {{ totalPages }}</span>
+      <button :disabled="page === totalPages" @click="changePage(page + 1)">{{ t('common.next') }} ►</button>
+
+      <div class="page-input-container">
+        <label for="pageInput">{{ t('common.goToPage') }}:</label>
+        <input class="pagination-input" id="pageInput" type="number" v-model.number="inputPage" :min="1"
+          :max="totalPages" placeholder="1" />
+      </div>
+    </div>
 
     <section class="log-table">
       <table>
@@ -82,7 +83,8 @@
             <th class="sortable-th">
               <div class="sort-control">
                 <span class="label">{{ t('threatLogs.table.dangerScore') }}</span>
-                <button @click="toggleSort('fingerprint.score')" :aria-label="t('sorting.sortScore')" class="sort-button">
+                <button @click="toggleSort('fingerprint.score')" :aria-label="t('sorting.sortScore')"
+                  class="sort-button">
                   <span v-if="getSortDirection('fingerprint.score') === 1">▲</span>
                   <span v-else-if="getSortDirection('fingerprint.score') === -1">▼</span>
                   <span v-else>⇵</span>
@@ -124,11 +126,10 @@
         <tbody>
           <tr v-for="log in logs" :key="log._id">
             <td>
-                <div style="display: flex; justify-content: center; align-items: center; min-width: 30px;">
-                  <CountryFlag
-                    :countryCode="log.ipDetailsId?.ipinfo?.country" 
-                    :tooltip="log.ipDetailsId?.ipinfo ? `${log.ipDetailsId.ipinfo.country} - ${log.ipDetailsId.ipinfo.org || t('common.notAvailable')}` : t('common.notAvailable')" />
-                </div>
+              <div style="display: flex; justify-content: center; align-items: center; min-width: 30px;">
+                <CountryFlag :countryCode="log.ipDetailsId?.ipinfo?.country"
+                  :tooltip="log.ipDetailsId?.ipinfo ? `${log.ipDetailsId.ipinfo.country} - ${log.ipDetailsId.ipinfo.org || t('common.notAvailable')}` : t('common.notAvailable')" />
+              </div>
             </td>
             <td><button @click="goToThreatLogDetails(log.id)" style="cursor: pointer;" class="info-btn">{{
               t('common.detail') }}</button></td>

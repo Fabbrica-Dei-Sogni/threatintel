@@ -29,10 +29,6 @@
             </div>
         </section>
 
-        <div v-if="loading" class="loading">{{ $t('cowrie.sessions.loading') }}</div>
-        <div v-if="error" class="error">{{ $t('cowrie.sessions.errorLoad') }}</div>
-
-
         <!-- Sezione Mappa -->
         <transition name="fade">
             <div v-if="showMap" class="map-section">
@@ -63,6 +59,10 @@
                     :max="totalPages" placeholder="1" />
             </div>
         </div>
+
+        <div v-if="loading" class="loading">{{ $t('common.loading') }}</div>
+        <div v-if="error" class="error">{{ $t('common.errorLoadingData') }}</div>
+
         <!-- Top Scrollbar Sync Wrapper -->
         <div class="top-scrollbar-wrapper" ref="topScrollRef" v-show="!loading && !error">
             <div class="top-scrollbar-content" :style="{ width: tableWidth + 'px' }"></div>

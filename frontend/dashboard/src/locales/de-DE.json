@@ -8,6 +8,7 @@
         "edit": "Bearbeiten",
         "loading": "Laden...",
         "error": "Fehler",
+        "errorLoadingData": "Fehler beim Laden der Daten",
         "search": "Suchen",
         "filter": "Filtern",
         "clear": "Löschen",
@@ -88,7 +89,6 @@
         "clearIpFilter": "IP-Filter löschen",
         "copyToFilter": "In IP-Filter kopieren und ausführen",
         "noAttacksFound": "Keine Angriffe gefunden",
-        "errorLoadingData": "Fehler beim Laden der Daten",
         "table": {
             "defcon": "Defcon",
             "attacker": "Angreifer",
@@ -212,7 +212,6 @@
         "clearIpFilter": "IP-Filter löschen",
         "clearUrlFilter": "URL-Filter löschen",
         "noLogsFound": "Keine Protokolle gefunden",
-        "errorLoadingData": "Fehler beim Laden der Daten",
         "trafficOverTime": "Zeitliche Verkehrsanalysen",
         "table": {
             "defcon": "Defcon",
@@ -369,9 +368,7 @@
         "sessions": {
             "title": "Telnet-Sitzungen",
             "backToDashboard": "Dashboard",
-            "loading": "Abfangen von Honeypot-Daten...",
             "emptyState": "Noch keine Honeypot-Aktivität erkannt.",
-            "errorLoad": "Laden der Telnet-Sitzungen fehlgeschlagen. Stellen Sie sicher, dass das Backend läuft.",
             "filterByIp": "Nach IP filtern...",
             "clearIpFilter": "IP-Filter löschen",
             "table": {

@@ -66,9 +66,6 @@
                 </div>
             </div>
         </section>
-        <div v-if="loading" class="loading">{{ t('common.loading') }}</div>
-        <div v-if="error" class="error">{{ t('attacks.errorLoadingData') }}</div>
-
 
         <section class="map-controls" style="margin-bottom: 20px;">
             <transition name="fade">
@@ -96,6 +93,9 @@
                     :max="totalPages" placeholder="1" />
             </div>
         </div>
+        <div v-if="loading" class="loading">{{ t('common.loading') }}</div>
+        <div v-if="error" class="error">{{ t('common.errorLoadingData') }}</div>
+
         <!-- Top Scrollbar Sync Wrapper -->
         <div class="top-scrollbar-wrapper" ref="topScrollRef">
             <div class="top-scrollbar-content" :style="{ width: tableWidth + 'px' }"></div>
@@ -254,13 +254,13 @@
                         </td>
                         </td>
                         <td class="tecniche-cell">
-                          <div class="tech-wrapper">
-                            <span v-for="tech in attack.attackPatterns" :key="tech" class="tech-chip">
-                              <span class="tech-name">{{ tech }}</span>
-                              <button @click.stop="copyToClipboard(tech)" class="btn-copy-mini-tech"
-                                :title="t('common.copyToClipboard')">📋</button>
-                            </span>
-                          </div>
+                            <div class="tech-wrapper">
+                                <span v-for="tech in attack.attackPatterns" :key="tech" class="tech-chip">
+                                    <span class="tech-name">{{ tech }}</span>
+                                    <button @click.stop="copyToClipboard(tech)" class="btn-copy-mini-tech"
+                                        :title="t('common.copyToClipboard')">📋</button>
+                                </span>
+                            </div>
                         </td>
                         <td>
                             <span style="display:inline-flex;align-items:center;">

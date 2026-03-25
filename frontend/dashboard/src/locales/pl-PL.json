@@ -8,6 +8,7 @@
         "edit": "Edytuj",
         "loading": "Ładowanie...",
         "error": "Błąd",
+        "errorLoadingData": "Błąd ładowania danych",
         "search": "Szukaj",
         "filter": "Filtruj",
         "clear": "Wyczyść",
@@ -89,7 +90,6 @@
         "clearIpFilter": "Wyczyść filtr IP",
         "copyToFilter": "Skopiuj do filtra IP i wykonaj",
         "noAttacksFound": "Nie znaleziono ataków",
-        "errorLoadingData": "Błąd ładowania danych",
         "table": {
             "defcon": "Defcon",
             "attacker": "Atakujący",
@@ -370,9 +370,7 @@
         "sessions": {
             "title": "Sesje Telnet",
             "backToDashboard": "Panel sterowania",
-            "loading": "Przechwytywanie danych Honeypot...",
             "emptyState": "Nie wykryto jeszcze żadnej aktywności honeypot.",
-            "errorLoad": "Nie udało się załadować sesji Telnet. Upewnij się, że backend działa.",
             "filterByIp": "Filtruj według IP...",
             "clearIpFilter": "Wyczyść filtr IP",
             "table": {

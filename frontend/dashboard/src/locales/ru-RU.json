@@ -8,6 +8,7 @@
         "edit": "Редактировать",
         "loading": "Загрузка...",
         "error": "Ошибка",
+        "errorLoadingData": "Ошибка загрузки данных",
         "search": "Поиск",
         "filter": "Фильтр",
         "clear": "Очистить",
@@ -88,7 +89,6 @@
         "clearIpFilter": "Очистить фильтр IP",
         "copyToFilter": "Скопировать в фильтр IP и выполнить",
         "noAttacksFound": "Атак не найдено",
-        "errorLoadingData": "Ошибка загрузки данных",
         "table": {
             "defcon": "Defcon",
             "attacker": "Атакующий",
@@ -369,9 +369,7 @@
         "sessions": {
             "title": "Сессии Telnet",
             "backToDashboard": "Панель управления",
-            "loading": "Перехват данных Honeypot...",
             "emptyState": "Активность honeypot пока не обнаружена.",
-            "errorLoad": "Не удалось загрузить сессии Telnet. Убедитесь, что бэкэнд запущен.",
             "filterByIp": "Фильтр по IP...",
             "clearIpFilter": "Очистить фильтр IP",
             "table": {

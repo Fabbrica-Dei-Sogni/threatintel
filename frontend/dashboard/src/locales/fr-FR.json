@@ -8,6 +8,7 @@
         "edit": "Modifier",
         "loading": "Chargement...",
         "error": "Erreur",
+        "errorLoadingData": "Erreur de chargement des données",
         "search": "Rechercher",
         "filter": "Filtrer",
         "clear": "Effacer",
@@ -88,7 +89,6 @@
         "clearIpFilter": "Effacer le filtre IP",
         "copyToFilter": "Copier dans le filtre IP et exécuter",
         "noAttacksFound": "Aucune attaque trouvée",
-        "errorLoadingData": "Erreur de chargement des données",
         "table": {
             "defcon": "Defcon",
             "attacker": "Attaquant",
@@ -369,9 +369,7 @@
         "sessions": {
             "title": "Sessions Telnet",
             "backToDashboard": "Tableau de bord",
-            "loading": "Interception des données Honeypot...",
             "emptyState": "Aucune activité honeypot détectée pour le moment.",
-            "errorLoad": "Échec du chargement des sessions Telnet. Vérifiez que le backend est en cours d'exécution.",
             "filterByIp": "Filtrer par IP...",
             "clearIpFilter": "Effacer le filtre IP",
             "table": {

@@ -8,6 +8,7 @@
         "edit": "Edit",
         "loading": "Loading...",
         "error": "Error",
+        "errorLoadingData": "Error loading data",
         "search": "Search",
         "filter": "Filter",
         "clear": "Clear",
@@ -88,7 +89,6 @@
         "clearIpFilter": "Clear IP filter",
         "copyToFilter": "Copy to IP filter and execute",
         "noAttacksFound": "No attacks found",
-        "errorLoadingData": "Error loading data",
         "table": {
             "defcon": "Defcon",
             "attacker": "Attacker",
@@ -212,8 +212,6 @@
         "clearUrlFilter": "Clear URL filter",
         "noLogsFound": "No logs found",
         "trafficPeaks": "Traffic Peaks",
-        "trafficOverTime": "Traffic Over Time Analysis",
-        "errorLoadingData": "Error loading data",
         "table": {
             "defcon": "Defcon",
             "ip": "IP",
@@ -373,9 +371,7 @@
         "sessions": {
             "title": "Telnet Sessions",
             "backToDashboard": "Dashboard",
-            "loading": "Intercepting Honeypot Data...",
             "emptyState": "No honeypot activity detected yet.",
-            "errorLoad": "Failed to load Telnet sessions. Ensure the backend is running.",
             "filterByIp": "Filter by IP...",
             "clearIpFilter": "Clear IP filter",
             "table": {

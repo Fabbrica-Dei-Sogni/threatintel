@@ -8,6 +8,7 @@
         "edit": "Modifica",
         "loading": "Caricamento...",
         "error": "Errore",
+        "errorLoadingData": "Errore nel caricamento dei dati",
         "search": "Cerca",
         "filter": "Filtra",
         "clear": "Svuota",
@@ -88,7 +89,6 @@
         "clearIpFilter": "Svuota filtro IP",
         "copyToFilter": "Copia nel filtro IP ed esegui",
         "noAttacksFound": "Nessun attacco trovato",
-        "errorLoadingData": "Errore nel caricamento dei dati",
         "table": {
             "defcon": "Defcon",
             "attacker": "Attaccante",
@@ -213,8 +213,6 @@
         "clearUrlFilter": "Svuota filtro URL",
         "noLogsFound": "Nessun log trovato",
         "trafficPeaks": "Picchi di Traffico",
-        "trafficOverTime": "Analisi Traffico Temporale",
-        "errorLoadingData": "Errore nel caricamento dei dati",
         "table": {
             "defcon": "Defcon",
             "ip": "IP",
@@ -374,9 +372,7 @@
         "sessions": {
             "title": "Sessioni Telnet",
             "backToDashboard": "Cruscotto",
-            "loading": "Intercettazione Dati Honeypot...",
             "emptyState": "Nessuna attività honeypot rilevata.",
-            "errorLoad": "Caricamento sessioni fallito. Assicurati che il backend sia attivo.",
             "filterByIp": "Filtra per IP...",
             "clearIpFilter": "Svuota filtro IP",
             "table": {

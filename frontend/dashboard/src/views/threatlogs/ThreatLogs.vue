@@ -40,10 +40,6 @@
       </div>
     </section>
 
-    <div v-if="loading" class="loading">{{ t('common.loading') }}</div>
-    <div v-if="error" class="error">{{ t('threatLogs.errorLoadingData') }}</div>
-
-
     <transition name="fade">
       <div v-if="showChart">
         <ThreadLogChart v-if="logs && logs.length > 0" :logs="logs" />
@@ -61,6 +57,9 @@
           :max="totalPages" placeholder="1" />
       </div>
     </div>
+
+    <div v-if="loading" class="loading">{{ t('common.loading') }}</div>
+    <div v-if="error" class="error">{{ t('common.errorLoadingData') }}</div>
 
     <!-- Top Scrollbar Sync Wrapper -->
     <div class="top-scrollbar-wrapper" ref="topScrollRef">

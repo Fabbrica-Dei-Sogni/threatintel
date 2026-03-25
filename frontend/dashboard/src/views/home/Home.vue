@@ -2,16 +2,16 @@
   <div class="dashboard">
     <div class="header-top">
       <h1>
-        <ConfigMenuButton inline class="animated-icon pulse-cog" />
+        <ConfigMenuButton inline class="animated-icon pulse-cobalt" />
         {{ t('home.title') }}
       </h1>
       <LanguageSwitcher />
     </div>
 
     <section class="actions">
-      <button @click="goToAttacks" class="btn-action">{{ t('home.attacks') }}</button>
-      <button @click="goToLogs" class="btn-action">{{ t('home.logRequests') }}</button>
-      <button @click="goToTelnet" class="btn-action">{{ t('home.telnet') }}</button>
+      <button @click="goToAttacks" class="btn-action">🛰️ {{ t('home.attacks') }}</button>
+      <button @click="goToLogs" class="btn-action">🗄️ {{ t('home.logRequests') }}</button>
+      <button @click="goToTelnet" class="btn-action">📟 {{ t('home.telnet') }}</button>
     </section>
 
     <section class="intel-center">

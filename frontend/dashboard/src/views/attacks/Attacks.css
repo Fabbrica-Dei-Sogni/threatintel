@@ -328,6 +328,11 @@
   flex-shrink: 0;
 }
 
+.time-ago-wrapper :deep(.el-select) {
+    width: 120px !important;
+    flex-shrink: 0;
+}
+
 /* Surgical Date-Picker Shrinkage */
 :deep(.el-date-editor--daterange.el-input__wrapper) {
   flex: 1 1 auto !important;

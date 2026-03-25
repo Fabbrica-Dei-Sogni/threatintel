@@ -1,11 +1,11 @@
 <template>
-  <div class="threatlogs">
-    <div class="header-top">
+  <div class="threatlogs cyber-view">
+    <div class="header-top cyber-sticky-area cyber-sticky-top-0">
       <h1><span class="animated-icon pulse-log">🗄️</span> {{ t('threatLogs.title') }}</h1>
       <LanguageSwitcher />
     </div>
     <!-- Pulsante per navigare alla Home -->
-    <div class="actions">
+    <div class="actions cyber-sticky-area cyber-sticky-top-1">
       <div class="nav-actions">
         <button @click="goToHome" class="btn-action">
           {{ t('threatLogs.dashboard') }}
@@ -19,7 +19,7 @@
       </div>
     </div>
 
-    <section class="filters-container">
+    <section class="filters-container cyber-sticky-area cyber-sticky-top-2">
       <div class="filter-row main-filters">
         <ProtocolSelector v-model="filterProtocol" :options="['http', 'https', 'ssh']" theme="amber" />
         <div class="filter-item search-box">
@@ -48,152 +48,157 @@
 
     <div class="pagination cyber-pagination" v-if="total > pageSize">
       <button :disabled="page === 1" @click="changePage(page - 1)">◄ {{ t('common.prev') }}</button>
-      <span class="pagination-info">{{ t('common.page') }} {{ page }} {{ t('common.of') }} {{ totalPages }}</span>
+      <span class="pagination-info cyber-pagination-info">{{ t('common.page') }} {{ page }} {{ t('common.of') }} {{
+        totalPages }}</span>
       <button :disabled="page === totalPages" @click="changePage(page + 1)">{{ t('common.next') }} ►</button>
 
-      <div class="page-input-container">
+      <div class="cyber-page-input-container">
         <label for="pageInput">{{ t('common.goToPage') }}:</label>
-        <input class="pagination-input" id="pageInput" type="number" v-model.number="inputPage" :min="1"
+        <input class="cyber-pagination-input" id="pageInput" type="number" v-model.number="inputPage" :min="1"
           :max="totalPages" placeholder="1" />
       </div>
+
     </div>
 
-    <div class="table-status-container">
-        <div v-if="loading" class="loading">{{ t('common.loading') }}</div>
-        <div v-if="error" class="error">{{ t('common.errorLoadingData') }}</div>
+    <div class="table-status-container cyber-table-status-container">
+      <div v-if="loading" class="loading cyber-status-overlay cyber-loading-overlay">{{ t('common.loading') }}</div>
+      <div v-if="error" class="error cyber-status-overlay cyber-error-overlay">{{ t('common.errorLoadingData') }}</div>
 
-    <!-- Top Scrollbar Sync Wrapper -->
-    <div class="top-scrollbar-wrapper" ref="topScrollRef">
-      <div class="top-scrollbar-content" :style="{ width: tableWidth + 'px' }"></div>
-    </div>
-
-    <section class="log-table" ref="tableScrollRef">
-      <table ref="tableRef">
-        <thead>
-          <tr>
-            <th>
-              <span class="label">{{ t('threatLogs.table.countryOrg') }}</span>
-            </th>
-            <th>{{ t('threatLogs.table.details') }}</th>
-            <th class="sortable-th">
-              <div class="sort-control">
-                <span class="label">{{ t('threatLogs.table.ip') }}</span>
-                <button @click="toggleSort('request.ip')" :aria-label="t('sorting.sortIp')" class="sort-button">
-                  <span v-if="getSortDirection('request.ip') === 1">▲</span>
-                  <span v-else-if="getSortDirection('request.ip') === -1">▼</span>
-                  <span v-else>⇵</span>
-                </button>
-              </div>
-            </th>
-            <th class="sortable-th">
-              <div class="sort-control">
-                <span class="label">{{ t('threatLogs.table.url') }}</span>
-                <button @click="toggleSort('request.url')" :aria-label="t('sorting.sortUrl')" class="sort-button">
-                  <span v-if="getSortDirection('request.url') === 1">▲</span>
-                  <span v-else-if="getSortDirection('request.url') === -1">▼</span>
-                  <span v-else>⇵</span>
-                </button>
-              </div>
-            </th>
-            <th class="sortable-th">
-              <div class="sort-control">
-                <span class="label">{{ t('threatLogs.table.dangerScore') }}</span>
-                <button @click="toggleSort('fingerprint.score')" :aria-label="t('sorting.sortScore')"
-                  class="sort-button">
-                  <span v-if="getSortDirection('fingerprint.score') === 1">▲</span>
-                  <span v-else-if="getSortDirection('fingerprint.score') === -1">▼</span>
-                  <span v-else>⇵</span>
-                </button>
-              </div>
-            </th>
-            <th class="sortable-th">
-              <div class="sort-control">
-                <span class="label">{{ t('threatLogs.table.method') }}</span>
-                <button @click="toggleSort('request.method')" :aria-label="t('sorting.sortMethod')" class="sort-button">
-                  <span v-if="getSortDirection('request.method') === 1">▲</span>
-                  <span v-else-if="getSortDirection('request.method') === -1">▼</span>
-                  <span v-else>⇵</span>
-                </button>
-              </div>
-            </th>
-            <th class="sortable-th">
-              <div class="sort-control">
-                <span class="label">{{ t('threatLogs.table.timestamp') }}</span>
-                <button @click="toggleSort('timestamp')" :aria-label="t('sorting.sortTimestamp')" class="sort-button">
-                  <span v-if="getSortDirection('timestamp') === 1">▲</span>
-                  <span v-else-if="getSortDirection('timestamp') === -1">▼</span>
-                  <span v-else>⇵</span>
-                </button>
-              </div>
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="log in logs" :key="log._id">
-            <td>
-              <div style="display: flex; justify-content: center; align-items: center; min-width: 30px;">
-                <CountryFlag :countryCode="log.ipDetailsId?.ipinfo?.country"
-                  :tooltip="log.ipDetailsId?.ipinfo ? `${log.ipDetailsId.ipinfo.country} - ${log.ipDetailsId.ipinfo.org || t('common.notAvailable')}` : t('common.notAvailable')" />
-              </div>
-            </td>
-            <td><button @click="goToThreatLogDetails(log.id)" style="cursor: pointer;" class="info-btn">{{
-              t('common.detail') }}</button></td>
-            <td>
-              <span style="display:inline-flex;align-items:center;">
-                <span class="info-btn" @click="goToIpDetails(log.request.ip)" style="cursor: pointer;"
-                  :title="t('common.infoIp')">{{
-                    log.request.ip }}</span>
-                <button @click.stop="copyToClipboard(log.request.ip)" class="btn-copy-ip"
-                  :title="t('common.copyToClipboard')">📋</button>
-                <button @click.stop="setIpFilter(log.request.ip)" class="btn-copy-ip"
-                  :title="t('common.copyToFilter')">⬇️</button>
-              </span>
-            </td>
-            <td class="url-cell">
-              <div class="url-badge">
-                <span class="url-text">{{ log.request.url }}</span>
-                <div class="url-actions">
-                  <button @click.stop="copyToClipboard(log.request.url)" class="btn-copy-url"
-                    :title="t('common.copyToClipboard')">📋</button>
-                  <button @click.stop="setUrlFilter(log.request.url)" class="btn-copy-url"
-                    :title="t('common.copyToFilter')">⬇️</button>
-                </div>
-              </div>
-            </td>
-            <td>{{ log.fingerprint.score }}</td>
-
-            <td>
-              {{ log.request.method }}
-              <span v-if="log.metadata?.eventCount > 1" style="color: #ffb86c; font-size: 0.9em; margin-left: 5px;">
-                (x{{ log.metadata.eventCount }})
-              </span>
-            </td>
-            <td class="time-cell">
-              <div class="time-display">
-                <span class="time-date">{{ dayjs(log.timestamp).format('DD/MM/YYYY') }}</span>
-                <span class="time-hour">{{ dayjs(log.timestamp).format('HH:mm:ss') }}</span>
-              </div>
-            </td>
-          </tr>
-          <tr v-if="logs.length === 0 && !loading">
-            <td colspan="7" style="text-align:center;">{{ t('threatLogs.noLogsFound') }}</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <div class="pagination cyber-pagination" v-if="total > pageSize">
-        <button :disabled="page === 1" @click="changePage(page - 1)">◄ {{ t('common.prev') }}</button>
-        <span class="pagination-info">{{ t('common.page') }} {{ page }} {{ t('common.of') }} {{ totalPages }}</span>
-        <button :disabled="page === totalPages" @click="changePage(page + 1)">{{ t('common.next') }} ►</button>
-
-        <div class="page-input-container">
-          <label for="pageInputBottom">{{ t('common.goToPage') }}:</label>
-          <input class="pagination-input" id="pageInputBottom" type="number" v-model.number="inputPage" :min="1"
-            :max="totalPages" placeholder="1" />
-        </div>
+      <!-- Top Scrollbar Sync Wrapper -->
+      <div class="top-scrollbar-wrapper cyber-scrollbar" ref="topScrollRef">
+        <div class="top-scrollbar-content" :style="{ width: tableWidth + 'px' }"></div>
       </div>
-    </section>
-  </div>
+
+      <section class="log-table cyber-scrollbar cyber-table-container" ref="tableScrollRef">
+
+        <table ref="tableRef" class="cyber-table">
+          <thead>
+            <tr>
+              <th>
+                <span class="label">{{ t('threatLogs.table.countryOrg') }}</span>
+              </th>
+              <th>{{ t('threatLogs.table.details') }}</th>
+              <th class="sortable-th">
+                <div class="sort-control">
+                  <span class="label">{{ t('threatLogs.table.ip') }}</span>
+                  <button @click="toggleSort('request.ip')" :aria-label="t('sorting.sortIp')" class="sort-button">
+                    <span v-if="getSortDirection('request.ip') === 1">▲</span>
+                    <span v-else-if="getSortDirection('request.ip') === -1">▼</span>
+                    <span v-else>⇵</span>
+                  </button>
+                </div>
+              </th>
+              <th class="sortable-th">
+                <div class="sort-control">
+                  <span class="label">{{ t('threatLogs.table.url') }}</span>
+                  <button @click="toggleSort('request.url')" :aria-label="t('sorting.sortUrl')" class="sort-button">
+                    <span v-if="getSortDirection('request.url') === 1">▲</span>
+                    <span v-else-if="getSortDirection('request.url') === -1">▼</span>
+                    <span v-else>⇵</span>
+                  </button>
+                </div>
+              </th>
+              <th class="sortable-th">
+                <div class="sort-control">
+                  <span class="label">{{ t('threatLogs.table.dangerScore') }}</span>
+                  <button @click="toggleSort('fingerprint.score')" :aria-label="t('sorting.sortScore')"
+                    class="sort-button">
+                    <span v-if="getSortDirection('fingerprint.score') === 1">▲</span>
+                    <span v-else-if="getSortDirection('fingerprint.score') === -1">▼</span>
+                    <span v-else>⇵</span>
+                  </button>
+                </div>
+              </th>
+              <th class="sortable-th">
+                <div class="sort-control">
+                  <span class="label">{{ t('threatLogs.table.method') }}</span>
+                  <button @click="toggleSort('request.method')" :aria-label="t('sorting.sortMethod')"
+                    class="sort-button">
+                    <span v-if="getSortDirection('request.method') === 1">▲</span>
+                    <span v-else-if="getSortDirection('request.method') === -1">▼</span>
+                    <span v-else>⇵</span>
+                  </button>
+                </div>
+              </th>
+              <th class="sortable-th">
+                <div class="sort-control">
+                  <span class="label">{{ t('threatLogs.table.timestamp') }}</span>
+                  <button @click="toggleSort('timestamp')" :aria-label="t('sorting.sortTimestamp')" class="sort-button">
+                    <span v-if="getSortDirection('timestamp') === 1">▲</span>
+                    <span v-else-if="getSortDirection('timestamp') === -1">▼</span>
+                    <span v-else>⇵</span>
+                  </button>
+                </div>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="log in logs" :key="log._id">
+              <td>
+                <div style="display: flex; justify-content: center; align-items: center; min-width: 30px;">
+                  <CountryFlag :countryCode="log.ipDetailsId?.ipinfo?.country"
+                    :tooltip="log.ipDetailsId?.ipinfo ? `${log.ipDetailsId.ipinfo.country} - ${log.ipDetailsId.ipinfo.org || t('common.notAvailable')}` : t('common.notAvailable')" />
+                </div>
+              </td>
+              <td><button @click="goToThreatLogDetails(log.id)" style="cursor: pointer;" class="info-btn">{{
+                t('common.detail') }}</button></td>
+              <td>
+                <span style="display:inline-flex;align-items:center;">
+                  <span class="info-btn" @click="goToIpDetails(log.request.ip)" style="cursor: pointer;"
+                    :title="t('common.infoIp')">{{
+                      log.request.ip }}</span>
+                  <button @click.stop="copyToClipboard(log.request.ip)" class="btn-copy-ip"
+                    :title="t('common.copyToClipboard')">📋</button>
+                  <button @click.stop="setIpFilter(log.request.ip)" class="btn-copy-ip"
+                    :title="t('common.copyToFilter')">⬇️</button>
+                </span>
+              </td>
+              <td class="url-cell">
+                <div class="url-badge">
+                  <span class="url-text">{{ log.request.url }}</span>
+                  <div class="url-actions">
+                    <button @click.stop="copyToClipboard(log.request.url)" class="btn-copy-url"
+                      :title="t('common.copyToClipboard')">📋</button>
+                    <button @click.stop="setUrlFilter(log.request.url)" class="btn-copy-url"
+                      :title="t('common.copyToFilter')">⬇️</button>
+                  </div>
+                </div>
+              </td>
+              <td>{{ log.fingerprint.score }}</td>
+
+              <td>
+                {{ log.request.method }}
+                <span v-if="log.metadata?.eventCount > 1" style="color: #ffb86c; font-size: 0.9em; margin-left: 5px;">
+                  (x{{ log.metadata.eventCount }})
+                </span>
+              </td>
+              <td class="time-cell">
+                <div class="time-display">
+                  <span class="time-date">{{ dayjs(log.timestamp).format('DD/MM/YYYY') }}</span>
+                  <span class="time-hour">{{ dayjs(log.timestamp).format('HH:mm:ss') }}</span>
+                </div>
+              </td>
+            </tr>
+            <tr v-if="logs.length === 0 && !loading">
+              <td colspan="7" style="text-align:center;">{{ t('threatLogs.noLogsFound') }}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="pagination cyber-pagination" v-if="total > pageSize">
+          <button :disabled="page === 1" @click="changePage(page - 1)">◄ {{ t('common.prev') }}</button>
+          <span class="pagination-info cyber-pagination-info">{{ t('common.page') }} {{ page }} {{ t('common.of') }} {{
+            totalPages }}</span>
+          <button :disabled="page === totalPages" @click="changePage(page + 1)">{{ t('common.next') }} ►</button>
+
+          <div class="cyber-page-input-container">
+            <label for="pageInput">{{ t('common.goToPage') }}:</label>
+            <input class="cyber-pagination-input" id="pageInput" type="number" v-model.number="inputPage" :min="1"
+              :max="totalPages" placeholder="1" />
+          </div>
+        </div>
+      </section>
+    </div>
   </div>
 </template>
 

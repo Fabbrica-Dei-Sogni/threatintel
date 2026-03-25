@@ -1,13 +1,13 @@
 <template>
-    <div class="cowrie-sessions attacchi">
-        <div class="header-top">
+    <div class="cowrie-sessions attacchi cyber-view">
+        <div class="header-top cyber-sticky-area cyber-sticky-top-0">
             <h1><span class="animated-icon pulse-jade">📟</span> {{ $t('cowrie.sessions.title') }}</h1>
             <LanguageSwitcher />
         </div>
-        <div class="actions">
+        <div class="actions cyber-sticky-area cyber-sticky-top-1">
             <div class="nav-actions">
                 <button @click="$router.push('/')" class="btn-action">{{ $t('cowrie.sessions.backToDashboard')
-                    }}</button>
+                }}</button>
             </div>
             <div class="view-controls">
                 <ViewToggle v-model="showMap" :label="$t('common.showMap')" theme="jade" />
@@ -15,7 +15,7 @@
             </div>
         </div>
 
-        <section class="filters-container">
+        <section class="filters-container cyber-sticky-area cyber-sticky-top-2">
             <div class="filter-row main-filters">
                 <div class="input-wrapper">
                     <input v-model="filterIp" :placeholder="$t('cowrie.sessions.filterByIp')" @input="onFilterChanged"
@@ -47,133 +47,138 @@
         <!-- Pagination superiore -->
         <div class="pagination cyber-pagination" v-if="totalPages > 1">
             <button :disabled="page === 1" @click="changePage(page - 1)">◄ {{ $t('common.prev') }}</button>
-            <span class="pagination-info">
+            <span class="pagination-info cyber-pagination-info">
                 {{ $t('common.page') }} {{ page }} {{ $t('common.of') }} {{ totalPages }}
             </span>
             <button :disabled="page === totalPages" @click="changePage(page + 1)">{{ $t('common.next') }} ►</button>
 
             <!-- Input per inserire pagina manualmente -->
-            <div class="page-input-container">
+            <div class="cyber-page-input-container">
                 <label for="pageInput">{{ $t('common.goToPage') }}:</label>
-                <input class="pagination-input" id="pageInput" type="number" v-model.number="inputPage" :min="1"
+                <input class="cyber-pagination-input" id="pageInput" type="number" v-model.number="inputPage" :min="1"
                     :max="totalPages" placeholder="1" />
             </div>
+
         </div>
 
-        <div class="table-status-container">
-            <div v-if="loading" class="loading">{{ $t('common.loading') }}</div>
-            <div v-if="error" class="error">{{ $t('common.errorLoadingData') }}</div>
+        <div class="table-status-container cyber-table-status-container">
+            <div v-if="loading" class="loading cyber-status-overlay cyber-loading-overlay">{{ $t('common.loading') }}
+            </div>
+            <div v-if="error" class="error cyber-status-overlay cyber-error-overlay">{{ $t('common.errorLoadingData') }}
+            </div>
 
-        <!-- Top Scrollbar Sync Wrapper -->
-        <div class="top-scrollbar-wrapper" ref="topScrollRef">
-            <div class="top-scrollbar-content" :style="{ width: tableWidth + 'px' }"></div>
-        </div>
+            <!-- Top Scrollbar Sync Wrapper -->
+            <div class="top-scrollbar-wrapper cyber-scrollbar" ref="topScrollRef">
+                <div class="top-scrollbar-content" :style="{ width: tableWidth + 'px' }"></div>
+            </div>
 
-        <section class="log-table" ref="tableScrollRef">
-            <table ref="tableRef">
-                <thead>
-                    <tr>
-                        <th>{{ $t('cowrie.sessions.table.country') }}</th>
-                        <th class="sortable-th">
-                            <div class="sort-control">
-                                <span class="label">{{ $t('cowrie.sessions.table.ip') }}</span>
-                                <button @click="toggleSort('src_ip')" class="sort-button">
-                                    <span v-if="getSortDirection('src_ip') === 1">▲</span>
-                                    <span v-else-if="getSortDirection('src_ip') === -1">▼</span>
-                                    <span v-else>⇵</span>
-                                </button>
-                            </div>
-                        </th>
-                        <th class="sortable-th">
-                            <div class="sort-control">
-                                <span class="label">{{ $t('cowrie.sessions.table.startTime') }}</span>
-                                <button @click="toggleSort('timestamp')" class="sort-button">
-                                    <span v-if="getSortDirection('timestamp') === 1">▲</span>
-                                    <span v-else-if="getSortDirection('timestamp') === -1">▼</span>
-                                    <span v-else>⇵</span>
-                                </button>
-                            </div>
-                        </th>
-                        <th class="sortable-th">
-                            <div class="sort-control">
-                                <span class="label">{{ $t('cowrie.sessions.table.duration') }}</span>
-                                <button @click="toggleSort('time')" class="sort-button">
-                                    <span v-if="getSortDirection('time') === 1">▲</span>
-                                    <span v-else-if="getSortDirection('time') === -1">▼</span>
-                                    <span v-else>⇵</span>
-                                </button>
-                            </div>
-                        </th>
-                        <th class="sortable-th">
-                            <div class="sort-control">
-                                <span class="label">{{ $t('cowrie.sessions.table.events') }}</span>
-                                <button @click="toggleSort('eventCount')" class="sort-button">
-                                    <span v-if="getSortDirection('eventCount') === 1">▲</span>
-                                    <span v-else-if="getSortDirection('eventCount') === -1">▼</span>
-                                    <span v-else>⇵</span>
-                                </button>
-                            </div>
-                        </th>
-                        <th>{{ $t('cowrie.sessions.table.exploration') }}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="session in sessions" :key="session.session" class="cyber-row">
-                        <td>
-                            <CountryFlag :countryCode="session.ipDetailsId?.ipinfo?.country"
-                                :tooltip="session.ipDetailsId?.ipinfo ? `${session.ipDetailsId.ipinfo.country} - ${session.ipDetailsId.ipinfo.org || t('common.notAvailable')}` : t('common.notAvailable')"
-                                size="small" />
-                        </td>
-                        <td class="ip-cell">
-                            <span class="ip-container">
-                                <span class="ip-link" @click="goToIpDetails(session.src_ip)"
-                                    :title="$t('common.infoIp')">
-                                    {{ session.src_ip }}
+            <section class="log-table cyber-scrollbar cyber-table-container" ref="tableScrollRef">
+
+                <table ref="tableRef" class="cyber-table">
+                    <thead>
+                        <tr>
+                            <th>{{ $t('cowrie.sessions.table.country') }}</th>
+                            <th class="sortable-th">
+                                <div class="sort-control">
+                                    <span class="label">{{ $t('cowrie.sessions.table.ip') }}</span>
+                                    <button @click="toggleSort('src_ip')" class="sort-button">
+                                        <span v-if="getSortDirection('src_ip') === 1">▲</span>
+                                        <span v-else-if="getSortDirection('src_ip') === -1">▼</span>
+                                        <span v-else>⇵</span>
+                                    </button>
+                                </div>
+                            </th>
+                            <th class="sortable-th">
+                                <div class="sort-control">
+                                    <span class="label">{{ $t('cowrie.sessions.table.startTime') }}</span>
+                                    <button @click="toggleSort('timestamp')" class="sort-button">
+                                        <span v-if="getSortDirection('timestamp') === 1">▲</span>
+                                        <span v-else-if="getSortDirection('timestamp') === -1">▼</span>
+                                        <span v-else>⇵</span>
+                                    </button>
+                                </div>
+                            </th>
+                            <th class="sortable-th">
+                                <div class="sort-control">
+                                    <span class="label">{{ $t('cowrie.sessions.table.duration') }}</span>
+                                    <button @click="toggleSort('time')" class="sort-button">
+                                        <span v-if="getSortDirection('time') === 1">▲</span>
+                                        <span v-else-if="getSortDirection('time') === -1">▼</span>
+                                        <span v-else>⇵</span>
+                                    </button>
+                                </div>
+                            </th>
+                            <th class="sortable-th">
+                                <div class="sort-control">
+                                    <span class="label">{{ $t('cowrie.sessions.table.events') }}</span>
+                                    <button @click="toggleSort('eventCount')" class="sort-button">
+                                        <span v-if="getSortDirection('eventCount') === 1">▲</span>
+                                        <span v-else-if="getSortDirection('eventCount') === -1">▼</span>
+                                        <span v-else>⇵</span>
+                                    </button>
+                                </div>
+                            </th>
+                            <th>{{ $t('cowrie.sessions.table.exploration') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="session in sessions" :key="session.session" class="cyber-row">
+                            <td>
+                                <CountryFlag :countryCode="session.ipDetailsId?.ipinfo?.country"
+                                    :tooltip="session.ipDetailsId?.ipinfo ? `${session.ipDetailsId.ipinfo.country} - ${session.ipDetailsId.ipinfo.org || t('common.notAvailable')}` : t('common.notAvailable')"
+                                    size="small" />
+                            </td>
+                            <td class="ip-cell">
+                                <span class="ip-container">
+                                    <span class="ip-link" @click="goToIpDetails(session.src_ip)"
+                                        :title="$t('common.infoIp')">
+                                        {{ session.src_ip }}
+                                    </span>
+                                    <button @click.stop="copyToClipboard(session.src_ip)" class="btn-copy-mini"
+                                        :title="$t('common.copyToClipboard')">📋</button>
+                                    <button @click.stop="setIpFilter(session.src_ip)" class="btn-copy-mini"
+                                        :title="$t('common.copyToFilter')">⬇️</button>
                                 </span>
-                                <button @click.stop="copyToClipboard(session.src_ip)" class="btn-copy-mini"
-                                    :title="$t('common.copyToClipboard')">📋</button>
-                                <button @click.stop="setIpFilter(session.src_ip)" class="btn-copy-mini"
-                                    :title="$t('common.copyToFilter')">⬇️</button>
-                            </span>
-                        </td>
-                        <td class="time-cell">
-                            <div class="time-display">
-                                <span class="time-date">{{ dayjs(session.starttime).format('DD/MM/YYYY') }}</span>
-                                <span class="time-hour">{{ dayjs(session.starttime).format('HH:mm:ss') }}</span>
-                            </div>
-                        </td>
-                        <td class="duration-cell">{{ computeDuration(session.starttime, session.endtime) }}</td>
-                        <td class="events-cell">
-                            {{ session.eventCount || 0 }}
-                        </td>
-                        <td>
-                            <router-link :to="{ name: 'CowrieAttackDetail', params: { id: session.session } }"
-                                class="detail-btn">
-                                {{ $t('cowrie.sessions.table.viewTimeline') }}
-                            </router-link>
-                        </td>
-                    </tr>
-                    <tr v-if="sessions.length === 0 && !loading && !error">
-                        <td colspan="6" class="empty-state">{{ $t('cowrie.sessions.emptyState') }}</td>
-                    </tr>
-                </tbody>
-            </table>
-        </section>
-    </div>
+                            </td>
+                            <td class="time-cell">
+                                <div class="time-display">
+                                    <span class="time-date">{{ dayjs(session.starttime).format('DD/MM/YYYY') }}</span>
+                                    <span class="time-hour">{{ dayjs(session.starttime).format('HH:mm:ss') }}</span>
+                                </div>
+                            </td>
+                            <td class="duration-cell">{{ computeDuration(session.starttime, session.endtime) }}</td>
+                            <td class="events-cell">
+                                {{ session.eventCount || 0 }}
+                            </td>
+                            <td>
+                                <router-link :to="{ name: 'CowrieAttackDetail', params: { id: session.session } }"
+                                    class="detail-btn">
+                                    {{ $t('cowrie.sessions.table.viewTimeline') }}
+                                </router-link>
+                            </td>
+                        </tr>
+                        <tr v-if="sessions.length === 0 && !loading && !error">
+                            <td colspan="6" class="empty-state">{{ $t('cowrie.sessions.emptyState') }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+        </div>
 
         <div class="pagination cyber-pagination" v-if="totalPages > 1">
             <button :disabled="page === 1" @click="changePage(page - 1)">◄ {{ $t('common.prev') }}</button>
-            <span class="pagination-info">
+            <span class="pagination-info cyber-pagination-info">
                 {{ $t('common.page') }} {{ page }} {{ $t('common.of') }} {{ totalPages }}
             </span>
             <button :disabled="page === totalPages" @click="changePage(page + 1)">{{ $t('common.next') }} ►</button>
 
             <!-- Input per inserire pagina manualmente -->
-            <div class="page-input-container">
-                <label for="pageInputBottom">{{ $t('common.goToPage') }}:</label>
-                <input class="pagination-input" id="pageInputBottom" type="number" v-model.number="inputPage" :min="1"
+            <div class="cyber-page-input-container">
+                <label for="pageInput">{{ $t('common.goToPage') }}:</label>
+                <input class="cyber-pagination-input" id="pageInput" type="number" v-model.number="inputPage" :min="1"
                     :max="totalPages" placeholder="1" />
             </div>
+
         </div>
     </div>
 </template>

@@ -1,0 +1,233 @@
+/**
+ * cyber-layout.css
+ * Core responsive layout and UI patterns for the Cyber Dashboard.
+ * Use CSS variables for theme-specific colors.
+ */
+
+:root {
+    /* Default fallback theme (Phosphorus Green) */
+    --cyber-primary: #00FF41;
+    --cyber-primary-glow: rgba(0, 255, 65, 0.5);
+    --cyber-secondary: rgba(0, 30, 0, 0.7);
+    --cyber-background: #0A0605;
+    --cyber-surface: rgba(0, 30, 0, 0.3);
+    --cyber-border: rgba(0, 255, 65, 0.2);
+    --cyber-text: #F0FAD0;
+    --cyber-accent: #33FF33;
+}
+
+/* Main View Container */
+.cyber-view {
+    padding: 25px 30px;
+    color: var(--cyber-text);
+    background-color: var(--cyber-background);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    max-width: 100vw;
+    overflow-x: hidden;
+    box-sizing: border-box;
+}
+
+
+@media (max-width: 768px) {
+    .cyber-view {
+        padding: 10px;
+    }
+}
+
+/* Sticky Areas (Headers, Filters, Actions) */
+.cyber-sticky-area {
+    position: sticky;
+    z-index: 110;
+    background: var(--cyber-secondary);
+    backdrop-filter: blur(12px);
+    padding-top: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--cyber-border);
+}
+
+.cyber-sticky-top-0 { top: 0; }
+.cyber-sticky-top-1 { top: 56px; }
+.cyber-sticky-top-2 { top: 112px; }
+
+/* Data Table Container & Status Overlays */
+.cyber-table-status-container {
+    position: relative;
+    min-height: 400px;
+    width: 100%;
+}
+
+.cyber-status-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 200;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 80px;
+    backdrop-filter: blur(4px);
+    transition: all 0.3s ease;
+    margin: 0;
+}
+
+.cyber-loading-overlay {
+    background: rgba(10, 6, 5, 0.7);
+    color: var(--cyber-primary);
+    text-shadow: 0 0 10px var(--cyber-primary-glow);
+    font-size: 1.5em;
+    font-weight: 700;
+}
+
+.cyber-error-overlay {
+    background: rgba(10, 6, 5, 0.85);
+    color: var(--cyber-accent);
+    text-shadow: 0 0 12px var(--cyber-primary-glow);
+    border: 1px solid var(--cyber-border);
+    padding: 20px;
+    border-radius: 8px;
+    font-weight: 700;
+}
+
+/* Standardized Pagination */
+.cyber-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: clamp(8px, 1.5vw, 18px);
+    margin: 28px 0;
+    flex-wrap: wrap;
+    padding: 0 12px;
+}
+
+.cyber-pagination button {
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--cyber-border);
+    border-radius: 8px;
+    padding: clamp(6px, 1vw, 10px) clamp(12px, 2vw, 22px);
+    font-weight: 600;
+    font-size: clamp(0.85rem, 1.1vw, 1rem);
+    color: var(--cyber-primary);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.cyber-pagination button:hover:not(:disabled) {
+    background: var(--cyber-border);
+    border-color: var(--cyber-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 0 10px var(--cyber-primary-glow);
+}
+
+.cyber-pagination button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.cyber-pagination-info {
+    font-weight: 600;
+    color: var(--cyber-primary);
+    user-select: none;
+    min-width: clamp(100px, 15vw, 130px);
+    display: inline-block;
+    text-align: center;
+    font-size: clamp(0.85rem, 1.1vw, 1rem);
+}
+
+/* Pagination Page Input */
+.cyber-page-input-container {
+    display: flex;
+    align-items: center;
+    gap: clamp(6px, 1vw, 12px);
+    margin-left: clamp(0px, 1vw, 10px);
+}
+
+.cyber-page-input-container label {
+    font-weight: 600;
+    color: var(--cyber-text);
+    opacity: 0.8;
+    user-select: none;
+    font-size: clamp(0.85rem, 1.1vw, 1rem);
+}
+
+.cyber-pagination-input {
+    width: clamp(50px, 8vw, 70px);
+    padding: clamp(6px, 1vw, 9px) clamp(8px, 1.5vw, 12px);
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--cyber-border);
+    border-radius: 8px;
+    font-weight: 600;
+    text-align: center;
+    color: var(--cyber-primary);
+    transition: all 0.3s ease;
+    font-size: clamp(0.85rem, 1.1vw, 1rem);
+}
+
+.cyber-pagination-input:focus {
+    outline: none;
+    border-color: var(--cyber-primary);
+    box-shadow: 0 0 12px var(--cyber-primary-glow);
+}
+
+/* Custom Scrollbars */
+.cyber-scrollbar::-webkit-scrollbar {
+    height: 10px;
+    width: 10px;
+}
+
+.cyber-scrollbar::-webkit-scrollbar-track {
+    background: var(--cyber-background);
+    border-radius: 6px;
+    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.4);
+}
+
+.cyber-scrollbar::-webkit-scrollbar-thumb {
+    background: linear-gradient(90deg, #001a1a, var(--cyber-primary));
+    border-radius: 6px;
+    border: 1px solid var(--cyber-border);
+}
+
+/* Container that allows horizontal scrolling for tables without breaking the page layout */
+.cyber-table-container {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-top: 20px;
+}
+
+/* Generic Table Styles */
+.cyber-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--cyber-surface);
+    box-shadow: 0 0 25px rgba(0, 0, 0, 0.6);
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--cyber-border);
+}
+
+.cyber-table th {
+    background: rgba(0, 0, 0, 0.4);
+    color: var(--cyber-primary);
+    padding: 12px 10px;
+    font-weight: 700;
+    border-bottom: 2px solid var(--cyber-primary);
+    font-size: clamp(11px, 1.4vw, 16px);
+    text-align: center;
+}
+
+.cyber-table td {
+    padding: 10px 10px;
+    border-bottom: 1px solid var(--cyber-border);
+    transition: background 0.2s ease;
+    font-size: clamp(11px, 1.3vw, 15px);
+    text-align: center;
+}
+
+.cyber-table tr:hover td {
+    background-color: var(--cyber-border);
+}

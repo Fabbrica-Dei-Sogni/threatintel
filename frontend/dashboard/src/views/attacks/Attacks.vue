@@ -1,11 +1,11 @@
 <template>
-    <div class="attacchi">
-        <div class="header-top">
+    <div class="attacchi cyber-view">
+        <div class="header-top cyber-sticky-area cyber-sticky-top-0">
             <h1><span class="animated-icon pulse-magma">📡</span> {{ t('attacks.title') }}</h1>
             <LanguageSwitcher />
         </div>
         <!-- Pulsante per tornare alla Home principale -->
-        <div class="actions">
+        <div class="actions cyber-sticky-area cyber-sticky-top-1">
             <div class="nav-actions">
                 <button @click="goToHome" class="btn-action">
                     {{ t('attacks.dashboard') }}
@@ -21,7 +21,7 @@
         </div>
 
         <!-- Filtri Combinati -->
-        <section class="filters-container">
+        <section class="filters-container cyber-sticky-area cyber-sticky-top-2">
             <div class="filter-row main-filters">
                 <ProtocolSelector v-model="filterProtocol" :options="['http', 'https', 'ssh']" theme="magma" />
 
@@ -83,27 +83,32 @@
 
         <div class="pagination cyber-pagination" v-if="total > pageSize">
             <button :disabled="page === 1" @click="changePage(page - 1)">◄ {{ t('common.prev') }}</button>
-            <span class="pagination-info">{{ t('common.page') }} {{ page }} {{ t('common.of') }} {{ totalPages }}</span>
+            <span class="pagination-info cyber-pagination-info">{{ t('common.page') }} {{ page }} {{ t('common.of') }}
+                {{ totalPages }}</span>
             <button :disabled="page === totalPages" @click="changePage(page + 1)">{{ t('common.next') }} ►</button>
 
             <!-- Input per inserire pagina manualmente -->
-            <div class="page-input-container">
+            <div class="cyber-page-input-container">
                 <label for="pageInput">{{ t('common.goToPage') }}:</label>
-                <input class="pagination-input" id="pageInput" type="number" v-model.number="inputPage" :min="1"
+                <input class="cyber-pagination-input" id="pageInput" type="number" v-model.number="inputPage" :min="1"
                     :max="totalPages" placeholder="1" />
             </div>
+
         </div>
-        <div class="table-status-container">
-            <div v-if="loading" class="loading">{{ t('common.loading') }}</div>
-            <div v-if="error" class="error">{{ t('common.errorLoadingData') }}</div>
+        <div class="table-status-container cyber-table-status-container">
+            <div v-if="loading" class="loading cyber-status-overlay cyber-loading-overlay">{{ t('common.loading') }}
+            </div>
+            <div v-if="error" class="error cyber-status-overlay cyber-error-overlay">{{ t('common.errorLoadingData') }}
+            </div>
 
             <!-- Top Scrollbar Sync Wrapper -->
-            <div class="top-scrollbar-wrapper" ref="topScrollRef">
+            <div class="top-scrollbar-wrapper cyber-scrollbar" ref="topScrollRef">
                 <div class="top-scrollbar-content" :style="{ width: tableWidth + 'px' }"></div>
             </div>
 
-            <section class="log-table" ref="tableScrollRef">
-                <table ref="tableRef">
+            <section class="log-table cyber-scrollbar cyber-table-container" ref="tableScrollRef">
+
+                <table ref="tableRef" class="cyber-table">
                     <thead>
                         <tr>
                             <th>
@@ -323,14 +328,17 @@
         </div>
         <div class="pagination cyber-pagination" v-if="total > pageSize">
             <button :disabled="page === 1" @click="changePage(page - 1)">◄ {{ t('common.prev') }}</button>
-            <span class="pagination-info">{{ t('common.page') }} {{ page }} {{ t('common.of') }} {{ totalPages }}</span>
+            <span class="pagination-info cyber-pagination-info">{{ t('common.page') }} {{ page }} {{ t('common.of') }}
+                {{ totalPages }}</span>
             <button :disabled="page === totalPages" @click="changePage(page + 1)">{{ t('common.next') }} ►</button>
 
-            <div class="page-input-container">
-                <label for="pageInputBottom">{{ t('common.goToPage') }}:</label>
-                <input class="pagination-input" id="pageInputBottom" type="number" v-model.number="inputPage" :min="1"
+            <!-- Input per inserire pagina manualmente -->
+            <div class="cyber-page-input-container">
+                <label for="pageInput">{{ t('common.goToPage') }}:</label>
+                <input class="cyber-pagination-input" id="pageInput" type="number" v-model.number="inputPage" :min="1"
                     :max="totalPages" placeholder="1" />
             </div>
+
         </div>
     </div>
 </template>

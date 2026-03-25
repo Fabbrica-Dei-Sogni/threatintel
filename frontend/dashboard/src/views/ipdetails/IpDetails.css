@@ -111,6 +111,189 @@ h1 {
   border-color: #00D4FF;
 }
 
+/* Forensic Briefing Area */
+.briefing-wrapper {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+}
+
+.forensic-briefing {
+  flex: 1;
+  min-width: 320px;
+  background: rgba(10, 20, 30, 0.4);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 168, 255, 0.2);
+  border-radius: 12px;
+  padding: 16px 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.briefing-header {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #00D4FF;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(0, 168, 255, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.briefing-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 15px;
+}
+
+.briefing-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 4px;
+  position: relative;
+  cursor: help;
+}
+
+/* Forensic Briefing Tooltip */
+.briefing-item[data-briefing-tooltip]:hover::after,
+.briefing-item[data-briefing-tooltip]:active::after {
+  content: attr(data-briefing-tooltip);
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(15, 23, 42, 0.95);
+  color: #00D4FF;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-family: 'JetBrains Mono', monospace;
+  white-space: pre-wrap;
+  z-index: 2000;
+  border: 1px solid rgba(0, 168, 255, 0.3);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+  pointer-events: none;
+  backdrop-filter: blur(8px);
+  width: max-content;
+  max-width: 250px;
+  text-align: center;
+  margin-top: 8px;
+}
+
+.briefing-item[data-briefing-tooltip]:hover::before,
+.briefing-item[data-briefing-tooltip]:active::before {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 6px;
+  border-style: solid;
+  border-color: transparent transparent rgba(15, 23, 42, 0.95) transparent;
+  z-index: 2000;
+  pointer-events: none;
+  margin-top: -4px;
+}
+
+.briefing-item:last-child {
+  border-right: none;
+}
+
+.briefing-flag {
+  transform: translateY(2px);
+  filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.5));
+}
+
+.briefing-icon {
+  font-size: 1.2rem;
+  filter: drop-shadow(0 0 5px rgba(0, 212, 255, 0.3));
+}
+
+.briefing-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.briefing-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #4B6584; /* Nocturnal Slate */
+  font-weight: 800;
+}
+
+.briefing-value {
+  font-size: 0.95rem;
+  color: #E0E7FF;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 1024px) {
+  .forensic-briefing {
+    grid-template-columns: 1fr 1fr;
+  }
+  .briefing-item {
+    border-right: none;
+    border-bottom: 1px solid rgba(0, 168, 255, 0.1);
+    padding-bottom: 12px;
+  }
+}
+
+@media (max-width: 600px) {
+  .forensic-briefing {
+    grid-template-columns: 1fr;
+    padding: 15px;
+  }
+}
+
+.title-with-action {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+h1 {
+  margin-bottom: 0;
+  color: #00D4FF; /* Neon Azure */
+  font-weight: 700;
+  font-size: 28px;
+  text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+  user-select: none;
+}
+
+.copy-ip-btn {
+  background: transparent;
+  border: 1px solid rgba(0, 212, 255, 0.2);
+  color: #00D4FF;
+  padding: 4px 10px;
+  font-size: 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-left: 15px;
+  transition: all 0.2s ease;
+  vertical-align: middle;
+  opacity: 0.6;
+}
+
+.copy-ip-btn:hover {
+  opacity: 1;
+  background: rgba(0, 212, 255, 0.1);
+  border-color: #00D4FF;
+}
+
 @media (max-width: 768px) {
   .header-main {
     flex-direction: column;

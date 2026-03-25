@@ -19,6 +19,61 @@
       </h1>
     </div>
 
+    <div v-if="ipInfo" class="briefing-wrapper">
+      <!-- BLOCK 1: GEOGRAPHIC INTELLIGENCE -->
+      <div class="forensic-briefing briefing-geo">
+        <div class="briefing-header">
+          <span class="briefing-icon">🌍</span> {{ t('ipDetails.location') }}
+        </div>
+        <div class="briefing-grid">
+          <div class="briefing-item country-box" :data-briefing-tooltip="ipInfo.ipinfo?.country">
+            <CountryFlag :countryCode="ipInfo.ipinfo?.country" class="briefing-flag" />
+            <div class="briefing-content">
+              <span class="briefing-label">{{ t('ipDetails.country') }}</span>
+              <span class="briefing-value">{{ ipInfo.ipinfo?.country || t('common.notAvailable') }}</span>
+            </div>
+          </div>
+          <div class="briefing-item" :data-briefing-tooltip="`${ipInfo.ipinfo?.city || '-'}, ${ipInfo.ipinfo?.region || '-'}`">
+            <span class="briefing-icon">📍</span>
+            <div class="briefing-content">
+              <span class="briefing-label">{{ t('ipDetails.city') }} / {{ t('ipDetails.region') }}</span>
+              <span class="briefing-value">{{ ipInfo.ipinfo?.city || '-' }}, {{ ipInfo.ipinfo?.region || '-' }}</span>
+            </div>
+          </div>
+          <div class="briefing-item timezone-box" :data-briefing-tooltip="`${ipInfo.ipinfo?.timezone || '-'} (${ipInfo.ipinfo?.loc || '-'})`">
+            <span class="briefing-icon">🕒</span>
+            <div class="briefing-content">
+              <span class="briefing-label">{{ t('ipDetails.timezone') }} / GPS</span>
+              <span class="briefing-value">{{ ipInfo.ipinfo?.timezone || '-' }} ({{ ipInfo.ipinfo?.loc || '-' }})</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BLOCK 2: NETWORK INTELLIGENCE -->
+      <div class="forensic-briefing briefing-net">
+        <div class="briefing-header">
+          <span class="briefing-icon">🛡️</span> NETWORK INFO
+        </div>
+        <div class="briefing-grid">
+          <div class="briefing-item" :data-briefing-tooltip="ipInfo.ipinfo?.org">
+            <span class="briefing-icon">🏢</span>
+            <div class="briefing-content">
+              <span class="briefing-label">{{ t('ipDetails.organization') }}</span>
+              <span class="briefing-value">{{ ipInfo.ipinfo?.org || t('common.notAvailable') }}</span>
+            </div>
+          </div>
+          <div class="briefing-item" :data-briefing-tooltip="ipInfo.ipinfo?.hostname">
+            <span class="briefing-icon">🌐</span>
+            <div class="briefing-content">
+              <span class="briefing-label">{{ t('ipDetails.isp') }} / {{ t('ipDetails.hostname') || 'Host' }}</span>
+              <span class="briefing-value">{{ ipInfo.ipinfo?.hostname || t('common.notAvailable') }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <section v-if="loading" class="loading">{{ t('common.loading') }}</section>
     <section v-if="error" class="error">{{ t('common.error') }}</section>
 
@@ -108,52 +163,6 @@
         </transition>
       </div>
 
-      <div class="section">
-        <div class="section-header" @click="toggles.geo = !toggles.geo">
-          <h2><span class="animated-icon pulse-cobalt" style="font-size: 0.9em;">🛰️</span> {{ t('ipDetails.location') }}</h2>
-          <span class="arrow" :class="{ open: toggles.geo }"></span>
-        </div>
-        <transition name="collapse">
-          <div v-if="toggles.geo" class="section-body">
-            <p>
-              <span class="detail-label">{{ t('ipDetails.organization') }}: </span>
-              <span class="detail-value">{{ ipInfo.ipinfo?.org || t('common.notAvailable') }}</span>
-            </p>
-            <p>
-              <span class="detail-label">{{ t('ipDetails.isp') }}: </span>
-              <span class="detail-value">{{ ipInfo.ipinfo?.hostname || t('common.notAvailable') }}</span>
-            </p>
-            <p>
-              <span class="detail-label">{{ t('ipDetails.country') }}: </span>
-              <span class="detail-value">{{ ipInfo.ipinfo?.country || t('common.notAvailable') }}</span>
-            </p>
-            <p>
-              <span class="detail-label">{{ t('ipDetails.region') }}: </span>
-              <span class="detail-value">{{ ipInfo.ipinfo?.region || t('common.notAvailable') }}</span>
-            </p>
-            <p>
-              <span class="detail-label">{{ t('ipDetails.city') }}: </span>
-              <span class="detail-value">{{ ipInfo.ipinfo?.city || t('common.notAvailable') }}</span>
-            </p>
-            <p>
-              <span class="detail-label">{{ t('ipDetails.postal') }}: </span>
-              <span class="detail-value">{{ ipInfo.ipinfo?.postal || t('common.notAvailable') }}</span>
-            </p>
-            <p>
-              <span class="detail-label">{{ t('ipDetails.location') }}: </span>
-              <span class="detail-value">{{ ipInfo.ipinfo?.loc || t('common.notAvailable') }}</span>
-            </p>
-            <p>
-              <span class="detail-label">{{ t('ipDetails.timezone') }}: </span>
-              <span class="detail-value">{{ ipInfo.ipinfo?.timezone || t('common.notAvailable') }}</span>
-            </p>
-            <p>
-              <span class="detail-label">{{ t('ipDetails.additionalInfo') }}: </span>
-              <span class="detail-value">{{ formatDate(ipInfo.enrichedAt) || t('common.notAvailable') }}</span>
-            </p>
-          </div>
-        </transition>
-      </div>
 
       <!-- Sezione Eventi RateLimit -->
       <div class="section" v-if="rateLimit.data && rateLimit.data.length > 0">
@@ -229,6 +238,7 @@ import dayjs from 'dayjs'
 import { fetchIpDetails, fetchRateLimitSearch, enrichReports, enrichReputationScore } from '../../api/index'
 import { useI18n } from 'vue-i18n'
 import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
+import CountryFlag from '../../components/CountryFlag.vue';
 import { ElMessage } from 'element-plus';
 
 const { t } = useI18n();
@@ -262,7 +272,6 @@ const expandedReports = reactive({});
 const toggles = reactive({
   abuse: true,
   honeypot: true,
-  geo: true,
   ratelimit: true,
   reports: true
 })

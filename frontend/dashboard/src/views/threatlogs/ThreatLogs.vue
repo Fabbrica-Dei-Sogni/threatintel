@@ -87,21 +87,21 @@
             </th>
             <th class="sortable-th">
               <div class="sort-control">
-                <span class="label">{{ t('threatLogs.table.dangerScore') }}</span>
-                <button @click="toggleSort('fingerprint.score')" :aria-label="t('sorting.sortScore')"
-                  class="sort-button">
-                  <span v-if="getSortDirection('fingerprint.score') === 1">▲</span>
-                  <span v-else-if="getSortDirection('fingerprint.score') === -1">▼</span>
+                <span class="label">{{ t('threatLogs.table.url') }}</span>
+                <button @click="toggleSort('request.url')" :aria-label="t('sorting.sortUrl')" class="sort-button">
+                  <span v-if="getSortDirection('request.url') === 1">▲</span>
+                  <span v-else-if="getSortDirection('request.url') === -1">▼</span>
                   <span v-else>⇵</span>
                 </button>
               </div>
             </th>
             <th class="sortable-th">
               <div class="sort-control">
-                <span class="label">{{ t('threatLogs.table.url') }}</span>
-                <button @click="toggleSort('request.url')" :aria-label="t('sorting.sortUrl')" class="sort-button">
-                  <span v-if="getSortDirection('request.url') === 1">▲</span>
-                  <span v-else-if="getSortDirection('request.url') === -1">▼</span>
+                <span class="label">{{ t('threatLogs.table.dangerScore') }}</span>
+                <button @click="toggleSort('fingerprint.score')" :aria-label="t('sorting.sortScore')"
+                  class="sort-button">
+                  <span v-if="getSortDirection('fingerprint.score') === 1">▲</span>
+                  <span v-else-if="getSortDirection('fingerprint.score') === -1">▼</span>
                   <span v-else>⇵</span>
                 </button>
               </div>
@@ -149,8 +149,6 @@
                   :title="t('common.copyToFilter')">⬇️</button>
               </span>
             </td>
-            <td>{{ log.fingerprint.score }}</td>
-
             <td class="url-cell">
               <div class="url-badge">
                 <span class="url-text">{{ log.request.url }}</span>
@@ -162,6 +160,7 @@
                 </div>
               </div>
             </td>
+            <td>{{ log.fingerprint.score }}</td>
 
             <td>
               {{ log.request.method }}
@@ -171,8 +170,8 @@
             </td>
             <td class="time-cell">
               <div class="time-display">
-                  <span class="time-date">{{ dayjs(log.timestamp).format('DD/MM/YYYY') }}</span>
-                  <span class="time-hour">{{ dayjs(log.timestamp).format('HH:mm:ss') }}</span>
+                <span class="time-date">{{ dayjs(log.timestamp).format('DD/MM/YYYY') }}</span>
+                <span class="time-hour">{{ dayjs(log.timestamp).format('HH:mm:ss') }}</span>
               </div>
             </td>
           </tr>

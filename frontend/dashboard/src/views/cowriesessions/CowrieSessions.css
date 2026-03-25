@@ -220,7 +220,7 @@
 
 .log-table table {
     width: 100%;
-    min-width: 1400px; /* Force overflow */
+    min-width: 1000px; /* Reduced from 1400px to reclaim space */
     border-collapse: collapse;
     background: rgba(0, 30, 0, 0.3);
     box-shadow: 0 0 25px rgba(0, 0, 0, 0.6);
@@ -233,7 +233,7 @@
 .log-table th {
     background: rgba(0, 59, 0, 0.6) !important;
     color: #00FF41 !important;
-    padding: 12px 15px;
+    padding: 12px 10px; /* Reduced from 15px */
     font-weight: 700;
     border-bottom: 2px solid rgba(0, 255, 65, 0.4);
     user-select: none;
@@ -243,9 +243,19 @@
     white-space: nowrap;
 }
 
+/* Specific Column Widths for optimization */
+.log-table th:nth-child(1), /* Flag */
+.log-table th:nth-child(2), /* IP */
+.log-table th:nth-child(3), /* Start Time */
+.log-table th:nth-child(4), /* Duration */
+.log-table th:nth-child(5), /* Events */
+.log-table th:nth-child(6)  /* View Timeline */ {
+    width: 1%;
+}
+
 .log-table td {
     color: #F0FAD0;
-    padding: 10px 15px;
+    padding: 10px 10px; /* Reduced from 15px */
     border-bottom: 1px solid rgba(0, 255, 65, 0.1);
     transition: background 0.2s ease;
     font-size: clamp(11px, 1.3vw, 15px);
@@ -295,6 +305,25 @@
     color: #1e6ad7;
     transform: scale(1.2);
     opacity: 1;
+}
+
+.time-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1.1;
+    gap: 2px;
+}
+
+.time-date {
+    font-size: 0.8em;
+    opacity: 0.7;
+    font-family: monospace;
+}
+
+.time-hour {
+    font-weight: 600;
+    color: #00FF41;
 }
 
 .detail-btn {

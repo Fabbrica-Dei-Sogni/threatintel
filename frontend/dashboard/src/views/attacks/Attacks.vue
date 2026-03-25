@@ -255,7 +255,15 @@
                             <DefconIndicator :level="attack.dangerLevel" :dangerScore="attack.dangerScore" />
                         </td>
                         </td>
-                        <td class="tecniche-cell">{{ attack.attackPatterns.join(', ') }}</td>
+                        <td class="tecniche-cell">
+                          <div class="tech-wrapper">
+                            <span v-for="tech in attack.attackPatterns" :key="tech" class="tech-chip">
+                              <span class="tech-name">{{ tech }}</span>
+                              <button @click.stop="copyToClipboard(tech)" class="btn-copy-mini-tech"
+                                :title="t('common.copyToClipboard')">📋</button>
+                            </span>
+                          </div>
+                        </td>
                         <td>
                             <span style="display:inline-flex;align-items:center;">
                                 <span class="detail-link" @click="goToIpDetails(attack.request.ip)"
@@ -290,8 +298,18 @@
                         <td>{{ attack.rps }}</td>
                         <td>{{ attack.totaleLogs }}</td>
                         <td>{{ attack.durataAttacco.human }}</td>
-                        <td>{{ formatDate(attack.firstSeen) }}</td>
-                        <td>{{ formatDate(attack.lastSeen) }}</td>
+                        <td>
+                            <div class="time-display">
+                                <span class="time-date">{{ dayjs(attack.firstSeen).format('DD/MM/YYYY') }}</span>
+                                <span class="time-hour">{{ dayjs(attack.firstSeen).format('HH:mm:ss') }}</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="time-display">
+                                <span class="time-date">{{ dayjs(attack.lastSeen).format('DD/MM/YYYY') }}</span>
+                                <span class="time-hour">{{ dayjs(attack.lastSeen).format('HH:mm:ss') }}</span>
+                            </div>
+                        </td>
                     </tr>
                     <tr v-if="attacks.length === 0 && !loading">
                         <td colspan="6" style="text-align:center;">

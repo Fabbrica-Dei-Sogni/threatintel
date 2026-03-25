@@ -136,7 +136,12 @@
                                     :title="$t('common.copyToFilter')">⬇️</button>
                             </span>
                         </td>
-                        <td class="time-cell">{{ formatDate(session.starttime) }}</td>
+                        <td class="time-cell">
+                            <div class="time-display">
+                                <span class="time-date">{{ dayjs(session.starttime).format('DD/MM/YYYY') }}</span>
+                                <span class="time-hour">{{ dayjs(session.starttime).format('HH:mm:ss') }}</span>
+                            </div>
+                        </td>
                         <td class="duration-cell">{{ computeDuration(session.starttime, session.endtime) }}</td>
                         <td class="events-cell">
                             {{ session.eventCount || 0 }}

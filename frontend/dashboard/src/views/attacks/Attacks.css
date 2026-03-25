@@ -306,8 +306,13 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  flex: 1 1 auto; /* Grow/shrink to fill space */
-  min-width: 0;   /* Essential for flexing components */
+  flex: 0 1 auto; /* Don't force to grow, let children define size */
+  min-width: 0;
+}
+
+.time-ago-wrapper :deep(.el-input-number) {
+  width: 120px !important;
+  flex-shrink: 0;
 }
 
 /* Surgical Date-Picker Shrinkage */
@@ -537,38 +542,53 @@
 .log-table th {
   background: rgba(230, 33, 23, 0.12);
   color: #FFB3B3;
-  padding: 16px 15px;
-  font-weight: 700;
-  text-shadow: 0 0 4px rgba(0, 0, 0, 0.6);
-  border-bottom: 2px solid rgba(230, 33, 23, 0.4);
-  user-select: none;
-  font-family: 'Outfit', sans-serif;
-  letter-spacing: 1px;
-  /* Fluid font size for headers - increased minimum for mobile readability */
   font-size: clamp(12px, 1.4vw, 16px);
   white-space: nowrap;
   min-width: 40px;
-  /* Prevent collapse */
   text-align: center;
-  /* Centering content */
   vertical-align: middle;
-  /* Vertical centering */
+  padding: 16px 8px; /* Reduced from 15px */
+}
+
+/* Specific Column Widths for optimization */
+.log-table th:nth-child(2), /* Avg Score */
+.log-table th:nth-child(3), /* Rate Breach */
+.log-table th:nth-child(4), /* RPS */
+.log-table th:nth-child(5), /* Total Logs */
+.log-table th:nth-child(6), /* Duration */
+.log-table th:nth-child(7), /* First Seen */
+.log-table th:nth-child(8)  /* Last Seen */ {
+    width: 1%;
 }
 
 .log-table td {
   color: #E6D4CF;
-  padding: 14px 15px;
+  padding: 12px 8px; /* Reduced from 15px */
   border-bottom: 1px solid rgba(230, 33, 23, 0.08);
   transition: all 0.25s ease;
   font-family: 'Source Code Pro', monospace;
-  /* Fluid font size for cells - increased minimum for mobile readability */
   font-size: clamp(12px, 1.3vw, 15px);
   white-space: nowrap;
-  /* Prevent wrap to force scroll */
   text-align: center;
-  /* Centering content */
   vertical-align: middle;
-  /* Vertical centering */
+}
+
+.time-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1.1;
+    gap: 2px;
+}
+
+.time-date {
+    font-size: 0.85em;
+    opacity: 0.6;
+}
+
+.time-hour {
+    font-weight: 600;
+    color: #FF4C4C; /* Magma Theme Highlight */
 }
 
 /* Mobile optimizations */
@@ -596,7 +616,52 @@
   .attacchi {
     padding: 10px;
   }
+}
 
+.tech-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  justify-content: center;
+  max-width: 350px; /* Prevent column from exploding */
+  margin: 0 auto;
+}
+
+.tech-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(230, 33, 23, 0.08);
+  border: 1px solid rgba(230, 33, 23, 0.3);
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-size: 0.75rem;
+  color: #ffb3b3;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  font-family: 'Source Code Pro', monospace;
+}
+
+.btn-copy-mini-tech {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 10px;
+  padding: 0;
+  opacity: 0.5;
+  transition: opacity 0.2s;
+  line-height: 1;
+}
+
+.btn-copy-mini-tech:hover {
+  opacity: 1;
+}
+
+.tech-chip:hover {
+  background: rgba(230, 33, 23, 0.2);
+  border-color: #ff4c4c;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .log-table tr:hover td {

@@ -152,12 +152,15 @@
             <td>{{ log.fingerprint.score }}</td>
 
             <td class="url-cell">
-              <span style="display:inline-flex;align-items:center;">
-                {{ log.request.url }}
-                <button @click.stop="setUrlFilter(log.request.url)" class="btn-copy-url"
-                  :title="t('common.copyToFilter')">⬇️</button>
-              </span>
-
+              <div class="url-badge">
+                <span class="url-text">{{ log.request.url }}</span>
+                <div class="url-actions">
+                  <button @click.stop="copyToClipboard(log.request.url)" class="btn-copy-url"
+                    :title="t('common.copyToClipboard')">📋</button>
+                  <button @click.stop="setUrlFilter(log.request.url)" class="btn-copy-url"
+                    :title="t('common.copyToFilter')">⬇️</button>
+                </div>
+              </div>
             </td>
 
             <td>
@@ -166,7 +169,12 @@
                 (x{{ log.metadata.eventCount }})
               </span>
             </td>
-            <td>{{ formatDate(log.timestamp) }}</td>
+            <td class="time-cell">
+              <div class="time-display">
+                  <span class="time-date">{{ dayjs(log.timestamp).format('DD/MM/YYYY') }}</span>
+                  <span class="time-hour">{{ dayjs(log.timestamp).format('HH:mm:ss') }}</span>
+              </div>
+            </td>
           </tr>
           <tr v-if="logs.length === 0 && !loading">
             <td colspan="7" style="text-align:center;">{{ t('threatLogs.noLogsFound') }}</td>

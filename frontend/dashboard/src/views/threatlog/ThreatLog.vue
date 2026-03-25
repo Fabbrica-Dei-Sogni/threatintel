@@ -1,7 +1,7 @@
 <template>
     <div class="threatlog-details">
         <div class="header-top">
-            <button @click="goBack" class="back-btn">📋 {{ t('threatLog.backToLogs') }}</button>
+            <button @click="goBack" class="back-btn">← {{ t('threatLog.backToLogs') }}</button>
             <LanguageSwitcher />
         </div>
         <h1><span class="animated-icon pulse-amber">🗄️</span> {{ t('threatLog.title') }}: {{ id }}</h1>

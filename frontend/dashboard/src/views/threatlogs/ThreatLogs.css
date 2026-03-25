@@ -370,19 +370,23 @@ td.url-cell {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 18px;
+  gap: clamp(8px, 1.5vw, 18px); /* Fluid gap */
   margin: 28px 0;
+  flex-wrap: wrap; /* Ensure wrapping on small screens */
+  padding: 0 12px;
 }
 
 .cyber-pagination button {
   background: rgba(255, 179, 0, 0.05);
   border: 1px solid rgba(255, 179, 0, 0.2);
   border-radius: 8px;
-  padding: 9px 20px;
+  padding: clamp(6px, 1vw, 10px) clamp(12px, 2vw, 22px); /* Responsive padding */
   font-weight: 600;
+  font-size: clamp(0.85rem, 1.1vw, 1rem); /* Responsive font size */
   color: #FFD700;
   cursor: pointer;
   transition: all 0.3s ease;
+  white-space: nowrap;
 }
 
 .cyber-pagination button:hover:not(:disabled) {
@@ -401,27 +405,36 @@ td.url-cell {
   font-weight: 600;
   color: #FFB300;
   user-select: none;
-  min-width: 130px; /* Stabilize width against digit changes */
+  min-width: clamp(100px, 15vw, 130px); /* Responsive min-width */
   display: inline-block;
   text-align: center;
+  font-size: clamp(0.85rem, 1.1vw, 1rem);
+}
+
+@media (max-width: 768px) {
+  .cyber-pagination {
+    margin: 20px 0;
+    gap: 10px;
+  }
 }
 
 .page-input-container {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-left: 10px;
+  gap: clamp(6px, 1vw, 12px);
+  margin-left: clamp(0px, 1vw, 10px);
 }
 
 .page-input-container label {
   font-weight: 600;
   color: #BBA685;
   user-select: none;
+  font-size: clamp(0.85rem, 1.1vw, 1rem);
 }
 
 .pagination-input {
-  width: 60px;
-  padding: 8px 12px;
+  width: clamp(50px, 8vw, 70px);
+  padding: clamp(6px, 1vw, 9px) clamp(8px, 1.5vw, 12px);
   background: rgba(255, 179, 0, 0.05);
   border: 1px solid rgba(255, 179, 0, 0.2);
   border-radius: 8px;
@@ -429,6 +442,7 @@ td.url-cell {
   text-align: center;
   color: #FFD700;
   transition: all 0.3s ease;
+  font-size: clamp(0.85rem, 1.1vw, 1rem);
 }
 
 .pagination-input:focus {

@@ -64,11 +64,11 @@
         <div v-if="error" class="error">{{ $t('common.errorLoadingData') }}</div>
 
         <!-- Top Scrollbar Sync Wrapper -->
-        <div class="top-scrollbar-wrapper" ref="topScrollRef" v-show="!loading && !error">
+        <div class="top-scrollbar-wrapper" ref="topScrollRef">
             <div class="top-scrollbar-content" :style="{ width: tableWidth + 'px' }"></div>
         </div>
 
-        <section class="log-table" ref="tableScrollRef" v-show="!loading && !error">
+        <section class="log-table" ref="tableScrollRef">
             <table ref="tableRef">
                 <thead>
                     <tr>
@@ -152,7 +152,7 @@
                             </router-link>
                         </td>
                     </tr>
-                    <tr v-if="sessions.length === 0">
+                    <tr v-if="sessions.length === 0 && !loading && !error">
                         <td colspan="6" class="empty-state">{{ $t('cowrie.sessions.emptyState') }}</td>
                     </tr>
                 </tbody>

@@ -8,17 +8,16 @@
       <LanguageSwitcher />
     </div>
 
-    <section class="actions">
-      <button @click="goToAttacks" class="btn-action">🛰️ {{ t('home.attacks') }}</button>
-      <button @click="goToLogs" class="btn-action">🗄️ {{ t('home.logRequests') }}</button>
-      <button @click="goToTelnet" class="btn-action">📟 {{ t('home.telnet') }}</button>
-    </section>
-
     <section class="intel-center">
       <!-- DOMINIO: NATIVE SERVER PROTECTION -->
       <div class="domain-section">
         <h2 class="domain-title"><span class="icon">🛡️</span> NATIVE SERVER PROTECTION</h2>
-        
+
+        <section class="actions">
+          <button @click="goToAttacks" class="btn-action">🛰️ {{ t('home.attacks') }}</button>
+          <button @click="goToLogs" class="btn-action">🗄️ {{ t('home.logRequests') }}</button>
+        </section>
+
         <div class="primary-intel">
           <div class="list-side glass-card">
             <div class="widget-header">
@@ -27,26 +26,24 @@
             </div>
             <ul class="scroll-list">
               <li v-for="attack in recentAttacks" :key="attack.id">
-                <div class="indicator-group" 
+                <div class="indicator-group"
                   :data-url-tooltip="`URI: ${attack.request?.url || 'N/A'}\nDATE: ${formatDate(attack.firstSeen)}`">
                   <DefconIndicator :level="attack.dangerLevel" :dangerScore="attack.dangerScore" mode="dot" />
-                  <CountryFlag
-                    :countryCode="attack.ipDetails?.ipinfo?.country" 
+                  <CountryFlag :countryCode="attack.ipDetails?.ipinfo?.country"
                     :tooltip="attack.ipDetails?.ipinfo ? `${attack.ipDetails.ipinfo.country} - ${attack.ipDetails.ipinfo.org || t('common.notAvailable')}` : t('common.notAvailable')" />
                 </div>
                 <span @click="goToIpDetails(attack.request.ip)" class="ip-link">{{ attack.request.ip }}</span>
                 <div class="column-spacer"></div>
-                <router-link
-                  :to="{ 
-                    name: 'AttackDetail', 
-                    params: { ip: attack.request.ip },
-                    query: {
-                        minLogsForAttack: 10,
-                        timeMode: 'ago',
-                        agoValue: 90,
-                        agoUnit: 'days'
-                    }
-                  }">
+                <router-link :to="{
+                  name: 'AttackDetail',
+                  params: { ip: attack.request.ip },
+                  query: {
+                    minLogsForAttack: 10,
+                    timeMode: 'ago',
+                    agoValue: 90,
+                    agoUnit: 'days'
+                  }
+                }">
                   {{ $t('common.detail') }}
                 </router-link>
               </li>
@@ -70,10 +67,9 @@
             </div>
             <ul class="scroll-list">
               <li v-for="log in recentLogs" :key="log._id">
-                <div class="indicator-group" 
+                <div class="indicator-group"
                   :data-url-tooltip="`URI: ${log.request?.url || 'N/A'}\nDATE: ${formatDate(log.timestamp)}`">
-                  <CountryFlag
-                    :countryCode="log.ipDetailsId?.ipinfo?.country" 
+                  <CountryFlag :countryCode="log.ipDetailsId?.ipinfo?.country"
                     :tooltip="log.ipDetailsId?.ipinfo ? `${log.ipDetailsId.ipinfo.country} - ${log.ipDetailsId.ipinfo.org || t('common.notAvailable')}` : t('common.notAvailable')" />
                 </div>
                 <span @click="goToIpDetails(log.request.ip)" class="ip-link">{{ log.request.ip }}</span>
@@ -90,23 +86,26 @@
       <!-- DOMINIO: HONEYPOT INTELLIGENCE -->
       <div class="domain-section" style="margin-top: 40px;">
         <h2 class="domain-title"><span class="icon">🔍</span> HONEYPOT INTELLIGENCE</h2>
-        
+
+        <section class="actions">
+          <button @click="goToTelnet" class="btn-action">📟 {{ t('home.telnet') }}</button>
+        </section>
+
         <div class="primary-intel">
           <div class="list-side glass-card">
             <div class="widget-header">
               <h3>{{ $t('home.recentSessions') }}</h3>
             </div>
             <ul class="scroll-list">
-                            <li v-for="session in recentSessions" :key="session.session" class="session-item">
+              <li v-for="session in recentSessions" :key="session.session" class="session-item">
                 <div class="indicator-group"
                   :data-url-tooltip="`PROTOCOL: ${session.protocol || 'N/A'}\nDATE: ${formatDate(session.starttime)}`">
-                  <CountryFlag
-                    :countryCode="session.ipDetailsId?.ipinfo?.country" 
+                  <CountryFlag :countryCode="session.ipDetailsId?.ipinfo?.country"
                     :tooltip="session.ipDetailsId?.ipinfo ? `${session.ipDetailsId.ipinfo.country} - ${session.ipDetailsId.ipinfo.org || t('common.notAvailable')}` : t('common.notAvailable')" />
                 </div>
                 <span @click="goToIpDetails(session.src_ip)" class="ip-link">{{ session.src_ip }}</span>
                 <span class="interaction-count" :class="{ 'high-interaction': (session.eventCount || 0) > 5 }">
-                   {{ session.eventCount || 0 }} {{ $t('sessionChart.events').toLowerCase() }}
+                  {{ session.eventCount || 0 }} {{ $t('sessionChart.events').toLowerCase() }}
                 </span>
                 <router-link :to="{ name: 'CowrieAttackDetail', params: { id: session.session } }">
                   {{ $t('common.detail') }}

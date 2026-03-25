@@ -426,25 +426,45 @@
     color: #ff4c4c;
 }
 
-/* Stati di caricamento ed errore */
+/* Stati di caricamento ed errore Overlay */
+.table-status-container {
+    position: relative;
+    min-height: 400px; /* Assicura spazio per l'overlay se la tabella è vuota */
+    width: 100%;
+}
+
 .loading, .error {
-    margin: 20px 0;
-    font-weight: 700;
-    text-align: center;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 200;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* Spostato al top */
+    padding-top: 80px;      /* Distanziato dal bordo superiore */
+    backdrop-filter: blur(4px);
+    transition: all 0.3s ease;
+    margin: 0; /* Rimuoviamo il margin che ora è gestito dal container */
 }
 
 .loading {
+    background: rgba(10, 6, 5, 0.7);
     color: #00FF41;
     text-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
+    font-size: 1.5em;
+    font-weight: 700;
 }
 
 .error {
+    background: rgba(10, 6, 5, 0.85);
     color: #33FF33;
     text-shadow: 0 0 12px rgba(0, 255, 65, 0.6);
-    background: rgba(0, 255, 65, 0.05);
-    padding: 15px;
+    border: 1px solid rgba(0, 255, 65, 0.2);
+    padding: 20px;
     border-radius: 8px;
-    border: 1px solid rgba(0, 255, 65, 0.1);
+    font-weight: 700;
 }
 
 

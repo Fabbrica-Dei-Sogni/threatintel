@@ -58,8 +58,9 @@
       </div>
     </div>
 
-    <div v-if="loading" class="loading">{{ t('common.loading') }}</div>
-    <div v-if="error" class="error">{{ t('common.errorLoadingData') }}</div>
+    <div class="table-status-container">
+        <div v-if="loading" class="loading">{{ t('common.loading') }}</div>
+        <div v-if="error" class="error">{{ t('common.errorLoadingData') }}</div>
 
     <!-- Top Scrollbar Sync Wrapper -->
     <div class="top-scrollbar-wrapper" ref="topScrollRef">
@@ -192,6 +193,7 @@
         </div>
       </div>
     </section>
+  </div>
   </div>
 </template>
 

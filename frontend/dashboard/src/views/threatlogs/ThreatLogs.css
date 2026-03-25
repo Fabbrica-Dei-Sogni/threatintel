@@ -565,22 +565,43 @@ td.url-cell {
   box-shadow: 0 0 12px rgba(255, 179, 0, 0.3);
 }
 
-/* === STATI e MESSAGGI === */
+/* Stati di caricamento ed errore Overlay */
+.table-status-container {
+    position: relative;
+    min-height: 400px; /* Assicura spazio per l'overlay se la tabella è vuota */
+    width: 100%;
+}
 
-.loading,
-.error {
-  margin-top: 18px;
-  font-weight: 700;
-  font-style: italic;
-  text-align: center;
+.loading, .error {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 200;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* Spostato al top */
+    padding-top: 80px;      /* Distanziato dal bordo superiore */
+    backdrop-filter: blur(4px);
+    transition: all 0.3s ease;
+    margin: 0; 
 }
 
 .loading {
-  color: #FFD700;
-  text-shadow: 0 0 8px rgba(255, 215, 0, 0.4);
+    background: rgba(10, 6, 5, 0.7);
+    color: #FFD700;
+    text-shadow: 0 0 8px rgba(255, 215, 0, 0.4);
+    font-size: 1.5em;
+    font-weight: 700;
 }
 
 .error {
-  color: #ff7b5a;
-  text-shadow: 0 0 6px rgba(255, 77, 77, 0.6);
+    background: rgba(10, 6, 5, 0.85);
+    color: #ff7b5a;
+    text-shadow: 0 0 6px rgba(255, 77, 77, 0.6);
+    border: 1px solid rgba(255, 179, 0, 0.2);
+    padding: 20px;
+    border-radius: 8px;
+    font-weight: 700;
 }

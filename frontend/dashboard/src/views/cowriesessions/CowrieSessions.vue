@@ -60,8 +60,9 @@
             </div>
         </div>
 
-        <div v-if="loading" class="loading">{{ $t('common.loading') }}</div>
-        <div v-if="error" class="error">{{ $t('common.errorLoadingData') }}</div>
+        <div class="table-status-container">
+            <div v-if="loading" class="loading">{{ $t('common.loading') }}</div>
+            <div v-if="error" class="error">{{ $t('common.errorLoadingData') }}</div>
 
         <!-- Top Scrollbar Sync Wrapper -->
         <div class="top-scrollbar-wrapper" ref="topScrollRef">
@@ -158,6 +159,7 @@
                 </tbody>
             </table>
         </section>
+    </div>
 
         <div class="pagination cyber-pagination" v-if="totalPages > 1">
             <button :disabled="page === 1" @click="changePage(page - 1)">◄ {{ $t('common.prev') }}</button>

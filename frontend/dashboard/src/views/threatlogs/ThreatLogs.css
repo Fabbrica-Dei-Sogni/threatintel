@@ -382,6 +382,9 @@ td.url-cell {
   font-weight: 600;
   color: #FFB300;
   user-select: none;
+  min-width: 130px; /* Stabilize width against digit changes */
+  display: inline-block;
+  text-align: center;
 }
 
 .page-input-container {

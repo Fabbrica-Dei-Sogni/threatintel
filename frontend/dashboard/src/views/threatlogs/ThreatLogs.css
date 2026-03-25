@@ -263,11 +263,14 @@
   white-space: nowrap;
 }
 
-/* Specific Column Widths for optimization */
+/* Global Table Compaction - all columns shrink to fit */
 .log-table th:nth-child(1), /* Country/Org */
+.log-table th:nth-child(2), /* Details */
 .log-table th:nth-child(3), /* IP */
 .log-table th:nth-child(4), /* URL */
-.log-table th:nth-child(5)  /* Score */
+.log-table th:nth-child(5), /* Score */
+.log-table th:nth-child(6), /* Method */
+.log-table th:nth-child(7)  /* Timestamp */
 {
   width: 1%;
 }

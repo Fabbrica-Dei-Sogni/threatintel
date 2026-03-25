@@ -550,14 +550,19 @@
   padding: 16px 8px; /* Reduced from 15px */
 }
 
-/* Specific Column Widths for optimization */
-.log-table th:nth-child(2), /* Avg Score */
-.log-table th:nth-child(3), /* Rate Breach */
-.log-table th:nth-child(4), /* RPS */
-.log-table th:nth-child(5), /* Total Logs */
-.log-table th:nth-child(6), /* Duration */
-.log-table th:nth-child(7), /* First Seen */
-.log-table th:nth-child(8)  /* Last Seen */ {
+/* Global Table Compaction - all columns shrink to fit */
+.log-table th:nth-child(1),  /* Country */
+.log-table th:nth-child(2),  /* Danger/DEFCON */
+.log-table th:nth-child(3),  /* Techniques */
+.log-table th:nth-child(4),  /* IP Address */
+.log-table th:nth-child(5),  /* Detail Link */
+.log-table th:nth-child(6),  /* Avg Score */
+.log-table th:nth-child(7),  /* Rate Breach */
+.log-table th:nth-child(8),  /* RPS */
+.log-table th:nth-child(9),  /* Total Logs */
+.log-table th:nth-child(10), /* Duration */
+.log-table th:nth-child(11), /* First Seen */
+.log-table th:nth-child(12)  /* Last Seen */ {
     width: 1%;
 }
 

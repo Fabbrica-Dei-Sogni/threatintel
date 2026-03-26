@@ -1,4 +1,5 @@
 import { createLogger, format, transports } from 'winston';
+import util from 'util';
 
 export const logger = createLogger({
   level: process.env.LOG_LEVEL || 'info',
@@ -7,38 +8,44 @@ export const logger = createLogger({
     format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
     format.errors({ stack: true }),
     format.splat(),
-    format.json()  // formato JSON per log strutturati, utile in produzione
+    format.json()
   ),
-  //defaultMeta: { service: 'chainprompt-api' },
   transports: [
-    new transports.Console({ format: format.simple() }),  // log su console
-    // Optionale, scrittura file log con rotazione
-    /*
-    new transports.DailyRotateFile({
-      filename: 'logs/app-%DATE%.log',
-      datePattern: 'YYYY-MM-DD',
-      maxSize: '20m',
-      maxFiles: '14d'
-    })
-    */
+    new transports.Console({
+      format: process.env.NODE_ENV === 'production' 
+        ? format.json() 
+        : format.combine(
+            format.label({ label: '[threat-intel]' }),
+            format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+            format.colorize(),
+            format.printf(({ timestamp, level, message, label }) => {
+              return `${timestamp} ${label} ${level}: ${message}`;
+            })
+          )
+    }),
   ],
 });
 
+// Helper per formattare gli argomenti come fa console.log originale
+const formatArgs = (args: unknown[]) => {
+  return util.format(...args);
+};
+
 // Sovrascrittura globale dei metodi console per usare Winston
 console.log = (...args: unknown[]) => {
-  logger.info(args.map(String).join(" "));
+  logger.info(formatArgs(args));
 };
 console.info = (...args: unknown[]) => {
-  logger.info(args.map(String).join(" "));
+  logger.info(formatArgs(args));
 };
 console.warn = (...args: unknown[]) => {
-  logger.warn(args.map(String).join(" "));
+  logger.warn(formatArgs(args));
 };
 console.error = (...args: unknown[]) => {
-  logger.error(args.map(String).join(" "));
+  logger.error(formatArgs(args));
 };
 console.debug = (...args: unknown[]) => {
-  logger.debug(args.map(String).join(" "));
+  logger.debug(formatArgs(args));
 };
 
 export default logger;

@@ -1,0 +1,23 @@
+[Unit]
+Description=Threat Intelligence Logger (Hybrid Bundle)
+After=network-online.target docker.service
+Wants=network-online.target docker.service
+
+[Service]
+Type=simple
+User=amodica
+WorkingDirectory={{WORKING_DIR}}
+# Environment variable to guide geoip-lite to the local data folder
+Environment=GEODATADIR=./data
+Environment=NODE_ENV=production
+Environment=PORT=3999
+
+ExecStartPre=/bin/bash {{WORKING_DIR}}/infra/check-redis.sh
+ExecStartPre=/bin/bash {{WORKING_DIR}}/infra/check-mongodb.sh
+ExecStart=/usr/bin/node index.js
+
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

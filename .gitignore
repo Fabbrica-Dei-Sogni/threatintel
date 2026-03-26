@@ -4,3 +4,6 @@ dist
 logs
 redis-data
 redisinsight-data
+artifact
+release
+.test_deploy

@@ -1,19 +1,32 @@
+# Managed-By: threatintel-release-workflow
 [Unit]
-Description=Threat Intelligence Logger (Hybrid Bundle)
+Description={{DESCRIPTION}}
 After=network-online.target docker.service
 Wants=network-online.target docker.service
 
 [Service]
 Type=simple
-User=amodica
+User={{USER}}
 WorkingDirectory={{WORKING_DIR}}
+
+# Runtime Configuration
+Environment=NODE_ENV={{NODE_ENV}}
+Environment=PORT={{PORT}}
 # Environment variable to guide geoip-lite to the local data folder
 Environment=GEODATADIR=./data
-Environment=NODE_ENV=production
-Environment=PORT=3999
 
+# Database & Infrastructure
+Environment=MONGO_URI=mongodb://intelagent:intelagent@127.0.0.1:17017/threatinteldb
+Environment=REDIS_HOST=127.0.0.1
+Environment=REDIS_PORT=6379
+Environment=REDIS_PASSWORD=!!!HoneyPotRedis!!!
+Environment=REDIS_DB=0
+
+# Health Checks
 ExecStartPre=/bin/bash {{WORKING_DIR}}/infra/check-redis.sh
 ExecStartPre=/bin/bash {{WORKING_DIR}}/infra/check-mongodb.sh
+
+# Execution
 ExecStart=/usr/bin/node index.js
 
 Restart=always

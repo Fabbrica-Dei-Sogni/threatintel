@@ -1,12 +1,12 @@
 <template>
   <div class="ip-details">
+    <LanguageSwitcher />
     <div class="header-top">
       <button @click="goBack" class="back-btn">← {{ t('ipDetails.backToAttacks') }}</button>
       <button @click="forzaArricchimento" :disabled="loadingEnrich" class="refresh-btn">
         <span v-if="loadingEnrich" class="spinner"></span>
         {{ loadingEnrich ? t('common.loading') : t('ipDetails.forceRefresh') }}
       </button>
-      <LanguageSwitcher />
     </div>
 
     <div class="header-main">
@@ -33,18 +33,20 @@
               <span class="briefing-value">{{ ipInfo.ipinfo?.country || t('common.notAvailable') }}</span>
             </div>
           </div>
-          <div class="briefing-item" :data-briefing-tooltip="`${ipInfo.ipinfo?.city || '-'}, ${ipInfo.ipinfo?.region || '-'}`">
+          <div class="briefing-item"
+            :data-briefing-tooltip="`${ipInfo.ipinfo?.city || '-'}, ${ipInfo.ipinfo?.region || '-'}`">
             <span class="briefing-icon">📍</span>
             <div class="briefing-content">
               <span class="briefing-label">{{ t('ipDetails.city') }} / {{ t('ipDetails.region') }}</span>
               <span class="briefing-value">{{ ipInfo.ipinfo?.city || '-' }}, {{ ipInfo.ipinfo?.region || '-' }}</span>
             </div>
           </div>
-          <div class="briefing-item timezone-box" :data-briefing-tooltip="`${ipInfo.ipinfo?.timezone || '-'} (${ipInfo.ipinfo?.loc || '-'})`">
+          <div class="briefing-item timezone-box"
+            :data-briefing-tooltip="`${ipInfo.ipinfo?.timezone || '-'} (${ipInfo.ipinfo?.loc || '-'})`">
             <span class="briefing-icon">🕒</span>
             <div class="briefing-content">
               <span class="briefing-label">{{ t('ipDetails.timezone') }} / GPS</span>
-              <span class="briefing-value">{{ ipInfo.ipinfo?.timezone || '-' }} ({{ ipInfo.ipinfo?.loc || '-' }})</span>
+              <div class="briefing-value">{{ ipInfo.ipinfo?.timezone || '-' }} ({{ ipInfo.ipinfo?.loc || '-' }})</div>
             </div>
           </div>
         </div>
@@ -72,6 +74,57 @@
           </div>
         </div>
       </div>
+
+      <!-- BLOCK 3: ABUSE INTELLIGENCE (AbuseIPDB) -->
+      <div class="forensic-briefing briefing-abuse"
+        :class="{ 'high-risk': ipInfo.abuseipdbId?.abuseConfidenceScore > 50 }">
+        <div class="briefing-header">
+          <span class="briefing-icon">🚨</span> ABUSE REPORTING (AbuseIPDB)
+        </div>
+        <div v-if="ipInfo.abuseipdbId" class="briefing-grid">
+          <div class="briefing-item" :data-briefing-tooltip="t('ipDetails.score')">
+            <div class="score-radial" :style="{ '--score': ipInfo.abuseipdbId.abuseConfidenceScore || 0 }">
+              {{ ipInfo.abuseipdbId.abuseConfidenceScore }}%
+            </div>
+            <div class="briefing-content">
+              <span class="briefing-label">{{ t('ipDetails.score') }}</span>
+              <span class="briefing-value">{{ ipInfo.abuseipdbId.abuseConfidenceScore }}% Confidence</span>
+            </div>
+          </div>
+          <div class="briefing-item">
+            <span class="briefing-icon" :class="ipInfo.abuseipdbId.isListed ? 'text-danger' : 'text-success'">
+              {{ ipInfo.abuseipdbId.isListed ? '🚫' : '✅' }}
+            </span>
+            <div class="briefing-content">
+              <span class="briefing-label">{{ t('ipDetails.isListed') }}</span>
+              <span class="briefing-value">{{ ipInfo.abuseipdbId.isListed ? 'Yes' : 'No' }}</span>
+            </div>
+          </div>
+          <div class="briefing-item">
+            <span class="briefing-icon">📋</span>
+            <div class="briefing-content">
+              <span class="briefing-label">{{ t('ipDetails.totalReports') }}</span>
+              <span class="briefing-value">{{ ipInfo.abuseipdbId.totalReports || 0 }} Reports</span>
+            </div>
+          </div>
+          <div class="briefing-item">
+            <span class="briefing-icon">🕒</span>
+            <div class="briefing-content">
+              <span class="briefing-label">{{ t('ipDetails.lastReportedAt') }}</span>
+              <div class="briefing-value">
+                <span v-if="ipInfo.abuseipdbId.lastReportedAt">
+                  <span class="t-date">{{ dayjs(ipInfo.abuseipdbId.lastReportedAt).format('DD/MM/YYYY') }}</span>
+                  <span class="t-hour">{{ dayjs(ipInfo.abuseipdbId.lastReportedAt).format('HH:mm:ss') }}</span>
+                </span>
+                <span v-else>{{ t('common.notAvailable') }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div v-else class="empty-placeholder">
+          {{ t('ipDetails.noAbuseData') }}
+        </div>
+      </div>
     </div>
 
     <section v-if="loading" class="loading">{{ t('common.loading') }}</section>
@@ -79,150 +132,140 @@
 
     <div v-if="ipInfo" class="sections">
       <!-- Sezioni toggle -->
-      <div class="section">
-        <div class="section-header" @click="toggles.abuse = !toggles.abuse">
-          <h2><span class="animated-icon pulse-cobalt" style="font-size: 0.9em;">🛡️</span> {{ t('ipDetails.additionalInfo') }}</h2>
-          <span class="arrow" :class="{ open: toggles.abuse }"></span>
-        </div>
-        <transition name="collapse">
-          <div v-if="toggles.abuse" class="section-body">
-
-            <div v-if="ipInfo.abuseipdbId">
-              <button @click="aggiornaReputationScore" :disabled="loadingReputationScore" class="update-btn">
-                {{ loadingReputationScore ? t('common.loading') : t('ipDetails.additionalInfo') }}
-              </button>
-              <section v-if="errorReputationScore" class="error">{{ t('common.error') }}</section>
-
-              <p><strong>{{ t('ipDetails.score') }}:</strong> {{ ipInfo.abuseipdbId.abuseConfidenceScore ||
-                t('common.notAvailable') }}</p>
-              <p><strong>{{ t('ipDetails.isListed') }}:</strong> {{ ipInfo.abuseipdbId.isListed ||
-                t('common.notAvailable') }}</p>
-              <p><strong>{{ t('ipDetails.isWhitelisted') }}:</strong> {{ ipInfo.abuseipdbId.isWhitelisted ||
-                t('common.notAvailable') }}</p>
-              <p><strong>{{ t('ipDetails.isTor') }}</strong> {{ ipInfo.abuseipdbId.isTor || t('common.notAvailable') }}
-              </p>
-              <p><strong>{{ t('ipDetails.totalReports') }}:</strong> {{ ipInfo.abuseipdbId.totalReports ||
-                t('common.notAvailable') }}</p>
-              <p><strong>{{ t('ipDetails.usage') }}:</strong> {{ ipInfo.abuseipdbId.usageType ||
-                t('common.notAvailable')
-              }}</p>
-              <p><strong>{{ t('ipDetails.lastReportedAt') }}:</strong> {{ formatDate(ipInfo.abuseipdbId.lastReportedAt)
-                ||
-                t('common.notAvailable') }}</p>
-            </div>
-            <div v-else class="empty-placeholder">
-              {{ t('ipDetails.noAbuseData') }}
-            </div>
-          </div>
-        </transition>
-      </div>
-
-      <div class="section" v-if="reports.length >= 0">
+      <!-- Section ABUSEIPDB REPORTS -->
+      <div class="section abuse-reports-section" v-if="reports.length >= 0">
         <div class="section-header" @click="toggles.reports = !toggles.reports">
-          <h2><span class="animated-icon pulse-cobalt" style="font-size: 0.9em;">📊</span> {{ t('ipDetails.relatedLogs') }}</h2>
+          <h2><span class="animated-icon pulse-cobalt" style="font-size: 0.9em;">📊</span> ABUSEIPDB INVESTIGATION LOGS
+          </h2>
           <span class="arrow" :class="{ open: toggles.reports }"></span>
         </div>
         <transition name="collapse">
           <div v-if="toggles.reports" class="section-body">
-            <button @click="aggiornaReports" :disabled="loadingReports" class="update-btn">
-              {{ loadingReports ? t('common.loading') : t('ipDetails.relatedLogs') }}
-            </button>
-            <section v-if="errorReports" class="error">{{ t('common.error') }}</section>
-
-            <div v-for="report in paginatedReports" :key="report._id" class="report-entry">
-              <div class="report-header" @click="toggleReport(report._id)">
-                <span>{{ formatDate(report.reportedAt) }} - {{report.categories.map(cat => cat.name).join(', ')
-                }}</span>
-                <span class="toggle-icon">{{ expandedReports[report._id] ? '–' : '+' }}</span>
-              </div>
-              <transition name="collapse">
-                <div v-if="expandedReports[report._id]" class="report-body">
-                  <div class="report-actions">
-                    <button class="action-btn copy" @click.stop="copyToClipboard(report.comment, report._id)"
-                      :title="t('common.copyToClipboard')">
-                      <span v-if="!copiedIds[report._id]">📋</span>
-                      <span v-else>✅</span>
-                    </button>
-                  </div>
-                  <p><strong>{{ t('ipDetails.reporterCountry') }}:</strong> {{ report.reporterCountryCode ||
-                    t('common.notAvailable') }}
-                  </p>
-                  <p><strong>{{ t('ipDetails.comment') }}:</strong> {{ report.comment }}</p>
-                </div>
-              </transition>
+            <div class="reports-controls">
+              <button @click="aggiornaReports" :disabled="loadingReports" class="update-btn">
+                <span v-if="loadingReports" class="spinner-small"></span>
+                {{ loadingReports ? t('common.loading') : 'Sync AbuseIPDB Reports' }}
+              </button>
             </div>
 
-            <div class="pagination-wrapper" v-if="reports.length > reportsMeta.pageSize"
-              style="text-align: right; margin-top: 10px;">
-              <el-pagination background layout="prev, pager, next, sizes, total" :total="reportsMeta.total"
+            <section v-if="errorReports" class="error-msg">{{ t('common.error') }}</section>
+
+            <div class="reports-container">
+              <div v-for="report in paginatedReports" :key="report._id" class="report-card"
+                :class="{ expanded: expandedReports[report._id] }">
+                <div class="report-header" @click="toggleReport(report._id)">
+                  <div class="report-meta">
+                    <div class="report-date">
+                      <span class="t-date">{{ dayjs(report.reportedAt).format('DD/MM/YYYY') }}</span>
+                      <span class="t-hour">{{ dayjs(report.reportedAt).format('HH:mm:ss') }}</span>
+                    </div>
+                    <div class="report-categories">
+                      <span v-for="cat in report.categories" :key="cat.id" class="cat-badge">{{ cat.name }}</span>
+                    </div>
+                  </div>
+                  <span class="report-arrow">⌄</span>
+                </div>
+                <transition name="collapse">
+                  <div v-if="expandedReports[report._id]" class="report-content">
+                    <div class="report-sub-header">
+                      <span class="reporter-info">
+                        <strong>{{ t('ipDetails.reporterCountry') }}:</strong> {{ report.reporterCountryCode ||
+                          t('common.notAvailable') }}
+                      </span>
+                      <button class="mini-copy-btn" @click.stop="copyToClipboard(report.comment, report._id)">
+                        {{ copiedIds[report._id] ? '✅ Copied' : '📋 Copy Comment' }}
+                      </button>
+                    </div>
+                    <div class="report-comment-box">
+                      {{ report.comment }}
+                    </div>
+                  </div>
+                </transition>
+              </div>
+            </div>
+
+            <div class="pagination-container" v-if="reports.length > reportsMeta.pageSize">
+              <el-pagination background layout="prev, pager, next, total" :total="reportsMeta.total"
                 :page-size="reportsMeta.pageSize" :current-page="reportsMeta.page"
-                @current-change="handleReportsPageChange" @size-change="handleReportsPageSizeChange"
-                :page-sizes="[5, 10, 25, 50]" />
+                @current-change="handleReportsPageChange" class="cyber-pagination" />
             </div>
           </div>
         </transition>
       </div>
 
 
-      <!-- Sezione Eventi RateLimit -->
-      <div class="section" v-if="rateLimit.data && rateLimit.data.length > 0">
+
+      <!-- Section RATELIMIT EVENTS -->
+      <div class="section ratelimit-section" v-if="rateLimit.data && rateLimit.data.length > 0">
         <div class="section-header" @click="toggles.ratelimit = !toggles.ratelimit">
-          <h2><span class="animated-icon pulse-cobalt" style="font-size: 0.9em;">⚠️</span> {{ t('ipDetails.rateLimitEvents') }}</h2>
+          <h2><span class="animated-icon pulse-cobalt" style="font-size: 0.9em;">⚠️</span> {{
+            t('ipDetails.rateLimitEvents') }}</h2>
           <span class="arrow" :class="{ open: toggles.ratelimit }"></span>
         </div>
         <transition name="collapse">
           <div v-if="toggles.ratelimit" class="section-body">
-            <el-table :data="rateLimit.data" style="width: 100%; border-radius: 6px;" :loading="rateLimit.loading"
-              @expand-change="() => { }" row-class-name="rate-limit-row" border>
-              <el-table-column type="expand">
-                <template #default="{ row }">
-                  <div class="expanded-details">
-                    <p><strong>{{ t('ipDetails.headers') }}:</strong>
-                    <pre>{{ JSON.stringify(row.headers, null, 2) }}</pre>
-                    </p>
-                    <p><strong>{{ t('ipDetails.message') }}:</strong> {{ row.message || '-' }}</p>
-                    <p><strong>{{ t('ipDetails.honeypotId') }}:</strong> {{ row.honeypotId || '-' }}</p>
-                    <p><strong>{{ t('ipDetails.userAgent') }}:</strong> {{ row.userAgent || '-' }}</p>
-                  </div>
-                </template>
-              </el-table-column>
+            <div class="table-wrapper">
+              <el-table :data="rateLimit.data" style="width: 100%;" :loading="rateLimit.loading"
+                row-class-name="cyber-table-row" border>
+                <el-table-column type="expand">
+                  <template #default="{ row }">
+                    <div class="expanded-details">
+                      <p><strong>{{ t('ipDetails.headers') }}:</strong></p>
+                      <pre class="headers-pre">{{ JSON.stringify(row.headers, null, 2) }}</pre>
+                      <p><strong>{{ t('ipDetails.message') }}:</strong> {{ row.message || '-' }}</p>
+                      <p><strong>{{ t('ipDetails.honeypotId') }}:</strong> {{ row.honeypotId || '-' }}</p>
+                      <p><strong>{{ t('ipDetails.userAgent') }}:</strong> {{ row.userAgent || '-' }}</p>
+                    </div>
+                  </template>
+                </el-table-column>
 
-              <el-table-column prop="timestamp" :label="t('ipDetails.timestamp')" width="180">
-                <template #default="{ row }">
-                  {{ formatDate(row.timestamp) }}
-                </template>
-              </el-table-column>
-              <el-table-column prop="limitType" :label="t('ipDetails.limitType')" width="160" />
-              <el-table-column prop="ip" :label="t('ipDetails.ip')" width="140" />
-              <el-table-column prop="method" :label="t('ipDetails.method')" width="90" />
-              <el-table-column prop="path" :label="t('ipDetails.path')" />
-            </el-table>
+                <el-table-column prop="timestamp" :label="t('ipDetails.timestamp')" width="180">
+                  <template #default="{ row }">
+                    <div class="time-display">
+                      <span class="t-date">{{ dayjs(row.timestamp).format('DD/MM/YYYY') }}</span>
+                      <span class="t-hour">{{ dayjs(row.timestamp).format('HH:mm:ss') }}</span>
+                    </div>
+                  </template>
+                </el-table-column>
+                <el-table-column prop="limitType" :label="t('ipDetails.limitType')" width="160" />
+                <el-table-column prop="ip" :label="t('ipDetails.ip')" width="140" />
+                <el-table-column prop="method" :label="t('ipDetails.method')" width="90" />
+                <el-table-column prop="path" :label="t('ipDetails.path')" show-overflow-tooltip />
+              </el-table>
+            </div>
 
-            <div class="pagination-wrapper" style="text-align: right; margin-top: 10px;">
-              <el-pagination background layout="prev, pager, next, sizes, total" :total="rateLimit.total"
-                :page-size="rateLimit.pageSize" :current-page="rateLimit.page" @size-change="handlePageSizeChange"
-                @current-change="handlePageChange" :page-sizes="[5, 10, 50, 100]" />
+            <div class="pagination-container">
+              <el-pagination background layout="prev, pager, next, total" :total="rateLimit.total"
+                :page-size="rateLimit.pageSize" :current-page="rateLimit.page" @current-change="handlePageChange"
+                class="cyber-pagination" />
             </div>
           </div>
         </transition>
       </div>
 
-      <div class="section">
+      <div class="section whois-section">
         <div class="section-header" @click="toggles.honeypot = !toggles.honeypot">
-          <h2>{{ t('ipDetails.fullWhois') }}</h2>
+          <h2><span class="animated-icon pulse-cobalt" style="font-size: 0.9em;">🔎</span> {{ t('ipDetails.fullWhois')
+            }}</h2>
           <span class="arrow" :class="{ open: toggles.honeypot }"></span>
         </div>
         <transition name="collapse">
-          <div v-if="toggles.honeypot" class="section-body">
-            <p><strong>{{ t('ipDetails.firstSeen') }}:</strong> {{ formatDate(ipInfo.firstSeenAt) ||
-              t('common.notAvailable')
-              }}</p>
-            <p><strong>{{ t('ipDetails.lastSeen') }}:</strong> {{ formatDate(ipInfo.lastSeenAt) ||
-              t('common.notAvailable') }}
-            </p>
-            <p><strong>{{ t('ipDetails.whoisRaw') }}:</strong>
-            <pre class="whois-pre">{{ JSON.stringify(ipInfo.whois_raw, null, 2) }}</pre>
-            </p>
+          <div v-if="toggles.honeypot" class="section-body no-padding">
+            <div class="whois-meta-info">
+              <div class="meta-item">
+                <strong>{{ t('ipDetails.firstSeen') }}:</strong>
+                <span class="t-date">{{ dayjs(ipInfo.firstSeenAt).format('DD/MM/YYYY') }}</span>
+                <span class="t-hour">{{ dayjs(ipInfo.firstSeenAt).format('HH:mm:ss') }}</span>
+              </div>
+              <div class="meta-item">
+                <strong>{{ t('ipDetails.lastSeen') }}:</strong>
+                <span class="t-date">{{ dayjs(ipInfo.lastSeenAt).format('DD/MM/YYYY') }}</span>
+                <span class="t-hour">{{ dayjs(ipInfo.lastSeenAt).format('HH:mm:ss') }}</span>
+              </div>
+            </div>
+            <div class="whois-viewer">
+              <pre class="whois-code-box">{{ JSON.stringify(ipInfo.whois_raw, null, 2) }}</pre>
+            </div>
           </div>
         </transition>
       </div>
@@ -457,9 +500,6 @@ function handlePageSizeChange(newSize) {
   loadRateLimitEvents()
 }
 
-function formatDate(dateStr) {
-  return dateStr ? dayjs(dateStr).format('DD/MM/YYYY HH:mm:ss') : t('common.notAvailable')
-}
 
 function goBack() {
   router.back()

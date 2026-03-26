@@ -37,7 +37,11 @@
         "copyIp": "Kopiuj IP",
         "path": "Ścieżka",
         "honeypotId": "ID Honeypot",
-        "score": "Wynik"
+        "score": "Wynik",
+        "yes": "Tak",
+        "no": "Nie",
+        "copied": "Skopiowano",
+        "copyComment": "Kopiuj komentarz"
     },
     "auth": {
         "login": "Zaloguj się",
@@ -295,7 +299,15 @@
         "forceRefresh": "Odśwież dane IP",
         "noAbuseData": "Oczekiwanie na wzbogacenie AbuseIPDB...",
         "refreshSuccess": "Dane IP pomyślnie zaktualizowane!",
-        "refreshError": "Błąd podczas aktualizacji danych IP"
+        "refreshError": "Błąd podczas aktualizacji danych IP",
+        "abuseInvestigationLogs": "LOGI DOCHODZENIOWE ABUSEIPDB",
+        "syncAbuseReports": "Synchronizuj raporty AbuseIPDB",
+        "confidence": "Zaufanie",
+        "reportsCount": "Raporty",
+        "networkInfo": "INFORMACJE O SIECI",
+        "reporterCountryCode": "Kraj zgłaszającego",
+        "abuseReportingTitle": "ZGŁASZANIE NADUŻYĆ (AbuseIPDB)",
+        "hostname": "Nazwa hosta / Host"
     },
     "components": {
         "radar": {

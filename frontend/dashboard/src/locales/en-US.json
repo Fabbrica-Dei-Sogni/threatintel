@@ -37,7 +37,11 @@
         "copyIp": "Copy IP",
         "path": "Path",
         "honeypotId": "Honeypot ID",
-        "score": "Score"
+        "score": "Score",
+        "yes": "Yes",
+        "no": "No",
+        "copied": "Copied",
+        "copyComment": "Copy Comment"
     },
     "auth": {
         "login": "Login",
@@ -295,7 +299,15 @@
         "forceRefresh": "Force IP Refresh",
         "noAbuseData": "Waiting for AbuseIPDB enrichment...",
         "refreshSuccess": "IP data successfully updated!",
-        "refreshError": "Error while updating IP data"
+        "refreshError": "Error while updating IP data",
+        "abuseInvestigationLogs": "ABUSEIPDB INVESTIGATION LOGS",
+        "syncAbuseReports": "Sync AbuseIPDB Reports",
+        "confidence": "Confidence",
+        "reportsCount": "Reports",
+        "networkInfo": "NETWORK INFO",
+        "reporterCountryCode": "Reporter Country",
+        "abuseReportingTitle": "ABUSE REPORTING (AbuseIPDB)",
+        "hostname": "Hostname / Host"
     },
     "components": {
         "radar": {

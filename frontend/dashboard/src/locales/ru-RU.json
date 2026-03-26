@@ -37,7 +37,11 @@
         "copyIp": "Копировать IP",
         "path": "Путь",
         "honeypotId": "ID Honeypot",
-        "score": "Балл"
+        "score": "Балл",
+        "yes": "Да",
+        "no": "Нет",
+        "copied": "Скопировано",
+        "copyComment": "Копировать комментарий"
     },
     "auth": {
         "login": "Войти",
@@ -295,7 +299,15 @@
         "forceRefresh": "Обновить данные IP",
         "noAbuseData": "Ожидание обогащения AbuseIPDB...",
         "refreshSuccess": "Данные IP успешно обновлены!",
-        "refreshError": "Ошибка при обновлении данных IP"
+        "refreshError": "Ошибка при обновлении данных IP",
+        "abuseInvestigationLogs": "ЖУРНАЛЫ РАССЛЕДОВАНИЙ ABUSEIPDB",
+        "syncAbuseReports": "Синхронизировать отчеты AbuseIPDB",
+        "confidence": "Доверие",
+        "reportsCount": "Отчеты",
+        "networkInfo": "ИНФОРМАЦИЯ О СЕТИ",
+        "reporterCountryCode": "Страна репортера",
+        "abuseReportingTitle": "ОТЧЕТЫ О ЗЛОУПОТРЕБЛЕНИЯХ (AbuseIPDB)",
+        "hostname": "Имя хоста / Хост"
     },
     "components": {
         "radar": {

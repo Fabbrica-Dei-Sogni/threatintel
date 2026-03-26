@@ -55,7 +55,7 @@
       <!-- BLOCK 2: NETWORK INTELLIGENCE -->
       <div class="forensic-briefing briefing-net">
         <div class="briefing-header">
-          <span class="briefing-icon">🛡️</span> NETWORK INFO
+          <span class="briefing-icon">🛡️</span> {{ t('ipDetails.networkInfo') }}
         </div>
         <div class="briefing-grid">
           <div class="briefing-item" :data-briefing-tooltip="ipInfo.ipinfo?.org">
@@ -68,18 +68,17 @@
           <div class="briefing-item" :data-briefing-tooltip="ipInfo.ipinfo?.hostname">
             <span class="briefing-icon">🌐</span>
             <div class="briefing-content">
-              <span class="briefing-label">{{ t('ipDetails.isp') }} / {{ t('ipDetails.hostname') || 'Host' }}</span>
+              <span class="briefing-label">{{ t('ipDetails.isp') }} / {{ t('ipDetails.hostname') }}</span>
               <span class="briefing-value">{{ ipInfo.ipinfo?.hostname || t('common.notAvailable') }}</span>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- BLOCK 3: ABUSE INTELLIGENCE (AbuseIPDB) -->
       <div class="forensic-briefing briefing-abuse"
         :class="{ 'high-risk': ipInfo.abuseipdbId?.abuseConfidenceScore > 50 }">
         <div class="briefing-header">
-          <span class="briefing-icon">🚨</span> ABUSE REPORTING (AbuseIPDB)
+          <span class="briefing-icon">🚨</span> {{ t('ipDetails.abuseReportingTitle') }}
         </div>
         <div v-if="ipInfo.abuseipdbId" class="briefing-grid">
           <div class="briefing-item" :data-briefing-tooltip="t('ipDetails.score')">
@@ -87,8 +86,8 @@
               {{ ipInfo.abuseipdbId.abuseConfidenceScore }}%
             </div>
             <div class="briefing-content">
-              <span class="briefing-label">{{ t('ipDetails.score') }}</span>
-              <span class="briefing-value">{{ ipInfo.abuseipdbId.abuseConfidenceScore }}% Confidence</span>
+              <span class="briefing-label">{{ t('ipDetails.confidence') }}</span>
+              <span class="briefing-value">{{ ipInfo.abuseipdbId.abuseConfidenceScore }}% {{ t('ipDetails.confidence') }}</span>
             </div>
           </div>
           <div class="briefing-item">
@@ -97,14 +96,14 @@
             </span>
             <div class="briefing-content">
               <span class="briefing-label">{{ t('ipDetails.isListed') }}</span>
-              <span class="briefing-value">{{ ipInfo.abuseipdbId.isListed ? 'Yes' : 'No' }}</span>
+              <span class="briefing-value">{{ ipInfo.abuseipdbId.isListed ? t('common.yes') : t('common.no') }}</span>
             </div>
           </div>
           <div class="briefing-item">
             <span class="briefing-icon">📋</span>
             <div class="briefing-content">
               <span class="briefing-label">{{ t('ipDetails.totalReports') }}</span>
-              <span class="briefing-value">{{ ipInfo.abuseipdbId.totalReports || 0 }} Reports</span>
+              <span class="briefing-value">{{ ipInfo.abuseipdbId.totalReports || 0 }} {{ t('ipDetails.reportsCount') }}</span>
             </div>
           </div>
           <div class="briefing-item">
@@ -135,7 +134,7 @@
       <!-- Section ABUSEIPDB REPORTS -->
       <div class="section abuse-reports-section" v-if="reports.length >= 0">
         <div class="section-header" @click="toggles.reports = !toggles.reports">
-          <h2><span class="animated-icon pulse-cobalt" style="font-size: 0.9em;">📊</span> ABUSEIPDB INVESTIGATION LOGS
+          <h2><span class="animated-icon pulse-cobalt">📊</span> {{ t('ipDetails.abuseInvestigationLogs') }}
           </h2>
           <span class="arrow" :class="{ open: toggles.reports }"></span>
         </div>
@@ -144,7 +143,7 @@
             <div class="reports-controls">
               <button @click="aggiornaReports" :disabled="loadingReports" class="update-btn">
                 <span v-if="loadingReports" class="spinner-small"></span>
-                {{ loadingReports ? t('common.loading') : 'Sync AbuseIPDB Reports' }}
+                {{ loadingReports ? t('common.loading') : t('ipDetails.syncAbuseReports') }}
               </button>
             </div>
 
@@ -169,11 +168,11 @@
                   <div v-if="expandedReports[report._id]" class="report-content">
                     <div class="report-sub-header">
                       <span class="reporter-info">
-                        <strong>{{ t('ipDetails.reporterCountry') }}:</strong> {{ report.reporterCountryCode ||
+                        <strong>{{ t('ipDetails.reporterCountryCode') }}:</strong> {{ report.reporterCountryCode ||
                           t('common.notAvailable') }}
                       </span>
                       <button class="mini-copy-btn" @click.stop="copyToClipboard(report.comment, report._id)">
-                        {{ copiedIds[report._id] ? '✅ Copied' : '📋 Copy Comment' }}
+                        {{ copiedIds[report._id] ? t('common.copied') : t('common.copyComment') }}
                       </button>
                     </div>
                     <div class="report-comment-box">
@@ -198,7 +197,7 @@
       <!-- Section RATELIMIT EVENTS -->
       <div class="section ratelimit-section" v-if="rateLimit.data && rateLimit.data.length > 0">
         <div class="section-header" @click="toggles.ratelimit = !toggles.ratelimit">
-          <h2><span class="animated-icon pulse-cobalt" style="font-size: 0.9em;">⚠️</span> {{
+          <h2><span class="animated-icon pulse-cobalt">⚠️</span> {{
             t('ipDetails.rateLimitEvents') }}</h2>
           <span class="arrow" :class="{ open: toggles.ratelimit }"></span>
         </div>
@@ -245,7 +244,7 @@
 
       <div class="section whois-section">
         <div class="section-header" @click="toggles.honeypot = !toggles.honeypot">
-          <h2><span class="animated-icon pulse-cobalt" style="font-size: 0.9em;">🔎</span> {{ t('ipDetails.fullWhois')
+          <h2><span class="animated-icon pulse-cobalt">🔎</span> {{ t('ipDetails.fullWhois')
             }}</h2>
           <span class="arrow" :class="{ open: toggles.honeypot }"></span>
         </div>

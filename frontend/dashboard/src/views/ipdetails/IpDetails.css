@@ -812,14 +812,117 @@ h1 {
   overflow-x: auto;
 }
 
+/* Typography & Fluid Sizes */
+.header-main h1 {
+  font-size: clamp(1.2rem, 4vw, 1.8rem);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #fff;
+  text-shadow: 0 0 15px rgba(0, 168, 255, 0.4);
+}
+
+.briefing-header,
+.section-header {
+  font-size: clamp(0.85rem, 2.5vw, 1rem);
+  font-weight: 700;
+  padding: 10px 15px;
+  background: rgba(0, 168, 255, 0.1);
+  border-bottom: 1px solid rgba(0, 168, 255, 0.2);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #00d4ff;
+  border-radius: 8px 8px 0 0;
+  cursor: pointer;
+}
+
+.briefing-label {
+  font-size: clamp(0.7rem, 2vw, 0.8rem);
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.briefing-value {
+  font-size: clamp(0.85rem, 2.8vw, 1rem);
+  color: #fff;
+  font-weight: 600;
+  word-break: break-all;
+}
+
+.section-header h2 {
+  margin: 0;
+  font-size: inherit;
+  font-weight: inherit;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: inherit;
+  text-transform: inherit;
+}
+
+/* Responsive Overrides */
 @media (max-width: 768px) {
+  .briefing-wrapper {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+  
+  .briefing-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .score-radial {
+    width: 60px;
+    height: 60px;
+    font-size: 0.9rem;
+  }
+
   .whois-meta-info {
     gap: 15px;
     padding: 12px 15px;
   }
+
   .report-sub-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .briefing-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .header-top {
+    flex-direction: column;
+    gap: 10px;
+    align-items: stretch;
+  }
+  
+  .refresh-btn, .back-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .time-display {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
+  
+  .reports-header-actions {
+    flex-direction: column;
+  }
+  
+  .cyber-btn.mini {
+    width: 100%;
+    justify-content: center;
   }
 }

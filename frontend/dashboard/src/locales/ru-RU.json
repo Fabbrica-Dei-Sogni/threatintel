@@ -9,6 +9,7 @@
         "loading": "Загрузка...",
         "error": "Ошибка",
         "errorLoadingData": "Ошибка загрузки данных",
+        "unit": "Единица",
         "search": "Поиск",
         "filter": "Фильтр",
         "clear": "Очистить",
@@ -214,6 +215,7 @@
         "noLogsFound": "Журналов не найдено",
         "errorLoadingData": "Ошибка загрузки данных",
         "trafficOverTime": "Анализ трафика во времени",
+        "trafficPeaks": "Пики трафика",
         "table": {
             "defcon": "Defcon",
             "ip": "IP",
@@ -289,7 +291,11 @@
         "fullWhois": "Полный Whois",
         "firstSeen": "Первое обнаружение",
         "lastSeen": "Последнее обнаружение",
-        "whoisRaw": "Whois"
+        "whoisRaw": "Whois",
+        "forceRefresh": "Обновить данные IP",
+        "noAbuseData": "Ожидание обогащения AbuseIPDB...",
+        "refreshSuccess": "Данные IP успешно обновлены!",
+        "refreshError": "Ошибка при обновлении данных IP"
     },
     "components": {
         "radar": {

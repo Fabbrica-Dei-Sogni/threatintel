@@ -215,6 +215,7 @@
         "noLogsFound": "Nie znaleziono dzienników",
         "errorLoadingData": "Błąd ładowania danych",
         "trafficOverTime": "Analiza ruchu w czasie",
+        "trafficPeaks": "Szczyty ruchu",
         "table": {
             "defcon": "Defcon",
             "ip": "IP",
@@ -290,7 +291,11 @@
         "fullWhois": "Pełny Whois",
         "firstSeen": "Pierwsze wykrycie",
         "lastSeen": "Ostatnie wykrycie",
-        "whoisRaw": "Whois"
+        "whoisRaw": "Whois",
+        "forceRefresh": "Odśwież dane IP",
+        "noAbuseData": "Oczekiwanie na wzbogacenie AbuseIPDB...",
+        "refreshSuccess": "Dane IP pomyślnie zaktualizowane!",
+        "refreshError": "Błąd podczas aktualizacji danych IP"
     },
     "components": {
         "radar": {

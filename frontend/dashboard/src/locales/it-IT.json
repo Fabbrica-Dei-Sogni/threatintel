@@ -9,6 +9,7 @@
         "loading": "Caricamento...",
         "error": "Errore",
         "errorLoadingData": "Errore nel caricamento dei dati",
+        "unit": "Unità",
         "search": "Cerca",
         "filter": "Filtra",
         "clear": "Svuota",
@@ -213,6 +214,8 @@
         "clearUrlFilter": "Svuota filtro URL",
         "noLogsFound": "Nessun log trovato",
         "trafficPeaks": "Picchi di Traffico",
+        "trafficOverTime": "Analisi Traffico Temporale",
+        "errorLoadingData": "Errore nel caricamento dei dati",
         "table": {
             "defcon": "Defcon",
             "ip": "IP",

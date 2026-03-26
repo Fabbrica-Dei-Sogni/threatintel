@@ -9,6 +9,7 @@
         "loading": "Laden...",
         "error": "Fehler",
         "errorLoadingData": "Fehler beim Laden der Daten",
+        "unit": "Einheit",
         "search": "Suchen",
         "filter": "Filtern",
         "clear": "Löschen",
@@ -213,6 +214,8 @@
         "clearUrlFilter": "URL-Filter löschen",
         "noLogsFound": "Keine Protokolle gefunden",
         "trafficOverTime": "Zeitliche Verkehrsanalysen",
+        "trafficPeaks": "Verkehrsspitzen",
+        "errorLoadingData": "Fehler beim Laden der Daten",
         "table": {
             "defcon": "Defcon",
             "ip": "IP",
@@ -288,7 +291,11 @@
         "fullWhois": "Vollständiges Whois",
         "firstSeen": "Zuerst gesehen",
         "lastSeen": "Zuletzt gesehen",
-        "whoisRaw": "Whois"
+        "whoisRaw": "Whois",
+        "forceRefresh": "Update IP-Daten",
+        "noAbuseData": "Warten auf AbuseIPDB-Anreicherung...",
+        "refreshSuccess": "IP-Daten erfolgreich aktualisiert!",
+        "refreshError": "Fehler beim Aktualisieren der IP-Daten"
     },
     "components": {
         "radar": {

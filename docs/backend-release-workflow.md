@@ -1,55 +1,76 @@
-# ThreatIntel Backend: Workflow di Release (Hybrid Bundle)
+# ThreatIntel Backend: Workflow di Release (v2.0)
 
-Questo documento descrive l'architettura e le procedure operative per la generazione di artefatti distribuibili del backend di ThreatIntel.
+Questo documento descrive l'architettura e le procedure operative per la gestione del ciclo di vita delle release del backend.
 
 ## 🎯 Obiettivi
-L'obiettivo del workflow di release è separare il codice sorgente dall'esecuzione in produzione, garantendo:
-1.  **Portabilità**: Esecuzione senza dipendere dalla cartella `node_modules` originale (spesso pesante e piena di dev-dependencies).
-2.  **Sicurezza**: Distribuzione di codice compilato e minificato (bundle), proteggendo la logica sorgente.
-3.  **Zero-Impact**: Mantenimento dell'attuale ambiente di sviluppo basato su `ts-node` senza alcuna modifica strutturale.
+1.  **Portabilità**: Esecuzione senza `node_modules` (Bundling NCC).
+2.  **Isolamento**: Supporto a istanze multiple parallele (Prod, Beta, Test) sullo stesso host.
+3.  **Sicurezza**: Distribuzione di codice compilato, senza sorgenti `.ts`.
+4.  **Automazione**: Gestione semplificata via CLI interattiva.
 
 ---
 
-## 🏗️ Architettura dell'Artefatto (Modello Ibrido)
+## 🏗️ Architettura Ibrida
 
-A causa della natura di alcune dipendenze (come `geoip-lite`) che richiedono database binari esterni, l'artefatto non è un singolo file fisico ma un **pacchetto auto-contenuto** così strutturato:
+L'artefatto generato (`artifact/*.tar.gz`) è un pacchetto auto-contenuto:
 
 ```text
-release/
-├── index.js             # Bundle unico (codice + dipendenze JS)
-├── data/                # Database binari (.dat) per GeoIP
-├── infra/               # Script di maintenance (Redis/MongoDB)
-├── install.sh           # Installer automatizzato per Linux
-└── threatintel.service  # Template per il servizio systemd
+deployment-folder/
+├── index.js              # Bundle unico (Codice + Dipendenze JS)
+├── VERSION               # Metadato versione (es. 1.0.0)
+├── data/                 # Database binari GeoIP (.dat)
+├── infra/                # Script check Redis/MongoDB
+├── install.sh            # Installer idempotente
+└── uninstall.sh          # Uninstaller con discovery tagging
 ```
 
-### Tecnologie Utilizzate
-- **Bundler**: `@vercel/ncc` (Node.js Compiler) per fondere il codice TypeScript e i moduli npm in un unico file CommonJS.
-- **Runtime**: Node.js nativo (senza necessità di `ts-node` o `typescript` sul server di produzione).
+---
+
+## 🛠️ Toolchain Operativa (`scripts/build/`)
+
+### 📦 1. Creazione Release
+```bash
+./scripts/build/interactive-release.sh
+```
+- Chiede la versione (default da `package.json`).
+- Genera il bundle in `artifact/`.
+- Estrae automaticamente il bundle in `deployments/{servizio}/`.
+- Opzionalmente registra il servizio su systemd.
+
+### 🚀 2. Deploy Differito
+Se hai già buildato un bundle ma non lo hai ancora attivato:
+```bash
+./scripts/build/deploy-pending.sh
+```
+- Scansiona `deployments/` e ti permette di attivare i bundle "dormienti".
+
+### 🗑️ 3. Unistallazione
+```bash
+./scripts/build/uninstall-release.sh
+```
+- Individua tutti i servizi gestiti dal workflow tramite il tag `Managed-By`.
+- Rimuove in modo pulito i link simbolici da `/etc/systemd/system/`.
+
+### 🧹 4. Pulizia Ambiente
+```bash
+./scripts/build/clean-release.sh
+```
+- Rimuove i file temporanei di build e gli artefatti, **ma preserva** le cartelle in `deployments/` per non interrompere i servizi attivi.
 
 ---
 
-## 🏗️ Ciclo di Vita della Release
+## ⚙️ Logica Tecnica Idempotente
 
-### 1. Generazione (Build)
-Lo script `scripts/build/make-hybrid-release.sh` gestisce l'intero processo in una directory temporanea isolata:
-1.  **Compilazione**: `ncc` analizza `server.ts` e genera `index.js`.
-2.  **Asset Harvesting**: Vengono raggruppati i database GeoIP e gli script infrastrutturali.
-3.  **Archiviazione**: Crea un file `.tar.gz` pronto per il trasporto.
+### Symbolic Links
+Invece di copiare i file in `/etc/systemd/system/`, l'installer crea dei **Link Simbolici**.
+- **Vantaggio**: Puoi modificare la configurazione del servizio direttamente nella sua cartella in `deployments/` e fare un `daemon-reload` senza toccare le cartelle di sistema.
 
-### 2. Distribuzione (Deploy)
-Una volta scompattato l'archivio sul server di destinazione, l'installer `install.sh`:
-1.  Configura il servizio `systemd`.
-2.  Imposta la variabile d'ambiente `GEODATADIR=./data` (fondamentale per permettere al bundle di trovare i database GeoIP).
-3.  Attiva il servizio senza richiedere `npm install`.
+### Versioning
+La versione viene iniettata in tre posti:
+1.  **Nome file**: `threatintel-bundle-v1.0.0-20260326.tar.gz`.
+2.  **Systemd Description**: Visibile via `systemctl status`.
+3.  **Environment Variable**: L'app può leggere `process.env.VERSION`.
 
 ---
-
-## 🛠️ Manutenzione e Sviluppo
-
--   **Sviluppo Locale**: Continua a usare `npm run start` o `ts-node server.ts`. Il processo di release è totalmente ortogonale al codice sorgente.
--   **Aggiunta Dipendenze**: Se aggiungi una dipendenza tramite `npm install`, questa verrà automaticamente inclusa nel prossimo bundle generato, a meno che non sia una dipendenza nativa con asset esterni (in quel caso va aggiunta manualmente allo script di raccolta asset).
-
----
-> [!IMPORTANT]
-> L'artefatto generato è "environment-agnostic" per quanto riguarda il codice, ma richiede che il server di destinazione abbia Node.js installato (versione raccomandata >= 20).
+> [!TIP]
+> Per aggiungere nuove istanze parallele, basta dare un nome diverso al servizio durante il prompt di `interactive-release.sh`. Lo script creerà una cartella isolata e una porta dedicata.

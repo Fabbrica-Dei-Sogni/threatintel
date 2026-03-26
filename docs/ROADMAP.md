@@ -18,6 +18,7 @@
 | [M6: Monitoring & Observability](#m6-monitoring--observability) | ⚪ Planned | 🟡 Low | 1 settimana |
 | [M7: Frontend Enhancements](#m7-frontend-enhancements) | 🟢 In Progress (95%) | 🟠 Medium | 2 settimane |
 | [M8: Log Analysis & Hardening](#m8-log-analysis--hardening) | ✅ Completed | 🔴 High | 1-2 settimane |
+| [M9: Backend Release System](#m9-backend-release-system) | ✅ Completed | 🔴 High | 1 settimana |
 
 **Legenda:**
 - 🟢 In Progress
@@ -370,13 +371,14 @@ Aprile 2026      M6 (Monitoring)
 
 ## 📊 Progress Tracking
 
-**Overall Project Completion**: ~45%
+**Overall Project Completion**: ~55%
 
 | Area | Coverage | Status |
 |------|----------|--------|
 | TypeScript Migration | 100% | ✅ |
 | Test Coverage | 80%+ | ✅ |
 | DI Integration | 100% | ✅ |
+| Release System | 100% (Hybrid Bundle + CLI) | ✅ |
 | Performance | Baseline | ⚪ |
 | Security | Baseline | ⚪ |
 | Monitoring | Basic (Winston) | 🟡 |
@@ -384,5 +386,34 @@ Aprile 2026      M6 (Monitoring)
 
 ---
 
-**Ultimo aggiornamento**: 2026-03-25
-**Prossimo checkpoint**: M7 Phase 3 Dashboard V2 completion
+## M9: Backend Release System
+
+**Obiettivo**: Implementare un sistema di release portabile, sicuro e automatizzato basato su Bundling Ibrido.
+
+**Status**: ✅ Completed
+
+### Phase 1: Hybrid Bundling Strategy ✅
+- [x] Integrate `@vercel/ncc` for single-file JS bundling
+- [x] Resolve `geoip-lite` binary dependency via external `data/` harvesting
+- [x] Implement `GEODATADIR` runtime resolution in service template
+
+### Phase 2: Automation & CLI ✅
+- [x] Create `make-release.sh` for source-independent artifact generation
+- [x] Implement `interactive-release.sh` for guided local/remote deployment
+- [x] Add semantic versioning integration (Artifact naming + Metadata)
+
+### Phase 3: Lifecycle Management ✅
+- [x] Multi-instance support via Symbolic Links in `/etc/systemd/system/`
+- [x] Create `deploy-pending.sh` for deferred installation of built bundles
+- [x] Create `uninstall-release.sh` with discovery tagging for clean removal
+- [x] Implement `clean-release.sh` for build environment hygiene
+
+**Benefici**:
+- Deployment "Zero-Install" (no npm install on target)
+- Totale isolamento tra istanze (Prod/Beta/Test) sullo stesso host
+- Riduzione della superficie di attacco (codice minificato, no sorgenti TS)
+
+---
+
+**Ultimo aggiornamento**: 2026-03-26
+**Prossimo checkpoint**: M4 Performance Profiling & Redis Caching

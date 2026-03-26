@@ -4,7 +4,13 @@
             <button @click="goBack" class="back-btn">← {{ t('attackDetail.backToAttacks') }}</button>
             <LanguageSwitcher />
         </div>
-        <h1><span class="animated-icon pulse-magma">🛰️</span> {{ t('attackDetail.title') }}</h1>
+
+        <div class="header-briefing-top">
+            <div class="briefing-info-main">
+                <span class="animated-icon pulse-magma">🛰️</span>
+                <h1>{{ t('attackDetail.title') }}</h1>
+            </div>
+        </div>
 
         <!-- Attacker Highlight Card -->
         <div v-if="attack" class="attacker-card">
@@ -27,22 +33,57 @@
         <div v-if="attack && !loading" class="attack-summary">
             <!-- Existing summary content -->
             <div class="summary-row">
-                <section>
-                    <strong>{{ t('attackDetail.defconLevel') }}:</strong>
-                    <DefconIndicator :level="attack.dangerLevel" :dangerScore="attack.dangerScore" />
+                <section class="forensic-briefing">
+                    <div class="briefing-header">
+                        <span class="animated-icon pulse-magma">🛡️</span>
+                        {{ t('attackDetail.defconLevel') }}
+                    </div>
+                    <div class="briefing-content">
+                        <DefconIndicator :level="attack.dangerLevel" :dangerScore="attack.dangerScore" />
+                    </div>
                 </section>
             </div>
-            <div><strong>{{ t('attackDetail.techniques') }}:</strong> {{ attack.attackPatterns.join(', ') }}</div>
             <div class="summary-row">
-                <div><strong>{{ t('attackDetail.firstSeen') }}:</strong> {{ formatDate(attack.firstSeen) }}</div>
-                <div><strong>{{ t('attackDetail.lastSeen') }}:</strong> {{ formatDate(attack.lastSeen) }}</div>
+                <div class="forensic-briefing">
+                    <div class="briefing-header">{{ t('attackDetail.techniques') }}</div>
+                    <div class="briefing-content">
+                        <span v-for="(tech, i) in attack.attackPatterns" :key="i" class="tech-tag">{{ tech }}</span>
+                    </div>
+                </div>
             </div>
             <div class="summary-row">
-                <div><strong>{{ t('attackDetail.totalLogs') }}:</strong> {{ attack.totaleLogs }}</div>
-                <div><strong>{{ t('attackDetail.attackDuration') }}:</strong> {{ attack.durataAttacco.human }}</div>
-                <div><strong>{{ t('attackDetail.rps') }}:</strong> {{ attack.rps }}</div>
-                <div><strong>{{ t('attackDetail.avgScore') }}:</strong> {{ attack.averageScore }}</div>
-                <div><strong>{{ t('attackDetail.style') }}:</strong> {{ attack.intensityAttack }}</div>
+                <div class="forensic-briefing">
+                    <div class="briefing-header">{{ t('attackDetail.firstSeen') }}</div>
+                    <div class="briefing-content" v-html="formatDate(attack.firstSeen)"></div>
+                </div>
+                <div class="forensic-briefing">
+                    <div class="briefing-header">{{ t('attackDetail.lastSeen') }}</div>
+                    <div class="briefing-content" v-html="formatDate(attack.lastSeen)"></div>
+                </div>
+            </div>
+            <div class="summary-row">
+                <div class="forensic-briefing">
+                    <div class="briefing-header">{{ t('attackDetail.totalLogs') }}</div>
+                    <div class="briefing-content">{{ attack.totaleLogs }}</div>
+                </div>
+                <div class="forensic-briefing">
+                    <div class="briefing-header">{{ t('attackDetail.attackDuration') }}</div>
+                    <div class="briefing-content">{{ attack.durataAttacco.human }}</div>
+                </div>
+                <div class="forensic-briefing">
+                    <div class="briefing-header">{{ t('attackDetail.rps') }}</div>
+                    <div class="briefing-content">{{ attack.rps }}</div>
+                </div>
+                <div class="forensic-briefing">
+                    <div class="briefing-header">{{ t('attackDetail.avgScore') }}</div>
+                    <div class="briefing-content">{{ attack.averageScore }}</div>
+                </div>
+                <div class="forensic-briefing">
+                    <div class="briefing-header">{{ t('attackDetail.style') }}</div>
+                    <div class="briefing-content">
+                        <span class="intensity-badge" :class="attack.intensityAttack.toLowerCase()">{{ attack.intensityAttack }}</span>
+                    </div>
+                </div>
             </div>
             <!-- ... existing rows ... -->
             <!-- Insert Map Here -->
@@ -50,14 +91,17 @@
                 <AttackMap v-if="mapAttackData.length > 0" :attacks="mapAttackData" />
             </section>
             <section class="attack-profile">
-                <AttackProfileRadar v-if="attack" :attackDetail="attack" />
+                <AttackProfileRadar v-if="attack" :attackDetail="attack" :isMobile="isMobile" />
             </section>
         </div>
         <div v-if="attack && !loading" class="attack-aggregates">
 
-            <el-card class="logs-container" v-if="attack">
-                <div class="logs-header-row">
-                    <h2>{{ t('attackDetail.logsRaggrupati') }}</h2>
+            <div class="logs-container forensic-card" v-if="attack">
+                <div class="section-header logs-header-row">
+                    <div class="header-title-group">
+                        <span class="animated-icon pulse-magma">📜</span>
+                        <h2>{{ t('attackDetail.logsRaggrupati') }}</h2>
+                    </div>
                     <el-input 
                         v-model="searchUrl" 
                         :placeholder="t('attackDetail.searchUrlPlaceholder')"
@@ -69,13 +113,17 @@
 
                 <div v-for="log in paginatedLogs" :key="log._id || log.id" class="log-entry">
                     <div class="log-header" @click="toggleLog(log._id || log.id)">
-                        <span>{{ formatDate(log.timestamp) }} - {{ log.request.method }} 
-                            <span v-if="log.metadata?.eventCount > 1" style="color: #ffb86c; font-size: 0.9em; margin-left: 5px; font-weight: bold;">
-                                (x{{ log.metadata.eventCount }})
+                        <span class="log-info-main">
+                            <span v-html="formatDate(log.timestamp)"></span>
+                            <span class="log-method-url">
+                                - {{ log.request.method }} 
+                                <span v-if="log.metadata?.eventCount > 1" class="event-count-badge">
+                                    (x{{ log.metadata.eventCount }})
+                                </span>
+                                {{ log.request.url || t('components.radar.notAvailable') }} 
                             </span>
-                            {{ log.request.url || t('components.radar.notAvailable') }} 
                         </span>
-                        <span class="toggle-icon">{{ expanded[log._id || log.id] ? '–' : '+' }}</span>
+                        <span class="toggle-icon" :class="{ 'open': expanded[log._id || log.id] }">▼</span>
                     </div>
                     <transition name="collapse">
                         <div v-if="expanded[log._id || log.id]" class="log-body">
@@ -104,15 +152,24 @@
                     </transition>
                 </div>
 
-                <div class="pagination-wrapper" v-if="filteredLogs.length > pageSize">
-                    <el-pagination background layout="prev, pager, next" :current-page="currentPage"
-                        :page-size="pageSize" :total="filteredLogs.length"
-                        @current-change="page => currentPage = page" />
+                <div class="pagination-container" v-if="filteredLogs.length > pageSize">
+                    <el-pagination background :layout="paginationLayout" :total="filteredLogs.length"
+                        :page-size="pageSize" :current-page="currentPage" :pager-count="isMobile ? 3 : 7"
+                        @current-change="page => currentPage = page" class="cyber-pagination magenta">
+                        <template #default v-if="isMobile">
+                            <span class="mobile-pagination-info">{{ currentPage }} / {{ Math.ceil(filteredLogs.length / pageSize) }}</span>
+                        </template>
+                    </el-pagination>
                 </div>
-            </el-card>
+            </div>
 
-            <el-card class="rate-limit-events-container" v-if="attack.rateLimitList && attack.countRateLimit">
-                <h2>{{ t('attackDetail.rateBreach') }}</h2>
+            <div class="rate-limit-events-container forensic-card" v-if="attack.rateLimitList && attack.countRateLimit">
+                <div class="section-header">
+                    <div class="header-title-group">
+                        <span class="animated-icon pulse-magma">⚡</span>
+                        <h2>{{ t('attackDetail.rateBreach') }}</h2>
+                    </div>
+                </div>
 
                 <div v-for="event in paginatedRateLimitEvents" :key="event._id || event.id"
                     class="rate-limit-event-entry">
@@ -136,19 +193,23 @@
                     </transition>
                 </div>
 
-                <div class="pagination-wrapper" v-if="attack.countRateLimit > pageSize">
-                    <el-pagination background layout="prev, pager, next" :current-page="currentPageEvents"
-                        :page-size="pageSize" :total="attack.countRateLimit"
-                        @current-change="page => currentPageEvents = page" />
+                <div class="pagination-container" v-if="attack.countRateLimit > pageSize">
+                    <el-pagination background :layout="paginationLayout" :total="attack.countRateLimit"
+                        :page-size="pageSize" :current-page="currentPageEvents" :pager-count="isMobile ? 3 : 7"
+                        @current-change="page => currentPageEvents = page" class="cyber-pagination magenta">
+                        <template #default v-if="isMobile">
+                            <span class="mobile-pagination-info">{{ currentPageEvents }} / {{ Math.ceil(attack.countRateLimit / pageSize) }}</span>
+                        </template>
+                    </el-pagination>
                 </div>
-            </el-card>
+            </div>
         </div>
 
     </div>
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted, watch } from 'vue'
+import { ref, reactive, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import dayjs from 'dayjs'
 import { useI18n } from 'vue-i18n'
@@ -239,9 +300,28 @@ const paginatedRateLimitEvents = computed(() => {
     return objs.slice(start, start + pageSizeEvents.value)
 })
 
+const windowWidth = ref(window.innerWidth)
+const isMobile = computed(() => windowWidth.value < 600)
+const paginationLayout = computed(() => isMobile.value ? 'prev, slot, next' : 'prev, pager, next, total')
+
+const updateWidth = () => {
+    windowWidth.value = window.innerWidth
+}
+
+onMounted(() => {
+    window.addEventListener('resize', updateWidth);
+    loadAttackData()
+})
+
+onUnmounted(() => {
+    window.removeEventListener('resize', updateWidth)
+})
+
 // Methods
 function formatDate(ts) {
-    return ts ? dayjs(ts).format('DD/MM/YYYY HH:mm:ss') : t('common.notAvailable')
+    if (!ts) return `<span class="t-na">${t('common.notAvailable')}</span>`
+    const d = dayjs(ts)
+    return `<span class="t-date">${d.format('DD/MM/YYYY')}</span> <span class="t-hour">${d.format('HH:mm:ss')}</span>`
 }
 
 function formatJson(obj) {

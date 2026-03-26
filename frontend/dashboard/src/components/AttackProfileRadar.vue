@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue';
+import { computed, inject } from 'vue';
 import { Chart as ChartJS, Title, Tooltip, Legend, RadialLinearScale, PointElement, LineElement, Filler } from 'chart.js';
 import { Radar } from 'vue-chartjs';
 import { useI18n } from 'vue-i18n';
@@ -21,6 +21,10 @@ const props = defineProps({
     attackDetail: {
         type: Object,
         required: true
+    },
+    isMobile: {
+        type: Boolean,
+        default: false
     }
 });
 
@@ -81,71 +85,73 @@ const chartData = computed(() => {
     ];
 
     return {
-        labels: originalData.value.map(d => d.label), // Usa le etichette dell'array grezzo,
+        labels: originalData.value.map(d => d.label),
         datasets: [
             {
                 label: `${t('components.radar.attackProfile')}: ${attack.request.ip}`,
                 data: dataValues,
-                // Colori coordinati con AttackDetail.css (rosso-bruciato)
-                backgroundColor: 'rgba(217, 48, 37, 0.25)', // Rosso brillante semi-trasparente (#d93025)
-                borderColor: 'rgb(255, 76, 76)',            // Contorno rosso acceso (#ff4c4c)
-                pointBackgroundColor: 'rgb(255, 76, 76)',   // Punti rosso acceso
-                pointBorderColor: '#2f2825',                // Bordo punti marrone scuro (dal CSS)
-                pointHoverBackgroundColor: '#f8eee0',       // Hover color crema chiaro
-                pointHoverBorderColor: 'rgb(217, 48, 37)',  // Hover border rosso brillante
-                borderWidth: 3,
+                // Colore Magma (Rosso Fuoco)
+                backgroundColor: 'rgba(230, 33, 23, 0.2)', 
+                borderColor: 'rgba(230, 33, 23, 1)',            
+                pointBackgroundColor: '#ff4c4c',   
+                pointBorderColor: '#000',                
+                pointHoverBackgroundColor: '#fff',       
+                pointHoverBorderColor: '#ff4c4c',  
+                borderWidth: 2,
+                pointRadius: 4,
                 fill: true
             }
         ]
     };
 });
 
-// Opzioni del Grafico (importante per la scala da 0 a 100)
-const chartOptions = {
+// Opzioni del Grafico (computed per reattività a isMobile)
+const chartOptions = computed(() => ({
     responsive: true,
     maintainAspectRatio: false,
     scales: {
         r: {
-            angleLines: { color: '#553c37' },           // Linee angolari marroni scure
-            grid: { color: '#3a3736' },                  // Griglia marrone scuro (dal CSS)
+            angleLines: { color: 'rgba(230, 33, 23, 0.2)' },           
+            grid: { color: 'rgba(230, 33, 23, 0.1)' },                  
             pointLabels: {
-                color: '#e6d4cf',                        // Etichette color crema (dal CSS)
-                font: { size: 13, weight: '600' }
+                color: '#ff9999',                       
+                font: { 
+                    size: props.isMobile ? 10 : 13, 
+                    weight: '800'
+                }
             },
             suggestedMin: 0,
-            suggestedMax: 100, // Scala da 0 a 100%
-            ticks: { display: false } // Nasconde i numeri sulla scala
+            suggestedMax: 100, 
+            ticks: { display: false } 
         }
     },
     plugins: {
         legend: { display: false },
         tooltip: {
             callbacks: {
-                // 3. MODIFICA DEL TOOLTIP CALLBACK
                 label: (context) => {
                     const index = context.dataIndex;
-                    // Accedi ai dati originali tramite l'indice e la computed property
                     const original = originalData.value[index];
-                    const transformed = context.raw.toFixed(1); // Valore visualizzato sul grafico (0-100)
+                    const transformed = context.raw.toFixed(1);
 
                     let output = `${original.label}: ${transformed}%`;
 
                     if (original.rawValue !== undefined) {
-                        // Aggiungi il valore originale formattato
                         output += ` (${original.format(original.rawValue)})`;
                     }
                     return output;
                 },
                 title: (context) => context[0].dataset.label,
             },
-            backgroundColor: 'rgba(47, 40, 37, 0.95)',  // Sfondo tooltip marrone scuro (#2f2825)
-            titleColor: '#ff4c4c',                       // Titolo rosso acceso
-            bodyColor: '#f0e6d2',                        // Testo color crema
-            borderColor: '#ff4c4c',                      // Bordo rosso
+            backgroundColor: 'rgba(15, 10, 8, 0.95)',  
+            titleColor: '#ff4c4c',                       
+            bodyColor: '#f0e6d2',                        
+            borderColor: 'rgba(230, 33, 23, 0.5)',                      
             borderWidth: 1
         }
     }
-};
+}));
+
 </script>
 
 <template>
@@ -156,21 +162,10 @@ const chartOptions = {
 
 <style scoped>
 .radar-chart-container {
-    /* Dimensioni dinamiche basate sul parent */
     width: 100%;
     height: 100%;
-    min-height: 250px;
-
-    /* Padding minimale per mobile */
-    padding: 10px;
-    margin: 0;
-
-    /* Styling coordinato con AttackDetail.css */
-    background: linear-gradient(180deg, #2f2825, #2b1b17 50%, #271511);
-    border-radius: 8px;
-    box-shadow: inset 0 0 20px #5a2a26, 0 4px 15px rgba(217, 48, 37, 0.3);
-
-    /* Mantiene aspect ratio */
+    padding: clamp(10px, 3vw, 30px);
+    background: transparent;
     display: flex;
     justify-content: center;
     align-items: center;

@@ -1,12 +1,12 @@
 <template>
   <div class="ip-details">
-    <LanguageSwitcher />
     <div class="header-top">
       <button @click="goBack" class="back-btn">← {{ t('ipDetails.backToAttacks') }}</button>
       <button @click="forzaArricchimento" :disabled="loadingEnrich" class="refresh-btn">
         <span v-if="loadingEnrich" class="spinner"></span>
         {{ loadingEnrich ? t('common.loading') : t('ipDetails.forceRefresh') }}
       </button>
+      <LanguageSwitcher />
     </div>
 
     <div class="header-main">
@@ -87,7 +87,8 @@
             </div>
             <div class="briefing-content">
               <span class="briefing-label">{{ t('ipDetails.confidence') }}</span>
-              <span class="briefing-value">{{ ipInfo.abuseipdbId.abuseConfidenceScore }}% {{ t('ipDetails.confidence') }}</span>
+              <span class="briefing-value">{{ ipInfo.abuseipdbId.abuseConfidenceScore }}% {{ t('ipDetails.confidence')
+                }}</span>
             </div>
           </div>
           <div class="briefing-item">
@@ -103,7 +104,8 @@
             <span class="briefing-icon">📋</span>
             <div class="briefing-content">
               <span class="briefing-label">{{ t('ipDetails.totalReports') }}</span>
-              <span class="briefing-value">{{ ipInfo.abuseipdbId.totalReports || 0 }} {{ t('ipDetails.reportsCount') }}</span>
+              <span class="briefing-value">{{ ipInfo.abuseipdbId.totalReports || 0 }} {{ t('ipDetails.reportsCount')
+                }}</span>
             </div>
           </div>
           <div class="briefing-item">
@@ -184,9 +186,14 @@
             </div>
 
             <div class="pagination-container" v-if="reports.length > reportsMeta.pageSize">
-              <el-pagination background layout="prev, pager, next, total" :total="reportsMeta.total"
-                :page-size="reportsMeta.pageSize" :current-page="reportsMeta.page"
-                @current-change="handleReportsPageChange" class="cyber-pagination" />
+              <el-pagination background :layout="paginationLayout" :total="reportsMeta.total"
+                :page-size="reportsMeta.pageSize" :current-page="reportsMeta.page" :pager-count="isMobile ? 3 : 7"
+                @current-change="handleReportsPageChange" class="cyber-pagination">
+                <template #default v-if="isMobile">
+                  <span class="mobile-pagination-info">{{ reportsMeta.page }} / {{ Math.ceil(reportsMeta.total /
+                    reportsMeta.pageSize) }}</span>
+                </template>
+              </el-pagination>
             </div>
           </div>
         </transition>
@@ -234,9 +241,14 @@
             </div>
 
             <div class="pagination-container">
-              <el-pagination background layout="prev, pager, next, total" :total="rateLimit.total"
-                :page-size="rateLimit.pageSize" :current-page="rateLimit.page" @current-change="handlePageChange"
-                class="cyber-pagination" />
+              <el-pagination background :layout="paginationLayout" :total="rateLimit.total"
+                :page-size="rateLimit.pageSize" :current-page="rateLimit.page" :pager-count="isMobile ? 3 : 7"
+                @current-change="handlePageChange" class="cyber-pagination">
+                <template #default v-if="isMobile">
+                  <span class="mobile-pagination-info">{{ rateLimit.page }} / {{ Math.ceil(rateLimit.total /
+                    rateLimit.pageSize) }}</span>
+                </template>
+              </el-pagination>
             </div>
           </div>
         </transition>
@@ -245,7 +257,7 @@
       <div class="section whois-section">
         <div class="section-header" @click="toggles.honeypot = !toggles.honeypot">
           <h2><span class="animated-icon pulse-cobalt">🔎</span> {{ t('ipDetails.fullWhois')
-            }}</h2>
+          }}</h2>
           <span class="arrow" :class="{ open: toggles.honeypot }"></span>
         </div>
         <transition name="collapse">
@@ -274,7 +286,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, computed } from 'vue'
+import { ref, reactive, onMounted, onUnmounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import dayjs from 'dayjs'
 import { fetchIpDetails, fetchRateLimitSearch, enrichReports, enrichReputationScore } from '../../api/index'
@@ -297,8 +309,25 @@ const copiedIds = reactive({});
 const copiedIp = ref(false);
 
 
-const loadingReputationScore = ref(false);
 const errorReputationScore = ref(false)
+
+// Responsive Pagination logic
+const windowWidth = ref(window.innerWidth)
+const isMobile = computed(() => windowWidth.value < 600)
+const paginationLayout = computed(() => isMobile.value ? 'prev, slot, next' : 'prev, pager, next, total')
+
+const updateWidth = () => {
+  windowWidth.value = window.innerWidth
+}
+
+onMounted(() => {
+  window.addEventListener('resize', updateWidth);
+  loadIpDetails()
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', updateWidth)
+})
 
 // Stato di caricamento e Reports
 const loadingReports = ref(false);

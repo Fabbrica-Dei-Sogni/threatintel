@@ -300,13 +300,13 @@
         "noAbuseData": "In attesa di arricchimento AbuseIPDB...",
         "refreshSuccess": "Dati IP aggiornati correttamente!",
         "refreshError": "Errore durante l'aggiornamento dei dati IP",
-        "abuseInvestigationLogs": "LOG INVESTIGATIVI ABUSEIPDB",
-        "syncAbuseReports": "Sincronizza Report AbuseIPDB",
+        "abuseInvestigationLogs": "LOG INVESTIGATIVI",
+        "syncAbuseReports": "Sincronizza Report",
         "confidence": "Confidenza",
         "reportsCount": "Reports",
         "networkInfo": "INFORMAZIONI DI RETE",
         "reporterCountryCode": "Paese Reporter",
-        "abuseReportingTitle": "REPORT ABUSI (AbuseIPDB)",
+        "abuseReportingTitle": "REPORT ABUSI",
         "hostname": "Hostname / Host"
     },
     "components": {

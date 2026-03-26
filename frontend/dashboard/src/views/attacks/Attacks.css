@@ -53,12 +53,8 @@
 }
 
 .attacchi h1 {
-  font-size: 24px;
   margin: 0;
   color: #ff4c4c;
-  font-weight: 700;
-  text-shadow: 0 0 6px rgba(255, 76, 76, 0.6);
-  display: flex;
 }
 
 /* =========================================
@@ -207,13 +203,8 @@
   color: #fff;
   border: none;
   padding: 10px 22px;
-  font-size: 15px;
-  font-weight: 700;
-  cursor: pointer;
   border-radius: 4px;
-  transition: all 0.3s ease;
   box-shadow: 0 4px 15px rgba(230, 33, 23, 0.4);
-  letter-spacing: 0.5px;
 }
 
 .btn-action:hover {
@@ -237,12 +228,8 @@
 }
 
 .min-logs-label {
-  font-weight: 600;
   color: #f2a1a1;
   white-space: normal;
-  /* Allow title to wrap */
-  font-size: clamp(0.8rem, 1.2vw, 0.95rem);
-  /* Responsive font size */
 }
 
 .search-box {
@@ -460,7 +447,6 @@
 }
 
 .time-hour {
-    font-weight: 600;
     color: #FF4C4C; /* Magma Theme Highlight */
 }
 
@@ -577,13 +563,11 @@
   border: none;
   padding: 5px 10px;
   border-radius: 4px;
-  font-weight: 600;
   cursor: pointer;
   transition: background 0.3s ease, transform 0.2s ease;
   white-space: nowrap;
   text-decoration: none;
   display: inline-block;
-  font-size: 13px;
 }
 
 @media (max-width: 768px) {

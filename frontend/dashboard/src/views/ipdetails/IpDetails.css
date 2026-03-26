@@ -134,11 +134,7 @@ h1 {
 }
 
 .briefing-header {
-  font-size: 0.75rem;
-  font-weight: 800;
   color: #00D4FF;
-  letter-spacing: 1.2px;
-  text-transform: uppercase;
   padding-bottom: 10px;
   border-bottom: 1px solid rgba(0, 168, 255, 0.1);
   display: flex;

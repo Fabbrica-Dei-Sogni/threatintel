@@ -70,9 +70,6 @@ const handleChange = () => {
     background: transparent;
     border: none;
     color: var(--text-color, #f0e6d2);
-    font-size: 13px;
-    font-weight: 600;
-    font-family: inherit;
     cursor: pointer;
     padding-right: 20px;
     outline: none;
@@ -86,7 +83,6 @@ const handleChange = () => {
     /* Mantiene coerenza con il colore di sfondo shell */
     color: #f0e6d2 !important;
     padding: 12px;
-    font-size: 14px;
 }
 
 .lang-select option:hover,

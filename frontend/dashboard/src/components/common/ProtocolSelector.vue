@@ -56,8 +56,6 @@ function selectProtocol(proto: string) {
     border: none;
     background: transparent;
     padding: 6px 12px;
-    font-size: 0.85rem;
-    font-weight: 600;
     cursor: pointer;
     border-radius: 6px;
     color: #666;

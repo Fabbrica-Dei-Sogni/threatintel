@@ -114,21 +114,16 @@ const formatAscii = (byte) => {
 }
 
 .hex-label {
-    font-size: 14px;
-    font-weight: bold;
     color: #ff4c4c;
     margin-bottom: 5px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
 }
 
 .hex-editor-container {
-    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-family: var(--font-mono);
     background-color: #1e1e1e;
     border: 1px solid #444;
     border-radius: 6px;
     padding: 10px;
-    font-size: 13px;
     line-height: 1.4;
     color: #d4d4d4;
     overflow-x: auto;
@@ -145,7 +140,6 @@ const formatAscii = (byte) => {
     border-bottom: 1px solid #444;
     margin-bottom: 5px;
     padding-bottom: 5px;
-    font-weight: bold;
 }
 
 .hex-row.alternate {
@@ -198,7 +192,6 @@ const formatAscii = (byte) => {
 .ascii-char.highlight {
     background-color: #264f78;
     color: white;
-    font-weight: bold;
 }
 
 /* Scrollbar stilizzata per il dark mode */

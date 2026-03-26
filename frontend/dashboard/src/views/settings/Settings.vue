@@ -484,7 +484,6 @@ const goBack = () => {
 
 .settings-title {
   margin: 0;
-  font-size: 1.5rem;
   color: var(--text-color);
 }
 
@@ -511,9 +510,6 @@ const goBack = () => {
 }
 
 .section-title {
-  font-size: 0.85rem;
-  text-transform: uppercase;
-  letter-spacing: 1px;
   color: var(--text-muted);
   margin-bottom: 1.5rem;
   display: flex;
@@ -613,8 +609,6 @@ const goBack = () => {
 label {
   display: block;
   margin-bottom: 0.6rem;
-  font-weight: 600;
-  font-size: 0.85rem;
   color: var(--text-muted);
 }
 
@@ -679,8 +673,6 @@ input:focus {
   padding: 0.75rem 1.75rem;
   border: 1px solid transparent;
   border-radius: 8px;
-  font-weight: 600;
-  font-size: 0.95rem;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;

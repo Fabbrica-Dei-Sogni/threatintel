@@ -231,15 +231,12 @@ const activityOptions = computed(() => ({
 }
 
 .icon {
-    font-size: 1.2rem;
+    display: inline-block;
 }
 
 h3 {
     margin: 0;
-    font-size: clamp(0.95rem, 1.5vw, 1.1rem);
-    font-weight: 600;
     color: #00FF41;
-    letter-spacing: 0.5px;
 }
 
 .chart-wrapper {

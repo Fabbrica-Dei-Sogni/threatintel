@@ -162,8 +162,6 @@ const chartOptions = {
 h3 {
     color: #FFB300;
     margin: 0 0 15px 0;
-    font-size: clamp(0.95rem, 1.5vw, 1.1rem);
-    font-weight: 600;
 }
 
 .chart-wrapper {

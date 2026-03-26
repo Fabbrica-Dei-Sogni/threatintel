@@ -83,12 +83,10 @@ function getDefconClass(level) {
     align-items: center;
     justify-content: flex-end;
     padding-right: 4px;
-    font-weight: 700;
 }
 
 .defcon-level-text {
     color: #1e1b1a;
-    font-size: 11px;
     text-shadow: 0 0 2px rgba(255, 255, 255, 0.7);
 }
 
@@ -102,8 +100,6 @@ function getDefconClass(level) {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: 800;
-    font-size: 10px;
     color: #000;
     box-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
     z-index: 2;

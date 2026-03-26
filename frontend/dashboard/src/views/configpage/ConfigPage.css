@@ -51,8 +51,6 @@
 
 .page-title {
   margin: 0;
-  font-size: 1.5rem;
-  font-weight: 700;
   color: #cbd5e1;
 }
 
@@ -130,8 +128,6 @@
   padding: 0.75rem 1.5rem;
   border: 1px solid transparent;
   border-radius: 10px;
-  font-weight: 600;
-  font-size: 0.9rem;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
@@ -265,8 +261,6 @@
 .form-group label {
   display: block;
   margin-bottom: 0.5rem;
-  font-weight: 600;
-  font-size: 0.85rem;
   color: var(--text-muted);
 }
 

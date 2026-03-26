@@ -88,13 +88,8 @@ const toggle = () => {
 }
 
 .toggle-label {
-  font-family: 'Source Code Pro', monospace;
-  font-size: 0.7rem;
-  font-weight: 800;
-  letter-spacing: 0.5px;
   color: #666;
   transition: all 0.3s ease;
-  text-transform: uppercase;
 }
 
 /* Active State Styles */

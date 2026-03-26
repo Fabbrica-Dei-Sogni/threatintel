@@ -366,8 +366,6 @@ const durationOptions = computed(() => ({
 h3 {
     color: #e6d4cf;
     margin: 0;
-    font-size: clamp(0.95rem, 1.5vw, 1.1rem);
-    font-weight: 600;
 }
 
 .chart-wrapper {

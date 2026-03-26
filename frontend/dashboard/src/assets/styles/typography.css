@@ -1,0 +1,134 @@
+/**
+ * typography.css
+ * Centralized typography system for the Cyber Dashboard.
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&display=swap');
+
+:root {
+    --font-primary: 'Source Code Pro', monospace;
+    --font-rounded: 'Outfit', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+}
+
+body {
+    font-family: var(--font-primary);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-shadow: 0 0 1px rgba(240, 230, 210, 0.15);
+    letter-spacing: -0.1px;
+}
+
+/* === HEADERS === */
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-primary);
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    margin-top: 0;
+}
+
+.cyber-title-base {
+    font-size: clamp(1.2rem, 4vw, 1.8rem);
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+}
+
+.cyber-title-sub {
+    font-size: clamp(1rem, 3.5vw, 1.2rem);
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+/* === FORENSIC & BRIEFING PATTERNS === */
+
+.briefing-header, .section-header {
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    font-family: var(--font-primary);
+}
+
+.briefing-label, .cyber-label-muted {
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    font-weight: 700;
+    opacity: 0.7;
+}
+
+.briefing-content, .briefing-value {
+    font-size: clamp(0.9rem, 3.5vw, 1.1rem);
+    font-weight: 700;
+}
+
+/* === DATA & MONOSPACE === */
+
+.cyber-monospaced {
+    font-family: var(--font-mono);
+}
+
+.attacker-ip, .cyber-value-large {
+    font-family: var(--font-mono);
+    font-size: clamp(1.2rem, 5vw, 1.8rem);
+    font-weight: 900;
+    letter-spacing: 1px;
+}
+
+.time-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1.1;
+    gap: 2px;
+}
+
+.time-date {
+    font-size: 0.85em;
+    opacity: 0.6;
+}
+
+.time-hour {
+    font-weight: 700;
+}
+
+/* === ACTIONS & BUTTONS === */
+
+.btn-action, .cyber-btn-base {
+    font-family: var(--font-primary);
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    font-size: 0.9rem;
+    text-transform: none;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.detail-link, .info-btn {
+    font-weight: 700;
+    font-size: 0.85rem;
+    white-space: nowrap;
+}
+
+/* === FORM ELEMENTS === */
+
+button, input, select, textarea {
+    font-family: inherit;
+    font-weight: 700;
+}
+
+.cyber-input-text {
+    font-family: var(--font-primary);
+    font-weight: 500;
+}
+
+/* === THEME SHADOWS (GLOWS) === */
+
+.glow-magma { text-shadow: 0 0 10px rgba(230, 33, 23, 0.4); }
+.glow-azure { text-shadow: 0 0 10px rgba(0, 122, 255, 0.4); }
+.glow-amber { text-shadow: 0 0 10px rgba(255, 179, 0, 0.4); }

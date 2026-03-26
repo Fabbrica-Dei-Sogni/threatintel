@@ -5,9 +5,10 @@
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../" && pwd)"
 RELEASE_DIR="$PROJECT_ROOT/release"
 BUILD_TMP="$PROJECT_ROOT/.build_tmp"
-ARTIFACT_NAME="threatintel-bundle-$(date +%Y%m%d).tar.gz"
+VERSION=${1:-"0.0.1"}
+ARTIFACT_NAME="threatintel-bundle-v$VERSION-$(date +%Y%m%d).tar.gz"
 
-echo "🚀 Starting Hybrid Bundle Build (NCC)..."
+echo "🚀 Starting Hybrid Bundle Build (NCC) - Version: $VERSION"
 echo "📍 Project Root: $PROJECT_ROOT"
 
 # 1. Cleanup
@@ -27,6 +28,7 @@ echo "📦 Assembling artifacts..."
 
 # A. The Bundle
 cp "$BUILD_TMP/index.js" "$RELEASE_DIR/"
+echo "$VERSION" > "$RELEASE_DIR/VERSION"
 
 # B. GeoIP Data (Essential Assets)
 echo "🌍 Copying GeoIP databases..."

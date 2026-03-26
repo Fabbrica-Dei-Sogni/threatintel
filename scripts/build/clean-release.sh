@@ -16,10 +16,11 @@ if [ -d "$PROJECT_ROOT/.build_tmp" ]; then
     rm -rf "$PROJECT_ROOT/.build_tmp"
 fi
 
-# 2. Rimuove le directory di test deploy locali
-if [ -d "$PROJECT_ROOT/.test_deploy" ]; then
-    echo "🗑️  Rimovendo directory di test .test_deploy/..."
-    rm -rf "$PROJECT_ROOT/.test_deploy"
+if [ -d "$PROJECT_ROOT/artifact" ]; then
+    echo "🗑️  Rimovendo directory artifact/..."
+    rm -rf "$PROJECT_ROOT/artifact"
 fi
 
-echo "✅ Pulizia completata. (La cartella artifact/ è stata preservata)"
+# 2. Nota sui Deployments
+echo "ℹ️  Nota: La cartella deployments/ NON viene toccata per preservare i servizi attivi."
+echo "✅ Pulizia ambiente di build completata."

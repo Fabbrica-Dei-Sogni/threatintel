@@ -1,0 +1,51 @@
+#!/bin/bash
+
+# Configuration
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../" && pwd)"
+
+echo "🔍 [Deploy Pending] Analisi cartelle deployments/..."
+echo "------------------------------------------------------------"
+
+# 1. Scansione directory in deployments/
+if [ ! -d "$PROJECT_ROOT/deployments" ]; then
+    echo "ℹ️  Nessun deployment trovato."
+    exit 0
+fi
+
+PENDING_DEPLOYS=""
+cd "$PROJECT_ROOT/deployments"
+for dir in */; do
+    dir=${dir%/} # Rimuove lo slash finale
+    if [ ! -f "/etc/systemd/system/$dir.service" ]; then
+        PENDING_DEPLOYS="$PENDING_DEPLOYS $dir"
+    fi
+done
+
+if [ -z "$PENDING_DEPLOYS" ]; then
+    echo "✅ Tutti i deployment rilevati sono già registrati come servizi systemd."
+    exit 0
+fi
+
+echo "Deployments trovati ma NON ancora installati come servizi:"
+select DEPLOY in $PENDING_DEPLOYS; do
+    if [ -n "$DEPLOY" ]; then
+        SELECTED_DIR="$DEPLOY"
+        break
+    fi
+done
+
+if [ -z "$SELECTED_DIR" ]; then exit 0; fi
+
+# 2. Avvio Installazione
+echo "🚀 Avvio installazione per: $SELECTED_DIR"
+cd "$PROJECT_ROOT/deployments/$SELECTED_DIR"
+
+if [ ! -f "./install.sh" ]; then
+    echo "❌ Errore: install.sh non trovato in deployments/$SELECTED_DIR"
+    exit 1
+fi
+
+# Chiede conferma parametri minimi o usa i default nell'install.sh
+./install.sh "$SELECTED_DIR"
+
+echo "✨ Deployment completato!"

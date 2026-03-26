@@ -6,7 +6,7 @@ echo "🗑️  ThreatIntel Release Uninstaller"
 echo "----------------------------------"
 
 # 1. Scoperta dei servizi gestiti
-MANAGED_SERVICES=$(grep -l "Managed-By: threatintel-release-workflow" /etc/systemd/system/*.service 2>/dev/null | xargs -n1 basename)
+MANAGED_SERVICES=$(grep -l "Managed-By: threatintel-release-workflow" /etc/systemd/system/*.service 2>/dev/null | xargs -n1 basename | sort -u)
 
 if [ -z "$MANAGED_SERVICES" ]; then
     echo "ℹ️  Nessun servizio gestito trovato nel sistema."
@@ -38,9 +38,19 @@ if [ -z "$SERVICE_TO_REMOVE" ]; then exit 0; fi
 # 2. Rimozione
 echo "🧹 Rimuovendo $SERVICE_TO_REMOVE..."
 
-sudo systemctl stop "$SERVICE_TO_REMOVE" 2>/dev/null
-sudo systemctl disable "$SERVICE_TO_REMOVE" 2>/dev/null
-sudo rm "/etc/systemd/system/$SERVICE_TO_REMOVE"
-sudo systemctl daemon-reload
+SERVICE_PATH="/etc/systemd/system/$SERVICE_TO_REMOVE"
 
-echo "✅ Servizio $SERVICE_TO_REMOVE rimosso correttamente."
+if [ -L "$SERVICE_PATH" ] || [ -f "$SERVICE_PATH" ]; then
+    sudo systemctl stop "$SERVICE_TO_REMOVE" 2>/dev/null
+    sudo systemctl disable "$SERVICE_TO_REMOVE" 2>/dev/null
+    
+    # Check again because systemctl disable might have already removed the symlink
+    if [ -L "$SERVICE_PATH" ] || [ -f "$SERVICE_PATH" ]; then
+        sudo rm "$SERVICE_PATH"
+    fi
+    
+    sudo systemctl daemon-reload
+    echo "✅ Servizio $SERVICE_TO_REMOVE rimosso correttamente."
+else
+    echo "⚠️  Il file $SERVICE_PATH non esiste più o è già stato rimosso."
+fi

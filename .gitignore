@@ -6,4 +6,6 @@ redis-data
 redisinsight-data
 artifact
 release
+deployments
 .test_deploy
+.build_tmp

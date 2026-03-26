@@ -12,6 +12,7 @@ WorkingDirectory={{WORKING_DIR}}
 # Runtime Configuration
 Environment=NODE_ENV={{NODE_ENV}}
 Environment=PORT={{PORT}}
+Environment=VERSION={{VERSION}}
 # Environment variable to guide geoip-lite to the local data folder
 Environment=GEODATADIR=./data
 

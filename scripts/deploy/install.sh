@@ -9,6 +9,13 @@ DEPLOY_ENV=${NODE_ENV:-"production"}
 DEPLOY_DESC=${DESC:-"Threat Intelligence Logger (Release Bundle)"}
 TEMPLATE_FILE="threatintel.service"
 
+# Detect version if file exists
+if [ -f "VERSION" ]; then
+    APP_VERSION=$(cat VERSION)
+    DEPLOY_DESC="$DEPLOY_DESC v$APP_VERSION"
+    echo "🏷️  Version detected: $APP_VERSION"
+fi
+
 echo "🎯 Installing ThreatIntel Bundle..."
 echo "📍 Working Directory: $WORKING_DIR"
 echo "📛 Service Name: $SERVICE_NAME"
@@ -18,6 +25,15 @@ echo "🌍 Environment: $DEPLOY_ENV"
 echo "📝 Description: $DEPLOY_DESC"
 
 # 1. Systemd Configuration
+if [ -f "/etc/systemd/system/$SERVICE_NAME.service" ]; then
+    echo "------------------------------------------------------------"
+    echo "⚠️  ATTENZIONE: Il servizio '$SERVICE_NAME' esiste già!"
+    echo "🔄 Procedo con l'AGGIORNAMENTO dell'istanza esistente."
+    echo "------------------------------------------------------------"
+else
+    echo "🆕 Creazione di un NUOVO servizio: $SERVICE_NAME"
+fi
+
 if [ -f "$TEMPLATE_FILE" ]; then
     echo "⚙️  Configuring systemd service..."
     # Replace placeholders with absolute path, user, etc.
@@ -26,6 +42,7 @@ if [ -f "$TEMPLATE_FILE" ]; then
         -e "s|{{PORT}}|$DEPLOY_PORT|g" \
         -e "s|{{NODE_ENV}}|$DEPLOY_ENV|g" \
         -e "s|{{DESCRIPTION}}|$DEPLOY_DESC|g" \
+        -e "s|{{VERSION}}|${APP_VERSION:-"unknown"}|g" \
         "$TEMPLATE_FILE" > "$SERVICE_NAME.service.final"
     
     if [ ! -s "$SERVICE_NAME.service.final" ]; then
@@ -33,22 +50,25 @@ if [ -f "$TEMPLATE_FILE" ]; then
         exit 1
     fi
 
-    echo "📜 Deploying service to /etc/systemd/system/$SERVICE_NAME.service..."
-    sudo cp "$SERVICE_NAME.service.final" "/etc/systemd/system/$SERVICE_NAME.service"
+    echo "📜 Linking service to /etc/systemd/system/$SERVICE_NAME.service..."
+    FINAL_SERVICE_FILE="$WORKING_DIR/$SERVICE_NAME.service.managed"
+    mv "$SERVICE_NAME.service.final" "$FINAL_SERVICE_FILE"
+    
+    sudo ln -sf "$FINAL_SERVICE_FILE" "/etc/systemd/system/$SERVICE_NAME.service"
     
     if [ $? -eq 0 ]; then
         echo "🔄 Reloading systemd daemon..."
         sudo systemctl daemon-reload
         
-        # Verify the file is actually there and readable by systemd
-        if [ -f "/etc/systemd/system/$SERVICE_NAME.service" ]; then
-            echo "✅ Service file successfully deployed and recognized."
+        # Verify the link is actually there
+        if [ -L "/etc/systemd/system/$SERVICE_NAME.service" ]; then
+            echo "✅ Service link successfully created."
         else
-            echo "❌ Error: Service file missing from /etc/systemd/system/ after copy."
+            echo "❌ Error: Service link missing from /etc/systemd/system/ after creation."
             exit 1
         fi
     else
-        echo "❌ Error: Failed to copy service file to /etc/systemd/system/."
+        echo "❌ Error: Failed to create service link in /etc/systemd/system/."
         exit 1
     fi
     

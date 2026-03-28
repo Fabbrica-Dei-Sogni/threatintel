@@ -254,9 +254,7 @@
                             </td>
 
                             <td class="defcon-cell" :title="attack.dangerScore">
-                            <td>
-                                <DefconIndicator :level="attack.dangerLevel" :dangerScore="attack.dangerScore" />
-                            </td>
+                                <DefconIndicator :level="attack.dangerLevel" :dangerScore="attack.dangerScore" mode="dot" />
                             </td>
                             <td class="tecniche-cell">
                                 <div class="tech-wrapper">

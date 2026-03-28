@@ -28,12 +28,11 @@
                 <div class="filter-item min-logs">
                     <label class="min-logs-label" for="minLogsForAttack">{{ t('attacks.minLogsLabel') }}</label>
                     <el-input-number id="minLogsForAttack" v-model="minLogsForAttack" :min="1" :step="1"
-                        class="min-logs-input" size="small" @input="onFilterChanged" />
+                        class="min-logs-input" size="small" />
                 </div>
 
                 <div class="filter-item search-box">
-                    <input type="text" v-model="filterIp" :placeholder="t('attacks.filterByIp')" class="ip-input"
-                        @input="onFilterChanged" />
+                    <input type="text" v-model="filterIp" :placeholder="t('attacks.filterByIp')" class="ip-input" />
                     <button v-if="filterIp" @click="clearIpFilter" class="clear-btn"
                         :aria-label="t('attacks.clearIpFilter')">×</button>
                 </div>
@@ -48,9 +47,8 @@
                     </el-radio-group>
 
                     <div v-if="timeMode === 'ago'" class="time-ago-wrapper">
-                        <el-input-number v-model="agoValue" :min="1" size="small" @input="onFilterChanged" />
-                        <el-select v-model="agoUnit" size="small" :placeholder="t('attacks.unit')"
-                            @change="onFilterChanged">
+                        <el-input-number v-model="agoValue" :min="1" size="small" />
+                        <el-select v-model="agoUnit" size="small" :placeholder="t('attacks.unit')">
                             <el-option :label="t('attacks.minutes')" value="minutes" />
                             <el-option :label="t('attacks.hours')" value="hours" />
                             <el-option :label="t('attacks.days')" value="days" />
@@ -61,7 +59,7 @@
                     <div v-else class="time-range-wrapper">
                         <el-date-picker v-model="dateRange" type="daterange" :start-placeholder="t('attacks.startDate')"
                             :end-placeholder="t('attacks.endDate')" value-format="YYYY-MM-DD" format="DD/MM/YYYY"
-                            @change="onFilterChanged" unlink-panels size="small" :teleported="true" />
+                            unlink-panels size="small" :teleported="true" />
                     </div>
                 </div>
             </div>
@@ -589,8 +587,7 @@ watch(() => attacks.value, () => {
     setTimeout(updateTableWidth, 200);
 }, { deep: true });
 
-// Fetch iniziale
-fetchData();
+// Fetch iniziale rimosso in favore del watcher immediato nel composable
 </script>
 
 <style scoped src="./Attacks.css"></style>

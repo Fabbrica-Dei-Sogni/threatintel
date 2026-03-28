@@ -30,6 +30,8 @@ export function useLogsFilter(
 
     // Funzione per recuperare dati
     async function fetchData(): Promise<void> {
+        if (loading.value) return; 
+
         loading.value = true;
         error.value = false;
 
@@ -59,48 +61,60 @@ export function useLogsFilter(
         }
     }
 
-    // Watchers
-    watch([filterIp, filterUrl, filterProtocol], () => {
-        //page.value = 1;
-        fetchData();
-    });
-
-    watch(page, () => {
-        fetchData();
-    });
-
-    // Debounced filter input handler
-    function onFilterChanged(resetPage = true): void {
-        if (filterTimer.value) {
-            clearTimeout(filterTimer.value);
-        }
-        filterTimer.value = setTimeout(() => {
-            if (resetPage) {
-                page.value = 1;
-            }
+    // Debounced fetchData
+    let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+    function debouncedFetch() {
+        if (debounceTimer) clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
             fetchData();
-        }, 400);
+        }, 300);
+    }
+
+    // Unico watcher per tutti i cambiamenti di stato
+    // Definiamo i campi che costituiscono un filtro per gestire il reset della pagina
+    const filterRefs = [filterIp, filterUrl, filterProtocol];
+
+    watch(
+        [...filterRefs, page, sortFields],
+        (newVal: any[], oldVal: any[]) => {
+            // Verifichiamo se è cambiato uno dei filtri (primi 3 elementi)
+            const filtersChanged = filterRefs.some((_, i) => newVal[i] !== oldVal[i]);
+            
+            if (filtersChanged && page.value !== 1) {
+                page.value = 1;
+                // fetchData verrà chiamato dal prossimo ciclo generato dal cambio di page
+                return;
+            }
+            
+            debouncedFetch();
+        },
+        { deep: true, immediate: true }
+    );
+
+    // Filter input handler (ora può essere vuoto o rimosso, 
+    // ma lo teniamo per compatibilità se chiamato esplicitamente)
+    function onFilterChanged(): void {
+        // Il watcher gestirà tutto
     }
 
     // Toggle sorting order for a field
     function toggleSort(field: string): void {
-        const currentDirection = sortFields.value[field];
+        const newSort = { ...sortFields.value };
+        const currentDirection = newSort[field];
 
         if (currentDirection === undefined) {
-            // Add ascending sort
-            sortFields.value = { ...sortFields.value, [field]: 1 };
+            // Aggiunge in coda se nuovo
+            newSort[field] = 1;
         } else if (currentDirection === 1) {
-            // Change to descending
-            sortFields.value = { ...sortFields.value, [field]: -1 };
+            // Inverte la direzione nello stesso posto
+            newSort[field] = -1;
         } else {
-            // Remove sort
-            const newSort = { ...sortFields.value };
+            // Rimuove il campo
             delete newSort[field];
-            sortFields.value = Object.keys(newSort).length ? newSort : {};
         }
-        // Sorting does not reset the page number
-        // page.value = 1;
-        fetchData();
+        
+        sortFields.value = newSort;
+        // fetchData() verrà chiamato automaticamente dal watcher di sortFields
     }
 
     // Get current sort direction for a field

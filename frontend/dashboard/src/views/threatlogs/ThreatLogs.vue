@@ -23,14 +23,14 @@
       <div class="filter-row main-filters">
         <ProtocolSelector v-model="filterProtocol" :options="['http', 'https', 'ssh']" theme="amber" />
         <div class="filter-item search-box">
-          <input type="text" v-model="filterIp" :placeholder="t('threatLogs.filterByIp')" @input="onFilterChanged"
+          <input type="text" v-model="filterIp" :placeholder="t('threatLogs.filterByIp')"
             class="ip-input" />
           <button v-if="filterIp" @click="clearIpFilter" class="clear-btn" :aria-label="t('threatLogs.clearIpFilter')">
             ×
           </button>
         </div>
         <div class="filter-item search-box url-search">
-          <input v-model="filterUrl" :placeholder="t('threatLogs.filterByUrl')" @input="onFilterChanged"
+          <input v-model="filterUrl" :placeholder="t('threatLogs.filterByUrl')"
             class="ip-input" type="text" />
           <button v-if="filterUrl" @click="clearUrlFilter" class="clear-btn" :title="t('threatLogs.clearUrlFilter')"
             type="button" aria-label="Clear URL filter">
@@ -286,7 +286,6 @@ onMounted(() => {
   updateTableWidth();
   const interval = setInterval(updateTableWidth, 1000);
   onUnmounted(() => clearInterval(interval));
-  fetchData();
 });
 
 onUnmounted(() => {
@@ -386,8 +385,7 @@ function changePage(newPage) {
   }
 }
 
-// Fetch iniziale
-fetchData();
+// Fetch iniziale rimosso in favore del watcher immediato nel composable
 </script>
 
 <style scoped src="./ThreatLogs.css"></style>

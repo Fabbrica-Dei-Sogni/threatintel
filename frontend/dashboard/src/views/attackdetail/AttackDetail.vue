@@ -36,7 +36,10 @@
                     <span class="animated-icon pulse-magma">🛰️</span>
                     <h2>{{ t('attackDetail.hudTitle').toUpperCase() }}</h2>
                 </div>
-                <span class="arrow" :class="{ open: toggles.summary }"></span>
+                <div class="header-actions">
+                    <span class="copy-log-btn" @click.stop="copyAttackSummary()" :title="t('common.copy')">📋</span>
+                    <span class="arrow" :class="{ open: toggles.summary }"></span>
+                </div>
             </div>
 
             <transition name="collapse">
@@ -555,6 +558,31 @@ const loadAttackData = async () => {
 }
 
 onMounted(loadAttackData)
+const copyAttackSummary = () => {
+    if (!attack.value) return;
+    
+    let text = `--- TACTICAL ATTACK SUMMARY ---\n`;
+    text += `Target IP: ${attack.value.request?.ip || 'N/A'}\n`;
+    text += `Defcon Level: ${attack.value.dangerLevel} (${attack.value.dangerScore}/10)\n`;
+    text += `\n[MAIN METRICS]\n`;
+    text += `- Total Logs: ${attack.value.totaleLogs}\n`;
+    text += `- Duration: ${attack.value.durataAttacco?.human || 'N/A'}\n`;
+    text += `- Average RPS: ${attack.value.rps}\n`;
+    text += `\n[ATTACK PROFILE]\n`;
+    
+    if (attack.value.attackPatterns?.length) {
+        text += `- Techniques: ${attack.value.attackPatterns.join(', ')}\n`;
+    }
+    
+    text += `- First Seen: ${dayjs(attack.value.firstSeen).format('YYYY-MM-DD HH:mm:ss')}\n`;
+    text += `- Last Seen: ${dayjs(attack.value.lastSeen).format('YYYY-MM-DD HH:mm:ss')}\n`;
+    text += `- Intensity: ${attack.value.intensityAttack || 'N/A'}\n`;
+    text += `- Average Forensic Score: ${attack.value.averageScore}\n`;
+    text += `\n--------------------------------`;
+    
+    copyToClipboard(text);
+};
+
 const copyAggregatedLog = (log) => {
     let text = `--- THREAT INTEL LOG SUMMARY ---\n`;
     text += `Timestamp: ${dayjs(log.timestamp).format('YYYY-MM-DD HH:mm:ss')}\n`;

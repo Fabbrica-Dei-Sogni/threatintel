@@ -459,7 +459,9 @@
             "sessionCaptured": "🎬 Session Recording Captured",
             "size": "Size",
             "duration": "Duration",
-            "mapTitle": "Session Map"
+            "mapTitle": "Session Map",
+            "mainInfo": "MAIN INFORMATION",
+            "eventTimeline": "OPERATIONAL TIMELINE"
         }
     }
 }

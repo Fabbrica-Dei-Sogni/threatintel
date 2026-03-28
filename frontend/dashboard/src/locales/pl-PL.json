@@ -458,7 +458,9 @@
             "sessionCaptured": "🎬 Nagranie sesji przechwycone",
             "size": "Rozmiar",
             "duration": "Czas trwania",
-            "mapTitle": "Mapa Sesji"
+            "mapTitle": "Mapa Sesji",
+            "mainInfo": "GŁÓWNE INFORMACJE",
+            "eventTimeline": "OŚ CZASU DZIAŁANIA"
         }
     }
 }

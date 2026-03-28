@@ -9,24 +9,44 @@
         </div>
         <p class="subtitle">{{ $t('cowrie.attackDetail.subtitle') }}: <span class="hash">{{ sessionId }}</span> ({{ $t('cowrie.attackDetail.rawEvents') }}: {{ events.length }})</p>
 
-        <div class="glass-card info-card" v-if="sessionDetails">
-            <div class="info-grid">
-                <div class="info-item">
-                    <span class="label">{{ $t('cowrie.attackDetail.hostileIp') }}</span>
-                    <span class="value ip">
-                        <span class="ip-link" @click="goToIpDetails(sessionDetails.src_ip)" :title="$t('common.infoIp')">{{ sessionDetails.src_ip }}</span>
-                        <button @click.stop="copyToClipboard(sessionDetails.src_ip)" class="btn-copy-mini" :title="$t('cowrie.attackDetail.copy')">📋</button>
-                    </span>
+        <div class="sub-card info-card" v-if="sessionDetails">
+            <div class="sub-card-header" @click="toggles.showInfo = !toggles.showInfo">
+                <div class="header-title-group">
+                    <span class="animated-icon">👤</span>
+                    <h3>{{ t('cowrie.attackDetail.mainInfo').toUpperCase() }}</h3>
                 </div>
-                <div class="info-item">
-                    <span class="label">{{ $t('cowrie.attackDetail.timeWindow') }}</span>
-                    <span class="value">{{ formatDate(sessionDetails.starttime) }} - {{ formatDate(sessionDetails.endtime) }}</span>
-                </div>
-                <div class="info-item" v-if="sessionDetails.ipDetailsId?.ipinfo?.country">
-                    <span class="label">{{ $t('cowrie.attackDetail.origin') }}</span>
-                    <span class="value geo">📍 {{ sessionDetails.ipDetailsId.ipinfo.city }}, {{ sessionDetails.ipDetailsId.ipinfo.country }}</span>
+                <div class="header-actions">
+                    <span class="copy-log-btn" @click.stop="copySessionSummary()" :title="t('common.copy')">📋</span>
+                    <span class="arrow" :class="{ open: toggles.showInfo }"></span>
                 </div>
             </div>
+            <transition name="collapse">
+                <div v-if="toggles.showInfo" class="sub-card-content">
+                    <div class="hud-sub-grid">
+                        <div class="hud-item">
+                            <span class="hud-label">
+                                <span class="mini-icon">👤</span> {{ $t('cowrie.attackDetail.hostileIp') }}
+                            </span>
+                            <div class="hud-content ip">
+                                <span class="ip-link" @click="goToIpDetails(sessionDetails.src_ip)" :title="$t('common.infoIp')">{{ sessionDetails.src_ip }}</span>
+                                <button @click.stop="copyToClipboard(sessionDetails.src_ip)" class="btn-copy-mini" :title="$t('cowrie.attackDetail.copy')">📋</button>
+                            </div>
+                        </div>
+                        <div class="hud-item">
+                            <span class="hud-label">
+                                <span class="mini-icon">📅</span> {{ $t('cowrie.attackDetail.timeWindow') }}
+                            </span>
+                            <div class="hud-content">{{ formatDate(sessionDetails.starttime) }} - {{ formatDate(sessionDetails.endtime) }}</div>
+                        </div>
+                        <div class="hud-item" v-if="sessionDetails.ipDetailsId?.ipinfo?.country">
+                            <span class="hud-label">
+                                <span class="mini-icon">📍</span> {{ $t('cowrie.attackDetail.origin') }}
+                            </span>
+                            <div class="hud-content geo">{{ sessionDetails.ipDetailsId.ipinfo.city }}, {{ sessionDetails.ipDetailsId.ipinfo.country }}</div>
+                        </div>
+                    </div>
+                </div>
+            </transition>
         </div>
 
         <!-- Mappa della Sessione -->
@@ -51,46 +71,65 @@
         
         <div v-if="error" class="error-box">{{ error }}</div>
 
-        <section class="timeline-container" v-if="!loading && !error">
-            <ul class="cyber-timeline">
-                <li v-for="(event, index) in events" :key="event._id" class="timeline-node" :style="{ animationDelay: `${index * 0.1}s` }">
-                    <div class="node-icon" :class="getEventTypeClass(event.eventid)">
-                        <i v-if="event.eventid.includes('login')">🔑</i>
-                        <i v-else-if="event.eventid.includes('command')">💻</i>
-                        <i v-else-if="event.eventid.includes('download')">📦</i>
-                        <i v-else-if="event.eventid.includes('log.closed')">📼</i>
-                        <i v-else>📡</i>
-                    </div>
-                    <div class="node-content glass-card">
-                        <h4>{{ formatEventName(event.eventid) }}</h4>
-                        <p class="event-msg">{{ event.message }}</p>
-                        
-                        <div v-if="event.input" class="terminal-payload">
-                            <span class="prompt">root@honeypot:~#</span> <span class="cmd-text">{{ event.input }}</span>
-                        </div>
-                        <div v-if="event.username" class="auth-payload" :class="event.eventid.includes('failed') ? 'failed' : 'success'">
-                            <span class="auth-label">{{ $t('cowrie.attackDetail.user') }}:</span> {{ event.username }} <br>
-                            <span class="auth-label">{{ $t('cowrie.attackDetail.pass') }}:</span> {{ event.password }}
-                        </div>
-                        <div v-if="event.shasum && !event.ttylog" class="dl-payload">
-                            <div class="dl-url">{{ $t('cowrie.attackDetail.url') }}: {{ event.url }}</div>
-                            <div class="dl-sha">{{ $t('cowrie.attackDetail.sha') }}: {{ event.shasum }}</div>
-                        </div>
-                        <div v-if="event.ttylog" class="ttylog-payload">
-                            <div class="tty-header">{{ $t('cowrie.attackDetail.sessionCaptured') }}</div>
-                            <div class="tty-meta">
-                                <span>{{ $t('cowrie.attackDetail.size') }}: {{ (event.size / 1024).toFixed(2) }} KB</span> | 
-                                <span>{{ $t('cowrie.attackDetail.duration') }}: {{ event.duration }}s</span>
-                            </div>
-                            <div class="tty-hex-preview">{{ event.ttylog.substring(0, 100) }}...</div>
-                        </div>
-                    </div>
-                </li>
-            </ul>
-            <div v-if="events.length === 0" class="empty-state">
-                {{ $t('cowrie.attackDetail.emptyState') }}
+        <div class="sub-card timeline-card" v-if="!loading && !error">
+            <div class="sub-card-header" @click="toggles.showTimeline = !toggles.showTimeline">
+                <div class="header-title-group">
+                    <span class="animated-icon">📊</span>
+                    <h3>{{ t('cowrie.attackDetail.eventTimeline').toUpperCase() }}</h3>
+                </div>
+                <div class="header-actions">
+                    <span class="copy-log-btn" @click.stop="copyEventTimeline()" :title="t('common.copy')">📋</span>
+                    <span class="arrow" :class="{ open: toggles.showTimeline }"></span>
+                </div>
             </div>
-        </section>
+            <transition name="collapse">
+                <div v-if="toggles.showTimeline" class="sub-card-content p-24">
+                    <section class="timeline-container">
+                        <ul class="cyber-timeline">
+                            <li v-for="(event, index) in events" :key="event._id" class="timeline-node" :style="{ animationDelay: `${index * 0.05}s` }">
+                                <div class="node-icon" :class="getEventTypeClass(event.eventid)">
+                                    <i v-if="event.eventid.includes('login')">🔑</i>
+                                    <i v-else-if="event.eventid.includes('command')">💻</i>
+                                    <i v-else-if="event.eventid.includes('download')">📦</i>
+                                    <i v-else-if="event.eventid.includes('log.closed')">📼</i>
+                                    <i v-else>📡</i>
+                                </div>
+                                <div class="node-content glass-card">
+                                    <div class="node-header">
+                                        <h4>{{ formatEventName(event.eventid) }}</h4>
+                                        <span class="node-time">{{ dayjs(event.timestamp).format('HH:mm:ss') }}</span>
+                                    </div>
+                                    <p class="event-msg">{{ event.message }}</p>
+                                    
+                                    <div v-if="event.input" class="terminal-payload">
+                                        <span class="prompt">root@honeypot:~#</span> <span class="cmd-text">{{ event.input }}</span>
+                                    </div>
+                                    <div v-if="event.username" class="auth-payload" :class="event.eventid.includes('failed') ? 'failed' : 'success'">
+                                        <span class="auth-label">{{ $t('cowrie.attackDetail.user') }}:</span> {{ event.username }} <br>
+                                        <span class="auth-label">{{ $t('cowrie.attackDetail.pass') }}:</span> {{ event.password }}
+                                    </div>
+                                    <div v-if="event.shasum && !event.ttylog" class="dl-payload">
+                                        <div class="dl-url">{{ $t('cowrie.attackDetail.url') }}: {{ event.url }}</div>
+                                        <div class="dl-sha">{{ $t('cowrie.attackDetail.sha') }}: {{ event.shasum }}</div>
+                                    </div>
+                                    <div v-if="event.ttylog" class="ttylog-payload">
+                                        <div class="tty-header">{{ $t('cowrie.attackDetail.sessionCaptured') }}</div>
+                                        <div class="tty-meta">
+                                            <span>{{ $t('cowrie.attackDetail.size') }}: {{ (event.size / 1024).toFixed(2) }} KB</span> | 
+                                            <span>{{ $t('cowrie.attackDetail.duration') }}: {{ event.duration }}s</span>
+                                        </div>
+                                        <div class="tty-hex-preview">{{ event.ttylog.substring(0, 100) }}...</div>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                        <div v-if="events.length === 0" class="empty-state">
+                            {{ $t('cowrie.attackDetail.emptyState') }}
+                        </div>
+                    </section>
+                </div>
+            </transition>
+        </div>
     </div>
 </template>
 
@@ -116,8 +155,43 @@ const loading = ref(true);
 const error = ref(null);
 
 const toggles = reactive({
-    showMap: false
+    showMap: false,
+    showInfo: true,
+    showTimeline: true
 });
+
+const copySessionSummary = () => {
+    if (!sessionDetails.value) return;
+    const s = sessionDetails.value;
+    let text = `--- TELNET SESSION SUMMARY ---\n`;
+    text += `Session ID: ${sessionId}\n`;
+    text += `Hostile IP: ${s.src_ip}\n`;
+    text += `Time Window: ${formatDate(s.starttime)} - ${formatDate(s.endtime)}\n`;
+    if (s.ipDetailsId?.ipinfo) {
+        text += `Origin: ${s.ipDetailsId.ipinfo.city}, ${s.ipDetailsId.ipinfo.country}\n`;
+    }
+    text += `Total Events: ${events.value.length}\n`;
+    text += `------------------------------`;
+    copyToClipboard(text);
+};
+
+const copyEventTimeline = () => {
+    if (events.value.length === 0) return;
+    let text = `--- TELNET OPERATIONAL TIMELINE ---\n`;
+    text += `Session ID: ${sessionId}\n\n`;
+    
+    events.value.forEach(event => {
+        text += `[${dayjs(event.timestamp).format('HH:mm:ss')}] ${formatEventName(event.eventid)}\n`;
+        text += `> ${event.message}\n`;
+        if (event.input) text += `  CMD: ${event.input}\n`;
+        if (event.username) text += `  AUTH: ${event.username} / ${event.password}\n`;
+        if (event.url) text += `  URL: ${event.url}\n`;
+        text += `\n`;
+    });
+    
+    text += `-----------------------------------`;
+    copyToClipboard(text);
+};
 
 const mapAttackData = computed(() => {
     if (!sessionDetails.value) return [];

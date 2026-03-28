@@ -458,7 +458,9 @@
             "sessionCaptured": "🎬 Enregistrement de session capturé",
             "size": "Taille",
             "duration": "Durée",
-            "mapTitle": "Carte de Session"
+            "mapTitle": "Carte de Session",
+            "mainInfo": "INFORMATIONS PRINCIPALES",
+            "eventTimeline": "TIMELINE OPÉRATIONNELLE"
         }
     }
 }

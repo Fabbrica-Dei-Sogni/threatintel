@@ -131,9 +131,37 @@
     transform: rotate(-135deg);
 }
 
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.copy-log-btn {
+    cursor: pointer;
+    opacity: 0.5;
+    font-size: 1.1rem;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+    color: #00FF41;
+}
+
+.copy-log-btn:hover {
+    opacity: 1;
+    transform: scale(1.2);
+    filter: drop-shadow(0 0 8px rgba(0, 255, 65, 0.6));
+}
+
+
 .sub-card-content {
     padding: 0;
 }
+
+.p-20 { padding: 20px; }
+.p-24 { padding: 24px; }
 
 /* Transitions */
 .collapse-enter-active,
@@ -155,31 +183,59 @@
     }
 }
 
-.info-grid {
+.hud-sub-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+    gap: 16px;
+    padding: 20px;
+    width: 100%;
 }
 
-.info-item {
+.hud-item {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 8px;
+    background: rgba(0, 255, 65, 0.03);
+    padding: 15px;
+    border-radius: 8px;
+    border-left: 3px solid rgba(0, 255, 65, 0.2);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.info-item .label {
+.hud-item:hover {
+    background: rgba(0, 255, 65, 0.06);
+    border-left-color: rgba(0, 255, 65, 0.5);
+    transform: translateX(4px);
+}
+
+.hud-label {
+    font-size: 0.75rem;
     color: #00FF41;
-    opacity: 0.8;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    opacity: 0.6;
+    white-space: nowrap;
 }
 
-.info-item .value {
+.mini-icon {
+    font-size: 1rem;
+    margin-right: 6px;
+    vertical-align: middle;
+}
+
+.hud-content {
+    font-size: 0.95rem;
+    font-weight: 600;
     color: #F0FAD0;
+    word-break: break-all;
 }
 
-.info-item .value.ip {
-    color: #00FF41;
-    font-family: 'Source Code Pro', monospace;
+.hud-content.ip {
+    display: flex;
+    align-items: center;
 }
+
 
 .ip-link {
     color: #00FF41;
@@ -279,13 +335,28 @@
     box-shadow: 0 0 15px rgba(0, 255, 65, 0.15);
 }
 
+.node-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
 .node-content h4 {
-    margin: 0 0 8px 0;
+    margin: 0;
     font-size: 14px;
     color: #00FF41;
     text-transform: uppercase;
     letter-spacing: 1px;
 }
+
+.node-time {
+    font-size: 11px;
+    font-family: 'Source Code Pro', monospace;
+    color: #BBA685;
+    opacity: 0.7;
+}
+
 
 .event-msg {
     margin: 0;

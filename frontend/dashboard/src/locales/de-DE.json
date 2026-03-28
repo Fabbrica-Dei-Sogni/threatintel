@@ -458,7 +458,9 @@
             "sessionCaptured": "🎬 Sitzungsaufzeichnung erfasst",
             "size": "Größe",
             "duration": "Dauer",
-            "mapTitle": "Sitzungskarte"
+            "mapTitle": "Sitzungskarte",
+            "mainInfo": "HAUPTINFORMATIONEN",
+            "eventTimeline": "OPERATIVE TIMELINE"
         }
     }
 }

@@ -416,6 +416,14 @@
             "filterByIp": "Filtruj według IP...",
             "clearIpFilter": "Wyczyść filtr IP",
             "table": {
+                "short": {
+                    "country": "🌍",
+                    "ip": "👤",
+                    "startTime": "⏱️",
+                    "duration": "⏳",
+                    "events": "📊",
+                    "exploration": "🔍"
+                },
                 "ip": "IP źródłowe",
                 "country": "Kraj",
                 "startTime": "Czas rozpoczęcia",

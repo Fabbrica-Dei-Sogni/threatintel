@@ -77,10 +77,10 @@
                 <table ref="tableRef" class="cyber-table">
                     <thead>
                         <tr>
-                            <th>{{ $t('cowrie.sessions.table.country') }}</th>
-                            <th class="sortable-th">
+                            <th :data-sessions-tooltip="$t('cowrie.sessions.table.country')">{{ $t('cowrie.sessions.table.short.country') }}</th>
+                            <th class="sortable-th" :data-sessions-tooltip="$t('cowrie.sessions.table.ip')">
                                 <div class="sort-control">
-                                    <span class="label">{{ $t('cowrie.sessions.table.ip') }}</span>
+                                    <span class="label">{{ $t('cowrie.sessions.table.short.ip') }}</span>
                                     <button @click="toggleSort('src_ip')" class="sort-button">
                                         <span v-if="getSortDirection('src_ip') === 1">▲</span>
                                         <span v-else-if="getSortDirection('src_ip') === -1">▼</span>
@@ -88,9 +88,9 @@
                                     </button>
                                 </div>
                             </th>
-                            <th class="sortable-th">
+                            <th class="sortable-th" :data-sessions-tooltip="$t('cowrie.sessions.table.startTime')">
                                 <div class="sort-control">
-                                    <span class="label">{{ $t('cowrie.sessions.table.startTime') }}</span>
+                                    <span class="label">{{ $t('cowrie.sessions.table.short.startTime') }}</span>
                                     <button @click="toggleSort('timestamp')" class="sort-button">
                                         <span v-if="getSortDirection('timestamp') === 1">▲</span>
                                         <span v-else-if="getSortDirection('timestamp') === -1">▼</span>
@@ -98,9 +98,9 @@
                                     </button>
                                 </div>
                             </th>
-                            <th class="sortable-th">
+                            <th class="sortable-th" :data-sessions-tooltip="$t('cowrie.sessions.table.duration')">
                                 <div class="sort-control">
-                                    <span class="label">{{ $t('cowrie.sessions.table.duration') }}</span>
+                                    <span class="label">{{ $t('cowrie.sessions.table.short.duration') }}</span>
                                     <button @click="toggleSort('time')" class="sort-button">
                                         <span v-if="getSortDirection('time') === 1">▲</span>
                                         <span v-else-if="getSortDirection('time') === -1">▼</span>
@@ -108,9 +108,9 @@
                                     </button>
                                 </div>
                             </th>
-                            <th class="sortable-th">
+                            <th class="sortable-th" :data-sessions-tooltip="$t('cowrie.sessions.table.events')">
                                 <div class="sort-control">
-                                    <span class="label">{{ $t('cowrie.sessions.table.events') }}</span>
+                                    <span class="label">{{ $t('cowrie.sessions.table.short.events') }}</span>
                                     <button @click="toggleSort('eventCount')" class="sort-button">
                                         <span v-if="getSortDirection('eventCount') === 1">▲</span>
                                         <span v-else-if="getSortDirection('eventCount') === -1">▼</span>
@@ -118,7 +118,7 @@
                                     </button>
                                 </div>
                             </th>
-                            <th>{{ $t('cowrie.sessions.table.exploration') }}</th>
+                            <th :data-sessions-tooltip="$t('cowrie.sessions.table.exploration')">{{ $t('cowrie.sessions.table.short.exploration') }}</th>
                         </tr>
                     </thead>
                     <tbody>

@@ -97,6 +97,20 @@
         "copyToFilter": "Скопировать в фильтр IP и выполнить",
         "noAttacksFound": "Атак не найдено",
         "table": {
+            "short": {
+                "origin": "🌍 ИСТОЧНИК",
+                "defcon": "🚨 DEFCON",
+                "tech": "🛠️ ТЕХН.",
+                "attacker": "👤 ХАКЕР",
+                "info": "📑 ИНФО",
+                "avg": "📊 СРЕДН.",
+                "breach": "⚔️ НАРУШ.",
+                "rps": "📈 RPS",
+                "logs": "📋 ЛОГИ",
+                "dur": "⏱️ ДЛИТ.",
+                "first": "📅 ПЕРВЫЙ",
+                "last": "📅 ПОСЛЕДН."
+            },
             "defcon": "Defcon",
             "attacker": "Атакующий",
             "details": "Подробности",

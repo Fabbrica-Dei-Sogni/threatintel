@@ -421,10 +421,54 @@
   height: 1px;
 }
 
-/* Log-table handled via global classes */
-.log-table th {
-  background: rgba(230, 33, 23, 0.12) !important;
-  border-bottom: 2px solid var(--cyber-primary);
+/* Attacks Table Tooltips (HUD Style) */
+.cyber-table th[data-attacks-tooltip] {
+  position: relative;
+  cursor: help;
+}
+
+.cyber-table th[data-attacks-tooltip]:hover::after {
+  content: attr(data-attacks-tooltip);
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(15, 23, 42, 0.95);
+  color: #ff4c4c;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+  white-space: nowrap;
+  z-index: 3000;
+  border: 1px solid rgba(230, 33, 23, 0.4);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.7);
+  pointer-events: none;
+  backdrop-filter: blur(8px);
+  margin-top: 8px;
+  opacity: 0;
+  animation: fadeInTooltip 0.2s forwards;
+}
+
+.cyber-table th[data-attacks-tooltip]:hover::before {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 6px;
+  border-style: solid;
+  border-color: transparent transparent rgba(15, 23, 42, 0.95) transparent;
+  z-index: 3000;
+  pointer-events: none;
+  margin-top: -4px;
+  opacity: 0;
+  animation: fadeInTooltip 0.2s forwards;
+}
+
+@keyframes fadeInTooltip {
+  from { opacity: 0; transform: translate(-50%, -5px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
 }
 
 

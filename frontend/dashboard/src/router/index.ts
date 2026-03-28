@@ -98,7 +98,7 @@ const routes: RouteRecordRaw[] = [
         props: (route: RouteLocationNormalized) => ({
             initialPage: route.query.page ? parseInt(route.query.page as string) : 1,
             initialPageSize: route.query.pageSize ? parseInt(route.query.pageSize as string) : 20,
-            initialSortFields: route.query.sortFields ? JSON.parse(route.query.sortFields as string) : undefined,
+            initialSortFields: route.query.sortFields ? JSON.parse(route.query.sortFields as string) : {},
             initialIp: typeof route.query.ip === 'string' ? route.query.ip : '',
         }),
     },

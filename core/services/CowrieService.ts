@@ -87,23 +87,43 @@ export class CowrieService implements ILongRunningService {
     }
 
     /**
-     * API: Recupera le sessioni paginate assieme ai dati IP arricchiti
+     * API: Recupera le sessioni paginate assieme ai dati IP arricchiti. 
+     * Implementa un'unica pipeline per dati e conteggio tramite $facet.
      */
     async getSessions(
         page: number = 1,
         pageSize: number = 20,
-        sort: Record<string, any> = { timestamp: -1 },
+        sortFields: Record<string, any> = { timestamp: -1 },
         filters: any = {}
     ) {
         const skip = (page - 1) * pageSize;
         const mongoFilters = this.buildRegExpFilter(filters);
         
-        // Costruisci sort stage coerente col formato di Mongoose
-        const sortStage = { $sort: sort && Object.keys(sort).length > 0 ? sort : { timestamp: -1 } };
+        // Se l'ordinamento è su timestamp, ci assicuriamo che sia cronologico e non alfabetico.
+        const effectiveSort: Record<string, any> = {};
+        for (const [key, value] of Object.entries(sortFields)) {
+            // Se il campo è timestamp, usiamo il campo convertito che aggiungeremo nella pipeline
+            if (key === 'timestamp') {
+                effectiveSort['sortTimestamp'] = value;
+            } else {
+                effectiveSort[key] = value;
+            }
+        }
 
-        const pipeline = [
+        // Se non ci sono campi di ordinamento, default a decrescente per timestamp
+        if (Object.keys(effectiveSort).length === 0) {
+            effectiveSort['sortTimestamp'] = -1;
+        }
+
+        const pipeline: any[] = [
             { $match: mongoFilters },
-            // Conteggio eventi da collezioni multiple tramite lookup performanti (sub-pipelines)
+            // Aggiungiamo un campo temporale convertito per l'ordinamento affidabile
+            {
+                $addFields: {
+                    sortTimestamp: { $toDate: "$timestamp" }
+                }
+            },
+            // Lookup per i conteggi degli eventi nelle collezioni correlate
             {
                 $lookup: {
                     from: 'event',
@@ -148,7 +168,6 @@ export class CowrieService implements ILongRunningService {
                     as: 'cnt_ttylog'
                 }
             },
-            // Somma dei conteggi (gestendo i casi null tramite ifNull)
             {
                 $addFields: {
                     eventCount: {
@@ -161,11 +180,10 @@ export class CowrieService implements ILongRunningService {
                     }
                 }
             },
-            // Faceting per ottenere sia i dati paginati che il conteggio totale in un'unica chiamata
+            // FacETING per dati e conteggio totale
             {
                 $facet: {
                     data: [
-                        // Popolazione IpDetails
                         {
                             $lookup: {
                                 from: 'ipdetails',
@@ -179,8 +197,7 @@ export class CowrieService implements ILongRunningService {
                                 ipDetailsId: { $arrayElemAt: ['$ipDetails', 0] }
                             }
                         },
-                        // Ordinamento, skip e limit
-                        sortStage,
+                        { $sort: effectiveSort },
                         { $skip: skip },
                         { $limit: Number(pageSize) }
                     ],
@@ -189,7 +206,6 @@ export class CowrieService implements ILongRunningService {
                     ]
                 }
             },
-            // Proiezione finale per pulire lo schema di ritorno
             {
                 $project: {
                     sessions: '$data',

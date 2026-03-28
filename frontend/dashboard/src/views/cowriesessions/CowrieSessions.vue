@@ -18,7 +18,7 @@
         <section class="filters-container cyber-sticky-area cyber-sticky-top-2">
             <div class="filter-row main-filters">
                 <div class="input-wrapper">
-                    <input v-model="filterIp" :placeholder="$t('cowrie.sessions.filterByIp')" @input="onFilterChanged"
+                    <input v-model="filterIp" :placeholder="$t('cowrie.sessions.filterByIp')"
                         class="input" type="text" />
                     <button v-if="filterIp" @click="clearIpFilter" class="clear-btn"
                         :title="$t('cowrie.sessions.clearIpFilter')" type="button"
@@ -190,7 +190,6 @@ import dayjs from 'dayjs';
 import { useI18n } from '../../composable/useI18n';
 import { useCowrieSessions } from '../../composable/useCowrieSessions';
 import { useClipboard } from '../../composable/useClipboard';
-import { fetchCowrieSessions } from '../../api';
 import CountryFlag from '../../components/CountryFlag.vue';
 import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
 import SessionChart from '../../components/SessionChart.vue';
@@ -200,7 +199,7 @@ import ViewToggle from '../../components/common/ViewToggle.vue';
 const props = defineProps({
     initialPage: { type: Number, default: 1 },
     initialPageSize: { type: Number, default: 20 },
-    initialSortFields: { type: Object, default: () => ({ timestamp: -1 }) },
+    initialSortFields: { type: Object, default: () => ({}) },
     initialIp: { type: String, default: '' }
 });
 
@@ -306,8 +305,6 @@ function setIpFilter(ip) {
         previousPageBeforeIpFilter.value = page.value;
     }
     filterIp.value = ip;
-    page.value = 1;
-    onFilterChanged();
 }
 
 function clearIpFilter() {
@@ -316,7 +313,6 @@ function clearIpFilter() {
         page.value = previousPageBeforeIpFilter.value;
         previousPageBeforeIpFilter.value = null;
     }
-    onFilterChanged();
 }
 
 const changePage = (p) => {
@@ -386,9 +382,6 @@ onMounted(() => {
     // Resize periodic check
     const interval = setInterval(updateTableWidth, 1000);
     onUnmounted(() => clearInterval(interval));
-
-    // Chiamata iniziale
-    fetchData();
 });
 
 onUnmounted(() => {

@@ -19,9 +19,19 @@ export function useCowrieSessions(
     const loading: Ref<boolean> = ref(false);
     const error: Ref<string | null> = ref(null);
 
-    const filterTimer = ref<ReturnType<typeof setTimeout> | null>(null);
+    // Debounced fetchData
+    let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+    function debouncedFetch() {
+        if (debounceTimer) clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+            fetchData();
+        }, 300);
+    }
 
     async function fetchData(): Promise<void> {
+        // Evitiamo chiamate multiple se già in caricamento
+        if (loading.value) return;
+        
         loading.value = true;
         error.value = null;
         try {
@@ -44,39 +54,47 @@ export function useCowrieSessions(
         }
     }
 
-    watch([page, pageSize, sortFields], () => {
-        fetchData();
-    });
+    // Definiamo i campi che costituiscono un filtro
+    const filterRefs = [filterIp];
 
-    watch(filterIp, () => {
-        onFilterChanged();
-    });
-
-    function onFilterChanged(resetPage: boolean = true): void {
-        if (filterTimer.value) clearTimeout(filterTimer.value);
-        filterTimer.value = setTimeout(() => {
-            if (resetPage) page.value = 1;
-            fetchData();
-        }, 400);
-    }
+    watch(
+        [...filterRefs, page, pageSize, sortFields],
+        (newVal: any[], oldVal: any[]) => {
+            // Verifichiamo se è cambiato il filtro IP (primo elemento)
+            const filtersChanged = filterRefs.some((_, i) => newVal[i] !== oldVal[i]);
+            
+            if (filtersChanged && page.value !== 1) {
+                page.value = 1;
+                return;
+            }
+            
+            debouncedFetch();
+        },
+        { deep: true, immediate: true }
+    );
 
     function toggleSort(field: string): void {
         const currentDirection = sortFields.value?.[field];
+        const newSort = { ...(sortFields.value || {}) };
 
         if (currentDirection === undefined) {
-            sortFields.value = { ...sortFields.value, [field]: 1 };
+            newSort[field] = 1;
         } else if (currentDirection === 1) {
-            sortFields.value = { ...sortFields.value, [field]: -1 };
+            newSort[field] = -1;
         } else {
-            const newSort = { ...sortFields.value };
             delete newSort[field];
-            sortFields.value = Object.keys(newSort).length ? newSort : null;
         }
-        fetchData();
+        
+        sortFields.value = Object.keys(newSort).length ? newSort : null;
+        // fetchData() verrà chiamato dal watcher di sortFields
     }
 
     function getSortDirection(field: string): number {
         return sortFields.value?.[field] || 0;
+    }
+
+    function onFilterChanged(): void {
+        // Il watcher gestirà tutto
     }
 
     return {

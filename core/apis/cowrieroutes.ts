@@ -7,6 +7,7 @@ export default function cowrieroutes(logger: Logger, cowrieController: CowrieCon
 
     // Endpoints dedicati a Cowrie Telnet
     router.get('/api/cowrie/sessions', (req, res) => cowrieController.getSessions(req, res));
+    router.post('/api/cowrie/search', (req, res) => cowrieController.searchSessions(req, res));
     router.get('/api/cowrie/sessions/:id/events', (req, res) => cowrieController.getSessionEvents(req, res));
     router.get('/api/cowrie/sessions/:id', (req, res) => cowrieController.getSessionDetails(req, res));
 

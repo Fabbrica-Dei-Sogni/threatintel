@@ -241,14 +241,12 @@ export async function enrichReputationScore(ip: string): Promise<any> {
 
 export async function fetchCowrieSessions(page = 1, pageSize = 20, sortFields: any = null, filters: any = null): Promise<any> {
     try {
-        const params: any = { page, pageSize };
-        if (sortFields) {
-            params.sort = JSON.stringify(sortFields);
-        }
-        if (filters) {
-            params.filters = JSON.stringify(filters);
-        }
-        const response = await apiClient.get('/cowrie/sessions', { params });
+        const response = await apiClient.post('/cowrie/search', {
+            page,
+            pageSize,
+            sortFields,
+            filters
+        });
         return response.data;
     } catch (error) {
         console.error('[fetchCowrieSessions] Error:', error);

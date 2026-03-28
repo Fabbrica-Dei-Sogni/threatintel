@@ -19,12 +19,12 @@ export class CowrieController {
             const sortStr = req.query.sort as string;
             const filtersStr = req.query.filters as string;
 
-            let sort: Record<string, any> = { timestamp: -1 };
+            let sortFields: Record<string, any> = { timestamp: -1 };
             let filters: any = {};
 
             if (sortStr) {
                 try {
-                    sort = JSON.parse(sortStr);
+                    sortFields = JSON.parse(sortStr);
                 } catch (e) {
                     this.logger.warn(`[CowrieController] Failed to parse sort query: ${sortStr}`);
                 }
@@ -38,18 +38,39 @@ export class CowrieController {
                 }
             }
 
-            const { sessions } = await this.cowrieService.getSessions(page, pageSize, sort, filters);
-            const total = await this.cowrieService.countSessions(filters);
+            const { sessions, totalCount } = await this.cowrieService.getSessions(page, pageSize, sortFields, filters);
 
             res.status(200).json({
                 sessions,
-                total,
+                total: totalCount,
                 page,
                 pageSize
             });
         } catch (error: any) {
             this.logger.error(`[CowrieController] Error in getSessions: ${error.message}`);
             res.status(500).json({ error: 'Failed to fetch telnet sessions.' });
+        }
+    }
+
+    // POST /api/cowrie/search
+    async searchSessions(req: Request, res: Response): Promise<void> {
+        try {
+            const page = parseInt(req.body.page as string) || 1;
+            const pageSize = parseInt(req.body.pageSize as string) || 20;
+            const sortFields = req.body.sortFields || { timestamp: -1 };
+            const filters = req.body.filters || {};
+
+            const { sessions, totalCount } = await this.cowrieService.getSessions(page, pageSize, sortFields, filters);
+
+            res.status(200).json({
+                sessions,
+                total: totalCount,
+                page,
+                pageSize
+            });
+        } catch (error: any) {
+            this.logger.error(`[CowrieController] Error in searchSessions: ${error.message}`);
+            res.status(500).json({ error: 'Failed to search telnet sessions.' });
         }
     }
 

@@ -161,7 +161,7 @@
       <!-- Section ABUSEIPDB REPORTS -->
       <div class="section abuse-reports-section" v-if="reports.length >= 0">
         <div class="section-header" @click="toggles.reports = !toggles.reports">
-          <h2><span class="animated-icon pulse-cobalt">📊</span> {{ t('ipDetails.abuseInvestigationLogs').toUpperCase()
+          <h2><span class="animated-icon pulse-cobalt">🕵️</span> {{ t('ipDetails.abuseInvestigationLogs').toUpperCase()
           }}
           </h2>
           <span class="arrow" :class="{ open: toggles.reports }"></span>

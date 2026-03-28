@@ -216,7 +216,10 @@
                                         </span>
                                     </div>
                                 </div>
-                                <span class="arrow magenta-arrow" :class="{ 'open': expanded[log._id || log.id] }"></span>
+                                <div class="log-actions">
+                                    <span class="copy-log-btn" @click.stop="copyAggregatedLog(log)" :title="t('common.copy')">📋</span>
+                                    <span class="arrow magenta-arrow" :class="{ 'open': expanded[log._id || log.id] }"></span>
+                                </div>
                             </div>
                             <transition name="collapse">
                                 <div v-if="expanded[log._id || log.id]" class="log-body">
@@ -552,6 +555,29 @@ const loadAttackData = async () => {
 }
 
 onMounted(loadAttackData)
+const copyAggregatedLog = (log) => {
+    let text = `--- THREAT INTEL LOG SUMMARY ---\n`;
+    text += `Timestamp: ${dayjs(log.timestamp).format('YYYY-MM-DD HH:mm:ss')}\n`;
+    text += `Method: ${log.request?.method || 'N/A'}\n`;
+    text += `URL: ${log.request?.url || 'N/A'}\n`;
+    const score = log.fingerprint?.score ?? 'N/A';
+    text += `Score: ${score}\n`;
+    if (log.fingerprint?.indicators?.length) {
+        text += `Indicators: ${log.fingerprint.indicators.join(', ')}\n`;
+    }
+    text += `User Agent: ${log.request?.userAgent || 'N/A'}\n`;
+    text += `IP: ${attack.value?.request?.ip || 'N/A'}\n`;
+    
+    if (log.request?.body) {
+        const bodyContent = typeof log.request.body === 'object' 
+            ? JSON.stringify(log.request.body, null, 2) 
+            : log.request.body;
+        text += `\nPayload:\n${bodyContent}\n`;
+    }
+    
+    text += `--------------------------------`;
+    copyToClipboard(text);
+};
 </script>
 
 <!--

@@ -433,6 +433,40 @@
     font-size: 0.9em;
 }
 
+.log-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-left: auto;
+}
+
+.copy-log-btn {
+    cursor: pointer;
+    opacity: 0.5;
+    font-size: 1.1rem;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(230, 33, 23, 0.05);
+    border: 1px solid transparent;
+}
+
+.copy-log-btn:hover {
+    opacity: 1;
+    transform: scale(1.1);
+    background: rgba(230, 33, 23, 0.1);
+    border-color: rgba(230, 33, 23, 0.2);
+    box-shadow: 0 0 10px rgba(230, 33, 23, 0.2);
+}
+
+.copy-log-btn:active {
+    transform: scale(0.95);
+}
+
 @media (max-width: 768px) {
     .hud-stats-row {
         gap: 8px;

@@ -157,41 +157,95 @@
                     <div v-if="toggles.logs">
                         <div v-for="log in paginatedLogs" :key="log._id || log.id" class="log-entry">
                             <div class="log-header" @click="toggleLog(log._id || log.id)">
-                                <span class="log-info-main">
+                                <div class="log-info-main">
+                                    <!-- <DefconIndicator 
+                                        :level="getDefconLevel(log.fingerprint.score)" 
+                                        :dangerScore="log.fingerprint.score" 
+                                        mode="dot" 
+                                        class="log-severity-indicator"
+                                    /> -->
                                     <span v-html="formatDate(log.timestamp)"></span>
                                     <span class="log-method-url">
-                                        - {{ log.request.method }} 
+                                        <span class="method-badge">{{ log.request.method }}</span>
                                         <span v-if="log.metadata?.eventCount > 1" class="event-count-badge">
                                             (x{{ log.metadata.eventCount }})
                                         </span>
-                                        {{ log.request.url || t('components.radar.notAvailable') }} 
+                                        <span class="url-text">{{ log.request.url || t('components.radar.notAvailable') }}</span>
                                     </span>
-                                </span>
+                                    <div class="log-header-indicators" v-if="log.fingerprint.indicators?.length">
+                                        <span v-for="(ind, i) in log.fingerprint.indicators.slice(0, 3)" :key="i" class="mini-tech-tag" :title="ind">
+                                            {{ ind.substring(0, 3).toUpperCase() }}
+                                        </span>
+                                        <span v-if="log.fingerprint.indicators.length > 3" class="mini-tech-tag-more">
+                                            +{{ log.fingerprint.indicators.length - 3 }}
+                                        </span>
+                                    </div>
+                                </div>
                                 <span class="arrow magenta-arrow" :class="{ 'open': expanded[log._id || log.id] }"></span>
                             </div>
                             <transition name="collapse">
                                 <div v-if="expanded[log._id || log.id]" class="log-body">
-                                    <p><strong>{{ t('common.score') }}:</strong> {{ log.fingerprint.score ?? t('common.notAvailable') }}
-                                    </p>
-                                    <span v-if="log.fingerprint.score != null && log.fingerprint.score > 0">
-                                        <p><strong>{{ t('threatLog.techniques') }}:</strong></p>
-                                        <ul>
-                                            <li v-for="(ind, i) in log.fingerprint.indicators" :key="i">{{ ind }}</li>
-                                        </ul>
-                                    </span>
-                                    <p><strong>{{ t('threatLog.url') }}:</strong></p>
-                                    <pre> {{ log.request.url ?? t('common.notAvailable') }}</pre>
-                                    <p><strong>{{ t('threatLog.userAgent') }}:</strong> {{ log.request.userAgent ||
-                                        t('common.notAvailable') }}</p>
-                                    <HexViewer :raw-data="log.request" :label="t('threatLog.request')" />
-                                    <!-- 1. Headers -->
-                                    <HexViewer v-if="log.request.headers" :raw-data="log.request.headers"
-                                        :label="t('threatLog.headers')" />
-                                    <!-- 2. Body -->
-                                    <HexViewer v-if="log.request.body" :raw-data="log.request.body"
-                                        :label="t('threatLog.body')" />
-                                    <!-- 3. Response -->
-                                    <HexViewer v-if="log.response" :raw-data="log.response" :label="t('threatLog.response')" />
+                                    <!-- Log Meta Summary -->
+                                    <div class="log-details-meta">
+                                        <div class="meta-row">
+                                            <span class="meta-label">{{ t('common.score').toUpperCase() }}:</span>
+                                            <span class="score-value">
+                                                {{ log.fingerprint.score ?? t('common.notAvailable') }}
+                                            </span>
+                                        </div>
+                                        <div class="meta-row" v-if="log.request.userAgent">
+                                            <span class="meta-label">UA:</span>
+                                            <span class="ua-value">{{ log.request.userAgent }}</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Tabs System -->
+                                    <div class="log-tabs-container">
+                                        <div class="log-tabs">
+                                            <button 
+                                                @click="setLogTab(log._id || log.id, 'request')" 
+                                                class="tab-btn" 
+                                                :class="{ active: getActiveLogTab(log._id || log.id) === 'request' }"
+                                            >
+                                                {{ t('threatLog.request').toUpperCase() }}
+                                            </button>
+                                            <button 
+                                                v-if="log.request.headers"
+                                                @click="setLogTab(log._id || log.id, 'headers')" 
+                                                class="tab-btn" 
+                                                :class="{ active: getActiveLogTab(log._id || log.id) === 'headers' }"
+                                            >
+                                                {{ t('threatLog.headers').toUpperCase() }}
+                                            </button>
+                                            <button 
+                                                v-if="log.request.body"
+                                                @click="setLogTab(log._id || log.id, 'body')" 
+                                                class="tab-btn" 
+                                                :class="{ active: getActiveLogTab(log._id || log.id) === 'body' }"
+                                            >
+                                                {{ t('threatLog.body').toUpperCase() }}
+                                            </button>
+                                            <button 
+                                                v-if="log.response"
+                                                @click="setLogTab(log._id || log.id, 'response')" 
+                                                class="tab-btn" 
+                                                :class="{ active: getActiveLogTab(log._id || log.id) === 'response' }"
+                                            >
+                                                {{ t('threatLog.response').toUpperCase() }}
+                                            </button>
+                                        </div>
+
+                                        <div class="tab-content">
+                                            <HexViewer v-if="getActiveLogTab(log._id || log.id) === 'request'" 
+                                                :raw-data="log.request" :label="t('threatLog.request')" />
+                                            <HexViewer v-if="getActiveLogTab(log._id || log.id) === 'headers'" 
+                                                :raw-data="log.request.headers" :label="t('threatLog.headers')" />
+                                            <HexViewer v-if="getActiveLogTab(log._id || log.id) === 'body'" 
+                                                :raw-data="log.request.body" :label="t('threatLog.body')" />
+                                            <HexViewer v-if="getActiveLogTab(log._id || log.id) === 'response'" 
+                                                :raw-data="log.response" :label="t('threatLog.response')" />
+                                        </div>
+                                    </div>
                                 </div>
                             </transition>
                         </div>
@@ -328,6 +382,7 @@ const router = useRouter()
 // Reactive state
 const expanded = reactive({})
 const expandedEvents = reactive({})
+const activeLogTabs = reactive({}) // logId -> 'request' | 'headers' | 'body' | 'response'
 const currentPage = ref(1)
 const pageSize = ref(5)
 const currentPageEvents = ref(1)
@@ -338,6 +393,35 @@ const searchUrl = ref('')
 watch(searchUrl, () => {
     currentPage.value = 1
 })
+
+// Helper for Defcon Level mapping
+/*
+function getDefconLevel(score) {
+    if (score == null) return 5;
+    if (score >= 9) return 1;
+    if (score >= 7) return 2;
+    if (score >= 4) return 3;
+    if (score >= 1) return 4;
+    return 5;
+}
+
+function getDefconClass(level) {
+    const numericLevel = parseInt(level, 10);
+    if (numericLevel <= 1) return 'defcon-critical';
+    if (numericLevel === 2) return 'defcon-high';
+    if (numericLevel === 3) return 'defcon-medium';
+    if (numericLevel === 4) return 'defcon-low';
+    return 'defcon-normal';
+}
+*/
+
+function setLogTab(id, tab) {
+    activeLogTabs[id] = tab
+}
+
+function getActiveLogTab(id) {
+    return activeLogTabs[id] || 'request'
+}
 
 // Computed properties
 const filteredLogs = computed(() => {

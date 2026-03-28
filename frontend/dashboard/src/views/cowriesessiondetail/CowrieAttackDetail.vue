@@ -49,23 +49,7 @@
             </transition>
         </div>
 
-        <!-- Mappa della Sessione -->
-        <div class="sub-card" v-if="sessionDetails && !loading">
-            <div class="sub-card-header clickable-header" @click="toggles.showMap = !toggles.showMap">
-                <div class="header-title-group">
-                    <span class="animated-icon">📡</span>
-                    <h3>{{ t('cowrie.attackDetail.mapTitle').toUpperCase() }}</h3>
-                </div>
-                <span class="arrow" :class="{ open: toggles.showMap }"></span>
-            </div>
-            <transition name="collapse">
-                <div v-if="toggles.showMap" class="sub-card-content">
-                    <section class="attack-map-section">
-                        <AttackMap v-if="mapAttackData.length > 0" :attacks="mapAttackData" :showLegend="false" />
-                    </section>
-                </div>
-            </transition>
-        </div>
+
 
         <div v-if="loading" class="loading">{{ $t('cowrie.attackDetail.loading') }}</div>
         
@@ -126,6 +110,24 @@
                         <div v-if="events.length === 0" class="empty-state">
                             {{ $t('cowrie.attackDetail.emptyState') }}
                         </div>
+                    </section>
+                </div>
+            </transition>
+        </div>
+
+        <!-- Mappa della Sessione -->
+        <div class="sub-card" v-if="sessionDetails && !loading">
+            <div class="sub-card-header clickable-header" @click="toggles.showMap = !toggles.showMap">
+                <div class="header-title-group">
+                    <span class="animated-icon">📡</span>
+                    <h3>{{ t('cowrie.attackDetail.mapTitle').toUpperCase() }}</h3>
+                </div>
+                <span class="arrow" :class="{ open: toggles.showMap }"></span>
+            </div>
+            <transition name="collapse">
+                <div v-if="toggles.showMap" class="sub-card-content">
+                    <section class="attack-map-section">
+                        <AttackMap v-if="mapAttackData.length > 0" :attacks="mapAttackData" :showLegend="false" />
                     </section>
                 </div>
             </transition>

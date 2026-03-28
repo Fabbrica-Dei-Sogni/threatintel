@@ -8,8 +8,9 @@ export function useClipboard() {
             // Modern API
             if (navigator.clipboard && navigator.clipboard.writeText) {
                 await navigator.clipboard.writeText(text);
+                const displayedText = text.length > 100 ? text.substring(0, 100) + '...' : text;
                 ElMessage({
-                    message: 'Copiato negli appunti: ' + text,
+                    message: 'Copiato negli appunti: ' + displayedText,
                     type: 'success',
                     duration: 2000
                 });
@@ -31,8 +32,9 @@ export function useClipboard() {
                 document.body.removeChild(textArea);
 
                 if (successful) {
+                    const displayedText = text.length > 200 ? text.substring(0, 100) + '...' : text;
                     ElMessage({
-                        message: 'Copiato negli appunti: ' + text,
+                        message: 'Copiato negli appunti: ' + displayedText,
                         type: 'success',
                         duration: 2000
                     });

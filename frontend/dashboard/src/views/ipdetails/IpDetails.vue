@@ -90,18 +90,16 @@
         <transition name="collapse">
           <div v-if="toggles.abuse">
             <div v-if="ipInfo.abuseipdbId" class="briefing-grid">
-              <div class="briefing-item" :data-briefing-tooltip="t('ipDetails.score')">
+              <div class="briefing-item" :data-briefing-tooltip="`${t('ipDetails.confidence').toUpperCase()}: ${ipInfo.abuseipdbId.abuseConfidenceScore}%` ">
                 <div class="score-radial" :style="{ '--score': ipInfo.abuseipdbId.abuseConfidenceScore || 0 }">
                   {{ ipInfo.abuseipdbId.abuseConfidenceScore }}%
                 </div>
                 <div class="briefing-content">
                   <span class="briefing-label">{{ t('ipDetails.confidence').toUpperCase() }}</span>
-                  <span class="briefing-value">{{ ipInfo.abuseipdbId.abuseConfidenceScore }}% {{
-                    t('ipDetails.confidence').toUpperCase()
-                  }}</span>
+                  <span class="briefing-value">{{ ipInfo.abuseipdbId.abuseConfidenceScore }}%</span>
                 </div>
               </div>
-              <div class="briefing-item">
+              <div class="briefing-item" :data-briefing-tooltip="ipInfo.abuseipdbId.isListed ? t('ipDetails.isListed').toUpperCase() : t('common.no').toUpperCase()">
                 <span class="briefing-icon" :class="ipInfo.abuseipdbId.isListed ? 'text-danger' : 'text-success'">
                   {{ ipInfo.abuseipdbId.isListed ? '🚫' : '✅' }}
                 </span>
@@ -111,16 +109,14 @@
                     t('common.no').toUpperCase() }}</span>
                 </div>
               </div>
-              <div class="briefing-item">
+              <div class="briefing-item" :data-briefing-tooltip="`${t('ipDetails.totalReports').toUpperCase()}: ${ipInfo.abuseipdbId.totalReports || 0}`">
                 <span class="briefing-icon">📋</span>
                 <div class="briefing-content">
                   <span class="briefing-label">{{ t('ipDetails.totalReports').toUpperCase() }}</span>
-                  <span class="briefing-value">{{ ipInfo.abuseipdbId.totalReports || 0 }} {{
-                    t('ipDetails.reportsCount').toUpperCase()
-                  }}</span>
+                  <span class="briefing-value">{{ ipInfo.abuseipdbId.totalReports || 0 }}</span>
                 </div>
               </div>
-              <div class="briefing-item">
+              <div class="briefing-item" :data-briefing-tooltip="ipInfo.abuseipdbId.lastReportedAt ? `${t('ipDetails.lastReportedAt').toUpperCase()}: ${dayjs(ipInfo.abuseipdbId.lastReportedAt).format('DD/MM/YYYY HH:mm:ss')}` : t('common.notAvailable').toUpperCase()">
                 <span class="briefing-icon">🕒</span>
                 <div class="briefing-content">
                   <span class="briefing-label">{{ t('ipDetails.lastReportedAt').toUpperCase() }}</span>

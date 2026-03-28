@@ -27,34 +27,38 @@
 }
 
 .back-btn {
-  background: linear-gradient(135deg, #007AFF, #0056b3);
-  color: #fff;
-  border: none;
+  background: rgba(0, 122, 255, 0.1);
+  color: #00D4FF;
+  border: 1px solid rgba(0, 212, 255, 0.3);
   font-weight: 700;
   padding: 10px 24px;
-  box-shadow: 0 4px 15px rgba(0, 122, 255, 0.4);
+  box-shadow: 0 0 15px rgba(0, 212, 255, 0.15);
   transition: all 0.3s ease;
   border-radius: 4px;
+  cursor: pointer;
 }
 
 .refresh-btn {
-  background: linear-gradient(135deg, #007AFF, #0056b3);
-  color: #fff;
-  border: none;
+  background: rgba(0, 122, 255, 0.1);
+  color: #00D4FF;
+  border: 1px solid rgba(0, 212, 255, 0.3);
   border-radius: 4px;
   padding: 10px 24px;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 4px 15px rgba(0, 122, 255, 0.4);
+  box-shadow: 0 0 15px rgba(0, 212, 255, 0.15);
   transition: all 0.3s ease;
   display: flex;
   gap: 8px;
+  align-items: center;
 }
 
 .back-btn:hover, .refresh-btn:hover:not(:disabled) {
-  background: linear-gradient(135deg, #00D4FF, #007AFF);
-  box-shadow: 0 6px 20px rgba(0, 212, 255, 0.6);
+  background: rgba(0, 122, 255, 0.2);
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
   transform: translateY(-2px);
+  border-color: rgba(0, 212, 255, 0.6);
+  filter: brightness(1.2);
 }
 
 .header-top {
@@ -611,7 +615,6 @@ h1 {
 /* New Briefing Abuse Styles */
 .briefing-abuse {
   position: relative;
-  overflow: hidden;
 }
 
 .briefing-abuse.high-risk {
@@ -664,7 +667,6 @@ h1 {
   border: 1px solid rgba(0, 212, 255, 0.1);
   border-radius: 8px;
   transition: all 0.3s ease;
-  overflow: hidden;
 }
 
 .report-card:hover {

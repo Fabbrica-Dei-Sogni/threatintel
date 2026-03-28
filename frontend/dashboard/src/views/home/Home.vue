@@ -3,7 +3,7 @@
     <div class="header-top">
       <h1>
         <ConfigMenuButton inline class="animated-icon pulse-cobalt" />
-        {{ t('home.title') }}
+        {{ t('home.title').toUpperCase() }}
       </h1>
       <LanguageSwitcher />
     </div>
@@ -11,17 +11,17 @@
     <section class="intel-center">
       <!-- DOMINIO: NATIVE SERVER PROTECTION -->
       <div class="domain-section">
-        <h2 class="domain-title"><span class="icon">🛡️</span> NATIVE SERVER PROTECTION</h2>
+        <h2 class="domain-title"><span class="icon">🛡️</span> {{ t('home.nativeServerProtection') }}</h2>
 
         <section class="actions">
-          <button @click="goToAttacks" class="btn-action">🛰️ {{ t('home.attacks') }}</button>
-          <button @click="goToLogs" class="btn-action">🗄️ {{ t('home.logRequests') }}</button>
+          <button @click="goToAttacks" class="btn-action">🛰️ {{ t('home.attacks').toUpperCase() }}</button>
+          <button @click="goToLogs" class="btn-action">🗄️ {{ t('home.logRequests').toUpperCase() }}</button>
         </section>
 
         <div class="primary-intel">
           <div class="list-side glass-card">
             <div class="widget-header">
-              <h3>{{ $t('home.recentAttacks') }}</h3>
+              <h3>{{ $t('home.recentAttacks').toUpperCase() }}</h3>
               <ProtocolSelector v-model="selectedAttackProtocol" :options="['http', 'https', 'ssh']" theme="dark" />
             </div>
             <ul class="scroll-list">
@@ -53,7 +53,7 @@
           </div>
           <div class="map-side glass-card">
             <div class="widget-header">
-              <h3><span class="pulse">📡</span> {{ $t('home.attackMap') }}</h3>
+              <h3><span class="pulse">📡</span> {{ $t('home.attackMap').toUpperCase() }}</h3>
             </div>
             <AttackMap :attacks="recentAttacks" />
           </div>
@@ -62,7 +62,7 @@
         <div class="secondary-intel" style="margin-top: 25px;">
           <div class="widget glass-card">
             <div class="widget-header">
-              <h3>{{ $t('home.recentLogs') }}</h3>
+              <h3>{{ $t('home.recentLogs').toUpperCase() }}</h3>
               <ProtocolSelector v-model="selectedLogProtocol" :options="['http', 'https', 'ssh']" theme="dark" />
             </div>
             <ul class="scroll-list">
@@ -85,16 +85,16 @@
 
       <!-- DOMINIO: HONEYPOT INTELLIGENCE -->
       <div class="domain-section" style="margin-top: 40px;">
-        <h2 class="domain-title"><span class="icon">🔍</span> HONEYPOT INTELLIGENCE</h2>
+        <h2 class="domain-title"><span class="icon">🔍</span> {{ t('home.honeypotIntelligence') }}</h2>
 
         <section class="actions">
-          <button @click="goToTelnet" class="btn-action">📟 {{ t('home.telnet') }}</button>
+          <button @click="goToTelnet" class="btn-action">📟 {{ t('home.telnet').toUpperCase() }}</button>
         </section>
 
         <div class="primary-intel">
           <div class="list-side glass-card">
             <div class="widget-header">
-              <h3>{{ $t('home.recentSessions') }}</h3>
+              <h3>{{ $t('home.recentSessions').toUpperCase() }}</h3>
             </div>
             <ul class="scroll-list">
               <li v-for="session in recentSessions" :key="session.session" class="session-item">
@@ -120,7 +120,7 @@
           </div>
           <div class="map-side glass-card">
             <div class="widget-header">
-              <h3><span class="pulse">📡</span> {{ $t('home.sessionsMap') }}</h3>
+              <h3><span class="pulse">📡</span> {{ $t('home.sessionsMap').toUpperCase() }}</h3>
             </div>
             <AttackMap :attacks="recentSessionsNormalized" :showLegend="false" />
           </div>

@@ -71,7 +71,9 @@
         "recentSessions": "10 dernières sessions Telnet",
         "loadingSessions": "Chargement des sessions...",
         "errorLoadingSessions": "Erreur de chargement des sessions",
-        "telnet": "Telnet"
+        "telnet": "Telnet",
+        "nativeServerProtection": "PROTECTION SERVEUR NATIVE",
+        "honeypotIntelligence": "INTELLIGENCE HONEYPOT"
     },
     "attacks": {
         "title": "Attaques",

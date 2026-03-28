@@ -71,7 +71,9 @@
         "recentSessions": "Последние 10 сессий Telnet",
         "loadingSessions": "Загрузка сессий...",
         "errorLoadingSessions": "Ошибка загрузки сессий",
-        "telnet": "Telnet"
+        "telnet": "Telnet",
+        "nativeServerProtection": "РОДНАЯ ЗАЩИТА СЕРВЕРА",
+        "honeypotIntelligence": "ИНТЕЛЛЕКТ ХОНИПОТОВ"
     },
     "attacks": {
         "title": "Атаки",

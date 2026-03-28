@@ -1,9 +1,9 @@
 // src/composables/useAttacksFilter.ts
-import { ref, watch } from 'vue';
-import type { Ref } from 'vue';
+import { ref } from 'vue';
 import { fetchAttackSearch } from '../api/index.js';
 import type { SortFields, TimeConfig } from '../models/CommonDTO';
 import type { AttackLog, FetchAttackSearchParams, FetchAttackSearchResponse } from '@/models/AttackDTO.js';
+import { useSearchBase } from './useSearchBase';
 
 export function useAttacksFilter(
     initialIp: string,
@@ -20,29 +20,54 @@ export function useAttacksFilter(
     initialToUnit: string,
     initialSortFields: SortFields = null
 ) {
-    const attacks: Ref<AttackLog[]> = ref([]);
-    const filterIp: Ref<string> = ref(initialIp);
-    const filterProtocol: Ref<string> = ref(initialProtocol);
-    const minLogsForAttack: Ref<number> = ref(initialMinLogsForAttack);
-    const page: Ref<number> = ref(initialPage);
+    // Filtri specifici
+    const filterIp = ref(initialIp);
+    const filterProtocol = ref(initialProtocol);
+    const minLogsForAttack = ref(initialMinLogsForAttack);
+    const timeMode = ref(initialTimeMode);
+    const agoValue = ref(initialAgoValue);
+    const agoUnit = ref(initialAgoUnit);
+    const dateRange = ref(initialDateRange);
+    const fromValue = ref(initialFromValue);
+    const fromUnit = ref(initialFromUnit);
+    const toValue = ref(initialToValue);
+    const toUnit = ref(initialToUnit);
+    
+    const attacks = ref<AttackLog[]>([]);
 
-    const timeMode: Ref<'ago' | 'range'> = ref(initialTimeMode);
-    const agoValue: Ref<number> = ref(initialAgoValue);
-    const agoUnit: Ref<string> = ref(initialAgoUnit);
-    const dateRange: Ref<[string | null, string | null] | null> = ref(initialDateRange);
-    const fromValue: Ref<number> = ref(initialFromValue);
-    const fromUnit: Ref<string> = ref(initialFromUnit);
-    const toValue: Ref<number> = ref(initialToValue);
-    const toUnit: Ref<string> = ref(initialToUnit);
+    // Definizione dei campi che costituiscono un filtro
+    const filterRefs = [
+        filterIp,
+        filterProtocol,
+        minLogsForAttack,
+        timeMode,
+        agoValue,
+        agoUnit,
+        dateRange,
+        fromValue,
+        fromUnit,
+        toValue,
+        toUnit
+    ];
 
-    const loading: Ref<boolean> = ref(false);
-    const error: Ref<boolean> = ref(false);
-    const pageSize: Ref<number> = ref(20);
-    const total: Ref<number> = ref(0);
-
-    const filterTimer: Ref<ReturnType<typeof setTimeout> | null> = ref(null);
-
-    const sortFields: Ref<SortFields> = ref(initialSortFields);
+    // Integrazione useSearchBase
+    const {
+        page,
+        pageSize,
+        sortFields,
+        total,
+        loading,
+        error,
+        toggleSort,
+        getSortDirection,
+        getSortClass,
+        debouncedFetch
+    } = useSearchBase({
+        fetchFn: fetchData,
+        initialPage,
+        initialSortFields,
+        filterRefs
+    });
 
     // Funzione per recuperare dati
     async function fetchData(): Promise<void> {
@@ -91,84 +116,6 @@ export function useAttacksFilter(
         }
     }
 
-    // Debounced fetchData
-    let debounceTimer: ReturnType<typeof setTimeout> | null = null;
-    function debouncedFetch() {
-        if (debounceTimer) clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(() => {
-            fetchData();
-        }, 300);
-    }
-
-    // Unico watcher per tutti i cambiamenti di stato
-    // Definiamo i campi che costituiscono un filtro
-    const filterRefs = [
-        filterIp,
-        filterProtocol,
-        minLogsForAttack,
-        timeMode,
-        agoValue,
-        agoUnit,
-        dateRange,
-        fromValue,
-        fromUnit,
-        toValue,
-        toUnit
-    ];
-
-    watch(
-        [...filterRefs, page, sortFields],
-        (newVal: any[], oldVal: any[]) => {
-            // Verifichiamo se è cambiato uno dei filtri (gli N elementi dell'array filterRefs)
-            const filtersChanged = filterRefs.some((_, i) => newVal[i] !== oldVal[i]);
-
-            if (filtersChanged && page.value !== 1) {
-                page.value = 1;
-                // fetchData verrà chiamato dal prossimo ciclo generato dal cambio di page
-                return;
-            }
-
-            debouncedFetch();
-        },
-        { deep: true, immediate: true }
-    );
-
-    // Debounced filter input handler (ora gestito internamente, lasciato per compatibilità)
-    function onFilterChanged(): void {
-        // Il watcher gestirà tutto
-    }
-
-    // Toggle sorting order for a field
-    function toggleSort(field: string): void {
-        const newSort = { ...sortFields.value };
-        const currentDirection = newSort[field];
-
-        if (currentDirection === undefined) {
-            // Aggiunge in coda se nuovo
-            newSort[field] = 1;
-        } else if (currentDirection === 1) {
-            // Inverte la direzione nello stesso posto
-            newSort[field] = -1;
-        } else {
-            // Rimuove il campo
-            delete newSort[field];
-        }
-        
-        sortFields.value = newSort;
-        // fetchData() verrà chiamato dal watcher di sortFields
-    }
-
-    function getSortDirection(field: string): number {
-        return sortFields.value?.[field] || 0;
-    }
-
-    function getSortClass(field: string): string {
-        const dir = getSortDirection(field);
-        if (dir === 1) return 'sorted-asc';
-        if (dir === -1) return 'sorted-desc';
-        return '';
-    }
-
     return {
         attacks,
         filterIp,
@@ -189,7 +136,7 @@ export function useAttacksFilter(
         pageSize,
         total,
         fetchData,
-        onFilterChanged,
+        onFilterChanged: () => {},
         toggleSort,
         getSortDirection,
         getSortClass,

@@ -1,8 +1,8 @@
 // src/composable/useCowrieSessions.ts
-import { ref, watch } from 'vue';
-import type { Ref } from 'vue';
+import { ref } from 'vue';
 import { fetchCowrieSessions } from '../api';
 import type { CowrieSession, FetchCowrieSessionsResponse } from '../models/CowrieDTO';
+import { useSearchBase } from './useSearchBase';
 
 export function useCowrieSessions(
     initialPage: number = 1,
@@ -10,26 +10,31 @@ export function useCowrieSessions(
     initialSortFields: any = {},
     initialIp: string = ''
 ) {
-    const sessions: Ref<CowrieSession[]> = ref([]);
-    const page: Ref<number> = ref(initialPage);
-    const pageSize: Ref<number> = ref(initialLimit);
-    const sortFields: Ref<any> = ref(initialSortFields);
-    const filterIp: Ref<string> = ref(initialIp);
-    const total: Ref<number> = ref(0);
-    const loading: Ref<boolean> = ref(false);
-    const error: Ref<string | null> = ref(null);
+    // Filtri specifici
+    const filterIp = ref(initialIp);
+    const sessions = ref<CowrieSession[]>([]);
 
-    // Debounced fetchData
-    let debounceTimer: ReturnType<typeof setTimeout> | null = null;
-    function debouncedFetch() {
-        if (debounceTimer) clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(() => {
-            fetchData();
-        }, 300);
-    }
+    // Integrazione useSearchBase
+    const {
+        page,
+        pageSize,
+        sortFields,
+        total,
+        loading,
+        error,
+        toggleSort,
+        getSortDirection,
+        getSortClass,
+        debouncedFetch
+    } = useSearchBase({
+        fetchFn: fetchData,
+        initialPage,
+        initialPageSize: initialLimit,
+        initialSortFields,
+        filterRefs: [filterIp]
+    });
 
     async function fetchData(): Promise<void> {
-        // Evitiamo chiamate multiple se già in caricamento
         if (loading.value) return;
         
         loading.value = true;
@@ -54,49 +59,6 @@ export function useCowrieSessions(
         }
     }
 
-    // Definiamo i campi che costituiscono un filtro
-    const filterRefs = [filterIp];
-
-    watch(
-        [...filterRefs, page, pageSize, sortFields],
-        (newVal: any[], oldVal: any[]) => {
-            // Verifichiamo se è cambiato il filtro IP (primo elemento)
-            const filtersChanged = filterRefs.some((_, i) => newVal[i] !== oldVal[i]);
-            
-            if (filtersChanged && page.value !== 1) {
-                page.value = 1;
-                return;
-            }
-            
-            debouncedFetch();
-        },
-        { deep: true, immediate: true }
-    );
-
-    function toggleSort(field: string): void {
-        const currentDirection = sortFields.value?.[field];
-        const newSort = { ...(sortFields.value || {}) };
-
-        if (currentDirection === undefined) {
-            newSort[field] = 1;
-        } else if (currentDirection === 1) {
-            newSort[field] = -1;
-        } else {
-            delete newSort[field];
-        }
-        
-        sortFields.value = Object.keys(newSort).length ? newSort : null;
-        // fetchData() verrà chiamato dal watcher di sortFields
-    }
-
-    function getSortDirection(field: string): number {
-        return sortFields.value?.[field] || 0;
-    }
-
-    function onFilterChanged(): void {
-        // Il watcher gestirà tutto
-    }
-
     return {
         sessions,
         page,
@@ -107,8 +69,9 @@ export function useCowrieSessions(
         loading,
         error,
         fetchData,
-        onFilterChanged,
+        onFilterChanged: () => {},
         toggleSort,
-        getSortDirection
+        getSortDirection,
+        getSortClass
     };
 }

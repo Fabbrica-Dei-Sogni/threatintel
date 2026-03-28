@@ -123,6 +123,9 @@
                                     </button>
                                 </div>
                             </th>
+                            <th :data-attacks-tooltip="t('attacks.table.details')">
+                                {{ t('attacks.table.short.info') }}
+                            </th>                            
                             <th :data-attacks-tooltip="t('attacks.table.techniques')">
                                 {{ t('attacks.table.short.tech') }}
                             </th>
@@ -137,11 +140,6 @@
                                     </button>
                                 </div>
                             </th>
-                            <th :data-attacks-tooltip="t('attacks.table.details')">
-                                {{ t('attacks.table.short.info') }}
-                            </th>
-
-
                             <!--
                         <th>
                             <div class="org-info">
@@ -260,6 +258,21 @@
                             <td class="defcon-cell" :title="attack.dangerScore">
                                 <DefconIndicator :level="attack.dangerLevel" :dangerScore="attack.dangerScore" mode="dot" />
                             </td>
+                            <td>
+                                <router-link :to="{
+                                    name: 'AttackDetail',
+                                    params: { ip: attack.request.ip },
+                                    query: {
+                                        minLogsForAttack: minLogsForAttack,
+                                        timeMode: timeMode,
+                                        agoValue: agoValue,
+                                        agoUnit: agoUnit,
+                                        dateRange: dateRange
+                                    }
+                                }" class="detail-link">
+                                    {{ t('common.detail') }}
+                                </router-link>
+                            </td>                            
                             <td class="tecniche-cell">
                                 <div class="tech-wrapper">
                                     <span v-for="tech in attack.attackPatterns" :key="tech" class="tech-chip">
@@ -279,21 +292,6 @@
                                     <button @click.stop="setIpFilter(attack.request.ip)" class="btn-copy-ip"
                                         :title="t('common.copyToFilter')">⬇️</button>
                                 </span>
-                            </td>
-                            <td>
-                                <router-link :to="{
-                                    name: 'AttackDetail',
-                                    params: { ip: attack.request.ip },
-                                    query: {
-                                        minLogsForAttack: minLogsForAttack,
-                                        timeMode: timeMode,
-                                        agoValue: agoValue,
-                                        agoUnit: agoUnit,
-                                        dateRange: dateRange
-                                    }
-                                }" class="detail-link">
-                                    {{ t('common.detail') }}
-                                </router-link>
                             </td>
                             <!--    
                         <td>{{ attack.intensityAttack }}</td>

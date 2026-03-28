@@ -54,18 +54,27 @@
                     </div>
 
                     <!-- Tactical HUD Container -->
-                    <div class="hud-container">
-                        <div class="hud-item">
-                            <span class="hud-label">{{ t('attackDetail.totalLogs') }}</span>
-                            <div class="hud-content highlight">{{ attack.totaleLogs }}</div>
+                    <div class="hud-stats-row">
+                        <div class="hud-stat-box">
+                            <span class="hud-box-icon">📋</span>
+                            <div class="hud-stat-data">
+                                <span class="hud-label">{{ t('attackDetail.totalLogs') }}</span>
+                                <div class="hud-value highlight">{{ attack.totaleLogs }}</div>
+                            </div>
                         </div>
-                        <div class="hud-item">
-                            <span class="hud-label">{{ t('attackDetail.attackDuration') }}</span>
-                            <div class="hud-content">{{ attack.durataAttacco.human }}</div>
+                        <div class="hud-stat-box">
+                            <span class="hud-box-icon">⏱️</span>
+                            <div class="hud-stat-data">
+                                <span class="hud-label">{{ t('attackDetail.attackDuration') }}</span>
+                                <div class="hud-value">{{ attack.durataAttacco.human }}</div>
+                            </div>
                         </div>
-                        <div class="hud-item">
-                            <span class="hud-label">{{ t('attackDetail.rps') }}</span>
-                            <div class="hud-content">{{ attack.rps }}</div>
+                        <div class="hud-stat-box">
+                            <span class="hud-box-icon">📈</span>
+                            <div class="hud-stat-data">
+                                <span class="hud-label">{{ t('attackDetail.rps') }}</span>
+                                <div class="hud-value">{{ attack.rps }}</div>
+                            </div>
                         </div>
                     </div>
 

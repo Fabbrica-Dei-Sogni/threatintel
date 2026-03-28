@@ -129,6 +129,7 @@
     },
     "attackDetail": {
         "title": "Szczegóły ataku",
+        "hudTitle": "HUD TAKTYCZNY",
         "summary": "Podsumowanie ataku",
         "backToAttacks": "Powrót",
         "attacker": "Atakujący",

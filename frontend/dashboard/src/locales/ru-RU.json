@@ -129,6 +129,7 @@
     },
     "attackDetail": {
         "title": "Детали атаки",
+        "hudTitle": "ТАКТИЧЕСКИЙ HUD",
         "summary": "Сводка атаки",
         "backToAttacks": "Вернуться",
         "attacker": "Атакующий",

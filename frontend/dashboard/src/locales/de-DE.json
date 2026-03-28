@@ -128,7 +128,8 @@
         }
     },
     "attackDetail": {
-        "title": "Angriffsdetail",
+        "title": "Angriffsdetails",
+        "hudTitle": "TAKTIK-HUD",
         "summary": "Angriffszusammenfassung",
         "backToAttacks": "Zurück",
         "attacker": "Angreifer",

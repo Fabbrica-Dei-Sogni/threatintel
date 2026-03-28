@@ -237,6 +237,82 @@
     border-color: #ff4c4c;
 }
 
+.attack-summary {
+    padding: 24px;
+}
+
+/* === TACTICAL HUD === */
+
+.hud-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 24px;
+}
+
+.hud-item {
+    flex: 0 1 auto;
+    width: auto;
+    min-width: 120px;
+    background: rgba(15, 10, 8, 0.4);
+    border-left: 3px solid #e62117; /* Magma border */
+    padding: 5px 12px;
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    transition: all 0.2s ease;
+    border: 1px solid rgba(230, 33, 23, 0.05);
+    border-left: 3px solid #e62117;
+}
+
+.hud-item:hover {
+    background: rgba(230, 33, 23, 0.08);
+    border-color: rgba(230, 33, 23, 0.2);
+    transform: translateY(-1px);
+}
+
+.hud-label {
+    font-size: clamp(0.6rem, 1.5vw, 0.7rem);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #ff9999;
+    opacity: 0.7;
+    font-weight: 700;
+}
+
+.hud-content {
+    font-size: clamp(0.75rem, 2vw, 0.85rem);
+    color: #fff;
+    font-weight: 800;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.hud-content.highlight {
+    color: #ff4c4c;
+    text-shadow: 0 0 10px rgba(255, 76, 76, 0.3);
+}
+
+.hud-item .tech-tag {
+    font-size: 0.7rem;
+    padding: 1px 6px;
+    margin-right: 4px;
+    margin-bottom: 4px;
+}
+
+.hud-item .intensity-badge {
+    font-size: 0.65rem;
+    padding: 2px 8px;
+}
+
+.hud-content :deep(.t-date) {
+    font-size: 0.85em;
+}
+
+.hud-content :deep(.t-hour) {
+    font-size: 0.9em;
+}
+
 /* === TRANSITIONS === */
 .collapse-enter-active,
 .collapse-leave-active {

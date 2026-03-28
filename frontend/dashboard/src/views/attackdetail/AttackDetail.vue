@@ -30,19 +30,18 @@
         <div v-if="loading" class="loading">{{ t('common.loading') }}</div>
         <div v-if="error" class="error">{{ error }}</div>
 
-        <div v-if="attack && !loading" class="attack-summary-wrapper">
+        <div v-if="attack && !loading" class="attack-summary-wrapper forensic-card">
             <div class="section-header clickable-header" @click="toggles.summary = !toggles.summary">
                 <div class="header-title-group">
-                    <span class="animated-icon pulse-magma">📊</span>
-                    <h2>{{ t('attackDetail.summary').toUpperCase() }}</h2>
+                    <span class="animated-icon pulse-magma">🛰️</span>
+                    <h2>{{ t('attackDetail.hudTitle').toUpperCase() }}</h2>
                 </div>
                 <span class="arrow" :class="{ open: toggles.summary }"></span>
             </div>
 
             <transition name="collapse">
                 <div v-if="toggles.summary" class="attack-summary">
-                    <!-- Existing summary content -->
-                    <div class="summary-row">
+                    <div class="summary-row" style="margin-bottom: 24px;">
                         <section class="forensic-briefing">
                             <div class="briefing-header">
                                 <span class="animated-icon pulse-magma">🛡️</span>
@@ -53,48 +52,48 @@
                             </div>
                         </section>
                     </div>
-                    <div class="summary-row">
-                        <div class="forensic-briefing">
-                            <div class="briefing-header">{{ t('attackDetail.techniques') }}</div>
-                            <div class="briefing-content">
+
+                    <!-- Tactical HUD Container -->
+                    <div class="hud-container">
+                        <div class="hud-item">
+                            <span class="hud-label">{{ t('attackDetail.techniques') }}</span>
+                            <div class="hud-content">
                                 <span v-for="(tech, i) in attack.attackPatterns" :key="i" class="tech-tag">{{ tech }}</span>
+                                <span v-if="!attack.attackPatterns?.length" class="t-na">{{ t('common.notAvailable') }}</span>
                             </div>
                         </div>
-                    </div>
-                    <div class="summary-row">
-                        <div class="forensic-briefing">
-                            <div class="briefing-header">{{ t('attackDetail.firstSeen') }}</div>
-                            <div class="briefing-content" v-html="formatDate(attack.firstSeen)"></div>
+                        <div class="hud-item">
+                            <span class="hud-label">{{ t('attackDetail.firstSeen') }}</span>
+                            <div class="hud-content" v-html="formatDate(attack.firstSeen)"></div>
                         </div>
-                        <div class="forensic-briefing">
-                            <div class="briefing-header">{{ t('attackDetail.lastSeen') }}</div>
-                            <div class="briefing-content" v-html="formatDate(attack.lastSeen)"></div>
+                        <div class="hud-item">
+                            <span class="hud-label">{{ t('attackDetail.lastSeen') }}</span>
+                            <div class="hud-content" v-html="formatDate(attack.lastSeen)"></div>
                         </div>
-                    </div>
-                    <div class="summary-row">
-                        <div class="forensic-briefing">
-                            <div class="briefing-header">{{ t('attackDetail.totalLogs') }}</div>
-                            <div class="briefing-content">{{ attack.totaleLogs }}</div>
+                        <div class="hud-item">
+                            <span class="hud-label">{{ t('attackDetail.totalLogs') }}</span>
+                            <div class="hud-content highlight">{{ attack.totaleLogs }}</div>
                         </div>
-                        <div class="forensic-briefing">
-                            <div class="briefing-header">{{ t('attackDetail.attackDuration') }}</div>
-                            <div class="briefing-content">{{ attack.durataAttacco.human }}</div>
+                        <div class="hud-item">
+                            <span class="hud-label">{{ t('attackDetail.attackDuration') }}</span>
+                            <div class="hud-content">{{ attack.durataAttacco.human }}</div>
                         </div>
-                        <div class="forensic-briefing">
-                            <div class="briefing-header">{{ t('attackDetail.rps') }}</div>
-                            <div class="briefing-content">{{ attack.rps }}</div>
+                        <div class="hud-item">
+                            <span class="hud-label">{{ t('attackDetail.rps') }}</span>
+                            <div class="hud-content">{{ attack.rps }}</div>
                         </div>
-                        <div class="forensic-briefing">
-                            <div class="briefing-header">{{ t('attackDetail.avgScore') }}</div>
-                            <div class="briefing-content">{{ attack.averageScore }}</div>
+                        <div class="hud-item">
+                            <span class="hud-label">{{ t('attackDetail.avgScore') }}</span>
+                            <div class="hud-content">{{ attack.averageScore }}</div>
                         </div>
-                        <div class="forensic-briefing">
-                            <div class="briefing-header">{{ t('attackDetail.style') }}</div>
-                            <div class="briefing-content">
+                        <div class="hud-item">
+                            <span class="hud-label">{{ t('attackDetail.style') }}</span>
+                            <div class="hud-content">
                                 <span class="intensity-badge" :class="attack.intensityAttack.toLowerCase()">{{ attack.intensityAttack }}</span>
                             </div>
                         </div>
                     </div>
+
                     <!-- Sub-card Map -->
                     <div class="sub-card">
                         <div class="sub-card-header clickable-header" @click="toggles.showMap = !toggles.showMap">

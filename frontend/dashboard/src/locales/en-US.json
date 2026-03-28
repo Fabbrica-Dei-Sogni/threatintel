@@ -129,6 +129,7 @@
     },
     "attackDetail": {
         "title": "Attack Detail",
+        "hudTitle": "TACTICAL HUD",
         "summary": "Attack Summary",
         "backToAttacks": "Back",
 

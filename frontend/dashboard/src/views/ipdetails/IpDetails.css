@@ -68,6 +68,30 @@
   margin-bottom: 20px;
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.copy-log-btn {
+  cursor: pointer;
+  opacity: 0.5;
+  font-size: 1.1rem;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+}
+
+.copy-log-btn:hover {
+  opacity: 1;
+  transform: scale(1.2);
+  filter: drop-shadow(0 0 8px rgba(0, 212, 255, 0.6));
+}
+
+
 .header-top :last-child {
   margin-left: auto;
 }

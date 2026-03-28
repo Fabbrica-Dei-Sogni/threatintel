@@ -24,7 +24,10 @@
       <div class="forensic-briefing briefing-geo">
         <div class="briefing-header" @click="toggles.geo = !toggles.geo">
           <span class="briefing-icon">🌍</span> {{ t('ipDetails.location').toUpperCase() }}
-          <span class="arrow" :class="{ open: toggles.geo }"></span>
+          <div class="header-actions">
+            <span class="copy-log-btn" @click.stop="copyGeoInfo()" :title="t('common.copy')">📋</span>
+            <span class="arrow" :class="{ open: toggles.geo }"></span>
+          </div>
         </div>
         <transition name="collapse">
           <div v-if="toggles.geo" class="briefing-grid">
@@ -59,7 +62,10 @@
       <div class="forensic-briefing briefing-net">
         <div class="briefing-header" @click="toggles.net = !toggles.net">
           <span class="briefing-icon">🛡️</span> {{ t('ipDetails.networkInfo').toUpperCase() }}
-          <span class="arrow" :class="{ open: toggles.net }"></span>
+          <div class="header-actions">
+            <span class="copy-log-btn" @click.stop="copyNetInfo()" :title="t('common.copy')">📋</span>
+            <span class="arrow" :class="{ open: toggles.net }"></span>
+          </div>
         </div>
         <transition name="collapse">
           <div v-if="toggles.net" class="briefing-grid">
@@ -85,7 +91,10 @@
         :class="{ 'high-risk': ipInfo.abuseipdbId?.abuseConfidenceScore > 50 }">
         <div class="briefing-header" @click="toggles.abuse = !toggles.abuse">
           <span class="briefing-icon">🚨</span> {{ t('ipDetails.abuseReportingTitle').toUpperCase() }}
-          <span class="arrow" :class="{ open: toggles.abuse }"></span>
+          <div class="header-actions">
+            <span class="copy-log-btn" @click.stop="copyAbuseSummary()" :title="t('common.copy')">📋</span>
+            <span class="arrow" :class="{ open: toggles.abuse }"></span>
+          </div>
         </div>
         <transition name="collapse">
           <div v-if="toggles.abuse">
@@ -268,7 +277,10 @@
         <div class="section-header" @click="toggles.honeypot = !toggles.honeypot">
           <h2><span class="animated-icon pulse-cobalt">🔎</span> {{ t('ipDetails.fullWhois').toUpperCase()
           }}</h2>
-          <span class="arrow" :class="{ open: toggles.honeypot }"></span>
+          <div class="header-actions">
+            <span class="copy-log-btn" @click.stop="copyWhoisRaw()" :title="t('common.copy')">📋</span>
+            <span class="arrow" :class="{ open: toggles.honeypot }"></span>
+          </div>
         </div>
         <transition name="collapse">
           <div v-if="toggles.honeypot" class="section-body no-padding">
@@ -543,6 +555,54 @@ function handlePageSizeChange(newSize) {
 function goBack() {
   router.back()
 }
+
+const copyGeoInfo = () => {
+  if (!ipInfo.value?.ipinfo) return;
+  const geo = ipInfo.value.ipinfo;
+  let text = `--- GEOGRAPHIC INTELLIGENCE ---\n`;
+  text += `IP: ${ip.value}\n`;
+  text += `Country: ${geo.country || 'N/A'}\n`;
+  text += `City/Region: ${geo.city || '-'}, ${geo.region || '-'}\n`;
+  text += `Timezone: ${geo.timezone || '-'}\n`;
+  text += `GPS: ${geo.loc || '-'}\n`;
+  text += `-------------------------------`;
+  copyToClipboard(text);
+};
+
+const copyNetInfo = () => {
+  if (!ipInfo.value?.ipinfo) return;
+  const net = ipInfo.value.ipinfo;
+  let text = `--- NETWORK INTELLIGENCE ---\n`;
+  text += `IP: ${ip.value}\n`;
+  text += `Organization: ${net.org || 'N/A'}\n`;
+  text += `Hostname/ISP: ${net.hostname || 'N/A'}\n`;
+  text += `-----------------------------`;
+  copyToClipboard(text);
+};
+
+const copyAbuseSummary = () => {
+  if (!ipInfo.value?.abuseipdbId) return;
+  const abuse = ipInfo.value.abuseipdbId;
+  let text = `--- ABUSE REPORTING SUMMARY ---\n`;
+  text += `IP: ${ip.value}\n`;
+  text += `Confidence Score: ${abuse.abuseConfidenceScore}%\n`;
+  text += `Is Listed: ${abuse.isListed ? 'YES' : 'NO'}\n`;
+  text += `Total Reports: ${abuse.totalReports || 0}\n`;
+  if (abuse.lastReportedAt) {
+    text += `Last Reported: ${dayjs(abuse.lastReportedAt).format('YYYY-MM-DD HH:mm:ss')}\n`;
+  }
+  text += `-------------------------------`;
+  copyToClipboard(text);
+};
+
+const copyWhoisRaw = () => {
+  if (!ipInfo.value?.whois_raw) return;
+  let text = `--- FULL WHOIS DATA ---\n`;
+  text += `IP: ${ip.value}\n\n`;
+  text += JSON.stringify(ipInfo.value.whois_raw, null, 2);
+  text += `\n-----------------------`;
+  copyToClipboard(text);
+};
 
 onMounted(() => {
   loadIpDetails()

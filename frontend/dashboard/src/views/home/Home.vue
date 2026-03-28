@@ -28,9 +28,9 @@
               <li v-for="attack in recentAttacks" :key="attack.id">
                 <div class="indicator-group"
                   :data-url-tooltip="`URI: ${attack.request?.url || 'N/A'}\nDATE: ${formatDate(attack.firstSeen)}`">
-                  <DefconIndicator :level="attack.dangerLevel" :dangerScore="attack.dangerScore" mode="dot" />
                   <CountryFlag :countryCode="attack.ipDetails?.ipinfo?.country"
                     :tooltip="attack.ipDetails?.ipinfo ? `${attack.ipDetails.ipinfo.country} - ${attack.ipDetails.ipinfo.org || t('common.notAvailable')}` : t('common.notAvailable')" />
+                  <DefconIndicator :level="attack.dangerLevel" :dangerScore="attack.dangerScore" mode="dot" />
                 </div>
                 <span @click="goToIpDetails(attack.request.ip)" class="ip-link">{{ attack.request.ip }}</span>
                 <div class="column-spacer"></div>

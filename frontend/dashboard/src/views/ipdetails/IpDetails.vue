@@ -1,17 +1,17 @@
 <template>
   <div class="ip-details">
     <div class="header-top">
-      <button @click="goBack" class="back-btn">← {{ t('ipDetails.backToAttacks') }}</button>
+      <button @click="goBack" class="back-btn">← {{ t('ipDetails.backToAttacks').toUpperCase() }}</button>
       <button @click="forzaArricchimento" :disabled="loadingEnrich" class="refresh-btn">
         <span v-if="loadingEnrich" class="spinner"></span>
-        {{ loadingEnrich ? t('common.loading') : t('ipDetails.forceRefresh') }}
+        {{ (loadingEnrich ? t('common.loading') : t('ipDetails.forceRefresh')).toUpperCase() }}
       </button>
       <LanguageSwitcher />
     </div>
 
     <div class="header-main">
       <h1>
-        <span class="animated-icon pulse-cobalt">🔍</span> {{ t('ipDetails.title') }}: {{ ip }}
+        <span class="animated-icon pulse-cobalt">🔍</span> {{ t('ipDetails.title').toUpperCase() }}: {{ ip }}
         <button class="action-btn copy-ip-btn" @click="copyToClipboard(ip)" :title="t('common.copyToClipboard')">
           <span v-if="!copiedIp">📋</span>
           <span v-else>✅</span>
@@ -19,112 +19,126 @@
       </h1>
     </div>
 
-    <div v-if="ipInfo" class="briefing-wrapper">
+    <div v-if="ipInfo" class="briefing-wrapper" ref="wrapperRef">
       <!-- BLOCK 1: GEOGRAPHIC INTELLIGENCE -->
-      <div class="forensic-briefing briefing-geo">
-        <div class="briefing-header">
-          <span class="briefing-icon">🌍</span> {{ t('ipDetails.location') }}
+      <div class="forensic-briefing briefing-geo" ref="geoRef" :class="{ 'is-full-width-card': isFullWidthModel.geo }">
+        <div class="briefing-header" @click="toggles.geo = !toggles.geo">
+          <span class="briefing-icon">🌍</span> {{ t('ipDetails.location').toUpperCase() }}
+          <span class="arrow" :class="{ open: toggles.geo }"></span>
         </div>
-        <div class="briefing-grid">
-          <div class="briefing-item country-box" :data-briefing-tooltip="ipInfo.ipinfo?.country">
-            <CountryFlag :countryCode="ipInfo.ipinfo?.country" class="briefing-flag" />
-            <div class="briefing-content">
-              <span class="briefing-label">{{ t('ipDetails.country') }}</span>
-              <span class="briefing-value">{{ ipInfo.ipinfo?.country || t('common.notAvailable') }}</span>
+        <transition name="collapse">
+          <div v-if="toggles.geo" class="briefing-grid">
+            <div class="briefing-item country-box" :data-briefing-tooltip="ipInfo.ipinfo?.country">
+              <CountryFlag :countryCode="ipInfo.ipinfo?.country" class="briefing-flag" />
+              <div class="briefing-content">
+                <span class="briefing-label">{{ t('ipDetails.country').toUpperCase() }}</span>
+                <span class="briefing-value">{{ ipInfo.ipinfo?.country || t('common.notAvailable') }}</span>
+              </div>
             </div>
-          </div>
-          <div class="briefing-item"
-            :data-briefing-tooltip="`${ipInfo.ipinfo?.city || '-'}, ${ipInfo.ipinfo?.region || '-'}`">
-            <span class="briefing-icon">📍</span>
-            <div class="briefing-content">
-              <span class="briefing-label">{{ t('ipDetails.city') }} / {{ t('ipDetails.region') }}</span>
-              <span class="briefing-value">{{ ipInfo.ipinfo?.city || '-' }}, {{ ipInfo.ipinfo?.region || '-' }}</span>
+            <div class="briefing-item"
+              :data-briefing-tooltip="`${ipInfo.ipinfo?.city || '-'}, ${ipInfo.ipinfo?.region || '-'}`">
+              <span class="briefing-icon">📍</span>
+              <div class="briefing-content">
+                <span class="briefing-label">{{ t('ipDetails.city').toUpperCase() }} / {{ t('ipDetails.region').toUpperCase() }}</span>
+                <span class="briefing-value">{{ ipInfo.ipinfo?.city || '-' }}, {{ ipInfo.ipinfo?.region || '-' }}</span>
+              </div>
             </div>
-          </div>
-          <div class="briefing-item timezone-box"
-            :data-briefing-tooltip="`${ipInfo.ipinfo?.timezone || '-'} (${ipInfo.ipinfo?.loc || '-'})`">
-            <span class="briefing-icon">🕒</span>
-            <div class="briefing-content">
-              <span class="briefing-label">{{ t('ipDetails.timezone') }} / GPS</span>
-              <div class="briefing-value">{{ ipInfo.ipinfo?.timezone || '-' }} ({{ ipInfo.ipinfo?.loc || '-' }})</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- BLOCK 2: NETWORK INTELLIGENCE -->
-      <div class="forensic-briefing briefing-net">
-        <div class="briefing-header">
-          <span class="briefing-icon">🛡️</span> {{ t('ipDetails.networkInfo') }}
-        </div>
-        <div class="briefing-grid">
-          <div class="briefing-item" :data-briefing-tooltip="ipInfo.ipinfo?.org">
-            <span class="briefing-icon">🏢</span>
-            <div class="briefing-content">
-              <span class="briefing-label">{{ t('ipDetails.organization') }}</span>
-              <span class="briefing-value">{{ ipInfo.ipinfo?.org || t('common.notAvailable') }}</span>
-            </div>
-          </div>
-          <div class="briefing-item" :data-briefing-tooltip="ipInfo.ipinfo?.hostname">
-            <span class="briefing-icon">🌐</span>
-            <div class="briefing-content">
-              <span class="briefing-label">{{ t('ipDetails.isp') }} / {{ t('ipDetails.hostname') }}</span>
-              <span class="briefing-value">{{ ipInfo.ipinfo?.hostname || t('common.notAvailable') }}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="forensic-briefing briefing-abuse"
-        :class="{ 'high-risk': ipInfo.abuseipdbId?.abuseConfidenceScore > 50 }">
-        <div class="briefing-header">
-          <span class="briefing-icon">🚨</span> {{ t('ipDetails.abuseReportingTitle') }}
-        </div>
-        <div v-if="ipInfo.abuseipdbId" class="briefing-grid">
-          <div class="briefing-item" :data-briefing-tooltip="t('ipDetails.score')">
-            <div class="score-radial" :style="{ '--score': ipInfo.abuseipdbId.abuseConfidenceScore || 0 }">
-              {{ ipInfo.abuseipdbId.abuseConfidenceScore }}%
-            </div>
-            <div class="briefing-content">
-              <span class="briefing-label">{{ t('ipDetails.confidence') }}</span>
-              <span class="briefing-value">{{ ipInfo.abuseipdbId.abuseConfidenceScore }}% {{ t('ipDetails.confidence')
-                }}</span>
-            </div>
-          </div>
-          <div class="briefing-item">
-            <span class="briefing-icon" :class="ipInfo.abuseipdbId.isListed ? 'text-danger' : 'text-success'">
-              {{ ipInfo.abuseipdbId.isListed ? '🚫' : '✅' }}
-            </span>
-            <div class="briefing-content">
-              <span class="briefing-label">{{ t('ipDetails.isListed') }}</span>
-              <span class="briefing-value">{{ ipInfo.abuseipdbId.isListed ? t('common.yes') : t('common.no') }}</span>
-            </div>
-          </div>
-          <div class="briefing-item">
-            <span class="briefing-icon">📋</span>
-            <div class="briefing-content">
-              <span class="briefing-label">{{ t('ipDetails.totalReports') }}</span>
-              <span class="briefing-value">{{ ipInfo.abuseipdbId.totalReports || 0 }} {{ t('ipDetails.reportsCount')
-                }}</span>
-            </div>
-          </div>
-          <div class="briefing-item">
-            <span class="briefing-icon">🕒</span>
-            <div class="briefing-content">
-              <span class="briefing-label">{{ t('ipDetails.lastReportedAt') }}</span>
-              <div class="briefing-value">
-                <span v-if="ipInfo.abuseipdbId.lastReportedAt">
-                  <span class="t-date">{{ dayjs(ipInfo.abuseipdbId.lastReportedAt).format('DD/MM/YYYY') }}</span>
-                  <span class="t-hour">{{ dayjs(ipInfo.abuseipdbId.lastReportedAt).format('HH:mm:ss') }}</span>
-                </span>
-                <span v-else>{{ t('common.notAvailable') }}</span>
+            <div class="briefing-item timezone-box"
+              :data-briefing-tooltip="`${ipInfo.ipinfo?.timezone || '-'} (${ipInfo.ipinfo?.loc || '-'})`">
+              <span class="briefing-icon">🕒</span>
+              <div class="briefing-content">
+                <span class="briefing-label">{{ t('ipDetails.timezone').toUpperCase() }} / GPS</span>
+                <div class="briefing-value">{{ ipInfo.ipinfo?.timezone || '-' }} ({{ ipInfo.ipinfo?.loc || '-' }})</div>
               </div>
             </div>
           </div>
+        </transition>
+      </div>
+
+      <!-- BLOCK 2: NETWORK INTELLIGENCE -->
+      <div class="forensic-briefing briefing-net" ref="netRef" :class="{ 'is-full-width-card': isFullWidthModel.net }">
+        <div class="briefing-header" @click="toggles.net = !toggles.net">
+          <span class="briefing-icon">🛡️</span> {{ t('ipDetails.networkInfo').toUpperCase() }}
+          <span class="arrow" :class="{ open: toggles.net }"></span>
         </div>
-        <div v-else class="empty-placeholder">
-          {{ t('ipDetails.noAbuseData') }}
+        <transition name="collapse">
+          <div v-if="toggles.net" class="briefing-grid">
+            <div class="briefing-item" :data-briefing-tooltip="ipInfo.ipinfo?.org">
+              <span class="briefing-icon">🏢</span>
+              <div class="briefing-content">
+                <span class="briefing-label">{{ t('ipDetails.organization').toUpperCase() }}</span>
+                <span class="briefing-value">{{ ipInfo.ipinfo?.org || t('common.notAvailable') }}</span>
+              </div>
+            </div>
+            <div class="briefing-item" :data-briefing-tooltip="ipInfo.ipinfo?.hostname">
+              <span class="briefing-icon">🌐</span>
+              <div class="briefing-content">
+                <span class="briefing-label">{{ t('ipDetails.isp').toUpperCase() }} / {{ t('ipDetails.hostname').toUpperCase() }}</span>
+                <span class="briefing-value">{{ ipInfo.ipinfo?.hostname || t('common.notAvailable') }}</span>
+              </div>
+            </div>
+          </div>
+        </transition>
+      </div>
+
+      <div class="forensic-briefing briefing-abuse" ref="abuseRef"
+        :class="[{ 'is-full-width-card': isFullWidthModel.abuse }, { 'high-risk': ipInfo.abuseipdbId?.abuseConfidenceScore > 50 }]">
+        <div class="briefing-header" @click="toggles.abuse = !toggles.abuse">
+          <span class="briefing-icon">🚨</span> {{ t('ipDetails.abuseReportingTitle').toUpperCase() }}
+          <span class="arrow" :class="{ open: toggles.abuse }"></span>
         </div>
+        <transition name="collapse">
+          <div v-if="toggles.abuse">
+            <div v-if="ipInfo.abuseipdbId" class="briefing-grid">
+              <div class="briefing-item" :data-briefing-tooltip="t('ipDetails.score')">
+                <div class="score-radial" :style="{ '--score': ipInfo.abuseipdbId.abuseConfidenceScore || 0 }">
+                  {{ ipInfo.abuseipdbId.abuseConfidenceScore }}%
+                </div>
+                <div class="briefing-content">
+                  <span class="briefing-label">{{ t('ipDetails.confidence').toUpperCase() }}</span>
+                  <span class="briefing-value">{{ ipInfo.abuseipdbId.abuseConfidenceScore }}% {{
+                    t('ipDetails.confidence').toUpperCase()
+                  }}</span>
+                </div>
+              </div>
+              <div class="briefing-item">
+                <span class="briefing-icon" :class="ipInfo.abuseipdbId.isListed ? 'text-danger' : 'text-success'">
+                  {{ ipInfo.abuseipdbId.isListed ? '🚫' : '✅' }}
+                </span>
+                <div class="briefing-content">
+                  <span class="briefing-label">{{ t('ipDetails.isListed').toUpperCase() }}</span>
+                  <span class="briefing-value">{{ ipInfo.abuseipdbId.isListed ? t('common.yes').toUpperCase() :
+                    t('common.no').toUpperCase() }}</span>
+                </div>
+              </div>
+              <div class="briefing-item">
+                <span class="briefing-icon">📋</span>
+                <div class="briefing-content">
+                  <span class="briefing-label">{{ t('ipDetails.totalReports').toUpperCase() }}</span>
+                  <span class="briefing-value">{{ ipInfo.abuseipdbId.totalReports || 0 }} {{
+                    t('ipDetails.reportsCount').toUpperCase()
+                  }}</span>
+                </div>
+              </div>
+              <div class="briefing-item">
+                <span class="briefing-icon">🕒</span>
+                <div class="briefing-content">
+                  <span class="briefing-label">{{ t('ipDetails.lastReportedAt').toUpperCase() }}</span>
+                  <div class="briefing-value">
+                    <span v-if="ipInfo.abuseipdbId.lastReportedAt">
+                      <span class="t-date">{{ dayjs(ipInfo.abuseipdbId.lastReportedAt).format('DD/MM/YYYY') }}</span>
+                      <span class="t-hour">{{ dayjs(ipInfo.abuseipdbId.lastReportedAt).format('HH:mm:ss') }}</span>
+                    </span>
+                    <span v-else>{{ t('common.notAvailable').toUpperCase() }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div v-else class="empty-placeholder">
+              {{ t('ipDetails.noAbuseData') }}
+            </div>
+          </div>
+        </transition>
       </div>
     </div>
 
@@ -136,7 +150,7 @@
       <!-- Section ABUSEIPDB REPORTS -->
       <div class="section abuse-reports-section" v-if="reports.length >= 0">
         <div class="section-header" @click="toggles.reports = !toggles.reports">
-          <h2><span class="animated-icon pulse-cobalt">📊</span> {{ t('ipDetails.abuseInvestigationLogs') }}
+          <h2><span class="animated-icon pulse-cobalt">📊</span> {{ t('ipDetails.abuseInvestigationLogs').toUpperCase() }}
           </h2>
           <span class="arrow" :class="{ open: toggles.reports }"></span>
         </div>
@@ -205,7 +219,7 @@
       <div class="section ratelimit-section" v-if="rateLimit.data && rateLimit.data.length > 0">
         <div class="section-header" @click="toggles.ratelimit = !toggles.ratelimit">
           <h2><span class="animated-icon pulse-cobalt">⚠️</span> {{
-            t('ipDetails.rateLimitEvents') }}</h2>
+            t('ipDetails.rateLimitEvents').toUpperCase() }}</h2>
           <span class="arrow" :class="{ open: toggles.ratelimit }"></span>
         </div>
         <transition name="collapse">
@@ -256,7 +270,7 @@
 
       <div class="section whois-section">
         <div class="section-header" @click="toggles.honeypot = !toggles.honeypot">
-          <h2><span class="animated-icon pulse-cobalt">🔎</span> {{ t('ipDetails.fullWhois')
+          <h2><span class="animated-icon pulse-cobalt">🔎</span> {{ t('ipDetails.fullWhois').toUpperCase()
           }}</h2>
           <span class="arrow" :class="{ open: toggles.honeypot }"></span>
         </div>
@@ -295,10 +309,9 @@ import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
 import CountryFlag from '../../components/CountryFlag.vue';
 import { ElMessage } from 'element-plus';
 
-const { t } = useI18n();
-
 const route = useRoute()
 const router = useRouter()
+const { t } = useI18n();
 
 const ip = ref('')
 const ipInfo = ref(null)
@@ -307,6 +320,27 @@ const loadingEnrich = ref(false)
 const error = ref(false)
 const copiedIds = reactive({});
 const copiedIp = ref(false);
+
+const wrapperRef = ref(null)
+const geoRef = ref(null)
+const netRef = ref(null)
+const abuseRef = ref(null)
+
+const isFullWidthModel = reactive({
+  geo: true,
+  net: true,
+  abuse: true
+})
+
+let resizeObserver = null;
+const updateFullWidthStates = () => {
+  if (!wrapperRef.value) return;
+  const parentWidth = wrapperRef.value.offsetWidth;
+
+  if (geoRef.value) isFullWidthModel.geo = geoRef.value.offsetWidth > parentWidth * 0.8;
+  if (netRef.value) isFullWidthModel.net = netRef.value.offsetWidth > parentWidth * 0.8;
+  if (abuseRef.value) isFullWidthModel.abuse = abuseRef.value.offsetWidth > parentWidth * 0.8;
+};
 
 
 const errorReputationScore = ref(false)
@@ -323,10 +357,21 @@ const updateWidth = () => {
 onMounted(() => {
   window.addEventListener('resize', updateWidth);
   loadIpDetails()
+
+  resizeObserver = new ResizeObserver(() => {
+    updateFullWidthStates();
+  });
+
+  if (wrapperRef.value) resizeObserver.observe(wrapperRef.value);
+  // Monitoriamo anche le card per sicurezza
+  [geoRef, netRef, abuseRef].forEach(r => {
+    if (r.value) resizeObserver.observe(r.value);
+  });
 })
 
 onUnmounted(() => {
   window.removeEventListener('resize', updateWidth)
+  if (resizeObserver) resizeObserver.disconnect();
 })
 
 // Stato di caricamento e Reports
@@ -344,7 +389,9 @@ const toggles = reactive({
   abuse: true,
   honeypot: true,
   ratelimit: true,
-  reports: true
+  reports: true,
+  geo: true,
+  net: true
 })
 
 const rateLimit = reactive({

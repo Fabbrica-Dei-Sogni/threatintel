@@ -131,6 +131,7 @@ h1 {
   display: flex;
   flex-direction: column;
   gap: 15px;
+  container-type: inline-size;
 }
 
 .briefing-header {
@@ -139,7 +140,16 @@ h1 {
   border-bottom: 1px solid rgba(0, 168, 255, 0.1);
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 8px;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.3s ease;
+}
+
+.briefing-header:hover {
+  filter: brightness(1.2);
+  border-bottom-color: rgba(0, 212, 255, 0.4);
 }
 
 .briefing-grid {
@@ -359,8 +369,25 @@ h1 {
   white-space: nowrap;
 }
 
-.section-header:hover {
-  color: #00D4FF;
+/* SMART TOGGLE LOGIC: Hidden if sharing a row, visible if full-width (managed via JS) */
+.forensic-briefing .arrow {
+  display: none !important;
+}
+.forensic-briefing .briefing-header {
+  pointer-events: none;
+  cursor: default;
+}
+
+.forensic-briefing.is-full-width-card .arrow {
+  display: block !important;
+}
+.forensic-briefing.is-full-width-card .briefing-header {
+  pointer-events: auto;
+  cursor: pointer;
+}
+.forensic-briefing.is-full-width-card .briefing-header:hover {
+  filter: brightness(1.2);
+  border-bottom-color: rgba(0, 212, 255, 0.4);
 }
 
 .arrow {

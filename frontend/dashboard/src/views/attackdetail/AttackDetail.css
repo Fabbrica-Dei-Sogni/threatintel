@@ -2,7 +2,7 @@
 
 .attack-detail {
     padding: clamp(12px, 3vw, 24px);
-    background-color: #080504; /* Carbon Deep */
+    background-color: #121212; /* Anthracite Deep */
     color: #f0e6d2;
     min-height: 100vh;
 }
@@ -70,7 +70,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: linear-gradient(135deg, #1a0f0d 0%, #0a0605 100%);
+    background: linear-gradient(135deg, #1C1C1C 0%, #121212 100%);
     border: 1px solid rgba(230, 33, 23, 0.2);
     border-left: 6px solid #e62117;
     border-radius: 12px;

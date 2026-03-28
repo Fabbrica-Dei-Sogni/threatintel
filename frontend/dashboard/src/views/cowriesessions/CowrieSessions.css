@@ -1,9 +1,9 @@
 .cowrie-sessions.attacchi {
     --cyber-primary: #00FF41;
     --cyber-primary-glow: rgba(0, 255, 65, 0.5);
-    --cyber-secondary: rgba(0, 30, 0, 0.7);
-    --cyber-background: #0A0605;
-    --cyber-surface: rgba(0, 30, 0, 0.3);
+    --cyber-secondary: rgba(0, 30, 0, 0.8);
+    --cyber-background: #121212;
+    --cyber-surface: linear-gradient(160deg, #1A241A, #121212);
     --cyber-border: rgba(0, 255, 65, 0.2);
     --cyber-text: #F0FAD0;
     --cyber-accent: #33FF33;

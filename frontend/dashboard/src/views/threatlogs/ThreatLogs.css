@@ -1,9 +1,9 @@
 .threatlogs {
     --cyber-primary: #FFB300;
     --cyber-primary-glow: rgba(255, 179, 0, 0.5);
-    --cyber-secondary: rgba(26, 20, 10, 0.7);
-    --cyber-background: #0A0605;
-    --cyber-surface: rgba(26, 20, 10, 0.3);
+    --cyber-secondary: rgba(26, 20, 10, 0.8);
+    --cyber-background: #121212;
+    --cyber-surface: linear-gradient(160deg, #1C1C1C, #121212);
     --cyber-border: rgba(255, 179, 0, 0.2);
     --cyber-text: #F4EBD0;
     --cyber-accent: #FFD700;

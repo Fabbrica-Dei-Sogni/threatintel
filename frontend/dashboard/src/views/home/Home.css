@@ -80,11 +80,57 @@ h1 {
   color: #4B6584; /* Nocturnal Grey-Blue */
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 12px;
   padding-bottom: 12px;
   padding-left: 5px;
   border-bottom: 2px solid rgba(74, 105, 189, 0.15);
   margin-bottom: 15px;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.3s ease;
+}
+
+.domain-title:hover {
+  filter: brightness(1.2);
+  border-bottom-color: rgba(74, 105, 189, 0.4);
+}
+
+.domain-title .title-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.arrow {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-right: 2px solid #4B6584;
+  border-bottom: 2px solid #4B6584;
+  transform: rotate(45deg);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-right: 15px;
+}
+
+.arrow.open {
+  transform: rotate(-135deg);
+  border-color: #5FA5FF;
+}
+
+/* Transizione Collapse */
+.collapse-enter-active,
+.collapse-leave-active {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  max-height: 2000px;
+  overflow: hidden;
+}
+
+.collapse-enter-from,
+.collapse-leave-to {
+  max-height: 0;
+  opacity: 0;
+  transform: translateY(-10px);
 }
 
 .domain-title .icon {
@@ -127,6 +173,24 @@ h1 {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.widget-header.clickable-header {
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.3s ease;
+  padding: 5px;
+  border-radius: 6px;
+}
+
+.widget-header.clickable-header:hover {
+  background: rgba(74, 105, 189, 0.1);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 15px;
 }
 
 .widget-header h3 {

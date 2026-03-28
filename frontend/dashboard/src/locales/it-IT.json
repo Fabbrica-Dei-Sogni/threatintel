@@ -237,6 +237,15 @@
         "trafficOverTime": "Analisi Traffico Temporale",
         "errorLoadingData": "Errore nel caricamento dei dati",
         "table": {
+            "short": {
+                "origin": "🌍",
+                "details": "📑",
+                "ip": "👤",
+                "url": "🔗",
+                "dangerScore": "🚨",
+                "method": "🛠️",
+                "timestamp": "⏱️"
+            },
             "defcon": "Defcon",
             "ip": "IP",
             "details": "Dettagli",

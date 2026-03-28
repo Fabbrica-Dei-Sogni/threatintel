@@ -237,6 +237,15 @@
         "trafficOverTime": "Анализ трафика во времени",
         "trafficPeaks": "Пики трафика",
         "table": {
+            "short": {
+                "origin": "🌍",
+                "details": "📑",
+                "ip": "👤",
+                "url": "🔗",
+                "dangerScore": "🚨",
+                "method": "🛠️",
+                "timestamp": "⏱️"
+            },
             "defcon": "Defcon",
             "ip": "IP",
             "details": "Подробности",

@@ -237,6 +237,15 @@
         "trafficOverTime": "Analyse du trafic dans le temps",
         "trafficPeaks": "Pics de trafic",
         "table": {
+            "short": {
+                "origin": "🌍",
+                "details": "📑",
+                "ip": "👤",
+                "url": "🔗",
+                "dangerScore": "🚨",
+                "method": "🛠️",
+                "timestamp": "⏱️"
+            },
             "defcon": "Defcon",
             "ip": "IP",
             "details": "Détails",

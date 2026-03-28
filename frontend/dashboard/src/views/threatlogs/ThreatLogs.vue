@@ -72,13 +72,13 @@
         <table ref="tableRef" class="cyber-table">
           <thead>
             <tr>
-              <th>
-                <span class="label">{{ t('threatLogs.table.countryOrg') }}</span>
+              <th :data-logs-tooltip="t('threatLogs.table.countryOrg')">
+                <span class="label">{{ t('threatLogs.table.short.origin') }}</span>
               </th>
-              <th>{{ t('threatLogs.table.details') }}</th>
-              <th class="sortable-th">
+              <th :data-logs-tooltip="t('threatLogs.table.details')">{{ t('threatLogs.table.short.details') }}</th>
+              <th class="sortable-th" :data-logs-tooltip="t('threatLogs.table.ip')">
                 <div class="sort-control">
-                  <span class="label">{{ t('threatLogs.table.ip') }}</span>
+                  <span class="label">{{ t('threatLogs.table.short.ip') }}</span>
                   <button @click="toggleSort('request.ip')" :aria-label="t('sorting.sortIp')" class="sort-button">
                     <span v-if="getSortDirection('request.ip') === 1">▲</span>
                     <span v-else-if="getSortDirection('request.ip') === -1">▼</span>
@@ -86,9 +86,9 @@
                   </button>
                 </div>
               </th>
-              <th class="sortable-th">
+              <th class="sortable-th" :data-logs-tooltip="t('threatLogs.table.url')">
                 <div class="sort-control">
-                  <span class="label">{{ t('threatLogs.table.url') }}</span>
+                  <span class="label">{{ t('threatLogs.table.short.url') }}</span>
                   <button @click="toggleSort('request.url')" :aria-label="t('sorting.sortUrl')" class="sort-button">
                     <span v-if="getSortDirection('request.url') === 1">▲</span>
                     <span v-else-if="getSortDirection('request.url') === -1">▼</span>
@@ -96,9 +96,9 @@
                   </button>
                 </div>
               </th>
-              <th class="sortable-th">
+              <th class="sortable-th" :data-logs-tooltip="t('threatLogs.table.dangerScore')">
                 <div class="sort-control">
-                  <span class="label">{{ t('threatLogs.table.dangerScore') }}</span>
+                  <span class="label">{{ t('threatLogs.table.short.dangerScore') }}</span>
                   <button @click="toggleSort('fingerprint.score')" :aria-label="t('sorting.sortScore')"
                     class="sort-button">
                     <span v-if="getSortDirection('fingerprint.score') === 1">▲</span>
@@ -107,9 +107,9 @@
                   </button>
                 </div>
               </th>
-              <th class="sortable-th">
+              <th class="sortable-th" :data-logs-tooltip="t('threatLogs.table.method')">
                 <div class="sort-control">
-                  <span class="label">{{ t('threatLogs.table.method') }}</span>
+                  <span class="label">{{ t('threatLogs.table.short.method') }}</span>
                   <button @click="toggleSort('request.method')" :aria-label="t('sorting.sortMethod')"
                     class="sort-button">
                     <span v-if="getSortDirection('request.method') === 1">▲</span>
@@ -118,9 +118,9 @@
                   </button>
                 </div>
               </th>
-              <th class="sortable-th">
+              <th class="sortable-th" :data-logs-tooltip="t('threatLogs.table.timestamp')">
                 <div class="sort-control">
-                  <span class="label">{{ t('threatLogs.table.timestamp') }}</span>
+                  <span class="label">{{ t('threatLogs.table.short.timestamp') }}</span>
                   <button @click="toggleSort('timestamp')" :aria-label="t('sorting.sortTimestamp')" class="sort-button">
                     <span v-if="getSortDirection('timestamp') === 1">▲</span>
                     <span v-else-if="getSortDirection('timestamp') === -1">▼</span>

@@ -261,6 +261,25 @@
     width: 100%;
 }
 
+/* Sub-card Grid for profile metadata */
+.hud-sub-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    padding: 20px;
+    width: 100%;
+}
+
+.grid-span-2 {
+    grid-column: span 2;
+}
+
+.mini-icon {
+    font-size: 1rem;
+    margin-right: 6px;
+    filter: drop-shadow(0 0 5px rgba(230, 33, 23, 0.3));
+}
+
 .hud-stat-box {
     position: relative;
     background: linear-gradient(135deg, rgba(20, 15, 12, 0.8) 0%, rgba(10, 5, 2, 0.9) 100%);
@@ -420,6 +439,15 @@
     }
     .hud-stat-box {
         padding: 8px 10px;
+    }
+    /* Sub-card grid stack */
+    .hud-sub-grid {
+        grid-template-columns: 1fr;
+        padding: 15px;
+        gap: 12px;
+    }
+    .grid-span-2 {
+        grid-column: span 1;
     }
 }
 

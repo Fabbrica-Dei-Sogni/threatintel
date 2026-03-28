@@ -89,30 +89,40 @@
                         </div>
                         <transition name="collapse">
                             <div v-if="toggles.showProfile" class="sub-card-content">
-                                <div class="hud-container">
+                                <div class="hud-sub-grid">
                                     <div class="hud-item">
-                                        <span class="hud-label">{{ t('attackDetail.techniques') }}</span>
+                                        <span class="hud-label">
+                                            <span class="mini-icon">🛠️</span> {{ t('attackDetail.techniques') }}
+                                        </span>
                                         <div class="hud-content">
                                             <span v-for="(tech, i) in attack.attackPatterns" :key="i" class="tech-tag">{{ tech }}</span>
                                             <span v-if="!attack.attackPatterns?.length" class="t-na">{{ t('common.notAvailable') }}</span>
                                         </div>
                                     </div>
                                     <div class="hud-item">
-                                        <span class="hud-label">{{ t('attackDetail.firstSeen') }}</span>
+                                        <span class="hud-label">
+                                            <span class="mini-icon">📅</span> {{ t('attackDetail.firstSeen') }}
+                                        </span>
                                         <div class="hud-content" v-html="formatDate(attack.firstSeen)"></div>
                                     </div>
                                     <div class="hud-item">
-                                        <span class="hud-label">{{ t('attackDetail.lastSeen') }}</span>
+                                        <span class="hud-label">
+                                            <span class="mini-icon">⏳</span> {{ t('attackDetail.lastSeen') }}
+                                        </span>
                                         <div class="hud-content" v-html="formatDate(attack.lastSeen)"></div>
                                     </div>
                                     <div class="hud-item">
-                                        <span class="hud-label">{{ t('attackDetail.style') }}</span>
+                                        <span class="hud-label">
+                                            <span class="mini-icon">🎨</span> {{ t('attackDetail.style') }}
+                                        </span>
                                         <div class="hud-content">
                                             <span class="intensity-badge" :class="attack.intensityAttack.toLowerCase()">{{ attack.intensityAttack }}</span>
                                         </div>
                                     </div>
                                     <div class="hud-item">
-                                        <span class="hud-label">{{ t('attackDetail.avgScore') }}</span>
+                                        <span class="hud-label">
+                                            <span class="mini-icon">📊</span> {{ t('attackDetail.avgScore') }}
+                                        </span>
                                         <div class="hud-content">{{ attack.averageScore }}</div>
                                     </div>
                                 </div>

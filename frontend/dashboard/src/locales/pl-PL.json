@@ -447,7 +447,7 @@
             "origin": "Pochodzenie",
             "loading": "Deszyfrowanie strumieni osi czasu...",
             "errorSync": "Nie udało się zsynchronizować osi czasu sesji. Węzeł zdalny niedostępny.",
-            "emptyState": "Interceptor nie wykrył żadnych zdarzeń ładunku dla tego śladu.",
+            "emptyState": "Nie wykryto zdarzeń",
             "unknownEvent": "Nieznane zdarzenie",
             "copy": "Kopiuj",
             "user": "UŻYTKOWNIK",
@@ -456,7 +456,8 @@
             "sha": "SHA",
             "sessionCaptured": "🎬 Nagranie sesji przechwycone",
             "size": "Rozmiar",
-            "duration": "Czas trwania"
+            "duration": "Czas trwania",
+            "mapTitle": "Mapa Sesji"
         }
     }
 }

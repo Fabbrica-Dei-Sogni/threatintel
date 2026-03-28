@@ -448,7 +448,7 @@
             "origin": "Origin",
             "loading": "Decrypting Timeline Streams...",
             "errorSync": "Failed to synchronize session timeline. Remote node unavailable.",
-            "emptyState": "Interceptor picked up no payload events for this trace.",
+            "emptyState": "No events detected",
             "unknownEvent": "Unknown Event",
             "copy": "Copy",
             "user": "USER",
@@ -457,7 +457,8 @@
             "sha": "SHA",
             "sessionCaptured": "🎬 Session Recording Captured",
             "size": "Size",
-            "duration": "Duration"
+            "duration": "Duration",
+            "mapTitle": "Session Map"
         }
     }
 }

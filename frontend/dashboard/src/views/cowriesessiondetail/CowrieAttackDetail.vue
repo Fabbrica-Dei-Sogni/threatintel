@@ -30,9 +30,22 @@
         </div>
 
         <!-- Mappa della Sessione -->
-        <section class="session-map-section glass-card" v-if="sessionDetails && !loading">
-            <AttackMap v-if="mapAttackData.length > 0" :attacks="mapAttackData" :showLegend="false" />
-        </section>
+        <div class="sub-card" v-if="sessionDetails && !loading">
+            <div class="sub-card-header clickable-header" @click="toggles.showMap = !toggles.showMap">
+                <div class="header-title-group">
+                    <span class="animated-icon">📡</span>
+                    <h3>{{ t('cowrie.attackDetail.mapTitle').toUpperCase() }}</h3>
+                </div>
+                <span class="arrow" :class="{ open: toggles.showMap }"></span>
+            </div>
+            <transition name="collapse">
+                <div v-if="toggles.showMap" class="sub-card-content">
+                    <section class="attack-map-section">
+                        <AttackMap v-if="mapAttackData.length > 0" :attacks="mapAttackData" :showLegend="false" />
+                    </section>
+                </div>
+            </transition>
+        </div>
 
         <div v-if="loading" class="loading">{{ $t('cowrie.attackDetail.loading') }}</div>
         
@@ -82,7 +95,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, reactive } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import dayjs from 'dayjs';
 import { useI18n } from '../../composable/useI18n';
@@ -101,6 +114,10 @@ const sessionDetails = ref(null);
 const events = ref([]);
 const loading = ref(true);
 const error = ref(null);
+
+const toggles = reactive({
+    showMap: false
+});
 
 const mapAttackData = computed(() => {
     if (!sessionDetails.value) return [];

@@ -447,7 +447,7 @@
             "origin": "Herkunft",
             "loading": "Entschlüsselung der Timeline-Streams...",
             "errorSync": "Synchronisierung der Sitzungs-Timeline fehlgeschlagen. Remote-Knoten nicht verfügbar.",
-            "emptyState": "Der Interceptor hat keine Payload-Ereignisse für diese Spur erfasst.",
+            "emptyState": "Keine Ereignisse erkannt",
             "unknownEvent": "Unbekanntes Ereignis",
             "copy": "Kopieren",
             "user": "BENUTZER",
@@ -456,7 +456,8 @@
             "sha": "SHA",
             "sessionCaptured": "🎬 Sitzungsaufzeichnung erfasst",
             "size": "Größe",
-            "duration": "Dauer"
+            "duration": "Dauer",
+            "mapTitle": "Sitzungskarte"
         }
     }
 }

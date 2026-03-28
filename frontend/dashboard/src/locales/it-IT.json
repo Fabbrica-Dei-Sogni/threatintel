@@ -447,7 +447,7 @@
             "origin": "Origine",
             "loading": "Decrittazione Stream Timeline...",
             "errorSync": "Sincronizzazione timeline fallita. Nodo remoto non disponibile.",
-            "emptyState": "L'intercettore non ha rilevato payload per questa traccia.",
+            "emptyState": "Nessun evento rilevato",
             "unknownEvent": "Evento Sconosciuto",
             "copy": "Copia",
             "user": "UTENTE",
@@ -456,7 +456,8 @@
             "sha": "SHA",
             "sessionCaptured": "🎬 Registrazione Sessione Catturata",
             "size": "Dimensione",
-            "duration": "Durata"
+            "duration": "Durata",
+            "mapTitle": "Mappa Sessione"
         }
     }
 }

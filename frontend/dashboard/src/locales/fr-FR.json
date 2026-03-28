@@ -447,7 +447,7 @@
             "origin": "Origine",
             "loading": "Décryptage des flux de la Timeline...",
             "errorSync": "Échec de la synchronisation de la timeline de session. Nœud distant indisponible.",
-            "emptyState": "L'intercepteur n'a récupéré aucun événement de payload per cette trace.",
+            "emptyState": "Aucun événement détecté",
             "unknownEvent": "Événement Inkonnu",
             "copy": "Copier",
             "user": "UTILISATEUR",
@@ -456,7 +456,8 @@
             "sha": "SHA",
             "sessionCaptured": "🎬 Enregistrement de session capturé",
             "size": "Taille",
-            "duration": "Durée"
+            "duration": "Durée",
+            "mapTitle": "Carte de Session"
         }
     }
 }

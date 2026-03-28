@@ -67,10 +67,6 @@
                             <span class="hud-label">{{ t('attackDetail.rps') }}</span>
                             <div class="hud-content">{{ attack.rps }}</div>
                         </div>
-                        <div class="hud-item">
-                            <span class="hud-label">{{ t('attackDetail.avgScore') }}</span>
-                            <div class="hud-content">{{ attack.averageScore }}</div>
-                        </div>
                     </div>
 
                     <!-- Profilo Attacco -->
@@ -105,6 +101,10 @@
                                         <div class="hud-content">
                                             <span class="intensity-badge" :class="attack.intensityAttack.toLowerCase()">{{ attack.intensityAttack }}</span>
                                         </div>
+                                    </div>
+                                    <div class="hud-item">
+                                        <span class="hud-label">{{ t('attackDetail.avgScore') }}</span>
+                                        <div class="hud-content">{{ attack.averageScore }}</div>
                                     </div>
                                 </div>
                             </div>

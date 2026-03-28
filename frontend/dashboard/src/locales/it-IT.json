@@ -148,6 +148,8 @@
         "frequency": "Frequenza",
         "rateBreach": "Rate breach",
         "attackProfile": "Profilo Attacco",
+        "mapTitle": "Mappa Attacco",
+        "radarTitle": "Analisi Radar",
         "searchUrlPlaceholder": "Filtra per URL..."
     },
     "attackChart": {

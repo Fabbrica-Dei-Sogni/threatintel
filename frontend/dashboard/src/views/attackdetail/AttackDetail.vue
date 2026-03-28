@@ -95,14 +95,41 @@
                             </div>
                         </div>
                     </div>
-                    <!-- ... existing rows ... -->
-                    <!-- Insert Map Here -->
-                    <section class="attack-map-section" style="margin-top: 20px;">
-                        <AttackMap v-if="mapAttackData.length > 0" :attacks="mapAttackData" />
-                    </section>
-                    <section class="attack-profile">
-                        <AttackProfileRadar v-if="attack" :attackDetail="attack" :isMobile="isMobile" />
-                    </section>
+                    <!-- Sub-card Map -->
+                    <div class="sub-card">
+                        <div class="sub-card-header clickable-header" @click="toggles.showMap = !toggles.showMap">
+                            <div class="header-title-group">
+                                <span class="animated-icon">📡</span>
+                                <h3>{{ t('attackDetail.mapTitle').toUpperCase() }}</h3>
+                            </div>
+                            <span class="arrow" :class="{ open: toggles.showMap }"></span>
+                        </div>
+                        <transition name="collapse">
+                            <div v-if="toggles.showMap" class="sub-card-content">
+                                <section class="attack-map-section">
+                                    <AttackMap v-if="mapAttackData.length > 0" :attacks="mapAttackData" />
+                                </section>
+                            </div>
+                        </transition>
+                    </div>
+
+                    <!-- Sub-card Radar -->
+                    <div class="sub-card">
+                        <div class="sub-card-header clickable-header" @click="toggles.showRadar = !toggles.showRadar">
+                            <div class="header-title-group">
+                                <span class="animated-icon">📊</span>
+                                <h3>{{ t('attackDetail.radarTitle').toUpperCase() }}</h3>
+                            </div>
+                            <span class="arrow" :class="{ open: toggles.showRadar }"></span>
+                        </div>
+                        <transition name="collapse">
+                            <div v-if="toggles.showRadar" class="sub-card-content">
+                                <section class="attack-profile">
+                                    <AttackProfileRadar v-if="attack" :attackDetail="attack" :isMobile="isMobile" />
+                                </section>
+                            </div>
+                        </transition>
+                    </div>
                 </div>
             </transition>
         </div>
@@ -253,7 +280,9 @@ const { copyToClipboard } = useClipboard();
 const toggles = reactive({
     summary: true,
     logs: true,
-    rateLimit: true
+    rateLimit: true,
+    showMap: false,
+    showRadar: false
 })
 
 // Props

@@ -149,6 +149,7 @@
         "frequency": "Częstotliwość",
         "rateBreach": "Naruszenie limitu",
         "attackProfile": "Profil ataku",
+        "profileTitle": "Profil ataku",
         "mapTitle": "Mapa Ataku",
         "radarTitle": "Analiza Radarowa",
         "searchUrlPlaceholder": "Filtruj według adresu URL..."

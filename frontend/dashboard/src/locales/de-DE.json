@@ -149,6 +149,7 @@
         "frequency": "Häufigkeit",
         "rateBreach": "Rate-Verstoß",
         "attackProfile": "Angriffsprofil",
+        "profileTitle": "Angriffsprofil",
         "mapTitle": "Angriffskarte",
         "radarTitle": "Radaranalyse",
         "searchUrlPlaceholder": "Nach URL filtern..."

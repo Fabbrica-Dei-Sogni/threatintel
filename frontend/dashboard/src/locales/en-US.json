@@ -150,6 +150,7 @@
         "frequency": "Frequency",
         "rateBreach": "Rate breach",
         "attackProfile": "Attack Profile",
+        "profileTitle": "Attack Profile",
         "mapTitle": "Attack Map",
         "radarTitle": "Radar Analysis",
         "searchUrlPlaceholder": "Filter by URL..."

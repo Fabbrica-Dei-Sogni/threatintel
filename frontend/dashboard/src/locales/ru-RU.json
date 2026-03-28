@@ -149,6 +149,7 @@
         "frequency": "Частота",
         "rateBreach": "Нарушение частоты",
         "attackProfile": "Профиль атаки",
+        "profileTitle": "Профиль атаки",
         "mapTitle": "Карта атак",
         "radarTitle": "Радарный анализ",
         "searchUrlPlaceholder": "Фильтровать по URL..."

@@ -56,21 +56,6 @@
                     <!-- Tactical HUD Container -->
                     <div class="hud-container">
                         <div class="hud-item">
-                            <span class="hud-label">{{ t('attackDetail.techniques') }}</span>
-                            <div class="hud-content">
-                                <span v-for="(tech, i) in attack.attackPatterns" :key="i" class="tech-tag">{{ tech }}</span>
-                                <span v-if="!attack.attackPatterns?.length" class="t-na">{{ t('common.notAvailable') }}</span>
-                            </div>
-                        </div>
-                        <div class="hud-item">
-                            <span class="hud-label">{{ t('attackDetail.firstSeen') }}</span>
-                            <div class="hud-content" v-html="formatDate(attack.firstSeen)"></div>
-                        </div>
-                        <div class="hud-item">
-                            <span class="hud-label">{{ t('attackDetail.lastSeen') }}</span>
-                            <div class="hud-content" v-html="formatDate(attack.lastSeen)"></div>
-                        </div>
-                        <div class="hud-item">
                             <span class="hud-label">{{ t('attackDetail.totalLogs') }}</span>
                             <div class="hud-content highlight">{{ attack.totaleLogs }}</div>
                         </div>
@@ -86,12 +71,44 @@
                             <span class="hud-label">{{ t('attackDetail.avgScore') }}</span>
                             <div class="hud-content">{{ attack.averageScore }}</div>
                         </div>
-                        <div class="hud-item">
-                            <span class="hud-label">{{ t('attackDetail.style') }}</span>
-                            <div class="hud-content">
-                                <span class="intensity-badge" :class="attack.intensityAttack.toLowerCase()">{{ attack.intensityAttack }}</span>
+                    </div>
+
+                    <!-- Profilo Attacco -->
+                    <div class="sub-card">
+                        <div class="sub-card-header clickable-header" @click="toggles.showProfile = !toggles.showProfile">
+                            <div class="header-title-group">
+                                <span class="animated-icon">🛡️</span>
+                                <h3>{{ t('attackDetail.profileTitle').toUpperCase() }}</h3>
                             </div>
+                            <span class="arrow" :class="{ open: toggles.showProfile }"></span>
                         </div>
+                        <transition name="collapse">
+                            <div v-if="toggles.showProfile" class="sub-card-content">
+                                <div class="hud-container">
+                                    <div class="hud-item">
+                                        <span class="hud-label">{{ t('attackDetail.techniques') }}</span>
+                                        <div class="hud-content">
+                                            <span v-for="(tech, i) in attack.attackPatterns" :key="i" class="tech-tag">{{ tech }}</span>
+                                            <span v-if="!attack.attackPatterns?.length" class="t-na">{{ t('common.notAvailable') }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="hud-item">
+                                        <span class="hud-label">{{ t('attackDetail.firstSeen') }}</span>
+                                        <div class="hud-content" v-html="formatDate(attack.firstSeen)"></div>
+                                    </div>
+                                    <div class="hud-item">
+                                        <span class="hud-label">{{ t('attackDetail.lastSeen') }}</span>
+                                        <div class="hud-content" v-html="formatDate(attack.lastSeen)"></div>
+                                    </div>
+                                    <div class="hud-item">
+                                        <span class="hud-label">{{ t('attackDetail.style') }}</span>
+                                        <div class="hud-content">
+                                            <span class="intensity-badge" :class="attack.intensityAttack.toLowerCase()">{{ attack.intensityAttack }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </transition>
                     </div>
 
                     <!-- Sub-card Map -->
@@ -334,6 +351,7 @@ const toggles = reactive({
     summary: true,
     logs: true,
     rateLimit: true,
+    showProfile: true,
     showMap: false,
     showRadar: false
 })

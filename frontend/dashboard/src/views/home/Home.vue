@@ -210,11 +210,11 @@ const { t } = useI18n();
 const toggles = reactive({
   native: true,
   recentAttacks: true,
-  attackMap: true,
-  recentLogs: true,
+  attackMap: false,
+  recentLogs: false,
   honeypot: true,
   recentSessions: true,
-  sessionsMap: true
+  sessionsMap: false
 });
 
 // Navigazione

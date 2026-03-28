@@ -1,7 +1,7 @@
 .config-page {
   min-height: 100vh;
   padding: 25px 30px;
-  background-color: #121212; /* Anthracite Blue-tinted */
+  background-color: #18181B; /* Tinged Charcoal */
   color: #e0e7ff;
   --text-color: #e0e7ff;
   --border-color: rgba(136, 170, 255, 0.2);
@@ -15,7 +15,7 @@
   position: sticky;
   top: 0;
   z-index: 100;
-  background-color: #121212;
+  background-color: #18181B;
   padding-top: 12px;
   padding-bottom: 12px;
   border-bottom: 1px solid var(--border-color);

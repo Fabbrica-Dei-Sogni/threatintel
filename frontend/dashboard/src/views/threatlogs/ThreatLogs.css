@@ -2,8 +2,8 @@
     --cyber-primary: #FFB300;
     --cyber-primary-glow: rgba(255, 179, 0, 0.5);
     --cyber-secondary: rgba(26, 20, 10, 0.8);
-    --cyber-background: #121212;
-    --cyber-surface: linear-gradient(160deg, #1C1C1C, #121212);
+    --cyber-background: #18181B;
+    --cyber-surface: linear-gradient(160deg, #2A271A, #18181B);
     --cyber-border: rgba(255, 179, 0, 0.2);
     --cyber-text: #F4EBD0;
     --cyber-accent: #FFD700;

@@ -12,7 +12,7 @@
     <div class="header-main">
       <h1>
         <span class="animated-icon pulse-cobalt">🔍</span> {{ t('ipDetails.title').toUpperCase() }}: {{ ip }}
-        <button class="action-btn copy-ip-btn" @click="copyToClipboard(ip)" :title="t('common.copyToClipboard')">
+        <button class="action-btn copy-ip-btn" @click="copyToClipboard(ip, 'main-ip')" :title="t('common.copyToClipboard')">
           <span v-if="!copiedIp">📋</span>
           <span v-else>✅</span>
         </button>
@@ -42,7 +42,8 @@
               :data-briefing-tooltip="`${ipInfo.ipinfo?.city || '-'}, ${ipInfo.ipinfo?.region || '-'}`">
               <span class="briefing-icon">📍</span>
               <div class="briefing-content">
-                <span class="briefing-label">{{ t('ipDetails.city').toUpperCase() }} / {{ t('ipDetails.region').toUpperCase() }}</span>
+                <span class="briefing-label">{{ t('ipDetails.city').toUpperCase() }} / {{
+                  t('ipDetails.region').toUpperCase() }}</span>
                 <span class="briefing-value">{{ ipInfo.ipinfo?.city || '-' }}, {{ ipInfo.ipinfo?.region || '-' }}</span>
               </div>
             </div>
@@ -79,7 +80,8 @@
             <div class="briefing-item" :data-briefing-tooltip="ipInfo.ipinfo?.hostname">
               <span class="briefing-icon">🌐</span>
               <div class="briefing-content">
-                <span class="briefing-label">{{ t('ipDetails.isp').toUpperCase() }} / {{ t('ipDetails.hostname').toUpperCase() }}</span>
+                <span class="briefing-label">{{ t('ipDetails.isp').toUpperCase() }} / {{
+                  t('ipDetails.hostname').toUpperCase() }}</span>
                 <span class="briefing-value">{{ ipInfo.ipinfo?.hostname || t('common.notAvailable') }}</span>
               </div>
             </div>
@@ -99,7 +101,8 @@
         <transition name="collapse">
           <div v-if="toggles.abuse">
             <div v-if="ipInfo.abuseipdbId" class="briefing-grid">
-              <div class="briefing-item" :data-briefing-tooltip="`${t('ipDetails.confidence').toUpperCase()}: ${ipInfo.abuseipdbId.abuseConfidenceScore}%` ">
+              <div class="briefing-item"
+                :data-briefing-tooltip="`${t('ipDetails.confidence').toUpperCase()}: ${ipInfo.abuseipdbId.abuseConfidenceScore}%`">
                 <div class="score-radial" :style="{ '--score': ipInfo.abuseipdbId.abuseConfidenceScore || 0 }">
                   {{ ipInfo.abuseipdbId.abuseConfidenceScore }}%
                 </div>
@@ -108,7 +111,8 @@
                   <span class="briefing-value">{{ ipInfo.abuseipdbId.abuseConfidenceScore }}%</span>
                 </div>
               </div>
-              <div class="briefing-item" :data-briefing-tooltip="ipInfo.abuseipdbId.isListed ? t('ipDetails.isListed').toUpperCase() : t('common.no').toUpperCase()">
+              <div class="briefing-item"
+                :data-briefing-tooltip="ipInfo.abuseipdbId.isListed ? t('ipDetails.isListed').toUpperCase() : t('common.no').toUpperCase()">
                 <span class="briefing-icon" :class="ipInfo.abuseipdbId.isListed ? 'text-danger' : 'text-success'">
                   {{ ipInfo.abuseipdbId.isListed ? '🚫' : '✅' }}
                 </span>
@@ -118,14 +122,16 @@
                     t('common.no').toUpperCase() }}</span>
                 </div>
               </div>
-              <div class="briefing-item" :data-briefing-tooltip="`${t('ipDetails.totalReports').toUpperCase()}: ${ipInfo.abuseipdbId.totalReports || 0}`">
+              <div class="briefing-item"
+                :data-briefing-tooltip="`${t('ipDetails.totalReports').toUpperCase()}: ${ipInfo.abuseipdbId.totalReports || 0}`">
                 <span class="briefing-icon">📋</span>
                 <div class="briefing-content">
                   <span class="briefing-label">{{ t('ipDetails.totalReports').toUpperCase() }}</span>
                   <span class="briefing-value">{{ ipInfo.abuseipdbId.totalReports || 0 }}</span>
                 </div>
               </div>
-              <div class="briefing-item" :data-briefing-tooltip="ipInfo.abuseipdbId.lastReportedAt ? `${t('ipDetails.lastReportedAt').toUpperCase()}: ${dayjs(ipInfo.abuseipdbId.lastReportedAt).format('DD/MM/YYYY HH:mm:ss')}` : t('common.notAvailable').toUpperCase()">
+              <div class="briefing-item"
+                :data-briefing-tooltip="ipInfo.abuseipdbId.lastReportedAt ? `${t('ipDetails.lastReportedAt').toUpperCase()}: ${dayjs(ipInfo.abuseipdbId.lastReportedAt).format('DD/MM/YYYY HH:mm:ss')}` : t('common.notAvailable').toUpperCase()">
                 <span class="briefing-icon">🕒</span>
                 <div class="briefing-content">
                   <span class="briefing-label">{{ t('ipDetails.lastReportedAt').toUpperCase() }}</span>
@@ -155,7 +161,8 @@
       <!-- Section ABUSEIPDB REPORTS -->
       <div class="section abuse-reports-section" v-if="reports.length >= 0">
         <div class="section-header" @click="toggles.reports = !toggles.reports">
-          <h2><span class="animated-icon pulse-cobalt">📊</span> {{ t('ipDetails.abuseInvestigationLogs').toUpperCase() }}
+          <h2><span class="animated-icon pulse-cobalt">📊</span> {{ t('ipDetails.abuseInvestigationLogs').toUpperCase()
+          }}
           </h2>
           <span class="arrow" :class="{ open: toggles.reports }"></span>
         </div>
@@ -192,9 +199,7 @@
                         <strong>{{ t('ipDetails.reporterCountryCode') }}:</strong> {{ report.reporterCountryCode ||
                           t('common.notAvailable') }}
                       </span>
-                      <button class="mini-copy-btn" @click.stop="copyToClipboard(report.comment, report._id)">
-                        {{ copiedIds[report._id] ? t('common.copied') : t('common.copyComment') }}
-                      </button>
+                      <span class="copy-log-btn" @click.stop="copyToClipboard(report.comment)" :title="t('common.copyComment')">📋</span>
                     </div>
                     <div class="report-comment-box">
                       {{ report.comment }}
@@ -411,16 +416,19 @@ async function copyToClipboard(text, id) {
     }
 
     if (successful) {
-      if (id) {
+      if (id === 'main-ip') {
+        copiedIp.value = true;
+        setTimeout(() => {
+          copiedIp.value = false;
+        }, 2000);
+        ElMessage.success(t('common.copied') + ': ' + text);
+      } else if (id) {
         copiedIds[id] = true;
         setTimeout(() => {
           copiedIds[id] = false;
         }, 2000);
       } else {
-        copiedIp.value = true;
-        setTimeout(() => {
-          copiedIp.value = false;
-        }, 2000);
+        // Simple copy without per-icon visual feedback (uses message only)
         ElMessage.success(t('common.copied') + ': ' + text);
       }
     } else {

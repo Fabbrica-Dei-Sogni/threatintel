@@ -1,6 +1,7 @@
 .ip-details {
   color: #E0E6ED;
-  background-color: #18181B; /* Tinged Charcoal */
+  background-color: #18181B;
+  /* Tinged Charcoal */
   padding: 24px 28px;
   min-height: 100vh;
   display: flex;
@@ -53,7 +54,8 @@
   align-items: center;
 }
 
-.back-btn:hover, .refresh-btn:hover:not(:disabled) {
+.back-btn:hover,
+.refresh-btn:hover:not(:disabled) {
   background: rgba(0, 122, 255, 0.2);
   box-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
   transform: translateY(-2px);
@@ -112,7 +114,8 @@
 
 h1 {
   margin-bottom: 0;
-  color: #00D4FF; /* Neon Azure */
+  color: #00D4FF;
+  /* Neon Azure */
   font-weight: 700;
   font-size: 28px;
   text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
@@ -261,7 +264,8 @@ h1 {
   font-size: 0.7rem;
   text-transform: uppercase;
   letter-spacing: 1px;
-  color: #4B6584; /* Nocturnal Slate */
+  color: #4B6584;
+  /* Nocturnal Slate */
   font-weight: 800;
 }
 
@@ -284,6 +288,7 @@ h1 {
   .forensic-briefing {
     grid-template-columns: 1fr 1fr;
   }
+
   .briefing-item {
     border-right: none;
     border-bottom: 1px solid rgba(0, 168, 255, 0.1);
@@ -307,7 +312,8 @@ h1 {
 
 h1 {
   margin-bottom: 0;
-  color: #00D4FF; /* Neon Azure */
+  color: #00D4FF;
+  /* Neon Azure */
   font-weight: 700;
   font-size: 28px;
   text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
@@ -339,6 +345,7 @@ h1 {
     flex-direction: column;
     align-items: flex-start;
   }
+
   .copy-ip-btn {
     padding: 2px 6px;
     font-size: 14px;
@@ -407,6 +414,7 @@ h1 {
 .forensic-briefing .arrow {
   display: inline-block;
 }
+
 .forensic-briefing .briefing-header {
   cursor: pointer;
   pointer-events: auto;
@@ -598,11 +606,13 @@ h1 {
   transform: rotate(180deg) !important;
 }
 
-:deep(.el-table--border), :deep(.el-table--group) {
+:deep(.el-table--border),
+:deep(.el-table--group) {
   border: 1px solid rgba(0, 212, 255, 0.15) !important;
 }
 
-:deep(.el-table td.el-table__cell), :deep(.el-table th.el-table__cell.is-leaf) {
+:deep(.el-table td.el-table__cell),
+:deep(.el-table th.el-table__cell.is-leaf) {
   border-bottom: 1px solid rgba(0, 212, 255, 0.1) !important;
 }
 
@@ -638,10 +648,25 @@ h1 {
 }
 
 @keyframes pulse-cobalt {
-  0% { transform: scale(1); opacity: 0.8; filter: drop-shadow(0 0 2px #007AFF); }
-  50% { transform: scale(1.1); opacity: 1; filter: drop-shadow(0 0 10px #00D4FF); }
-  100% { transform: scale(1); opacity: 0.8; filter: drop-shadow(0 0 2px #007AFF); }
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+    filter: drop-shadow(0 0 2px #007AFF);
+  }
+
+  50% {
+    transform: scale(1.1);
+    opacity: 1;
+    filter: drop-shadow(0 0 10px #00D4FF);
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 0.8;
+    filter: drop-shadow(0 0 2px #007AFF);
+  }
 }
+
 /* New Briefing Abuse Styles */
 .briefing-abuse {
   position: relative;
@@ -667,8 +692,13 @@ h1 {
   flex-shrink: 0;
 }
 
-.text-danger { color: #FF704D; }
-.text-success { color: #00E676; }
+.text-danger {
+  color: #FF704D;
+}
+
+.text-success {
+  color: #00E676;
+}
 
 /* Date formatting utility */
 .t-date {
@@ -766,21 +796,7 @@ h1 {
   font-size: 0.85rem;
 }
 
-.mini-copy-btn {
-  background: rgba(0, 122, 255, 0.1);
-  border: 1px solid rgba(0, 122, 255, 0.3);
-  color: #00D4FF;
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 0.75rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
 
-.mini-copy-btn:hover {
-  background: #007AFF;
-  color: #fff;
-}
 
 .report-comment-box {
   background: #0A0605;
@@ -817,7 +833,8 @@ h1 {
   padding: 20px;
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.85rem;
-  color: #00E676; /* Terminal Green */
+  color: #00E676;
+  /* Terminal Green */
   background: #000;
   line-height: 1.6;
   white-space: pre-wrap;
@@ -839,7 +856,7 @@ h1 {
   --el-pagination-button-color: #00d4ff;
   --el-pagination-hover-color: #00d4ff;
   --el-pagination-button-disabled-bg-color: transparent;
-  
+
   font-family: 'JetBrains Mono', monospace;
 }
 
@@ -898,7 +915,7 @@ h1 {
   .pagination-container {
     justify-content: center;
   }
-  
+
   .cyber-pagination .btn-prev,
   .cyber-pagination .btn-next {
     min-width: 45px;
@@ -985,7 +1002,7 @@ h1 {
     grid-template-columns: 1fr;
     gap: 15px;
   }
-  
+
   .briefing-grid {
     grid-template-columns: 1fr 1fr;
   }
@@ -1012,14 +1029,15 @@ h1 {
   .briefing-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .header-top {
     flex-direction: column;
     gap: 10px;
     align-items: stretch;
   }
-  
-  .refresh-btn, .back-btn {
+
+  .refresh-btn,
+  .back-btn {
     width: 100%;
     justify-content: center;
   }
@@ -1029,11 +1047,11 @@ h1 {
     align-items: flex-start;
     gap: 2px;
   }
-  
+
   .reports-header-actions {
     flex-direction: column;
   }
-  
+
   .cyber-btn.mini {
     width: 100%;
     justify-content: center;

@@ -5,7 +5,10 @@ import mongoose from 'mongoose';
 import configroutes from '../configroutes';
 import { ConfigController } from '../../controllers/ConfigController';
 import Configuration from '../../models/ConfigSchema';
-import { container } from 'tsyringe';
+import { container } from '../../di/container';
+import { ConfigService } from '../../services/ConfigService';
+import { SshLogService } from '../../services/SshLogService';
+import { PatternAnalysisService } from '../../services/PatternAnalysisService';
 
 describe('ConfigRoutes API', () => {
     let app: express.Application;

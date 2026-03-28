@@ -55,10 +55,7 @@ describe('IpDetailsService Rate Limit & Retry', () => {
         // Setup mock to return 429 error
         const error = {
             status: 429,
-            error: {
-                title: "Rate limit exceeded",
-                message: "You've hit the daily limit..."
-            }
+            error: 'Rate limit exceeded'
         };
 
         mockIpInfo.mockImplementation((ip: any, opts: any, cb: any) => {
@@ -70,17 +67,14 @@ describe('IpDetailsService Rate Limit & Retry', () => {
 
         // Expectation changed: should return the error object, not null
         expect(data.ipinfo).toEqual(error);
-        expect(mockLogger.warn).toHaveBeenCalledWith(expect.stringMatching(/Salvo l'errore per riprovare in futuro/));
+        expect(mockLogger.warn).toHaveBeenCalledWith(expect.stringMatching(/Rate limit superato per ipinfo/));
     });
 
     test('should handle 429 Rate Limit error from ipinfo (data arg) by returning the error object', async () => {
         // Setup mock to return 429 error in DATA
         const errorData = {
             status: 429,
-            error: {
-                title: "Rate limit exceeded",
-                message: "You've hit the daily limit..."
-            }
+            error: 'Rate limit exceeded'
         };
 
         mockIpInfo.mockImplementation((ip: any, opts: any, cb: any) => {
@@ -92,7 +86,7 @@ describe('IpDetailsService Rate Limit & Retry', () => {
 
         // Expectation changed: should return the error object, not null
         expect(data.ipinfo).toEqual(errorData);
-        expect(mockLogger.warn).toHaveBeenCalledWith(expect.stringMatching(/Salvo l'errore per riprovare in futuro/));
+        expect(mockLogger.warn).toHaveBeenCalledWith(expect.stringMatching(/Rate limit superato per ipinfo/));
     });
 
     test('should retry enrichment in findOrCreate if ipinfo contains Rate Limit error', async () => {
@@ -101,16 +95,15 @@ describe('IpDetailsService Rate Limit & Retry', () => {
         // 1. Create an entry with ERROR ipinfo (simulating previous rate limit saving error)
         const errorDetails = {
             status: 429,
-            error: {
-                title: "Rate limit exceeded"
-            }
+            error: 'Rate limit exceeded'
         };
 
         await IpDetails.create({
             ip,
             ipinfo: errorDetails,
             firstSeenAt: new Date(),
-            lastSeenAt: new Date()
+            lastSeenAt: new Date(),
+            enrichedAt: null
         });
 
         // 2. Setup mock to return valid data this time
@@ -140,7 +133,8 @@ describe('IpDetailsService Rate Limit & Retry', () => {
             ip,
             ipinfo: null,
             firstSeenAt: new Date(),
-            lastSeenAt: new Date()
+            lastSeenAt: new Date(),
+            enrichedAt: null
         });
 
         // 2. Setup mock to return valid data

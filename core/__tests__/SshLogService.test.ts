@@ -74,6 +74,7 @@ describe('SshLogService', () => {
         };
 
         await (service as any).processEntry(entry);
+        await (service as any).flushBuffer();
 
         expect(mockThreatLogService.saveLog).toHaveBeenCalledWith(expect.objectContaining({
             fingerprint: expect.objectContaining({
@@ -130,6 +131,7 @@ describe('SshLogService', () => {
         const expectedTimestamp = new Date(1767962508879); // Milliseconds
 
         await (service as any).processEntry(entry);
+        await (service as any).flushBuffer();
 
         expect(mockThreatLogService.saveLog).toHaveBeenCalledWith(expect.objectContaining({
             timestamp: expectedTimestamp

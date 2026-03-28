@@ -13,14 +13,6 @@ jest.mock('../models/CowrieEventSchema');
 jest.mock('../models/CowrieAuthSchema');
 jest.mock('../models/CowrieInputSchema');
 jest.mock('../models/CowrieTtyLogSchema');
-jest.mock('winston', () => ({
-    Logger: jest.fn().mockImplementation(() => ({
-        info: jest.fn(),
-        warn: jest.fn(),
-        error: jest.fn(),
-        debug: jest.fn()
-    }))
-}));
 
 describe('CowrieService', () => {
     let cowrieService: CowrieService;
@@ -60,6 +52,7 @@ describe('CowrieService', () => {
             }];
 
             const aggregateMock = jest.fn().mockReturnValue({
+                allowDiskUse: jest.fn().mockReturnThis(),
                 exec: jest.fn().mockResolvedValue(mockAggregateResult)
             });
             (CowrieSession.aggregate as jest.Mock).mockReturnValue(aggregateMock());
@@ -80,6 +73,7 @@ describe('CowrieService', () => {
 
         it('should return empty array if aggregate returns nothing', async () => {
             (CowrieSession.aggregate as jest.Mock).mockReturnValue({
+                allowDiskUse: jest.fn().mockReturnThis(),
                 exec: jest.fn().mockResolvedValue([])
             });
 

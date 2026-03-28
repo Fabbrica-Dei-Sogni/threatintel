@@ -92,7 +92,7 @@
       <div class="forensic-briefing briefing-abuse"
         :class="{ 'high-risk': ipInfo.abuseipdbId?.abuseConfidenceScore > 50 }">
         <div class="briefing-header" @click="toggles.abuse = !toggles.abuse">
-          <span class="briefing-icon">🚨</span> {{ t('ipDetails.abuseReportingTitle').toUpperCase() }}
+          <span class="briefing-icon animated-icon pulse-alarm">🚨</span> {{ t('ipDetails.abuseReportingTitle').toUpperCase() }}
           <div class="header-actions">
             <span class="copy-log-btn" @click.stop="copyAbuseSummary()" :title="t('common.copy')">📋</span>
             <span class="arrow" :class="{ open: toggles.abuse }"></span>
@@ -124,7 +124,7 @@
               </div>
               <div class="briefing-item"
                 :data-briefing-tooltip="`${t('ipDetails.totalReports').toUpperCase()}: ${ipInfo.abuseipdbId.totalReports || 0}`">
-                <span class="briefing-icon">📋</span>
+                <span class="briefing-icon">📜</span>
                 <div class="briefing-content">
                   <span class="briefing-label">{{ t('ipDetails.totalReports').toUpperCase() }}</span>
                   <span class="briefing-value">{{ ipInfo.abuseipdbId.totalReports || 0 }}</span>

@@ -667,6 +667,30 @@ h1 {
   }
 }
 
+.pulse-alarm {
+  animation: pulse-alarm 2s infinite ease-in-out;
+}
+
+@keyframes pulse-alarm {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+    filter: drop-shadow(0 0 2px #FF3D00);
+  }
+
+  50% {
+    transform: scale(1.15);
+    opacity: 1;
+    filter: drop-shadow(0 0 12px #FF1744);
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 0.8;
+    filter: drop-shadow(0 0 2px #FF3D00);
+  }
+}
+
 /* New Briefing Abuse Styles */
 .briefing-abuse {
   position: relative;

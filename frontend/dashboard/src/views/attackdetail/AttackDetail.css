@@ -203,14 +203,14 @@
     gap: 15px;
 }
 
-.section-header.clickable-header {
+.clickable-header {
     cursor: pointer;
     user-select: none;
     transition: all 0.3s ease;
 }
 
-.section-header.clickable-header:hover {
-    background: rgba(230, 33, 23, 0.15);
+.clickable-header:hover {
+    background: rgba(230, 33, 23, 0.15) !important;
 }
 
 .header-actions {

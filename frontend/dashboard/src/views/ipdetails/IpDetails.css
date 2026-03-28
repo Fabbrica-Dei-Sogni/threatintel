@@ -369,25 +369,13 @@ h1 {
   white-space: nowrap;
 }
 
-/* SMART TOGGLE LOGIC: Hidden if sharing a row, visible if full-width (managed via JS) */
+/* Toggle Controls: Always visible and interactive */
 .forensic-briefing .arrow {
-  display: none !important;
+  display: inline-block;
 }
 .forensic-briefing .briefing-header {
-  pointer-events: none;
-  cursor: default;
-}
-
-.forensic-briefing.is-full-width-card .arrow {
-  display: block !important;
-}
-.forensic-briefing.is-full-width-card .briefing-header {
-  pointer-events: auto;
   cursor: pointer;
-}
-.forensic-briefing.is-full-width-card .briefing-header:hover {
-  filter: brightness(1.2);
-  border-bottom-color: rgba(0, 212, 255, 0.4);
+  pointer-events: auto;
 }
 
 .arrow {

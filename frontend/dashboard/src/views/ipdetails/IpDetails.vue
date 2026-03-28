@@ -19,9 +19,9 @@
       </h1>
     </div>
 
-    <div v-if="ipInfo" class="briefing-wrapper" ref="wrapperRef">
+    <div v-if="ipInfo" class="briefing-wrapper">
       <!-- BLOCK 1: GEOGRAPHIC INTELLIGENCE -->
-      <div class="forensic-briefing briefing-geo" ref="geoRef" :class="{ 'is-full-width-card': isFullWidthModel.geo }">
+      <div class="forensic-briefing briefing-geo">
         <div class="briefing-header" @click="toggles.geo = !toggles.geo">
           <span class="briefing-icon">🌍</span> {{ t('ipDetails.location').toUpperCase() }}
           <span class="arrow" :class="{ open: toggles.geo }"></span>
@@ -56,7 +56,7 @@
       </div>
 
       <!-- BLOCK 2: NETWORK INTELLIGENCE -->
-      <div class="forensic-briefing briefing-net" ref="netRef" :class="{ 'is-full-width-card': isFullWidthModel.net }">
+      <div class="forensic-briefing briefing-net">
         <div class="briefing-header" @click="toggles.net = !toggles.net">
           <span class="briefing-icon">🛡️</span> {{ t('ipDetails.networkInfo').toUpperCase() }}
           <span class="arrow" :class="{ open: toggles.net }"></span>
@@ -81,8 +81,8 @@
         </transition>
       </div>
 
-      <div class="forensic-briefing briefing-abuse" ref="abuseRef"
-        :class="[{ 'is-full-width-card': isFullWidthModel.abuse }, { 'high-risk': ipInfo.abuseipdbId?.abuseConfidenceScore > 50 }]">
+      <div class="forensic-briefing briefing-abuse"
+        :class="{ 'high-risk': ipInfo.abuseipdbId?.abuseConfidenceScore > 50 }">
         <div class="briefing-header" @click="toggles.abuse = !toggles.abuse">
           <span class="briefing-icon">🚨</span> {{ t('ipDetails.abuseReportingTitle').toUpperCase() }}
           <span class="arrow" :class="{ open: toggles.abuse }"></span>
@@ -321,27 +321,6 @@ const error = ref(false)
 const copiedIds = reactive({});
 const copiedIp = ref(false);
 
-const wrapperRef = ref(null)
-const geoRef = ref(null)
-const netRef = ref(null)
-const abuseRef = ref(null)
-
-const isFullWidthModel = reactive({
-  geo: true,
-  net: true,
-  abuse: true
-})
-
-let resizeObserver = null;
-const updateFullWidthStates = () => {
-  if (!wrapperRef.value) return;
-  const parentWidth = wrapperRef.value.offsetWidth;
-
-  if (geoRef.value) isFullWidthModel.geo = geoRef.value.offsetWidth > parentWidth * 0.8;
-  if (netRef.value) isFullWidthModel.net = netRef.value.offsetWidth > parentWidth * 0.8;
-  if (abuseRef.value) isFullWidthModel.abuse = abuseRef.value.offsetWidth > parentWidth * 0.8;
-};
-
 
 const errorReputationScore = ref(false)
 
@@ -357,21 +336,10 @@ const updateWidth = () => {
 onMounted(() => {
   window.addEventListener('resize', updateWidth);
   loadIpDetails()
-
-  resizeObserver = new ResizeObserver(() => {
-    updateFullWidthStates();
-  });
-
-  if (wrapperRef.value) resizeObserver.observe(wrapperRef.value);
-  // Monitoriamo anche le card per sicurezza
-  [geoRef, netRef, abuseRef].forEach(r => {
-    if (r.value) resizeObserver.observe(r.value);
-  });
 })
 
 onUnmounted(() => {
   window.removeEventListener('resize', updateWidth)
-  if (resizeObserver) resizeObserver.disconnect();
 })
 
 // Stato di caricamento e Reports

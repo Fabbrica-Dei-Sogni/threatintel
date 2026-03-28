@@ -203,6 +203,54 @@
     gap: 15px;
 }
 
+.section-header.clickable-header {
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.3s ease;
+}
+
+.section-header.clickable-header:hover {
+    background: rgba(230, 33, 23, 0.15);
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.arrow {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-right: 2px solid #ff4c4c;
+    border-bottom: 2px solid #ff4c4c;
+    transform: rotate(45deg);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.arrow.open {
+    transform: rotate(-135deg);
+}
+
+.magenta-arrow {
+    border-color: #ff4c4c;
+}
+
+/* === TRANSITIONS === */
+.collapse-enter-active,
+.collapse-leave-active {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    max-height: 5000px; /* High enough for long log lists */
+    overflow: hidden;
+}
+
+.collapse-enter-from,
+.collapse-leave-to {
+    max-height: 0;
+    opacity: 0;
+}
+
 .header-title-group {
     display: flex;
     align-items: center;

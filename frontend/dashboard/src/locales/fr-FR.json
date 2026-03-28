@@ -129,6 +129,7 @@
     },
     "attackDetail": {
         "title": "Détail de l'attaque",
+        "summary": "Résumé de l'attaque",
         "backToAttacks": "Retour",
         "attacker": "Attaquant",
         "country": "Pays",

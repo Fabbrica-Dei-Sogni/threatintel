@@ -129,7 +129,9 @@
     },
     "attackDetail": {
         "title": "Attack Detail",
-        "backToAttacks": "Back to logs",
+        "summary": "Attack Summary",
+        "backToAttacks": "Back",
+
         "attacker": "Attacker",
         "country": "Country",
         "organization": "Organization",

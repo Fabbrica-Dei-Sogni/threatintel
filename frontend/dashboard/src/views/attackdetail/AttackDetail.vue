@@ -30,178 +30,202 @@
         <div v-if="loading" class="loading">{{ t('common.loading') }}</div>
         <div v-if="error" class="error">{{ error }}</div>
 
-        <div v-if="attack && !loading" class="attack-summary">
-            <!-- Existing summary content -->
-            <div class="summary-row">
-                <section class="forensic-briefing">
-                    <div class="briefing-header">
-                        <span class="animated-icon pulse-magma">🛡️</span>
-                        {{ t('attackDetail.defconLevel') }}
-                    </div>
-                    <div class="briefing-content">
-                        <DefconIndicator :level="attack.dangerLevel" :dangerScore="attack.dangerScore" />
-                    </div>
-                </section>
+        <div v-if="attack && !loading" class="attack-summary-wrapper">
+            <div class="section-header clickable-header" @click="toggles.summary = !toggles.summary">
+                <div class="header-title-group">
+                    <span class="animated-icon pulse-magma">📊</span>
+                    <h2>{{ t('attackDetail.summary').toUpperCase() }}</h2>
+                </div>
+                <span class="arrow" :class="{ open: toggles.summary }"></span>
             </div>
-            <div class="summary-row">
-                <div class="forensic-briefing">
-                    <div class="briefing-header">{{ t('attackDetail.techniques') }}</div>
-                    <div class="briefing-content">
-                        <span v-for="(tech, i) in attack.attackPatterns" :key="i" class="tech-tag">{{ tech }}</span>
+
+            <transition name="collapse">
+                <div v-if="toggles.summary" class="attack-summary">
+                    <!-- Existing summary content -->
+                    <div class="summary-row">
+                        <section class="forensic-briefing">
+                            <div class="briefing-header">
+                                <span class="animated-icon pulse-magma">🛡️</span>
+                                {{ t('attackDetail.defconLevel') }}
+                            </div>
+                            <div class="briefing-content">
+                                <DefconIndicator :level="attack.dangerLevel" :dangerScore="attack.dangerScore" />
+                            </div>
+                        </section>
                     </div>
-                </div>
-            </div>
-            <div class="summary-row">
-                <div class="forensic-briefing">
-                    <div class="briefing-header">{{ t('attackDetail.firstSeen') }}</div>
-                    <div class="briefing-content" v-html="formatDate(attack.firstSeen)"></div>
-                </div>
-                <div class="forensic-briefing">
-                    <div class="briefing-header">{{ t('attackDetail.lastSeen') }}</div>
-                    <div class="briefing-content" v-html="formatDate(attack.lastSeen)"></div>
-                </div>
-            </div>
-            <div class="summary-row">
-                <div class="forensic-briefing">
-                    <div class="briefing-header">{{ t('attackDetail.totalLogs') }}</div>
-                    <div class="briefing-content">{{ attack.totaleLogs }}</div>
-                </div>
-                <div class="forensic-briefing">
-                    <div class="briefing-header">{{ t('attackDetail.attackDuration') }}</div>
-                    <div class="briefing-content">{{ attack.durataAttacco.human }}</div>
-                </div>
-                <div class="forensic-briefing">
-                    <div class="briefing-header">{{ t('attackDetail.rps') }}</div>
-                    <div class="briefing-content">{{ attack.rps }}</div>
-                </div>
-                <div class="forensic-briefing">
-                    <div class="briefing-header">{{ t('attackDetail.avgScore') }}</div>
-                    <div class="briefing-content">{{ attack.averageScore }}</div>
-                </div>
-                <div class="forensic-briefing">
-                    <div class="briefing-header">{{ t('attackDetail.style') }}</div>
-                    <div class="briefing-content">
-                        <span class="intensity-badge" :class="attack.intensityAttack.toLowerCase()">{{ attack.intensityAttack }}</span>
+                    <div class="summary-row">
+                        <div class="forensic-briefing">
+                            <div class="briefing-header">{{ t('attackDetail.techniques') }}</div>
+                            <div class="briefing-content">
+                                <span v-for="(tech, i) in attack.attackPatterns" :key="i" class="tech-tag">{{ tech }}</span>
+                            </div>
+                        </div>
                     </div>
+                    <div class="summary-row">
+                        <div class="forensic-briefing">
+                            <div class="briefing-header">{{ t('attackDetail.firstSeen') }}</div>
+                            <div class="briefing-content" v-html="formatDate(attack.firstSeen)"></div>
+                        </div>
+                        <div class="forensic-briefing">
+                            <div class="briefing-header">{{ t('attackDetail.lastSeen') }}</div>
+                            <div class="briefing-content" v-html="formatDate(attack.lastSeen)"></div>
+                        </div>
+                    </div>
+                    <div class="summary-row">
+                        <div class="forensic-briefing">
+                            <div class="briefing-header">{{ t('attackDetail.totalLogs') }}</div>
+                            <div class="briefing-content">{{ attack.totaleLogs }}</div>
+                        </div>
+                        <div class="forensic-briefing">
+                            <div class="briefing-header">{{ t('attackDetail.attackDuration') }}</div>
+                            <div class="briefing-content">{{ attack.durataAttacco.human }}</div>
+                        </div>
+                        <div class="forensic-briefing">
+                            <div class="briefing-header">{{ t('attackDetail.rps') }}</div>
+                            <div class="briefing-content">{{ attack.rps }}</div>
+                        </div>
+                        <div class="forensic-briefing">
+                            <div class="briefing-header">{{ t('attackDetail.avgScore') }}</div>
+                            <div class="briefing-content">{{ attack.averageScore }}</div>
+                        </div>
+                        <div class="forensic-briefing">
+                            <div class="briefing-header">{{ t('attackDetail.style') }}</div>
+                            <div class="briefing-content">
+                                <span class="intensity-badge" :class="attack.intensityAttack.toLowerCase()">{{ attack.intensityAttack }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- ... existing rows ... -->
+                    <!-- Insert Map Here -->
+                    <section class="attack-map-section" style="margin-top: 20px;">
+                        <AttackMap v-if="mapAttackData.length > 0" :attacks="mapAttackData" />
+                    </section>
+                    <section class="attack-profile">
+                        <AttackProfileRadar v-if="attack" :attackDetail="attack" :isMobile="isMobile" />
+                    </section>
                 </div>
-            </div>
-            <!-- ... existing rows ... -->
-            <!-- Insert Map Here -->
-            <section class="attack-map-section" style="margin-top: 20px;">
-                <AttackMap v-if="mapAttackData.length > 0" :attacks="mapAttackData" />
-            </section>
-            <section class="attack-profile">
-                <AttackProfileRadar v-if="attack" :attackDetail="attack" :isMobile="isMobile" />
-            </section>
+            </transition>
         </div>
         <div v-if="attack && !loading" class="attack-aggregates">
 
             <div class="logs-container forensic-card" v-if="attack">
-                <div class="section-header logs-header-row">
+                <div class="section-header logs-header-row clickable-header" @click="toggles.logs = !toggles.logs">
                     <div class="header-title-group">
                         <span class="animated-icon pulse-magma">📜</span>
-                        <h2>{{ t('attackDetail.logsRaggrupati') }}</h2>
+                        <h2>{{ t('attackDetail.logsRaggrupati').toUpperCase() }}</h2>
                     </div>
-                    <el-input 
-                        v-model="searchUrl" 
-                        :placeholder="t('attackDetail.searchUrlPlaceholder')"
-                        class="url-search-input"
-                        clearable
-                        prefix-icon="Search"
-                    />
+                    <div class="header-actions" @click.stop>
+                        <el-input 
+                            v-model="searchUrl" 
+                            :placeholder="t('attackDetail.searchUrlPlaceholder')"
+                            class="url-search-input"
+                            clearable
+                            prefix-icon="Search"
+                        />
+                        <span class="arrow" :class="{ open: toggles.logs }"></span>
+                    </div>
                 </div>
 
-                <div v-for="log in paginatedLogs" :key="log._id || log.id" class="log-entry">
-                    <div class="log-header" @click="toggleLog(log._id || log.id)">
-                        <span class="log-info-main">
-                            <span v-html="formatDate(log.timestamp)"></span>
-                            <span class="log-method-url">
-                                - {{ log.request.method }} 
-                                <span v-if="log.metadata?.eventCount > 1" class="event-count-badge">
-                                    (x{{ log.metadata.eventCount }})
+                <transition name="collapse">
+                    <div v-if="toggles.logs">
+                        <div v-for="log in paginatedLogs" :key="log._id || log.id" class="log-entry">
+                            <div class="log-header" @click="toggleLog(log._id || log.id)">
+                                <span class="log-info-main">
+                                    <span v-html="formatDate(log.timestamp)"></span>
+                                    <span class="log-method-url">
+                                        - {{ log.request.method }} 
+                                        <span v-if="log.metadata?.eventCount > 1" class="event-count-badge">
+                                            (x{{ log.metadata.eventCount }})
+                                        </span>
+                                        {{ log.request.url || t('components.radar.notAvailable') }} 
+                                    </span>
                                 </span>
-                                {{ log.request.url || t('components.radar.notAvailable') }} 
-                            </span>
-                        </span>
-                        <span class="toggle-icon" :class="{ 'open': expanded[log._id || log.id] }">▼</span>
-                    </div>
-                    <transition name="collapse">
-                        <div v-if="expanded[log._id || log.id]" class="log-body">
-                            <p><strong>{{ t('common.score') }}:</strong> {{ log.fingerprint.score ?? t('common.notAvailable') }}
-                            </p>
-                            <span v-if="log.fingerprint.score != null && log.fingerprint.score > 0">
-                                <p><strong>{{ t('threatLog.techniques') }}:</strong></p>
-                                <ul>
-                                    <li v-for="(ind, i) in log.fingerprint.indicators" :key="i">{{ ind }}</li>
-                                </ul>
-                            </span>
-                            <p><strong>{{ t('threatLog.url') }}:</strong></p>
-                            <pre> {{ log.request.url ?? t('common.notAvailable') }}</pre>
-                            <p><strong>{{ t('threatLog.userAgent') }}:</strong> {{ log.request.userAgent ||
-                                t('common.notAvailable') }}</p>
-                            <HexViewer :raw-data="log.request" :label="t('threatLog.request')" />
-                            <!-- 1. Headers -->
-                            <HexViewer v-if="log.request.headers" :raw-data="log.request.headers"
-                                :label="t('threatLog.headers')" />
-                            <!-- 2. Body -->
-                            <HexViewer v-if="log.request.body" :raw-data="log.request.body"
-                                :label="t('threatLog.body')" />
-                            <!-- 3. Response -->
-                            <HexViewer v-if="log.response" :raw-data="log.response" :label="t('threatLog.response')" />
+                                <span class="arrow magenta-arrow" :class="{ 'open': expanded[log._id || log.id] }"></span>
+                            </div>
+                            <transition name="collapse">
+                                <div v-if="expanded[log._id || log.id]" class="log-body">
+                                    <p><strong>{{ t('common.score') }}:</strong> {{ log.fingerprint.score ?? t('common.notAvailable') }}
+                                    </p>
+                                    <span v-if="log.fingerprint.score != null && log.fingerprint.score > 0">
+                                        <p><strong>{{ t('threatLog.techniques') }}:</strong></p>
+                                        <ul>
+                                            <li v-for="(ind, i) in log.fingerprint.indicators" :key="i">{{ ind }}</li>
+                                        </ul>
+                                    </span>
+                                    <p><strong>{{ t('threatLog.url') }}:</strong></p>
+                                    <pre> {{ log.request.url ?? t('common.notAvailable') }}</pre>
+                                    <p><strong>{{ t('threatLog.userAgent') }}:</strong> {{ log.request.userAgent ||
+                                        t('common.notAvailable') }}</p>
+                                    <HexViewer :raw-data="log.request" :label="t('threatLog.request')" />
+                                    <!-- 1. Headers -->
+                                    <HexViewer v-if="log.request.headers" :raw-data="log.request.headers"
+                                        :label="t('threatLog.headers')" />
+                                    <!-- 2. Body -->
+                                    <HexViewer v-if="log.request.body" :raw-data="log.request.body"
+                                        :label="t('threatLog.body')" />
+                                    <!-- 3. Response -->
+                                    <HexViewer v-if="log.response" :raw-data="log.response" :label="t('threatLog.response')" />
+                                </div>
+                            </transition>
                         </div>
-                    </transition>
-                </div>
 
-                <div class="pagination-container" v-if="filteredLogs.length > pageSize">
-                    <el-pagination background :layout="paginationLayout" :total="filteredLogs.length"
-                        :page-size="pageSize" :current-page="currentPage" :pager-count="isMobile ? 3 : 7"
-                        @current-change="page => currentPage = page" class="cyber-pagination magenta">
-                        <template #default v-if="isMobile">
-                            <span class="mobile-pagination-info">{{ currentPage }} / {{ Math.ceil(filteredLogs.length / pageSize) }}</span>
-                        </template>
-                    </el-pagination>
-                </div>
+                        <div class="pagination-container" v-if="filteredLogs.length > pageSize">
+                            <el-pagination background :layout="paginationLayout" :total="filteredLogs.length"
+                                :page-size="pageSize" :current-page="currentPage" :pager-count="isMobile ? 3 : 7"
+                                @current-change="page => currentPage = page" class="cyber-pagination magenta">
+                                <template #default v-if="isMobile">
+                                    <span class="mobile-pagination-info">{{ currentPage }} / {{ Math.ceil(filteredLogs.length / pageSize) }}</span>
+                                </template>
+                            </el-pagination>
+                        </div>
+                    </div>
+                </transition>
             </div>
 
             <div class="rate-limit-events-container forensic-card" v-if="attack.rateLimitList && attack.countRateLimit">
-                <div class="section-header">
+                <div class="section-header clickable-header" @click="toggles.rateLimit = !toggles.rateLimit">
                     <div class="header-title-group">
                         <span class="animated-icon pulse-magma">⚡</span>
-                        <h2>{{ t('attackDetail.rateBreach') }}</h2>
+                        <h2>{{ t('attackDetail.rateBreach').toUpperCase() }}</h2>
                     </div>
+                    <span class="arrow" :class="{ open: toggles.rateLimit }"></span>
                 </div>
 
-                <div v-for="event in paginatedRateLimitEvents" :key="event._id || event.id"
-                    class="rate-limit-event-entry">
-                    <div class="event-header" @click="toggleEvent(event._id || event.id)">
-                        <span>{{ formatDate(event.timestamp) }} - {{ event.ip }} - {{ event.limitType }}</span>
-                        <span class="toggle-icon">{{ expandedEvents[event._id || event.id] ? '–' : '+' }}</span>
-                    </div>
-                    <transition name="collapse">
-                        <div v-if="expandedEvents[event._id || event.id]" class="event-body">
-                            <p><strong>{{ t('threatLog.userAgent') }}:</strong> {{ event.userAgent || t('common.notAvailable') }}
-                            </p>
-                            <p><strong>{{ t('common.path') }}:</strong> {{ event.path }}</p>
-                            <p><strong>{{ t('threatLog.method') }}:</strong> {{ event.method ||
-                                t('common.notAvailable') }}</p>
-                            <p><strong>{{ t('common.honeypotId') }}:</strong> {{ event.honeypotId || t('common.notAvailable')
-                            }}</p>
-                            <p><strong>{{ t('common.error') }}:</strong> {{ event.message ||
-                                t('common.notAvailable') }}</p>
-                            <HexViewer v-if="event.headers" :raw-data="event.headers" :label="t('threatLog.headers')" />
+                <transition name="collapse">
+                    <div v-if="toggles.rateLimit">
+                        <div v-for="event in paginatedRateLimitEvents" :key="event._id || event.id"
+                            class="rate-limit-event-entry">
+                            <div class="event-header" @click="toggleEvent(event._id || event.id)">
+                                <span>{{ formatDate(event.timestamp) }} - {{ event.ip }} - {{ event.limitType }}</span>
+                                <span class="arrow magenta-arrow" :class="{ 'open': expandedEvents[event._id || event.id] }"></span>
+                            </div>
+                            <transition name="collapse">
+                                <div v-if="expandedEvents[event._id || event.id]" class="event-body">
+                                    <p><strong>{{ t('threatLog.userAgent') }}:</strong> {{ event.userAgent || t('common.notAvailable') }}
+                                    </p>
+                                    <p><strong>{{ t('common.path') }}:</strong> {{ event.path }}</p>
+                                    <p><strong>{{ t('threatLog.method') }}:</strong> {{ event.method ||
+                                        t('common.notAvailable') }}</p>
+                                    <p><strong>{{ t('common.honeypotId') }}:</strong> {{ event.honeypotId || t('common.notAvailable')
+                                    }}</p>
+                                    <p><strong>{{ t('common.error') }}:</strong> {{ event.message ||
+                                        t('common.notAvailable') }}</p>
+                                    <HexViewer v-if="event.headers" :raw-data="event.headers" :label="t('threatLog.headers')" />
+                                </div>
+                            </transition>
                         </div>
-                    </transition>
-                </div>
 
-                <div class="pagination-container" v-if="attack.countRateLimit > pageSize">
-                    <el-pagination background :layout="paginationLayout" :total="attack.countRateLimit"
-                        :page-size="pageSize" :current-page="currentPageEvents" :pager-count="isMobile ? 3 : 7"
-                        @current-change="page => currentPageEvents = page" class="cyber-pagination magenta">
-                        <template #default v-if="isMobile">
-                            <span class="mobile-pagination-info">{{ currentPageEvents }} / {{ Math.ceil(attack.countRateLimit / pageSize) }}</span>
-                        </template>
-                    </el-pagination>
-                </div>
+                        <div class="pagination-container" v-if="attack.countRateLimit > pageSize">
+                            <el-pagination background :layout="paginationLayout" :total="attack.countRateLimit"
+                                :page-size="pageSize" :current-page="currentPageEvents" :pager-count="isMobile ? 3 : 7"
+                                @current-change="page => currentPageEvents = page" class="cyber-pagination magenta">
+                                <template #default v-if="isMobile">
+                                    <span class="mobile-pagination-info">{{ currentPageEvents }} / {{ Math.ceil(attack.countRateLimit / pageSize) }}</span>
+                                </template>
+                            </el-pagination>
+                        </div>
+                    </div>
+                </transition>
             </div>
         </div>
 
@@ -224,6 +248,13 @@ import { fetchAttackDetail } from '../../api';
 
 const { t } = useI18n();
 const { copyToClipboard } = useClipboard();
+
+// Reactive state for sections
+const toggles = reactive({
+    summary: true,
+    logs: true,
+    rateLimit: true
+})
 
 // Props
 const props = defineProps({

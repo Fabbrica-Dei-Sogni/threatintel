@@ -129,6 +129,7 @@
     },
     "attackDetail": {
         "title": "Детали атаки",
+        "summary": "Сводка атаки",
         "backToAttacks": "Вернуться",
         "attacker": "Атакующий",
         "country": "Страна",

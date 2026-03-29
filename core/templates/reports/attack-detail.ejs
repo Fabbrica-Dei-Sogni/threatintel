@@ -2,65 +2,467 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
+    <title>ThreatIntel Investigative Dossier - <%= data.ip %></title>
     <style>
-        body { font-family: 'Helvetica', sans-serif; color: #333; margin: 40px; }
-        .header { border-bottom: 2px solid #2c3e50; padding-bottom: 10px; display: flex; justify-content: space-between; }
-        .title { color: #2c3e50; text-transform: uppercase; font-size: 20px; }
-        .meta { font-size: 12px; margin-top: 20px; background: #f9f9f9; padding: 10px; border-left: 5px solid #2c3e50; }
-        .section-title { background: #2c3e50; color: #fff; padding: 5px 10px; margin-top: 30px; font-size: 16px; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
-        .item { font-size: 13px; border-bottom: 1px solid #eee; padding: 5px 0; }
-        .label { font-weight: bold; color: #7f8c8d; }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 11px; }
-        th { background: #ecf0f1; text-align: left; padding: 8px; }
-        td { border-bottom: 1px solid #eee; padding: 8px; word-break: break-all; font-family: monospace; }
-        .badge { padding: 2px 5px; border-radius: 3px; font-weight: bold; }
-        .high { background: #e74c3c; color: #fff; }
-        .footer { margin-top: 40px; font-size: 10px; color: #bdc3c7; text-align: center; }
+        :root {
+            --bg-paper: #ffffff;
+            --text-main: #1a202c;
+            --text-muted: #4a5568;
+            --primary: #2c5282; /* Deep Blue for professional look */
+            --danger: #c53030;
+            --warning: #b7791f;
+            --success: #2f855a;
+            --border: #e2e8f0;
+            --section-bg: #f7fafc;
+        }
+
+        @page {
+            margin: 15mm;
+            size: A4;
+        }
+
+        body {
+            font-family: 'Helvetica', 'Arial', sans-serif;
+            background-color: var(--bg-paper);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            line-height: 1.4;
+        }
+
+        .document-container {
+            max-width: 100%;
+        }
+
+        /* Institutional Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 2px solid var(--text-main);
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-box {
+            width: 50px;
+            height: 50px;
+            border: 1px solid var(--border);
+            padding: 2px;
+            background: #fff;
+        }
+
+        .logo-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .title-group h1 {
+            margin: 0;
+            font-size: 22px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 900;
+        }
+
+        .title-group p {
+            margin: 2px 0 0;
+            font-size: 10px;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+
+        .header-right {
+            text-align: right;
+        }
+
+        .security-stamp {
+            display: inline-block;
+            border: 2px solid var(--danger);
+            color: var(--danger);
+            font-weight: 900;
+            font-size: 12px;
+            padding: 4px 8px;
+            text-transform: uppercase;
+            transform: rotate(-2deg);
+            margin-bottom: 10px;
+        }
+
+        .dossier-id {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-family: monospace;
+        }
+
+        /* Metadata & Timestamps */
+        .meta-strip {
+            display: flex;
+            justify-content: space-between;
+            background: var(--section-bg);
+            padding: 10px 15px;
+            border: 1px solid var(--border);
+            font-size: 11px;
+            margin-bottom: 25px;
+        }
+
+        /* Section Styling */
+        .section {
+            margin-bottom: 25px;
+        }
+
+        .section-header {
+            border-bottom: 1px solid var(--text-main);
+            margin-bottom: 12px;
+            padding-bottom: 4px;
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: var(--primary);
+        }
+
+        /* Summary Grid */
+        .summary-block {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1px;
+            background: var(--border);
+            border: 1px solid var(--border);
+            margin-bottom: 25px;
+        }
+
+        .summary-item {
+            background: #fff;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .summary-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            font-weight: 700;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .summary-value {
+            font-size: 18px;
+            font-weight: 800;
+        }
+
+        .danger-HIGH { color: var(--danger); }
+        .danger-MEDIUM { color: var(--warning); }
+        .danger-LOW { color: var(--success); }
+
+        /* Panels */
+        .panel-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .detail-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+
+        .detail-table th {
+            text-align: left;
+            padding: 6px 0;
+            color: var(--text-muted);
+            width: 40%;
+            font-weight: 600;
+        }
+
+        .detail-table td {
+            text-align: right;
+            padding: 6px 0;
+            font-weight: 700;
+        }
+
+        /* Forensic Timeline */
+        .timeline-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 10px;
+            margin-top: 10px;
+        }
+
+        .timeline-table th {
+            background: var(--section-bg);
+            padding: 8px;
+            text-align: left;
+            border: 1px solid var(--border);
+            text-transform: uppercase;
+        }
+
+        .timeline-table td {
+            padding: 8px;
+            border: 1px solid var(--border);
+            word-break: break-all;
+        }
+
+        .badge-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-top: 8px;
+        }
+
+        .badge {
+            font-size: 9px;
+            padding: 2px 6px;
+            border-radius: 2px;
+            font-weight: 700;
+            border: 1px solid var(--border);
+            background: var(--section-bg);
+        }
+
+        .badge-danger { color: var(--danger); border-color: var(--danger); background: #fff5f5; }
+        .badge-warning { color: var(--warning); border-color: var(--warning); background: #fffaf0; }
+        .badge-primary { color: var(--primary); border-color: var(--primary); background: #ebf8ff; }
+
+        .footer {
+            margin-top: 50px;
+            border-top: 1px solid var(--border);
+            padding-top: 10px;
+            text-align: center;
+            font-size: 9px;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        .page-counter {
+            text-align: right;
+            font-size: 9px;
+            margin-top: 5px;
+        }
     </style>
 </head>
 <body>
-    <div class="header">
-        <div class="title"><%= data.title %></div>
-        <div style="color: #e74c3c; font-weight: bold;">SECRET // ANALYST ONLY</div>
+    <div class="document-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <div class="logo-box">
+                    <% if (typeof logoBase64 !== 'undefined' && logoBase64) { %>
+                        <img src="<%= logoBase64 %>" class="logo-img" alt="Seal">
+                    <% } else { %>
+                        <div style="font-size: 24px; font-weight: bold; color: #cbd5e0;">TI</div>
+                    <% } %>
+                </div>
+                <div class="title-group">
+                    <h1>ThreatIntelligence Agency</h1>
+                    <p>Divisione Investigativa Forense • Report Esecutivo</p>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="dossier-id">REF: ATK-<%= data.ip.replace(/\./g, '') %>-<%= Date.now().toString().slice(-6) %></div>
+            </div>
+        </header>
+
+        <div class="meta-strip">
+            <span><strong>Target IP Address:</strong> <%= data.ip %></span>
+            <span><strong>Data Documento:</strong> <%= data.generatedAt %></span>
+            <span><strong>Protocollo:</strong> HTTP Investigativo</span>
+        </div>
+
+        <!-- Executive Summary -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-title">1. Sintesi Esecutiva dell'Attacco</div>
+            </div>
+            <div class="summary-block">
+                <div class="summary-item">
+                    <span class="summary-label">Livello Criticità</span>
+                    <span class="summary-value danger-<%= data.summary.dangerLevel %>"><%= data.summary.dangerLevel %></span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Danger Score</span>
+                    <span class="summary-value"><%= data.summary.dangerScore.toFixed(2) %></span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Volume Eventi</span>
+                    <span class="summary-value"><%= data.summary.totalLogs %></span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Intensità (RPS)</span>
+                    <span class="summary-value"><%= (data.attack?.rps || 0).toFixed(2) %></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel-grid">
+            <!-- Intelligence Attacco -->
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-title">2. Dettagli Operativi Attacco</div>
+                </div>
+                <table class="detail-table">
+                    <tr>
+                        <th>Intensità Rilevata</th>
+                        <td style="color: var(--warning);"><%= data.attack?.intensityAttack || 'N/D' %></td>
+                    </tr>
+                    <tr>
+                        <th>Durata Stimata</th>
+                        <td><%= data.summary.duration %></td>
+                    </tr>
+                    <tr>
+                        <th>Primo Segnale</th>
+                        <td><%= data.attack?.firstSeen ? new Date(data.attack.firstSeen).toLocaleString() : 'N/D' %></td>
+                    </tr>
+                    <tr>
+                        <th>Ultimo Segnale</th>
+                        <td><%= data.attack?.lastSeen ? new Date(data.attack.lastSeen).toLocaleString() : 'N/D' %></td>
+                    </tr>
+                </table>
+                
+                <div style="margin-top: 15px;">
+                    <span class="summary-label">Pattern Tecniche Rilevate:</span>
+                    <div class="badge-list">
+                        <% if (data.attack?.attackPatterns && data.attack.attackPatterns.length > 0) { %>
+                            <% data.attack.attackPatterns.forEach(function(p) { %>
+                                <span class="badge badge-primary"><%= p %></span>
+                            <% }); %>
+                        <% } else { %>
+                            <span class="badge">Nessun pattern specifico</span>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fingerprint Forense -->
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-title">3. Fingerprint Forense</div>
+                </div>
+                <table class="detail-table">
+                    <tr>
+                        <th>Classe di Rischio</th>
+                        <td style="color: var(--danger);"><%= data.attack?.fingerprint?.riskLevel || 'N/D' %></td>
+                    </tr>
+                    <tr>
+                        <th>Fingerprint Score</th>
+                        <td><%= data.attack?.fingerprint?.score || 0 %> / 10</td>
+                    </tr>
+                    <tr>
+                        <th>Bot Detection</th>
+                        <td><%= data.attack?.fingerprint?.isBot ? 'SI (Identificato)' : 'No / Sconosciuto' %></td>
+                    </tr>
+                </table>
+
+                <div style="margin-top: 15px;">
+                    <span class="summary-label">Indicatori di Pericolo:</span>
+                    <div class="badge-list">
+                        <% if (data.attack?.fingerprint?.indicators && data.attack.fingerprint.indicators.length > 0) { %>
+                            <% data.attack.fingerprint.indicators.forEach(function(ind) { %>
+                                <span class="badge badge-danger"><%= ind %></span>
+                            <% }); %>
+                        <% } else { %>
+                            <span class="badge">Analisi neutra</span>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- IP Context Data -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-title">4. Intelligence Sorgente (IP Geolocation & Network)</div>
+            </div>
+            <div style="background: var(--section-bg); padding: 15px; border: 1px solid var(--border);">
+                <div class="panel-grid" style="gap: 40px;">
+                    <table class="detail-table">
+                        <tr>
+                            <th>Nazione</th>
+                            <td><%= data.ipInfo.country %> (<%= data.ipInfo.countryCode %>)</td>
+                        </tr>
+                        <tr>
+                            <th>Città</th>
+                            <td><%= data.ipInfo.city || 'N/D' %></td>
+                        </tr>
+                        <tr>
+                            <th>ISP</th>
+                            <td><%= data.ipInfo.isp %></td>
+                        </tr>
+                    </table>
+                    <table class="detail-table">
+                        <tr>
+                            <th>Abuso (Score)</th>
+                            <td style="color: <%= data.ipInfo.abuseScore > 50 ? 'var(--danger)' : 'var(--success)' %>;">
+                                <%= data.ipInfo.abuseScore %>%
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Tipologia Network</th>
+                            <td><%= data.ipInfo.usageType %></td>
+                        </tr>
+                        <tr>
+                            <th>Marcatori Speciali</th>
+                            <td>
+                                <% if (data.ipInfo.isTor) { %><span class="badge badge-danger">TOR EXIT NODE</span><% } %>
+                                <% if (data.ipInfo.isWhitelisted) { %><span class="badge badge-primary">WHITELISTED</span><% } %>
+                                <% if (!data.ipInfo.isTor && !data.ipInfo.isWhitelisted) { %>Standard / Cleartext<% } %>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Forensic Timeline Samples -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-title">5. Estratto Cronologico Eventi Forensi (Timeline)</div>
+            </div>
+            <table class="timeline-table">
+                <thead>
+                    <tr>
+                        <th width="15%">Orario</th>
+                        <th width="10%">Metodo</th>
+                        <th>Risorsa Richiesta (URI Path)</th>
+                        <th width="12%">Status Code</th>
+                        <th width="8%">Score</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% data.events.slice(0, 20).forEach(function(e) { %>
+                        <tr>
+                            <td><%= new Date(e.timestamp).toLocaleTimeString() %></td>
+                            <td><strong><%= e.method %></strong></td>
+                            <td style="font-family: monospace; font-size: 9px;"><%= e.url %></td>
+                            <td style="text-align: center; font-weight: bold; color: <%= e.statusCode < 400 ? 'var(--success)' : (e.statusCode < 500 ? 'var(--warning)' : 'var(--danger)') %>">
+                                <%= e.statusCode %>
+                            </td>
+                            <td style="text-align: center;"><%= e.score %></td>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+            <% if (data.events.length > 20) { %>
+                <div style="font-size: 9px; color: var(--text-muted); margin-top: 5px; text-align: right;">
+                    Nota: L'estratto mostra i primi 20 eventi di <%= data.events.length %> totali nel periodo considerato.
+                </div>
+            <% } %>
+        </div>
+
+        <footer class="footer">
+            ThreatIntel Intelligence Platform - Report Esecutivo
+        </footer>
+        <div class="page-counter">Pagina 1 di 1</div>
     </div>
-
-    <div class="meta">
-        <strong>IP Sorgente:</strong> <%= data.ip %><br>
-        <strong>Generato il:</strong> <%= data.generatedAt %><br>
-        <strong>Sintesi:</strong> <%= data.summary.totalLogs %> log rilevati in <%= data.summary.duration %>
-    </div>
-
-    <div class="section-title">IP Intelligence Summary</div>
-    <div class="grid">
-        <div class="item"><span class="label">Paese:</span> <%= data.ipInfo.country %> (<%= data.ipInfo.countryCode %>)</div>
-        <div class="item"><span class="label">ISP:</span> <%= data.ipInfo.isp %></div>
-        <div class="item"><span class="label">Abuse Score:</span> <%= data.ipInfo.abuseScore %>%</div>
-        <div class="item"><span class="label">Tor:</span> <%= data.ipInfo.isTor ? 'SÌ' : 'NO' %></div>
-    </div>
-
-    <div class="section-title">Timeline degli Eventi (Ultimi 100)</div>
-    <table>
-        <thead>
-            <tr>
-                <th width="15%">Data/Ora</th>
-                <th width="10%">Metodo</th>
-                <th>Path / URL</th>
-                <th width="10%">Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            <% data.events.forEach(function(e) { %>
-                <tr>
-                    <td><%= new Date(e.timestamp).toLocaleString() %></td>
-                    <td><strong><%= e.method %></strong></td>
-                    <td><%= e.url %></td>
-                    <td><%= e.statusCode %></td>
-                </tr>
-            <% }); %>
-        </tbody>
-    </table>
-
-    <div class="footer">ThreatIntel Intelligence Platform - Report Esecutivo</div>
 </body>
 </html>

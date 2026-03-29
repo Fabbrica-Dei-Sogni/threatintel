@@ -46,7 +46,18 @@ export class ReportService {
         }
 
         const templatePath = path.join(__dirname, `../templates/reports/${templateName}`);
-        const html = await ejs.renderFile(templatePath, { data });
+        
+        // Carichiamo il logo dal progetto e lo convertiamo in base64 per incorporarlo nel PDF
+        let logoBase64 = '';
+        try {
+            const logoPath = path.join(__dirname, '../public/assets/intelligence-logo.png');
+            const logoBuffer = require('fs').readFileSync(logoPath);
+            logoBase64 = `data:image/png;base64,${logoBuffer.toString('base64')}`;
+        } catch (e) {
+            this.logger.error(`[ReportService] Errore caricamento logo: ${e}`);
+        }
+
+        const html = await ejs.renderFile(templatePath, { data, logoBase64 });
 
         if (format === 'html') return html;
 
@@ -61,6 +72,7 @@ export class ReportService {
             title: 'Dossier Dettaglio Attacco HTTP',
             generatedAt: new Date().toLocaleString(),
             ip,
+            attack, // Passa l'intero oggetto AttackDTO
             summary: {
                 dangerLevel: attack?.dangerLevel || 'LOW',
                 dangerScore: attack?.dangerScore || 0,
@@ -75,7 +87,9 @@ export class ReportService {
                 url: l.request?.url || 'N/D',
                 userAgent: l.request?.userAgent || 'N/D',
                 statusCode: l.response?.statusCode || 'N/D',
-                score: l.fingerprint?.score || 0
+                score: l.fingerprint?.score || 0,
+                headers: l.request?.headers,
+                body: l.request?.body
             }))
         };
     }

@@ -72,12 +72,25 @@ const isTyping = ref(false);
 const contentRef = ref(null);
 let rotationInterval = null;
 
+/**
+ * Helper to format IP with ISP if available
+ */
+const formatIpWithIsp = (ip, ipDetails) => {
+  const isp = ipDetails?.ipinfo?.org || ipDetails?.isp || ipDetails?.ipinfo?.isp;
+  if (isp) {
+    // Clean some common ISP prefixes/suffixes if needed (optional)
+    const cleanIsp = isp.replace(/^AS\d+\s+/, '');
+    return `${ip} (${cleanIsp})`;
+  }
+  return ip;
+};
+
 const headlines = computed(() => {
   const list = [];
 
   // 1. Geopolitical Narrative
   if (props.attacks.length > 0) {
-    const countries = props.attacks.map(a => a.ipDetails?.ipinfo?.country).filter(Boolean);
+    const countries = props.attacks.map(a => a.ipDetails?.ipinfo?.country || a.ipDetails?.country).filter(Boolean);
     if (countries.length > 0) {
       const counts = countries.reduce((acc, c) => ({ ...acc, [c]: (acc[c] || 0) + 1 }), {});
       const topCountry = Object.keys(counts).reduce((a, b) => counts[a] > counts[b] ? a : b);
@@ -87,33 +100,35 @@ const headlines = computed(() => {
 
   // 2. Recent Attack IPs
   if (props.attacks.length >= 3) {
-    const last3Ips = props.attacks.slice(0, 3).map(a => a.request?.ip).join(', ');
-    list.push({ text: t('home.breakingNews.lastAttacks', { ips: last3Ips }), icon: '🛰️' });
+    const formattedIps = props.attacks.slice(0, 3).map(a => formatIpWithIsp(a.request?.ip, a.ipDetails)).join(', ');
+    list.push({ text: t('home.breakingNews.lastAttacks', { ips: formattedIps }), icon: '🛰️' });
   }
 
   // 3. Persistent Actor Intelligence (Sessions)
   if (props.sessions.length > 0) {
     const mostActive = [...props.sessions].sort((a, b) => (b.eventCount || 0) - (a.eventCount || 0))[0];
     if (mostActive && (mostActive.eventCount || 0) > 2) {
+      const formattedActor = formatIpWithIsp(mostActive.src_ip, mostActive.ipDetailsId);
       list.push({
-        text: t('home.breakingNews.mostActiveSession', { ip: mostActive.src_ip, count: mostActive.eventCount || 0 }),
+        text: t('home.breakingNews.mostActiveSession', { ip: formattedActor, count: mostActive.eventCount || 0 }),
         icon: '📟',
-        countryCode: mostActive.ipDetailsId?.ipinfo?.country
+        countryCode: mostActive.ipDetailsId?.ipinfo?.country || mostActive.ipDetailsId?.country
       });
     }
   }
 
   // 4. Recent Session IPs
   if (props.sessions.length >= 3) {
-    const last3Ips = props.sessions.slice(0, 3).map(s => s.src_ip).join(', ');
-    list.push({ text: t('home.breakingNews.lastSessions', { ips: last3Ips }), icon: '📟' });
+    const formattedIps = props.sessions.slice(0, 3).map(s => formatIpWithIsp(s.src_ip, s.ipDetailsId)).join(', ');
+    list.push({ text: t('home.breakingNews.lastSessions', { ips: formattedIps }), icon: '📟' });
   }
 
   // 5. Critical Incursion Alert
   if (props.attacks.length > 0) {
     const critical = props.attacks.find(a => a.dangerLevel >= 4);
     if (critical) {
-      list.push({ text: t('home.breakingNews.criticalAlert', { ip: critical.request?.ip }), icon: '⚠️' });
+      const formattedIp = formatIpWithIsp(critical.request?.ip, critical.ipDetails);
+      list.push({ text: t('home.breakingNews.criticalAlert', { ip: formattedIp }), icon: '⚠️' });
     }
   }
 

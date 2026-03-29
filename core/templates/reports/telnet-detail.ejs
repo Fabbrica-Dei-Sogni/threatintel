@@ -1,50 +1,515 @@
 <!DOCTYPE html>
 <html lang="it">
+
 <head>
     <meta charset="UTF-8">
+    <title>ThreatIntel Forensic Session Dossier - <%= data.sessionId %>
+    </title>
     <style>
-        body { font-family: 'Courier New', monospace; color: #333; margin: 40px; }
-        .header { border-bottom: 2px solid #34495e; padding-bottom: 10px; font-family: sans-serif; }
-        .title { color: #2c3e50; text-transform: uppercase; font-size: 18px; font-weight: bold; }
-        .terminal-box { background: #2c3e50; color: #ecf0f1; padding: 15px; border-radius: 5px; margin-top: 20px; font-size: 12px; }
-        .section-title { font-family: sans-serif; background: #34495e; color: #fff; padding: 5px 10px; margin-top: 25px; font-size: 14px; }
-        .timeline-entry { border-left: 2px solid #bdc3c7; padding-left: 15px; margin-bottom: 10px; font-size: 12px; }
-        .timestamp { color: #7f8c8d; font-size: 10px; }
-        .cmd { color: #2ecc71; font-weight: bold; }
-        .auth { color: #e67e22; }
-        .footer { margin-top: 40px; font-size: 10px; color: #bdc3c7; text-align: center; font-family: sans-serif; }
+        :root {
+            --bg-paper: #ffffff;
+            --bg-body: #f4f7f9;
+            --primary: #2c5282;
+            --primary-dark: #1a365d;
+            --danger: #c53030;
+            --warning: #dd6b20;
+            --success: #2f855a;
+            --text-main: #1a202c;
+            --text-muted: #4a5568;
+            --border: #e2e8f0;
+            --section-bg: #f8fafc;
+        }
+
+        @page {
+            size: A4;
+            margin: 0;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-print-color-adjust: exact;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--bg-body);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            line-height: 1.5;
+        }
+
+        .document-container {
+            width: 210mm;
+            min-height: 297mm;
+            margin: 0 auto;
+            background: var(--bg-paper);
+            padding: 20mm;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        /* Institutional Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 3px solid var(--primary);
+            padding-bottom: 20px;
+            margin-bottom: 25px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-box {
+            width: 60px;
+            height: 60px;
+            background: var(--primary);
+            margin-right: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+        }
+
+        .logo-img {
+            width: 45px;
+            height: 45px;
+            object-fit: contain;
+        }
+
+        .title-group h1 {
+            margin: 0;
+            font-size: 20px;
+            letter-spacing: 1px;
+            color: var(--primary-dark);
+            text-transform: uppercase;
+        }
+
+        .title-group p {
+            margin: 3px 0 0 0;
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .header-right {
+            text-align: right;
+        }
+
+        .dossier-id {
+            background: #edf2f7;
+            padding: 8px 15px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-weight: bold;
+            font-size: 14px;
+            color: var(--primary);
+            border: 1px solid var(--border);
+        }
+
+        /* Meta Metadata Strip */
+        .meta-strip {
+            display: flex;
+            justify-content: space-between;
+            background: var(--primary-dark);
+            color: white;
+            padding: 10px 20px;
+            font-size: 12px;
+            border-radius: 4px;
+            margin-bottom: 30px;
+        }
+
+        .meta-strip strong {
+            color: #a3bffa;
+            margin-right: 5px;
+        }
+
+        /* Section Layout */
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            border-left: 5px solid var(--primary);
+            padding-left: 15px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--primary-dark);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Grid & Panels */
+        .summary-block {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .summary-item {
+            background: var(--section-bg);
+            border: 1px solid var(--border);
+            padding: 15px;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .summary-label {
+            display: block;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        .summary-value {
+            display: block;
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--primary-dark);
+        }
+
+        .panel-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        /* Tables */
+        .detail-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+
+        .detail-table th {
+            text-align: left;
+            padding: 8px 12px;
+            background: #edf2f7;
+            color: var(--primary-dark);
+            font-weight: 700;
+            width: 140px;
+            border: 1px solid var(--border);
+        }
+
+        .detail-table td {
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            color: var(--text-main);
+        }
+
+        .event-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+            margin-top: 10px;
+        }
+
+        .event-table th {
+            background: var(--primary-dark);
+            color: white;
+            text-align: left;
+            padding: 10px;
+            font-weight: 600;
+        }
+
+        .event-table td {
+            padding: 10px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: top;
+        }
+
+        .event-table tr:nth-child(even) {
+            background: var(--section-bg);
+        }
+
+        /* Badge Styles */
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            border: 1px solid currentColor;
+        }
+
+        .badge-auth {
+            color: var(--warning);
+            border-color: var(--warning);
+            background: #fffaf0;
+        }
+
+        .badge-cmd {
+            color: var(--success);
+            border-color: var(--success);
+            background: #f0fff4;
+        }
+
+        .badge-session {
+            color: var(--primary);
+            border-color: var(--primary);
+            background: #ebf8ff;
+        }
+
+        .badge-danger {
+            color: var(--danger);
+            border-color: var(--danger);
+            background: #fff5f5;
+        }
+
+        .terminal-cmd {
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+            background: #1a202c;
+            color: #48bb78;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+            word-break: break-all;
+        }
+
+        .footer-note {
+            margin-top: 40px;
+            border-top: 1px solid var(--border);
+            padding-top: 15px;
+            font-size: 10px;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        .page-counter {
+            position: absolute;
+            bottom: 20mm;
+            right: 20mm;
+            font-size: 10px;
+            color: var(--text-muted);
+        }
     </style>
 </head>
+
 <body>
-    <div class="header">
-        <div class="title"><%= data.title %></div>
-        <div style="font-size: 12px;">Session ID: <%= data.sessionId %></div>
-    </div>
-
-    <div style="font-family: sans-serif; font-size: 12px; margin-top: 15px;">
-        <strong>Soggetto:</strong> <%= data.ip %> (<%= data.ipInfo.country %>)<br>
-        <strong>Protocollo:</strong> <%= data.sessionInfo.protocol.toUpperCase() %><br>
-        <strong>Data Inizio:</strong> <%= new Date(data.sessionInfo.startTime).toLocaleString() %>
-    </div>
-
-    <div class="section-title">Timeline delle Operazioni Hostili</div>
-    <div style="margin-top: 15px;">
-        <% data.timeline.forEach(function(e) { %>
-            <div class="timeline-entry">
-                <span class="timestamp">[<%= new Date(e.timestamp).toLocaleTimeString() %>]</span>
-                <% if (e.type.includes('login')) { %>
-                    <span class="auth">TENTATIVO LOGIN: <%= e.username %> / <%= e.password %></span>
-                <% } else if (e.input) { %>
-                    <span class="cmd">COMANDO: <%= e.input %></span>
-                <% } else if (e.message) { %>
-                    <span><%= e.message %></span>
-                <% } else { %>
-                    <span style="color: #95a5a6;"><%= e.type %></span>
-                <% } %>
+    <div class="document-container">
+        <!-- Header -->
+        <header>
+            <div class="header-left">
+                <div class="logo-box">
+                    <% if (typeof logoBase64 !=='undefined' && logoBase64) { %>
+                        <img src="<%= logoBase64 %>" class="logo-img" alt="Seal">
+                        <% } else { %>
+                            <div style="font-size: 24px; font-weight: bold; color: #cbd5e0;">TI</div>
+                            <% } %>
+                </div>
+                <div class="title-group">
+                    <h1>ThreatIntelligence Agency</h1>
+                    <p>Cyber Forensic Division - Session Analysis Report</p>
+                </div>
             </div>
-        <% }); %>
-    </div>
+            <div class="header-right">
+                <div class="dossier-id">REF: SES-<%= data.sessionId.slice(-8).toUpperCase() %>
+                </div>
+            </div>
+        </header>
 
-    <div class="footer">ThreatIntel Honeypot System - Forensic Session Report</div>
+        <!-- Meta Strip -->
+        <div class="meta-strip">
+            <span><strong>Target IP:</strong>
+                <%= data.ip %>
+            </span>
+            <span><strong>Data Sessione:</strong>
+                <%= data.sessionInfo.startTime %>
+            </span>
+            <span><strong>Protocollo:</strong>
+                <%= data.sessionInfo.protocol.toUpperCase() %>
+            </span>
+        </div>
+
+        <!-- Executive Summary Stats -->
+        <div class="summary-block">
+            <div class="summary-item">
+                <span class="summary-label">Durata Sessione</span>
+                <span class="summary-value">
+                    <%= data.sessionInfo.duration %>
+                </span>
+            </div>
+            <div class="summary-item">
+                <span class="summary-label">Eventi Totali</span>
+                <span class="summary-value">
+                    <%= data.sessionInfo.totalEvents %>
+                </span>
+            </div>
+            <div class="summary-item">
+                <span class="summary-label">Tentativi Auth</span>
+                <span class="summary-value text-warning">
+                    <%= data.sessionInfo.authAttempts %>
+                </span>
+            </div>
+            <div class="summary-item">
+                <span class="summary-label">Comandi Eseguiti</span>
+                <span class="summary-value" style="color: var(--success);">
+                    <%= data.sessionInfo.commands %>
+                </span>
+            </div>
+        </div>
+
+        <!-- Section 1: Session Context -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-title">1. Contesto dell'Incastro (Honeypot Infrastructure)</div>
+            </div>
+            <table class="detail-table">
+                <tr>
+                    <th>Identificativo Sessione</th>
+                    <td style="font-family: monospace; font-weight: bold;">
+                        <%= data.sessionId %>
+                    </td>
+                </tr>
+                <tr>
+                    <th>Sensore Ricevente</th>
+                    <td>
+                        <%= data.sessionInfo.sensor %>
+                    </td>
+                </tr>
+                <tr>
+                    <th>Timestamp Inizio</th>
+                    <td>
+                        <%= data.sessionInfo.startTime %>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Section 2: Source Intelligence -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-title">2. Intelligence Sorgente (IP Geolocation & Network)</div>
+            </div>
+            <div class="panel-grid">
+                <table class="detail-table">
+                    <tr>
+                        <th>Nazione / Città</th>
+                        <td>
+                            <%= data.ipInfo.country %> - <%= data.ipInfo.city %>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Coordinate</th>
+                        <td>
+                            <%= data.ipInfo.coordinates %>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>ISP / Org</th>
+                        <td>
+                            <%= data.ipInfo.isp %>
+                        </td>
+                    </tr>
+                </table>
+                <table class="detail-table">
+                    <tr>
+                        <th>Network Type</th>
+                        <td>
+                            <%= data.ipInfo.usageType %>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Abuse Score</th>
+                        <td
+                            style="color: <%= data.ipInfo.abuseScore > 50 ? 'var(--danger)' : 'var(--success)' %>; font-weight: bold;">
+                            <%= data.ipInfo.abuseScore %>%
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Marcatori</th>
+                        <td>
+                            <% if (data.ipInfo.isTor) { %><span class="badge badge-danger">TOR EXIT</span>
+                                <% } %>
+                                    <% if (data.ipInfo.isWhitelisted) { %><span
+                                            class="badge badge-session">WHITELISTED</span>
+                                        <% } %>
+                                            <% if (!data.ipInfo.isTor && !data.ipInfo.isWhitelisted) { %>Standard Node<%
+                                                    } %>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- Section 3: Interactive Forensic Timeline -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-title">3. Timeline Forense Interactiva (Event Stream)</div>
+            </div>
+            <table class="event-table">
+                <thead>
+                    <tr>
+                        <th style="width: 80px;">Time Offset</th>
+                        <th style="width: 120px;">Tipo Evento</th>
+                        <th>Dettaglio Forense</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% data.timeline.forEach(function(e) { %>
+                        <tr>
+                            <td style="font-weight: bold; color: var(--text-muted);">
+                                <%= new Date(e.timestamp).toLocaleTimeString() %>
+                            </td>
+                            <td>
+                                <% if (e.type.includes('login')) { %>
+                                    <span class="badge badge-auth">AUTHENTICATION</span>
+                                    <% } else if (e.input) { %>
+                                        <span class="badge badge-cmd">INPUT COMMAND</span>
+                                        <% } else if (e.type.includes('closed') || e.type.includes('lost')) { %>
+                                            <span class="badge badge-danger">CONNECTION CLOSED</span>
+                                            <% } else { %>
+                                                <span class="badge badge-session">
+                                                    <%= e.type.replace('cowrie.', '' ).toUpperCase() %>
+                                                </span>
+                                                <% } %>
+                            </td>
+                            <td>
+                                <% if (e.type.includes('login')) { %>
+                                    Tentativo di accesso: <strong style="color: var(--danger);">
+                                        <%= e.username %>
+                                    </strong> / <strong>
+                                        <%= e.password %>
+                                    </strong>
+                                    <% } else if (e.input) { %>
+                                        Esecuzione comando: <span class="terminal-cmd">$ <%= e.input %></span>
+                                        <% } else if (e.message) { %>
+                                            <span style="color: var(--text-muted);">
+                                                <%= e.message %>
+                                            </span>
+                                            <% } else { %>
+                                                Segnale di sistema Cowrie rilevato: <%= e.type %>
+                                                    <% } %>
+                            </td>
+                        </tr>
+                        <% }); %>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="footer-note">
+            Questo documento costituisce evidenza digitale raccolta tramite sistemi honeypot distribuiti.
+            Le informazioni contenute sono strettamente riservate e destinate all'uso investigativo.
+            <br>
+            TI Forensic Analysis System - <%= data.generatedAt %>
+        </div>
+
+        <div class="page-counter">Pagina 1 di 1</div>
+    </div>
 </body>
+
 </html>

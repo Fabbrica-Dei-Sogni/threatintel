@@ -104,8 +104,22 @@ export class ReportService {
         if (session.starttime && session.endtime) {
             const start = new Date(session.starttime).getTime();
             const end = new Date(session.endtime).getTime();
-            duration = Math.round((end - start) / 1000) + 's';
+            const diffSeconds = Math.round((end - start) / 1000);
+            duration = diffSeconds + 's';
+            if (diffSeconds > 60) {
+                const mins = Math.floor(diffSeconds / 60);
+                const secs = diffSeconds % 60;
+                duration = `${mins}m ${secs}s`;
+            }
         }
+
+        // Statistiche sessione
+        const stats = {
+            totalEvents: events.length,
+            authAttempts: events.filter((e: any) => (e.eventid || '').includes('login')).length,
+            commands: events.filter((e: any) => e.input).length,
+            ttyLogs: events.filter((e: any) => e.eventid === 'cowrie.session.closed' && e.ttylog && e.ttylog.length > 0).length
+        };
 
         return {
             title: 'Dossier Investigativo Sessione Telnet/SSH',
@@ -113,10 +127,11 @@ export class ReportService {
             sessionId,
             ip: session.src_ip,
             sessionInfo: {
-                startTime: session.timestamp,
+                startTime: session.timestamp ? new Date(session.timestamp).toLocaleString() : 'N/D',
                 duration: duration,
                 protocol: session.protocol || 'telnet',
-                sensor: session.sensor || 'N/D'
+                sensor: session.sensor || 'N/D',
+                ...stats
             },
             ipInfo: this.normalizeIpDetails(session.ipDetailsId),
             timeline: events.map((e: any) => ({
@@ -125,7 +140,8 @@ export class ReportService {
                 input: e.input || null,
                 username: e.username || null,
                 password: e.password || null,
-                message: e.message || null
+                message: e.message || null,
+                src_ip: e.src_ip
             }))
         };
     }

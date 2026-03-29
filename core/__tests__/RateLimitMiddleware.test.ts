@@ -90,6 +90,7 @@ describe('RateLimitMiddleware', () => {
                 json: jest.fn().mockReturnThis(),
             } as any;
 
+            process.env.LOG_RATE_LIMIT_EVENTS = 'true';
             await handler(req, res);
 
             expect(mockRateLimitService.logEvent).toHaveBeenCalledWith(expect.objectContaining({

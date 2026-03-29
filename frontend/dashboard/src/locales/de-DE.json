@@ -76,7 +76,19 @@
         "errorLoadingSessions": "Fehler beim Laden der Sitzungen",
         "telnet": "Telnet",
         "nativeServerProtection": "NATIVE SERVER-SCHUTZ",
-        "honeypotIntelligence": "HONEYPOT-INTELLIGENZ"
+        "honeypotIntelligence": "HONEYPOT-INTELLIGENZ",
+        "breakingNews": {
+            "badge": "Eilmeldung",
+            "topCountry": "Geopolitische Informationen: {country} ist derzeit die aktivste Scan-Quelle.",
+            "mostActiveSession": "Feindliche Persistenz: Akteur {ip} hat {count} interaktive Befehle erreicht.",
+            "criticalAlert": "Kritischer Alarm: Hochrisiko-Einbruch von {ip} erkannt.",
+            "topOrganization": "Netzwerküberwachung: {org} zeigt Signaturen koordinierter Scans.",
+            "targetDiscovery": "Zielerkennung: Ungewöhnliches Interesse an {path} an Edge-Knoten identifiziert.",
+            "generalTrafficAlert": "Verkehrsanalyse: Ein Peak von {count} verdächtigen HTTP-Anfragen wurde erkannt.",
+            "rootDirectory": "Haupteinstiegspunkt",
+            "lastAttacks": "Aktuelle Erkennungen: In den letzten Sitzungen identifizierte Übergriffe von den IPs {ips}.",
+            "lastSessions": "Honeypot-Aktivität: Neue Zugriffsversuche von {ips} registriert."
+        }
     },
     "attacks": {
         "title": "Angriffe",

@@ -76,7 +76,19 @@
         "errorLoadingSessions": "Erreur de chargement des sessions",
         "telnet": "Telnet",
         "nativeServerProtection": "PROTECTION SERVEUR NATIVE",
-        "honeypotIntelligence": "INTELLIGENCE HONEYPOT"
+        "honeypotIntelligence": "INTELLIGENCE HONEYPOT",
+        "breakingNews": {
+            "badge": "Dernière minute",
+            "topCountry": "Intelligence Géopolitique : {country} est actuellement la source de scans la plus active.",
+            "mostActiveSession": "Persistance Hostile : L'acteur {ip} a atteint {count} commandes interactives.",
+            "criticalAlert": "Alerte Critique : Incursion à haut risque détectée depuis {ip}.",
+            "topOrganization": "Surveillance Réseau : {org} présente des signatures de scans coordonnés.",
+            "targetDiscovery": "Découverte de Cible : Intérêt inhabituel pour {path} identifié sur les nœuds périphériques.",
+            "generalTrafficAlert": "Analyse du Trafic : Détection d'un pic de {count} requêtes HTTP suspectes.",
+            "rootDirectory": "point d'entrée principal",
+            "lastAttacks": "Détections Récentes : Incursions identifiées à partir des IP {ips} lors delle ultime sessioni.",
+            "lastSessions": "Activité Honeypot : Nouvelles tentatives d'accès enregistrées depuis {ips}."
+        }
     },
     "attacks": {
         "title": "Attaques",

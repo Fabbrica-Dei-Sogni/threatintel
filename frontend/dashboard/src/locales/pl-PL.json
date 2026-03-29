@@ -76,7 +76,19 @@
         "errorLoadingSessions": "Błąd ładowania sesji",
         "telnet": "Telnet",
         "nativeServerProtection": "RODZIMA OCHRONA SERWERÓW",
-        "honeypotIntelligence": "INTELIGENCJA HONEYPOT"
+        "honeypotIntelligence": "INTELIGENCJA HONEYPOT",
+        "breakingNews": {
+            "badge": "Wiadomość z ostatniej chwili",
+            "topCountry": "Analiza Geopolityczna: {country} jest obecnie najaktywniejszym źródłem skanowania.",
+            "mostActiveSession": "Wroga uporczywość: Aktor {ip} osiągnął {count} interaktywnych poleceń.",
+            "criticalAlert": "Alert krytyczny: Wykryto wtargnięcie wysokiego ryzyka z adresu {ip}.",
+            "topOrganization": "Monitorowanie sieci: {org} wykazuje sygnatury skoordynowanego skanowania.",
+            "targetDiscovery": "Wykrywanie celów: Zidentyfikowano nietypowe zainteresowanie ścieżką {path}.",
+            "generalTrafficAlert": "Analiza ruchu: Wykryto szczyt {count} podejrzanych żądań HTTP.",
+            "rootDirectory": "główny punkt wejścia",
+            "lastAttacks": "Ostatnie Wykrycia: Incursje zidentyfikowane z adresów IP {ips} w ostatnich sesjach.",
+            "lastSessions": "Aktywność Honeypot: Zarejestrowano nowe próby dostępu z {ips}."
+        }
     },
     "attacks": {
         "title": "Ataki",

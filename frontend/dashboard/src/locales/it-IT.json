@@ -76,7 +76,19 @@
         "errorLoadingSessions": "Errore caricamento sessioni",
         "telnet": "Telnet",
         "nativeServerProtection": "PROTEZIONE SERVER NATIVA",
-        "honeypotIntelligence": "INTELLIGENZA DEL VASO DI MIELE"
+        "honeypotIntelligence": "INTELLIGENZA DEL VASO DI MIELE",
+        "breakingNews": {
+            "badge": "Ultime notizie",
+            "topCountry": "Analisi Geopolitica: {country} risulta attualmente la fonte più attiva di scansioni.",
+            "mostActiveSession": "Persistenza Ostile: L'attore {ip} ha raggiunto {count} comandi interattivi.",
+            "criticalAlert": "Allerta Critica: Rilevata un'incursione ad alto rischio da {ip}.",
+            "topOrganization": "Monitoraggio Rete: {org} mostra segnali di scansione coordinata.",
+            "targetDiscovery": "Target Discovery: Rilevato un interesse anomalo per {path}.",
+            "generalTrafficAlert": "Analisi Traffico: Rilevato un picco di {count} richieste HTTP sospette.",
+            "rootDirectory": "punto di ingresso principale",
+            "lastAttacks": "Rilevamenti Recenti: Incursioni identificate dagli IP {ips} nelle ultime sessioni.",
+            "lastSessions": "Attività Honeypot: Nuovi tentativi di accesso registrati da {ips}."
+        }
     },
     "attacks": {
         "title": "Attacchi",

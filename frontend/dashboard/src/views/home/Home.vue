@@ -1,10 +1,21 @@
 <template>
   <div class="dashboard">
     <div class="header-top">
-      <h1>
-        <ConfigMenuButton inline class="animated-icon pulse-cobalt" />
-        {{ t('home.title').toUpperCase() }}
-      </h1>
+      <div class="header-main-title">
+        <h1>
+          <ConfigMenuButton inline class="animated-icon pulse-cobalt" />
+          {{ t('home.title').toUpperCase() }}
+        </h1>
+      </div>
+
+      <!-- Header Breaking News Ticker -->
+      <BreakingNews 
+        mode="ticker" 
+        :attacks="recentAttacks" 
+        :sessions="recentSessions" 
+        :logs="recentLogs"
+        :isVisible="showTicker" />
+
       <LanguageSwitcher />
     </div>
 
@@ -201,6 +212,7 @@ import dayjs from 'dayjs';
 import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
 import CountryFlag from '../../components/CountryFlag.vue';
 import AttackMap from '../../components/AttackMap.vue';
+import BreakingNews from '../../components/BreakingNews.vue';
 import ConfigMenuButton from '../../components/ConfigMenuButton.vue';
 import ProtocolSelector from '../../components/common/ProtocolSelector.vue';
 import DefconIndicator from '../../components/DefconIndicator.vue';
@@ -215,6 +227,13 @@ const toggles = reactive({
   honeypot: true,
   recentSessions: true,
   sessionsMap: false
+});
+
+const showTicker = ref(true);
+
+// Header ticker remains persistent as requested
+onMounted(() => {
+  // No toggle timer here
 });
 
 // Navigazione

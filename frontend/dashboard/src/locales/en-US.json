@@ -76,7 +76,19 @@
         "errorLoadingSessions": "Error loading sessions",
         "telnet": "Telnet",
         "nativeServerProtection": "NATIVE SERVER PROTECTION",
-        "honeypotIntelligence": "HONEYPOT INTELLIGENCE"
+        "honeypotIntelligence": "HONEYPOT INTELLIGENCE",
+        "breakingNews": {
+            "badge": "Breaking news",
+            "topCountry": "Geopolitical Intelligence: {country} is currently the most active source of scans.",
+            "mostActiveSession": "Hostile Persistence: Actor {ip} has reached {count} interactive commands.",
+            "criticalAlert": "Critical Alert: High-risk incursion detected from {ip}.",
+            "topOrganization": "Network Monitoring: {org} is showing signatures of coordinated scanning.",
+            "targetDiscovery": "Target Discovery: Unusual interest in {path} identified across edge nodes.",
+            "generalTrafficAlert": "Traffic Analysis: Detected a peak of {count} suspicious HTTP requests.",
+            "rootDirectory": "main entry point",
+            "lastAttacks": "Recent Detections: Incursions identified from IPs {ips} in the latest sessions.",
+            "lastSessions": "Honeypot Activity: New access attempts recorded from {ips}."
+        }
     },
     "attacks": {
         "title": "Attacks",
@@ -135,7 +147,6 @@
         "hudTitle": "TACTICAL HUD",
         "summary": "Attack Summary",
         "backToAttacks": "Back",
-
         "attacker": "Attacker",
         "country": "Country",
         "organization": "Organization",

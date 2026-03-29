@@ -81,6 +81,7 @@ export class ReportService {
                 techniques: attack?.attackPatterns || []
             },
             ipInfo: this.normalizeIpDetails(attack?.ipDetails),
+            abuse: await this.prepareAbuseData(ip),
             events: logs.map(l => ({
                 timestamp: l.timestamp,
                 method: l.request?.method || 'N/D',
@@ -134,6 +135,7 @@ export class ReportService {
                 ...stats
             },
             ipInfo: this.normalizeIpDetails(session.ipDetailsId),
+            abuse: await this.prepareAbuseData(session.src_ip),
             timeline: events.map((e: any) => ({
                 timestamp: e.timestamp,
                 type: e.eventid || 'generic',
@@ -192,6 +194,48 @@ export class ReportService {
             isTor: details?.isTor || info.isTor || false,
             isWhitelisted: details?.isWhitelisted || info.isWhitelisted || false,
             coordinates: coordinates
+        };
+    }
+
+    /**
+     * Helper centralizzato per estrarre i dati di reputazione da AbuseIPDB
+     */
+    private async prepareAbuseData(ip: string) {
+        try {
+            const data = await this.ipDetailsService.getIpDetails(ip);
+            if (!data || !data.ipDetails) return this.getDefaultAbuseObject();
+
+            const details = data.ipDetails;
+            const abuseDb = details.abuseipdbId as any;
+
+            return {
+                confidenceScore: abuseDb?.abuseConfidenceScore || 0,
+                totalReports: abuseDb?.totalReports || 0,
+                lastReportedAt: abuseDb?.lastReportedAt ? new Date(abuseDb.lastReportedAt).toLocaleString() : 'Mai',
+                domain: abuseDb?.domain || 'N/D',
+                usageType: abuseDb?.usageType || 'N/D',
+                isp: abuseDb?.isp || (details as any)?.isp || 'N/D',
+                isTor: abuseDb?.isTor || (details as any)?.isTor || false,
+                isWhitelisted: abuseDb?.isWhitelisted || (details as any)?.isWhitelisted || false,
+                countryCode: abuseDb?.countryCode || (details as any)?.countryCode || '??'
+            };
+        } catch (e) {
+            this.logger.error(`[ReportService] Errore preparazione dati Abuse per ${ip}: ${e}`);
+            return this.getDefaultAbuseObject();
+        }
+    }
+
+    private getDefaultAbuseObject() {
+        return {
+            confidenceScore: 0,
+            totalReports: 0,
+            lastReportedAt: 'N/D',
+            domain: 'N/D',
+            usageType: 'N/D',
+            isp: 'N/D',
+            isTor: false,
+            isWhitelisted: false,
+            countryCode: '??'
         };
     }
 

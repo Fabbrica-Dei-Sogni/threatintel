@@ -378,11 +378,35 @@
             </div>
         </div>
 
-        <!-- IP Context Data -->
+        <!-- IP Context & Reputation -->
         <div class="section">
             <div class="section-header">
-                <div class="section-title">4. Intelligence Sorgente (IP Geolocation & Network)</div>
+                <div class="section-title">4. Intelligence Sorgente (IP Geolocation & Reputation)</div>
             </div>
+            
+            <!-- AbuseIPDB Summary -->
+            <div class="summary-block" style="margin-bottom: 20px;">
+                <div class="summary-item">
+                    <span class="summary-label">Abuse Confidence Score</span>
+                    <span class="summary-value" 
+                          style="color: <%= data.abuse.confidenceScore > 50 ? 'var(--danger)' : (data.abuse.confidenceScore > 20 ? 'var(--warning)' : 'var(--success)') %>">
+                        <%= data.abuse.confidenceScore %>%
+                    </span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Segnalazioni Totali</span>
+                    <span class="summary-value"><%= data.abuse.totalReports %></span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Ultima Segnalazione</span>
+                    <span class="summary-value" style="font-size: 11px;"><%= data.abuse.lastReportedAt %></span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">ISP / Org</span>
+                    <span class="summary-value" style="font-size: 11px;"><%= data.abuse.isp %></span>
+                </div>
+            </div>
+
             <div style="background: var(--section-bg); padding: 15px; border: 1px solid var(--border);">
                 <div class="panel-grid" style="gap: 40px;">
                     <table class="detail-table">
@@ -395,8 +419,8 @@
                             <td><%= data.ipInfo.city || 'N/D' %></td>
                         </tr>
                         <tr>
-                            <th>ISP</th>
-                            <td><%= data.ipInfo.isp %></td>
+                            <th>Dominio</th>
+                            <td style="font-family: monospace; font-size: 10px;"><%= data.abuse.domain %></td>
                         </tr>
                         <tr>
                             <th>Coordinate</th>
@@ -405,21 +429,21 @@
                     </table>
                     <table class="detail-table">
                         <tr>
-                            <th>Abuso (Score)</th>
-                            <td style="color: <%= data.ipInfo.abuseScore > 50 ? 'var(--danger)' : 'var(--success)' %>;">
-                                <%= data.ipInfo.abuseScore %>%
-                            </td>
-                        </tr>
-                        <tr>
                             <th>Tipologia Network</th>
-                            <td><%= data.ipInfo.usageType %></td>
+                            <td><%= data.abuse.usageType %></td>
                         </tr>
                         <tr>
                             <th>Marcatori Speciali</th>
                             <td>
-                                <% if (data.ipInfo.isTor) { %><span class="badge badge-danger">TOR EXIT NODE</span><% } %>
-                                <% if (data.ipInfo.isWhitelisted) { %><span class="badge badge-primary">WHITELISTED</span><% } %>
-                                <% if (!data.ipInfo.isTor && !data.ipInfo.isWhitelisted) { %>Standard / Cleartext<% } %>
+                                <% if (data.abuse.isTor) { %><span class="badge badge-danger">TOR EXIT NODE</span><% } %>
+                                <% if (data.abuse.isWhitelisted) { %><span class="badge badge-primary">WHITELISTED</span><% } %>
+                                <% if (!data.abuse.isTor && !data.abuse.isWhitelisted) { %>Standard Network<% } %>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Confidence Risk</th>
+                            <td style="color: <%= data.abuse.confidenceScore > 50 ? 'var(--danger)' : 'var(--success)' %>;">
+                                <%= data.abuse.confidenceScore > 75 ? 'ALTO RISCHIO' : (data.abuse.confidenceScore > 25 ? 'SOSPETTO' : 'SICURO') %>
                             </td>
                         </tr>
                     </table>

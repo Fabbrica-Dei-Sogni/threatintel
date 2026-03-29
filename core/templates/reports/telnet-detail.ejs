@@ -390,11 +390,32 @@
             </table>
         </div>
 
-        <!-- Section 2: Source Intelligence -->
+        <!-- Section 2: Source Intelligence Refined -->
         <div class="section">
             <div class="section-header">
-                <div class="section-title">2. Intelligence Sorgente (IP Geolocation & Network)</div>
+                <div class="section-title">2. Intelligence Sorgente (Geolocation & Reputation)</div>
             </div>
+
+            <!-- New AbuseIPDB Reputation Panel -->
+            <div class="summary-block" style="margin-bottom: 20px; grid-template-columns: repeat(3, 1fr);">
+                <div class="summary-item" style="border-bottom: 3px solid <%= data.abuse.confidenceScore > 50 ? 'var(--danger)' : 'var(--success)' %>">
+                    <span class="summary-label">Abuse Confidence Score</span>
+                    <span class="summary-value" style="color: <%= data.abuse.confidenceScore > 50 ? 'var(--danger)' : 'var(--success)' %>">
+                        <%= data.abuse.confidenceScore %>%
+                    </span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Segnalazioni Totali</span>
+                    <span class="summary-value"><%= data.abuse.totalReports %></span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Whitelist Status</span>
+                    <span class="summary-value" style="font-size: 14px; color: <%= data.abuse.isWhitelisted ? 'var(--success)' : 'var(--text-muted)' %>">
+                        <%= data.abuse.isWhitelisted ? 'VERIFICATO SICURO' : 'NON LISTATO' %>
+                    </span>
+                </div>
+            </div>
+
             <div class="panel-grid">
                 <table class="detail-table">
                     <tr>
@@ -404,45 +425,47 @@
                         </td>
                     </tr>
                     <tr>
-                        <th>Coordinate</th>
+                        <th>Coordinate Map</th>
                         <td>
                             <%= data.ipInfo.coordinates %>
                         </td>
                     </tr>
                     <tr>
-                        <th>ISP / Org</th>
-                        <td>
-                            <%= data.ipInfo.isp %>
+                        <th>Dominio Sorgente</th>
+                        <td style="font-family: monospace;">
+                            <%= data.abuse.domain %>
                         </td>
                     </tr>
                 </table>
                 <table class="detail-table">
                     <tr>
-                        <th>Network Type</th>
+                        <th>Tipologia Host</th>
                         <td>
-                            <%= data.ipInfo.usageType %>
+                            <%= data.abuse.usageType %>
                         </td>
                     </tr>
                     <tr>
-                        <th>Abuse Score</th>
-                        <td
-                            style="color: <%= data.ipInfo.abuseScore > 50 ? 'var(--danger)' : 'var(--success)' %>; font-weight: bold;">
-                            <%= data.ipInfo.abuseScore %>%
+                        <th>ISP / Organizzazione</th>
+                        <td>
+                            <%= data.abuse.isp %>
                         </td>
                     </tr>
                     <tr>
-                        <th>Marcatori</th>
+                        <th>Marcatori Forensi</th>
                         <td>
-                            <% if (data.ipInfo.isTor) { %><span class="badge badge-danger">TOR EXIT</span>
+                            <% if (data.abuse.isTor) { %><span class="badge badge-danger">TOR EXIT NODE</span>
                                 <% } %>
-                                    <% if (data.ipInfo.isWhitelisted) { %><span
+                                    <% if (data.abuse.isWhitelisted) { %><span
                                             class="badge badge-session">WHITELISTED</span>
                                         <% } %>
-                                            <% if (!data.ipInfo.isTor && !data.ipInfo.isWhitelisted) { %>Standard Node<%
+                                            <% if (!data.abuse.isTor && !data.abuse.isWhitelisted) { %>Standard Host<%
                                                     } %>
                         </td>
                     </tr>
                 </table>
+            </div>
+            <div style="margin-top: 10px; font-size: 10px; color: var(--text-muted); text-align: right;">
+                Dati sincronizzati con AbuseIPDB Global Intelligence - Ultimo report: <%= data.abuse.lastReportedAt %>
             </div>
         </div>
 

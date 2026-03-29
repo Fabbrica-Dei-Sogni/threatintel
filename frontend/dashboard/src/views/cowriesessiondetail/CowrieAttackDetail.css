@@ -48,6 +48,33 @@
     transform: translateY(-2px);
 }
 
+.report-btn {
+    background: rgba(0, 40, 0, 0.4) !important;
+    border: 1px solid rgba(0, 255, 65, 0.3) !important;
+    color: #00FF41 !important;
+    margin-left: 10px;
+}
+
+.report-btn:hover {
+    background: rgba(0, 60, 0, 0.6) !important;
+    border-color: #00FF41 !important;
+    box-shadow: 0 0 15px rgba(0, 255, 65, 0.4) !important;
+}
+
+.spinner-small {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(0, 255, 65, 0.3);
+    border-radius: 50%;
+    border-top-color: #00FF41;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
 /* Glass Card & Info Card */
 .glass-card {
     background: rgba(0, 30, 0, 0.4);

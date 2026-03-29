@@ -41,7 +41,10 @@
         "yes": "Oui",
         "no": "Non",
         "copied": "Copié",
-        "copyComment": "Copier le commentaire"
+        "copyComment": "Copier le commentaire",
+        "generateReport": "Générer un dossier",
+        "downloadPdf": "Télécharger le PDF",
+        "viewHtml": "Voir le HTML"
     },
     "auth": {
         "login": "Connexion",

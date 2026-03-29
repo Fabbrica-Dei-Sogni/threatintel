@@ -6,6 +6,10 @@
         <span v-if="loadingEnrich" class="spinner"></span>
         {{ (loadingEnrich ? t('common.loading') : t('ipDetails.forceRefresh')).toUpperCase() }}
       </button>
+      <button @click="downloadReport" :disabled="loadingReport" class="report-btn header-report-btn">
+        <span v-if="loadingReport" class="spinner-small"></span>
+        <span v-else>📄</span> {{ t('common.generateReport').toUpperCase() }}
+      </button>
       <LanguageSwitcher />
     </div>
 
@@ -316,7 +320,7 @@
 import { ref, reactive, onMounted, onUnmounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import dayjs from 'dayjs'
-import { fetchIpDetails, fetchRateLimitSearch, enrichReports, enrichReputationScore } from '../../api/index'
+import { fetchIpDetails, fetchRateLimitSearch, enrichReports, enrichReputationScore, fetchReport } from '../../api/index'
 import { useI18n } from 'vue-i18n'
 import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
 import CountryFlag from '../../components/CountryFlag.vue';
@@ -330,7 +334,32 @@ const ip = ref('')
 const ipInfo = ref(null)
 const loading = ref(false)
 const loadingEnrich = ref(false)
+const loadingReport = ref(false)
 const error = ref(false)
+
+const downloadReport = async () => {
+  loadingReport.value = true;
+  try {
+    const blob = await fetchReport({
+      type: 'ip',
+      ip: ip.value,
+      format: 'pdf'
+    });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `dossier_ip_${ip.value}.pdf`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+  } catch (err) {
+    console.error('Error downloading report:', err);
+    ElMessage.error(t('common.error'));
+  } finally {
+    loadingReport.value = false;
+  }
+};
 const copiedIds = reactive({});
 const copiedIp = ref(false);
 

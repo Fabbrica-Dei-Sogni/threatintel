@@ -6,6 +6,10 @@
         </div>
         <div class="actions">
             <button @click="$router.back()" class="btn-action">{{ $t('cowrie.attackDetail.backToSessions') }}</button>
+            <button @click="downloadReport" :disabled="loadingReport" class="btn-action report-btn">
+                <span v-if="loadingReport" class="spinner-small"></span>
+                <span v-else>📄</span> {{ $t('common.generateReport') }}
+            </button>
         </div>
         <p class="subtitle">{{ $t('cowrie.attackDetail.subtitle') }}: <span class="hash">{{ sessionId }}</span> ({{ $t('cowrie.attackDetail.rawEvents') }}: {{ events.length }})</p>
 
@@ -141,15 +145,39 @@ import { useRoute, useRouter } from 'vue-router';
 import dayjs from 'dayjs';
 import { useI18n } from '../../composable/useI18n';
 import { useClipboard } from '../../composable/useClipboard';
-import { fetchCowrieSessionDetails, fetchCowrieSessionEvents } from '../../api';
+import { fetchCowrieSessionDetails, fetchCowrieSessionEvents, fetchReport } from '../../api';
 import AttackMap from '../../components/AttackMap.vue';
 import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
 
 const { t } = useI18n();
 const { copyToClipboard } = useClipboard();
+const loadingReport = ref(false);
 const route = useRoute();
 const router = useRouter();
 const sessionId = route.params.id;
+
+const downloadReport = async () => {
+    loadingReport.value = true;
+    try {
+        const blob = await fetchReport({
+            type: 'telnet',
+            sessionId,
+            format: 'pdf'
+        });
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `dossier_telnet_${sessionId}.pdf`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+    } catch (err) {
+        console.error('Error downloading report:', err);
+    } finally {
+        loadingReport.value = false;
+    }
+};
 
 const sessionDetails = ref(null);
 const events = ref([]);

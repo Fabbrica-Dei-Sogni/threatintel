@@ -136,6 +136,36 @@
     box-shadow: 0 0 20px rgba(230, 33, 23, 0.5);
 }
 
+.report-btn {
+    background: rgba(230, 33, 23, 0.05);
+    border-color: rgba(230, 33, 23, 0.3);
+    color: #ff9999;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.report-btn:hover {
+    background: rgba(230, 33, 23, 0.15) !important;
+    border-color: #ff4c4c !important;
+    color: #fff !important;
+    box-shadow: 0 0 20px rgba(230, 33, 23, 0.3) !important;
+}
+
+.spinner-small {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: #ff4c4c;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
 /* === FORENSIC BRIEFING BLOCKS === */
 
 .forensic-briefing {

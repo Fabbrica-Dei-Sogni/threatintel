@@ -25,6 +25,10 @@
             <button @click="goToIpDetails(attack.request.ip)" class="attacker-action-btn">
                 {{ t('common.analizeProfile') }} &rarr;
             </button>
+            <button @click="downloadReport" :disabled="loadingReport" class="attacker-action-btn report-btn">
+                <span v-if="loadingReport" class="spinner-small"></span>
+                <span v-else>📄</span> {{ t('common.generateReport') }}
+            </button>
         </div>
 
         <div v-if="loading" class="loading">{{ t('common.loading') }}</div>
@@ -366,10 +370,11 @@ import HexViewer from '../../components/HexViewer.vue';
 import AttackMap from '../../components/AttackMap.vue';
 import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
 import { Search } from '@element-plus/icons-vue';
-import { fetchAttackDetail } from '../../api';
+import { fetchAttackDetail, fetchReport } from '../../api';
 
 const { t } = useI18n();
 const { copyToClipboard } = useClipboard();
+const loadingReport = ref(false);
 
 // Reactive state for sections
 const toggles = reactive({
@@ -558,6 +563,30 @@ const loadAttackData = async () => {
 }
 
 onMounted(loadAttackData)
+const downloadReport = async () => {
+    if (!attack.value) return;
+    loadingReport.value = true;
+    try {
+        const blob = await fetchReport({
+            type: 'attack',
+            ip: props.ip,
+            format: 'pdf'
+        });
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `dossier_attack_${props.ip}.pdf`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+    } catch (err) {
+        console.error('Error downloading report:', err);
+    } finally {
+        loadingReport.value = false;
+    }
+};
+
 const copyAttackSummary = () => {
     if (!attack.value) return;
     

@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>ThreatIntel - Attack Dossier</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            padding: 40px;
+        }
+        .header {
+            border-bottom: 2px solid #2c3e50;
+            margin-bottom: 30px;
+            padding-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header h1 {
+            margin: 0;
+            color: #2c3e50;
+            font-size: 24px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .confidential {
+            color: #c0392b;
+            font-weight: bold;
+            border: 2px solid #c0392b;
+            padding: 5px 10px;
+            text-transform: uppercase;
+        }
+        .meta-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        .section-title {
+            background: #2c3e50;
+            color: white;
+            padding: 8px 15px;
+            font-size: 18px;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            border-radius: 3px;
+        }
+        .ip-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .ip-item {
+            border-bottom: 1px solid #eee;
+            padding: 5px 0;
+        }
+        .label {
+            font-weight: bold;
+            color: #7f8c8d;
+            font-size: 12px;
+            display: block;
+        }
+        .value {
+            font-size: 14px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th {
+            text-align: left;
+            background: #ecf0f1;
+            padding: 10px;
+            font-size: 12px;
+        }
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            font-size: 12px;
+        }
+        .log-entry {
+            font-family: 'Courier New', Courier, monospace;
+            background: #f4f4f4;
+            padding: 5px;
+            border-radius: 3px;
+            font-size: 11px;
+            word-break: break-all;
+        }
+        .footer {
+            margin-top: 50px;
+            text-align: center;
+            font-size: 10px;
+            color: #bdc3c7;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+        }
+        .badge {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: bold;
+            color: white;
+        }
+        .badge-threat { background: #e74c3c; }
+        .badge-info { background: #3498db; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1>ThreatIntel Dossier</h1>
+                <small>Cyber Intelligence Reporting System</small>
+            </div>
+            <div class="confidential">Analyst Only</div>
+        </div>
+
+        <div class="meta-info">
+            <strong>ID Report:</strong> TR-<%= Math.random().toString(36).substr(2, 9).toUpperCase() %><br>
+            <strong>Generato il:</strong> <%= data.generatedAt %><br>
+            <strong>Tipo Attacco:</strong> <%= data.type %><br>
+            <strong>Soggetto Investigato:</strong> <%= data.sourceIp %>
+        </div>
+
+        <div class="section-title">Sintesi del Soggetto (IP Intelligence)</div>
+        <div class="ip-grid">
+            <div class="ip-item">
+                <span class="label">IP Address</span>
+                <span class="value"><%= data.sourceIp %></span>
+            </div>
+            <div class="ip-item">
+                <span class="label">Paese</span>
+                <span class="value">
+                    <%= data.ipDetails?.country || 'Sconosciuto' %> 
+                    <%= data.ipDetails?.countryCode ? '(' + data.ipDetails.countryCode + ')' : '' %>
+                </span>
+            </div>
+            <div class="ip-item">
+                <span class="label">Organizzazione / ISP</span>
+                <span class="value"><%= data.ipDetails?.isp || data.ipDetails?.org || 'N/D' %></span>
+            </div>
+            <div class="ip-item">
+                <span class="label">Punteggio Abuso</span>
+                <span class="value">
+                    <span class="badge badge-threat"><%= data.ipDetails?.abuseScore || 0 %>%</span>
+                </span>
+            </div>
+        </div>
+
+        <div class="section-title">Timeline degli Eventi Forensi</div>
+        <table>
+            <thead>
+                <tr>
+                    <th width="20%">Timestamp</th>
+                    <th width="15%">Tipo</th>
+                    <th>Dettaglio Attività</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% data.events.forEach(function(event) { %>
+                    <tr>
+                        <td><%= new Date(event.timestamp).toLocaleString() %></td>
+                        <td>
+                            <span class="badge badge-info">
+                                <%= event.eventid || event.protocol || (event.request ? event.request.method : 'EVENT') %>
+                            </span>
+                        </td>
+                        <td class="log-entry">
+                            <% if (event.input) { %>
+                                COMMAND: <%= event.input %>
+                            <% } else if (event.request) { %>
+                                URL: <%= event.request.url %><br>
+                                UA: <%= event.request.userAgent %>
+                            <% } else if (event.username) { %>
+                                AUTH ATTEMPT: <%= event.username %> / <%= event.password || '****' %>
+                            <% } else { %>
+                                <%= JSON.stringify(event).substring(0, 200) %>...
+                            <% } %>
+                        </td>
+                    </tr>
+                <% }); %>
+            </tbody>
+        </table>
+
+        <div class="footer">
+            ThreatIntel Dashboard - Proprietary Intelligence Platform<br>
+            Generato automaticamente dal sistema di analisi forense.
+        </div>
+    </div>
+</body>
+</html>

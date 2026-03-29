@@ -41,7 +41,10 @@
         "yes": "Да",
         "no": "Нет",
         "copied": "Скопировано",
-        "copyComment": "Копировать комментарий"
+        "copyComment": "Копировать комментарий",
+        "generateReport": "Создать досье",
+        "downloadPdf": "Скачать PDF",
+        "viewHtml": "Просмотреть HTML"
     },
     "auth": {
         "login": "Войти",

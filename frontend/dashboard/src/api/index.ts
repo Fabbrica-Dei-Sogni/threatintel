@@ -273,3 +273,25 @@ export async function fetchCowrieSessionEvents(sessionId: string): Promise<any> 
         throw error;
     }
 }
+
+/**
+ * Recupera un report (Dossier) in formato PDF o HTML
+ * @param params { type: 'attack'|'telnet'|'ip', ip?: string, sessionId?: string, format?: 'pdf'|'html' }
+ */
+export async function fetchReport(params: {
+    type: string;
+    ip?: string;
+    sessionId?: string;
+    format?: string;
+}): Promise<Blob> {
+    try {
+        const response = await apiClient.get('/reports/attack', {
+            params,
+            responseType: 'blob',
+        });
+        return response.data;
+    } catch (error) {
+        console.error('[fetchReport] Error:', error);
+        throw error;
+    }
+}

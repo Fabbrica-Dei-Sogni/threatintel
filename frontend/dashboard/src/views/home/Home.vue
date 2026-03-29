@@ -9,12 +9,14 @@
       </div>
 
       <!-- Header Breaking News Ticker -->
+      <!--
       <BreakingNews 
         mode="ticker" 
         :attacks="recentAttacks" 
         :sessions="recentSessions" 
         :logs="recentLogs"
         :isVisible="showTicker" />
+    -->
 
       <LanguageSwitcher />
     </div>
@@ -43,7 +45,8 @@
                     <h3>{{ $t('home.recentAttacks').toUpperCase() }}</h3>
                   </div>
                   <div class="header-actions" @click.stop>
-                    <ProtocolSelector v-model="selectedAttackProtocol" :options="['http', 'https', 'ssh']" theme="dark" />
+                    <ProtocolSelector v-model="selectedAttackProtocol" :options="['http', 'https', 'ssh']"
+                      theme="dark" />
                     <span class="arrow" :class="{ open: toggles.recentAttacks }"></span>
                   </div>
                 </div>
@@ -115,7 +118,8 @@
                         </div>
                         <span @click="goToIpDetails(log.request.ip)" class="ip-link">{{ log.request.ip }}</span>
                         <div class="column-spacer"></div>
-                        <router-link :to="{ name: 'ThreatLog', params: { id: log.id } }">{{ $t('common.detail') }}</router-link>
+                        <router-link :to="{ name: 'ThreatLog', params: { id: log.id } }">{{ $t('common.detail')
+                          }}</router-link>
                       </li>
                     </ul>
                     <div v-if="loadingLogs" class="loading">{{ $t('home.loadingLogs') }}</div>

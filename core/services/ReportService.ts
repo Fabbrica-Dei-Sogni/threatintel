@@ -133,31 +133,49 @@ export class ReportService {
     private async getIpReportData(ip: string) {
         const data = await this.ipDetailsService.getIpDetails(ip);
         const details = data?.ipDetails;
+        const abuseDb = details?.abuseipdbId as any;
         
         return {
-            title: 'Intelligence Briefing: Analisi Reputazione IP',
+            title: 'Intelligence Briefing: Investigazione Forense IP',
             generatedAt: new Date().toLocaleString(),
             ip,
             details: this.normalizeIpDetails(details),
+            abuse: {
+                confidenceScore: abuseDb?.abuseConfidenceScore || 0,
+                totalReports: abuseDb?.totalReports || 0,
+                lastReportedAt: abuseDb?.lastReportedAt ? new Date(abuseDb.lastReportedAt).toLocaleString() : 'Mai',
+                domain: abuseDb?.domain || 'N/D',
+                usageType: abuseDb?.usageType || 'N/D',
+                isp: abuseDb?.isp || (details as any)?.isp || 'N/D',
+                isTor: abuseDb?.isTor || (details as any)?.isTor || false,
+                isWhitelisted: abuseDb?.isWhitelisted || (details as any)?.isWhitelisted || false,
+                countryCode: abuseDb?.countryCode || (details as any)?.countryCode || '??'
+            },
             whois: details?.whois_raw || 'Dati Whois non disponibili',
             abuseReports: (data?.abuseReports || []).map((r: any) => ({
                 date: r.reportedAt,
-                category: r.categories || [],
+                categories: r.categories || [],
                 comment: r.comment || 'Nessun commento'
             }))
         };
     }
 
+
     private normalizeIpDetails(details: any) {
+        // Estraiamo i dati da ipinfo se presenti (lookups ipinfo.io) o dal root (AbuseIPDB)
+        const info = details?.ipinfo || details || {};
+        const coordinates = info.loc || (details?.geo?.coordinates ? details.geo.coordinates.join(',') : 'N/D');
+
         return {
-            country: details?.country || 'Sconosciuto',
-            countryCode: details?.countryCode || '??',
-            city: details?.city || 'N/D',
-            isp: details?.isp || details?.org || 'N/D',
-            abuseScore: details?.abuseScore || 0,
-            usageType: details?.usageType || 'N/D',
-            isTor: details?.isTor || false,
-            isWhitelisted: details?.isWhitelisted || false
+            country: info.country || details?.country || 'Sconosciuto',
+            countryCode: info.countryCode || details?.countryCode || '??',
+            city: info.city || details?.city || 'N/D',
+            isp: info.isp || info.org || details?.isp || 'N/D',
+            abuseScore: details?.abuseScore || info.abuseScore || 0,
+            usageType: details?.usageType || info.usageType || 'N/D',
+            isTor: details?.isTor || info.isTor || false,
+            isWhitelisted: details?.isWhitelisted || info.isWhitelisted || false,
+            coordinates: coordinates
         };
     }
 

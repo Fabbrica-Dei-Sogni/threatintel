@@ -1,7 +1,9 @@
 import 'reflect-metadata';
+import { container } from 'tsyringe';
 import { ForensicService } from '../services/forense/ForensicService';
 import { ConfigService } from '../services/ConfigService';
 import { Logger } from 'winston';
+import { LOGGER_TOKEN } from '../di/tokens';
 
 describe('ForensicService - Time Filter Surgical Fix', () => {
     let service: ForensicService;
@@ -9,6 +11,7 @@ describe('ForensicService - Time Filter Surgical Fix', () => {
     let mockConfigService: jest.Mocked<ConfigService>;
 
     beforeEach(() => {
+        container.clearInstances();
         mockLogger = {
             info: jest.fn(),
             error: jest.fn(),
@@ -19,6 +22,10 @@ describe('ForensicService - Time Filter Surgical Fix', () => {
         mockConfigService = {
             getConfigValue: jest.fn().mockResolvedValue(null),
         } as any;
+
+        // Register for container.resolve
+        container.registerInstance(LOGGER_TOKEN, mockLogger);
+        container.registerInstance(ConfigService, mockConfigService);
 
         service = new ForensicService(mockLogger, mockConfigService);
     });
@@ -80,5 +87,123 @@ describe('ForensicService - Time Filter Surgical Fix', () => {
 
         // Allow 1000ms variance
         expect(Math.abs(actualDate.getTime() - expectedDate.getTime())).toBeLessThan(1000);
+    });
+
+    describe('_initFromDB', () => {
+        it('should load weights from JSON string', async () => {
+            mockConfigService.getConfigValue.mockImplementation(async (key) => {
+                if (key === 'DANGER_WEIGHT') return JSON.stringify({ RPSNORM: 0.5 });
+                return null;
+            });
+            await (service as any)._initFromDB();
+            expect((service as any).dangerWeights.RPSNORM).toBe(0.5);
+        });
+
+        it('should fallback to key:value parsing for weights', async () => {
+            mockConfigService.getConfigValue.mockImplementation(async (key) => {
+                if (key === 'DANGER_WEIGHT') return 'RPSNORM:0.7,SCORENORM:0.3';
+                return null;
+            });
+            await (service as any)._initFromDB();
+            expect((service as any).dangerWeights.RPSNORM).toBe(0.7);
+            expect((service as any).dangerWeights.SCORENORM).toBe(0.3);
+        });
+    });
+
+    describe('buildAttackGroupsBasePipeline complex cases', () => {
+        it('should handle minutes, hours, days time filter', async () => {
+            const configs = [
+                { minutes: 30, expectedMs: 30 * 60 * 1000 },
+                { hours: 2, expectedMs: 2 * 60 * 60 * 1000 },
+                { days: 3, expectedMs: 3 * 24 * 60 * 60 * 1000 }
+            ];
+
+            for (const config of configs) {
+                const pipeline = await service.buildAttackGroupsBasePipeline({}, 10, config);
+                const actualDate = pipeline[0].$match.timestamp.$gte;
+                const expectedDate = new Date(Date.now() - config.expectedMs);
+                expect(Math.abs(actualDate.getTime() - expectedDate.getTime())).toBeLessThan(1000);
+            }
+        });
+
+    });
+
+    describe('buildAttackGroupsBasePipeline', () => {
+        it('should handle custom time configuration', async () => {
+            const timeConfig = { days: 1 };
+            const pipeline = await service.buildAttackGroupsBasePipeline({}, 1, timeConfig);
+            expect(pipeline[0].$match.timestamp).toBeDefined();
+        });
+
+        it('should handle from/to object filter', async () => {
+            const timeConfig = {
+                from: { days: 2 },
+                to: { hours: 1 }
+            };
+            const pipeline = await service.buildAttackGroupsBasePipeline({}, 10, timeConfig);
+            const matchStage = pipeline[0];
+            const gte = matchStage.$match.timestamp.$gte;
+            const lte = matchStage.$match.timestamp.$lte;
+
+            expect(Math.abs(gte.getTime() - (Date.now() - 2 * 24 * 60 * 60 * 1000))).toBeLessThan(1000);
+            expect(Math.abs(lte.getTime() - (Date.now() - 1 * 60 * 60 * 1000))).toBeLessThan(1000);
+        });
+
+        it('should handle partial from object filter', async () => {
+            const configs = [
+                { from: { minutes: 5 }, expected: 5 * 60 * 1000 },
+                { from: { hours: 1 }, expected: 1 * 60 * 60 * 1000 },
+                { from: { days: 1 }, expected: 1 * 24 * 60 * 60 * 1000 }
+            ];
+            for (const cfg of configs) {
+                const pipeline = await service.buildAttackGroupsBasePipeline({}, 10, cfg);
+                expect(pipeline[0].$match.timestamp.$gte).toBeDefined();
+            }
+        });
+
+        it('should handle partial to object filter', async () => {
+            const configs = [
+                { to: { minutes: 5 } },
+                { to: { hours: 1 } },
+                { to: { days: 1 } }
+            ];
+            for (const cfg of configs) {
+                const pipeline = await service.buildAttackGroupsBasePipeline({}, 10, cfg);
+                expect(pipeline[0].$match.timestamp.$lte).toBeDefined();
+            }
+        });
+
+        it('should handle from object with all units', async () => {
+            await service.buildAttackGroupsBasePipeline({}, 10, { from: { minutes: 1 } });
+            await service.buildAttackGroupsBasePipeline({}, 10, { from: { hours: 1 } });
+            await service.buildAttackGroupsBasePipeline({}, 10, { from: { days: 1 } });
+            expect(mockLogger.info).toHaveBeenCalled();
+        });
+
+        it('should handle to object with all units', async () => {
+            await service.buildAttackGroupsBasePipeline({}, 10, { to: { minutes: 1 } });
+            await service.buildAttackGroupsBasePipeline({}, 10, { to: { hours: 1 } });
+            await service.buildAttackGroupsBasePipeline({}, 10, { to: { days: 1 } });
+            expect(mockLogger.info).toHaveBeenCalled();
+        });
+
+        it('should handle fromDate without toDate', async () => {
+            const pipeline = await service.buildAttackGroupsBasePipeline({}, 10, { fromDate: '2025-01-01' });
+            expect(pipeline[0].$match.timestamp.$gte).toBeDefined();
+            expect(pipeline[0].$match.timestamp.$lte).toBeUndefined();
+        });
+
+        it('should handle toDate without fromDate', async () => {
+            const pipeline = await service.buildAttackGroupsBasePipeline({}, 10, { toDate: '2025-01-01' });
+            expect(pipeline[0].$match.timestamp.$lte).toBeDefined();
+            expect(pipeline[0].$match.timestamp.$gte).toBeUndefined();
+        });
+
+        it('should include $match stage if filters or timeConfig are present', async () => {
+            const pipeline = await service.buildAttackGroupsBasePipeline({ test: 1 }, 10, { minutes: 5 });
+            // Should have two $match stages: one for time, one for filters
+            expect(pipeline[0].$match).toBeDefined();
+            expect(pipeline[1].$match).toBeDefined();
+        });
     });
 });

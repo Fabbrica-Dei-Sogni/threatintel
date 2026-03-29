@@ -9,13 +9,16 @@ const instance = axios.create({
 export async function verifyToken(req: any, res: any, next: any) {
     const token = req.headers['authorization'];
 
+    if (!token) {
+        return res.status(401).json({ message: 'Token mancante' });
+    }
+
     try {
         await verify(token);
         next();
     } catch (error: any) {
         res.status(500).json(error);
     }
-    if (!token) return res.status(401).json({ message: 'Token mancante' });
 }
 
 export default { verifyToken };

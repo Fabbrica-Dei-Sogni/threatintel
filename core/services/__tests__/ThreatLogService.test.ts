@@ -190,7 +190,97 @@ describe('ThreatLogService', () => {
 
             const result = await service.dryRunAnalyzeLogs('10');
             expect(result.summary.totalSampled).toBe(1);
-            expect(result.previews[0].comparison.hasChanges).toBe(true); // Because mock returns suspicious: true
+            expect(result.previews[0].comparison.hasChanges).toBe(true);
+        });
+    });
+
+    describe('analyzeLogs', () => {
+        it('should re-analyze and update logs permanently', async () => {
+            // Create a log that is currently not suspicious
+            await ThreatLog.create({
+                id: 'to-reanalyze',
+                request: { ip: '1.2.3.4', url: '/malicious-path' },
+                fingerprint: { suspicious: false, score: 0, indicators: [] },
+                timestamp: new Date()
+            });
+
+            // Mock pattern analyzer to detect it as suspicious now
+            mockPatternAnalysisService.analyze.mockReturnValue({
+                suspicious: true,
+                score: 50,
+                indicators: ['RE_ANALYZED'],
+                isBot: false
+            });
+
+            const { results } = await service.analyzeLogs({ batchSize: 10, updateDatabase: true });
+            expect(results.updated).toBe(1);
+
+            const updatedLog = await ThreatLog.findOne({ id: 'to-reanalyze' });
+            expect(updatedLog?.fingerprint.suspicious).toBe(true);
+            expect(updatedLog?.fingerprint.score).toBe(50);
+        });
+
+        it('should handle batch limits in re-analysis', async () => {
+            await ThreatLog.create([
+                { id: 'l1', request: { ip: '1.1.1.1' }, timestamp: new Date() },
+                { id: 'l2', request: { ip: '2.2.2.2' }, timestamp: new Date() }
+            ]);
+
+            const { results } = await service.analyzeLogs({ batchSize: 1, updateDatabase: true });
+            // Since total is 2 and batchSize is 1, it will run 2 batches (0, 1)
+            expect(results.processed).toBe(2);
+        });
+
+        it('should handle updateDatabase: false in analyzeLogs', async () => {
+            await ThreatLog.create({
+                id: 'no-update',
+                request: { ip: '1.2.3.4', url: '/malicious-path' },
+                fingerprint: { suspicious: false, score: 0, indicators: [] },
+                timestamp: new Date()
+            });
+
+            mockPatternAnalysisService.analyze.mockReturnValue({
+                suspicious: true,
+                score: 50,
+                indicators: ['RE_ANALYZED'],
+                isBot: false
+            });
+
+            const { results } = await service.analyzeLogs({ batchSize: 10, updateDatabase: false });
+            expect(results.updated).toBe(0);
+            
+            const log = await ThreatLog.findOne({ id: 'no-update' });
+            expect(log?.fingerprint.suspicious).toBe(false); // Should not have changed
+        });
+
+        it('should handle batch errors gracefully', async () => {
+            await ThreatLog.create({ id: 'err-log', request: { ip: '1.1.1.1' }, timestamp: new Date() });
+            
+            // Mock getLogs to throw on the first call
+            const realGetLogs = service.getLogs.bind(service);
+            service.getLogs = jest.fn().mockRejectedValueOnce(new Error('Batch Error'));
+            
+            const { results } = await service.analyzeLogs({ batchSize: 1, updateDatabase: true });
+            expect(results.errors).toBe(1);
+            
+            // Restore
+            service.getLogs = realGetLogs;
+        });
+    });
+
+    describe('getLogs (with IP filter)', () => {
+        it('should return paginated logs for a specific IP', async () => {
+            await ThreatLog.create([
+                { id: '1', request: { ip: '1.2.3.4' }, timestamp: new Date() },
+                { id: '2', request: { ip: '1.2.3.4' }, timestamp: new Date() },
+                { id: '3', request: { ip: '5.5.5.5' }, timestamp: new Date() }
+            ]);
+
+            const logs = await service.getLogs({ filters: { 'request.ip': '1.2.3.4' }, page: 1, pageSize: 1 });
+            expect(logs).toHaveLength(1);
+            
+            const total = await service.countLogs({ 'request.ip': '1.2.3.4' });
+            expect(total).toBe(2);
         });
     });
 });

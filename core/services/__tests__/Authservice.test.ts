@@ -39,9 +39,32 @@ describe('Authservice', () => {
             await expect(Authservice.verify('invalid-token')).rejects.toEqual({ message: 'Invalid token' });
         });
 
-        test('should handle API errors', async () => {
+        test('should handle API errors with response data', async () => {
             mockAxiosInstance.post.mockRejectedValue({ response: { data: { message: 'API Error' } } });
             await expect(Authservice.verify('error-token')).rejects.toEqual({ message: 'API Error' });
+        });
+
+        test('should handle API errors without response data but with message', async () => {
+            mockAxiosInstance.post.mockRejectedValue(new Error('Network Error'));
+            await expect(Authservice.verify('error-token')).rejects.toEqual({ message: 'Network Error' });
+        });
+
+        test('should handle completely unknown errors', async () => {
+            mockAxiosInstance.post.mockRejectedValue({});
+            await expect(Authservice.verify('error-token')).rejects.toEqual({ message: 'Errore sconosciuto' });
+        });
+
+        test('should log error when verify fails', async () => {
+            const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+            mockAxiosInstance.post.mockRejectedValue(new Error('Log Error'));
+            try { await Authservice.verify('log-token'); } catch (e) {}
+            expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('Log Error'));
+            consoleSpy.mockRestore();
+        });
+
+        test('should handle axios error without response and without message', async () => {
+            mockAxiosInstance.post.mockRejectedValue({});
+            await expect(Authservice.verify('token')).rejects.toEqual({ message: 'Errore sconosciuto' });
         });
     });
 
@@ -67,6 +90,18 @@ describe('Authservice', () => {
             expect(next).not.toHaveBeenCalled();
             expect(res.status).toHaveBeenCalledWith(403);
             expect(res.json).toHaveBeenCalledWith({ message: 'Autorizzazione negata' });
+        });
+
+        test('should handle missing user object in request', () => {
+            const req = {} as any;
+            const res = {
+                status: jest.fn().mockReturnThis(),
+                json: jest.fn(),
+            } as any;
+            const next = jest.fn();
+            const middleware = Authservice.checkRole('any');
+            
+            expect(() => middleware(req, res, next)).toThrow();
         });
     });
 });

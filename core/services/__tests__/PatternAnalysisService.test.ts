@@ -86,12 +86,28 @@ describe('PatternAnalysisService', () => {
             expect(result.indicators).toContain(`${ThreatIndicator.SUSPICIOUS_REFERER}:malicious.com`);
         });
 
+
+        it('should detect short user agents', () => {
+            const result = service.analyze('/', 'curl', '{}', '', 'GET', '{}', { headers: {} });
+            expect(result.indicators.some(i => i.includes(ThreatIndicator.SHORT_USER_AGENT))).toBe(true);
+        });
+
+        it('should detect uncommon HTTP methods', () => {
+            const result = service.analyze('/', 'Mozilla/5.0', '{}', '', 'PUT', '{}', { headers: {} });
+            expect(result.indicators.some(i => i.includes(ThreatIndicator.UNCOMMON_METHOD))).toBe(true);
+        });
+
         it('should detect alternative ports in headers', () => {
             const otherToAnalyze = {
                 headers: { 'x-server-port': '8080' }
             };
             const result = service.analyze('/', 'Mozilla/5.0 (Windows NT 10.0)', '{}', '', 'GET', '{}', otherToAnalyze);
             expect(result.indicators).toContain(`${ThreatIndicator.ALT_PORT}:8080`);
+        });
+
+        it('should detect suspicious patterns in User-Agent if they match referer patterns', () => {
+            const result = service.analyze('/', 'malicious.com', '{}', '', 'GET', '{}', { headers: {} });
+            expect(result.indicators.some(i => i.includes(ThreatIndicator.SUSPICIOUS_REFERER))).toBe(true);
         });
     });
 

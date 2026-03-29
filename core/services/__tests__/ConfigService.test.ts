@@ -131,4 +131,46 @@ describe('ConfigService (DI)', () => {
             ConfigSchema.find = originalFind;
         });
     });
+
+    describe('deleteConfig', () => {
+        it('should delete a config', async () => {
+            await ConfigSchema.create({ key: 'to_delete', value: 'val' });
+            const result = await configService.deleteConfig('to_delete');
+            expect(result).toBe(true);
+            const found = await ConfigSchema.findOne({ key: 'to_delete' });
+            expect(found).toBeNull();
+        });
+
+        it('should return false if config not found', async () => {
+            const result = await configService.deleteConfig('nonexistent');
+            expect(result).toBe(false);
+        });
+
+        it('should handle errors gracefully', async () => {
+            const spy = jest.spyOn(ConfigSchema, 'findOneAndDelete').mockRejectedValue(new Error('Delete error') as never);
+            await expect(configService.deleteConfig('key')).rejects.toThrow('Delete error');
+            spy.mockRestore();
+        });
+    });
+
+    describe('searchConfigs', () => {
+        it('should search configs by key or value', async () => {
+            await ConfigSchema.create({ key: 'test_key', value: 'other_val' });
+            await ConfigSchema.create({ key: 'other_key', value: 'test_val' });
+            
+            const results = await configService.searchConfigs('test');
+            expect(results).toHaveLength(2);
+        });
+
+        it('should return empty array if no matches', async () => {
+            const results = await configService.searchConfigs('nomatch');
+            expect(results).toHaveLength(0);
+        });
+
+        it('should handle errors gracefully', async () => {
+            const spy = jest.spyOn(ConfigSchema, 'find').mockRejectedValue(new Error('Search error') as never);
+            await expect(configService.searchConfigs('query')).rejects.toThrow('Search error');
+            spy.mockRestore();
+        });
+    });
 });

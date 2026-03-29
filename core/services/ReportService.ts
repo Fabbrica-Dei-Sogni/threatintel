@@ -148,7 +148,14 @@ export class ReportService {
     }
 
     private async convertToPdf(html: string): Promise<Buffer> {
-        const browser = await puppeteer.launch({ args: ['--no-sandbox'] });
+        const browser = await puppeteer.launch({ 
+            args: [
+                '--no-sandbox', 
+                '--disable-setuid-sandbox', 
+                '--disable-dev-shm-usage', 
+                '--disable-gpu'
+            ] 
+        });
         const page = await browser.newPage();
         await page.setContent(html, { waitUntil: 'networkidle0' });
         const pdf = await page.pdf({

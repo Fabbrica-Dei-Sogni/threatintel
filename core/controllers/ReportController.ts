@@ -24,9 +24,11 @@ export class ReportController {
                 res.setHeader('Content-Type', 'text/html');
                 return res.send(result);
             } else {
+                const pdfBuffer = result as Buffer;
                 res.setHeader('Content-Type', 'application/pdf');
                 res.setHeader('Content-Disposition', `attachment; filename=dossier_${reportType}_${id}.pdf`);
-                return res.send(result);
+                res.setHeader('Content-Length', pdfBuffer.length);
+                return res.send(pdfBuffer);
             }
         } catch (error: any) {
             console.error('[ReportController] Errore:', error);

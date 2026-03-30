@@ -221,7 +221,6 @@ watch(() => props.attacks.length, () => {
   margin: 0;
   height: 40px;
   flex: 1;
-  max-width: 800px; /* Increased max width for longer ticker */
 }
 
 .breaking-news-container.ticker .news-badge {
@@ -245,7 +244,6 @@ watch(() => props.attacks.length, () => {
   align-items: center;
   white-space: nowrap;
   gap: 40px;
-  padding-left: 100%; /* Start from outside */
   animation: ticker-scroll linear infinite;
   will-change: transform;
 }
@@ -288,6 +286,7 @@ watch(() => props.attacks.length, () => {
   gap: 6px;
   white-space: nowrap;
   flex-shrink: 0;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.3);
 }
 
 .pulse-dot {
@@ -341,5 +340,18 @@ watch(() => props.attacks.length, () => {
   opacity: 0;
   transform: translateY(-20px);
   pointer-events: none;
+}
+
+@media (max-width: 768px) {
+  .headline-text {
+    font-size: 0.8rem;
+  }
+  .news-badge {
+    font-size: 0.65rem;
+    padding: 2px 6px;
+  }
+  .breaking-news-container {
+    gap: 10px;
+  }
 }
 </style>

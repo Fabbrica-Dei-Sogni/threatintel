@@ -8,17 +8,17 @@
         </h1>
       </div>
 
-      <!-- Header Breaking News Ticker -->
-      <!--
+      <LanguageSwitcher />
+    </div>
+
+    <!-- Breaking News Row -->
+    <div class="breaking-news-row" v-if="showTicker">
       <BreakingNews 
         mode="ticker" 
         :attacks="recentAttacks" 
         :sessions="recentSessions" 
         :logs="recentLogs"
         :isVisible="showTicker" />
-    -->
-
-      <LanguageSwitcher />
     </div>
 
     <section class="intel-center">

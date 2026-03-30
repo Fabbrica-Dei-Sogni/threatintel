@@ -6,7 +6,6 @@
         <span v-if="loadingEnrich" class="spinner"></span>
         {{ (loadingEnrich ? t('common.loading') : t('ipDetails.forceRefresh')).toUpperCase() }}
       </button>
-      <ReportActions type="ip" :ip="ip" filename="dossier_ip" />
       <LanguageSwitcher />
     </div>
 
@@ -18,6 +17,7 @@
           <span v-else>✅</span>
         </button>
       </h1>
+      <ReportActions type="ip" :ip="ip" filename="dossier_ip" customClass="report-btn header-report-btn" />
     </div>
 
     <div v-if="ipInfo" class="briefing-wrapper">

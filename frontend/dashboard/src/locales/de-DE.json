@@ -44,7 +44,8 @@
         "copyComment": "Kommentar kopieren",
         "generateReport": "Dossier erstellen",
         "downloadPdf": "PDF herunterladen",
-        "viewHtml": "HTML anzeigen"
+        "viewHtml": "HTML anzeigen",
+        "preview": "Vorschau"
     },
     "auth": {
         "login": "Anmelden",

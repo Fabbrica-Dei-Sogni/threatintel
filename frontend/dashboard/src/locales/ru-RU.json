@@ -44,7 +44,8 @@
         "copyComment": "Копировать комментарий",
         "generateReport": "Создать досье",
         "downloadPdf": "Скачать PDF",
-        "viewHtml": "Просмотреть HTML"
+        "viewHtml": "Просмотреть HTML",
+        "preview": "Предварительный просмотр"
     },
     "auth": {
         "login": "Войти",

@@ -44,7 +44,8 @@
         "copyComment": "Copier le commentaire",
         "generateReport": "Générer un dossier",
         "downloadPdf": "Télécharger le PDF",
-        "viewHtml": "Voir le HTML"
+        "viewHtml": "Voir le HTML",
+        "preview": "Aperçu"
     },
     "auth": {
         "login": "Connexion",

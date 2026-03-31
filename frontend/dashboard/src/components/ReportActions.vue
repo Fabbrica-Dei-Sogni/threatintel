@@ -457,7 +457,7 @@ onUnmounted(() => {
   justify-content: center;
   align-items: center;
   z-index: 9999;
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(12px);
 }
 
 .preview-modal-content {
@@ -467,7 +467,7 @@ onUnmounted(() => {
   flex-direction: column;
   border-radius: 28px;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  overflow: hidden;
+  overflow: hidden; /* Lock the content inside */
 }
 
 .glass-morphism-dark {
@@ -481,6 +481,8 @@ onUnmounted(() => {
   justify-content: space-between;
   align-items: center;
   background: rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  flex-shrink: 0; /* Header stays fixed */
 }
 
 .header-title h3 {
@@ -519,25 +521,31 @@ onUnmounted(() => {
 .close-btn:hover { background: #ef4444; color: white; }
 
 .modal-body {
-  flex: 1;
-  overflow: auto;
+  flex: 1; /* Occupies all space between header and footer */
+  overflow: auto; /* Only this scrolls */
   padding: 60px 40px;
   background: radial-gradient(circle at center, #1e293b 0%, #020617 100%);
   display: flex;
   justify-content: center;
+  align-items: flex-start; /* Start from top */
 }
 
-.scaling-wrapper { transition: transform 0.4s; }
+.scaling-wrapper { 
+  transition: transform 0.4s; 
+  transform-origin: top center; /* Better for scrolling */
+}
 .report-frame { width: 100%; background: white; border-radius: 4px; }
 
 .modal-info-bar {
   padding: 12px 40px;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.8);
   display: flex;
   gap: 40px;
   font-size: 0.7rem;
   font-weight: 800;
-  color: #475569;
+  color: #64748b;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  flex-shrink: 0; /* Footer stays fixed */
 }
 
 .zoom-indicator { margin-left: auto; color: var(--theme-color); }
@@ -585,5 +593,23 @@ onUnmounted(() => {
 @media (max-width: 640px) {
   .sticky-report-tab { top: auto; bottom: 40px; transform: none; }
   .mode-sticky .action-menu { position: fixed; bottom: 120px; right: 20px; width: calc(100% - 40px); }
+  
+  .preview-modal-content { 
+    width: 100vw; 
+    height: 100vh;
+    height: 100dvh;
+    border-radius: 0; 
+  }
+  .modal-header { padding: 15px 20px; }
+  .header-title h3 { font-size: 0.8rem; letter-spacing: 2px; }
+  .modal-body { 
+    padding: 20px 5px; 
+    align-items: flex-start;
+  }
+  .modal-info-bar {
+    padding: 10px 20px;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
 }
 </style>

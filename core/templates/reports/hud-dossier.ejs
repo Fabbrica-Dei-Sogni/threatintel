@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="<%= locale.split('-')[0] %>">
+<head>
+    <meta charset="UTF-8">
+    <title><%= t('reports.common.agencyName') %> - HUD DOSSIER</title>
+    <style>
+        :root {
+            --bg-deep: #020617;
+            --bg-card: #0f172a;
+            --text-cyan: #22d3ee;
+            --text-emerald: #10b981;
+            --text-red: #f43f5e;
+            --text-amber: #f87171;
+            --text-slate: #94a3b8;
+            --border-color: rgba(255, 255, 255, 0.1);
+            --border-active: rgba(34, 211, 238, 0.5);
+            --mono: 'JetBrains Mono', 'Courier New', Courier, monospace;
+        }
+
+        @page {
+            margin: 10mm;
+            size: A4;
+        }
+
+        body {
+            font-family: 'Inter', 'Helvetica', sans-serif;
+            background-color: var(--bg-deep);
+            color: #f1f5f9;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.5;
+        }
+
+        .hud-document {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        /* HEADER HUD */
+        .hud-main-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--text-cyan);
+            padding-bottom: 20px;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .hud-main-header::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100px;
+            height: 2px;
+            background: var(--text-cyan);
+        }
+
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo-hud {
+            width: 65px;
+            height: 65px;
+            filter: drop-shadow(0 0 10px rgba(34, 211, 238, 0.4));
+        }
+
+        .brand-text h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--text-cyan);
+        }
+
+        .brand-text p {
+            margin: 0;
+            font-size: 10px;
+            text-transform: uppercase;
+            color: var(--text-slate);
+            letter-spacing: 3px;
+        }
+
+        .header-meta {
+            text-align: right;
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--text-slate);
+        }
+
+        .hud-security-stamp {
+            display: inline-block;
+            border: 1px solid var(--text-red);
+            color: var(--text-red);
+            padding: 4px 10px;
+            font-weight: 900;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            letter-spacing: 2px;
+        }
+
+        /* FRAGMENT CONTAINERS */
+        .hud-section-wrapper {
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .hud-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-left: 4px solid var(--text-cyan);
+            padding: 20px;
+            border-radius: 0 8px 8px 0;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            page-break-inside: avoid;
+        }
+
+        /* IP MARKER STYLES */
+        .hud-marker-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .hud-status-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .hud-dot {
+            width: 10px;
+            height: 10px;
+            background: var(--text-red);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--text-red);
+        }
+
+        .hud-label {
+            font-weight: 900;
+            font-size: 14px;
+            letter-spacing: 2px;
+            color: var(--text-cyan);
+        }
+
+        .hud-ip-address {
+            font-family: var(--mono);
+            font-size: 24px;
+            font-weight: 900;
+            color: #fff;
+        }
+
+        /* ATTACK HUD STYLES */
+        .attack-hud-box {
+            border-left-color: var(--text-red) !important;
+        }
+
+        .hud-box-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .hud-box-title {
+            font-weight: 900;
+            font-size: 16px;
+            color: var(--text-red);
+            letter-spacing: 1px;
+        }
+
+        .hud-box-subtitle {
+            font-size: 11px;
+            font-family: var(--mono);
+            color: var(--text-slate);
+        }
+
+        .hud-grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .hud-metric {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 15px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .hud-metric-label {
+            display: block;
+            font-size: 9px;
+            font-weight: 700;
+            color: var(--text-slate);
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .hud-metric-value {
+            font-size: 20px;
+            font-weight: 900;
+            color: #fff;
+        }
+
+        .danger-0, .danger-1 { color: var(--text-emerald); }
+        .danger-2, .danger-3 { color: var(--text-amber); }
+        .danger-4, .danger-5 { color: var(--text-red); }
+
+        .hud-footer-details {
+            font-size: 11px;
+            color: var(--text-slate);
+        }
+
+        .hud-tech-tags { color: #fff; margin-bottom: 5px; }
+
+        /* LOG DETAIL STYLES */
+        .hud-log-header {
+            margin-bottom: 15px;
+        }
+
+        .hud-log-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 10px;
+            font-family: var(--mono);
+            margin-bottom: 8px;
+        }
+
+        .hud-log-method-badge {
+            background: var(--text-cyan);
+            color: #000;
+            padding: 2px 6px;
+            font-weight: 900;
+        }
+
+        .hud-log-method-badge.POST { background: var(--text-amber); }
+        .hud-log-method-badge.DELETE { background: var(--text-red); }
+
+        .hud-log-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: #fff;
+            word-break: break-all;
+        }
+
+        .hud-log-row {
+            margin-bottom: 10px;
+            font-size: 12px;
+        }
+
+        .hud-log-label {
+            font-weight: 700;
+            color: var(--text-cyan);
+            font-size: 11px;
+            display: inline-block;
+            width: 120px;
+        }
+
+        .hud-log-val-red { color: var(--text-red); font-weight: 700; }
+
+        .hud-log-payload-data {
+            background: #000;
+            padding: 15px;
+            color: #33ff33;
+            font-family: var(--mono);
+            font-size: 11px;
+            border: 1px solid #1a2233;
+            overflow: auto;
+            margin-top: 10px;
+        }
+
+        /* TELEX FALLBACK STYLES */
+        .hud-mono-text {
+            font-family: var(--mono);
+            font-size: 11px;
+            background: #000;
+            padding: 15px;
+            border: 1px solid var(--border-color);
+            color: var(--text-slate);
+            white-space: pre-wrap;
+        }
+
+        .footer-hud {
+            margin-top: 60px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 15px;
+            text-align: center;
+            font-size: 10px;
+            color: var(--text-slate);
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+    <div class="hud-document">
+        <!-- GLOBAL HUD HEADER -->
+        <header class="hud-main-header">
+            <div class="header-brand">
+                <% if (logoBase64) { %>
+                    <img src="<%= logoBase64 %>" class="logo-hud">
+                <% } else { %>
+                    <div style="font-size: 40px; color: var(--text-cyan);">⌬</div>
+                <% } %>
+                <div class="brand-text">
+                    <h1>THREAT-INTEL</h1>
+                    <p>FORENSIC INVESTIGATIVE DOSSIER</p>
+                </div>
+            </div>
+            <div class="header-meta">
+                <span class="hud-security-stamp">INTERNAL RECIPIENT ONLY</span><br>
+                REF: HUD-<%= new Date().getTime().toString().slice(-8) %>-<%= locale.toUpperCase() %><br>
+                STAMP: <%= new Date().toLocaleString(locale) %>
+            </div>
+        </header>
+
+        <!-- DYNAMIC FRAGMENTS INJECTION -->
+        <div class="hud-content-flow">
+            <% if (sections && sections.length > 0) { %>
+                <% sections.forEach((section, index) => { %>
+                    <div class="hud-section-wrapper">
+                        <% 
+                            let fragmentName = 'generic-block';
+                            if (section.templateKey === 'clipboard.ip') fragmentName = 'ip-marker';
+                            else if (section.templateKey === 'clipboard.attackDetail.summary') fragmentName = 'attack-hud';
+                            else if (section.templateKey === 'clipboard.attackDetail.log') fragmentName = 'log-entry';
+                            // Aggiungiamo il path completo relativo alla directory templates/reports
+                            let fragmentPath = './fragments/' + fragmentName + '.ejs';
+                        %>
+                        <%- include(fragmentPath, { data: section.data, section: section, index: index, t: t, locale: locale }) %>
+                    </div>
+                <% }); %>
+            <% } else { %>
+                <div class="hud-item" style="text-align: center; border-left: 2px solid var(--text-red);">
+                    <p style="color: var(--text-red); font-weight: 900;">[ WARNING ] NO FORENSIC DATA CAPTURED IN THIS SESSION</p>
+                </div>
+            <% } %>
+        </div>
+
+        <footer class="footer-hud">
+            SYSTEM-GENERATED REPORT • THREATINTEL V2.4 • CONFIDENTIAL ASSETS
+        </footer>
+    </div>
+</body>
+</html>

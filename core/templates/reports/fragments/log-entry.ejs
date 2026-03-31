@@ -1,0 +1,24 @@
+<div class="hud-item log-detail-box">
+    <header class="hud-log-header">
+        <div class="hud-log-meta">
+            <span class="hud-log-timestamp"><%= data.timestamp %></span>
+            <span class="hud-log-method-badge <%= data.method %>"><%= data.method %></span>
+            <span class="hud-log-score">SCORE: <%= data.score %></span>
+        </div>
+        <div class="hud-log-title"><%= data.url %></div>
+    </header>
+    <div class="hud-log-body">
+        <div class="hud-log-row">
+            <span class="hud-log-label">INDICATORS:</span>
+            <span class="hud-log-val-red"><%= data.indicators %></span>
+        </div>
+        <div class="hud-log-row">
+            <span class="hud-log-label">USER AGENT:</span>
+            <span class="hud-log-val-muted"><%= data.userAgent || 'N/D' %></span>
+        </div>
+        <div class="hud-log-payload-section">
+            <div class="hud-log-label">RAW PAYLOAD:</div>
+            <pre class="hud-log-payload-data"><%= data.payload %></pre>
+        </div>
+    </div>
+</div>

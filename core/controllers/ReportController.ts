@@ -44,13 +44,19 @@ export class ReportController {
         try {
             const { sections, locale } = req.body;
             const format = (req.query.format as 'html' | 'pdf') || 'pdf';
+            const style = (req.query.style as 'telex' | 'hud') || 'telex';
             const lang = (locale as string) || 'it-IT';
 
             if (!sections || !Array.isArray(sections)) {
                 return res.status(400).json({ error: 'Sections array is required' });
             }
 
-            const result = await this.reportService.generateCustomReport(sections, lang, format);
+            let result: Buffer | string;
+            if (style === 'hud') {
+                result = await this.reportService.generateHudReport(sections, lang, format);
+            } else {
+                result = await this.reportService.generateCustomReport(sections, lang, format);
+            }
 
             if (format === 'html') {
                 res.setHeader('Content-Type', 'text/html');

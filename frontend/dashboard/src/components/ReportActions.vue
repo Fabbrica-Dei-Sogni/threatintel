@@ -86,7 +86,7 @@
             <div class="header-actions">
                <button @click="handleDownload" class="download-mini-btn" :disabled="loadingPdf">
                 <span v-if="loadingPdf" class="spinner-tiny"></span>
-                <span v-else>📥 PDF</span>
+                <span v-else>📥 {{ t('common.downloadPdf') }}</span>
               </button>
               <button class="close-btn" @click="closePreview">✕</button>
             </div>

@@ -72,7 +72,7 @@ export class ReportService {
      * Genera un Dossier Investigativo Personalizzato partendo da una lista di sezioni catturate
      */
     async generateCustomReport(sections: any[], locale: string, format: 'html' | 'pdf' = 'pdf'): Promise<Buffer | string> {
-        this.logger.info(`[ReportService] Generazione Custom Dossier (${sections.length} sezioni) [${locale}]`);
+        this.logger.info(`[ReportService] Generazione Custom Dossier (Telex) (${sections.length} sezioni) [${locale}]`);
 
         const templatePath = path.join(__dirname, `../templates/reports/custom-dossier.ejs`);
         
@@ -97,6 +97,38 @@ export class ReportService {
 
         const html = await ejs.renderFile(templatePath, { 
             sections: enrichedSections, 
+            logoBase64, 
+            t, 
+            locale 
+        });
+
+        if (format === 'html') return html;
+
+        return await this.convertToPdf(html);
+    }
+
+    /**
+     * Genera un Dossier in stile HUD (Rich UI) usando frammenti EJS modulari
+     */
+    async generateHudReport(sections: any[], locale: string, format: 'html' | 'pdf' = 'pdf'): Promise<Buffer | string> {
+        this.logger.info(`[ReportService] Generazione HUD Dossier (${sections.length} sezioni) [${locale}]`);
+
+        const templatePath = path.join(__dirname, `../templates/reports/hud-dossier.ejs`);
+        
+        let logoBase64 = '';
+        try {
+            const logoPath = path.join(__dirname, '../public/assets/intelligence-logo.png');
+            const logoBuffer = fs.readFileSync(logoPath);
+            logoBase64 = `data:image/png;base64,${logoBuffer.toString('base64')}`;
+        } catch (e) {
+            this.logger.error(`[ReportService] Errore caricamento logo: ${e}`);
+        }
+
+        const t = (key: string, params?: any) => this.i18n.t(key, locale, params);
+
+        // Nel caso HUD passiamo i dati raw e lasciamo che il template hud-dossier.ejs gestisca i fragment
+        const html = await ejs.renderFile(templatePath, { 
+            sections, 
             logoBase64, 
             t, 
             locale 

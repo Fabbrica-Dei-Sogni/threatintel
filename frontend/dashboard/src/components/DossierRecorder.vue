@@ -33,15 +33,15 @@
 
           <template v-if="dossierStore.sections.length > 0">
             <div class="divider"></div>
-            <button class="btn-tool preview" @click="generateCustomReport('html')" :disabled="loadingHtml" :title="t('common.previewDossier')">
+            <button class="btn-tool preview hud-btn" @click="generateCustomReport('html', 'hud')" :disabled="loadingHtml" :title="t('common.previewDossier')">
               <span v-if="loadingHtml" class="spinner-tiny"></span>
               <span v-else class="icon">👁️</span> 
               <span class="btn-text h-900">{{ t('common.preview') }}</span>
             </button>
-            <button class="btn-tool download" @click="generateCustomReport('pdf')" :disabled="loadingPdf" :title="t('common.generateDossier')">
+            <button class="btn-tool download" @click="generateCustomReport('pdf', 'hud')" :disabled="loadingPdf" :title="t('common.generateDossier')">
                <span v-if="loadingPdf" class="spinner-tiny"></span>
               <span v-else class="icon">📄</span> 
-              <span class="btn-text h-900">PDF</span>
+              <span class="btn-text h-900">{{ t('common.downloadPdf') }}</span>
             </button>
             <button class="btn-tool reset" @click="confirmReset" :title="t('common.clearDossier')">
               <span class="icon">🗑️</span>
@@ -61,9 +61,9 @@
                   <h3>DOSSIER PREVIEW</h3>
                 </div>
                 <div class="header-actions">
-                  <button @click="generateCustomReport('pdf')" class="download-mini-btn" :disabled="loadingPdf">
+                  <button @click="generateCustomReport('pdf', 'hud')" class="download-mini-btn" :disabled="loadingPdf">
                     <span v-if="loadingPdf" class="spinner-tiny"></span>
-                    <span v-else>📥 PDF</span>
+                    <span v-else>📥 {{ t('common.downloadPdf') }}</span>
                   </button>
                   <button class="close-btn" @click="closePreview">✕</button>
                 </div>
@@ -99,6 +99,7 @@ const showPreview = ref(false);
 const htmlContent = ref('');
 const loadingHtml = ref(false);
 const loadingPdf = ref(false);
+const lastUsedStyle = ref('telex');
 const scaleFactor = ref(1);
 const reportWidth = 794;
 const modalBody = ref(null);
@@ -145,8 +146,9 @@ const confirmReset = () => {
   });
 };
 
-const generateCustomReport = async (format) => {
+const generateCustomReport = async (format, style = 'telex') => {
   if (dossierStore.sections.length === 0) return;
+  lastUsedStyle.value = style;
   if (format === 'html') loadingHtml.value = true;
   else loadingPdf.value = true;
   try {
@@ -157,14 +159,14 @@ const generateCustomReport = async (format) => {
       locale: locale.value
     };
     if (format === 'html') {
-      const html = await fetchCustomReport(payload, 'html');
+      const html = await fetchCustomReport(payload, 'html', style);
       htmlContent.value = html;
       showPreview.value = true;
       await nextTick();
       updateScale();
       window.addEventListener('resize', updateScale);
     } else {
-      await fetchCustomReport(payload, 'pdf');
+      await fetchCustomReport(payload, 'pdf', style);
       if (showPreview.value) ElMessage.success(t('common.downloadPdf'));
     }
   } catch (error) {
@@ -301,6 +303,17 @@ onUnmounted(() => window.removeEventListener('resize', updateScale));
 }
 
 .btn-tool.reset:hover { border-color: #ef4444; color: #f87171; background: rgba(239, 68, 68, 0.1); }
+
+.btn-tool.hud-btn {
+  border-color: rgba(34, 211, 238, 0.4);
+  color: var(--text-cyan, #22d3ee);
+}
+
+.btn-tool.hud-btn:hover {
+  background: rgba(34, 211, 238, 0.15);
+  border-color: #22d3ee;
+  color: #fff;
+}
 
 .icon { font-size: 1.1rem; flex-shrink: 0; }
 .divider { width: 1px; height: 20px; background: rgba(255, 255, 255, 0.15); margin: 0 2px; }

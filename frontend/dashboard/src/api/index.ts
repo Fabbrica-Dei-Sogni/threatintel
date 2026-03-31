@@ -301,10 +301,10 @@ export async function fetchReport(params: {
  * @param payload { sections: Array, locale: string }
  * @param format 'pdf' | 'html'
  */
-export async function fetchCustomReport(payload: any, format: string = 'pdf'): Promise<any> {
+export async function fetchCustomReport(payload: any, format: string = 'pdf', style: string = 'telex'): Promise<any> {
     try {
         const response = await apiClient.post('/reports/custom', payload, {
-            params: { format },
+            params: { format, style },
             responseType: format === 'pdf' ? 'blob' : 'text'
         });
 

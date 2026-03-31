@@ -10,7 +10,7 @@
                 <span class="animated-icon pulse-magma">🛰️</span>
                 <h1>{{ t('attackDetail.title') }}</h1>
             </div>
-            <ReportActions type="attack" :ip="props.ip" filename="dossier_attack" />
+            <ReportActions type="attack" :ip="props.ip" filename="dossier_attack" mode="sticky" accentColor="#ff4d4d" />
         </div>
 
         <!-- Attacker Highlight Card -->

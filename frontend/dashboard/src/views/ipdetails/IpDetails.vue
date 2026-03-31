@@ -17,7 +17,7 @@
           <span v-else>✅</span>
         </button>
       </h1>
-      <ReportActions type="ip" :ip="ip" filename="dossier_ip" customClass="report-btn header-report-btn" />
+      <ReportActions type="ip" :ip="ip" filename="dossier_ip" mode="sticky" accentColor="#00D4FF" />
     </div>
 
     <div v-if="ipInfo" class="briefing-wrapper">

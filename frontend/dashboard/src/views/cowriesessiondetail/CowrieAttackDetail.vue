@@ -6,7 +6,7 @@
         </div>
         <div class="actions">
             <button @click="$router.back()" class="btn-action">{{ $t('cowrie.attackDetail.backToSessions') }}</button>
-            <ReportActions type="telnet" :sessionId="sessionId" filename="dossier_telnet" />
+            <ReportActions type="telnet" :sessionId="sessionId" filename="dossier_telnet" mode="sticky" accentColor="#00FF41" />
         </div>
         <p class="subtitle">{{ $t('cowrie.attackDetail.subtitle') }}: <span class="hash">{{ sessionId }}</span> ({{ $t('cowrie.attackDetail.rawEvents') }}: {{ events.length }})</p>
 

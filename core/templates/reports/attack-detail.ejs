@@ -1,14 +1,14 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="<%= locale.split('-')[0] %>">
 <head>
     <meta charset="UTF-8">
-    <title>ThreatIntel Investigative Dossier - <%= data.ip %></title>
+    <title><%= t('reports.common.agencyName') %> - <%= t('reports.common.investigativeDossier') %> - <%= data.ip %></title>
     <style>
         :root {
             --bg-paper: #ffffff;
             --text-main: #1a202c;
             --text-muted: #4a5568;
-            --primary: #2c5282; /* Deep Blue for professional look */
+            --primary: #2c5282;
             --danger: #c53030;
             --warning: #b7791f;
             --success: #2f855a;
@@ -34,7 +34,6 @@
             max-width: 100%;
         }
 
-        /* Institutional Header */
         .header {
             display: flex;
             justify-content: space-between;
@@ -102,7 +101,6 @@
             font-family: monospace;
         }
 
-        /* Metadata & Timestamps */
         .meta-strip {
             display: flex;
             justify-content: space-between;
@@ -113,7 +111,6 @@
             margin-bottom: 25px;
         }
 
-        /* Section Styling */
         .section {
             margin-bottom: 25px;
         }
@@ -131,7 +128,6 @@
             color: var(--primary);
         }
 
-        /* Summary Grid */
         .summary-block {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -165,7 +161,6 @@
         .danger-MEDIUM { color: var(--warning); }
         .danger-LOW { color: var(--success); }
 
-        /* Panels */
         .panel-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -192,7 +187,6 @@
             font-weight: 700;
         }
 
-        /* Forensic Timeline */
         .timeline-table {
             width: 100%;
             border-collapse: collapse;
@@ -253,7 +247,6 @@
 </head>
 <body>
     <div class="document-container">
-        <!-- Header -->
         <header class="header">
             <div class="header-left">
                 <div class="logo-box">
@@ -264,8 +257,8 @@
                     <% } %>
                 </div>
                 <div class="title-group">
-                    <h1>ThreatIntelligence Agency</h1>
-                    <p>Divisione Investigativa Forense • Report Esecutivo</p>
+                    <h1><%= t('reports.common.agencyName') %></h1>
+                    <p><%= t('reports.attackDetail.division') %> • <%= t('reports.common.executiveReport') %></p>
                 </div>
             </div>
             <div class="header-right">
@@ -274,135 +267,130 @@
         </header>
 
         <div class="meta-strip">
-            <span><strong>Target IP Address:</strong> <%= data.ip %></span>
-            <span><strong>Data Documento:</strong> <%= data.generatedAt %></span>
-            <span><strong>Protocollo:</strong> HTTP Investigativo</span>
+            <span><strong><%= t('reports.common.targetIp') %>:</strong> <%= data.ip %></span>
+            <span><strong><%= t('reports.common.generatedAt') %>:</strong> <%= data.generatedAt %></span>
+            <span><strong><%= t('reports.common.protocol') %>:</strong> <%= t('reports.common.httpInvestigative') %></span>
         </div>
 
-        <!-- Executive Summary -->
         <div class="section">
             <div class="section-header">
-                <div class="section-title">1. Sintesi Esecutiva dell'Attacco</div>
+                <div class="section-title"><%= t('reports.attackDetail.summaryTitle') %></div>
             </div>
             <div class="summary-block">
                 <div class="summary-item">
-                    <span class="summary-label">Livello Criticità</span>
+                    <span class="summary-label"><%= t('reports.attackDetail.criticality') %></span>
                     <span class="summary-value danger-<%= data.summary.dangerLevel %>"><%= data.summary.dangerLevel %></span>
                 </div>
                 <div class="summary-item">
-                    <span class="summary-label">Danger Score</span>
+                    <span class="summary-label"><%= t('reports.attackDetail.dangerScore') %></span>
                     <span class="summary-value"><%= data.summary.dangerScore.toFixed(2) %></span>
                 </div>
                 <div class="summary-item">
-                    <span class="summary-label">Volume Eventi</span>
+                    <span class="summary-label"><%= t('reports.attackDetail.eventVolume') %></span>
                     <span class="summary-value"><%= data.summary.totalLogs %></span>
                 </div>
                 <div class="summary-item">
-                    <span class="summary-label">Intensità (RPS)</span>
+                    <span class="summary-label"><%= t('reports.attackDetail.intensity') %></span>
                     <span class="summary-value"><%= (data.attack?.rps || 0).toFixed(2) %></span>
                 </div>
             </div>
         </div>
 
         <div class="panel-grid">
-            <!-- Intelligence Attacco -->
             <div class="section">
                 <div class="section-header">
-                    <div class="section-title">2. Dettagli Operativi Attacco</div>
+                    <div class="section-title"><%= t('reports.attackDetail.operationalDetails') %></div>
                 </div>
                 <table class="detail-table">
                     <tr>
-                        <th>Intensità Rilevata</th>
-                        <td style="color: var(--warning);"><%= data.attack?.intensityAttack || 'N/D' %></td>
+                        <th><%= t('reports.attackDetail.detectedIntensity') %></th>
+                        <td style="color: var(--warning);"><%= data.attack?.intensityAttack || t('reports.common.notAvailable') %></td>
                     </tr>
                     <tr>
-                        <th>Durata Stimata</th>
+                        <th><%= t('reports.attackDetail.estimatedDuration') %></th>
                         <td><%= data.summary.duration %></td>
                     </tr>
                     <tr>
-                        <th>Primo Segnale</th>
-                        <td><%= data.attack?.firstSeen ? new Date(data.attack.firstSeen).toLocaleString() : 'N/D' %></td>
+                        <th><%= t('reports.attackDetail.firstSeen') %></th>
+                        <td><%= data.attack?.firstSeen ? new Date(data.attack.firstSeen).toLocaleString(locale) : t('reports.common.notAvailable') %></td>
                     </tr>
                     <tr>
-                        <th>Ultimo Segnale</th>
-                        <td><%= data.attack?.lastSeen ? new Date(data.attack.lastSeen).toLocaleString() : 'N/D' %></td>
+                        <th><%= t('reports.attackDetail.lastSeen') %></th>
+                        <td><%= data.attack?.lastSeen ? new Date(data.attack.lastSeen).toLocaleString(locale) : t('reports.common.notAvailable') %></td>
                     </tr>
                 </table>
                 
                 <div style="margin-top: 15px;">
-                    <span class="summary-label">Pattern Tecniche Rilevate:</span>
+                    <span class="summary-label"><%= t('reports.attackDetail.patterns') %>:</span>
                     <div class="badge-list">
                         <% if (data.attack?.attackPatterns && data.attack.attackPatterns.length > 0) { %>
                             <% data.attack.attackPatterns.forEach(function(p) { %>
                                 <span class="badge badge-primary"><%= p %></span>
                             <% }); %>
                         <% } else { %>
-                            <span class="badge">Nessun pattern specifico</span>
+                            <span class="badge"><%= t('reports.attackDetail.noPatterns') %></span>
                         <% } %>
                     </div>
                 </div>
             </div>
 
-            <!-- Fingerprint Forense -->
             <div class="section">
                 <div class="section-header">
-                    <div class="section-title">3. Fingerprint Forense</div>
+                    <div class="section-title"><%= t('reports.attackDetail.forensicFingerprint') %></div>
                 </div>
                 <table class="detail-table">
                     <tr>
-                        <th>Classe di Rischio</th>
-                        <td style="color: var(--danger);"><%= data.attack?.fingerprint?.riskLevel || 'N/D' %></td>
+                        <th><%= t('reports.attackDetail.riskClass') %></th>
+                        <td style="color: var(--danger);"><%= data.attack?.fingerprint?.riskLevel || t('reports.common.notAvailable') %></td>
                     </tr>
                     <tr>
-                        <th>Fingerprint Score</th>
+                        <th><%= t('reports.attackDetail.fingerprintScore') %></th>
                         <td><%= data.attack?.fingerprint?.score || 0 %> / 10</td>
                     </tr>
                     <tr>
-                        <th>Bot Detection</th>
-                        <td><%= data.attack?.fingerprint?.isBot ? 'SI (Identificato)' : 'No / Sconosciuto' %></td>
+                        <th><%= t('reports.attackDetail.botDetection') %></th>
+                        <td><%= data.attack?.fingerprint?.isBot ? t('reports.attackDetail.isBot') : t('reports.attackDetail.notBot') %></td>
                     </tr>
                 </table>
 
                 <div style="margin-top: 15px;">
-                    <span class="summary-label">Indicatori di Pericolo:</span>
+                    <span class="summary-label"><%= t('reports.attackDetail.dangerIndicators') %>:</span>
                     <div class="badge-list">
                         <% if (data.attack?.fingerprint?.indicators && data.attack.fingerprint.indicators.length > 0) { %>
                             <% data.attack.fingerprint.indicators.forEach(function(ind) { %>
                                 <span class="badge badge-danger"><%= ind %></span>
                             <% }); %>
                         <% } else { %>
-                            <span class="badge">Analisi neutra</span>
+                            <span class="badge"><%= t('reports.attackDetail.neutralAnalysis') %></span>
                         <% } %>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- IP Context & Reputation -->
         <div class="section">
             <div class="section-header">
-                <div class="section-title">4. Intelligence Sorgente (IP Geolocation & Reputation)</div>
+                <div class="section-title"><%= t('reports.attackDetail.sourceIntelligence') %></div>
             </div>
             
-            <!-- AbuseIPDB Summary -->
             <div class="summary-block" style="margin-bottom: 20px;">
                 <div class="summary-item">
-                    <span class="summary-label">Abuse Confidence Score</span>
+                    <span class="summary-label"><%= t('reports.attackDetail.abuseConfidence') %></span>
                     <span class="summary-value" 
                           style="color: <%= data.abuse.confidenceScore > 50 ? 'var(--danger)' : (data.abuse.confidenceScore > 20 ? 'var(--warning)' : 'var(--success)') %>">
                         <%= data.abuse.confidenceScore %>%
                     </span>
                 </div>
                 <div class="summary-item">
-                    <span class="summary-label">Segnalazioni Totali</span>
+                    <span class="summary-label"><%= t('reports.attackDetail.totalReports') %></span>
                     <span class="summary-value"><%= data.abuse.totalReports %></span>
                 </div>
                 <div class="summary-item">
-                    <span class="summary-label">Ultima Segnalazione</span>
+                    <span class="summary-label"><%= t('reports.attackDetail.lastReported') %></span>
                     <span class="summary-value" style="font-size: 11px;"><%= data.abuse.lastReportedAt %></span>
                 </div>
                 <div class="summary-item">
-                    <span class="summary-label">ISP / Org</span>
+                    <span class="summary-label"><%= t('reports.attackDetail.ispOrg') %></span>
                     <span class="summary-value" style="font-size: 11px;"><%= data.abuse.isp %></span>
                 </div>
             </div>
@@ -411,29 +399,29 @@
                 <div class="panel-grid" style="gap: 40px;">
                     <table class="detail-table">
                         <tr>
-                            <th>Nazione</th>
+                            <th><%= t('reports.attackDetail.country') %></th>
                             <td><%= data.ipInfo.country %> (<%= data.ipInfo.countryCode %>)</td>
                         </tr>
                         <tr>
-                            <th>Città</th>
-                            <td><%= data.ipInfo.city || 'N/D' %></td>
+                            <th><%= t('reports.attackDetail.city') %></th>
+                            <td><%= data.ipInfo.city || t('reports.common.notAvailable') %></td>
                         </tr>
                         <tr>
-                            <th>Dominio</th>
+                            <th><%= t('reports.attackDetail.domain') %></th>
                             <td style="font-family: monospace; font-size: 10px;"><%= data.abuse.domain %></td>
                         </tr>
                         <tr>
-                            <th>Coordinate</th>
+                            <th><%= t('reports.attackDetail.coordinates') %></th>
                             <td><%= data.ipInfo.coordinates %></td>
                         </tr>
                     </table>
                     <table class="detail-table">
                         <tr>
-                            <th>Tipologia Network</th>
+                            <th><%= t('reports.attackDetail.networkType') %></th>
                             <td><%= data.abuse.usageType %></td>
                         </tr>
                         <tr>
-                            <th>Marcatori Speciali</th>
+                            <th><%= t('reports.attackDetail.specialMarkers') %></th>
                             <td>
                                 <% if (data.abuse.isTor) { %><span class="badge badge-danger">TOR EXIT NODE</span><% } %>
                                 <% if (data.abuse.isWhitelisted) { %><span class="badge badge-primary">WHITELISTED</span><% } %>
@@ -441,9 +429,9 @@
                             </td>
                         </tr>
                         <tr>
-                            <th>Confidence Risk</th>
+                            <th><%= t('reports.attackDetail.confidenceRisk') %></th>
                             <td style="color: <%= data.abuse.confidenceScore > 50 ? 'var(--danger)' : 'var(--success)' %>;">
-                                <%= data.abuse.confidenceScore > 75 ? 'ALTO RISCHIO' : (data.abuse.confidenceScore > 25 ? 'SOSPETTO' : 'SICURO') %>
+                                <%= data.abuse.confidenceScore > 75 ? t('reports.attackDetail.riskLevels.high') : (data.abuse.confidenceScore > 25 ? t('reports.attackDetail.riskLevels.suspicious') : t('reports.attackDetail.riskLevels.safe')) %>
                             </td>
                         </tr>
                     </table>
@@ -451,25 +439,24 @@
             </div>
         </div>
 
-        <!-- Forensic Timeline Samples -->
         <div class="section">
             <div class="section-header">
-                <div class="section-title">5. Estratto Cronologico Eventi Forensi (Timeline)</div>
+                <div class="section-title"><%= t('reports.attackDetail.timeline') %></div>
             </div>
             <table class="timeline-table">
                 <thead>
                     <tr>
-                        <th width="15%">Orario</th>
-                        <th width="10%">Metodo</th>
-                        <th>Risorsa Richiesta (URI Path)</th>
-                        <th width="12%">Status Code</th>
-                        <th width="8%">Score</th>
+                        <th width="15%"><%= t('reports.attackDetail.timelineHeaders.time') %></th>
+                        <th width="10%"><%= t('reports.attackDetail.timelineHeaders.method') %></th>
+                        <th><%= t('reports.attackDetail.timelineHeaders.resource') %></th>
+                        <th width="12%"><%= t('reports.attackDetail.timelineHeaders.status') %></th>
+                        <th width="8%"><%= t('reports.attackDetail.timelineHeaders.score') %></th>
                     </tr>
                 </thead>
                 <tbody>
                     <% data.events.slice(0, 20).forEach(function(e) { %>
                         <tr>
-                            <td><%= new Date(e.timestamp).toLocaleTimeString() %></td>
+                            <td><%= new Date(e.timestamp).toLocaleTimeString(locale) %></td>
                             <td><strong><%= e.method %></strong></td>
                             <td style="font-family: monospace; font-size: 9px;"><%= e.url %></td>
                             <td style="text-align: center; font-weight: bold; color: <%= e.statusCode < 400 ? 'var(--success)' : (e.statusCode < 500 ? 'var(--warning)' : 'var(--danger)') %>">
@@ -482,15 +469,15 @@
             </table>
             <% if (data.events.length > 20) { %>
                 <div style="font-size: 9px; color: var(--text-muted); margin-top: 5px; text-align: right;">
-                    Nota: L'estratto mostra i primi 20 eventi di <%= data.events.length %> totali nel periodo considerato.
+                    <%= t('reports.attackDetail.timelineNote', { count: data.events.length }) %>
                 </div>
             <% } %>
         </div>
 
         <footer class="footer">
-            ThreatIntel Intelligence Platform - Report Esecutivo
+            <%= t('reports.common.footer') %>
         </footer>
-        <div class="page-counter">Pagina 1 di 1</div>
+        <div class="page-counter"><%= t('reports.common.page') %> 1 <%= t('reports.common.of') %> 1</div>
     </div>
 </body>
 </html>

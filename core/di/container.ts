@@ -1,7 +1,8 @@
 import { Logger } from "winston";
 import { container, type InjectionToken } from "tsyringe";
-import { LOGGER_TOKEN } from "./tokens";
+import { LOGGER_TOKEN, I18N_TOKEN } from "./tokens";
 import logger from "../../logger";
+import { I18nService } from "../services/I18nService";
 
 export const coreContainer = container;
 
@@ -32,12 +33,17 @@ export function get<T>(token: InjectionToken<T>): T {
  *
  * Currently injected:
  * - Logger (Winston instance)
+ * - I18nService
  *
  * Future: Can extend to inject other services if needed
  */
 
 // registrazione del logger come valore usando token centralizzato
 registerValue<Logger>(LOGGER_TOKEN, logger);
+
+// registrazione del servizio i18n come singleton
+coreContainer.registerSingleton(I18nService);
+coreContainer.register(I18N_TOKEN, { useClass: I18nService });
 
 
 // nuova funzione generica

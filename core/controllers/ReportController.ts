@@ -8,17 +8,21 @@ export class ReportController {
 
     async generateAttackReport(req: Request, res: Response) {
         try {
-            const { ip, sessionId, type } = req.query;
+            const { ip, sessionId, type, locale } = req.query;
             const format = (req.query.format as 'html' | 'pdf') || 'pdf';
             const reportType = (type as ReportType) || 'attack';
+            const lang = (locale as string) || 'it-IT';
 
             const id = (reportType === 'telnet' ? sessionId : ip) as string;
 
             if (!id) {
-                return res.status(400).json({ error: `È necessario fornire un ID valido per il tipo ${reportType}` });
+                const errorMsg = lang.startsWith('it') 
+                    ? `È necessario fornire un ID valido per il tipo ${reportType}`
+                    : `A valid ID is required for type ${reportType}`;
+                return res.status(400).json({ error: errorMsg });
             }
 
-            const result = await this.reportService.generateReport(reportType, id, format);
+            const result = await this.reportService.generateReport(reportType, id, format, lang);
 
             if (format === 'html') {
                 res.setHeader('Content-Type', 'text/html');

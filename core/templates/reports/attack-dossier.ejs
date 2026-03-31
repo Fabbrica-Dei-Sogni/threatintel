@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="<%= locale.split('-')[0] %>">
 
 <head>
     <meta charset="UTF-8">
-    <title>ThreatIntel - Attack Dossier</title>
+    <title><%= t('reports.common.agencyName') %> - <%= t('reports.common.investigativeDossier') %></title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -142,44 +142,44 @@
     <div class="container">
         <div class="header">
             <div>
-                <h1>ThreatIntel Dossier</h1>
-                <small>Cyber Intelligence Reporting System</small>
+                <h1><%= t('reports.common.agencyName') %></h1>
+                <small><%= t('reports.attackDetail.division') %></small>
             </div>
-            <div class="confidential">Analyst Only</div>
+            <div class="confidential"><%= t('reports.common.confidential') %></div>
         </div>
 
         <div class="meta-info">
             <strong>ID Report:</strong> TR-<%= Math.random().toString(36).substr(2, 9).toUpperCase() %><br>
-                <strong>Generato il:</strong>
+                <strong><%= t('reports.common.generatedAt') %>:</strong>
                 <%= data.generatedAt %><br>
-                    <strong>Tipo Attacco:</strong>
+                    <strong><%= t('reports.attackDetail.riskClass') %>:</strong>
                     <%= data.type %><br>
-                        <strong>Soggetto Investigato:</strong>
+                        <strong><%= t('reports.common.subject') %>:</strong>
                         <%= data.sourceIp %>
         </div>
 
-        <div class="section-title">Sintesi del Soggetto (IP Intelligence)</div>
+        <div class="section-title"><%= t('reports.ipDetail.summaryTitle') %></div>
         <div class="ip-grid">
             <div class="ip-item">
-                <span class="label">IP Address</span>
+                <span class="label"><%= t('reports.common.ipAddress') %></span>
                 <span class="value">
                     <%= data.sourceIp %>
                 </span>
             </div>
             <div class="ip-item">
-                <span class="label">Paese</span>
+                <span class="label"><%= t('reports.attackDetail.country') %></span>
                 <span class="value">
-                    <%= data.ipDetails?.country || 'Sconosciuto' %>
+                    <%= data.ipDetails?.country || t('reports.common.unknown') %>
                 </span>
             </div>
             <div class="ip-item">
-                <span class="label">Organizzazione / ISP</span>
+                <span class="label"><%= t('reports.attackDetail.ispOrg') %></span>
                 <span class="value">
-                    <%= data.ipDetails?.isp || data.ipDetails?.org || 'N/D' %>
+                    <%= data.ipDetails?.isp || data.ipDetails?.org || t('reports.common.notAvailable') %>
                 </span>
             </div>
             <div class="ip-item">
-                <span class="label">Punteggio Abuso</span>
+                <span class="label"><%= t('reports.attackDetail.abuseConfidence') %></span>
                 <span class="value">
                     <span class="badge badge-threat">
                         <%= data.ipDetails?.abuseScore || 0 %>%
@@ -188,20 +188,20 @@
             </div>
         </div>
 
-        <div class="section-title">Timeline degli Eventi Forensi</div>
+        <div class="section-title"><%= t('reports.attackDetail.timeline') %></div>
         <table>
             <thead>
                 <tr>
-                    <th width="20%">Timestamp</th>
-                    <th width="15%">Tipo</th>
-                    <th>Dettaglio Attività</th>
+                    <th width="20%"><%= t('reports.attackDetail.timelineHeaders.time') %></th>
+                    <th width="15%"><%= t('reports.common.protocol') %></th>
+                    <th><%= t('reports.attackDetail.operationalDetails') %></th>
                 </tr>
             </thead>
             <tbody>
                 <% data.events.forEach(function(event) { %>
                     <tr>
                         <td>
-                            <%= new Date(event.timestamp).toLocaleString() %>
+                            <%= new Date(event.timestamp).toLocaleString(locale) %>
                         </td>
                         <td>
                             <span class="badge badge-info">
@@ -228,10 +228,11 @@
         </table>
 
         <div class="footer">
-            ThreatIntel Dashboard - Proprietary Intelligence Platform<br>
-            Generato automaticamente dal sistema di analisi forense.
+            <%= t('reports.common.footer') %><br>
+            <%= t('reports.ipDetail.geoNote') %>
         </div>
     </div>
 </body>
 
 </html>
+>

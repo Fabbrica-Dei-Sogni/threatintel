@@ -3,6 +3,7 @@ import { ReportService } from '../services/ReportService';
 import { ThreatLogService } from '../services/ThreatLogService';
 import { CowrieService } from '../services/CowrieService';
 import { IpDetailsService } from '../services/IpDetailsService';
+import { I18nService } from '../services/I18nService';
 import { Logger } from 'winston';
 import * as ejs from 'ejs';
 import puppeteer from 'puppeteer';
@@ -13,6 +14,7 @@ jest.mock('puppeteer');
 jest.mock('../services/ThreatLogService');
 jest.mock('../services/CowrieService');
 jest.mock('../services/IpDetailsService');
+jest.mock('../services/I18nService');
 
 describe('ReportService', () => {
     let reportService: ReportService;
@@ -20,18 +22,21 @@ describe('ReportService', () => {
     let mockThreatLogService: jest.Mocked<ThreatLogService>;
     let mockCowrieService: jest.Mocked<CowrieService>;
     let mockIpDetailsService: jest.Mocked<IpDetailsService>;
+    let mockI18nService: jest.Mocked<I18nService>;
 
     beforeEach(() => {
         mockLogger = { info: jest.fn(), error: jest.fn() } as any;
         mockThreatLogService = new ThreatLogService(mockLogger, {} as any, {} as any, {} as any, {} as any) as any;
         mockCowrieService = new CowrieService(mockLogger, {} as any) as any;
         mockIpDetailsService = new IpDetailsService(mockLogger) as any;
+        mockI18nService = { t: jest.fn().mockImplementation((key) => key) } as any;
 
         reportService = new ReportService(
             mockLogger,
             mockThreatLogService,
             mockCowrieService,
-            mockIpDetailsService
+            mockIpDetailsService,
+            mockI18nService
         );
     });
 

@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="<%= locale.split('-')[0] %>">
 
 <head>
     <meta charset="UTF-8">
-    <title>ThreatIntel Forensic Session Dossier - <%= data.sessionId %>
+    <title><%= t('reports.common.agencyName') %> - <%= t('reports.telnetDetail.title') %> - <%= data.sessionId %>
     </title>
     <style>
         :root {
@@ -312,8 +312,8 @@
                             <% } %>
                 </div>
                 <div class="title-group">
-                    <h1>ThreatIntelligence Agency</h1>
-                    <p>Cyber Forensic Division - Session Analysis Report</p>
+                    <h1><%= t('reports.common.agencyName') %></h1>
+                    <p><%= t('reports.telnetDetail.division') || 'Cyber Forensic Division' %> - <%= t('reports.telnetDetail.overview') %></p>
                 </div>
             </div>
             <div class="header-right">
@@ -324,13 +324,13 @@
 
         <!-- Meta Strip -->
         <div class="meta-strip">
-            <span><strong>Target IP:</strong>
+            <span><strong><%= t('reports.common.targetIp') %>:</strong>
                 <%= data.ip %>
             </span>
-            <span><strong>Data Sessione:</strong>
+            <span><strong><%= t('reports.common.generatedAt') %>:</strong>
                 <%= data.sessionInfo.startTime %>
             </span>
-            <span><strong>Protocollo:</strong>
+            <span><strong><%= t('reports.common.protocol') %>:</strong>
                 <%= data.sessionInfo.protocol.toUpperCase() %>
             </span>
         </div>
@@ -338,25 +338,25 @@
         <!-- Executive Summary Stats -->
         <div class="summary-block">
             <div class="summary-item">
-                <span class="summary-label">Durata Sessione</span>
+                <span class="summary-label"><%= t('reports.telnetDetail.duration') %></span>
                 <span class="summary-value">
                     <%= data.sessionInfo.duration %>
                 </span>
             </div>
             <div class="summary-item">
-                <span class="summary-label">Eventi Totali</span>
+                <span class="summary-label"><%= t('reports.telnetDetail.events') %></span>
                 <span class="summary-value">
                     <%= data.sessionInfo.totalEvents %>
                 </span>
             </div>
             <div class="summary-item">
-                <span class="summary-label">Tentativi Auth</span>
+                <span class="summary-label"><%= t('reports.telnetDetail.authAttempts') %></span>
                 <span class="summary-value text-warning">
                     <%= data.sessionInfo.authAttempts %>
                 </span>
             </div>
             <div class="summary-item">
-                <span class="summary-label">Comandi Eseguiti</span>
+                <span class="summary-label"><%= t('reports.telnetDetail.commands') %></span>
                 <span class="summary-value" style="color: var(--success);">
                     <%= data.sessionInfo.commands %>
                 </span>
@@ -366,23 +366,23 @@
         <!-- Section 1: Session Context -->
         <div class="section">
             <div class="section-header">
-                <div class="section-title">1. Contesto dell'Incastro (Honeypot Infrastructure)</div>
+                <div class="section-title">1. <%= t('reports.telnetDetail.sessionInfo') %></div>
             </div>
             <table class="detail-table">
                 <tr>
-                    <th>Identificativo Sessione</th>
+                    <th><%= t('reports.telnetDetail.sessionId') || 'Session ID' %></th>
                     <td style="font-family: monospace; font-weight: bold;">
                         <%= data.sessionId %>
                     </td>
                 </tr>
                 <tr>
-                    <th>Sensore Ricevente</th>
+                    <th><%= t('reports.telnetDetail.sensor') || 'Sensor' %></th>
                     <td>
                         <%= data.sessionInfo.sensor %>
                     </td>
                 </tr>
                 <tr>
-                    <th>Timestamp Inizio</th>
+                    <th><%= t('reports.attackDetail.firstSeen') %></th>
                     <td>
                         <%= data.sessionInfo.startTime %>
                     </td>
@@ -393,25 +393,25 @@
         <!-- Section 2: Source Intelligence Refined -->
         <div class="section">
             <div class="section-header">
-                <div class="section-title">2. Intelligence Sorgente (Geolocation & Reputation)</div>
+                <div class="section-title">2. <%= t('reports.attackDetail.sourceIntelligence') %></div>
             </div>
 
             <!-- New AbuseIPDB Reputation Panel -->
             <div class="summary-block" style="margin-bottom: 20px; grid-template-columns: repeat(3, 1fr);">
                 <div class="summary-item" style="border-bottom: 3px solid <%= data.abuse.confidenceScore > 50 ? 'var(--danger)' : 'var(--success)' %>">
-                    <span class="summary-label">Abuse Confidence Score</span>
+                    <span class="summary-label"><%= t('reports.attackDetail.abuseConfidence') %></span>
                     <span class="summary-value" style="color: <%= data.abuse.confidenceScore > 50 ? 'var(--danger)' : 'var(--success)' %>">
                         <%= data.abuse.confidenceScore %>%
                     </span>
                 </div>
                 <div class="summary-item">
-                    <span class="summary-label">Segnalazioni Totali</span>
+                    <span class="summary-label"><%= t('reports.attackDetail.totalReports') %></span>
                     <span class="summary-value"><%= data.abuse.totalReports %></span>
                 </div>
                 <div class="summary-item">
-                    <span class="summary-label">Whitelist Status</span>
+                    <span class="summary-label"><%= t('reports.ipDetail.whitelistStatus') %></span>
                     <span class="summary-value" style="font-size: 14px; color: <%= data.abuse.isWhitelisted ? 'var(--success)' : 'var(--text-muted)' %>">
-                        <%= data.abuse.isWhitelisted ? 'VERIFICATO SICURO' : 'NON LISTATO' %>
+                        <%= data.abuse.isWhitelisted ? t('reports.ipDetail.safe') : t('reports.ipDetail.notListed') %>
                     </span>
                 </div>
             </div>
@@ -419,19 +419,19 @@
             <div class="panel-grid">
                 <table class="detail-table">
                     <tr>
-                        <th>Nazione / Città</th>
+                        <th><%= t('reports.attackDetail.country') %> / <%= t('reports.attackDetail.city') %></th>
                         <td>
                             <%= data.ipInfo.country %> - <%= data.ipInfo.city %>
                         </td>
                     </tr>
                     <tr>
-                        <th>Coordinate Map</th>
+                        <th><%= t('reports.attackDetail.coordinates') %></th>
                         <td>
                             <%= data.ipInfo.coordinates %>
                         </td>
                     </tr>
                     <tr>
-                        <th>Dominio Sorgente</th>
+                        <th><%= t('reports.attackDetail.domain') %></th>
                         <td style="font-family: monospace;">
                             <%= data.abuse.domain %>
                         </td>
@@ -439,24 +439,24 @@
                 </table>
                 <table class="detail-table">
                     <tr>
-                        <th>Tipologia Host</th>
+                        <th><%= t('reports.ipDetail.usageType') %></th>
                         <td>
                             <%= data.abuse.usageType %>
                         </td>
                     </tr>
                     <tr>
-                        <th>ISP / Organizzazione</th>
+                        <th><%= t('reports.attackDetail.ispOrg') %></th>
                         <td>
                             <%= data.abuse.isp %>
                         </td>
                     </tr>
                     <tr>
-                        <th>Marcatori Forensi</th>
+                        <th><%= t('reports.attackDetail.specialMarkers') %></th>
                         <td>
-                            <% if (data.abuse.isTor) { %><span class="badge badge-danger">TOR EXIT NODE</span>
+                            <% if (data.abuse.isTor) { %><span class="badge badge-danger"><%= t('reports.ipDetail.markers.tor') %></span>
                                 <% } %>
                                     <% if (data.abuse.isWhitelisted) { %><span
-                                            class="badge badge-session">WHITELISTED</span>
+                                            class="badge badge-session"><%= t('reports.ipDetail.markers.whitelisted') %></span>
                                         <% } %>
                                             <% if (!data.abuse.isTor && !data.abuse.isWhitelisted) { %>Standard Host<%
                                                     } %>
@@ -465,28 +465,28 @@
                 </table>
             </div>
             <div style="margin-top: 10px; font-size: 10px; color: var(--text-muted); text-align: right;">
-                Dati sincronizzati con AbuseIPDB Global Intelligence - Ultimo report: <%= data.abuse.lastReportedAt %>
+                <%= t('reports.attackDetail.lastReported') %>: <%= data.abuse.lastReportedAt %>
             </div>
         </div>
 
         <!-- Section 3: Interactive Forensic Timeline -->
         <div class="section">
             <div class="section-header">
-                <div class="section-title">3. Timeline Forense Interactiva (Event Stream)</div>
+                <div class="section-title">3. <%= t('reports.telnetDetail.timeline') %></div>
             </div>
             <table class="event-table">
                 <thead>
                     <tr>
-                        <th style="width: 80px;">Time Offset</th>
-                        <th style="width: 120px;">Tipo Evento</th>
-                        <th>Dettaglio Forense</th>
+                        <th style="width: 80px;"><%= t('reports.attackDetail.timelineHeaders.time') %></th>
+                        <th style="width: 120px;"><%= t('reports.common.protocol') %></th>
+                        <th><%= t('reports.attackDetail.operationalDetails') %></th>
                     </tr>
                 </thead>
                 <tbody>
                     <% data.timeline.forEach(function(e) { %>
                         <tr>
                             <td style="font-weight: bold; color: var(--text-muted);">
-                                <%= new Date(e.timestamp).toLocaleTimeString() %>
+                                <%= new Date(e.timestamp).toLocaleTimeString(locale) %>
                             </td>
                             <td>
                                 <% if (e.type.includes('login')) { %>
@@ -503,19 +503,19 @@
                             </td>
                             <td>
                                 <% if (e.type.includes('login')) { %>
-                                    Tentativo di accesso: <strong style="color: var(--danger);">
+                                    <%= t('reports.telnetDetail.authAttempts') %>: <strong style="color: var(--danger);">
                                         <%= e.username %>
                                     </strong> / <strong>
                                         <%= e.password %>
                                     </strong>
                                     <% } else if (e.input) { %>
-                                        Esecuzione comando: <span class="terminal-cmd">$ <%= e.input %></span>
+                                        <%= t('reports.telnetDetail.commands') %>: <span class="terminal-cmd">$ <%= e.input %></span>
                                         <% } else if (e.message) { %>
                                             <span style="color: var(--text-muted);">
                                                 <%= e.message %>
                                             </span>
                                             <% } else { %>
-                                                Segnale di sistema Cowrie rilevato: <%= e.type %>
+                                                <%= e.type %>
                                                     <% } %>
                             </td>
                         </tr>
@@ -525,13 +525,12 @@
         </div>
 
         <div class="footer-note">
-            Questo documento costituisce evidenza digitale raccolta tramite sistemi honeypot distribuiti.
-            Le informazioni contenute sono strettamente riservate e destinate all'uso investigativo.
+            <%= t('reports.common.proprietary') %>
             <br>
             TI Forensic Analysis System - <%= data.generatedAt %>
         </div>
 
-        <div class="page-counter">Pagina 1 di 1</div>
+        <div class="page-counter"><%= t('reports.common.page') %> 1 <%= t('reports.common.of') %> 1</div>
     </div>
 </body>
 

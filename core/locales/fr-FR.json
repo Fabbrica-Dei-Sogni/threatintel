@@ -1,0 +1,112 @@
+{
+  "reports": {
+    "common": {
+      "agencyName": "ThreatIntelligence Agency",
+      "executiveReport": "Rapport Exécutif",
+      "forensicReport": "Rapport Forensique IP",
+      "investigativeDossier": "Dossier d'Investigation",
+      "generatedAt": "Date du Document",
+      "targetIp": "Adresse IP Cible",
+      "investigatedIp": "Adresse IP Investigée",
+      "subject": "Sujet Investigué",
+      "protocol": "Protocole",
+      "httpInvestigative": "HTTP Investigatif",
+      "telnetSshInvestigative": "Session Telnet/SSH",
+      "globalReputation": "Réputation Globale",
+      "confidential": "Analyste Uniquement",
+      "notAvailable": "N/D",
+      "unknown": "Inconnu",
+      "page": "Page",
+      "of": "sur",
+      "footer": "Plateforme d'Intelligence ThreatIntel - Rapport Exécutif",
+      "proprietary": "Portfolio ThreatIntelligence • Document Confidentiel • Généré par ThreatIntel Engine"
+    },
+    "attackDetail": {
+      "title": "Dossier de Détail d'Attaque HTTP",
+      "division": "Division de l'Investigation Forensique",
+      "summaryTitle": "1. Résumé Exécutif de l'Attaque",
+      "criticality": "Niveau de Criticité",
+      "dangerScore": "Score de Danger",
+      "eventVolume": "Volume des Événements",
+      "intensity": "Intensité (RPS)",
+      "operationalDetails": "2. Détails Opérationnels de l'Attaque",
+      "detectedIntensity": "Intensité Détectée",
+      "estimatedDuration": "Durée Estimée",
+      "firstSeen": "Premier Signal",
+      "lastSeen": "Dernier Signal",
+      "patterns": "Modèles de Techniques Détectés",
+      "noPatterns": "Aucun modèle spécifique",
+      "forensicFingerprint": "3. Empreinte Forensique",
+      "riskClass": "Classe de Risque",
+      "fingerprintScore": "Score d'Empreinte Digitale",
+      "botDetection": "Détection de Bot",
+      "isBot": "OUI (Identifié)",
+      "notBot": "Non / Inconnu",
+      "dangerIndicators": "Indicateurs de Danger",
+      "neutralAnalysis": "Analyse neutre",
+      "sourceIntelligence": "4. Intelligence Source (Géolocalisation IP & Réputation)",
+      "abuseConfidence": "Score de Confiance d'Abus",
+      "totalReports": "Rapports Totaux",
+      "lastReported": "Dernière Signalisation",
+      "ispOrg": "ISP / Org",
+      "country": "Pays",
+      "city": "Ville",
+      "domain": "Domaine",
+      "coordinates": "Coordonnées",
+      "networkType": "Type de Réseau",
+      "specialMarkers": "Marqueurs Spéciaux",
+      "confidenceRisk": "Risque de Confiance",
+      "riskLevels": {
+        "high": "HAUT RISQUE",
+        "suspicious": "SUSPECT",
+        "safe": "SÛR"
+      },
+      "timeline": "5. Événements Forensiques Chronologiques (Timeline)",
+      "timelineHeaders": {
+        "time": "Heure",
+        "method": "Méthode",
+        "resource": "Ressource Requise (URI Path)",
+        "status": "Code de Statut",
+        "score": "Score"
+      },
+      "timelineNote": "Remarque: L'extrait montre les 20 premiers événements sur {count} totaux."
+    },
+    "ipDetail": {
+      "title": "Briefing d'Intelligence: Investigation Forensique IP",
+      "division": "Division de l'Intelligence de Réputation",
+      "summaryTitle": "1. Analyse Exécutive de la Réputation",
+      "whitelistStatus": "Statut de la Liste Blanche",
+      "safe": "SÛR",
+      "notListed": "NON LISTÉ",
+      "networkContext": "2. Contexte Réseau & ISP",
+      "usageType": "Type d'Utilisation",
+      "markers": {
+        "tor": "TOR EXIT NODE",
+        "highRisk": "SOURCE À HAUT RISQUE",
+        "suspicious": "ACTIVITÉ SUSPECTE",
+        "whitelisted": "ENTITÉ EN LISTE BLANCHE"
+      },
+      "geolocation": "3. Localisation Géographique",
+      "geoNote": "Remarque: La géolocalisation est basée sur les registres publics de l'ISP.",
+      "reportsTimeline": "4. Chronologie des Rapports d'Abus",
+      "reportTable": {
+        "date": "Date de l'Événement",
+        "categories": "Catégories Détectées",
+        "comment": "Détail Analytique / Commentaire"
+      },
+      "noAbuse": "Aucun rapport d'abus détecté au cours des 30 derniers jours.",
+      "whoisTitle": "5. Analyse Forensique des Enregistrements Whois (Données Raw)",
+      "truncated": "Document tronqué: Affiche les {count} premiers sur {total} rapports."
+    },
+    "telnetDetail": {
+      "title": "Dossier d'Investigation de Session Telnet/SSH",
+      "overview": "Aperçu de la Session",
+      "sessionInfo": "Informations sur la Session",
+      "events": "Événements Totaux",
+      "authAttempts": "Tentatives d'Auth",
+      "commands": "Commandes Exécutées",
+      "duration": "Durée",
+      "timeline": "Chronologie Opérationnelle"
+    }
+  }
+}

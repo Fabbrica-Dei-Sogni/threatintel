@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="<%= locale.split('-')[0] %>">
 
 <head>
     <meta charset="UTF-8">
-    <title>ThreatIntel IP Intelligence Dossier - <%= data.ip %>
+    <title><%= t('reports.common.agencyName') %> - <%= t('reports.common.forensicReport') %> - <%= data.ip %>
     </title>
     <style>
         :root {
@@ -36,7 +36,6 @@
             max-width: 100%;
         }
 
-        /* Institutional Header */
         .header {
             display: flex;
             justify-content: space-between;
@@ -92,7 +91,6 @@
             font-family: monospace;
         }
 
-        /* Metadata & Timestamps */
         .meta-strip {
             display: flex;
             justify-content: space-between;
@@ -103,7 +101,6 @@
             margin-bottom: 25px;
         }
 
-        /* Section Styling */
         .section {
             margin-bottom: 25px;
         }
@@ -121,7 +118,6 @@
             color: var(--primary);
         }
 
-        /* Summary Grid */
         .summary-block {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -151,7 +147,6 @@
             font-weight: 800;
         }
 
-        /* Panels */
         .panel-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -178,7 +173,6 @@
             font-weight: 700;
         }
 
-        /* Incident Reports Table */
         .report-table {
             width: 100%;
             border-collapse: collapse;
@@ -266,7 +260,6 @@
 
 <body>
     <div class="document-container">
-        <!-- Header -->
         <header class="header">
             <div class="header-left">
                 <div class="logo-box">
@@ -277,8 +270,8 @@
                             <% } %>
                 </div>
                 <div class="title-group">
-                    <h1>ThreatIntelligence Agency</h1>
-                    <p>Divisione Intelligence Reputazionale • Report Forense IP</p>
+                    <h1><%= t('reports.common.agencyName') %></h1>
+                    <p><%= t('reports.ipDetail.division') %> • <%= t('reports.common.forensicReport') %></p>
                 </div>
             </div>
             <div class="header-right">
@@ -289,77 +282,75 @@
         </header>
 
         <div class="meta-strip">
-            <span><strong>Indirizzo IP Investigato:</strong>
+            <span><strong><%= t('reports.common.investigatedIp') %>:</strong>
                 <%= data.ip %>
             </span>
-            <span><strong>Data Documento:</strong>
+            <span><strong><%= t('reports.common.generatedAt') %>:</strong>
                 <%= data.generatedAt %>
             </span>
-            <span><strong>Classe Intelligence:</strong> Reputazione Globale</span>
+            <span><strong><%= t('reports.ipDetail.class') %>:</strong> <%= t('reports.ipDetail.classValue') %></span>
         </div>
 
-        <!-- Executive IP Intelligence -->
         <div class="section">
             <div class="section-header">
-                <div class="section-title">1. Analisi Reputazionale Esecutiva (AbuseIPDB Overview)</div>
+                <div class="section-title"><%= t('reports.ipDetail.summaryTitle') %></div>
             </div>
             <div class="summary-block">
                 <div class="summary-item">
-                    <span class="summary-label">Abuse Confidence Score</span>
+                    <span class="summary-label"><%= t('reports.attackDetail.abuseConfidence') %></span>
                     <span class="summary-value"
                         style="color: <%= data.abuse.confidenceScore > 50 ? 'var(--danger)' : (data.abuse.confidenceScore > 20 ? 'var(--warning)' : 'var(--success)') %>">
                         <%= data.abuse.confidenceScore %>%
                     </span>
                 </div>
                 <div class="summary-item">
-                    <span class="summary-label">Segnalazioni Totali</span>
+                    <span class="summary-label"><%= t('reports.attackDetail.totalReports') %></span>
                     <span class="summary-value">
                         <%= data.abuse.totalReports %>
                     </span>
                 </div>
                 <div class="summary-item">
-                    <span class="summary-label">Ultima Segnalazione</span>
+                    <span class="summary-label"><%= t('reports.attackDetail.lastReported') %></span>
                     <span class="summary-value" style="font-size: 11px;">
                         <%= data.abuse.lastReportedAt %>
                     </span>
                 </div>
                 <div class="summary-item">
-                    <span class="summary-label">Stato Whitelist</span>
+                    <span class="summary-label"><%= t('reports.ipDetail.whitelistStatus') %></span>
                     <span class="summary-value"
                         style="color: <%= data.abuse.isWhitelisted ? 'var(--success)' : 'var(--text-muted)' %>">
-                        <%= data.abuse.isWhitelisted ? 'SICURO' : 'NON LISTATO' %>
+                        <%= data.abuse.isWhitelisted ? t('reports.ipDetail.safe') : t('reports.ipDetail.notListed') %>
                     </span>
                 </div>
             </div>
         </div>
 
         <div class="panel-grid">
-            <!-- Network Context -->
             <div class="section">
                 <div class="section-header">
-                    <div class="section-title">2. Contesto di Rete & ISP</div>
+                    <div class="section-title"><%= t('reports.ipDetail.networkContext') %></div>
                 </div>
                 <table class="detail-table" style="margin-bottom: 10px;">
                     <tr>
-                        <th>ISP / Organizzazione</th>
+                        <th><%= t('reports.attackDetail.ispOrg') %></th>
                         <td>
                             <%= data.abuse.isp %>
                         </td>
                     </tr>
                     <tr>
-                        <th>Dominio</th>
+                        <th><%= t('reports.attackDetail.domain') %></th>
                         <td style="font-family: monospace;">
                             <%= data.abuse.domain %>
                         </td>
                     </tr>
                     <tr>
-                        <th>Tipologia Utilizzo</th>
+                        <th><%= t('reports.ipDetail.usageType') %></th>
                         <td>
                             <%= data.abuse.usageType %>
                         </td>
                     </tr>
                     <tr>
-                        <th>Nazione</th>
+                        <th><%= t('reports.attackDetail.country') %></th>
                         <td>
                             <%= data.details.country %> (<%= data.abuse.countryCode %>)
                         </td>
@@ -367,70 +358,67 @@
                 </table>
                 <div class="badge-list">
                     <% if (data.abuse.isTor) { %>
-                        <span class="badge badge-danger">TOR EXIT NODE</span>
+                        <span class="badge badge-danger"><%= t('reports.ipDetail.markers.tor') %></span>
                         <% } %>
                             <% if (data.abuse.confidenceScore> 80) { %>
-                                <span class="badge badge-danger">HIGH RISK SOURCE</span>
+                                <span class="badge badge-danger"><%= t('reports.ipDetail.markers.highRisk') %></span>
                                 <% } else if (data.abuse.confidenceScore> 30) { %>
-                                    <span class="badge badge-warning">SUSPICIOUS ACTIVITY</span>
+                                    <span class="badge badge-warning"><%= t('reports.ipDetail.markers.suspicious') %></span>
                                     <% } %>
                                         <% if (data.abuse.isWhitelisted) { %>
-                                            <span class="badge badge-primary">WHITELISTED ENTITY</span>
+                                            <span class="badge badge-primary"><%= t('reports.ipDetail.markers.whitelisted') %></span>
                                             <% } %>
                 </div>
             </div>
 
-            <!-- Geolocation Detail -->
             <div class="section">
                 <div class="section-header">
-                    <div class="section-title">3. Localizzazione Geografica</div>
+                    <div class="section-title"><%= t('reports.ipDetail.geolocation') %></div>
                 </div>
                 <table class="detail-table">
                     <tr>
-                        <th>Nazione (ISO)</th>
+                        <th><%= t('reports.attackDetail.country') %> (ISO)</th>
                         <td>
                             <%= data.details.country %>
                         </td>
                     </tr>
                     <tr>
-                        <th>Città / Area</th>
+                        <th><%= t('reports.attackDetail.city') %> / Area</th>
                         <td>
                             <%= data.details.city %>
                         </td>
                     </tr>
                     <tr>
-                        <th>Coordinate</th>
+                        <th><%= t('reports.attackDetail.coordinates') %></th>
                         <td>
                             <%= data.details.coordinates %>
                         </td>
                     </tr>
                 </table>
                 <div style="margin-top: 15px; font-size: 10px; color: var(--text-muted); font-style: italic;">
-                    Nota: La geolocalizzazione si basa sui record pubblici dell'ISP e potrebbe non corrispondere alla
-                    posizione fisica esatta dell'utente.
+                    <%= t('reports.ipDetail.geoNote') %>
                 </div>
             </div>
         </div>
 
-        <!-- Abuse Reports Timeline -->
         <div class="section">
             <div class="section-header">
-                <div class="section-title">4. Cronologia Segnalazioni di Abuso (Global History)</div>
+                <div class="section-title"><%= t('reports.ipDetail.reportsTimeline') %></div>
             </div>
             <% if (data.abuseReports && data.abuseReports.length> 0) { %>
                 <table class="report-table">
                     <thead>
                         <tr>
-                            <th width="15%">Data Evento</th>
-                            <th width="25%">Categorie Rilevate</th>
-                            <th>Dettaglio Analitico / Commento</th>
+                            <th width="15%"><%= t('reports.ipDetail.reportTable.date') %></th>
+                            <th width="25%"><%= t('reports.ipDetail.reportTable.categories') %></th>
+                            <th><%= t('reports.ipDetail.reportTable.comment') %></th>
                         </tr>
                     </thead>
                     <tbody>
                         <% data.abuseReports.slice(0, 15).forEach(function(r) { %>
                             <tr>
                                 <td style="font-weight: bold;">
-                                    <%= new Date(r.date).toLocaleDateString() %>
+                                    <%= new Date(r.date).toLocaleDateString(locale) %>
                                 </td>
                                 <td>
                                     <div class="badge-list">
@@ -450,21 +438,20 @@
                 </table>
                 <% if (data.abuseReports.length> 15) { %>
                     <div style="font-size: 9px; color: var(--text-muted); margin-top: 5px; text-align: right;">
-                        Documento troncato: Visualizzati primi 15 di <%= data.abuseReports.length %> report totali.
+                        <%= t('reports.ipDetail.truncated', { count: 15, total: data.abuseReports.length }) %>
                     </div>
                     <% } %>
                         <% } else { %>
                             <div
                                 style="background: var(--section-bg); padding: 15px; border: 1px solid var(--border); text-align: center; color: var(--text-muted); font-size: 12px;">
-                                Nessuna segnalazione di abuso rilevata negli ultimi 30 giorni per questo indirizzo IP.
+                                <%= t('reports.ipDetail.noAbuse') %>
                             </div>
                             <% } %>
         </div>
 
-        <!-- Forensic Whois -->
         <div class="section">
             <div class="section-header">
-                <div class="section-title">5. Analisi Forense dei Record Whois (Data Raw)</div>
+                <div class="section-title"><%= t('reports.ipDetail.whoisTitle') %></div>
             </div>
             <div class="whois-box">
                 <%= data.whois %>
@@ -472,10 +459,11 @@
         </div>
 
         <footer class="footer">
-            ThreatIntelligence Portfolio • Documento riservato ad uso investigativo • Generato da ThreatIntel Engine
+            <%= t('reports.common.proprietary') %>
         </footer>
-        <div class="page-counter">Pagina 1 di 1</div>
+        <div class="page-counter"><%= t('reports.common.page') %> 1 <%= t('reports.common.of') %> 1</div>
     </div>
 </body>
 
+</html>
 </html>

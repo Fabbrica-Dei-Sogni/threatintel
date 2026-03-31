@@ -125,7 +125,7 @@ import { useI18n } from 'vue-i18n';
 import { fetchReport } from '../api';
 import { ElMessage } from 'element-plus';
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 
 const props = defineProps({
   type: String, // 'attack' | 'ip' | 'telnet'
@@ -185,7 +185,8 @@ const handlePreview = async () => {
       type: props.type,
       ip: props.ip,
       sessionId: props.sessionId,
-      format: 'html'
+      format: 'html',
+      locale: locale.value
     });
     htmlContent.value = await blob.text();
     showPreview.value = true;
@@ -212,7 +213,8 @@ const handleDownload = async () => {
       type: props.type,
       ip: props.ip,
       sessionId: props.sessionId,
-      format: 'pdf'
+      format: 'pdf',
+      locale: locale.value
     });
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement('a');

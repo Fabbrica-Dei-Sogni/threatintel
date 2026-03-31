@@ -6,3 +6,4 @@ import { InjectionToken } from "tsyringe";
  */
 export const LOGGER_TOKEN: InjectionToken<any> = Symbol("Logger");
 export const LIFECYCLE_MANAGER_TOKEN = Symbol("LifecycleManager");
+export const I18N_TOKEN = Symbol("I18nService");

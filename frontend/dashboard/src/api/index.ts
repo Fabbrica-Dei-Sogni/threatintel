@@ -283,6 +283,7 @@ export async function fetchReport(params: {
     ip?: string;
     sessionId?: string;
     format?: string;
+    locale?: string;
 }): Promise<Blob> {
     try {
         const response = await apiClient.get('/reports/attack', {

@@ -1,15 +1,11 @@
 <template>
   <div class="dossier-toggle-container" :class="{ 'is-enabled': dossierStore.isEnabled }">
+    <!-- Tooltip is handled by the 'title' attribute -->
     <div class="toggle-btn shadow-xl" @click="toggleDossier" :title="t('common.recorderToggle')">
-      <!-- Fixed-width wrapper to ensure the icon is ALWAYS centered in the circle part -->
+      <!-- Fixed Investigator Icon -->
       <div class="icon-fixed-zone">
         <span class="main-icon">🕵️</span>
         <div class="status-led" :class="{ 'led-active': dossierStore.isEnabled }"></div>
-      </div>
-
-      <!-- Label revealed on expansion -->
-      <div class="label-reveal h-mobile">
-        {{ t('common.recorderToggle').toUpperCase() }}
       </div>
     </div>
   </div>
@@ -46,8 +42,9 @@ const toggleDossier = () => {
   border-radius: 50%;
   display: flex;
   align-items: center;
+  justify-content: center;
   cursor: pointer;
-  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.3s;
   overflow: hidden;
   color: #94a3b8;
 }
@@ -59,11 +56,9 @@ const toggleDossier = () => {
 }
 
 .toggle-btn:hover {
-  width: 190px;
-  border-radius: 32px;
   background: rgba(30, 41, 59, 1);
   border-color: #10b981;
-  color: #fff;
+  transform: translateY(-2px);
 }
 
 .icon-fixed-zone {
@@ -103,39 +98,21 @@ const toggleDossier = () => {
 .led-active {
   background: #10b981;
   box-shadow: 0 0 10px rgba(16, 185, 129, 0.8);
-  animation: led-pulse 2.5s infinite;
+  /* Animation disabled by default as per request */
 }
 
-@keyframes led-pulse {
+/* Optional slow pulse animation (kept here but not attached to led-active) */
+@keyframes led-pulse-slow {
   0% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.5; transform: scale(1.2); }
+  50% { opacity: 0.7; transform: scale(1.1); }
   100% { opacity: 1; transform: scale(1); }
 }
 
-.label-reveal {
-  font-size: 0.65rem;
-  font-weight: 900;
-  color: #fff;
-  letter-spacing: 1px;
-  opacity: 0;
-  transform: translateX(-10px);
-  transition: all 0.3s;
-  white-space: nowrap;
-  padding-right: 20px;
-}
-
-.toggle-btn:hover .label-reveal {
-  opacity: 1;
-  transform: translateX(0);
-}
-
 @media (max-width: 600px) {
-  .h-mobile { display: none; }
   .dossier-toggle-container {
     right: auto;
     left: 20px;
     bottom: 25px;
   }
-  .toggle-btn:hover { width: 52px; border-radius: 50%; padding: 0; }
 }
 </style>

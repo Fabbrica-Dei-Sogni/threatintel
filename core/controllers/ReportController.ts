@@ -39,4 +39,32 @@ export class ReportController {
             res.status(500).json({ error: error.message });
         }
     }
+
+    async generateCustomReport(req: Request, res: Response) {
+        try {
+            const { sections, locale } = req.body;
+            const format = (req.query.format as 'html' | 'pdf') || 'pdf';
+            const lang = (locale as string) || 'it-IT';
+
+            if (!sections || !Array.isArray(sections)) {
+                return res.status(400).json({ error: 'Sections array is required' });
+            }
+
+            const result = await this.reportService.generateCustomReport(sections, lang, format);
+
+            if (format === 'html') {
+                res.setHeader('Content-Type', 'text/html');
+                return res.send(result);
+            } else {
+                const pdfBuffer = result as Buffer;
+                res.setHeader('Content-Type', 'application/pdf');
+                res.setHeader('Content-Disposition', `attachment; filename=custom_dossier_${new Date().getTime()}.pdf`);
+                res.setHeader('Content-Length', pdfBuffer.length);
+                return res.send(pdfBuffer);
+            }
+        } catch (error: any) {
+            console.error('[ReportController] Errore:', error);
+            res.status(500).json({ error: error.message });
+        }
+    }
 }

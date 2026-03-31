@@ -25,11 +25,15 @@ describe('ReportService', () => {
     let mockI18nService: jest.Mocked<I18nService>;
 
     beforeEach(() => {
+        jest.clearAllMocks();
         mockLogger = { info: jest.fn(), error: jest.fn() } as any;
         mockThreatLogService = new ThreatLogService(mockLogger, {} as any, {} as any, {} as any, {} as any) as any;
         mockCowrieService = new CowrieService(mockLogger, {} as any) as any;
         mockIpDetailsService = new IpDetailsService(mockLogger) as any;
-        mockI18nService = { t: jest.fn().mockImplementation((key) => key) } as any;
+        mockI18nService = { 
+            t: jest.fn().mockImplementation((key) => key),
+            tm: jest.fn()
+        } as any;
 
         reportService = new ReportService(
             mockLogger,
@@ -93,5 +97,31 @@ describe('ReportService', () => {
 
         expect(result).toBe('<html>Test IP</html>');
         expect(mockIpDetailsService.getIpDetails).toHaveBeenCalledWith('1.2.3.4');
+    });
+
+    it('dovrebbe generare un dossier personalizzato (custom) con più sezioni', async () => {
+        const mockSections = [
+            { templateKey: 'clipboard.ipDetails.geo', data: { ip: '1.1.1.1' }, type: 'ip' },
+            { templateKey: 'clipboard.telnetDetail.summary', data: { sessionId: 'abc' }, type: 'telnet' }
+        ];
+
+        mockI18nService.tm.mockImplementation((key) => {
+            if (key === 'clipboard.ipDetails.geo') return ['IP: {ip}'];
+            if (key === 'clipboard.telnetDetail.summary') return ['SESS: {sessionId}'];
+            return null;
+        });
+
+        (ejs.renderFile as jest.Mock).mockResolvedValue('<html>Custom Dossier</html>');
+
+        const result = await reportService.generateCustomReport(mockSections, 'it-IT', 'html');
+
+        expect(result).toBe('<html>Custom Dossier</html>');
+        expect(mockI18nService.tm).toHaveBeenCalledWith('clipboard.ipDetails.geo', 'it-IT');
+        expect(mockI18nService.tm).toHaveBeenCalledWith('clipboard.telnetDetail.summary', 'it-IT');
+        
+        // Verifica che ejs sia chiamato con le sezioni arricchite (renderedText popolato)
+        const ejsArgs = (ejs.renderFile as jest.Mock).mock.calls[0][1];
+        expect(ejsArgs.sections[0].renderedText).toBe('IP: 1.1.1.1');
+        expect(ejsArgs.sections[1].renderedText).toBe('SESS: abc');
     });
 });

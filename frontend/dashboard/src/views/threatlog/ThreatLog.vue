@@ -70,10 +70,9 @@
                 <transition name="collapse">
                     <div v-if="toggles.request" class="section-body">
                         <p class="link">
-                            <strong @click="goToIpDetails(log.request.ip)" style="cursor: pointer;">{{ t('common.ip') }}:</strong>
                             <span @click="goToIpDetails(log.request.ip)" style="cursor: pointer;"> {{ log.request.ip ||
                                 t('common.notAvailable') }} </span>
-                            <span class="copy-btn-inline" @click.stop="copyToClipboard(log.request.ip)"
+                            <span class="copy-btn-inline" @click.stop="copyFormatted('clipboard.ip', { ip: log.request.ip })"
                                 :title="t('common.copyIp')">📋</span>
                         </p>
                         <p><strong>{{ t('threatLog.method') }}:</strong> {{ log.request.method ||
@@ -139,7 +138,7 @@ import { useClipboard } from '../../composable/useClipboard';
 import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
 
 const { t } = useI18n();
-const { copyToClipboard } = useClipboard();
+const { copyToClipboard, copyFormatted } = useClipboard();
 
 const route = useRoute()
 const router = useRouter()

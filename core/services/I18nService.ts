@@ -79,4 +79,26 @@ export class I18nService {
 
         return translated;
     }
+
+    /**
+     * Recupera l'oggetto grezzo della traduzione (senza interpolazione)
+     * Utile per recuperare array di blue-print (template multi-riga)
+     */
+    public tm(key: string, locale: string = this.defaultLocale): any {
+        let content = this.locales[locale] || this.locales[this.defaultLocale];
+        if (!content) return null;
+
+        const parts = key.split('.');
+        let value = content;
+        for (const part of parts) {
+            value = value?.[part];
+            if (value === undefined) break;
+        }
+
+        if (value === undefined && locale !== this.defaultLocale) {
+            return this.tm(key, this.defaultLocale);
+        }
+
+        return value;
+    }
 }

@@ -1,112 +1,204 @@
 {
-  "reports": {
-    "common": {
-      "agencyName": "ThreatIntelligence Agency",
-      "executiveReport": "Management-Bericht",
-      "forensicReport": "IP-Forensik-Bericht",
-      "investigativeDossier": "Investigatives Dossier",
-      "generatedAt": "Dokumentdatum",
-      "targetIp": "Ziel-IP-Adresse",
-      "investigatedIp": "Untersuchte IP-Adresse",
-      "subject": "Untersuchtes Subjekt",
-      "protocol": "Protokoll",
-      "httpInvestigative": "Investigative HTTP",
-      "telnetSshInvestigative": "Telnet/SSH Sitzung",
-      "globalReputation": "Globaler Ruf",
-      "confidential": "Nur für Analysten",
-      "notAvailable": "n.v.",
-      "unknown": "Unbekannt",
-      "page": "Seite",
-      "of": "von",
-      "footer": "ThreatIntel Intelligence Plattform - Management-Bericht",
-      "proprietary": "ThreatIntelligence Portfolio • Vertrauliches Dokument • Erstellt von ThreatIntel Engine"
+    "reports": {
+        "common": {
+            "agencyName": "ThreatIntelligence Agency",
+            "executiveReport": "Management-Bericht",
+            "forensicReport": "IP-Forensik-Bericht",
+            "investigativeDossier": "Investigatives Dossier",
+            "generatedAt": "Dokumentdatum",
+            "targetIp": "Ziel-IP-Adresse",
+            "investigatedIp": "Untersuchte IP-Adresse",
+            "subject": "Untersuchtes Subjekt",
+            "protocol": "Protokoll",
+            "httpInvestigative": "Investigative HTTP",
+            "telnetSshInvestigative": "Telnet/SSH Sitzung",
+            "globalReputation": "Globaler Ruf",
+            "confidential": "Nur für Analysten",
+            "notAvailable": "n.v.",
+            "unknown": "Unbekannt",
+            "page": "Seite",
+            "of": "von",
+            "footer": "ThreatIntel Intelligence Plattform - Management-Bericht",
+            "proprietary": "ThreatIntelligence Portfolio • Vertrauliches Dokument • Erstellt von ThreatIntel Engine",
+            "customDossier": "Benutzerdefiniertes Dossier",
+            "disclaimer": "Die in diesem Dossier enthaltenen Informationen sind zur exklusiven Verwendung durch autorisierte Analysten bestimmt."
+        },
+        "attackDetail": {
+            "title": "HTTP-Angriffsdetail-Dossier",
+            "division": "Abteilung für forensische Untersuchungen",
+            "summaryTitle": "1. Zusammenfassung des Angriffs",
+            "criticality": "Kritikalitätsstufe",
+            "dangerScore": "Gefahrenwert",
+            "eventVolume": "Ereignisvolumen",
+            "intensity": "Intensität (RPS)",
+            "operationalDetails": "2. Operative Angriffsdetails",
+            "detectedIntensity": "Erkannte Intensität",
+            "estimatedDuration": "Geschätzte Dauer",
+            "firstSeen": "Erstes Signal",
+            "lastSeen": "Letztes Signal",
+            "patterns": "Erkannte Technikmuster",
+            "noPatterns": "Keine spezifischen Muster",
+            "forensicFingerprint": "3. Forensischer Fingerabdruck",
+            "riskClass": "Risikoklasse",
+            "fingerprintScore": "Fingerabdruck-Score",
+            "botDetection": "Bot-Erkennung",
+            "isBot": "JA (Identifiziert)",
+            "notBot": "Nein / Unbekannt",
+            "dangerIndicators": "Gefahrenindikatoren",
+            "neutralAnalysis": "Neutrale Analyse",
+            "sourceIntelligence": "4. Quellen-Intelligenz (IP-Geolokalisierung & Ruf)",
+            "abuseConfidence": "Missbrauchsvertrauenswert",
+            "totalReports": "Meldungen insgesamt",
+            "lastReported": "Zuletzt gemeldet",
+            "ispOrg": "ISP / Org",
+            "country": "Land",
+            "city": "Stadt",
+            "domain": "Domain",
+            "coordinates": "Koordinaten",
+            "networkType": "Netzwerktyp",
+            "specialMarkers": "Spezielle Markierungen",
+            "confidenceRisk": "Vertrauensrisiko",
+            "riskLevels": {
+                "high": "HOHES RISIKO",
+                "suspicious": "VERDÄCHTIG",
+                "safe": "SICHER"
+            },
+            "timeline": "5. Chronologische forensische Ereignisse (Zeitachse)",
+            "timelineHeaders": {
+                "time": "Zeit",
+                "method": "Methode",
+                "resource": "Angeforderte Ressource (URI-Pfad)",
+                "status": "Statuscode",
+                "score": "Score"
+            },
+            "timelineNote": "Hinweis: Der Auszug zeigt die ersten 20 Ereignisse von insgesamt {count}."
+        },
+        "ipDetail": {
+            "title": "Intelligence Briefing: IP-forensische Untersuchung",
+            "division": "Abteilung für Reputationsintelligenz",
+            "summaryTitle": "1. Management-Reputationsanalyse",
+            "whitelistStatus": "Whitelist-Status",
+            "safe": "SICHER",
+            "notListed": "NICHT GELISTET",
+            "networkContext": "2. Netzwerkkontext & ISP",
+            "usageType": "Nutzungstyp",
+            "markers": {
+                "tor": "TOR EXIT NODE",
+                "highRisk": "HOCHRISIKOQUELLE",
+                "suspicious": "VERDÄCHTIGE AKTIVITÄT",
+                "whitelisted": "WHITELISTED ENTITY"
+            },
+            "geolocation": "3. Geografische Lokalisierung",
+            "geoNote": "Hinweis: Geolokalisierung basiert auf öffentlichen ISP-Datensätzen.",
+            "reportsTimeline": "4. Chronologie der Missbrauchsmeldungen",
+            "reportTable": {
+                "date": "Ereignisdatum",
+                "categories": "Erkannte Kategorien",
+                "comment": "Analytisches Detail / Kommentar"
+            },
+            "noAbuse": "Keine Missbrauchsmeldungen in den letzten 30 Tagen erkannt.",
+            "whoisTitle": "5. Forensische Analyse von Whois-Datensätzen (Rohdaten)",
+            "truncated": "Gekürztes Dokument: Zeige erste {count} von {total} Meldungen."
+        },
+        "telnetDetail": {
+            "title": "Telnet/SSH-Sitzung - Investigatives Dossier",
+            "overview": "Sitzungsübersicht",
+            "sessionInfo": "Sitzungsinformationen",
+            "events": "Ereignisse insgesamt",
+            "authAttempts": "Auth-Versuche",
+            "commands": "Ausgeführte Befehle",
+            "duration": "Dauer",
+            "timeline": "Operative Zeitachse"
+        }
     },
-    "attackDetail": {
-      "title": "HTTP-Angriffsdetail-Dossier",
-      "division": "Abteilung für forensische Untersuchungen",
-      "summaryTitle": "1. Zusammenfassung des Angriffs",
-      "criticality": "Kritikalitätsstufe",
-      "dangerScore": "Gefahrenwert",
-      "eventVolume": "Ereignisvolumen",
-      "intensity": "Intensität (RPS)",
-      "operationalDetails": "2. Operative Angriffsdetails",
-      "detectedIntensity": "Erkannte Intensität",
-      "estimatedDuration": "Geschätzte Dauer",
-      "firstSeen": "Erstes Signal",
-      "lastSeen": "Letztes Signal",
-      "patterns": "Erkannte Technikmuster",
-      "noPatterns": "Keine spezifischen Muster",
-      "forensicFingerprint": "3. Forensischer Fingerabdruck",
-      "riskClass": "Risikoklasse",
-      "fingerprintScore": "Fingerabdruck-Score",
-      "botDetection": "Bot-Erkennung",
-      "isBot": "JA (Identifiziert)",
-      "notBot": "Nein / Unbekannt",
-      "dangerIndicators": "Gefahrenindikatoren",
-      "neutralAnalysis": "Neutrale Analyse",
-      "sourceIntelligence": "4. Quellen-Intelligenz (IP-Geolokalisierung & Ruf)",
-      "abuseConfidence": "Missbrauchsvertrauenswert",
-      "totalReports": "Meldungen insgesamt",
-      "lastReported": "Zuletzt gemeldet",
-      "ispOrg": "ISP / Org",
-      "country": "Land",
-      "city": "Stadt",
-      "domain": "Domain",
-      "coordinates": "Koordinaten",
-      "networkType": "Netzwerktyp",
-      "specialMarkers": "Spezielle Markierungen",
-      "confidenceRisk": "Vertrauensrisiko",
-      "riskLevels": {
-        "high": "HOHES RISIKO",
-        "suspicious": "VERDÄCHTIG",
-        "safe": "SICHER"
-      },
-      "timeline": "5. Chronologische forensische Ereignisse (Zeitachse)",
-      "timelineHeaders": {
-        "time": "Zeit",
-        "method": "Methode",
-        "resource": "Angeforderte Ressource (URI-Pfad)",
-        "status": "Statuscode",
-        "score": "Score"
-      },
-      "timelineNote": "Hinweis: Der Auszug zeigt die ersten 20 Ereignisse von insgesamt {count}."
-    },
-    "ipDetail": {
-      "title": "Intelligence Briefing: IP-forensische Untersuchung",
-      "division": "Abteilung für Reputationsintelligenz",
-      "summaryTitle": "1. Management-Reputationsanalyse",
-      "whitelistStatus": "Whitelist-Status",
-      "safe": "SICHER",
-      "notListed": "NICHT GELISTET",
-      "networkContext": "2. Netzwerkkontext & ISP",
-      "usageType": "Nutzungstyp",
-      "markers": {
-        "tor": "TOR EXIT NODE",
-        "highRisk": "HOCHRISIKOQUELLE",
-        "suspicious": "VERDÄCHTIGE AKTIVITÄT",
-        "whitelisted": "WHITELISTED ENTITY"
-      },
-      "geolocation": "3. Geografische Lokalisierung",
-      "geoNote": "Hinweis: Geolokalisierung basiert auf öffentlichen ISP-Datensätzen.",
-      "reportsTimeline": "4. Chronologie der Missbrauchsmeldungen",
-      "reportTable": {
-        "date": "Ereignisdatum",
-        "categories": "Erkannte Kategorien",
-        "comment": "Analytisches Detail / Kommentar"
-      },
-      "noAbuse": "Keine Missbrauchsmeldungen in den letzten 30 Tagen erkannt.",
-      "whoisTitle": "5. Forensische Analyse von Whois-Datensätzen (Rohdaten)",
-      "truncated": "Gekürztes Dokument: Zeige erste {count} von {total} Meldungen."
-    },
-    "telnetDetail": {
-      "title": "Telnet/SSH-Sitzung - Investigatives Dossier",
-      "overview": "Sitzungsübersicht",
-      "sessionInfo": "Sitzungsinformationen",
-      "events": "Ereignisse insgesamt",
-      "authAttempts": "Auth-Versuche",
-      "commands": "Ausgeführte Befehle",
-      "duration": "Dauer",
-      "timeline": "Operative Zeitachse"
+    "clipboard": {
+        "ipDetails": {
+            "geo": [
+                "--- GEOGRAFISCHE INTELLIGENZ ---",
+                "IP: {ip}",
+                "Land: {country}",
+                "Stadt/Region: {city}, {region}",
+                "Zeitzone: {timezone}",
+                "GPS-Koordinaten: {gps}",
+                "-------------------------------"
+            ],
+            "net": [
+                "--- NETZWERKINFORMATIONEN ---",
+                "IP: {ip}",
+                "Organisation: {org}",
+                "Hostname/ISP: {hostname}",
+                "-----------------------------"
+            ],
+            "abuse": [
+                "--- MISSBRAUCHS-ZUSAMMENFASSUNG (ABUSEIPDB) ---",
+                "IP: {ip}",
+                "Vertrauenswert: {score}%",
+                "In Blacklist: {listed}",
+                "Gesamtzahl Meldungen: {total}",
+                "Letzte Meldung: {lastReport}",
+                "-----------------------------------------------"
+            ],
+            "whois": [
+                "--- VOLLSTÄNDIGE WHOIS-DATEN ---",
+                "IP: {ip}",
+                "",
+                "{rawData}",
+                "--------------------------------"
+            ]
+        },
+        "attackDetail": {
+            "summary": [
+                "--- TAKTISCHES HUD: ANGRIFFS-ZUSAMMENFASSUNG ---",
+                "Ziel-IP: {ip}",
+                "Defcon-Stufe: {defcon} ({score}/10)",
+                "",
+                "[HAUPTMETRIKEN]",
+                "- Gesamt-Logs: {totalLogs}",
+                "- Dauer: {duration}",
+                "- Durchschnittliche RPS: {rps}",
+                "",
+                "[ANGRIFFSPROFIL]",
+                "- Techniken: {techniques}",
+                "- Zuerst gesehen: {firstSeen}",
+                "- Zuletzt gesehen: {lastSeen}",
+                "- Intensität: {intensity}",
+                "- Durchschnittlicher Forensic Score: {avgScore}",
+                "------------------------------------------------"
+            ],
+            "log": [
+                "--- VOLLSTÄNDIGES THREAT-LOG-DETAIL ---",
+                "Zeitstempel: {timestamp}",
+                "Methode: {method}",
+                "URL: {url}",
+                "Forensic Score: {score}",
+                "Indikatoren: {indicators}",
+                "User Agent: {userAgent}",
+                "Quell-IP: {ip}",
+                "",
+                "Payload:",
+                "{payload}",
+                "---------------------------------------"
+            ]
+        },
+        "telnetDetail": {
+            "summary": [
+                "--- TELNET-SITZUNGSZUSAMMENFASSUNG ---",
+                "Sitzungs-ID: {sessionId}",
+                "Host-IP: {ip}",
+                "Zeitfenster: {timeWindow}",
+                "Herkunft: {origin}",
+                "Gesamt-Ereignisse: {totalEvents}",
+                "--------------------------------------"
+            ],
+            "timelineRow": "[{timestamp}] {eventName}\n> {message}{details}"
+        },
+        "ip": [
+            "--- SUBJEKTIDENTIFIZIERUNG ---",
+            "IP-ADRESSE: {ip}",
+            "-------------------------------"
+        ],
+        "generic": "{text}",
+        "attackSummary": "RIEPILOGO ATTACCO:\nIP: {ip}\nPericolo: {dangerLevel} ({dangerScore})\nLogs: {totaleLogs}\nDurata: {duration}\nRPS: {rps}",
+        "attackTechnique": "Tecnica Rilevata: {tech}"
     }
-  }
 }

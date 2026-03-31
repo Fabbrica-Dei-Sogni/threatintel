@@ -8,6 +8,7 @@ import ejs from 'ejs';
 import puppeteer from 'puppeteer';
 import { IpDetailsService } from './IpDetailsService';
 import { I18nService } from './I18nService';
+import fs from 'fs';
 
 export type ReportType = 'attack' | 'telnet' | 'ip';
 
@@ -65,6 +66,74 @@ export class ReportService {
         if (format === 'html') return html;
 
         return await this.convertToPdf(html);
+    }
+
+    /**
+     * Genera un Dossier Investigativo Personalizzato partendo da una lista di sezioni catturate
+     */
+    async generateCustomReport(sections: any[], locale: string, format: 'html' | 'pdf' = 'pdf'): Promise<Buffer | string> {
+        this.logger.info(`[ReportService] Generazione Custom Dossier (${sections.length} sezioni) [${locale}]`);
+
+        const templatePath = path.join(__dirname, `../templates/reports/custom-dossier.ejs`);
+        
+        let logoBase64 = '';
+        try {
+            const logoPath = path.join(__dirname, '../public/assets/intelligence-logo.png');
+            const logoBuffer = fs.readFileSync(logoPath);
+            logoBase64 = `data:image/png;base64,${logoBuffer.toString('base64')}`;
+        } catch (e) {
+            this.logger.error(`[ReportService] Errore caricamento logo: ${e}`);
+        }
+
+        const t = (key: string, params?: any) => this.i18n.t(key, locale, params);
+
+        // Prepariamo le sezioni renderizzando il testo lato server per massima precisione
+        const enrichedSections = sections.map(s => {
+            return {
+                ...s,
+                renderedText: this.renderSection(s.templateKey, s.data, locale)
+            };
+        });
+
+        const html = await ejs.renderFile(templatePath, { 
+            sections: enrichedSections, 
+            logoBase64, 
+            t, 
+            locale 
+        });
+
+        if (format === 'html') return html;
+
+        return await this.convertToPdf(html);
+    }
+
+    /**
+     * Helper per renderizzare una sezione basata su template a blocchi (blueprint)
+     */
+    private renderSection(templateKey: string, data: any, locale: string): string {
+        try {
+            const template = this.i18n.tm(templateKey, locale);
+            if (!template) return `[Template Error: ${templateKey}]`;
+
+            const replaceTokens = (text: string, d: any) => {
+                return text.replace(/{(\w+)}/g, (match, key) => {
+                    const value = d[key];
+                    return (value !== undefined && value !== null && value !== '') 
+                        ? String(value) 
+                        : this.i18n.t('reports.common.notAvailable', locale);
+                });
+            };
+
+            if (Array.isArray(template)) {
+                return template.map(line => replaceTokens(line, data)).join('\n');
+            } else if (typeof template === 'string') {
+                return replaceTokens(template, data);
+            }
+            return `[Invalid Template Format: ${templateKey}]`;
+        } catch (e) {
+            this.logger.error(`[ReportService] Errore rendering sezione ${templateKey}: ${e}`);
+            return `[Rendering Error]`;
+        }
     }
 
     private async getAttackReportData(ip: string, locale: string) {

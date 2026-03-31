@@ -6,6 +6,9 @@
         "confirm": "Potwierdź",
         "delete": "Usuń",
         "edit": "Edytuj",
+        "on": "WŁĄCZONY",
+        "off": "WYŁĄCZONY",
+        "recorderToggle": "Rejestrator Sądowy",
         "loading": "Ładowanie...",
         "error": "Błąd",
         "errorLoadingData": "Błąd ładowania danych",
@@ -45,7 +48,17 @@
         "generateReport": "Generuj dossier",
         "downloadPdf": "Pobierz PDF",
         "viewHtml": "Zobacz HTML",
-        "preview": "Podgląd"
+        "preview": "Podgląd",
+        "addedToDossier": "Dodano do własnego dossier",
+        "dossier": "Własne dossier",
+        "startRecording": "Rozpocznij nagrywanie",
+        "stopRecording": "Zatrzymaj nagrywanie",
+        "clearDossier": "Wyczyść dossier",
+        "generateDossier": "Generuj dossier",
+        "previewDossier": "Podgląd dossier",
+        "recordingActive": "NAGRYWANIE AKTYWNE",
+        "noSectionsCaptured": "Nie uchwycono żadnych sekcji",
+        "sectionsCaptured": "Uchwycono {count} sekcji"
     },
     "auth": {
         "login": "Zaloguj się",
@@ -559,6 +572,14 @@
                 "----------------------------------"
             ],
             "timelineRow": "[{timestamp}] {eventName}\n> {message}{details}"
-        }
+        },
+        "ip": [
+            "--- IDENTYFIKACJA PODMIOTU ---",
+            "ADRES IP: {ip}",
+            "-------------------------------"
+        ],
+        "generic": "{text}",
+        "attackSummary": "RIEPILOGO ATTACCO:\nIP: {ip}\nPericolo: {dangerLevel} ({dangerScore})\nLogs: {totaleLogs}\nDurata: {duration}\nRPS: {rps}",
+        "attackTechnique": "Tecnica Rilevata: {tech}"
     }
 }

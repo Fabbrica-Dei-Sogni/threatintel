@@ -2,6 +2,9 @@
   <div id="app-container">
     <router-view />
 
+    <DossierRecorder />
+    <DossierToggle />
+
     <!-- Floating Settings Button -->
     <router-link to="/settings" class="floating-settings" :title="t('nav.settings')">
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
@@ -18,6 +21,8 @@
 <script setup lang="ts">
 import { onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
+import DossierRecorder from './components/DossierRecorder.vue';
+import DossierToggle from './components/DossierToggle.vue';
 
 const { t } = useI18n();
 

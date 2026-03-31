@@ -277,7 +277,7 @@
                                 <div class="tech-wrapper">
                                     <span v-for="tech in attack.attackPatterns" :key="tech" class="tech-chip">
                                         <span class="tech-name">{{ tech }}</span>
-                                        <button @click.stop="copyToClipboard(tech)" class="btn-copy-mini-tech"
+                                        <button @click.stop="copyFormatted('clipboard.attackTechnique', { tech: tech })" class="btn-copy-mini-tech"
                                             :title="t('common.copyToClipboard')">📋</button>
                                     </span>
                                 </div>
@@ -287,7 +287,7 @@
                                     <span class="detail-link" @click="goToIpDetails(attack.request.ip)"
                                         style="cursor:pointer;" :title="t('common.infoIp')">{{ attack.request.ip
                                         }}</span>
-                                    <button @click.stop="copyToClipboard(attack.request.ip)" class="btn-copy-ip"
+                                    <button @click.stop="copyFormatted('clipboard.ip', { ip: attack.request.ip })" class="btn-copy-ip"
                                         :title="t('common.copyToClipboard')">📋</button>
                                     <button @click.stop="setIpFilter(attack.request.ip)" class="btn-copy-ip"
                                         :title="t('common.copyToFilter')">⬇️</button>
@@ -349,7 +349,7 @@ import { useAttacksFilter } from '../../composable/useAttacksFilter';
 import { useClipboard } from '../../composable/useClipboard';
 import { useI18n } from 'vue-i18n';
 
-const { copyToClipboard } = useClipboard();
+const { copyToClipboard, copyFormatted } = useClipboard();
 const { t } = useI18n();
 import ProtocolSelector from '../../components/common/ProtocolSelector.vue';
 import ViewToggle from '../../components/common/ViewToggle.vue';

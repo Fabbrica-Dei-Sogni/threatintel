@@ -6,6 +6,9 @@
         "confirm": "Confirmer",
         "delete": "Supprimer",
         "edit": "Modifier",
+        "on": "MARCHE",
+        "off": "ARRÊT",
+        "recorderToggle": "Enregistreur Forensique",
         "loading": "Chargement...",
         "error": "Erreur",
         "errorLoadingData": "Erreur de chargement des données",
@@ -45,7 +48,17 @@
         "generateReport": "Générer un dossier",
         "downloadPdf": "Télécharger le PDF",
         "viewHtml": "Voir le HTML",
-        "preview": "Aperçu"
+        "preview": "Aperçu",
+        "addedToDossier": "Ajouté au dossier personnalisé",
+        "dossier": "Dossier personnalisé",
+        "startRecording": "Démarrer l'enregistrement",
+        "stopRecording": "Arrêter l'enregistrement",
+        "clearDossier": "Vider le dossier",
+        "generateDossier": "Générer le dossier",
+        "previewDossier": "Aperçu du dossier",
+        "recordingActive": "ENREGISTREMENT ACTIF",
+        "noSectionsCaptured": "Aucune section capturée",
+        "sectionsCaptured": "{count} sections capturées"
     },
     "auth": {
         "login": "Connexion",
@@ -559,6 +572,14 @@
                 "------------------------------------"
             ],
             "timelineRow": "[{timestamp}] {eventName}\n> {message}{details}"
-        }
+        },
+        "ip": [
+            "--- IDENTIFICATION DU SUJET ---",
+            "ADRESSE IP: {ip}",
+            "-------------------------------"
+        ],
+        "generic": "{text}",
+        "attackSummary": "RIEPILOGO ATTACCO:\nIP: {ip}\nPericolo: {dangerLevel} ({dangerScore})\nLogs: {totaleLogs}\nDurata: {duration}\nRPS: {rps}",
+        "attackTechnique": "Tecnica Rilevata: {tech}"
     }
 }

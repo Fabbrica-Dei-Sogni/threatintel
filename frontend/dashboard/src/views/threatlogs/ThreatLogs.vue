@@ -145,7 +145,7 @@
                   <span class="info-btn" @click="goToIpDetails(log.request.ip)" style="cursor: pointer;"
                     :title="t('common.infoIp')">{{
                       log.request.ip }}</span>
-                  <button @click.stop="copyToClipboard(log.request.ip)" class="btn-copy-ip"
+                  <button @click.stop="copyFormatted('clipboard.ip', { ip: log.request.ip })" class="btn-copy-ip"
                     :title="t('common.copyToClipboard')">📋</button>
                   <button @click.stop="setIpFilter(log.request.ip)" class="btn-copy-ip"
                     :title="t('common.copyToFilter')">⬇️</button>
@@ -214,7 +214,7 @@ import ThreadLogChart from '../../components/ThreadLogChart.vue';
 import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
 
 const { t } = useI18n();
-const { copyToClipboard } = useClipboard();
+const { copyToClipboard, copyFormatted } = useClipboard();
 const router = useRouter();
 
 // Props iniziali

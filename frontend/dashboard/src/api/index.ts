@@ -296,3 +296,32 @@ export async function fetchReport(params: {
         throw error;
     }
 }
+/**
+ * Genera un dossier personalizzato (Custom Dossier)
+ * @param payload { sections: Array, locale: string }
+ * @param format 'pdf' | 'html'
+ */
+export async function fetchCustomReport(payload: any, format: string = 'pdf'): Promise<any> {
+    try {
+        const response = await apiClient.post('/reports/custom', payload, {
+            params: { format },
+            responseType: format === 'pdf' ? 'blob' : 'text'
+        });
+
+        if (format === 'pdf') {
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `custom_dossier_${new Date().getTime()}.pdf`);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            return null;
+        }
+
+        return response.data;
+    } catch (error) {
+        console.error('[fetchCustomReport] Error:', error);
+        throw error;
+    }
+}

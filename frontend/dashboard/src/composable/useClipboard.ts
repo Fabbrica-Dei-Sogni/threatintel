@@ -1,10 +1,12 @@
 import { ElMessage } from 'element-plus';
 import { useI18n } from 'vue-i18n';
+import { useDossierStore } from '../stores/dossier';
 
 export function useClipboard() {
     const { t, tm } = useI18n();
+    const dossierStore = useDossierStore();
 
-    const copyToClipboard = async (text: string) => {
+    const copyToClipboard = async (text: string, fromFormatted = false) => {
         if (!text) return;
 
         try {
@@ -45,6 +47,17 @@ export function useClipboard() {
                     throw new Error('Fallback copy failed');
                 }
             }
+
+            // [REC] Integrazione Automatica Dossier
+            // Se siamo in modalità REC e NON proviene da copyFormatted, registriamo come generico
+            if (dossierStore.isRecording && !fromFormatted) {
+                dossierStore.addSection('clipboard.generic', { text }, text);
+                ElMessage({
+                    message: `🔴 [REC] ${t('common.addedToDossier')}`,
+                    type: 'warning',
+                    duration: 3000
+                });
+            }
         } catch (err) {
             console.error('Failed to copy: ', err);
             ElMessage({
@@ -57,9 +70,6 @@ export function useClipboard() {
 
     /**
      * Rende un template i18n in una stringa piatta senza copiarla negli appunti
-     * @param templateKey La chiave i18n
-     * @param data Dati per i placeholder
-     * @returns La stringa renderizzata
      */
     const renderTemplate = (templateKey: string, data: Record<string, any>): string => {
         try {
@@ -91,11 +101,22 @@ export function useClipboard() {
 
     /**
      * Copia negli appunti un testo formattato basato su un template i18n
+     * Se siamo in REC, aggiunge automaticamente la sezione atomica (chiave + dati)
      */
     const copyFormatted = async (templateKey: string, data: Record<string, any>) => {
         const rendered = renderTemplate(templateKey, data);
         if (rendered) {
-            await copyToClipboard(rendered);
+            // Chiamiamo copyToClipboard passando true per indicare che è già processata
+            await copyToClipboard(rendered, true);
+
+            if (dossierStore.isRecording) {
+                dossierStore.addSection(templateKey, data, rendered);
+                ElMessage({
+                    message: `🔴 [REC] ${t('common.addedToDossier')}`,
+                    type: 'warning',
+                    duration: 3000
+                });
+            }
         } else {
             console.warn(`[useClipboard] Template non trovato o vuoto per la chiave: ${templateKey}`);
         }

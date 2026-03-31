@@ -9,6 +9,7 @@ export default (reportController: ReportController) => {
      * @desc Genera un report dossier per un attacco (IP o sessionId)
      */
     router.get('/api/reports/attack', (req, res) => reportController.generateAttackReport(req, res));
+    router.post('/api/reports/custom', (req, res) => reportController.generateCustomReport(req, res));
 
     return router;
 };

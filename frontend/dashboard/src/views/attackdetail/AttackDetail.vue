@@ -20,7 +20,7 @@
                 <h2 class="attacker-ip">
                     <span class="animated-icon pulse-magma" style="font-size: 0.8em;">🎯</span>
                     {{ attack.request.ip }}
-                    <span class="copy-btn" @click.stop="copyToClipboard(attack.request.ip)" :title="t('common.copyIp')">📋</span>
+                    <span class="copy-btn" @click.stop="copyFormatted('clipboard.ip', { ip: attack.request.ip })" :title="t('common.copyIp')">📋</span>
                 </h2>
             </div>
             <button @click="goToIpDetails(attack.request.ip)" class="attacker-action-btn">
@@ -38,7 +38,7 @@
                     <h2>{{ t('attackDetail.hudTitle').toUpperCase() }}</h2>
                 </div>
                 <div class="header-actions">
-                    <span class="copy-log-btn" @click.stop="copyAttackSummary()" :title="t('common.copy')">📋</span>
+                    <span class="copy-log-btn" @click.stop="copyAttackSummaryFormatted()" :title="t('common.copy')">📋</span>
                     <span class="arrow" :class="{ open: toggles.summary }"></span>
                 </div>
             </div>
@@ -561,7 +561,7 @@ const loadAttackData = async () => {
 
 onMounted(loadAttackData)
 
-const copyAttackSummary = () => {
+const copyAttackSummaryFormatted = () => {
     if (!attack.value) return;
     copyFormatted('clipboard.attackDetail.summary', {
         ip: attack.value.request?.ip,

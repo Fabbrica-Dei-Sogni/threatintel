@@ -400,7 +400,7 @@ function toggleReport(id) {
 // Local helper for main IP copy with visual feedback
 async function copyMainIp(text) {
   if (!text) return;
-  await copyToClipboard(text);
+  await copyFormatted('clipboard.ip', { ip: text });
   copiedIp.value = true;
   setTimeout(() => {
     copiedIp.value = false;

@@ -6,6 +6,9 @@
         "confirm": "Bestätigen",
         "delete": "Löschen",
         "edit": "Bearbeiten",
+        "on": "AN",
+        "off": "AUS",
+        "recorderToggle": "Forensischer Rekorder",
         "loading": "Laden...",
         "error": "Fehler",
         "errorLoadingData": "Fehler beim Laden der Daten",
@@ -45,7 +48,17 @@
         "generateReport": "Dossier erstellen",
         "downloadPdf": "PDF herunterladen",
         "viewHtml": "HTML anzeigen",
-        "preview": "Vorschau"
+        "preview": "Vorschau",
+        "addedToDossier": "Zum benutzerdefinierten Dossier hinzugefügt",
+        "dossier": "Benutzerdefiniertes Dossier",
+        "startRecording": "Aufnahme starten",
+        "stopRecording": "Aufnahme stoppen",
+        "clearDossier": "Dossier leeren",
+        "generateDossier": "Dossier generieren",
+        "previewDossier": "Dossier-Vorschau",
+        "recordingActive": "AUFNAHME AKTIV",
+        "noSectionsCaptured": "Keine Abschnitte erfasst",
+        "sectionsCaptured": "{count} Abschnitte erfasst"
     },
     "auth": {
         "login": "Anmelden",
@@ -559,6 +572,14 @@
                 "--------------------------------------"
             ],
             "timelineRow": "[{timestamp}] {eventName}\n> {message}{details}"
-        }
+        },
+        "ip": [
+            "--- SUBJEKTIDENTIFIZIERUNG ---",
+            "IP-ADRESSE: {ip}",
+            "-------------------------------"
+        ],
+        "generic": "{text}",
+        "attackSummary": "RIEPILOGO ATTACCO:\nIP: {ip}\nPericolo: {dangerLevel} ({dangerScore})\nLogs: {totaleLogs}\nDurata: {duration}\nRPS: {rps}",
+        "attackTechnique": "Tecnica Rilevata: {tech}"
     }
 }

@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="<%= locale.split('-')[0] %>">
+<head>
+    <meta charset="UTF-8">
+    <title><%= t('reports.common.agencyName') %> - <%= t('reports.common.customDossier') %></title>
+    <style>
+        :root {
+            --bg-paper: #ffffff;
+            --text-main: #1a202c;
+            --text-muted: #4a5568;
+            --primary: #2c5282;
+            --danger: #c53030;
+            --warning: #b7791f;
+            --success: #2f855a;
+            --border: #e2e8f0;
+            --section-bg: #f9fafb;
+        }
+
+        @page {
+            margin: 15mm;
+            size: A4;
+        }
+
+        body {
+            font-family: 'Courier New', Courier, monospace; /* Font monospaziato per stile 'hacking/forensic' */
+            background-color: var(--bg-paper);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            line-height: 1.4;
+            font-size: 13px;
+        }
+
+        .document-container {
+            max-width: 100%;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 3px solid var(--text-main);
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-box {
+            width: 60px;
+            height: 60px;
+            border: 1px solid var(--border);
+            padding: 2px;
+            background: #fff;
+        }
+
+        .logo-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .title-group h1 {
+            margin: 0;
+            font-size: 24px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 900;
+        }
+
+        .title-group p {
+            margin: 4px 0 0;
+            font-size: 11px;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+
+        .header-right {
+            text-align: right;
+        }
+
+        .security-stamp {
+            display: inline-block;
+            border: 2px solid var(--danger);
+            color: var(--danger);
+            font-weight: 900;
+            font-size: 14px;
+            padding: 5px 10px;
+            text-transform: uppercase;
+            transform: rotate(-1deg);
+            margin-bottom: 10px;
+        }
+
+        .dossier-info {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .section-card {
+            margin-bottom: 25px;
+            border: 1px solid var(--border);
+            background-color: var(--section-bg);
+            page-break-inside: avoid;
+        }
+
+        .section-header {
+            background-color: var(--text-main);
+            color: #fff;
+            padding: 8px 15px;
+            font-weight: 900;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-title {
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .section-timestamp {
+            font-size: 10px;
+            opacity: 0.8;
+        }
+
+        .section-body {
+            padding: 15px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-size: 12px;
+            color: var(--text-main);
+            background: #fdfdfd;
+        }
+
+        .footer {
+            margin-top: 40px;
+            border-top: 1px solid var(--border);
+            padding-top: 10px;
+            text-align: center;
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+
+        .blueprint-container {
+            font-family: inherit;
+        }
+    </style>
+</head>
+<body>
+    <div class="document-container">
+        <!-- Document Header -->
+        <div class="header">
+            <div class="header-left">
+                <div class="logo-box">
+                    <% if (logoBase64) { %>
+                        <img src="<%= logoBase64 %>" alt="Agency Logo" class="logo-img">
+                    <% } %>
+                </div>
+                <div class="title-group">
+                    <h1><%= t('reports.common.agencyName') %></h1>
+                    <p><%= t('reports.common.customDossier') %></p>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="security-stamp">INTERNAL RECIPIENT ONLY</div>
+                <div class="dossier-info">
+                    ID: CUSTOM-<%= new Date().getTime() %><br>
+                    DATE: <%= new Date().toLocaleString(locale) %><br>
+                    LOCALE: <%= locale %>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sections Content -->
+        <div class="content">
+            <% if (sections && sections.length > 0) { %>
+                <% sections.forEach((section, index) => { %>
+                    <div class="section-card">
+                        <div class="section-header">
+                            <span class="section-title">
+                                [SECTION #<%= index + 1 %>] <%= section.type.toUpperCase() %> ANALYSIS
+                            </span>
+                            <span class="section-timestamp">CAPTURED AT: <%= section.timestamp ? new Date(section.timestamp).toLocaleTimeString() : 'N/A' %></span>
+                        </div>
+                        <div class="section-body">
+                            <div class="blueprint-container">
+<%= section.renderedText %>
+                            </div>
+                        </div>
+                    </div>
+                <% }); %>
+            <% } else { %>
+                <p>Nessun dato catturato in questo dossier.</p>
+            <% } %>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <%= t('reports.common.disclaimer') %>
+        </div>
+    </div>
+</body>
+</html>

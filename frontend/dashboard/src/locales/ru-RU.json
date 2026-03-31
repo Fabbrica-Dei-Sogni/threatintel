@@ -6,6 +6,9 @@
         "confirm": "Подтвердить",
         "delete": "Удалить",
         "edit": "Редактировать",
+        "on": "ВКЛ",
+        "off": "ВЫКЛ",
+        "recorderToggle": "Форензик-регистратор",
         "loading": "Загрузка...",
         "error": "Ошибка",
         "errorLoadingData": "Ошибка загрузки данных",
@@ -45,7 +48,17 @@
         "generateReport": "Создать досье",
         "downloadPdf": "Скачать PDF",
         "viewHtml": "Просмотреть HTML",
-        "preview": "Предварительный просмотр"
+        "preview": "Предпросмотр",
+        "addedToDossier": "Добавлено в пользовательское досье",
+        "dossier": "Пользовательское досье",
+        "startRecording": "Начать запись",
+        "stopRecording": "Остановить запись",
+        "clearDossier": "Очистить досье",
+        "generateDossier": "Создать досье",
+        "previewDossier": "Предпросмотр досье",
+        "recordingActive": "ЗАПИСЬ АКТИВНА",
+        "noSectionsCaptured": "Разделы не захвачены",
+        "sectionsCaptured": "Захвачено разделов: {count}"
     },
     "auth": {
         "login": "Войти",
@@ -559,6 +572,14 @@
                 "----------------------------"
             ],
             "timelineRow": "[{timestamp}] {eventName}\n> {message}{details}"
-        }
+        },
+        "ip": [
+            "--- ИДЕНТИФИКАЦИЯ СУБЪЕКТА ---",
+            "IP-АДРЕС: {ip}",
+            "-------------------------------"
+        ],
+        "generic": "{text}",
+        "attackSummary": "RIEPILOGO ATTACCO:\nIP: {ip}\nPericolo: {dangerLevel} ({dangerScore})\nLogs: {totaleLogs}\nDurata: {duration}\nRPS: {rps}",
+        "attackTechnique": "Tecnica Rilevata: {tech}"
     }
 }

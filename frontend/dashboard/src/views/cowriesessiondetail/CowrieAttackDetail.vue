@@ -30,7 +30,7 @@
                             </span>
                             <div class="hud-content ip">
                                 <span class="ip-link" @click="goToIpDetails(sessionDetails.src_ip)" :title="$t('common.infoIp')">{{ sessionDetails.src_ip }}</span>
-                                <button @click.stop="copyToClipboard(sessionDetails.src_ip)" class="btn-copy-mini" :title="$t('cowrie.attackDetail.copy')">📋</button>
+                                <button @click.stop="copyFormatted('clipboard.ip', { ip: sessionDetails.src_ip })" class="btn-copy-mini" :title="$t('cowrie.attackDetail.copy')">📋</button>
                             </div>
                         </div>
                         <div class="hud-item">

@@ -1,112 +1,204 @@
 {
-  "reports": {
-    "common": {
-      "agencyName": "Агентство ThreatIntelligence",
-      "executiveReport": "Исполнительный отчет",
-      "forensicReport": "Отчет по криминалистике IP",
-      "investigativeDossier": "Следственное досье",
-      "generatedAt": "Дата документа",
-      "targetIp": "Целевой IP-адрес",
-      "investigatedIp": "Исследуемый IP-адрес",
-      "subject": "Объект расследования",
-      "protocol": "Протокол",
-      "httpInvestigative": "Исследовательский HTTP",
-      "telnetSshInvestigative": "Сессия Telnet/SSH",
-      "globalReputation": "Глобальная репутация",
-      "confidential": "Только для аналитиков",
-      "notAvailable": "Н/Д",
-      "unknown": "Неизвестно",
-      "page": "Страница",
-      "of": "из",
-      "footer": "Платформа разведки ThreatIntel - Исполнительный отчет",
-      "proprietary": "Портфолио ThreatIntelligence • Конфиденциальный документ • Создано на движке ThreatIntel Engine"
+    "reports": {
+        "common": {
+            "agencyName": "Агентство ThreatIntelligence",
+            "executiveReport": "Исполнительный отчет",
+            "forensicReport": "Отчет по криминалистике IP",
+            "investigativeDossier": "Следственное досье",
+            "generatedAt": "Дата документа",
+            "targetIp": "Целевой IP-адрес",
+            "investigatedIp": "Исследуемый IP-адрес",
+            "subject": "Объект расследования",
+            "protocol": "Протокол",
+            "httpInvestigative": "Исследовательский HTTP",
+            "telnetSshInvestigative": "Сессия Telnet/SSH",
+            "globalReputation": "Глобальная репутация",
+            "confidential": "Только для аналитиков",
+            "notAvailable": "Н/Д",
+            "unknown": "Неизвестно",
+            "page": "Страница",
+            "of": "из",
+            "footer": "Платформа разведки ThreatIntel - Исполнительный отчет",
+            "proprietary": "Портфолио ThreatIntelligence • Конфиденциальный документ • Создано на движке ThreatIntel Engine",
+            "customDossier": "Пользовательское следственное досье",
+            "disclaimer": "Информация в данном досье предназначена исключительно для использования уполномоченными аналитиками."
+        },
+        "attackDetail": {
+            "title": "Досье подробностей атаки HTTP",
+            "division": "Отдел криминалистических расследований",
+            "summaryTitle": "1. Исполнительное резюме атаки",
+            "criticality": "Уровень критичности",
+            "dangerScore": "Оценка опасности",
+            "eventVolume": "Объем событий",
+            "intensity": "Интенсивность (RPS)",
+            "operationalDetails": "2. Операционные детали атаки",
+            "detectedIntensity": "Обнаруженная интенсивность",
+            "estimatedDuration": "Оценочная продолжительность",
+            "firstSeen": "Первый сигнал",
+            "lastSeen": "Последний сигнал",
+            "patterns": "Обнаруженные шаблоны техник",
+            "noPatterns": "Конкретные шаблоны не найдены",
+            "forensicFingerprint": "3. Криминалистический отпечаток",
+            "riskClass": "Класс риска",
+            "fingerprintScore": "Оценка цифрового отпечатка",
+            "botDetection": "Обнаружение ботов",
+            "isBot": "ДА (Идентифицирован)",
+            "notBot": "Нет / Неизвестно",
+            "dangerIndicators": "Индикаторы опасности",
+            "neutralAnalysis": "Нейтральный анализ",
+            "sourceIntelligence": "4. Разведка источника (геолокация IP и репутация)",
+            "abuseConfidence": "Оценка доверия к злоупотреблениям",
+            "totalReports": "Всего отчетов",
+            "lastReported": "Последняя жалоба",
+            "ispOrg": "Провайдер / Орг",
+            "country": "Страна",
+            "city": "Город",
+            "domain": "Домен",
+            "coordinates": "Координаты",
+            "networkType": "Тип сети",
+            "specialMarkers": "Специальные маркеры",
+            "confidenceRisk": "Риск доверия",
+            "riskLevels": {
+                "high": "ВЫСОКИЙ РИСК",
+                "suspicious": "ПОДОЗРИТЕЛЬНЫЙ",
+                "safe": "БЕЗОПАСНЫЙ"
+            },
+            "timeline": "5. Хронологические криминалистические события (Timeline)",
+            "timelineHeaders": {
+                "time": "Время",
+                "method": "Метод",
+                "resource": "Запрошенный ресурс (путь URI)",
+                "status": "Код статуса",
+                "score": "Балл"
+            },
+            "timelineNote": "Примечание: Выписка показывает первые 20 событий из {count} всего."
+        },
+        "ipDetail": {
+            "title": "Информационный брифинг: криминалистическое расследование IP",
+            "division": "Отдел репутационной разведки",
+            "summaryTitle": "1. Исполнительный анализ репутации",
+            "whitelistStatus": "Статус белого списка",
+            "safe": "БЕЗОПАСНО",
+            "notListed": "НЕ В СПИСКЕ",
+            "networkContext": "2. Сетевой контекст и провайдер",
+            "usageType": "Тип использования",
+            "markers": {
+                "tor": "ВЫХОДНОЙ УЗЕЛ TOR",
+                "highRisk": "ИСТОЧНИК ВЫСОКОГО РИСКА",
+                "suspicious": "ПОДОЗРИТЕЛЬНАЯ АКТИВНОСТЬ",
+                "whitelisted": "ОБЪЕКТ ИЗ БЕЛОГО СПИСКА"
+            },
+            "geolocation": "3. Географическая локализация",
+            "geoNote": "Примечание: Геолокация основана на общедоступных записях ISP.",
+            "reportsTimeline": "4. Хронология жалоб на злоупотребления",
+            "reportTable": {
+                "date": "Дата события",
+                "categories": "Обнаруженные категории",
+                "comment": "Аналитическая деталь / комментарий"
+            },
+            "noAbuse": "Жалоб на злоупотребления за последние 30 дней не обнаружено.",
+            "whoisTitle": "5. Криминалистический анализ записей Whois (Raw данные)",
+            "truncated": "Документ сокращен: Отображаются первые {count} из {total} отчетов."
+        },
+        "telnetDetail": {
+            "title": "Следственное досье сессии Telnet/SSH",
+            "overview": "Обзор сессии",
+            "sessionInfo": "Информация о сессии",
+            "events": "Всего событий",
+            "authAttempts": "Попытки авторизации",
+            "commands": "Выполненные команды",
+            "duration": "Продолжительность",
+            "timeline": "Операционная временная шкала"
+        }
     },
-    "attackDetail": {
-      "title": "Досье подробностей атаки HTTP",
-      "division": "Отдел криминалистических расследований",
-      "summaryTitle": "1. Исполнительное резюме атаки",
-      "criticality": "Уровень критичности",
-      "dangerScore": "Оценка опасности",
-      "eventVolume": "Объем событий",
-      "intensity": "Интенсивность (RPS)",
-      "operationalDetails": "2. Операционные детали атаки",
-      "detectedIntensity": "Обнаруженная интенсивность",
-      "estimatedDuration": "Оценочная продолжительность",
-      "firstSeen": "Первый сигнал",
-      "lastSeen": "Последний сигнал",
-      "patterns": "Обнаруженные шаблоны техник",
-      "noPatterns": "Конкретные шаблоны не найдены",
-      "forensicFingerprint": "3. Криминалистический отпечаток",
-      "riskClass": "Класс риска",
-      "fingerprintScore": "Оценка цифрового отпечатка",
-      "botDetection": "Обнаружение ботов",
-      "isBot": "ДА (Идентифицирован)",
-      "notBot": "Нет / Неизвестно",
-      "dangerIndicators": "Индикаторы опасности",
-      "neutralAnalysis": "Нейтральный анализ",
-      "sourceIntelligence": "4. Разведка источника (геолокация IP и репутация)",
-      "abuseConfidence": "Оценка доверия к злоупотреблениям",
-      "totalReports": "Всего отчетов",
-      "lastReported": "Последняя жалоба",
-      "ispOrg": "Провайдер / Орг",
-      "country": "Страна",
-      "city": "Город",
-      "domain": "Домен",
-      "coordinates": "Координаты",
-      "networkType": "Тип сети",
-      "specialMarkers": "Специальные маркеры",
-      "confidenceRisk": "Риск доверия",
-      "riskLevels": {
-        "high": "ВЫСОКИЙ РИСК",
-        "suspicious": "ПОДОЗРИТЕЛЬНЫЙ",
-        "safe": "БЕЗОПАСНЫЙ"
-      },
-      "timeline": "5. Хронологические криминалистические события (Timeline)",
-      "timelineHeaders": {
-        "time": "Время",
-        "method": "Метод",
-        "resource": "Запрошенный ресурс (путь URI)",
-        "status": "Код статуса",
-        "score": "Балл"
-      },
-      "timelineNote": "Примечание: Выписка показывает первые 20 событий из {count} всего."
-    },
-    "ipDetail": {
-      "title": "Информационный брифинг: криминалистическое расследование IP",
-      "division": "Отдел репутационной разведки",
-      "summaryTitle": "1. Исполнительный анализ репутации",
-      "whitelistStatus": "Статус белого списка",
-      "safe": "БЕЗОПАСНО",
-      "notListed": "НЕ В СПИСКЕ",
-      "networkContext": "2. Сетевой контекст и провайдер",
-      "usageType": "Тип использования",
-      "markers": {
-        "tor": "ВЫХОДНОЙ УЗЕЛ TOR",
-        "highRisk": "ИСТОЧНИК ВЫСОКОГО РИСКА",
-        "suspicious": "ПОДОЗРИТЕЛЬНАЯ АКТИВНОСТЬ",
-        "whitelisted": "ОБЪЕКТ ИЗ БЕЛОГО СПИСКА"
-      },
-      "geolocation": "3. Географическая локализация",
-      "geoNote": "Примечание: Геолокация основана на общедоступных записях ISP.",
-      "reportsTimeline": "4. Хронология жалоб на злоупотребления",
-      "reportTable": {
-        "date": "Дата события",
-        "categories": "Обнаруженные категории",
-        "comment": "Аналитическая деталь / комментарий"
-      },
-      "noAbuse": "Жалоб на злоупотребления за последние 30 дней не обнаружено.",
-      "whoisTitle": "5. Криминалистический анализ записей Whois (Raw данные)",
-      "truncated": "Документ сокращен: Отображаются первые {count} из {total} отчетов."
-    },
-    "telnetDetail": {
-      "title": "Следственное досье сессии Telnet/SSH",
-      "overview": "Обзор сессии",
-      "sessionInfo": "Информация о сессии",
-      "events": "Всего событий",
-      "authAttempts": "Попытки авторизации",
-      "commands": "Выполненные команды",
-      "duration": "Продолжительность",
-      "timeline": "Операционная временная шкала"
+    "clipboard": {
+        "ipDetails": {
+            "geo": [
+                "--- ГЕОГРАФИЧЕСКИЕ ДАННЫЕ ---",
+                "IP: {ip}",
+                "Страна: {country}",
+                "Город/Регион: {city}, {region}",
+                "Часовой пояс: {timezone}",
+                "Координаты GPS: {gps}",
+                "------------------------------"
+            ],
+            "net": [
+                "--- СЕТЕВЫЕ ДАННЫЕ ---",
+                "IP: {ip}",
+                "Организация: {org}",
+                "Хост/Провайдер: {hostname}",
+                "----------------------"
+            ],
+            "abuse": [
+                "--- СВОДКА НАРУШЕНИЙ (ABUSEIPDB) ---",
+                "IP: {ip}",
+                "Уровень доверия: {score}%",
+                "В черном списке: {listed}",
+                "Всего отчетов: {total}",
+                "Последний отчет: {lastReport}",
+                "------------------------------------"
+            ],
+            "whois": [
+                "--- ПОЛНЫЕ ДАННЫЕ WHOIS ---",
+                "IP: {ip}",
+                "",
+                "{rawData}",
+                "---------------------------"
+            ]
+        },
+        "attackDetail": {
+            "summary": [
+                "--- ТАКТИЧЕСКИЙ HUD: СВОДКА АТАКИ ---",
+                "Целевой IP: {ip}",
+                "Уровень Defcon: {defcon} ({score}/10)",
+                "",
+                "[ОСНОВНЫЕ МЕТРИКИ]",
+                "- Всего логов: {totalLogs}",
+                "- Длительность: {duration}",
+                "- Среднее RPS: {rps}",
+                "",
+                "[ПРОФИЛЬ АТАКИ]",
+                "- Техники: {techniques}",
+                "- Впервые обнаружен: {firstSeen}",
+                "- Последний раз обнаружен: {lastSeen}",
+                "- Интенсивность: {intensity}",
+                "- Ср. криминалистический балл: {avgScore}",
+                "-------------------------------------"
+            ],
+            "log": [
+                "--- ПОДРОБНОСТИ ЛОГА УГРОЗЫ ---",
+                "Временная метка: {timestamp}",
+                "Метод: {method}",
+                "URL: {url}",
+                "Крим. балл: {score}",
+                "Индикаторы: {indicators}",
+                "User Agent: {userAgent}",
+                "Source IP: {ip}",
+                "",
+                "Данные (Payload):",
+                "{payload}",
+                "--------------------------------"
+            ]
+        },
+        "telnetDetail": {
+            "summary": [
+                "--- СВОДКА СЕССИИ TELNET ---",
+                "ID Сессии: {sessionId}",
+                "Враждебный IP: {ip}",
+                "Временное Окно: {timeWindow}",
+                "Происхождение: {origin}",
+                "Всего событий: {totalEvents}",
+                "----------------------------"
+            ],
+            "timelineRow": "[{timestamp}] {eventName}\n> {message}{details}"
+        },
+        "ip": [
+            "--- ИДЕНТИФИКАЦИЯ СУБЪЕКТА ---",
+            "IP-АДРЕС: {ip}",
+            "-------------------------------"
+        ],
+        "generic": "{text}",
+        "attackSummary": "RIEPILOGO ATTACCO:\nIP: {ip}\nPericolo: {dangerLevel} ({dangerScore})\nLogs: {totaleLogs}\nDurata: {duration}\nRPS: {rps}",
+        "attackTechnique": "Tecnica Rilevata: {tech}"
     }
-  }
 }

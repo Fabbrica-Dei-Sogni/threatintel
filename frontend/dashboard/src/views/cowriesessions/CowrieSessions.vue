@@ -134,7 +134,7 @@
                                         :title="$t('common.infoIp')">
                                         {{ session.src_ip }}
                                     </span>
-                                    <button @click.stop="copyToClipboard(session.src_ip)" class="btn-copy-mini"
+                                    <button @click.stop="copyFormatted('clipboard.ip', { ip: session.src_ip })" class="btn-copy-mini"
                                         :title="$t('common.copyToClipboard')">📋</button>
                                     <button @click.stop="setIpFilter(session.src_ip)" class="btn-copy-mini"
                                         :title="$t('common.copyToFilter')">⬇️</button>
@@ -204,7 +204,7 @@ const props = defineProps({
 });
 
 const { t } = useI18n();
-const { copyToClipboard } = useClipboard();
+const { copyToClipboard, copyFormatted } = useClipboard();
 const router = useRouter();
 
 // Dual Scrollbar Sync Support

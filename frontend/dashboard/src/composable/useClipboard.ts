@@ -1,5 +1,6 @@
 import { ElMessage } from 'element-plus';
 import { useI18n } from 'vue-i18n';
+import { unref } from 'vue';
 import { useDossierStore } from '../stores/dossier';
 
 export function useClipboard() {
@@ -10,9 +11,24 @@ export function useClipboard() {
         if (!text) return;
 
         try {
+            // [REC] Integrazione Automatica Dossier
+            // Se siamo in modalità REC e NON proviene da copyFormatted, registriamo come generico
+            // Lo facciamo PRIMA di determinare cosa copiare, così il buffer è aggiornato
+            // IMPORTANTE: Unwrapping esplicito per evitare problemi di truthyness degli oggetti Ref in JS
+            const isRecording = unref(dossierStore.isRecording);
+
+            // Se siamo in modalità REC e NON proviene da copyFormatted, registriamo qui
+            if (isRecording && !fromFormatted) {
+                dossierStore.addSection('clipboard.generic', { text }, text);
+            }
+
+            // Recuperiamo il buffer aggiornato (se in REC)
+            const buffer = unref(dossierStore.clipboardBuffer);
+            const textToCopy = isRecording ? (buffer || text) : text;
+
             // Modern API
             if (navigator.clipboard && navigator.clipboard.writeText) {
-                await navigator.clipboard.writeText(text);
+                await navigator.clipboard.writeText(textToCopy);
                 const displayedText = text.length > 100 ? text.substring(0, 100) + '...' : text;
                 ElMessage({
                     message: t('common.copied') + ': ' + displayedText,
@@ -22,7 +38,7 @@ export function useClipboard() {
             } else {
                 // Fallback for older browsers or non-secure contexts
                 const textArea = document.createElement("textarea");
-                textArea.value = text;
+                textArea.value = textToCopy;
 
                 // Ensure it's not visible
                 textArea.style.position = "fixed";
@@ -48,10 +64,8 @@ export function useClipboard() {
                 }
             }
 
-            // [REC] Integrazione Automatica Dossier
-            // Se siamo in modalità REC e NON proviene da copyFormatted, registriamo come generico
-            if (dossierStore.isRecording && !fromFormatted) {
-                dossierStore.addSection('clipboard.generic', { text }, text);
+            // Feedback aggiuntivo se in REC
+            if (isRecording && !fromFormatted) {
                 ElMessage({
                     message: `🔴 [REC] ${t('common.addedToDossier')}`,
                     type: 'warning',
@@ -106,11 +120,18 @@ export function useClipboard() {
     const copyFormatted = async (templateKey: string, data: Record<string, any>) => {
         const rendered = renderTemplate(templateKey, data);
         if (rendered) {
-            // Chiamiamo copyToClipboard passando true per indicare che è già processata
+            // Se siamo in REC, aggiungiamo la sezione PRIMA di copiare,
+            // così la clipboard conterrà anche questo nuovo elemento
+            const isRecording = unref(dossierStore.isRecording);
+            if (isRecording) {
+                dossierStore.addSection(templateKey, data, rendered);
+            }
+
+            // Chiamiamo copyToClipboard passando true per indicare che è già registrata
+            // copyToClipboard si occuperà di copiare l'intero buffer se in REC
             await copyToClipboard(rendered, true);
 
-            if (dossierStore.isRecording) {
-                dossierStore.addSection(templateKey, data, rendered);
+            if (isRecording) {
                 ElMessage({
                     message: `🔴 [REC] ${t('common.addedToDossier')}`,
                     type: 'warning',

@@ -14,6 +14,7 @@ export const useDossierStore = defineStore('dossier', () => {
     const isRecording = ref(false);
     const isEnabled = ref(true); // Global visibility toggle
     const sections = ref<DossierSection[]>([]);
+    const clipboardBuffer = ref('');
 
     // Caricamento iniziale da localStorage
     const savedDossier = localStorage.getItem('custom_dossier_session');
@@ -23,17 +24,19 @@ export const useDossierStore = defineStore('dossier', () => {
             isRecording.value = parsed.isRecording || false;
             isEnabled.value = parsed.isEnabled !== undefined ? parsed.isEnabled : true;
             sections.value = parsed.sections || [];
+            clipboardBuffer.value = parsed.clipboardBuffer || '';
         } catch (e) {
             console.error('[DossierStore] Errore nel caricamento della sessione:', e);
         }
     }
 
     // Persistenza automatica ad ogni modifica
-    watch([isRecording, isEnabled, sections], () => {
+    watch([isRecording, isEnabled, sections, clipboardBuffer], () => {
         localStorage.setItem('custom_dossier_session', JSON.stringify({
             isRecording: isRecording.value,
             isEnabled: isEnabled.value,
-            sections: sections.value
+            sections: sections.value,
+            clipboardBuffer: clipboardBuffer.value
         }));
     }, { deep: true });
 
@@ -47,6 +50,7 @@ export const useDossierStore = defineStore('dossier', () => {
 
     const reset = () => {
         sections.value = [];
+        clipboardBuffer.value = '';
         isRecording.value = false;
         localStorage.removeItem('custom_dossier_session');
     };
@@ -70,6 +74,10 @@ export const useDossierStore = defineStore('dossier', () => {
         };
 
         sections.value.push(newSection);
+
+        // Aggiorniamo il buffer degli appunti (accodamento)
+        const separator = clipboardBuffer.value ? '\n\n' : '';
+        clipboardBuffer.value += separator + renderedText;
     };
 
     const removeSection = (id: string) => {
@@ -80,6 +88,7 @@ export const useDossierStore = defineStore('dossier', () => {
         isRecording,
         isEnabled,
         sections,
+        clipboardBuffer,
         startRecording,
         stopRecording,
         reset,

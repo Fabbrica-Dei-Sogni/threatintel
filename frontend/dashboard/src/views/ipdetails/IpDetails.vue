@@ -12,7 +12,7 @@
     <div class="header-main">
       <h1>
         <span class="animated-icon pulse-cobalt">🔍</span> {{ t('ipDetails.title').toUpperCase() }}: {{ ip }}
-        <button class="action-btn copy-ip-btn" @click="copyToClipboard(ip, 'main-ip')" :title="t('common.copyToClipboard')">
+        <button class="action-btn copy-ip-btn" @click="copyMainIp(ip)" :title="t('common.copyToClipboard')">
           <span v-if="!copiedIp">📋</span>
           <span v-else>✅</span>
         </button>
@@ -323,10 +323,12 @@ import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
 import CountryFlag from '../../components/CountryFlag.vue';
 import ReportActions from '../../components/ReportActions.vue';
 import { ElMessage } from 'element-plus';
+import { useClipboard } from '../../composable/useClipboard';
 
 const route = useRoute()
 const router = useRouter()
 const { t } = useI18n();
+const { copyToClipboard, copyFormatted } = useClipboard();
 
 const ip = ref('')
 const ipInfo = ref(null)
@@ -395,52 +397,14 @@ function toggleReport(id) {
   expandedReports[id] = !expandedReports[id];
 }
 
-async function copyToClipboard(text, id) {
+// Local helper for main IP copy with visual feedback
+async function copyMainIp(text) {
   if (!text) return;
-  try {
-    let successful = false;
-
-    // Modern API
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      await navigator.clipboard.writeText(text);
-      successful = true;
-    } else {
-      // Fallback for older browsers or non-secure contexts
-      const textArea = document.createElement("textarea");
-      textArea.value = text;
-      textArea.style.position = "fixed";
-      textArea.style.left = "-9999px";
-      textArea.style.top = "0";
-      document.body.appendChild(textArea);
-      textArea.focus();
-      textArea.select();
-      successful = document.execCommand('copy');
-      document.body.removeChild(textArea);
-    }
-
-    if (successful) {
-      if (id === 'main-ip') {
-        copiedIp.value = true;
-        setTimeout(() => {
-          copiedIp.value = false;
-        }, 2000);
-        ElMessage.success(t('common.copied') + ': ' + text);
-      } else if (id) {
-        copiedIds[id] = true;
-        setTimeout(() => {
-          copiedIds[id] = false;
-        }, 2000);
-      } else {
-        // Simple copy without per-icon visual feedback (uses message only)
-        ElMessage.success(t('common.copied') + ': ' + text);
-      }
-    } else {
-      throw new Error('Copy command failed');
-    }
-  } catch (err) {
-    console.error('Copy failed:', err);
-    ElMessage.error(t('common.copyError'));
-  }
+  await copyToClipboard(text);
+  copiedIp.value = true;
+  setTimeout(() => {
+    copiedIp.value = false;
+  }, 2000);
 }
 
 function handleReportsPageChange(page) {
@@ -570,49 +534,44 @@ function goBack() {
 const copyGeoInfo = () => {
   if (!ipInfo.value?.ipinfo) return;
   const geo = ipInfo.value.ipinfo;
-  let text = `--- GEOGRAPHIC INTELLIGENCE ---\n`;
-  text += `IP: ${ip.value}\n`;
-  text += `Country: ${geo.country || 'N/A'}\n`;
-  text += `City/Region: ${geo.city || '-'}, ${geo.region || '-'}\n`;
-  text += `Timezone: ${geo.timezone || '-'}\n`;
-  text += `GPS: ${geo.loc || '-'}\n`;
-  text += `-------------------------------`;
-  copyToClipboard(text);
+  copyFormatted('clipboard.ipDetails.geo', {
+    ip: ip.value,
+    country: geo.country,
+    city: geo.city,
+    region: geo.region,
+    timezone: geo.timezone,
+    gps: geo.loc
+  });
 };
 
 const copyNetInfo = () => {
   if (!ipInfo.value?.ipinfo) return;
   const net = ipInfo.value.ipinfo;
-  let text = `--- NETWORK INTELLIGENCE ---\n`;
-  text += `IP: ${ip.value}\n`;
-  text += `Organization: ${net.org || 'N/A'}\n`;
-  text += `Hostname/ISP: ${net.hostname || 'N/A'}\n`;
-  text += `-----------------------------`;
-  copyToClipboard(text);
+  copyFormatted('clipboard.ipDetails.net', {
+    ip: ip.value,
+    org: net.org,
+    hostname: net.hostname
+  });
 };
 
 const copyAbuseSummary = () => {
   if (!ipInfo.value?.abuseipdbId) return;
   const abuse = ipInfo.value.abuseipdbId;
-  let text = `--- ABUSE REPORTING SUMMARY ---\n`;
-  text += `IP: ${ip.value}\n`;
-  text += `Confidence Score: ${abuse.abuseConfidenceScore}%\n`;
-  text += `Is Listed: ${abuse.isListed ? 'YES' : 'NO'}\n`;
-  text += `Total Reports: ${abuse.totalReports || 0}\n`;
-  if (abuse.lastReportedAt) {
-    text += `Last Reported: ${dayjs(abuse.lastReportedAt).format('YYYY-MM-DD HH:mm:ss')}\n`;
-  }
-  text += `-------------------------------`;
-  copyToClipboard(text);
+  copyFormatted('clipboard.ipDetails.abuse', {
+    ip: ip.value,
+    score: abuse.abuseConfidenceScore,
+    listed: abuse.isListed ? t('common.yes').toUpperCase() : t('common.no').toUpperCase(),
+    total: abuse.totalReports || 0,
+    lastReport: abuse.lastReportedAt ? dayjs(abuse.lastReportedAt).format('YYYY-MM-DD HH:mm:ss') : t('common.notAvailable')
+  });
 };
 
 const copyWhoisRaw = () => {
   if (!ipInfo.value?.whois_raw) return;
-  let text = `--- FULL WHOIS DATA ---\n`;
-  text += `IP: ${ip.value}\n\n`;
-  text += JSON.stringify(ipInfo.value.whois_raw, null, 2);
-  text += `\n-----------------------`;
-  copyToClipboard(text);
+  copyFormatted('clipboard.ipDetails.whois', {
+    ip: ip.value,
+    rawData: JSON.stringify(ipInfo.value.whois_raw, null, 2)
+  });
 };
 
 onMounted(() => {

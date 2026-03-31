@@ -478,5 +478,87 @@
             "mainInfo": "GŁÓWNE INFORMACJE",
             "eventTimeline": "OŚ CZASU DZIAŁANIA"
         }
+    },
+    "clipboard": {
+        "ipDetails": {
+            "geo": [
+                "--- INTELIGENCJA GEOGRAFICZNA ---",
+                "IP: {ip}",
+                "Kraj: {country}",
+                "Miasto/Region: {city}, {region}",
+                "Strefa czasowa: {timezone}",
+                "Współrzędne GPS: {gps}",
+                "-------------------------------"
+            ],
+            "net": [
+                "--- INFORMACJE SIECIOWE ---",
+                "IP: {ip}",
+                "Organizacja: {org}",
+                "Nazwa hosta/ISP: {hostname}",
+                "----------------------------"
+            ],
+            "abuse": [
+                "--- PODSUMOWANIE ZGŁOSZEŃ (ABUSEIPDB) ---",
+                "IP: {ip}",
+                "Wskaźnik ufności: {score}%",
+                "Na czarnej liście: {listed}",
+                "Łącznie zgłoszeń: {total}",
+                "Ostatnie zgłoszenie: {lastReport}",
+                "----------------------------------------"
+            ],
+            "whois": [
+                "--- PEŁNE DANE WHOIS ---",
+                "IP: {ip}",
+                "",
+                "{rawData}",
+                "------------------------"
+            ]
+        },
+        "attackDetail": {
+            "summary": [
+                "--- HUD TAKTYCZNY: PODSUMOWANIE ATAKU ---",
+                "Docelowy IP: {ip}",
+                "Poziom Defcon: {defcon} ({score}/10)",
+                "",
+                "[GŁÓWNE METRYKI]",
+                "- Łącznie logów: {totalLogs}",
+                "- Czas trwania: {duration}",
+                "- Średni RPS: {rps}",
+                "",
+                "[PROFIL ATAKU]",
+                "- Techniki: {techniques}",
+                "- Pierwszy raz widziany: {firstSeen}",
+                "- Ostatni raz widziany: {lastSeen}",
+                "- Intensywność: {intensity}",
+                "- Średni wynik forensyczny: {avgScore}",
+                "-----------------------------------------"
+            ],
+            "log": [
+                "--- PEŁNY SZCZEGÓŁ LOGU ZAGROŻENIA ---",
+                "Znacznik czasu: {timestamp}",
+                "Metoda: {method}",
+                "URL: {url}",
+                "Wynik forensyczny: {score}",
+                "Wskaźniki: {indicators}",
+                "User Agent: {userAgent}",
+                "Źródłowy IP: {ip}",
+                "",
+                "Ładunek (Payload):",
+                "{payload}",
+                "--------------------------------------"
+            ]
+        },
+        "telnetDetail": {
+            "summary": [
+                "--- PODSUMOWANIE SESJI TELNET ---",
+                "ID Sesji: {sessionId}",
+                "Wrogi IP: {ip}",
+                "Okno czasowe: {timeWindow}",
+                "Pochodzenie: {origin}",
+                "Łącznie zdarzeń: {totalEvents}",
+                "----------------------------------"
+            ],
+            "timelineRow": "[{timestamp}] {eventName}\n> {message}{details}"
+        }
     }
 }

@@ -371,7 +371,7 @@ import { Search } from '@element-plus/icons-vue';
 import { fetchAttackDetail } from '../../api';
 
 const { t } = useI18n();
-const { copyToClipboard } = useClipboard();
+const { copyToClipboard, copyFormatted } = useClipboard();
 
 // Reactive state for sections
 const toggles = reactive({
@@ -563,51 +563,34 @@ onMounted(loadAttackData)
 
 const copyAttackSummary = () => {
     if (!attack.value) return;
-    
-    let text = `--- TACTICAL ATTACK SUMMARY ---\n`;
-    text += `Target IP: ${attack.value.request?.ip || 'N/A'}\n`;
-    text += `Defcon Level: ${attack.value.dangerLevel} (${attack.value.dangerScore}/10)\n`;
-    text += `\n[MAIN METRICS]\n`;
-    text += `- Total Logs: ${attack.value.totaleLogs}\n`;
-    text += `- Duration: ${attack.value.durataAttacco?.human || 'N/A'}\n`;
-    text += `- Average RPS: ${attack.value.rps}\n`;
-    text += `\n[ATTACK PROFILE]\n`;
-    
-    if (attack.value.attackPatterns?.length) {
-        text += `- Techniques: ${attack.value.attackPatterns.join(', ')}\n`;
-    }
-    
-    text += `- First Seen: ${dayjs(attack.value.firstSeen).format('YYYY-MM-DD HH:mm:ss')}\n`;
-    text += `- Last Seen: ${dayjs(attack.value.lastSeen).format('YYYY-MM-DD HH:mm:ss')}\n`;
-    text += `- Intensity: ${attack.value.intensityAttack || 'N/A'}\n`;
-    text += `- Average Forensic Score: ${attack.value.averageScore}\n`;
-    text += `\n--------------------------------`;
-    
-    copyToClipboard(text);
+    copyFormatted('clipboard.attackDetail.summary', {
+        ip: attack.value.request?.ip,
+        defcon: attack.value.dangerLevel,
+        score: attack.value.dangerScore,
+        totalLogs: attack.value.totaleLogs,
+        duration: attack.value.durataAttacco?.human,
+        rps: attack.value.rps,
+        techniques: attack.value.attackPatterns?.join(', '),
+        firstSeen: dayjs(attack.value.firstSeen).format('YYYY-MM-DD HH:mm:ss'),
+        lastSeen: dayjs(attack.value.lastSeen).format('YYYY-MM-DD HH:mm:ss'),
+        intensity: attack.value.intensityAttack,
+        avgScore: attack.value.averageScore
+    });
 };
 
 const copyAggregatedLog = (log) => {
-    let text = `--- THREAT INTEL LOG SUMMARY ---\n`;
-    text += `Timestamp: ${dayjs(log.timestamp).format('YYYY-MM-DD HH:mm:ss')}\n`;
-    text += `Method: ${log.request?.method || 'N/A'}\n`;
-    text += `URL: ${log.request?.url || 'N/A'}\n`;
-    const score = log.fingerprint?.score ?? 'N/A';
-    text += `Score: ${score}\n`;
-    if (log.fingerprint?.indicators?.length) {
-        text += `Indicators: ${log.fingerprint.indicators.join(', ')}\n`;
-    }
-    text += `User Agent: ${log.request?.userAgent || 'N/A'}\n`;
-    text += `IP: ${attack.value?.request?.ip || 'N/A'}\n`;
-    
-    if (log.request?.body) {
-        const bodyContent = typeof log.request.body === 'object' 
-            ? JSON.stringify(log.request.body, null, 2) 
-            : log.request.body;
-        text += `\nPayload:\n${bodyContent}\n`;
-    }
-    
-    text += `--------------------------------`;
-    copyToClipboard(text);
+    copyFormatted('clipboard.attackDetail.log', {
+        timestamp: dayjs(log.timestamp).format('YYYY-MM-DD HH:mm:ss'),
+        method: log.request?.method,
+        url: log.request?.url,
+        score: log.fingerprint?.score,
+        indicators: log.fingerprint?.indicators?.join(', '),
+        userAgent: log.request?.userAgent,
+        ip: attack.value?.request?.ip,
+        payload: log.request?.body 
+            ? (typeof log.request.body === 'object' ? JSON.stringify(log.request.body, null, 2) : log.request.body)
+            : t('common.notAvailable')
+    });
 };
 </script>
 

@@ -148,7 +148,7 @@ import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
 import ReportActions from '../../components/ReportActions.vue';
 
 const { t } = useI18n();
-const { copyToClipboard } = useClipboard();
+const { copyToClipboard, copyFormatted, renderTemplate } = useClipboard();
 const route = useRoute();
 const router = useRouter();
 const sessionId = route.params.id;
@@ -167,34 +167,38 @@ const toggles = reactive({
 const copySessionSummary = () => {
     if (!sessionDetails.value) return;
     const s = sessionDetails.value;
-    let text = `--- TELNET SESSION SUMMARY ---\n`;
-    text += `Session ID: ${sessionId}\n`;
-    text += `Hostile IP: ${s.src_ip}\n`;
-    text += `Time Window: ${formatDate(s.starttime)} - ${formatDate(s.endtime)}\n`;
-    if (s.ipDetailsId?.ipinfo) {
-        text += `Origin: ${s.ipDetailsId.ipinfo.city}, ${s.ipDetailsId.ipinfo.country}\n`;
-    }
-    text += `Total Events: ${events.value.length}\n`;
-    text += `------------------------------`;
-    copyToClipboard(text);
+    copyFormatted('clipboard.telnetDetail.summary', {
+        sessionId,
+        ip: s.src_ip,
+        timeWindow: `${formatDate(s.starttime)} - ${formatDate(s.endtime)}`,
+        origin: s.ipDetailsId?.ipinfo ? `${s.ipDetailsId.ipinfo.city}, ${s.ipDetailsId.ipinfo.country}` : t('common.notAvailable'),
+        totalEvents: events.value.length
+    });
 };
 
 const copyEventTimeline = () => {
     if (events.value.length === 0) return;
-    let text = `--- TELNET OPERATIONAL TIMELINE ---\n`;
-    text += `Session ID: ${sessionId}\n\n`;
     
-    events.value.forEach(event => {
-        text += `[${dayjs(event.timestamp).format('HH:mm:ss')}] ${formatEventName(event.eventid)}\n`;
-        text += `> ${event.message}\n`;
-        if (event.input) text += `  CMD: ${event.input}\n`;
-        if (event.username) text += `  AUTH: ${event.username} / ${event.password}\n`;
-        if (event.url) text += `  URL: ${event.url}\n`;
-        text += `\n`;
-    });
+    // Generiamo le righe della timeline usando il template strutturato
+    const renderedEvents = events.value.map(event => {
+        let details = '';
+        if (event.input) details += `\n  CMD: ${event.input}`;
+        if (event.username) details += `\n  AUTH: ${event.username} / ${event.password}`;
+        if (event.url) details += `\n  URL: ${event.url}`;
+        
+        return renderTemplate('clipboard.telnetDetail.timelineRow', {
+            timestamp: dayjs(event.timestamp).format('HH:mm:ss'),
+            eventName: formatEventName(event.eventid),
+            message: event.message,
+            details
+        });
+    }).join('\n\n');
     
-    text += `-----------------------------------`;
-    copyToClipboard(text);
+    // Componiamo il testo finale con header/footer standard (si potrebbe anche qui usare un template dedicato volendo)
+    const header = `--- TELNET OPERATIONAL TIMELINE ---\nSession ID: ${sessionId}\n\n`;
+    const footer = `\n-----------------------------------`;
+    
+    copyToClipboard(header + renderedEvents + footer);
 };
 
 const mapAttackData = computed(() => {

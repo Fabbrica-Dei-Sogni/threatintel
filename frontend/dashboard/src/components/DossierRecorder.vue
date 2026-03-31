@@ -33,12 +33,18 @@
 
           <template v-if="dossierStore.sections.length > 0">
             <div class="divider"></div>
-            <button class="btn-tool preview hud-btn" @click="generateCustomReport('html', 'hud')" :disabled="loadingHtml" :title="t('common.previewDossier')">
+            
+            <div class="style-selector-pill">
+              <button class="style-opt" :class="{ active: selectedStyle === 'classic' }" @click="selectedStyle = 'classic'" title="Stile Istituzionale">CLASSIC</button>
+              <button class="style-opt" :class="{ active: selectedStyle === 'hud' }" @click="selectedStyle = 'hud'" title="Stile HUD Tattico">HUD</button>
+            </div>
+
+            <button class="btn-tool preview" @click="generateCustomReport('html', selectedStyle)" :disabled="loadingHtml" :title="t('common.previewDossier')">
               <span v-if="loadingHtml" class="spinner-tiny"></span>
               <span v-else class="icon">👁️</span> 
               <span class="btn-text h-900">{{ t('common.preview') }}</span>
             </button>
-            <button class="btn-tool download" @click="generateCustomReport('pdf', 'hud')" :disabled="loadingPdf" :title="t('common.generateDossier')">
+            <button class="btn-tool download" @click="generateCustomReport('pdf', selectedStyle)" :disabled="loadingPdf" :title="t('common.generateDossier')">
                <span v-if="loadingPdf" class="spinner-tiny"></span>
               <span v-else class="icon">📄</span> 
               <span class="btn-text h-900">{{ t('common.downloadPdf') }}</span>
@@ -61,7 +67,7 @@
                   <h3>DOSSIER PREVIEW</h3>
                 </div>
                 <div class="header-actions">
-                  <button @click="generateCustomReport('pdf', 'hud')" class="download-mini-btn" :disabled="loadingPdf">
+                  <button @click="generateCustomReport('pdf', selectedStyle)" class="download-mini-btn" :disabled="loadingPdf">
                     <span v-if="loadingPdf" class="spinner-tiny"></span>
                     <span v-else>📥 {{ t('common.downloadPdf') }}</span>
                   </button>
@@ -99,7 +105,7 @@ const showPreview = ref(false);
 const htmlContent = ref('');
 const loadingHtml = ref(false);
 const loadingPdf = ref(false);
-const lastUsedStyle = ref('telex');
+const selectedStyle = ref('classic');
 const scaleFactor = ref(1);
 const reportWidth = 794;
 const modalBody = ref(null);
@@ -148,7 +154,7 @@ const confirmReset = () => {
 
 const generateCustomReport = async (format, style = 'telex') => {
   if (dossierStore.sections.length === 0) return;
-  lastUsedStyle.value = style;
+  selectedStyle.value = style;
   if (format === 'html') loadingHtml.value = true;
   else loadingPdf.value = true;
   try {
@@ -304,15 +310,37 @@ onUnmounted(() => window.removeEventListener('resize', updateScale));
 
 .btn-tool.reset:hover { border-color: #ef4444; color: #f87171; background: rgba(239, 68, 68, 0.1); }
 
-.btn-tool.hud-btn {
-  border-color: rgba(34, 211, 238, 0.4);
-  color: var(--text-cyan, #22d3ee);
+/* Style Selector */
+.style-selector-pill {
+  display: flex;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 2px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  margin-right: 4px;
 }
 
-.btn-tool.hud-btn:hover {
-  background: rgba(34, 211, 238, 0.15);
-  border-color: #22d3ee;
+.style-opt {
+  background: transparent;
+  border: none;
+  color: #64748b;
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 0.5px;
+}
+
+.style-opt.active {
+  background: var(--primary-light, #3b82f6);
   color: #fff;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.style-opt:hover:not(.active) {
+  color: #e2e8f0;
 }
 
 .icon { font-size: 1.1rem; flex-shrink: 0; }

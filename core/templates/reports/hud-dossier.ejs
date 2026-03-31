@@ -317,7 +317,6 @@
                 </div>
             </div>
             <div class="header-meta">
-                <span class="hud-security-stamp">INTERNAL RECIPIENT ONLY</span><br>
                 REF: HUD-<%= new Date().getTime().toString().slice(-8) %>-<%= locale.toUpperCase() %><br>
                 STAMP: <%= new Date().toLocaleString(locale) %>
             </div>
@@ -334,7 +333,7 @@
                             else if (section.templateKey === 'clipboard.attackDetail.summary') fragmentName = 'attack-hud';
                             else if (section.templateKey === 'clipboard.attackDetail.log') fragmentName = 'log-entry';
                             // Aggiungiamo il path completo relativo alla directory templates/reports
-                            let fragmentPath = './fragments/' + fragmentName + '.ejs';
+                            let fragmentPath = './fragments/hud/' + fragmentName + '.ejs';
                         %>
                         <%- include(fragmentPath, { data: section.data, section: section, index: index, t: t, locale: locale }) %>
                     </div>

@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="<%= locale.split('-')[0] %>">
+<head>
+    <meta charset="UTF-8">
+    <title><%= t('reports.common.agencyName') %> - INVESTIGATIVE DOSSIER</title>
+    <style>
+        :root {
+            --bg-paper: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --primary: #1d4ed8;
+            --primary-dark: #1e3a8a;
+            --danger: #b91c1c;
+            --accent: #eff6ff;
+            --border: #cbd5e1;
+            --border-light: #e2e8f0;
+            --font-sans: 'Inter', 'Helvetica', 'Arial', sans-serif;
+            --font-mono: 'JetBrains Mono', 'Courier New', Courier, monospace;
+        }
+
+        @page {
+            margin: 15mm;
+            size: A4;
+            @bottom-right {
+                content: "Pagina " counter(page) " di " counter(pages);
+                font-family: var(--font-sans);
+                font-size: 9px;
+                color: var(--text-muted);
+            }
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--bg-paper);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            line-height: 1.4;
+            font-size: 11px;
+        }
+
+        .classic-document {
+            max-width: 100%;
+        }
+
+        /* HEADER FORMALE */
+        .classic-main-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 2px solid var(--primary-dark);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-box {
+            width: 55px;
+            height: 55px;
+            border: 1px solid var(--border);
+            padding: 4px;
+            background: #fff;
+        }
+
+        .logo-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .brand-text h1 {
+            margin: 0;
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--primary-dark);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .brand-text p {
+            margin: 2px 0 0;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .header-meta {
+            text-align: right;
+        }
+
+        .security-mark {
+            display: inline-block;
+            border: 1px solid var(--danger);
+            color: var(--danger);
+            font-weight: 900;
+            font-size: 10px;
+            padding: 3px 10px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            border-radius: 2px;
+        }
+
+        .dossier-id {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+
+        /* METADATA STRIP */
+        .classic-metadata-bar {
+            background: var(--accent);
+            border: 1px solid var(--border-light);
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            font-weight: 600;
+            font-size: 10px;
+            color: var(--primary-dark);
+        }
+
+        /* FRAGMENTS CONTAINER */
+        .classic-content-flow {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .classic-section {
+            page-break-inside: avoid;
+            border-bottom: 1px solid var(--border-light);
+            padding-bottom: 25px;
+        }
+
+        /* FRAGMENT: IP INFO CLASSIC */
+        .classic-header-block {
+            display: flex;
+            align-items: baseline;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .classic-badge-formal {
+            background: var(--primary-dark);
+            color: #fff;
+            padding: 3px 8px;
+            font-weight: 800;
+            font-size: 9px;
+            border-radius: 2px;
+        }
+
+        .classic-ip-formal {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--text-main);
+            font-family: var(--font-mono);
+        }
+
+        .classic-meta-info {
+            font-size: 9px;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        /* FRAGMENT: ATTACK SUMMARY CLASSIC */
+        .formal-header-bar {
+            background: #f1f5f9;
+            padding: 6px 12px;
+            border-left: 4px solid var(--primary);
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .formal-title { font-weight: 800; color: var(--primary-dark); }
+        .formal-id { font-size: 9px; opacity: 0.7; font-family: var(--font-mono); }
+
+        .formal-data-grid {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .formal-data-grid th {
+            text-align: left;
+            background: #fff;
+            color: var(--text-muted);
+            font-weight: 600;
+            padding: 8px 12px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .formal-data-grid td {
+            padding: 8px 12px;
+            border-bottom: 1px solid var(--border-light);
+            font-weight: 700;
+        }
+
+        .classic-danger-val { color: var(--danger); }
+
+        /* FRAGMENT: LOG TABLE CLASSIC */
+        .log-grid-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .log-method-rect {
+            background: #e2e8f0;
+            padding: 2px 6px;
+            font-weight: 800;
+            font-size: 9px;
+        }
+        .log-method-rect.POST { background: #fed7aa; }
+        .log-method-rect.DELETE { background: #fecaca; }
+
+        .log-url-rect {
+            font-family: var(--font-mono);
+            font-weight: 700;
+            font-size: 10px;
+            word-break: break-all;
+            flex: 1;
+        }
+
+        .log-score-rect {
+            font-weight: 800;
+            color: var(--danger);
+        }
+
+        .log-grid-body {
+            padding-left: 15px;
+            border-left: 1px solid var(--border-light);
+            margin-left: 5px;
+            font-size: 10px;
+        }
+
+        .log-row { margin-bottom: 4px; }
+        .log-row strong { color: var(--text-muted); display: inline-block; width: 100px; }
+
+        .indicator-text { color: var(--danger); }
+
+        .payload-box-classic {
+            background: #f8fafc;
+            border: 1px solid var(--border-light);
+            padding: 10px;
+            font-family: var(--font-mono);
+            font-size: 9px;
+            white-space: pre-wrap;
+            margin-top: 5px;
+            color: #334155;
+        }
+
+        /* GENERIC TELEX FORMAL */
+        .mono-telex-classic {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            background: #f1f5f9;
+            padding: 15px;
+            border: 1px dashed var(--border);
+            color: var(--text-main);
+            white-space: pre-wrap;
+        }
+
+        /* FOOTER */
+        .classic-footer {
+            margin-top: 50px;
+            border-top: 1px solid var(--border);
+            padding-top: 15px;
+            text-align: center;
+            font-size: 9px;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="classic-document">
+        <!-- GLOBAL REPORT HEADER -->
+        <header class="classic-main-header">
+            <div class="header-brand">
+                <div class="logo-box">
+                    <% if (logoBase64) { %>
+                        <img src="<%= logoBase64 %>" class="logo-img" alt="Seal">
+                    <% } else { %>
+                        <div style="font-size: 24px; font-weight: bold; color: var(--primary);">TI</div>
+                    <% } %>
+                </div>
+                <div class="brand-text">
+                    <h1><%= t('reports.common.agencyName') %></h1>
+                    <p><%= t('reports.common.investigativeDossier') %> • CLASSIC-ADMIN-STYLE</p>
+                </div>
+            </div>
+            <div class="header-meta">
+                <div class="dossier-id">
+                    REF-NO: CLS-<%= new Date().getTime().toString().slice(-8) %><br>
+                    DATE: <%= new Date().toLocaleString(locale) %>
+                </div>
+            </div>
+        </header>
+
+        <!-- SUBTITLE STRIP -->
+        <div class="classic-metadata-bar">
+            <span>GEN: THREATINTEL-CORE-V2</span>
+            <span>LOCALE: <%= locale.toUpperCase() %></span>
+            <span>SYSTEM: FORENSIC-ENGINE-PUPPETEER</span>
+        </div>
+
+        <!-- DYNAMIC CONTENT SECTIONS -->
+        <div class="classic-content-flow">
+            <% if (sections && sections.length > 0) { %>
+                <% sections.forEach((section, index) => { %>
+                    <div class="classic-section">
+                        <% 
+                            let fragmentName = 'generic-telex';
+                            if (section.templateKey === 'clipboard.ip') fragmentName = 'ip-info';
+                            else if (section.templateKey === 'clipboard.attackDetail.summary') fragmentName = 'attack-summary';
+                            else if (section.templateKey === 'clipboard.attackDetail.log') fragmentName = 'log-table';
+                            
+                            let fragmentPath = './fragments/classic/' + fragmentName + '.ejs';
+                        %>
+                        <%- include(fragmentPath, { data: section.data, section: section, index: index, t: t, locale: locale }) %>
+                    </div>
+                <% }); %>
+            <% } else { %>
+                <div style="text-align: center; color: var(--text-muted); padding: 40px; border: 1px dashed var(--border);">
+                    <p>NESSUN DATO ACQUISITO PER QUESTO DOSSIER.</p>
+                </div>
+            <% } %>
+        </div>
+
+        <footer class="classic-footer">
+            <%= t('reports.common.proprietary') %> • <%= new Date().getFullYear() %>
+        </footer>
+    </div>
+</body>
+</html>

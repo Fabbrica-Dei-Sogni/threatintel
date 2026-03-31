@@ -1,0 +1,24 @@
+<div class="classic-item forensic-log-block">
+    <div class="log-grid-header">
+        <span class="log-method-rect <%= data.method %>"><%= data.method %></span>
+        <span class="log-url-rect"><%= data.url %></span>
+        <span class="log-score-rect">SCORE: <%= data.score %></span>
+    </div>
+    <div class="log-grid-body">
+        <div class="log-row">
+            <strong>TIMESTAMP:</strong> <%= data.timestamp %>
+        </div>
+        <div class="log-row">
+            <strong>INDICATORI:</strong> <span class="indicator-text"><%= data.indicators %></span>
+        </div>
+        <% if (data.userAgent) { %>
+            <div class="log-row">
+                <strong>USER AGENT:</strong> <%= data.userAgent %>
+            </div>
+        <% } %>
+        <div class="log-payload-area">
+            <strong>PAYLOAD ESTRATTO:</strong>
+            <pre class="payload-box-classic"><%= data.payload %></pre>
+        </div>
+    </div>
+</div>

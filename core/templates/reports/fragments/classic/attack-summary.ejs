@@ -1,0 +1,28 @@
+<div class="classic-item attack-card-formal">
+    <div class="formal-header-bar">
+        <span class="formal-title">RIEPILOGO ESECUTIVO ATTACCO</span>
+        <span class="formal-id">REF-ID: <%= Math.random().toString(36).substring(7).toUpperCase() %></span>
+    </div>
+    <table class="formal-data-grid">
+        <tr>
+            <th width="30%">INDIVIDUO SOGGETTO</th>
+            <td><strong><%= data.ip %></strong></td>
+        </tr>
+        <tr>
+            <th>DANGER SCORE</th>
+            <td><span class="classic-danger-val"><%= (data.score || 0).toFixed(2) %> / 10.00</span></td>
+        </tr>
+        <tr>
+            <th>VOLUME LOGS</th>
+            <td><%= data.totalLogs %> EVENTI RILEVATI</td>
+        </tr>
+        <tr>
+            <th>TECNICHE IDENTIFICATE</th>
+            <td><%= data.techniques || 'NESSUN PATTERN SPECIFICO' %></td>
+        </tr>
+        <tr>
+            <th>FINESTRA TEMPORALE</th>
+            <td><%= data.firstSeen %> — <%= data.lastSeen %></td>
+        </tr>
+    </table>
+</div>

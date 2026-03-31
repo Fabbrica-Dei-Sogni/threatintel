@@ -140,6 +140,38 @@ export class ReportService {
     }
 
     /**
+     * Genera un Dossier in stile Classic (Formal/Admin) usando frammenti EJS dedicati
+     */
+    async generateClassicReport(sections: any[], locale: string, format: 'html' | 'pdf' = 'pdf'): Promise<Buffer | string> {
+        this.logger.info(`[ReportService] Generazione Classic Dossier (${sections.length} sezioni) [${locale}]`);
+
+        const templatePath = path.join(__dirname, `../templates/reports/classic-dossier.ejs`);
+        
+        let logoBase64 = '';
+        try {
+            const logoPath = path.join(__dirname, '../public/assets/intelligence-logo.png');
+            const logoBuffer = fs.readFileSync(logoPath);
+            logoBase64 = `data:image/png;base64,${logoBuffer.toString('base64')}`;
+        } catch (e) {
+            this.logger.error(`[ReportService] Errore caricamento logo: ${e}`);
+        }
+
+        const t = (key: string, params?: any) => this.i18n.t(key, locale, params);
+
+        // Nel caso Classic passiamo i dati raw e lasciamo che il template classic-dossier.ejs gestisca i fragment dedicati
+        const html = await ejs.renderFile(templatePath, { 
+            sections, 
+            logoBase64, 
+            t, 
+            locale 
+        });
+
+        if (format === 'html') return html;
+
+        return await this.convertToPdf(html);
+    }
+
+    /**
      * Helper per renderizzare una sezione basata su template a blocchi (blueprint)
      */
     private renderSection(templateKey: string, data: any, locale: string): string {

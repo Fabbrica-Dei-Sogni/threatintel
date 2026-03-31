@@ -44,7 +44,7 @@ export class ReportController {
         try {
             const { sections, locale } = req.body;
             const format = (req.query.format as 'html' | 'pdf') || 'pdf';
-            const style = (req.query.style as 'telex' | 'hud') || 'telex';
+            const style = (req.query.style as 'telex' | 'hud' | 'classic') || 'classic';
             const lang = (locale as string) || 'it-IT';
 
             if (!sections || !Array.isArray(sections)) {
@@ -53,9 +53,11 @@ export class ReportController {
 
             let result: Buffer | string;
             if (style === 'hud') {
-                result = await this.reportService.generateHudReport(sections, lang, format);
+                result = await this.reportService.generateHudReport(sections, locale, format);
+            } else if (style === 'classic') {
+                result = await this.reportService.generateClassicReport(sections, locale, format);
             } else {
-                result = await this.reportService.generateCustomReport(sections, lang, format);
+                result = await this.reportService.generateCustomReport(sections, locale, format);
             }
 
             if (format === 'html') {

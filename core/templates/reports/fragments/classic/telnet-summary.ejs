@@ -1,0 +1,38 @@
+<div class="classic-item telnet-summary-formal">
+    <div class="formal-header-bar">
+        <span class="formal-title"><%= t('reports.fragments.telnetSummaryTitle') %></span>
+        <span class="formal-id">SESSION-REF: <%= data.sessionId.slice(-8) %></span>
+    </div>
+    <table class="formal-data-grid">
+        <tr>
+            <th width="30%"><%= t('reports.fragments.startTime') %></th>
+            <td><strong><%= data.src_ip || data.ip %></strong></td>
+        </tr>
+        <tr>
+            <th><%= t('reports.fragments.startTime') %> / Window</th>
+            <td><%= data.starttime ? (new Date(data.starttime).toLocaleString()) : (data.timeWindow || t('reports.common.notAvailable')) %></td>
+        </tr>
+        <tr>
+            <th><%= t('reports.fragments.duration') %></th>
+            <td><%= data.duration || 'N/A' %> s</td>
+        </tr>
+        <tr>
+            <th><%= t('reports.fragments.protocol') %></th>
+            <td style="text-transform: uppercase;"><%= data.protocol %></td>
+        </tr>
+        <tr>
+            <th><%= t('reports.fragments.totalEvents') %></th>
+            <td><%= data.eventCount || data.totalEvents || 0 %></td>
+        </tr>
+        <tr>
+            <th><%= t('reports.fragments.authAttempts') %></th>
+            <td><%= data.authAttempts %></td>
+        </tr>
+        <tr>
+            <th><%= t('reports.fragments.commandsExecuted') %></th>
+            <td style="color: <%= data.commands > 0 ? 'var(--danger)' : 'inherit' %>;">
+                <strong><%= data.commands %></strong>
+            </td>
+        </tr>
+    </table>
+</div>

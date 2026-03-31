@@ -109,6 +109,37 @@
             "commands": "Executed Commands",
             "duration": "Duration",
             "timeline": "Operational Timeline"
+        },
+        "fragments": {
+            "ipAbuseTitle": "Abuse Analysis (AbuseIPDB)",
+            "confidenceScore": "Confidence Score",
+            "totalReports": "Total Reports",
+            "reports": "reports",
+            "lastReportedAt": "Last Reported At",
+            "domain": "Domain",
+            "isp": "ISP / Provider",
+            "techniqueIdentified": "Technique Identified",
+            "patternDetected": "Pattern Detected",
+            "ipGeoTitle": "IP Geographic Location",
+            "country": "Country",
+            "city": "City / Region",
+            "coordinates": "GPS Coordinates",
+            "ipNetTitle": "Network & Infrastructure Details",
+            "asn": "ASN",
+            "org": "Organization",
+            "usageType": "Usage Type",
+            "isTor": "Tor Exit Node",
+            "isWhitelisted": "Whitelisted",
+            "hostname": "Hostname / Flag",
+            "firewallBlockTitle": "Firewall Intercept (UFW)",
+            "ipWhoisTitle": "WHOIS Record Intercept",
+            "telnetSummaryTitle": "Intercepted Session Summary",
+            "startTime": "Session Start",
+            "duration": "Total Duration",
+            "protocol": "Protocol",
+            "totalEvents": "Total Events",
+            "authAttempts": "Auth Attempts",
+            "commandsExecuted": "Commands Executed"
         }
     },
     "clipboard": {
@@ -190,7 +221,18 @@
                 "Total Events: {totalEvents}",
                 "------------------------------"
             ],
-            "timelineRow": "[{timestamp}] {eventName}\n> {message}{details}"
+            "timelineRow": "[{timestamp}] {eventName}\n> {message}{details}",
+            "firewall": {
+                "block": [
+                    "--- FIREWALL INTERCEPT ---",
+                    "EVENT: {event}",
+                    "SOURCE: {source}",
+                    "TTL: {ttl}",
+                    "LENGTH: {length}",
+                    "TOS: {tos}",
+                    "--------------------------"
+                ]
+            }
         },
         "ip": [
             "--- SUBJECT IDENTIFICATION ---",
@@ -199,6 +241,10 @@
         ],
         "generic": "{text}",
         "attackSummary": "RIEPILOGO ATTACCO:\nIP: {ip}\nPericolo: {dangerLevel} ({dangerScore})\nLogs: {totaleLogs}\nDurata: {duration}\nRPS: {rps}",
-        "attackTechnique": "Tecnica Rilevata: {tech}"
+        "attackTechnique": "Technique Detected: {tech}"
+    },
+    "common": {
+        "yes": "YES",
+        "no": "NO"
     }
 }

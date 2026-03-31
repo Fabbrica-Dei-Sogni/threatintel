@@ -126,9 +126,16 @@ export class ReportService {
 
         const t = (key: string, params?: any) => this.i18n.t(key, locale, params);
 
-        // Nel caso HUD passiamo i dati raw e lasciamo che il template hud-dossier.ejs gestisca i fragment
+        // Arricchiamo le sezioni con il testo renderizzato per i casi di fallback (generic blocks)
+        const enrichedSections = sections.map(s => {
+            return {
+                ...s,
+                renderedText: s.renderedText || this.renderSection(s.templateKey, s.data, locale)
+            };
+        });
+
         const html = await ejs.renderFile(templatePath, { 
-            sections, 
+            sections: enrichedSections, 
             logoBase64, 
             t, 
             locale 
@@ -158,9 +165,16 @@ export class ReportService {
 
         const t = (key: string, params?: any) => this.i18n.t(key, locale, params);
 
-        // Nel caso Classic passiamo i dati raw e lasciamo che il template classic-dossier.ejs gestisca i fragment dedicati
+        // Arricchiamo le sezioni con il testo renderizzato per i casi di fallback (telex extracts)
+        const enrichedSections = sections.map(s => {
+            return {
+                ...s,
+                renderedText: s.renderedText || this.renderSection(s.templateKey, s.data, locale)
+            };
+        });
+
         const html = await ejs.renderFile(templatePath, { 
-            sections, 
+            sections: enrichedSections, 
             logoBase64, 
             t, 
             locale 

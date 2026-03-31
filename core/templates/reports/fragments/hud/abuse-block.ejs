@@ -1,0 +1,32 @@
+<div class="hud-item abuse-hud-box" style="border-left-color: var(--text-red);">
+    <div class="hud-box-header">
+        <span class="hud-box-title">TACTICAL HUD: REPUTATION ANALYSIS</span>
+        <span class="hud-box-subtitle">THREAT CONFIDENCE</span>
+    </div>
+    <div class="hud-grid-4">
+        <div class="hud-metric danger-<%= Math.floor((data.confidenceScore || data.score || 0) / 20) %>">
+            <span class="hud-metric-label">CONFIDENCE</span>
+            <span class="hud-metric-value"><%= data.confidenceScore || data.score || 0 %>%</span>
+        </div>
+        <div class="hud-metric">
+            <span class="hud-metric-label">TOTAL REPORTS</span>
+            <span class="hud-metric-value"><%= data.totalReports || data.total || 0 %></span>
+        </div>
+        <div class="hud-metric">
+            <span class="hud-metric-label">LISTED</span>
+            <span class="hud-metric-value <%= data.isListed || data.listed === t('common.yes') ? 'text-red' : '' %>">
+                <%= (data.isListed || data.listed) ? ( (data.isListed === true || data.listed === t('common.yes')) ? t('common.yes') : t('common.no') ) : t('common.no') %>
+            </span>
+        </div>
+        <div class="hud-metric">
+            <span class="hud-metric-label">LAST SEEN</span>
+            <span class="hud-metric-value" style="font-size: 10px;"><%= data.lastReportedAt || data.lastReport || 'N/A' %></span>
+        </div>
+    </div>
+    <% if (data.domain || data.isp) { %>
+    <div class="hud-footer-details">
+        <% if (data.domain) { %><strong>DOMAIN:</strong> <%= data.domain %> <% } %>
+        <% if (data.isp) { %><strong>ISP:</strong> <%= data.isp %><% } %>
+    </div>
+    <% } %>
+</div>

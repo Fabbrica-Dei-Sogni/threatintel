@@ -101,14 +101,45 @@
             "truncated": "Gekürztes Dokument: Zeige erste {count} von {total} Meldungen."
         },
         "telnetDetail": {
-            "title": "Telnet/SSH-Sitzung - Investigatives Dossier",
+            "title": "Telnet/SSH-Sitzung - Ermittlungsdossier",
             "overview": "Sitzungsübersicht",
             "sessionInfo": "Sitzungsinformationen",
-            "events": "Ereignisse insgesamt",
-            "authAttempts": "Auth-Versuche",
+            "events": "Ereignisse Gesamt",
+            "authAttempts": "Anmeldeversuche",
             "commands": "Ausgeführte Befehle",
             "duration": "Dauer",
             "timeline": "Operative Zeitachse"
+        },
+        "fragments": {
+            "ipAbuseTitle": "Missbrauchsanalyse (AbuseIPDB)",
+            "confidenceScore": "Vertrauenswert",
+            "totalReports": "Berichte Gesamt",
+            "reports": "Berichte",
+            "lastReportedAt": "Zuletzt gemeldet am",
+            "domain": "Domain",
+            "isp": "ISP / Anbieter",
+            "techniqueIdentified": "Identifizierte Technik",
+            "patternDetected": "Erkanntes Muster",
+            "ipGeoTitle": "IP Geografischer Standort",
+            "country": "Land",
+            "city": "Stadt / Region",
+            "coordinates": "GPS Koordinaten",
+            "ipNetTitle": "Netzwerk & Infrastruktur Details",
+            "asn": "ASN",
+            "org": "Organisation",
+            "usageType": "Nutzungstyp",
+            "isTor": "Tor Exit Node",
+            "isWhitelisted": "Auf der Whitelist",
+            "hostname": "Hostname / Flagge",
+            "firewallBlockTitle": "Firewall Abfangung (UFW)",
+            "ipWhoisTitle": "WHOIS-Datensatz Abfangen",
+            "telnetSummaryTitle": "Zusammenfassung der abgefangenen Sitzung",
+            "startTime": "Sitzungsbeginn",
+            "duration": "Gesamtdauer",
+            "protocol": "Protokoll",
+            "totalEvents": "Ereignisse Gesamt",
+            "authAttempts": "Authentifizierungsversuche",
+            "commandsExecuted": "Ausgeführte Befehle"
         }
     },
     "clipboard": {
@@ -178,7 +209,19 @@
                 "Payload:",
                 "{payload}",
                 "---------------------------------------"
-            ]
+            ],
+            "timelineRow": "[{timestamp}] {eventName}\n> {message}{details}",
+            "firewall": {
+                "block": [
+                    "--- FIREWALL ABFANGUNG ---",
+                    "EREIGNIS: {event}",
+                    "QUELLE: {source}",
+                    "TTL: {ttl}",
+                    "LÄNGE: {length}",
+                    "TOS: {tos}",
+                    "--------------------------"
+                ]
+            }
         },
         "telnetDetail": {
             "summary": [
@@ -199,6 +242,10 @@
         ],
         "generic": "{text}",
         "attackSummary": "RIEPILOGO ATTACCO:\nIP: {ip}\nPericolo: {dangerLevel} ({dangerScore})\nLogs: {totaleLogs}\nDurata: {duration}\nRPS: {rps}",
-        "attackTechnique": "Tecnica Rilevata: {tech}"
+        "attackTechnique": "Erkannte Technik: {tech}"
+    },
+    "common": {
+        "yes": "JA",
+        "no": "NEIN"
     }
 }

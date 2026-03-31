@@ -1,0 +1,28 @@
+<div class="classic-item ip-abuse-formal">
+    <div class="formal-header-bar">
+        <span class="formal-title"><%= t('reports.fragments.ipAbuseTitle') %></span>
+        <span class="formal-id">ABUSE-CONFIDENCE: <%= data.confidenceScore || data.score || 0 %>%</span>
+    </div>
+    <table class="formal-data-grid">
+        <tr>
+            <th width="30%"><%= t('reports.fragments.confidenceScore') %></th>
+            <td><span class="classic-danger-val"><strong><%= data.confidenceScore || data.score || 0 %>%</strong></span></td>
+        </tr>
+        <tr>
+            <th><%= t('reports.fragments.totalReports') %></th>
+            <td><%= data.totalReports || data.total || 0 %> <%= t('reports.fragments.reports') %></td>
+        </tr>
+        <tr>
+            <th><%= t('reports.fragments.lastReportedAt') %></th>
+            <td><%= data.lastReportedAt || data.lastReport || t('reports.common.notAvailable') %></td>
+        </tr>
+        <tr>
+            <th><%= t('reports.fragments.domain') %></th>
+            <td><%= data.domain %></td>
+        </tr>
+        <tr>
+            <th><%= t('reports.fragments.isp') %></th>
+            <td><%= data.isp %></td>
+        </tr>
+    </table>
+</div>

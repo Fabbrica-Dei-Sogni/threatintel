@@ -1,0 +1,29 @@
+<div class="classic-item ip-geo-formal">
+    <div class="formal-header-bar">
+        <span class="formal-title"><%= t('reports.fragments.ipGeoTitle') %></span>
+        <span class="formal-id">GEO-DATA-REF: <%= data.ip %></span>
+    </div>
+    <table class="formal-data-grid">
+        <tr>
+            <th width="30%"><%= t('reports.fragments.country') %></th>
+            <td><strong><%= data.country %></strong></td>
+        </tr>
+        <tr>
+            <th><%= t('reports.fragments.city') %></th>
+            <td><%= data.city %></td>
+        </tr>
+        <tr>
+            <th><%= t('reports.fragments.isp') %></th>
+            <td><%= data.isp %></td>
+        </tr>
+        <tr>
+            <th><%= t('reports.fragments.coordinates') %></th>
+            <td style="font-family: var(--font-mono);"><%= data.coordinates || data.gps %></td>
+        </tr>
+    </table>
+    <% if (data.timezone) { %>
+    <div style="margin-top: 8px; font-size: 0.85em; color: #666;">
+        <strong>TIMEZONE:</strong> <%= data.timezone %>
+    </div>
+    <% } %>
+</div>

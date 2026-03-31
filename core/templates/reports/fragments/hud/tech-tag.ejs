@@ -1,0 +1,15 @@
+<div class="hud-item technique-hud-box" style="border-left-color: var(--text-amber);">
+    <div class="hud-box-header">
+        <span class="hud-box-title">TACTICAL HUD: TECHNIQUE IDENTIFIED</span>
+        <span class="hud-box-subtitle">TAG: <%= data.tech %></span>
+    </div>
+    <div class="hud-marker-container">
+        <div class="hud-status-section">
+            <div class="hud-dot" style="background: var(--text-amber); box-shadow: 0 0 10px var(--text-amber);"></div>
+            <div class="hud-label"><%= t('reports.fragments.patternDetected') %></div>
+        </div>
+        <div class="hud-ip-address" style="color: var(--text-amber); font-size: 18px;">
+            <%= data.tech %>
+        </div>
+    </div>
+</div>

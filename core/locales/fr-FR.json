@@ -101,14 +101,45 @@
             "truncated": "Document tronqué: Affiche les {count} premiers sur {total} rapports."
         },
         "telnetDetail": {
-            "title": "Dossier d'Investigation de Session Telnet/SSH",
-            "overview": "Aperçu de la Session",
-            "sessionInfo": "Informations sur la Session",
-            "events": "Événements Totaux",
-            "authAttempts": "Tentatives d'Auth",
-            "commands": "Commandes Exécutées",
+            "title": "Dossier d'investigation de session Telnet/SSH",
+            "overview": "Aperçu de la session",
+            "sessionInfo": "Informations sur la session",
+            "events": "Total des événements",
+            "authAttempts": "Tentatives d'authentification",
+            "commands": "Commandes exécutées",
             "duration": "Durée",
-            "timeline": "Chronologie Opérationnelle"
+            "timeline": "Timeline opérationnelle"
+        },
+        "fragments": {
+            "ipAbuseTitle": "Analyse des Abus (AbuseIPDB)",
+            "confidenceScore": "Score de Confiance",
+            "totalReports": "Total des Signalements",
+            "reports": "signalements",
+            "lastReportedAt": "Dernier Signalement le",
+            "domain": "Domaine",
+            "isp": "FAI / Fournisseur",
+            "techniqueIdentified": "Technique Identifiée",
+            "patternDetected": "Pattern Détecté",
+            "ipGeoTitle": "Localisation Géographique IP",
+            "country": "Pays",
+            "city": "Ville / Région",
+            "coordinates": "Coordonnées GPS",
+            "ipNetTitle": "Détails Réseau & Infrastructure",
+            "asn": "ASN",
+            "org": "Organisation",
+            "usageType": "Type d'utilisation",
+            "isTor": "Nœud de sortie Tor",
+            "isWhitelisted": "En Liste Blanche",
+            "hostname": "Nom d'hôte / Drapeau",
+            "firewallBlockTitle": "Interception Firewall (UFW)",
+            "ipWhoisTitle": "Interception de l'enregistrement WHOIS",
+            "telnetSummaryTitle": "Résumé de la session interceptée",
+            "startTime": "Début de la session",
+            "duration": "Durée totale",
+            "protocol": "Protocole",
+            "totalEvents": "Nombre total d'événements",
+            "authAttempts": "Tentatives d'authentification",
+            "commandsExecuted": "Commandes exécutées"
         }
     },
     "clipboard": {
@@ -190,7 +221,18 @@
                 "Total des Événements: {totalEvents}",
                 "------------------------------------"
             ],
-            "timelineRow": "[{timestamp}] {eventName}\n> {message}{details}"
+            "timelineRow": "[{timestamp}] {eventName}\n> {message}{details}",
+            "firewall": {
+                "block": [
+                    "--- INTERCEPTION FIREWALL ---",
+                    "ÉVÉNEMENT: {event}",
+                    "SOURCE: {source}",
+                    "TTL: {ttl}",
+                    "LONGUEUR: {length}",
+                    "TOS: {tos}",
+                    "-----------------------------"
+                ]
+            }
         },
         "ip": [
             "--- IDENTIFICATION DU SUJET ---",
@@ -199,6 +241,10 @@
         ],
         "generic": "{text}",
         "attackSummary": "RIEPILOGO ATTACCO:\nIP: {ip}\nPericolo: {dangerLevel} ({dangerScore})\nLogs: {totaleLogs}\nDurata: {duration}\nRPS: {rps}",
-        "attackTechnique": "Tecnica Rilevata: {tech}"
+        "attackTechnique": "Technique Détectée: {tech}"
+    },
+    "common": {
+        "yes": "OUI",
+        "no": "NON"
     }
 }

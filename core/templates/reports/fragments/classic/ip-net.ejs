@@ -1,0 +1,35 @@
+<div class="classic-item ip-net-formal">
+    <div class="formal-header-bar">
+        <span class="formal-title"><%= t('reports.fragments.ipNetTitle') %></span>
+        <span class="formal-id">ASN-REF: <%= data.asn %></span>
+    </div>
+    <table class="formal-data-grid">
+        <tr>
+            <th width="30%"><%= t('reports.fragments.asn') %></th>
+            <td><strong><%= data.asn %></strong></td>
+            <td><strong><%= data.asn || 'N/A' %></strong></td>
+        </tr>
+        <tr>
+            <th><%= t('reports.fragments.org') %></th>
+            <td><%= data.org || 'N/A' %></td>
+        </tr>
+        <tr>
+            <th><%= t('reports.fragments.usageType') %></th>
+            <td><%= data.usageType || 'N/A' %></td>
+        </tr>
+        <tr>
+            <th><%= t('reports.fragments.hostname') %></th>
+            <td><%= data.hostname || 'N/A' %></td>
+        </tr>
+        <tr>
+            <th><%= t('reports.fragments.isTor') %></th>
+            <td style="color: <%= data.isTor ? 'var(--danger)' : 'var(--text-muted)' %>;">
+                <strong><%= data.isTor ? t('common.yes') : t('common.no') %></strong>
+            </td>
+        </tr>
+        <tr>
+            <th><%= t('reports.fragments.isWhitelisted') %></th>
+            <td><%= data.isWhitelisted ? t('common.yes') : t('common.no') %></td>
+        </tr>
+    </table>
+</div>

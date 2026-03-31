@@ -1,0 +1,41 @@
+<div class="hud-item firewall-hud-box">
+    <div class="hud-box-header">
+        <span class="hud-box-title">TACTICAL HUD: FIREWALL INTERCEPT</span>
+        <span class="hud-box-subtitle"><%= data.event || 'UFW_LOG' %></span>
+    </div>
+    
+    <div class="hud-grid-4">
+        <div class="hud-metric">
+            <span class="hud-metric-label">SOURCE</span>
+            <span class="hud-metric-value" style="font-size: 11px;"><%= data.source || 'N/A' %></span>
+        </div>
+        <div class="hud-metric">
+            <span class="hud-metric-label">TTL</span>
+            <span class="hud-metric-value"><%= data.ttl || 'N/A' %></span>
+        </div>
+        <div class="hud-metric">
+            <span class="hud-metric-label">LEN</span>
+            <span class="hud-metric-value"><%= data.length || 'N/A' %></span>
+        </div>
+        <div class="hud-metric">
+            <span class="hud-metric-label">TOS</span>
+            <span class="hud-metric-value"><%= data.tos || '0x00' %></span>
+        </div>
+    </div>
+    
+    <div class="hud-footer-details" style="border-top: 1px dashed rgba(0, 243, 255, 0.2); margin-top: 10px; padding-top: 5px;">
+        <span class="hud-status-tag-mini pulse-red">ACTION: BLOCKED</span>
+        <span class="hud-timestamp-mini"><%= new Date().toLocaleTimeString() %></span>
+    </div>
+</div>
+
+<style>
+.firewall-hud-box {
+    border-left: 4px solid var(--danger) !important;
+}
+.pulse-red {
+    color: var(--danger);
+    text-shadow: 0 0 5px var(--danger);
+    font-weight: 800;
+}
+</style>

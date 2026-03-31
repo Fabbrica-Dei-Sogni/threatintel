@@ -1,0 +1,32 @@
+<div class="hud-item telnet-row-hud" style="border-left-width: 2px; padding: 12px; margin-bottom: 5px; background: rgba(0,0,0,0.2);">
+    <div class="hud-log-header">
+        <div class="hud-log-meta">
+            <span class="hud-log-method-badge <%= (data.type || data.eventName || '').toLowerCase().includes('login') ? 'POST' : '' %>">
+                <%= (data.type || data.eventName || 'EVENT').toUpperCase() %>
+            </span>
+            <span style="color: var(--text-slate);"><%= data.timestamp %></span>
+        </div>
+        <% if (data.details) { %>
+            <div class="hud-log-row" style="white-space: pre-wrap; font-family: var(--mono); color: var(--text-cyan); font-size: 11px;">
+                <%= data.details %>
+            </div>
+        <% } %>
+        <% if (data.username || data.password) { %>
+            <div class="hud-log-row">
+                <span class="hud-log-label">AUTH DATA</span>
+                <span class="hud-log-val-red"><%= data.username || '-' %></span> / <span class="hud-log-val-red"><%= data.password || '-' %></span>
+            </div>
+        <% } %>
+        <% if (data.input) { %>
+            <div class="hud-log-row">
+                <span class="hud-log-label">REMOTE INPUT</span>
+                <span style="color: #33ff33; font-family: var(--mono); font-weight: 900;"><%= data.input %></span>
+            </div>
+        <% } %>
+        <% if (data.message && !data.details) { %>
+            <div class="hud-log-row" style="font-size: 11px; color: var(--text-slate); font-style: italic;">
+                <%= data.message %>
+            </div>
+        <% } %>
+    </div>
+</div>

@@ -101,14 +101,45 @@
             "truncated": "Dokument obcięty: Wyświetlanie pierwszych {count} z {total} raportów."
         },
         "telnetDetail": {
-            "title": "Dossier Śledcze Sesji Telnet/SSH",
-            "overview": "Przegląd Sesji",
-            "sessionInfo": "Informacje o Sesji",
-            "events": "Razem Zdarzeń",
-            "authAttempts": "Próby Autoryzacji",
-            "commands": "Wykonane Komendy",
-            "duration": "Czas Trwania",
-            "timeline": "Oś Czasu Operacyjnego"
+            "title": "Dossier śledczy sesji Telnet/SSH",
+            "overview": "Przegląd sesji",
+            "sessionInfo": "Informacje o sesji",
+            "events": "Wszystkie zdarzenia",
+            "authAttempts": "Próby uwierzytelnienia",
+            "commands": "Wykonane polecenia",
+            "duration": "Czas trwania",
+            "timeline": "Oś czasu operacji"
+        },
+        "fragments": {
+            "ipAbuseTitle": "Analiza nadużyć (AbuseIPDB)",
+            "confidenceScore": "Wynik zaufania",
+            "totalReports": "Łączna liczba zgłoszeń",
+            "reports": "zgłoszeń",
+            "lastReportedAt": "Ostatnie zgłoszenie",
+            "domain": "Domena",
+            "isp": "Dostawca / ISP",
+            "techniqueIdentified": "Zidentyfikowana technika",
+            "patternDetected": "Wykryty wzorzec",
+            "ipGeoTitle": "Lokalizacja geograficzna IP",
+            "country": "Kraj",
+            "city": "Miasto / Region",
+            "coordinates": "Współrzędne GPS",
+            "ipNetTitle": "Szczegóły sieci i infrastruktury",
+            "asn": "ASN",
+            "org": "Organizacja",
+            "usageType": "Typ użycia",
+            "isTor": "Tor Exit Node",
+            "isWhitelisted": "Na białej liście",
+            "hostname": "Nazwa hosta / Flaga",
+            "firewallBlockTitle": "Przechwycenie Firewall (UFW)",
+            "ipWhoisTitle": "Przejęcie rekordu WHOIS",
+            "telnetSummaryTitle": "Podsumowanie przechwyconej sesji",
+            "startTime": "Rozpoczęcie sesji",
+            "duration": "Całkowity czas trwania",
+            "protocol": "Protokół",
+            "totalEvents": "Łączna liczba zdarzeń",
+            "authAttempts": "Próby autoryzacji",
+            "commandsExecuted": "Wykonane polecenia"
         }
     },
     "clipboard": {
@@ -178,7 +209,19 @@
                 "Ładunek (Payload):",
                 "{payload}",
                 "--------------------------------------"
-            ]
+            ],
+            "timelineRow": "[{timestamp}] {eventName}\n> {message}{details}",
+            "firewall": {
+                "block": [
+                    "--- PRZECHWYCENIE FIREWALL ---",
+                    "ZDARZENIE: {event}",
+                    "ŹRÓDŁO: {source}",
+                    "TTL: {ttl}",
+                    "DŁUGOŚĆ: {length}",
+                    "TOS: {tos}",
+                    "------------------------------"
+                ]
+            }
         },
         "telnetDetail": {
             "summary": [
@@ -199,6 +242,10 @@
         ],
         "generic": "{text}",
         "attackSummary": "RIEPILOGO ATTACCO:\nIP: {ip}\nPericolo: {dangerLevel} ({dangerScore})\nLogs: {totaleLogs}\nDurata: {duration}\nRPS: {rps}",
-        "attackTechnique": "Tecnica Rilevata: {tech}"
+        "attackTechnique": "Wykryta technika: {tech}"
+    },
+    "common": {
+        "yes": "TAK",
+        "no": "NIE"
     }
 }

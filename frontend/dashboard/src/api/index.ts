@@ -286,7 +286,7 @@ export async function fetchReport(params: {
     locale?: string;
 }): Promise<Blob> {
     try {
-        const response = await apiClient.get('/reports/attack', {
+        const response = await apiClient.get('/reports/dettaglio', {
             params,
             responseType: 'blob',
         });

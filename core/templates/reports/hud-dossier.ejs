@@ -332,6 +332,15 @@
                             if (section.templateKey === 'clipboard.ip') fragmentName = 'ip-marker';
                             else if (section.templateKey === 'clipboard.attackDetail.summary') fragmentName = 'attack-hud';
                             else if (section.templateKey === 'clipboard.attackDetail.log') fragmentName = 'log-entry';
+                            else if (section.templateKey === 'clipboard.attackTechnique') fragmentName = 'tech-tag';
+                            else if (section.templateKey === 'clipboard.ipDetails.geo') fragmentName = 'geo-block';
+                            else if (section.templateKey === 'clipboard.ipDetails.net') fragmentName = 'net-block';
+                            else if (section.templateKey === 'clipboard.ipDetails.abuse') fragmentName = 'abuse-block';
+                            else if (section.templateKey === 'clipboard.ipDetails.whois') fragmentName = 'whois-block';
+                            else if (section.templateKey === 'clipboard.telnetDetail.summary') fragmentName = 'telnet-hud';
+                            else if (section.templateKey === 'clipboard.telnetDetail.timelineRow') fragmentName = 'telnet-row';
+                            else if (section.templateKey === 'clipboard.firewall.block') fragmentName = 'firewall-block';
+
                             // Aggiungiamo il path completo relativo alla directory templates/reports
                             let fragmentPath = './fragments/hud/' + fragmentName + '.ejs';
                         %>

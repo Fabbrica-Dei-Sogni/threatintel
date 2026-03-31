@@ -1,0 +1,29 @@
+<div class="hud-item telnet-hud-box" style="border-left-color: var(--text-amber);">
+    <div class="hud-box-header">
+        <span class="hud-box-title">TACTICAL HUD: SESSION INTERCEPT</span>
+        <span class="hud-box-subtitle">SID: <%= data.sessionId.slice(-8) %></span>
+    </div>
+    <div class="hud-grid-4">
+        <div class="hud-metric">
+            <span class="hud-metric-label">HOSTILE IP</span>
+            <span class="hud-metric-value"><%= data.src_ip || data.ip %></span>
+        </div>
+        <div class="hud-metric">
+            <span class="hud-metric-label">TIME WINDOW</span>
+            <span class="hud-metric-value" style="font-size: 10px;"><%= data.starttime ? (new Date(data.starttime).toLocaleString()) : (data.timeWindow || 'N/A') %></span>
+        </div>
+        <div class="hud-metric">
+            <span class="hud-metric-label">EVENTS</span>
+            <span class="hud-metric-value"><%= data.eventCount || data.totalEvents || 0 %></span>
+        </div>
+        <div class="hud-metric">
+            <span class="hud-metric-label">DURATION</span>
+            <span class="hud-metric-value"><%= data.duration || 'N/A' %>s</span>
+        </div>
+    </div>
+    <% if (data.origin) { %>
+    <div class="hud-footer-details">
+        <strong>ORIGIN:</strong> <%= data.origin %>
+    </div>
+    <% } %>
+</div>

@@ -1,0 +1,34 @@
+<div class="classic-item telnet-event-formal" style="margin-bottom: 5px;">
+    <div class="log-grid-header">
+        <div class="log-method-rect <%= (data.type || data.eventName || '').toLowerCase().includes('login') ? 'POST' : '' %>">
+            <%= (data.type || data.eventName || 'EVENT').toUpperCase() %>
+        </div>
+        <div class="log-url-rect">
+            <%= data.timestamp %>
+        </div>
+    </div>
+    <div class="log-grid-body">
+        <% if (data.details) { %>
+            <div class="log-row" style="white-space: pre-wrap; font-family: var(--font-mono); font-size: 0.9em;">
+                <%= data.details %>
+            </div>
+        <% } %>
+        <% if (data.username || data.password) { %>
+            <div class="log-row">
+                <strong>CREDENTIALS:</strong> 
+                <span class="indicator-text"><%= data.username || '-' %> / <%= data.password || '-' %></span>
+            </div>
+        <% } %>
+        <% if (data.input) { %>
+            <div class="log-row">
+                <strong>INPUT:</strong> 
+                <span style="font-family: var(--font-mono); color: var(--danger); font-weight: 800;"><%= data.input %></span>
+            </div>
+        <% } %>
+        <% if (data.message && !data.details) { %>
+            <div class="log-row">
+                <strong>MESSAGE:</strong> <%= data.message %>
+            </div>
+        <% } %>
+    </div>
+</div>

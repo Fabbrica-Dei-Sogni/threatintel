@@ -322,6 +322,14 @@
                             if (section.templateKey === 'clipboard.ip') fragmentName = 'ip-info';
                             else if (section.templateKey === 'clipboard.attackDetail.summary') fragmentName = 'attack-summary';
                             else if (section.templateKey === 'clipboard.attackDetail.log') fragmentName = 'log-table';
+                            else if (section.templateKey === 'clipboard.attackTechnique') fragmentName = 'attack-technique';
+                            else if (section.templateKey === 'clipboard.ipDetails.geo') fragmentName = 'ip-geo';
+                            else if (section.templateKey === 'clipboard.ipDetails.net') fragmentName = 'ip-net';
+                            else if (section.templateKey === 'clipboard.ipDetails.abuse') fragmentName = 'ip-abuse';
+                            else if (section.templateKey === 'clipboard.ipDetails.whois') fragmentName = 'ip-whois';
+                            else if (section.templateKey === 'clipboard.telnetDetail.summary') fragmentName = 'telnet-summary';
+                            else if (section.templateKey === 'clipboard.telnetDetail.timelineRow') fragmentName = 'telnet-timeline';
+                            else if (section.templateKey === 'clipboard.firewall.block') fragmentName = 'firewall-block';
                             
                             let fragmentPath = './fragments/classic/' + fragmentName + '.ejs';
                         %>

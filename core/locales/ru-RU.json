@@ -101,14 +101,45 @@
             "truncated": "Документ сокращен: Отображаются первые {count} из {total} отчетов."
         },
         "telnetDetail": {
-            "title": "Следственное досье сессии Telnet/SSH",
+            "title": "Досье расследования сессии Telnet/SSH",
             "overview": "Обзор сессии",
             "sessionInfo": "Информация о сессии",
             "events": "Всего событий",
             "authAttempts": "Попытки авторизации",
             "commands": "Выполненные команды",
-            "duration": "Продолжительность",
-            "timeline": "Операционная временная шкала"
+            "duration": "Длительность",
+            "timeline": "Оперативная хронология"
+        },
+        "fragments": {
+            "ipAbuseTitle": "Анализ злоупотреблений (AbuseIPDB)",
+            "confidenceScore": "Уровень доверия",
+            "totalReports": "Всего отчетов",
+            "reports": "отчетов",
+            "lastReportedAt": "Последний отчет",
+            "domain": "Домен",
+            "isp": "Провайдер / ISP",
+            "techniqueIdentified": "Идентифицированная техника",
+            "patternDetected": "Обнаруженный паттерн",
+            "ipGeoTitle": "Географическое положение IP",
+            "country": "Страна",
+            "city": "Город / Регион",
+            "coordinates": "GPS координаты",
+            "ipNetTitle": "Детали сети и инфраструктуры",
+            "asn": "ASN",
+            "org": "Организация",
+            "usageType": "Тип использования",
+            "isTor": "Выходной узел Tor",
+            "isWhitelisted": "В белом списке",
+            "hostname": "Имя хоста / Флаг",
+            "firewallBlockTitle": "Перехват Firewall (UFW)",
+            "ipWhoisTitle": "Перехват записи WHOIS",
+            "telnetSummaryTitle": "Сводка перехваченной сессии",
+            "startTime": "Начало сессии",
+            "duration": "Общая длительность",
+            "protocol": "Протокол",
+            "totalEvents": "Всего событий",
+            "authAttempts": "Попытки авторизации",
+            "commandsExecuted": "Выполненные команды"
         }
     },
     "clipboard": {
@@ -178,7 +209,19 @@
                 "Данные (Payload):",
                 "{payload}",
                 "--------------------------------"
-            ]
+            ],
+            "timelineRow": "[{timestamp}] {eventName}\n> {message}{details}",
+            "firewall": {
+                "block": [
+                    "--- ПЕРЕХВАТ FIREWALL ---",
+                    "СОБЫТИЕ: {event}",
+                    "ИСТОЧНИК: {source}",
+                    "TTL: {ttl}",
+                    "ДЛИНА: {length}",
+                    "TOS: {tos}",
+                    "-------------------------"
+                ]
+            }
         },
         "telnetDetail": {
             "summary": [
@@ -199,6 +242,10 @@
         ],
         "generic": "{text}",
         "attackSummary": "RIEPILOGO ATTACCO:\nIP: {ip}\nPericolo: {dangerLevel} ({dangerScore})\nLogs: {totaleLogs}\nDurata: {duration}\nRPS: {rps}",
-        "attackTechnique": "Tecnica Rilevata: {tech}"
+        "attackTechnique": "Обнаруженная техника: {tech}"
+    },
+    "common": {
+        "yes": "ДА",
+        "no": "НЕТ"
     }
 }

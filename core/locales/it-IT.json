@@ -110,6 +110,37 @@
             "duration": "Durata",
             "timeline": "Timeline Operativa"
         },
+        "fragments": {
+            "ipAbuseTitle": "Analisi Abusi (AbuseIPDB)",
+            "confidenceScore": "Punteggio Confidenza",
+            "totalReports": "Segnalazioni Totali",
+            "reports": "segnalazioni",
+            "lastReportedAt": "Ultima Segnalazione",
+            "domain": "Dominio",
+            "isp": "ISP / Fornitore",
+            "techniqueIdentified": "Tecnica Identificata",
+            "patternDetected": "Pattern Rilevato",
+            "ipGeoTitle": "Localizzazione Geografica IP",
+            "country": "Nazione",
+            "city": "Città / Regione",
+            "coordinates": "Coordinate GPS",
+            "ipNetTitle": "Dettagli Rete & Infrastruttura",
+            "asn": "ASN",
+            "org": "Organizzazione",
+            "usageType": "Tipo Utilizzo",
+            "isTor": "Tor Exit Node",
+            "isWhitelisted": "In Whitelist",
+            "hostname": "Hostname / Insegna",
+            "firewallBlockTitle": "Intercettazione Firewall (UFW)",
+            "ipWhoisTitle": "Intercettazione Record WHOIS",
+            "telnetSummaryTitle": "Riepilogo Sessione Intercettata",
+            "startTime": "Inizio Sessione",
+            "duration": "Durata Totale",
+            "protocol": "Protocollo",
+            "totalEvents": "Eventi Totali",
+            "authAttempts": "Tentativi Autenticazione",
+            "commandsExecuted": "Comandi Eseguiti"
+        },
         "clipboard": {
             "ipDetails": {
                 "geo": [
@@ -189,98 +220,32 @@
                     "Totale Eventi: {totalEvents}",
                     "-----------------------------------"
                 ],
-                "timelineRow": "[{timestamp}] {eventName}\n> {message}{details}"
-            }
-        }
-    },
-    "clipboard": {
-        "ipDetails": {
-            "geo": [
-                "--- INTELLIGENZA GEOGRAFICA ---",
-                "IP: {ip}",
-                "Paese: {country}",
-                "Città/Regione: {city}, {region}",
-                "Fuso Orario: {timezone}",
-                "Coordinate GPS: {gps}",
+                "timelineRow": "[{timestamp}] {eventName}\n> {message}{details}",
+                "firewall": {
+                    "block": [
+                        "--- INTERCETTAZIONE FIREWALL ---",
+                        "EVENTO: {event}",
+                        "SORGENTE: {source}",
+                        "TTL: {ttl}",
+                        "LUNGHEZZA: {length}",
+                        "TOS: {tos}",
+                        "--------------------------------"
+                    ]
+                }
+            },
+            "ip": [
+                "--- IDENTIFICATIVO SOGGETTO ---",
+                "INDIRIZZO IP: {ip}",
+                "HOSTNAME: {hostname}",
                 "-------------------------------"
             ],
-            "net": [
-                "--- INFORMAZIONI DI RETE ---",
-                "IP: {ip}",
-                "Organizzazione: {org}",
-                "Hostname/ISP: {hostname}",
-                "-----------------------------"
-            ],
-            "abuse": [
-                "--- RIEPILOGO ABUSI (ABUSEIPDB) ---",
-                "IP: {ip}",
-                "Punteggio di Confidenza: {score}%",
-                "Presente in Blacklist: {listed}",
-                "Totale Segnalazioni: {total}",
-                "Ultima Segnalazione: {lastReport}",
-                "-----------------------------------"
-            ],
-            "whois": [
-                "--- DATI WHOIS COMPLETI ---",
-                "IP: {ip}",
-                "",
-                "{rawData}",
-                "---------------------------"
-            ]
-        },
-        "attackDetail": {
-            "summary": [
-                "--- HUD TATTICO: RIEPILOGO ATTACCO ---",
-                "IP Bersaglio: {ip}",
-                "Livello Defcon: {defcon} ({score}/10)",
-                "",
-                "[METRICHE PRINCIPALI]",
-                "- Totale Log: {totalLogs}",
-                "- Durata: {duration}",
-                "- RPS Medi: {rps}",
-                "",
-                "[PROFILO ATTACCO]",
-                "- Tecniche: {techniques}",
-                "- Primo Avvistamento: {firstSeen}",
-                "- Ultimo Avvistamento: {lastSeen}",
-                "- Intensità: {intensity}",
-                "- Forensic Score Medio: {avgScore}",
-                "--------------------------------------"
-            ],
-            "log": [
-                "--- DETTAGLIO THREAT LOG COMPLETO ---",
-                "Timestamp: {timestamp}",
-                "Metodo: {method}",
-                "URL: {url}",
-                "Forensic Score: {score}",
-                "Indicatori: {indicators}",
-                "User Agent: {userAgent}",
-                "IP Sorgente: {ip}",
-                "",
-                "Payload:",
-                "{payload}",
-                "--------------------------------------"
-            ]
-        },
-        "telnetDetail": {
-            "summary": [
-                "--- RIEPILOGO SESSIONE TELNET ---",
-                "ID Sessione: {sessionId}",
-                "IP Ostile: {ip}",
-                "Finestra Temporale: {timeWindow}",
-                "Origine: {origin}",
-                "Totale Eventi: {totalEvents}",
-                "-----------------------------------"
-            ],
-            "timelineRow": "[{timestamp}] {eventName}\n> {message}{details}"
-        },
-        "ip": [
-            "--- IDENTIFICATIVO SOGGETTO ---",
-            "INDIRIZZO IP: {ip}",
-            "-------------------------------"
-        ],
-        "generic": "{text}",
-        "attackSummary": "RIEPILOGO ATTACCO:\nIP: {ip}\nPericolo: {dangerLevel} ({dangerScore})\nLogs: {totaleLogs}\nDurata: {duration}\nRPS: {rps}",
-        "attackTechnique": "Tecnica Rilevata: {tech}"
+            "generic": "{text}",
+            "attackSummary": "RIEPILOGO ATTACCO:\nIP: {ip}\nPericolo: {dangerLevel} ({dangerScore})\nLogs: {totaleLogs}\nDurata: {duration}\nRPS: {rps}",
+            "attackTechnique": "Tecnica Rilevata: {tech}"
+        }
+    },
+    "common": {
+        "yes": "SI",
+        "no": "NO"
     }
 }

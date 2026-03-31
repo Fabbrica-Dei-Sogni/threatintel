@@ -61,9 +61,9 @@
                   <h3>DOSSIER PREVIEW</h3>
                 </div>
                 <div class="header-actions">
-                   <button @click="generateCustomReport('pdf')" class="download-mini-btn" :disabled="loadingPdf">
+                  <button @click="generateCustomReport('pdf')" class="download-mini-btn" :disabled="loadingPdf">
                     <span v-if="loadingPdf" class="spinner-tiny"></span>
-                    <span v-else>📥 <span class="h-tablet">DOWNLOAD</span> PDF</span>
+                    <span v-else>📥 PDF</span>
                   </button>
                   <button class="close-btn" @click="closePreview">✕</button>
                 </div>
@@ -376,6 +376,26 @@ onUnmounted(() => window.removeEventListener('resize', updateScale));
 }
 
 .header-title h3 { font-size: 0.75rem; letter-spacing: 3px; color: #fff; margin: 0; }
+
+.download-mini-btn {
+  background: #10b981;
+  color: white;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+  transition: all 0.3s;
+}
+
+.download-mini-btn:hover:not(:disabled) {
+  filter: brightness(1.1);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
+}
+
 .close-btn { background: rgba(255, 255, 255, 0.05); border: none; color: #fff; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; }
 
 .modal-body {

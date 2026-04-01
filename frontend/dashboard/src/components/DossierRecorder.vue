@@ -38,9 +38,9 @@
 
             <div class="style-selector-pill">
               <button v-for="style in AVAILABLE_STYLES" :key="style.id" class="style-opt"
-                :class="{ active: selectedStyle === style.id, [style.id]: true }" @click="selectedStyle = style.id"
-                :title="t(style.titleKey)">
-                {{ style.label }}
+                :class="{ active: selectedStyle === style.id, [style.id]: true }" @click="selectedStyle = style.id">
+                <span class="label-full">{{ style.label }}</span>
+                <span class="label-short">{{ style.label[0] }}</span>
               </button>
             </div>
 
@@ -137,8 +137,7 @@ const previewFrame = ref(null);
 const scalingStyle = computed(() => ({
   transform: `scale(${scaleFactor.value})`,
   transformOrigin: 'top center',
-  width: `${reportWidth}px`,
-  marginBottom: `-${reportWidth * (1 - scaleFactor.value)}px`
+  width: `${reportWidth}px`
 }));
 
 const updateScale = () => {
@@ -497,6 +496,13 @@ onUnmounted(() => window.removeEventListener('resize', updateScale));
   cursor: pointer;
   transition: all 0.2s;
   letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.label-short {
+  display: none;
 }
 
 .style-opt.active.classic {
@@ -574,6 +580,19 @@ onUnmounted(() => window.removeEventListener('resize', updateScale));
     gap: 10px;
     padding: 0 12px;
   }
+
+  .label-full {
+    display: none;
+  }
+
+  .label-short {
+    display: inline;
+    font-size: 0.8rem;
+  }
+
+  .style-opt {
+    padding: 4px 10px;
+  }
 }
 
 @media (max-width: 400px) {
@@ -632,12 +651,13 @@ onUnmounted(() => window.removeEventListener('resize', updateScale));
 }
 
 .modal-header {
-  padding: 12px 24px;
+  padding: 15px 25px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   background: rgba(30, 41, 59, 0.5);
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  flex-shrink: 0;
 }
 
 .header-title h3 {
@@ -679,10 +699,16 @@ onUnmounted(() => window.removeEventListener('resize', updateScale));
 .modal-body {
   flex: 1;
   overflow: auto;
-  padding: 10px;
+  padding: 60px 40px;
+  background: radial-gradient(circle at center, #1e293b 0%, #020617 100%);
   display: flex;
   justify-content: center;
   align-items: flex-start;
+}
+
+.glass-morphism-dark {
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(40px);
 }
 
 .report-frame {
@@ -767,5 +793,33 @@ onUnmounted(() => window.removeEventListener('resize', updateScale));
 
 :global(.cyber-message-box .el-button--primary:hover) {
   filter: brightness(1.2);
+}
+
+/* Mobile Adjustments for Modal */
+@media (max-width: 768px) {
+  .preview-modal-content {
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    border-radius: 0;
+  }
+
+  .modal-header {
+    padding: 15px 20px;
+  }
+
+  .header-title h3 {
+    font-size: 0.8rem;
+    letter-spacing: 2px;
+  }
+
+  .download-mini-btn {
+    padding: 8px 16px;
+    font-size: 0.7rem;
+  }
+
+  .modal-body {
+    padding: 20px 5px;
+  }
 }
 </style>

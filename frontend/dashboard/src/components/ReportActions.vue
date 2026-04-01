@@ -154,8 +154,7 @@ const toggleMenu = () => {
 const scalingStyle = computed(() => ({
   transform: `scale(${scaleFactor.value})`,
   transformOrigin: 'top center',
-  width: `${reportWidth}px`,
-  marginBottom: `-${reportWidth * (1 - scaleFactor.value)}px` 
+  width: `${reportWidth}px`
 }));
 
 const updateScale = () => {

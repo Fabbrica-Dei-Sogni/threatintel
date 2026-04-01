@@ -103,7 +103,17 @@ const routes: RouteRecordRaw[] = [
         }),
     },
     { path: '/telnet-attack-detail/:id', name: 'CowrieAttackDetail', component: CowrieAttackDetail },
-    { path: '/dossiers', name: 'Dossiers', component: () => import('../views/dossiers/Dossiers.vue') },
+    { 
+        path: '/dossiers', 
+        name: 'Dossiers', 
+        component: () => import('../views/dossiers/Dossiers.vue'),
+        props: (route: RouteLocationNormalized) => ({
+            initialSearch: typeof route.query.search === 'string' ? route.query.search : '',
+            initialStatus: typeof route.query.status === 'string' ? route.query.status : '',
+            initialPage: route.query.page ? parseInt(route.query.page as string) : 1,
+            initialSortFields: route.query.sortFields ? JSON.parse(route.query.sortFields as string) : undefined,
+        }),
+    },
     { path: '/dossiers/:id', name: 'DossierDetail', component: () => import('../views/dossiers/DossierDetail.vue'), props: true },
 ];
 

@@ -8,7 +8,7 @@
     <div class="archive-header">
       <button @click="goBack" class="back-btn">← {{ t('home.dashboard').toUpperCase() }}</button>
       <div class="header-stats">
-        <span class="badge indigo-pulse">{{ totalDossiers }} {{ t('common.investigations') }}</span>
+        <span class="badge indigo-pulse">{{ total }} {{ t('common.investigations') }}</span>
       </div>
     </div>
 
@@ -17,19 +17,27 @@
       <div class="search-box">
         <span class="search-icon">🔍</span>
         <input 
-          v-model="filters.search" 
+          v-model="filterSearch" 
           type="text" 
           class="search-input" 
           :placeholder="t('common.searchByTitleOrIp')"
-          @input="handleSearch"
+          @input="handleSearchInput"
         />
       </div>
       <div class="filter-group">
-        <select v-model="filters.status" @change="fetchData" class="filter-select">
+        <select v-model="filterStatus" class="filter-select">
           <option value="">{{ t('common.allStatus') }}</option>
           <option value="draft">DRAFT</option>
           <option value="finalized">FINALIZED</option>
           <option value="archived">ARCHIVED</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <select @change="handleSortChange" class="filter-select">
+          <option value="createdAt:-1">{{ t('sorting.sortTimestamp') }} (Newest)</option>
+          <option value="createdAt:1">{{ t('sorting.sortTimestamp') }} (Oldest)</option>
+          <option value="title:1">{{ t('sorting.sortUrl') }} (A-Z)</option> <!-- Using sortUrl because it's available and similar to Title -->
+          <option value="status:1">{{ t('common.status') }}</option>
         </select>
       </div>
       <button @click="fetchData" class="btn-refresh" :class="{ rotating: loading }">🔄</button>
@@ -85,22 +93,22 @@
     <div class="pagination-controls" v-if="totalPages > 1">
       <button 
         class="page-btn" 
-        :disabled="currentPage === 1" 
-        @click="changePage(currentPage - 1)">
+        :disabled="page === 1" 
+        @click="changePage(page - 1)">
         &lt;
       </button>
       <button 
         v-for="p in totalPages" 
         :key="p" 
         class="page-btn" 
-        :class="{ active: p === currentPage }"
+        :class="{ active: p === page }"
         @click="changePage(p)">
         {{ p }}
       </button>
       <button 
         class="page-btn" 
-        :disabled="currentPage === totalPages" 
-        @click="changePage(currentPage + 1)">
+        :disabled="page === totalPages" 
+        @click="changePage(page + 1)">
         &gt;
       </button>
     </div>
@@ -108,70 +116,90 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, watch } from 'vue';
+import { computed, watch, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
-import { fetchDossiers, deleteDossier, exportDossier } from '../../api';
+import { deleteDossier, exportDossier } from '../../api';
 import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
 import { ElMessageBox, ElMessage } from 'element-plus';
 import { useDossierStore } from '../../stores/dossier';
+import { useDossiersFilter } from '../../composable/useDossiersFilter';
 import dayjs from 'dayjs';
 
 const { t } = useI18n();
 const router = useRouter();
 const dossierStore = useDossierStore();
 
-const dossiers = ref([]);
-const totalDossiers = ref(0);
-const loading = ref(false);
-const currentPage = ref(1);
-const pageSize = ref(12);
-const totalPages = ref(0);
-
-const filters = reactive({
-  search: '',
-  status: ''
+const props = defineProps({
+  initialSearch: { type: String, default: '' },
+  initialStatus: { type: String, default: '' },
+  initialPage: { type: Number, default: 1 },
+  initialPageSize: { type: Number, default: 12 },
+  initialSortFields: { type: Object, default: () => ({ createdAt: -1 }) }
 });
 
-const fetchData = async () => {
-  loading.value = true;
-  try {
-    const params = {
-      page: currentPage.value,
-      pageSize: pageSize.value,
-      search: filters.search,
-      status: filters.status
-    };
-    const response = await fetchDossiers(params);
-    dossiers.value = response.items;
-    totalDossiers.value = response.total;
-    totalPages.value = Math.ceil(response.total / pageSize.value);
-  } catch (error) {
-    ElMessage.error(t('common.errorLoadingDossiers'));
-  } finally {
-    loading.value = false;
-  }
-};
+const {
+  dossiers,
+  filterSearch,
+  filterStatus,
+  page,
+  pageSize,
+  sortFields,
+  total,
+  loading,
+  error,
+  fetchData,
+  debouncedFetch
+} = useDossiersFilter(
+  props.initialSearch,
+  props.initialStatus,
+  props.initialPage,
+  props.initialPageSize,
+  props.initialSortFields
+);
 
-// Sincronizzazione automatica: se viene salvato un dossier mentre siamo qui, ricarichiamo la lista
+const totalPages = computed(() => Math.ceil(total.value / pageSize.value));
+
+// Sincronizzazione Prop -> Ref (per navigazione con tasti back/forward del browser)
+watch(() => props.initialSearch, (newVal) => { filterSearch.value = newVal; });
+watch(() => props.initialStatus, (newVal) => { filterStatus.value = newVal; });
+watch(() => props.initialPage, (newVal) => { page.value = newVal; });
+watch(() => props.initialSortFields, (newVal) => { sortFields.value = newVal; }, { deep: true });
+
+// Sincronizzazione Ref -> URL query
+watch(
+  [filterSearch, filterStatus, page, sortFields],
+  ([nSearch, nStatus, nPage, nSort]) => {
+    router.replace({
+      name: 'Dossiers',
+      query: {
+        search: nSearch || undefined,
+        status: nStatus || undefined,
+        page: nPage > 1 ? nPage : undefined,
+        sortFields: nSort ? JSON.stringify(nSort) : undefined
+      }
+    });
+  }
+);
+
+// Sincronizzazione automatica se viene salvato un dossier altrove
 watch(() => dossierStore.lastSavedAt, (newVal) => {
   if (newVal) {
     fetchData();
   }
-});
+}, { immediate: true });
 
-let searchTimeout = null;
-const handleSearch = () => {
-  if (searchTimeout) clearTimeout(searchTimeout);
-  searchTimeout = setTimeout(() => {
-    currentPage.value = 1;
-    fetchData();
-  }, 500);
+const handleSearchInput = () => {
+  // debouncedFetch is handled by useSearchBase via watcher on filterSearch
+};
+
+const handleSortChange = (e) => {
+  const [field, direction] = e.target.value.split(':');
+  sortFields.value = { [field]: parseInt(direction) };
 };
 
 const changePage = (p) => {
-  currentPage.value = p;
-  fetchData();
+  page.value = p;
 };
 
 const viewDetail = (id) => {
@@ -184,9 +212,9 @@ const goBack = () => {
 
 const exportDossierPdf = async (id) => {
   try {
-    await exportDossier(id, 'pdf', 'classic'); // Default to classic for historical export
+    await exportDossier(id, 'pdf', 'classic'); 
     ElMessage.success(t('common.downloadPdf'));
-  } catch (error) {
+  } catch (err) {
     ElMessage.error(t('common.errorExporting'));
   }
 };
@@ -200,12 +228,14 @@ const confirmDelete = (id) => {
     await deleteDossier(id);
     ElMessage.info(t('common.dossierDeleted'));
     fetchData();
-  });
+  }).catch(() => {});
 };
 
 const formatDate = (date) => dayjs(date).format('DD/MM/YYYY HH:mm');
 
-onMounted(fetchData);
+onMounted(() => {
+  // fetchData() is already called immediately by useSearchBase watcher
+});
 </script>
 
 <style scoped src="./Dossiers.css"></style>

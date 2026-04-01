@@ -264,6 +264,7 @@ import { useRouter } from 'vue-router'
 import { computed, onMounted, watch, ref, reactive } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { fetchDossiers } from '../../api';
+import { useDossierStore } from '../../stores/dossier';
 import dayjs from 'dayjs';
 import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
 import CountryFlag from '../../components/CountryFlag.vue';
@@ -385,6 +386,7 @@ const fetchRecentDossiers = async () => {
 import { useProfileStore } from '../../stores/profiles';
 
 const profileStore = useProfileStore();
+const dossierStore = useDossierStore();
 
 // Carica i dati solo una volta per la dashboard, ma ricarica se cambia il profilo
 const loadAll = () => {
@@ -396,6 +398,7 @@ const loadAll = () => {
 
 onMounted(loadAll);
 watch(() => profileStore.activeProfileId, loadAll);
+watch(() => dossierStore.lastSavedAt, fetchRecentDossiers);
 </script>
 
 <style scoped src="./Home.css"></style>

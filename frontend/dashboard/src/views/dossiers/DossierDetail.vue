@@ -347,14 +347,7 @@ onMounted(loadDossier);
 
 /* Standard Header & Back Button */
 .header-top {
-  display: flex;
-  align-items: center;
-  gap: 15px;
   margin-bottom: 25px;
-}
-
-.header-top :last-child {
-  margin-left: auto;
 }
 
 .back-btn {

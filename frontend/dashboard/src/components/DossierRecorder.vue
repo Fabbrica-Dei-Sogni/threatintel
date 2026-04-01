@@ -1,6 +1,7 @@
 <template>
   <transition name="recorder-slide">
-    <div v-if="dossierStore.isEnabled" class="dossier-recorder-wrapper" :class="{ 'is-active': dossierStore.isRecording }">
+    <div v-if="dossierStore.isEnabled" class="dossier-recorder-wrapper"
+      :class="{ 'is-active': dossierStore.isRecording }">
       <div class="recorder-bar glass-morphism">
         <!-- Section 1: Status -->
         <div class="status-section">
@@ -17,45 +18,51 @@
         <!-- Section 2: Counter -->
         <div class="count-section" v-if="dossierStore.sections.length > 0 || dossierStore.isRecording">
           <span class="count-badge pulse-emerald">{{ dossierStore.sections.length }}</span>
-          <span class="count-label h-1000">{{ dossierStore.sections.length === 0 ? t('common.noSectionsCaptured') : t('common.sectionsCaptured', { count: dossierStore.sections.length }) }}</span>
+          <span class="count-label h-1000">{{ dossierStore.sections.length === 0 ? t('common.noSectionsCaptured') :
+            t('common.sectionsCaptured', { count: dossierStore.sections.length }) }}</span>
         </div>
 
         <!-- Section 3: Actions -->
         <div class="actions-section">
           <button v-if="!dossierStore.isRecording" class="btn-rec start" @click="dossierStore.startRecording()">
-            <span class="icon">⏺️</span> 
+            <span class="icon">⏺️</span>
             <span class="btn-text h-600">{{ t('common.startRecording') }}</span>
           </button>
           <button v-else class="btn-rec stop" @click="dossierStore.stopRecording()">
-            <span class="icon">⏹️</span> 
+            <span class="icon">⏹️</span>
             <span class="btn-text h-600">{{ t('common.stopRecording') }}</span>
           </button>
 
           <template v-if="dossierStore.sections.length > 0">
             <div class="divider"></div>
-            
+
             <div class="style-selector-pill">
-              <button class="style-opt" :class="{ active: selectedStyle === 'classic' }" @click="selectedStyle = 'classic'" title="Stile Istituzionale">CLASSIC</button>
-              <button class="style-opt" :class="{ active: selectedStyle === 'hud' }" @click="selectedStyle = 'hud'" title="Stile HUD Tattico">HUD</button>
+              <button class="style-opt" :class="{ active: selectedStyle === 'classic' }"
+                @click="selectedStyle = 'classic'" title="Stile Istituzionale">CLASSIC</button>
+              <button class="style-opt" :class="{ active: selectedStyle === 'hud' }" @click="selectedStyle = 'hud'"
+                title="Stile HUD Tattico">HUD</button>
             </div>
 
-            <button class="btn-tool preview" @click="generateCustomReport('html', selectedStyle)" :disabled="loadingHtml" :title="t('common.previewDossier')">
+            <button class="btn-tool preview" @click="generateCustomReport('html', selectedStyle)"
+              :disabled="loadingHtml" :title="t('common.previewDossier')">
               <span v-if="loadingHtml" class="spinner-tiny"></span>
-              <span v-else class="icon">👁️</span> 
+              <span v-else class="icon">👁️</span>
               <span class="btn-text h-900">{{ t('common.preview') }}</span>
             </button>
-            <button class="btn-tool download" @click="generateCustomReport('pdf', selectedStyle)" :disabled="loadingPdf" :title="t('common.generateDossier')">
-               <span v-if="loadingPdf" class="spinner-tiny"></span>
-              <span v-else class="icon">📄</span> 
+            <button class="btn-tool download" @click="generateCustomReport('pdf', selectedStyle)" :disabled="loadingPdf"
+              :title="t('common.generateDossier')">
+              <span v-if="loadingPdf" class="spinner-tiny"></span>
+              <span v-else class="icon">📄</span>
               <span class="btn-text h-900">{{ t('common.downloadPdf') }}</span>
             </button>
-            <button class="btn-tool save" @click="handleSave" :disabled="dossierStore.isSaving" title="Salva nel Database">
-               <span v-if="dossierStore.isSaving" class="spinner-tiny"></span>
-              <span v-else class="icon">💾</span> 
+            <button class="btn-tool save" @click="handleSave" :disabled="dossierStore.isSaving"
+              title="Salva nel Database">
+              <span v-if="dossierStore.isSaving" class="spinner-tiny"></span>
+              <span v-else class="icon">💾</span>
               <span class="btn-text h-900">{{ t('common.save').toUpperCase() }}</span>
             </button>
             <button class="btn-tool reset" @click="confirmReset" :title="t('common.clearDossier')">
-               <span class="icon">🗑️</span>
+              <span class="icon">🗑️</span>
             </button>
           </template>
         </div>
@@ -72,7 +79,8 @@
                   <h3>DOSSIER PREVIEW</h3>
                 </div>
                 <div class="header-actions">
-                  <button @click="generateCustomReport('pdf', selectedStyle)" class="download-mini-btn" :disabled="loadingPdf">
+                  <button @click="generateCustomReport('pdf', selectedStyle)" class="download-mini-btn"
+                    :disabled="loadingPdf">
                     <span v-if="loadingPdf" class="spinner-tiny"></span>
                     <span v-else>📥 {{ t('common.downloadPdf') }}</span>
                   </button>
@@ -81,11 +89,12 @@
               </div>
               <div class="modal-body" ref="modalBody">
                 <div class="scaling-wrapper" v-if="htmlContent" :style="scalingStyle">
-                  <iframe ref="previewFrame" :srcdoc="htmlContent" class="report-frame shadow-2xl" frameborder="0" @load="onFrameLoad"></iframe>
+                  <iframe ref="previewFrame" :srcdoc="htmlContent" class="report-frame shadow-2xl" frameborder="0"
+                    @load="onFrameLoad"></iframe>
                 </div>
                 <div v-else class="loading-preview">
-                   <span class="spinner-large"></span>
-                   <p>{{ t('common.loading') }}</p>
+                  <span class="spinner-large"></span>
+                  <p>{{ t('common.loading') }}</p>
                 </div>
               </div>
             </div>
@@ -97,10 +106,10 @@
 </template>
 
 <script setup>
-import { ref, computed, nextTick, onUnmounted } from 'vue';
+import { ref, reactive, h, computed, nextTick, onUnmounted } from 'vue';
 import { useDossierStore } from '../stores/dossier';
 import { useI18n } from 'vue-i18n';
-import { ElMessageBox, ElMessage } from 'element-plus';
+import { ElMessageBox, ElMessage, ElInput } from 'element-plus';
 import { fetchCustomReport } from '../api';
 import dayjs from 'dayjs';
 
@@ -121,14 +130,14 @@ const scalingStyle = computed(() => ({
   transform: `scale(${scaleFactor.value})`,
   transformOrigin: 'top center',
   width: `${reportWidth}px`,
-  marginBottom: `-${reportWidth * (1 - scaleFactor.value)}px` 
+  marginBottom: `-${reportWidth * (1 - scaleFactor.value)}px`
 }));
 
 const updateScale = () => {
   if (!modalBody.value) return;
   const padding = window.innerWidth < 768 ? 20 : 80;
   const availableWidth = modalBody.value.clientWidth - padding;
-  scaleFactor.value = Math.min(availableWidth / reportWidth, 1.1); 
+  scaleFactor.value = Math.min(availableWidth / reportWidth, 1.1);
 };
 
 const onFrameLoad = () => {
@@ -191,37 +200,73 @@ const generateCustomReport = async (format, style = 'telex') => {
 
 const handleSave = async () => {
   if (dossierStore.sections.length === 0) return;
-  
+
+  // 1. Genera valori di default
+  const now = dayjs().format('YYYY-MM-DD HH:mm');
+  let subject = 'Intelligence';
+  const firstSection = dossierStore.sections[0];
+  if (firstSection) {
+    if (firstSection.type === 'ip') subject = firstSection.data.ip || subject;
+    else if (firstSection.type === 'attack') subject = firstSection.data.attacker || firstSection.data.id || subject;
+    else if (firstSection.type === 'telnet') subject = firstSection.data.ip || subject;
+  }
+
+  const defaultTitle = `Dossier ${subject} - ${now}`;
+  const count = dossierStore.sections.length;
+  const defaultDescription = `Investigazione forense contenente ${count} ${count === 1 ? 'sezione' : 'sezioni'} di intelligence catturate il ${dayjs().format('DD/MM/YYYY')}.`;
+
+  // 2. Stato locale per il form all'interno dell'ElMessageBox
+  const formState = reactive({
+    title: defaultTitle,
+    description: defaultDescription
+  });
+
   try {
-    // Genera un titolo smart di default
-    const now = dayjs().format('YYYY-MM-DD HH:mm');
-    let subject = 'Intelligence';
-    const firstSection = dossierStore.sections[0];
-    
-    if (firstSection) {
-      if (firstSection.type === 'ip') subject = firstSection.data.ip || subject;
-      else if (firstSection.type === 'attack') subject = firstSection.data.attacker || firstSection.data.id || subject;
-      else if (firstSection.type === 'telnet') subject = firstSection.data.ip || subject;
-    }
-
-    const defaultTitle = `Dossier ${subject} - ${now}`;
-
-    const { value: title } = await ElMessageBox.prompt(
-      'Inserisci un titolo per questa investigazione', 
-      'Salva Dossier', 
-      {
-        confirmButtonText: 'Salva',
-        cancelButtonText: 'Annulla',
-        inputValue: defaultTitle,
-        inputPlaceholder: 'Es: Analisi Botnet March 2024',
-        inputValidator: (val) => val ? true : 'Il titolo è obbligatorio'
+    await ElMessageBox({
+      title: 'Salva Investigazione nell\'Archivio',
+      showCancelButton: true,
+      confirmButtonText: 'Conferma e Salva',
+      cancelButtonText: 'Annulla',
+      customClass: 'cyber-message-box',
+      message: () => h('div', { class: 'save-dossier-vnode-form' }, [
+        h('div', { class: 'vnode-form-item' }, [
+          h('label', { class: 'vnode-label' }, 'TITOLO DOSSIER'),
+          h(ElInput, {
+            modelValue: formState.title,
+            'onUpdate:modelValue': (val) => formState.title = val,
+            placeholder: 'Es: Analisi Botnet March 2024',
+            class: 'vnode-input'
+          })
+        ]),
+        h('div', { class: 'vnode-form-item', style: 'margin-top: 15px' }, [
+          h('label', { class: 'vnode-label' }, 'DESCRIZIONE / NOTE'),
+          h(ElInput, {
+            type: 'textarea',
+            rows: 4,
+            modelValue: formState.description,
+            'onUpdate:modelValue': (val) => formState.description = val,
+            placeholder: 'Aggiungi note investigative...',
+            class: 'vnode-textarea'
+          })
+        ])
+      ]),
+      beforeClose: (action, instance, done) => {
+        if (action === 'confirm') {
+          if (!formState.title) {
+            ElMessage.warning('Il titolo è obbligatorio');
+            return;
+          }
+          done();
+        } else {
+          done();
+        }
       }
-    );
+    });
 
-    if (title) {
-      await dossierStore.persistToDb(title);
-      ElMessage.success('Dossier salvato correttamente nell\'archivio.');
-    }
+    // 3. Persistenza reale
+    await dossierStore.persistToDb(formState.title, formState.description);
+    ElMessage.success('Dossier salvato correttamente nell\'archivio.');
+
   } catch (error) {
     if (error !== 'cancel') {
       ElMessage.error('Errore durante il salvataggio.');
@@ -266,21 +311,32 @@ onUnmounted(() => window.removeEventListener('resize', updateScale));
   box-shadow: 0 0 20px rgba(239, 68, 68, 0.15), 0 15px 50px rgba(0, 0, 0, 0.7);
 }
 
-.status-section, .count-section, .actions-section {
+.status-section,
+.count-section,
+.actions-section {
   display: flex;
   align-items: center;
   flex-shrink: 0;
 }
 
-.rec-indicator, .idle-indicator, .count-section {
+.rec-indicator,
+.idle-indicator,
+.count-section {
   font-weight: 800;
   font-size: 0.7rem;
   letter-spacing: 0.8px;
   text-transform: uppercase;
 }
 
-.rec-indicator { color: #f87171; gap: 8px; }
-.idle-indicator { color: #94a3b8; gap: 8px; }
+.rec-indicator {
+  color: #f87171;
+  gap: 8px;
+}
+
+.idle-indicator {
+  color: #94a3b8;
+  gap: 8px;
+}
 
 .dot {
   width: 8px;
@@ -291,12 +347,28 @@ onUnmounted(() => window.removeEventListener('resize', updateScale));
   animation: pulse-red 2.5s infinite;
   flex-shrink: 0;
 }
-.dot.idle { background: #475569; box-shadow: none; animation: none; }
+
+.dot.idle {
+  background: #475569;
+  box-shadow: none;
+  animation: none;
+}
 
 @keyframes pulse-red {
-  0% { transform: scale(0.9); opacity: 1; }
-  50% { transform: scale(1.15); opacity: 0.6; }
-  100% { transform: scale(0.9); opacity: 1; }
+  0% {
+    transform: scale(0.9);
+    opacity: 1;
+  }
+
+  50% {
+    transform: scale(1.15);
+    opacity: 0.6;
+  }
+
+  100% {
+    transform: scale(0.9);
+    opacity: 1;
+  }
 }
 
 .count-badge {
@@ -314,11 +386,16 @@ onUnmounted(() => window.removeEventListener('resize', updateScale));
   margin-right: 4px;
 }
 
-.count-label { color: #64748b; }
+.count-label {
+  color: #64748b;
+}
 
-.actions-section { gap: 8px; }
+.actions-section {
+  gap: 8px;
+}
 
-.btn-rec, .btn-tool {
+.btn-rec,
+.btn-tool {
   height: 36px;
   border: none;
   border-radius: 12px;
@@ -334,10 +411,26 @@ onUnmounted(() => window.removeEventListener('resize', updateScale));
   white-space: nowrap;
 }
 
-.btn-rec { border-radius: 30px; min-width: 40px; }
-.btn-rec.start { background: #10b981; color: #064e3b; }
-.btn-rec.stop { background: #ef4444; color: #fff; }
-.btn-rec:hover { transform: translateY(-2px); filter: brightness(1.1); box-shadow: 0 5px 15px rgba(0,0,0,0.4); }
+.btn-rec {
+  border-radius: 30px;
+  min-width: 40px;
+}
+
+.btn-rec.start {
+  background: #10b981;
+  color: #064e3b;
+}
+
+.btn-rec.stop {
+  background: #ef4444;
+  color: #fff;
+}
+
+.btn-rec:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.1);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+}
 
 .btn-tool {
   background: rgba(255, 255, 255, 0.05);
@@ -366,7 +459,11 @@ onUnmounted(() => window.removeEventListener('resize', updateScale));
   border-color: #3b82f6;
 }
 
-.btn-tool.reset:hover { border-color: #ef4444; color: #f87171; background: rgba(239, 68, 68, 0.1); }
+.btn-tool.reset:hover {
+  border-color: #ef4444;
+  color: #f87171;
+  background: rgba(239, 68, 68, 0.1);
+}
 
 /* Style Selector */
 .style-selector-pill {
@@ -394,54 +491,103 @@ onUnmounted(() => window.removeEventListener('resize', updateScale));
 .style-opt.active {
   background: var(--primary-light, #3b82f6);
   color: #fff;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 .style-opt:hover:not(.active) {
   color: #e2e8f0;
 }
 
-.icon { font-size: 1.1rem; flex-shrink: 0; }
-.divider { width: 1px; height: 20px; background: rgba(255, 255, 255, 0.15); margin: 0 2px; }
+.icon {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.divider {
+  width: 1px;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.15);
+  margin: 0 2px;
+}
 
 /* PROGRESSIVE VISIBILITY */
 
 @media (max-width: 1200px) {
-  .idle-indicator .label { display: none; }
+  .idle-indicator .label {
+    display: none;
+  }
 }
 
 @media (max-width: 1050px) {
-  .count-label { display: none; }
-  .btn-tool .btn-text { display: none; }
-  .btn-tool { padding: 0; width: 36px; }
+  .count-label {
+    display: none;
+  }
+
+  .btn-tool .btn-text {
+    display: none;
+  }
+
+  .btn-tool {
+    padding: 0;
+    width: 36px;
+  }
 }
 
 @media (max-width: 800px) {
-  .rec-indicator .label { display: none; }
+  .rec-indicator .label {
+    display: none;
+  }
 }
 
 @media (max-width: 650px) {
-  .btn-rec .btn-text { display: none; }
-  .btn-rec { padding: 0; width: 42px; border-radius: 50%; }
-  .recorder-bar { gap: 10px; padding: 0 12px; }
+  .btn-rec .btn-text {
+    display: none;
+  }
+
+  .btn-rec {
+    padding: 0;
+    width: 42px;
+    border-radius: 50%;
+  }
+
+  .recorder-bar {
+    gap: 10px;
+    padding: 0 12px;
+  }
 }
 
 @media (max-width: 400px) {
-  .divider { display: none; }
-  .recorder-bar { gap: 8px; }
+  .divider {
+    display: none;
+  }
+
+  .recorder-bar {
+    gap: 8px;
+  }
 }
 
 /* Transitions */
-.recorder-slide-enter-active, .recorder-slide-leave-active {
+.recorder-slide-enter-active,
+.recorder-slide-leave-active {
   transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
-.recorder-slide-enter-from, .recorder-slide-leave-to {
+
+.recorder-slide-enter-from,
+.recorder-slide-leave-to {
   opacity: 0;
   transform: translate(-50%, 100px);
 }
 
-.modal-fade-enter-active, .modal-fade-leave-active { transition: all 0.4s ease; }
-.modal-fade-enter-from, .modal-fade-leave-to { opacity: 0; transform: scale(1.02); }
+.modal-fade-enter-active,
+.modal-fade-leave-active {
+  transition: all 0.4s ease;
+}
+
+.modal-fade-enter-from,
+.modal-fade-leave-to {
+  opacity: 0;
+  transform: scale(1.02);
+}
 
 .preview-modal-overlay {
   position: fixed;
@@ -474,7 +620,12 @@ onUnmounted(() => window.removeEventListener('resize', updateScale));
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.header-title h3 { font-size: 0.75rem; letter-spacing: 3px; color: #fff; margin: 0; }
+.header-title h3 {
+  font-size: 0.75rem;
+  letter-spacing: 3px;
+  color: #fff;
+  margin: 0;
+}
 
 .download-mini-btn {
   background: #10b981;
@@ -495,7 +646,15 @@ onUnmounted(() => window.removeEventListener('resize', updateScale));
   box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
 }
 
-.close-btn { background: rgba(255, 255, 255, 0.05); border: none; color: #fff; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; }
+.close-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: none;
+  color: #fff;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+}
 
 .modal-body {
   flex: 1;
@@ -506,10 +665,87 @@ onUnmounted(() => window.removeEventListener('resize', updateScale));
   align-items: flex-start;
 }
 
-.report-frame { width: 100%; min-height: 100%; background: white; }
+.report-frame {
+  width: 100%;
+  min-height: 100%;
+  background: white;
+}
 
 .spinner-tiny {
-  width: 12px; height: 12px; border: 2px solid rgba(255, 255, 255, 0.2); border-top-color: #fff; border-radius: 50%; animation: spin 0.6s linear infinite;
+  width: 12px;
+  height: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
 }
-@keyframes spin { to { transform: rotate(360deg); } }
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Stili per il VNode Form di salvataggio all'interno dell'ElMessageBox */
+.save-dossier-vnode-form {
+  display: flex;
+  flex-direction: column;
+  padding: 10px 5px;
+}
+
+.vnode-form-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.vnode-label {
+  font-size: 0.7rem;
+  font-weight: 900;
+  color: #94a3b8;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+:global(.cyber-message-box) {
+  background: #0d1117 !important;
+  border: 1px solid rgba(16, 185, 129, 0.3) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9) !important;
+  backdrop-filter: blur(20px) !important;
+}
+
+:global(.cyber-message-box .el-message-box__title) {
+  color: #10b981 !important;
+  font-weight: 900 !important;
+  letter-spacing: 2px !important;
+  font-size: 0.9rem !important;
+}
+
+:global(.cyber-message-box .el-message-box__content) {
+  color: #cbd5e1 !important;
+}
+
+:global(.cyber-message-box .el-input__wrapper),
+:global(.cyber-message-box .el-textarea__inner) {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.2) inset !important;
+  border: none !important;
+}
+
+:global(.cyber-message-box .el-input__inner),
+:global(.cyber-message-box .el-textarea__inner) {
+  color: #fff !important;
+}
+
+:global(.cyber-message-box .el-button--primary) {
+  background: #10b981 !important;
+  border: none !important;
+  font-weight: 900 !important;
+  color: #064e3b !important;
+}
+
+:global(.cyber-message-box .el-button--primary:hover) {
+  filter: brightness(1.2);
+}
 </style>

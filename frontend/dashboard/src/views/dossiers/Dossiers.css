@@ -5,10 +5,23 @@
     align-items: center;
     gap: 15px;
     margin-bottom: 25px;
+    flex-wrap: wrap; /* Permette il wrapping su schermi piccoli */
 }
 
 .header-top :last-child {
     margin-left: auto;
+}
+
+@media (max-width: 768px) {
+    .header-top {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    .header-top :last-child {
+        margin-left: 0;
+        width: 100%;
+    }
 }
 
 .back-btn {

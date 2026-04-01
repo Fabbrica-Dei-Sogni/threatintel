@@ -112,6 +112,7 @@ import { ref, reactive, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { fetchDossiers, deleteDossier, exportDossier } from '../../api';
+import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
 import { ElMessageBox, ElMessage } from 'element-plus';
 import dayjs from 'dayjs';
 

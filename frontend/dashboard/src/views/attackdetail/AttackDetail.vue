@@ -60,7 +60,7 @@
                     <!-- Tactical HUD Container -->
                     <div class="hud-stats-row">
                         <div class="hud-stat-box">
-                            <span class="hud-box-icon">📋</span>
+                            <span class="hud-box-icon">🧾</span>
                             <div class="hud-stat-data">
                                 <span class="hud-label">{{ t('attackDetail.totalLogs') }}</span>
                                 <div class="hud-value highlight">{{ attack.totaleLogs }}</div>

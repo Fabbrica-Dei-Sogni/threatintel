@@ -45,7 +45,7 @@
         <div class="sections-timeline">
            <!-- New Section Button at the TOP -->
            <div class="add-section-action top-action" v-if="!isSaving && dossier && !isEditing && editingSectionIndex === -1">
-             <button @click="addNewGenericSection" class="back-btn add-btn-full">
+             <button @click="handleAddGenericSection" class="back-btn add-btn-full">
                 + {{ t('common.add').toUpperCase() }}
              </button>
            </div>
@@ -65,10 +65,10 @@
                   <span class="timestamp">{{ formatDate(section.timestamp) }}</span>
                   <template v-if="editingSectionIndex !== index">
                     <button @click="startEditSection(index, section)" class="action-icon-btn" title="Modifica Sezione">✎</button>
-                    <button @click="deleteSection(index)" class="action-icon-btn danger-text" title="Elimina Sezione">🗑</button>
+                    <button @click="handleDeleteSection(index)" class="action-icon-btn danger-text" title="Elimina Sezione">🗑</button>
                   </template>
                   <template v-else>
-                    <button @click="saveSection(index)" class="action-icon-btn success-text" title="Salva Sezione" :disabled="isSaving">✓</button>
+                    <button @click="handleSaveSection(index)" class="action-icon-btn success-text" title="Salva Sezione" :disabled="isSaving">✓</button>
                     <button @click="showRawEdit = !showRawEdit" class="action-icon-btn btn-expert" :class="{ 'active-expert': showRawEdit }" title="Expert Mode (JSON)">{...}</button>
                     <button @click="cancelEditSection()" class="action-icon-btn" title="Annulla" :disabled="isSaving">✗</button>
                   </template>
@@ -107,31 +107,42 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useRoute, useRouter } from 'vue-router';
-import { fetchDossierById, updateDossier } from '../../api';
+import { useRouter } from 'vue-router';
+import { useDossierDetail } from '../../composable/useDossierDetail';
 import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
 import DossierReportActions from '../../components/DossierReportActions.vue';
 import DossierSectionRenderer from '../../components/dossier/DossierSectionRenderer.vue';
 import DossierSectionEditor from '../../components/dossier/DossierSectionEditor.vue';
-import { ElMessage } from 'element-plus';
+import { ElMessage, ElMessageBox } from 'element-plus';
 import dayjs from 'dayjs';
 import type { IDossier, IDossierSection } from '../../models/DossierDTO';
 
-const route = useRoute();
-const router = useRouter();
+const props = defineProps<{
+  id: string;
+}>();
 
+const router = useRouter();
 const { t } = useI18n();
 
-const dossier = ref(null);
-const loading = ref(true);
-const showRaw = ref(false);
+const {
+  dossier,
+  loading,
+  error,
+  isSaving,
+  loadDossier,
+  saveMetadata,
+  addGenericSection,
+  updateSection,
+  deleteSection
+} = useDossierDetail();
 
+const showRaw = ref(false);
 const isEditing = ref(false);
-const isSaving = ref(false);
 const showRawEdit = ref(false);
 const editForm = ref({ title: '', description: '' });
 
 const startEdit = () => {
+  if (!dossier.value) return;
   editForm.value = {
     title: dossier.value.title,
     description: dossier.value.description || ''
@@ -148,17 +159,12 @@ const saveEdit = async () => {
     ElMessage.warning('Title required / Titolo richiesto');
     return;
   }
-  isSaving.value = true;
   try {
-    const updated = await updateDossier(dossier.value._id, editForm.value);
-    dossier.value.title = updated.title || editForm.value.title;
-    dossier.value.description = updated.description || editForm.value.description;
+    await saveMetadata(props.id, editForm.value);
     isEditing.value = false;
     ElMessage.success(t('common.save') + ' OK');
-  } catch (error) {
+  } catch (err) {
     ElMessage.error(t('common.error'));
-  } finally {
-    isSaving.value = false;
   }
 };
 
@@ -166,7 +172,7 @@ const saveEdit = async () => {
 const editingSectionIndex = ref(-1);
 const sectionEditForm = ref({ type: '', data: {}, dataString: '' });
 
-const startEditSection = (index, section) => {
+const startEditSection = (index: number, section: IDossierSection) => {
   editingSectionIndex.value = index;
   showRawEdit.value = false;
   sectionEditForm.value = {
@@ -180,7 +186,7 @@ const cancelEditSection = () => {
   editingSectionIndex.value = -1;
 };
 
-const saveSection = async (index) => {
+const handleSaveSection = async (index: number) => {
   let finalData = {};
   
   if (showRawEdit.value) {
@@ -194,105 +200,59 @@ const saveSection = async (index) => {
     finalData = sectionEditForm.value.data;
   }
   
-  isSaving.value = true;
   try {
-    // Preparazione array aggiornato e ordinato
-    const updatedSections = sortSections([...dossier.value.sections]);
-    updatedSections[index] = {
-      ...updatedSections[index],
+    await updateSection(props.id, index, {
       type: sectionEditForm.value.type,
       data: finalData
-    };
-    
-    const finalizedSections = sortSections(updatedSections);
-    await updateDossier(dossier.value._id, { sections: finalizedSections });
-    dossier.value.sections = finalizedSections;
+    });
     editingSectionIndex.value = -1;
     ElMessage.success(t('common.save') + ' OK');
-  } catch (error) {
+  } catch (err) {
     ElMessage.error(t('common.error'));
-  } finally {
-    isSaving.value = false;
   }
 };
 
-const deleteSection = async (index) => {
-  if (!confirm("Confermi l'eliminazione di questa sezione?")) return;
-  
-  isSaving.value = true;
+const handleDeleteSection = async (index: number) => {
   try {
-    const updatedSections = dossier.value.sections.filter((_, i) => i !== index);
-    await updateDossier(dossier.value._id, { sections: updatedSections });
-    dossier.value.sections = updatedSections;
+    await ElMessageBox.confirm(
+      t('common.confirmDeleteDossier'),
+      t('common.confirm'),
+      { type: 'warning' }
+    );
+    await deleteSection(props.id, index);
     if (editingSectionIndex.value === index) editingSectionIndex.value = -1;
     ElMessage.success(t('common.delete') + ' OK');
-  } catch (error) {
-    ElMessage.error(t('common.error'));
-  } finally {
-    isSaving.value = false;
+  } catch (err) {
+    if (err !== 'cancel') {
+        ElMessage.error(t('common.error'));
+    }
   }
 };
 
-// Helper per ordinare le sezioni: generic prima, poi il resto (per timestamp desc)
-const sortSections = (sections) => {
-  return [...sections].sort((a, b) => {
-    // Tipo generic ha sempre la precedenza
-    if (a.type === 'generic' && b.type !== 'generic') return -1;
-    if (a.type !== 'generic' && b.type === 'generic') return 1;
-    
-    // All'interno dello stesso gruppo, ordiniamo per data (più recenti in alto)
-    return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
-  });
-};
-
-const addNewGenericSection = async () => {
-  if (!dossier.value) return;
-  
-  isSaving.value = true;
+const handleAddGenericSection = async () => {
   try {
-    const newSection = {
-      templateKey: 'clipboard.generic',
-      type: 'generic',
-      data: { text: '' },
-      timestamp: new Date().toISOString(),
-      order: 0
-    };
-    
-    // Aggiunta in testa e ri-ordinamento
-    const updatedSections = sortSections([newSection, ...dossier.value.sections]);
-    
-    // Salvataggio su database
-    await updateDossier(dossier.value._id, { sections: updatedSections });
-    
-    // Aggiornamento stato locale
-    dossier.value.sections = updatedSections;
-    
-    // Attivazione immediata dell'edit per la nuova sezione (che sarà all'indice 0)
-    startEditSection(0, newSection);
-    
+    await addGenericSection(props.id);
+    // L'aggiunta in testa rende la nuova sezione all'indice 0
+    if (dossier.value) {
+        startEditSection(0, dossier.value.sections[0]);
+    }
     ElMessage.success(t('common.add') + ' OK');
-  } catch (error) {
-    console.error('[DossierDetail] Errore aggiunta sezione:', error);
+  } catch (err) {
     ElMessage.error(t('common.error'));
-  } finally {
-    isSaving.value = false;
   }
 };
 // =============================
 
-const loadDossier = async () => {
-  loading.value = true;
+const init = async () => {
   try {
-    const id = route.params.id as string;
-    const data = await fetchDossierById(id);
-    dossier.value = data;
-  } catch (error) {
+    await loadDossier(props.id);
+  } catch (err) {
     ElMessage.error(t('common.errorLoadingData'));
     router.push('/dossiers');
-  } finally {
-    loading.value = false;
   }
 };
+
+onMounted(init);
 
 const goBack = () => router.push('/dossiers');
 const formatDate = (date) => dayjs(date).format('DD/MM/YYYY HH:mm:ss');

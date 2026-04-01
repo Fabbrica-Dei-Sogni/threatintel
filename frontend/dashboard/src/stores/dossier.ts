@@ -125,6 +125,10 @@ export const useDossierStore = defineStore('dossier', () => {
         }
     };
 
+    const notifySaved = () => {
+        lastSavedAt.value = Date.now();
+    };
+
     return {
         isRecording,
         isEnabled,
@@ -137,6 +141,7 @@ export const useDossierStore = defineStore('dossier', () => {
         reset,
         addSection,
         removeSection,
-        persistToDb
+        persistToDb,
+        notifySaved
     };
 });

@@ -9,6 +9,7 @@ import puppeteer from 'puppeteer';
 import { IpDetailsService } from './IpDetailsService';
 import { I18nService } from './I18nService';
 import fs from 'fs';
+import { IDossierSection } from '../models/DossierSchema';
 
 export type ReportType = 'attack' | 'telnet' | 'ip';
 
@@ -71,7 +72,7 @@ export class ReportService {
     /**
      * Genera un Dossier Investigativo Personalizzato partendo da una lista di sezioni catturate
      */
-    async generateCustomReport(sections: any[], locale: string, format: 'html' | 'pdf' = 'pdf'): Promise<Buffer | string> {
+    async generateCustomReport(sections: IDossierSection[], locale: string, format: 'html' | 'pdf' = 'pdf'): Promise<Buffer | string> {
         this.logger.info(`[ReportService] Generazione Custom Dossier (Telex) (${sections.length} sezioni) [${locale}]`);
 
         const templatePath = path.join(__dirname, `../templates/reports/custom-dossier.ejs`);
@@ -117,7 +118,7 @@ export class ReportService {
     /**
      * Genera un Dossier in stile HUD (Rich UI) usando frammenti EJS modulari
      */
-    async generateHudReport(sections: any[], locale: string, format: 'html' | 'pdf' = 'pdf'): Promise<Buffer | string> {
+    async generateHudReport(sections: IDossierSection[], locale: string, format: 'html' | 'pdf' = 'pdf'): Promise<Buffer | string> {
         this.logger.info(`[ReportService] Generazione HUD Dossier (${sections.length} sezioni) [${locale}]`);
 
         const templatePath = path.join(__dirname, `../templates/reports/hud-dossier.ejs`);
@@ -163,7 +164,7 @@ export class ReportService {
     /**
      * Genera un Dossier in stile Classic (Formal/Admin) usando frammenti EJS dedicati
      */
-    async generateClassicReport(sections: any[], locale: string, format: 'html' | 'pdf' = 'pdf'): Promise<Buffer | string> {
+    async generateClassicReport(sections: IDossierSection[], locale: string, format: 'html' | 'pdf' = 'pdf'): Promise<Buffer | string> {
         this.logger.info(`[ReportService] Generazione Classic Dossier (${sections.length} sezioni) [${locale}]`);
 
         const templatePath = path.join(__dirname, `../templates/reports/classic-dossier.ejs`);
@@ -385,7 +386,7 @@ export class ReportService {
     /**
      * Sanifica ricorsivamente un oggetto data per pulire campi raw noti.
      */
-    private sanitizeSectionData(data: any): any {
+    private sanitizeSectionData(data: Record<string, any>): Record<string, any> {
         if (!data || typeof data !== 'object') return data;
         
         const sanitized = { ...data };

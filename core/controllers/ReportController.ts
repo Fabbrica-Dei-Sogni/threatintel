@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { injectable } from 'tsyringe';
 import { ReportService, ReportType } from '../services/ReportService';
+import { IDossierSection } from '../models/DossierSchema';
 
 @injectable()
 export class ReportController {
@@ -42,7 +43,7 @@ export class ReportController {
 
     async generateCustomReport(req: Request, res: Response) {
         try {
-            const { sections, locale } = req.body;
+            const { sections, locale }: { sections: IDossierSection[], locale: string } = req.body;
             const format = (req.query.format as 'html' | 'pdf') || 'pdf';
             const style = (req.query.style as 'telex' | 'hud' | 'classic') || 'classic';
             const lang = (locale as string) || 'it-IT';

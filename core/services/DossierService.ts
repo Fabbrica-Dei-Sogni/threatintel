@@ -1,7 +1,7 @@
 import { inject, injectable } from 'tsyringe';
 import { LOGGER_TOKEN } from '../di/tokens';
 import { Logger } from 'winston';
-import Dossier, { IDossier, DossierStatus } from '../models/DossierSchema';
+import Dossier, { IDossier, DossierStatus, IDossierSection } from '../models/DossierSchema';
 import { CreateDossierDTO, UpdateDossierDTO, DossierResponseDTO } from '../models/dto/DossierDTO';
 import { ReportService } from './ReportService';
 
@@ -101,12 +101,13 @@ export class DossierService {
         this.logger.info(`[DossierService] Generazione report per dossier salvato: ${id} [${style}/${format}]`);
 
         // Prepariamo le sezioni mappandole sul formato atteso dai generatori del ReportService
-        const sections = dossier.sections.map(s => ({
+        const sections: IDossierSection[] = dossier.sections.map(s => ({
             templateKey: s.templateKey,
             data: s.data,
             type: s.type,
             timestamp: s.timestamp,
-            renderedText: s.renderedText
+            renderedText: s.renderedText,
+            order: s.order || 0
         }));
 
         if (style === 'hud') {
@@ -122,7 +123,7 @@ export class DossierService {
      * Sanifica ricorsivamente un oggetto data per pulire campi raw.
      * Logica derivata dal ReportService per coerenza.
      */
-    private sanitizeSectionData(data: any): any {
+    private sanitizeSectionData(data: Record<string, any>): Record<string, any> {
         if (!data || typeof data !== 'object') return data;
         
         const sanitized = { ...data };

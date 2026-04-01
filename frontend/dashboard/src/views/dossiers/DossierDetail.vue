@@ -45,17 +45,44 @@
         <div class="sections-timeline">
            <div v-for="(section, index) in dossier.sections" :key="index" class="section-preview glass-card">
               <div class="section-header">
-                <span class="badge">{{ section.type.toUpperCase() }}</span>
-                <span class="timestamp">{{ formatDate(section.timestamp) }}</span>
+                <div>
+                  <span class="badge" v-if="editingSectionIndex !== index">{{ section.type.toUpperCase() }}</span>
+                  <select v-else v-model="sectionEditForm.type" class="edit-title-input" style="width: auto; padding: 4px; font-size: 0.8rem; height: auto;">
+                    <option value="ip">IP</option>
+                    <option value="attack">ATTACK</option>
+                    <option value="telnet">TELNET</option>
+                    <option value="generic">GENERIC</option>
+                  </select>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <span class="timestamp">{{ formatDate(section.timestamp) }}</span>
+                  <template v-if="editingSectionIndex !== index">
+                    <button @click="startEditSection(index, section)" class="action-icon-btn" title="Modifica Sezione">✎</button>
+                    <button @click="deleteSection(index)" class="action-icon-btn danger-text" title="Elimina Sezione">🗑</button>
+                  </template>
+                  <template v-else>
+                    <button @click="saveSection(index)" class="action-icon-btn success-text" title="Salva Sezione" :disabled="isSaving">✓</button>
+                    <button @click="cancelEditSection()" class="action-icon-btn" title="Annulla" :disabled="isSaving">✗</button>
+                  </template>
+                </div>
               </div>
               <div class="section-body">
-                 <!-- Se è presente renderedText (fallback) lo mostriamo, altrimenti mostriamo i dati raw o un placeholder -->
-                 <div class="rendered-content" v-html="section.renderedText"></div>
-                 
-                 <!-- Expandable Data Toggle (for forensic review) -->
-                 <div class="data-dump" v-if="showRaw">
-                    <pre>{{ JSON.stringify(section.data, null, 2) }}</pre>
-                 </div>
+                 <template v-if="editingSectionIndex !== index">
+                   <!-- Se è presente renderedText (fallback) lo mostriamo, altrimenti mostriamo i dati raw o un placeholder -->
+                   <div class="rendered-content" v-html="section.renderedText"></div>
+                   
+                   <!-- Expandable Data Toggle (for forensic review) -->
+                   <div class="data-dump" v-if="showRaw">
+                      <pre>{{ JSON.stringify(section.data, null, 2) }}</pre>
+                   </div>
+                 </template>
+                 <template v-else>
+                   <label style="font-size: 0.8rem; color: #818cf8; font-weight: bold; margin-bottom: 5px; display: block;">TESTO RENDERIZZATO (HTML):</label>
+                   <textarea v-model="sectionEditForm.renderedText" class="edit-desc-input" rows="8"></textarea>
+                   
+                   <label style="font-size: 0.8rem; color: #818cf8; font-weight: bold; margin-bottom: 5px; display: block; margin-top: 15px;">PAYLOAD DATI (JSON):</label>
+                   <textarea v-model="sectionEditForm.dataString" class="edit-desc-input" rows="8" style="font-family: monospace;"></textarea>
+                 </template>
               </div>
            </div>
         </div>
@@ -117,6 +144,71 @@ const saveEdit = async () => {
     isSaving.value = false;
   }
 };
+
+// === GESTIONE EDIT SEZIONI ===
+const editingSectionIndex = ref(-1);
+const sectionEditForm = ref({ type: '', renderedText: '', dataString: '' });
+
+const startEditSection = (index, section) => {
+  editingSectionIndex.value = index;
+  sectionEditForm.value = {
+    type: section.type,
+    renderedText: section.renderedText || '',
+    dataString: section.data ? JSON.stringify(section.data, null, 2) : '{}'
+  };
+};
+
+const cancelEditSection = () => {
+  editingSectionIndex.value = -1;
+};
+
+const saveSection = async (index) => {
+  let parsedData = {};
+  try {
+    parsedData = JSON.parse(sectionEditForm.value.dataString);
+  } catch (e) {
+    ElMessage.error('JSON non valido nel Payload Dati.');
+    return;
+  }
+  
+  isSaving.value = true;
+  try {
+    const updatedSections = [...dossier.value.sections];
+    updatedSections[index] = {
+      ...updatedSections[index],
+      type: sectionEditForm.value.type,
+      renderedText: sectionEditForm.value.renderedText,
+      data: parsedData
+    };
+    
+    await updateDossier(dossier.value._id, { sections: updatedSections });
+    dossier.value.sections = updatedSections;
+    editingSectionIndex.value = -1;
+    ElMessage.success(t('common.save') + ' OK');
+  } catch (error) {
+    ElMessage.error(t('common.error'));
+  } finally {
+    isSaving.value = false;
+  }
+};
+
+const deleteSection = async (index) => {
+  if (!confirm("Confermi l'eliminazione di questa sezione?")) return;
+  
+  isSaving.value = true;
+  try {
+    const updatedSections = dossier.value.sections.filter((_, i) => i !== index);
+    await updateDossier(dossier.value._id, { sections: updatedSections });
+    dossier.value.sections = updatedSections;
+    if (editingSectionIndex.value === index) editingSectionIndex.value = -1;
+    ElMessage.success(t('common.delete') + ' OK');
+  } catch (error) {
+    ElMessage.error(t('common.error'));
+  } finally {
+    isSaving.value = false;
+  }
+};
+// =============================
 
 const loadDossier = async () => {
   loading.value = true;
@@ -318,4 +410,25 @@ onMounted(loadDossier);
   font-family: inherit;
 }
 .edit-desc-input:focus { border-color: #6366f1; }
+
+.action-icon-btn {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #818cf8;
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 4px;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.action-icon-btn:hover { background: rgba(99, 102, 241, 0.2); transform: scale(1.05); border-color: rgba(99, 102, 241, 0.5); }
+.success-text { color: #10b981; }
+.danger-text { color: #ef4444; }
+.action-icon-btn.success-text:hover { background: rgba(16, 185, 129, 0.2); border-color: rgba(16, 185, 129, 0.5); }
+.action-icon-btn.danger-text:hover { background: rgba(239, 68, 68, 0.2); border-color: rgba(239, 68, 68, 0.5); }
 </style>

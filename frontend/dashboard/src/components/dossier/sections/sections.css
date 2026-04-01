@@ -1,0 +1,118 @@
+.dossier-section {
+  padding: 15px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all 0.2s ease;
+}
+
+.dossier-section:hover {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(99, 102, 241, 0.2);
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid rgba(99, 102, 241, 0.2);
+  padding-bottom: 8px;
+}
+
+.section-title h3 {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #818cf8;
+}
+
+.data-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 15px;
+}
+
+.data-item {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.data-item.full-width {
+  grid-column: 1 / -1;
+}
+
+.data-item label {
+  font-size: 0.7rem;
+  color: #64748b;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+.data-item .value {
+  font-size: 0.85rem;
+  color: #e2e8f0;
+  word-break: break-all;
+}
+
+.cyan-text { color: #22d3ee !important; }
+.amber-text { color: #fbbf24 !important; }
+.emerald-text { color: #10b981 !important; }
+.rose-text { color: #fb7185 !important; }
+
+.coordinates {
+  font-family: monospace;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px dashed rgba(255, 255, 255, 0.1);
+}
+
+.badge-defcon {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 800;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+}
+
+.timeline-row {
+  display: flex;
+  gap: 15px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.timeline-time {
+  min-width: 140px;
+  font-family: monospace;
+  font-size: 0.8rem;
+  color: #94a3b8;
+}
+
+.timeline-content {
+  flex: 1;
+}
+
+.timeline-event-name {
+  font-weight: 700;
+  color: #818cf8;
+  font-size: 0.8rem;
+  margin-bottom: 4px;
+}
+
+.timeline-message {
+  font-size: 0.85rem;
+  color: #cbd5e1;
+}
+
+.timeline-details {
+  font-size: 0.75rem;
+  color: #64748b;
+  margin-top: 5px;
+  font-style: italic;
+}

@@ -1,0 +1,47 @@
+<template>
+  <div class="dossier-section telnet-summary-section">
+    <div class="section-title">
+      <span class="icon">🖥️</span>
+      <h3>{{ t('dossierSections.abuseInfo') }} (SESSIONE TELNET)</h3>
+    </div>
+    
+    <div class="data-grid">
+      <div class="data-item">
+        <label>{{ t('dossierSections.sessionId') }}</label>
+        <span class="value amber-text fw-800">{{ data.sessionId }}</span>
+      </div>
+      <div class="data-item">
+        <label>{{ t('dossierSections.ip') }}</label>
+        <span class="value cyan-text">{{ data.ip }}</span>
+      </div>
+      <div class="data-item">
+        <label>{{ t('dossierSections.timeWindow') }}</label>
+        <span class="value">{{ data.timeWindow }}</span>
+      </div>
+      <div class="data-item">
+        <label>{{ t('dossierSections.origin') }}</label>
+        <span class="value">{{ data.origin }}</span>
+      </div>
+      <div class="data-item">
+        <label>{{ t('dossierSections.eventsCount') }}</label>
+        <span class="value emerald-text">{{ data.totalEvents }}</span>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { useI18n } from 'vue-i18n';
+import type { ITelnetSummarySectionData } from '../../../models/DossierDTO';
+
+const { t } = useI18n();
+
+defineProps<{
+  data: ITelnetSummarySectionData;
+}>();
+</script>
+
+<style scoped src="./sections.css"></style>
+<style scoped>
+.fw-800 { font-weight: 800; }
+</style>

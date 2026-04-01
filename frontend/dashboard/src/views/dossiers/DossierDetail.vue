@@ -67,21 +67,18 @@
                 </div>
               </div>
               <div class="section-body">
-                 <template v-if="editingSectionIndex !== index">
-                   <!-- Se è presente renderedText (fallback) lo mostriamo, altrimenti mostriamo i dati raw o un placeholder -->
-                   <div class="rendered-content" v-html="section.renderedText"></div>
-                   
-                   <!-- Expandable Data Toggle (for forensic review) -->
-                   <div class="data-dump" v-if="showRaw">
-                      <pre>{{ JSON.stringify(section.data, null, 2) }}</pre>
-                   </div>
-                 </template>
+                  <template v-if="editingSectionIndex !== index">
+                    <!-- Nuovo sistema di rendering dinamico basato su DTO -->
+                    <DossierSectionRenderer :section="section" />
+                    
+                    <!-- Expandable Data Toggle (for forensic review) -->
+                    <div class="data-dump" v-if="showRaw">
+                       <pre>{{ JSON.stringify(section.data, null, 2) }}</pre>
+                    </div>
+                  </template>
                  <template v-else>
-                   <label style="font-size: 0.8rem; color: #818cf8; font-weight: bold; margin-bottom: 5px; display: block;">TESTO RENDERIZZATO (HTML):</label>
-                   <textarea v-model="sectionEditForm.renderedText" class="edit-desc-input" rows="8"></textarea>
-                   
-                   <label style="font-size: 0.8rem; color: #818cf8; font-weight: bold; margin-bottom: 5px; display: block; margin-top: 15px;">PAYLOAD DATI (JSON):</label>
-                   <textarea v-model="sectionEditForm.dataString" class="edit-desc-input" rows="8" style="font-family: monospace;"></textarea>
+                   <label style="font-size: 0.8rem; color: #818cf8; font-weight: bold; margin-bottom: 5px; display: block;">PAYLOAD DATI (JSON):</label>
+                   <textarea v-model="sectionEditForm.dataString" class="edit-desc-input" rows="12" style="font-family: monospace;"></textarea>
                  </template>
               </div>
            </div>
@@ -98,6 +95,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { fetchDossierById, updateDossier } from '../../api';
 import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
 import DossierReportActions from '../../components/DossierReportActions.vue';
+import DossierSectionRenderer from '../../components/dossier/DossierSectionRenderer.vue';
 import { ElMessage } from 'element-plus';
 import dayjs from 'dayjs';
 
@@ -147,13 +145,12 @@ const saveEdit = async () => {
 
 // === GESTIONE EDIT SEZIONI ===
 const editingSectionIndex = ref(-1);
-const sectionEditForm = ref({ type: '', renderedText: '', dataString: '' });
+const sectionEditForm = ref({ type: '', dataString: '' });
 
 const startEditSection = (index, section) => {
   editingSectionIndex.value = index;
   sectionEditForm.value = {
     type: section.type,
-    renderedText: section.renderedText || '',
     dataString: section.data ? JSON.stringify(section.data, null, 2) : '{}'
   };
 };
@@ -177,7 +174,6 @@ const saveSection = async (index) => {
     updatedSections[index] = {
       ...updatedSections[index],
       type: sectionEditForm.value.type,
-      renderedText: sectionEditForm.value.renderedText,
       data: parsedData
     };
     

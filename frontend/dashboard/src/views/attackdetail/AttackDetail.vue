@@ -320,7 +320,10 @@
                             class="rate-limit-event-entry">
                             <div class="event-header" @click="toggleEvent(event._id || event.id)">
                                 <div class="event-header-content">
-                                    <span class="event-time"><span class="icon">🕒</span> {{ formatDate(event.timestamp) }}</span>
+                                    <span class="event-time">
+                                        <span class="icon">🕒</span> 
+                                        <span v-html="formatDate(event.timestamp)"></span>
+                                    </span>
                                     <span class="event-ip"><span class="icon">🎯</span> {{ event.ip }}</span>
                                     <span class="event-limit-badge pulse-magma-mini">{{ event.limitType }}</span>
                                 </div>

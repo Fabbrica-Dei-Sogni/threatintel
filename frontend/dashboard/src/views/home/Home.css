@@ -517,7 +517,15 @@ li > a:last-child:hover {
 
 @media (max-width: 768px) {
   .dashboard { padding: 10px; }
-  .header-with-lang { padding-left: 50px; margin-bottom: 15px; }
+  .header-top { 
+    padding-left: 10px; 
+    padding-right: 10px; 
+    gap: 10px; /* Reduced gap to fit both elements on the same line */
+    margin-bottom: 15px; 
+  }
+  .header-main-title h1 {
+    font-size: 1.25rem; /* Slightly scale the title down on mobile */
+  }
   .secondary-intel { grid-template-columns: 1fr !important; gap: 15px; }
   .map-side { height: 300px; }
 

@@ -19,7 +19,7 @@
       </router-link>
 
       <!-- Main Hub Button -->
-      <button class="hub-btn shadow-2xl pulse-glow" @click="isOpen = !isOpen" :title="t('nav.menu')">
+      <button class="hub-btn shadow-2xl pulse-glow" :class="`theme-${currentDomain}`" @click="isOpen = !isOpen" :title="t('nav.menu')">
         <transition name="icon-spin" mode="out-in">
           <span v-if="isOpen" class="hub-icon close">✕</span>
           <span v-else class="hub-icon open">
@@ -136,7 +136,6 @@ const availableOptions = computed(() => {
   height: 60px;
   border-radius: 50%;
   border: 1px solid rgba(136, 170, 255, 0.4);
-  background: radial-gradient(circle at top left, #1E3799, #0C2461);
   color: #fff;
   display: flex;
   align-items: center;
@@ -147,15 +146,44 @@ const availableOptions = computed(() => {
   outline: none;
 }
 
-.pulse-glow {
+/* THEMES */
+.theme-home {
+  background: radial-gradient(circle at top left, #1E3799, #0C2461);
+  border-color: rgba(136, 170, 255, 0.4);
+}
+.theme-home.pulse-glow {
   box-shadow: 0 0 20px rgba(74, 105, 189, 0.5), inset 0 0 10px rgba(255, 255, 255, 0.1);
 }
 
+.theme-dossier {
+  background: radial-gradient(circle at top left, #6366f1, #312e81);
+  border-color: rgba(99, 102, 241, 0.4);
+}
+.theme-dossier.pulse-glow {
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.5), inset 0 0 10px rgba(255, 255, 255, 0.1);
+}
+
+.theme-attack {
+  background: radial-gradient(circle at top left, #e11d48, #881337);
+  border-color: rgba(225, 29, 72, 0.4);
+}
+.theme-attack.pulse-glow {
+  box-shadow: 0 0 20px rgba(225, 29, 72, 0.5), inset 0 0 10px rgba(255, 255, 255, 0.1);
+}
+
+.theme-telnet {
+  background: radial-gradient(circle at top left, #10b981, #064e3b);
+  border-color: rgba(16, 185, 129, 0.4);
+}
+.theme-telnet.pulse-glow {
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.5), inset 0 0 10px rgba(255, 255, 255, 0.1);
+}
+
 .menu-open .hub-btn {
-  background: #0f172a;
-  border-color: #ef4444;
+  background: #0f172a !important;
+  border-color: #ef4444 !important;
   transform: scale(0.9);
-  box-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.4) !important;
 }
 
 .hub-icon {

@@ -617,5 +617,22 @@
         "generic": "{text}",
         "attackSummary": "RIEPILOGO ATTACCO:\nIP: {ip}\nPericolo: {dangerLevel} ({dangerScore})\nLogs: {totaleLogs}\nDurata: {duration}\nRPS: {rps}",
         "attackTechnique": "Tecnica Rilevata: {tech}"
+    },
+    "dossierRecorder": {
+        "institutionalStyle": "Stile Istituzionale",
+        "tacticalHudStyle": "Stile HUD Tattico",
+        "saveToDb": "Salva nel Database",
+        "previewTitle": "ANTEPRIMA DOSSIER",
+        "saveInvestigation": "Salva Investigazione nell'Archivio",
+        "confirmSave": "Conferma e Salva",
+        "dossierTitleLabel": "TITOLO DOSSIER",
+        "dossierTitlePlaceholder": "Es: Analisi Botnet {date}",
+        "dossierDescLabel": "DESCRIZIONE / NOTE",
+        "dossierDescPlaceholder": "Aggiungi note investigative...",
+        "defaultSubject": "Intelligence",
+        "defaultDescription": "Investigazione forense contenente {count} sezioni di intelligence catturate il {date}.",
+        "titleRequired": "Il titolo è obbligatorio",
+        "saveSuccess": "Dossier salvato correttamente nell'archivio.",
+        "saveError": "Errore durante il salvataggio."
     }
 }

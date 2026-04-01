@@ -617,5 +617,22 @@
         "generic": "{text}",
         "attackSummary": "СВОДКА АТАКИ:\nIP: {ip}\nОпасность: {dangerLevel} ({dangerScore})\nЛоги: {totaleLogs}\nДлительность: {duration}\nRPS: {rps}",
         "attackTechnique": "Обнаруженная техника: {tech}"
+    },
+    "dossierRecorder": {
+        "institutionalStyle": "Институциональный стиль",
+        "tacticalHudStyle": "Тактический стиль HUD",
+        "saveToDb": "Сохранить в базу данных",
+        "previewTitle": "ПРЕДПРОСМОТР ДОСЬЕ",
+        "saveInvestigation": "Сохранить расследование в архив",
+        "confirmSave": "Подтвердить и сохранить",
+        "dossierTitleLabel": "ЗАГОЛОВОК ДОСЬЕ",
+        "dossierTitlePlaceholder": "Пример: Анализ ботнета {date}",
+        "dossierDescLabel": "ОПИСАНИЕ / ЗАМЕТКИ",
+        "dossierDescPlaceholder": "Добавить следственные заметки...",
+        "defaultSubject": "Intelligence",
+        "defaultDescription": "Судебно-криминалистическое расследование, содержащее {count} разделов разведданных, зафиксированных {date}.",
+        "titleRequired": "Заголовок обязателен",
+        "saveSuccess": "Досье успешно сохранено в архиве.",
+        "saveError": "Ошибка при сохранении."
     }
 }

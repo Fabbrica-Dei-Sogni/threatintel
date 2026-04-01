@@ -617,5 +617,22 @@
         "generic": "{text}",
         "attackSummary": "PODSUMOWANIE ATAKU:\nIP: {ip}\nZagrożenie: {dangerLevel} ({dangerScore})\nLogi: {totaleLogs}\nCzas trwania: {duration}\nRPS: {rps}",
         "attackTechnique": "Wykryta technika: {tech}"
+    },
+    "dossierRecorder": {
+        "institutionalStyle": "Styl Instytucjonalny",
+        "tacticalHudStyle": "Taktyczny Styl HUD",
+        "saveToDb": "Zapisz w bazie danych",
+        "previewTitle": "PODGLĄD DOSSIER",
+        "saveInvestigation": "Zapisz śledztwo w archiwum",
+        "confirmSave": "Potwierdź i zapisz",
+        "dossierTitleLabel": "TYTUŁ DOSSIER",
+        "dossierTitlePlaceholder": "Np: Analiza Botnetu {date}",
+        "dossierDescLabel": "OPIS / NOTATKI",
+        "dossierDescPlaceholder": "Dodaj notatki śledcze...",
+        "defaultSubject": "Intelligence",
+        "defaultDescription": "Śledztwo kryminalistyczne zawierające {count} sekcji wywiadowczych zarejestrowanych {date}.",
+        "titleRequired": "Tytuł jest wymagany",
+        "saveSuccess": "Dossier pomyślnie zapisane w archiwum.",
+        "saveError": "Błąd podczas zapisywania."
     }
 }

@@ -38,9 +38,9 @@
 
             <div class="style-selector-pill">
               <button class="style-opt" :class="{ active: selectedStyle === 'classic' }"
-                @click="selectedStyle = 'classic'" title="Stile Istituzionale">CLASSIC</button>
+                @click="selectedStyle = 'classic'" :title="t('dossierRecorder.institutionalStyle')">CLASSIC</button>
               <button class="style-opt" :class="{ active: selectedStyle === 'hud' }" @click="selectedStyle = 'hud'"
-                title="Stile HUD Tattico">HUD</button>
+                :title="t('dossierRecorder.tacticalHudStyle')">HUD</button>
             </div>
 
             <button class="btn-tool preview" @click="generateCustomReport('html', selectedStyle)"
@@ -56,7 +56,7 @@
               <span class="btn-text h-900">{{ t('common.downloadPdf') }}</span>
             </button>
             <button class="btn-tool save" @click="handleSave" :disabled="dossierStore.isSaving"
-              title="Salva nel Database">
+              :title="t('dossierRecorder.saveToDb')">
               <span v-if="dossierStore.isSaving" class="spinner-tiny"></span>
               <span v-else class="icon">💾</span>
               <span class="btn-text h-900">{{ t('common.save').toUpperCase() }}</span>
@@ -76,7 +76,7 @@
               <div class="modal-header">
                 <div class="header-title">
                   <span class="header-icon h-tablet">🔎</span>
-                  <h3>DOSSIER PREVIEW</h3>
+                  <h3>{{ t('dossierRecorder.previewTitle') }}</h3>
                 </div>
                 <div class="header-actions">
                   <button @click="generateCustomReport('pdf', selectedStyle)" class="download-mini-btn"
@@ -203,7 +203,7 @@ const handleSave = async () => {
 
   // 1. Genera valori di default
   const now = dayjs().format('YYYY-MM-DD HH:mm');
-  let subject = 'Intelligence';
+  let subject = t('dossierRecorder.defaultSubject');
   const firstSection = dossierStore.sections[0];
   if (firstSection) {
     if (firstSection.type === 'ip') subject = firstSection.data.ip || subject;
@@ -213,7 +213,10 @@ const handleSave = async () => {
 
   const defaultTitle = `Dossier ${subject} - ${now}`;
   const count = dossierStore.sections.length;
-  const defaultDescription = `Investigazione forense contenente ${count} ${count === 1 ? 'sezione' : 'sezioni'} di intelligence catturate il ${dayjs().format('DD/MM/YYYY')}.`;
+  const defaultDescription = t('dossierRecorder.defaultDescription', {
+    count: count,
+    date: dayjs().format('DD/MM/YYYY')
+  });
 
   // 2. Stato locale per il form all'interno dell'ElMessageBox
   const formState = reactive({
@@ -223,29 +226,29 @@ const handleSave = async () => {
 
   try {
     await ElMessageBox({
-      title: 'Salva Investigazione nell\'Archivio',
+      title: t('dossierRecorder.saveInvestigation'),
       showCancelButton: true,
-      confirmButtonText: 'Conferma e Salva',
-      cancelButtonText: 'Annulla',
+      confirmButtonText: t('dossierRecorder.confirmSave'),
+      cancelButtonText: t('common.cancel'),
       customClass: 'cyber-message-box',
       message: () => h('div', { class: 'save-dossier-vnode-form' }, [
         h('div', { class: 'vnode-form-item' }, [
-          h('label', { class: 'vnode-label' }, 'TITOLO DOSSIER'),
+          h('label', { class: 'vnode-label' }, t('dossierRecorder.dossierTitleLabel')),
           h(ElInput, {
             modelValue: formState.title,
             'onUpdate:modelValue': (val) => formState.title = val,
-            placeholder: 'Es: Analisi Botnet March 2024',
+            placeholder: t('dossierRecorder.dossierTitlePlaceholder', { date: dayjs().format('MMMM YYYY') }),
             class: 'vnode-input'
           })
         ]),
         h('div', { class: 'vnode-form-item', style: 'margin-top: 15px' }, [
-          h('label', { class: 'vnode-label' }, 'DESCRIZIONE / NOTE'),
+          h('label', { class: 'vnode-label' }, t('dossierRecorder.dossierDescLabel')),
           h(ElInput, {
             type: 'textarea',
             rows: 4,
             modelValue: formState.description,
             'onUpdate:modelValue': (val) => formState.description = val,
-            placeholder: 'Aggiungi note investigative...',
+            placeholder: t('dossierRecorder.dossierDescPlaceholder'),
             class: 'vnode-textarea'
           })
         ])
@@ -253,7 +256,7 @@ const handleSave = async () => {
       beforeClose: (action, instance, done) => {
         if (action === 'confirm') {
           if (!formState.title) {
-            ElMessage.warning('Il titolo è obbligatorio');
+            ElMessage.warning(t('dossierRecorder.titleRequired'));
             return;
           }
           done();
@@ -265,11 +268,11 @@ const handleSave = async () => {
 
     // 3. Persistenza reale
     await dossierStore.persistToDb(formState.title, formState.description);
-    ElMessage.success('Dossier salvato correttamente nell\'archivio.');
+    ElMessage.success(t('dossierRecorder.saveSuccess'));
 
   } catch (error) {
     if (error !== 'cancel') {
-      ElMessage.error('Errore durante il salvataggio.');
+      ElMessage.error(t('dossierRecorder.saveError'));
     }
   }
 };

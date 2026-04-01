@@ -617,5 +617,22 @@
         "generic": "{text}",
         "attackSummary": "ANGRIFFSZUSAMMENFASSUNG:\nIP: {ip}\nGefahr: {dangerLevel} ({dangerScore})\nLogs: {totaleLogs}\nDauer: {duration}\nRPS: {rps}",
         "attackTechnique": "Erkannte Technik: {tech}"
+    },
+    "dossierRecorder": {
+        "institutionalStyle": "Institutioneller Stil",
+        "tacticalHudStyle": "Taktischer HUD-Stil",
+        "saveToDb": "In Datenbank speichern",
+        "previewTitle": "DOSSIER-VORSCHAU",
+        "saveInvestigation": "Untersuchung im Archiv speichern",
+        "confirmSave": "Bestätigen und Speichern",
+        "dossierTitleLabel": "DOSSIER-TITEL",
+        "dossierTitlePlaceholder": "Z.B.: Botnet-Analyse {date}",
+        "dossierDescLabel": "BESCHREIBUNG / NOTIZEN",
+        "dossierDescPlaceholder": "Investigative Notizen hinzufügen...",
+        "defaultSubject": "Intelligence",
+        "defaultDescription": "Forensische Untersuchung mit {count} Aufklärungsabschnitten, erfasst am {date}.",
+        "titleRequired": "Titel ist erforderlich",
+        "saveSuccess": "Dossier erfolgreich im Archiv gespeichert.",
+        "saveError": "Fehler beim Speichern."
     }
 }

@@ -16,13 +16,7 @@
       </svg>
     </router-link>
     
-    <!-- Floating Dossier Archive Button -->
-    <router-link to="/dossiers" class="floating-dossiers" :class="{ 'recorder-active': dossierStore.isEnabled && dossierStore.sections.length > 0 }" title="Archivio Investigativo">
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" 
-        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
-      </svg>
-    </router-link>
+    <GlobalNavMenu />
   </div>
 </template>
 
@@ -31,6 +25,7 @@ import { onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import DossierRecorder from './components/DossierRecorder.vue';
 import DossierToggle from './components/DossierToggle.vue';
+import GlobalNavMenu from './components/GlobalNavMenu.vue';
 import { useDossierStore } from './stores/dossier';
 
 const { t } = useI18n();
@@ -104,40 +99,8 @@ onMounted(() => {
   transform: rotate(45deg);
 }
 
-.floating-dossiers {
-  position: fixed;
-  bottom: 24px;
-  right: 90px; /* Posizionato a sinistra di settings */
-  width: 54px;
-  height: 54px;
-  background: rgba(99, 102, 241, 0.1);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(99, 102, 241, 0.3);
-  color: #818cf8; /* Indigo light */
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-  z-index: 1000;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  text-decoration: none;
-}
-
-.floating-dossiers:hover {
-  background: #6366f1;
-  color: white;
-  transform: scale(1.1) translateY(-2px);
-  box-shadow: 0 12px 40px rgba(99, 102, 241, 0.4);
-}
-
 .recorder-active {
   bottom: 84px !important;
-}
-
-.floating-dossiers svg {
-  width: 24px;
-  height: 24px;
 }
 
 @media (max-width: 600px) {
@@ -149,16 +112,8 @@ onMounted(() => {
   }
   .floating-settings svg { width: 20px; height: 20px; }
 
-  .floating-dossiers {
-    right: 70px;
-    bottom: 24px;
-    width: 44px;
-    height: 44px;
-  }
-  .floating-dossiers.recorder-active, 
   .floating-settings.recorder-active {
     bottom: 84px !important;
   }
-  .floating-dossiers svg { width: 18px; height: 18px; }
 }
 </style>

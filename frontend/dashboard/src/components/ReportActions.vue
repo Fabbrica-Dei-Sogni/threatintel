@@ -10,31 +10,33 @@
         <span class="tab-text">{{ t('common.generateReport').toUpperCase() }}</span>
       </div>
       
-      <transition name="slide-card">
-        <div v-if="showMenu" class="action-menu glass-morphism">
-          <div class="menu-header">
-            <strong>COMMAND CENTER</strong>
-            <span class="status-dot pulse"></span>
+      <Teleport to="body" :disabled="!isMobile">
+        <transition name="slide-card">
+          <div v-if="showMenu" class="action-menu glass-morphism" :class="{ 'is-mobile-menu mode-sticky': isMobile }">
+            <div class="menu-header">
+              <strong>COMMAND CENTER</strong>
+              <span class="status-dot pulse"></span>
+            </div>
+            <button @click="handlePreview" class="menu-item" :disabled="loadingHtml">
+              <span class="icon">👁️</span>
+              <div class="item-info">
+                <span class="title">{{ t('common.viewHtml') }}</span>
+                <span class="subtext">Anteprima Interattiva</span>
+              </div>
+              <span v-if="loadingHtml" class="spinner-tiny"></span>
+            </button>
+            <div class="menu-divider"></div>
+            <button @click="handleDownload" class="menu-item" :disabled="loadingPdf">
+              <span class="icon">📥</span>
+              <div class="item-info">
+                <span class="title">{{ t('common.downloadPdf') }}</span>
+                <span class="subtext">Documento Forense A4</span>
+              </div>
+              <span v-if="loadingPdf" class="spinner-tiny"></span>
+            </button>
           </div>
-          <button @click="handlePreview" class="menu-item" :disabled="loadingHtml">
-            <span class="icon">👁️</span>
-            <div class="item-info">
-              <span class="title">{{ t('common.viewHtml') }}</span>
-              <span class="subtext">Anteprima Interattiva</span>
-            </div>
-            <span v-if="loadingHtml" class="spinner-tiny"></span>
-          </button>
-          <div class="menu-divider"></div>
-          <button @click="handleDownload" class="menu-item" :disabled="loadingPdf">
-            <span class="icon">📥</span>
-            <div class="item-info">
-              <span class="title">{{ t('common.downloadPdf') }}</span>
-              <span class="subtext">Documento Forense A4</span>
-            </div>
-            <span v-if="loadingPdf" class="spinner-tiny"></span>
-          </button>
-        </div>
-      </transition>
+        </transition>
+      </Teleport>
     </div>
 
     <!-- MODE: BUTTON -->
@@ -47,80 +49,86 @@
         </span>
       </button>
 
-      <transition name="popover">
-        <div v-if="showMenu" class="action-menu popover-menu glass-morphism">
-          <div class="menu-header mini">
-            <strong>{{ t('common.preview').toUpperCase() }}</strong>
+      <Teleport to="body" :disabled="!isMobile">
+        <transition name="popover">
+          <div v-if="showMenu" class="action-menu popover-menu glass-morphism" :class="{ 'is-mobile-menu': isMobile }">
+            <div class="menu-header mini">
+              <strong>{{ t('common.preview').toUpperCase() }}</strong>
+            </div>
+            <button @click="handlePreview" class="menu-item" :disabled="loadingHtml">
+              <span class="icon">👁️</span>
+              <div class="item-info">
+                <span class="title">{{ t('common.viewHtml') }}</span>
+              </div>
+              <span v-if="loadingHtml" class="spinner-tiny"></span>
+            </button>
+            <div class="menu-divider"></div>
+            <button @click="handleDownload" class="menu-item" :disabled="loadingPdf">
+              <span class="icon">📥</span>
+              <div class="item-info">
+                <span class="title">{{ t('common.downloadPdf') }}</span>
+              </div>
+              <span v-if="loadingPdf" class="spinner-tiny"></span>
+            </button>
           </div>
-          <button @click="handlePreview" class="menu-item" :disabled="loadingHtml">
-            <span class="icon">👁️</span>
-            <div class="item-info">
-              <span class="title">{{ t('common.viewHtml') }}</span>
-            </div>
-            <span v-if="loadingHtml" class="spinner-tiny"></span>
-          </button>
-          <div class="menu-divider"></div>
-          <button @click="handleDownload" class="menu-item" :disabled="loadingPdf">
-            <span class="icon">📥</span>
-            <div class="item-info">
-              <span class="title">{{ t('common.downloadPdf') }}</span>
-            </div>
-            <span v-if="loadingPdf" class="spinner-tiny"></span>
-          </button>
-        </div>
-      </transition>
+        </transition>
+      </Teleport>
     </div>
 
-    <!-- Backdrop for menus -->
-    <div v-if="showMenu" class="menu-backdrop" @click="showMenu = false"></div>
+    <!-- Backdrop Teleported to Body -->
+    <Teleport to="body">
+      <div v-if="showMenu" class="menu-backdrop" @click="showMenu = false"></div>
+    </Teleport>
 
-    <!-- Preview Modal (Common) -->
-    <transition name="modal-fade">
-      <div v-if="showPreview" class="preview-modal-overlay" @click.self="closePreview">
-        <div class="preview-modal-content glass-morphism-dark">
-          <div class="modal-header">
-            <div class="header-title">
-              <span class="header-icon">🔎</span>
-              <h3>INTELLIGENCE DOSSIER PREVIEW</h3>
-            </div>
-            <div class="header-actions">
-               <button @click="handleDownload" class="download-mini-btn" :disabled="loadingPdf">
-                <span v-if="loadingPdf" class="spinner-tiny"></span>
-                <span v-else>📥 {{ t('common.downloadPdf') }}</span>
-              </button>
-              <button class="close-btn" @click="closePreview">✕</button>
-            </div>
-          </div>
-          
-          <div class="modal-body" ref="modalBody">
-            <div class="scaling-wrapper" :style="scalingStyle">
-              <iframe 
-                v-if="htmlContent" 
-                ref="previewFrame"
-                :srcdoc="htmlContent" 
-                class="report-frame shadow-2xl"
-                frameborder="0"
-                @load="onFrameLoad"
-              ></iframe>
-              <div v-else class="loading-preview">
-                 <span class="spinner-large"></span>
-                 <p>{{ t('common.loading') }}</p>
+    <!-- Preview Modal Teleported to Body -->
+    <Teleport to="body">
+      <transition name="modal-fade">
+        <div v-if="showPreview" class="preview-modal-overlay" @click.self="closePreview">
+          <div class="preview-modal-content glass-morphism-dark">
+            <div class="modal-header">
+              <div class="header-title">
+                <span class="header-icon">🔎</span>
+                <h3>INTELLIGENCE DOSSIER PREVIEW</h3>
+              </div>
+              <div class="header-actions">
+                 <button @click="handleDownload" class="download-mini-btn" :disabled="loadingPdf">
+                  <span v-if="loadingPdf" class="spinner-tiny"></span>
+                  <span v-else>📥 {{ t('common.downloadPdf') }}</span>
+                </button>
+                <button class="close-btn" @click="closePreview">✕</button>
               </div>
             </div>
-          </div>
-          
-          <div class="modal-info-bar">
-            <span>FORMATO: A4 (ISO 216)</span>
-            <span class="zoom-indicator">ZOOM: {{ Math.round(scaleFactor * 100) }}%</span>
+            
+            <div class="modal-body" ref="modalBody">
+              <div class="scaling-wrapper" :style="scalingStyle">
+                <iframe 
+                  v-if="htmlContent" 
+                  ref="previewFrame"
+                  :srcdoc="htmlContent" 
+                  class="report-frame shadow-2xl"
+                  frameborder="0"
+                  @load="onFrameLoad"
+                ></iframe>
+                <div v-else class="loading-preview">
+                   <span class="spinner-large"></span>
+                   <p>{{ t('common.loading') }}</p>
+                </div>
+              </div>
+            </div>
+            
+            <div class="modal-info-bar">
+              <span>FORMATO: A4 (ISO 216)</span>
+              <span class="zoom-indicator">ZOOM: {{ Math.round(scaleFactor * 100) }}%</span>
+            </div>
           </div>
         </div>
-      </div>
-    </transition>
+      </transition>
+    </Teleport>
   </div>
 </template>
 
 <script setup>
-import { ref, onUnmounted, computed, nextTick } from 'vue';
+import { ref, onUnmounted, computed, nextTick, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { fetchReport } from '../api';
 import { ElMessage } from 'element-plus';
@@ -142,6 +150,11 @@ const htmlContent = ref('');
 const loadingHtml = ref(false);
 const loadingPdf = ref(false);
 
+const isMobile = ref(false);
+const checkMobile = () => {
+  isMobile.value = window.innerWidth < 768;
+};
+
 const modalBody = ref(null);
 const previewFrame = ref(null);
 const scaleFactor = ref(1);
@@ -159,9 +172,8 @@ const scalingStyle = computed(() => ({
 
 const updateScale = () => {
   if (!modalBody.value) return;
-  const padding = 40;
-  const targetPadding = window.innerWidth < 640 ? 10 : padding;
-  const availableWidth = modalBody.value.clientWidth - targetPadding;
+  const padding = window.innerWidth < 768 ? 10 : 40;
+  const availableWidth = modalBody.value.clientWidth - padding;
   scaleFactor.value = Math.min(availableWidth / reportWidth, 1.1); 
 };
 
@@ -231,8 +243,14 @@ const handleDownload = async () => {
   }
 };
 
+onMounted(() => {
+  checkMobile();
+  window.addEventListener('resize', checkMobile);
+});
+
 onUnmounted(() => {
   window.removeEventListener('resize', updateScale);
+  window.removeEventListener('resize', checkMobile);
 });
 </script>
 
@@ -283,8 +301,21 @@ onUnmounted(() => {
   right: 0;
   margin-top: 10px;
   width: 220px;
-  z-index: 2200;
+  z-index: 9500;
   border-radius: 12px;
+}
+
+.is-mobile-menu {
+  position: fixed !important;
+  bottom: 80px !important;
+  right: 20px !important;
+  top: auto !important;
+  width: calc(100% - 40px) !important;
+  z-index: 9500;
+}
+
+.is-mobile-menu.mode-sticky {
+  bottom: 120px !important;
 }
 
 .popover-menu .menu-item {
@@ -445,19 +476,20 @@ onUnmounted(() => {
 .menu-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 2050;
-  background: rgba(2, 6, 17, 0.4);
+  z-index: 9000;
+  background: rgba(2, 6, 17, 0.6);
+  backdrop-filter: blur(4px);
 }
 
 /* Modal Styling */
 .preview-modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(2, 6, 17, 0.95);
+  background: rgba(2, 6, 17, 0.9);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 9999;
+  z-index: 10000;
   backdrop-filter: blur(12px);
 }
 
@@ -591,9 +623,8 @@ onUnmounted(() => {
 @keyframes spin { to { transform: rotate(360deg); } }
 
 /* Mobile Adjustments */
-@media (max-width: 640px) {
+@media (max-width: 768px) {
   .sticky-report-tab { top: auto; bottom: 40px; transform: none; }
-  .mode-sticky .action-menu { position: fixed; bottom: 120px; right: 20px; width: calc(100% - 40px); }
   
   .preview-modal-content { 
     width: 100vw; 

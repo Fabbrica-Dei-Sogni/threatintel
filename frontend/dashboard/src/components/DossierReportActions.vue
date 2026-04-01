@@ -10,108 +10,115 @@
         </span>
       </button>
 
-      <transition name="popover">
-        <div v-if="showMenu" class="action-menu popover-menu glass-morphism">
-          <div class="menu-header mini">
-            <strong>{{ t('common.preview').toUpperCase() }}</strong>
-          </div>
-          
-          <!-- Classic Admin Style -->
-          <div class="style-group">
-            <div class="group-label">{{ t('common.dossierStyleAdmin').toUpperCase() }}</div>
-            <div class="action-buttons">
-              <button @click="handlePreview('classic')" class="menu-item mini" :disabled="loadingHtml">
-                <span class="icon-mini">👁️</span> {{ t('common.preview') }}
-              </button>
-              <button @click="handleDownload('classic')" class="menu-item mini" :disabled="loadingPdf">
-                <span class="icon-mini">📥</span> PDF
-              </button>
+      <!-- Popover Menu Teleported on Mobile -->
+      <Teleport to="body" :disabled="!isMobile">
+        <transition name="popover">
+          <div v-if="showMenu" class="action-menu popover-menu glass-morphism" :class="{ 'is-mobile-menu': isMobile }">
+            <div class="menu-header mini">
+              <strong>{{ t('common.preview').toUpperCase() }}</strong>
+            </div>
+            
+            <!-- Classic Admin Style -->
+            <div class="style-group">
+              <div class="group-label">{{ t('common.dossierStyleAdmin').toUpperCase() }}</div>
+              <div class="action-buttons">
+                <button @click="handlePreview('classic')" class="menu-item mini" :disabled="loadingHtml">
+                  <span class="icon-mini">👁️</span> {{ t('common.preview') }}
+                </button>
+                <button @click="handleDownload('classic')" class="menu-item mini" :disabled="loadingPdf">
+                  <span class="icon-mini">📥</span> PDF
+                </button>
+              </div>
+            </div>
+
+            <div class="menu-divider"></div>
+
+            <!-- Tactical HUD Style -->
+            <div class="style-group">
+              <div class="group-label">{{ t('common.dossierStyleTactical').toUpperCase() }}</div>
+              <div class="action-buttons">
+                <button @click="handlePreview('hud')" class="menu-item mini" :disabled="loadingHtml">
+                  <span class="icon-mini">👁️</span> {{ t('common.preview') }}
+                </button>
+                <button @click="handleDownload('hud')" class="menu-item mini" :disabled="loadingPdf">
+                  <span class="icon-mini">📥</span> PDF
+                </button>
+              </div>
+            </div>
+
+             <div class="menu-divider"></div>
+
+            <!-- Forensic Telex Style -->
+            <div class="style-group">
+              <div class="group-label">{{ t('common.dossierStyleForensic').toUpperCase() }}</div>
+              <div class="action-buttons">
+                <button @click="handlePreview('telex')" class="menu-item mini" :disabled="loadingHtml">
+                  <span class="icon-mini">👁️</span> {{ t('common.preview') }}
+                </button>
+                <button @click="handleDownload('telex')" class="menu-item mini" :disabled="loadingPdf">
+                  <span class="icon-mini">📥</span> PDF
+                </button>
+              </div>
             </div>
           </div>
+        </transition>
+      </Teleport>
+    </div>
 
-          <div class="menu-divider"></div>
+    <!-- Backdrop Teleported to Body -->
+    <Teleport to="body">
+      <div v-if="showMenu" class="menu-backdrop" @click="showMenu = false"></div>
+    </Teleport>
 
-          <!-- Tactical HUD Style -->
-          <div class="style-group">
-            <div class="group-label">{{ t('common.dossierStyleTactical').toUpperCase() }}</div>
-            <div class="action-buttons">
-              <button @click="handlePreview('hud')" class="menu-item mini" :disabled="loadingHtml">
-                <span class="icon-mini">👁️</span> {{ t('common.preview') }}
-              </button>
-              <button @click="handleDownload('hud')" class="menu-item mini" :disabled="loadingPdf">
-                <span class="icon-mini">📥</span> PDF
-              </button>
+    <!-- Preview Modal Teleported to Body -->
+    <Teleport to="body">
+      <transition name="modal-fade">
+        <div v-if="showPreview" class="preview-modal-overlay" @click.self="closePreview">
+          <div class="preview-modal-content glass-morphism-dark">
+            <div class="modal-header">
+              <div class="header-title">
+                <span class="header-icon">🔎</span>
+                <h3>{{ t('common.dossierPreviewTitle').toUpperCase() }} [{{ currentStyle.toUpperCase() }}]</h3>
+              </div>
+              <div class="header-actions">
+                 <button @click="handleDownload(currentStyle)" class="download-mini-btn" :disabled="loadingPdf">
+                  <span v-if="loadingPdf" class="spinner-tiny"></span>
+                  <span v-else>📥 {{ t('common.downloadPdf') }}</span>
+                </button>
+                <button class="close-btn" @click="closePreview">✕</button>
+              </div>
             </div>
-          </div>
-
-           <div class="menu-divider"></div>
-
-          <!-- Forensic Telex Style -->
-          <div class="style-group">
-            <div class="group-label">{{ t('common.dossierStyleForensic').toUpperCase() }}</div>
-            <div class="action-buttons">
-              <button @click="handlePreview('telex')" class="menu-item mini" :disabled="loadingHtml">
-                <span class="icon-mini">👁️</span> {{ t('common.preview') }}
-              </button>
-              <button @click="handleDownload('telex')" class="menu-item mini" :disabled="loadingPdf">
-                <span class="icon-mini">📥</span> PDF
-              </button>
+            
+            <div class="modal-body" ref="modalBody">
+              <div class="scaling-wrapper" :style="scalingStyle">
+                <iframe 
+                  v-if="htmlContent" 
+                  ref="previewFrame"
+                  :srcdoc="htmlContent" 
+                  class="report-frame shadow-2xl"
+                  frameborder="0"
+                  @load="onFrameLoad"
+                ></iframe>
+                <div v-else class="loading-preview">
+                   <span class="spinner-large"></span>
+                   <p>{{ t('common.loading') }}</p>
+                </div>
+              </div>
+            </div>
+            
+            <div class="modal-info-bar">
+              <span>{{ t('common.dossierFormatA4').toUpperCase() }}</span>
+              <span class="zoom-indicator">{{ t('common.dossierZoom').toUpperCase() }}: {{ Math.round(scaleFactor * 100) }}%</span>
             </div>
           </div>
         </div>
       </transition>
-    </div>
-
-    <!-- Backdrop for menus -->
-    <div v-if="showMenu" class="menu-backdrop" @click="showMenu = false"></div>
-
-    <!-- Preview Modal -->
-    <transition name="modal-fade">
-      <div v-if="showPreview" class="preview-modal-overlay" @click.self="closePreview">
-        <div class="preview-modal-content glass-morphism-dark">
-          <div class="modal-header">
-            <div class="header-title">
-              <span class="header-icon">🔎</span>
-              <h3>{{ t('common.dossierPreviewTitle').toUpperCase() }} [{{ currentStyle.toUpperCase() }}]</h3>
-            </div>
-            <div class="header-actions">
-               <button @click="handleDownload(currentStyle)" class="download-mini-btn" :disabled="loadingPdf">
-                <span v-if="loadingPdf" class="spinner-tiny"></span>
-                <span v-else>📥 {{ t('common.downloadPdf') }}</span>
-              </button>
-              <button class="close-btn" @click="closePreview">✕</button>
-            </div>
-          </div>
-          
-          <div class="modal-body" ref="modalBody">
-            <div class="scaling-wrapper" :style="scalingStyle">
-              <iframe 
-                v-if="htmlContent" 
-                ref="previewFrame"
-                :srcdoc="htmlContent" 
-                class="report-frame shadow-2xl"
-                frameborder="0"
-                @load="onFrameLoad"
-              ></iframe>
-              <div v-else class="loading-preview">
-                 <span class="spinner-large"></span>
-                 <p>{{ t('common.loading') }}</p>
-              </div>
-            </div>
-          </div>
-          
-          <div class="modal-info-bar">
-            <span>{{ t('common.dossierFormatA4').toUpperCase() }}</span>
-            <span class="zoom-indicator">{{ t('common.dossierZoom').toUpperCase() }}: {{ Math.round(scaleFactor * 100) }}%</span>
-          </div>
-        </div>
-      </div>
-    </transition>
+    </Teleport>
   </div>
 </template>
 
 <script setup>
-import { ref, onUnmounted, computed, nextTick } from 'vue';
+import { ref, onUnmounted, computed, nextTick, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { exportDossier } from '../api';
 import { ElMessage } from 'element-plus';
@@ -135,6 +142,11 @@ const previewFrame = ref(null);
 const scaleFactor = ref(1);
 const reportWidth = 794;
 
+const isMobile = ref(false);
+const checkMobile = () => {
+  isMobile.value = window.innerWidth < 768;
+};
+
 const toggleMenu = () => {
   showMenu.value = !showMenu.value;
 };
@@ -147,9 +159,8 @@ const scalingStyle = computed(() => ({
 
 const updateScale = () => {
   if (!modalBody.value) return;
-  const padding = 40;
-  const targetPadding = window.innerWidth < 640 ? 10 : padding;
-  const availableWidth = modalBody.value.clientWidth - targetPadding;
+  const padding = window.innerWidth < 768 ? 10 : 40;
+  const availableWidth = modalBody.value.clientWidth - padding;
   scaleFactor.value = Math.min(availableWidth / reportWidth, 1.1); 
 };
 
@@ -193,7 +204,6 @@ const handleDownload = async (style) => {
   showMenu.value = false;
   loadingPdf.value = true;
   try {
-    // Note: exportDossier directly triggers download if format='pdf'
     await exportDossier(props.dossierId, 'pdf', style, locale.value);
   } catch (err) {
     console.error('Download error:', err);
@@ -203,8 +213,14 @@ const handleDownload = async (style) => {
   }
 };
 
+onMounted(() => {
+  checkMobile();
+  window.addEventListener('resize', checkMobile);
+});
+
 onUnmounted(() => {
   window.removeEventListener('resize', updateScale);
+  window.removeEventListener('resize', checkMobile);
 });
 </script>
 
@@ -254,9 +270,18 @@ onUnmounted(() => {
   right: 0;
   margin-top: 10px;
   width: 280px;
-  z-index: 2200;
+  z-index: 9500;
   border-radius: 12px;
   padding: 10px 0;
+}
+
+.is-mobile-menu {
+  position: fixed !important;
+  bottom: 80px !important;
+  right: 20px !important;
+  top: auto !important;
+  width: calc(100% - 40px) !important;
+  z-index: 9500;
 }
 
 .style-group {
@@ -308,19 +333,20 @@ onUnmounted(() => {
 .menu-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 2050;
-  background: rgba(2, 6, 17, 0.4);
+  z-index: 9000;
+  background: rgba(2, 6, 17, 0.6);
+  backdrop-filter: blur(4px);
 }
 
-/* Modal Styling (copied from ReportActions.vue) */
+/* Modal Styling */
 .preview-modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(2, 6, 17, 0.95);
+  background: rgba(2, 6, 17, 0.9);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 9999;
+  z-index: 10000;
   backdrop-filter: blur(12px);
 }
 
@@ -446,10 +472,19 @@ onUnmounted(() => {
 @keyframes spin { to { transform: rotate(360deg); } }
 
 /* Mobile Adjustments */
-@media (max-width: 640px) {
-  .popover-menu { position: fixed; bottom: 80px; right: 20px; width: calc(100% - 40px); }
-  .preview-modal-content { width: 100vw; height: 100vh; border-radius: 0; }
+@media (max-width: 768px) {
+  .preview-modal-content { 
+    width: 100vw; 
+    height: 100vh; 
+    height: 100dvh;
+    border-radius: 0; 
+  }
   .modal-header { padding: 15px 20px; }
   .modal-body { padding: 20px 5px; }
+
+  .cyber-report-btn {
+    padding: 8px 16px;
+    font-size: 0.75rem;
+  }
 }
 </style>

@@ -327,7 +327,10 @@
                                     <span class="event-ip"><span class="icon">🎯</span> {{ event.ip }}</span>
                                     <span class="event-limit-badge pulse-magma-mini">{{ event.limitType }}</span>
                                 </div>
-                                <span class="arrow magenta-arrow" :class="{ 'open': expandedEvents[event._id || event.id] }"></span>
+                                <div class="log-actions">
+                                    <span class="copy-log-btn" @click.stop="copyRateBreachEvent(event)" :title="t('common.copy')">📋</span>
+                                    <span class="arrow magenta-arrow" :class="{ 'open': expandedEvents[event._id || event.id] }"></span>
+                                </div>
                             </div>
                             <transition name="collapse">
                                 <div v-if="expandedEvents[event._id || event.id]" class="event-body">
@@ -582,6 +585,19 @@ const copyAttackSummaryFormatted = () => {
         lastSeen: dayjs(attack.value.lastSeen).format('YYYY-MM-DD HH:mm:ss'),
         intensity: attack.value.intensityAttack,
         avgScore: attack.value.averageScore
+    });
+};
+
+const copyRateBreachEvent = (event) => {
+    copyFormatted('clipboard.attackDetail.rateLimitEvent', {
+        timestamp: dayjs(event.timestamp).format('YYYY-MM-DD HH:mm:ss'),
+        ip: event.ip || attack.value?.request?.ip || t('common.notAvailable'),
+        limitType: event.limitType || t('common.notAvailable'),
+        path: event.path || t('common.notAvailable'),
+        method: event.method || t('common.notAvailable'),
+        userAgent: event.userAgent || t('common.notAvailable'),
+        honeypotId: event.honeypotId || t('common.notAvailable'),
+        message: event.message || t('common.notAvailable')
     });
 };
 

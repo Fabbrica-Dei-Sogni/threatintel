@@ -597,6 +597,18 @@
                 "Ładunek (Payload):",
                 "{payload}",
                 "--------------------------------------"
+            ],
+            "rateLimitEvent": [
+                "--- SZCZEGÓŁY RATE BREACH ---",
+                "Data: {timestamp}",
+                "IP: {ip}",
+                "Typ Limitu: {limitType}",
+                "Ścieżka: {path}",
+                "Metoda: {method}",
+                "User Agent: {userAgent}",
+                "Honeypot: {honeypotId}",
+                "Błąd: {message}",
+                "-----------------------------"
             ]
         },
         "telnetDetail": {

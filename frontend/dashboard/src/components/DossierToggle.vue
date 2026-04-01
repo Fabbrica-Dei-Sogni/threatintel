@@ -1,5 +1,5 @@
 <template>
-  <div class="dossier-toggle-container" :class="{ 'is-enabled': dossierStore.isEnabled }">
+  <div class="dossier-toggle-container" :class="{ 'is-enabled': dossierStore.isEnabled, 'recorder-active': dossierStore.isEnabled && dossierStore.sections.length > 0 }">
     <!-- Tooltip is handled by the 'title' attribute -->
     <div class="toggle-btn shadow-xl" @click="toggleDossier" :title="t('common.recorderToggle')">
       <!-- Fixed Investigator Icon -->
@@ -27,9 +27,13 @@ const toggleDossier = () => {
 .dossier-toggle-container {
   position: fixed;
   bottom: 25px;
-  right: 92px;
+  left: 24px;
   z-index: 1001;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.recorder-active {
+  bottom: 85px;
 }
 
 .toggle-btn {
@@ -110,9 +114,11 @@ const toggleDossier = () => {
 
 @media (max-width: 600px) {
   .dossier-toggle-container {
-    right: auto;
     left: 20px;
     bottom: 25px;
+  }
+  .recorder-active {
+    bottom: 85px;
   }
 }
 </style>

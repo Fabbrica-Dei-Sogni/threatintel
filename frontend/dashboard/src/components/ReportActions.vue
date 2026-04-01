@@ -3,7 +3,7 @@
     <!-- Trigger (Conditional based on mode) -->
     
     <!-- MODE: STICKY -->
-    <div v-if="mode === 'sticky'" class="sticky-report-tab" :class="{ 'is-loading': loadingPdf || loadingHtml }">
+    <div v-if="mode === 'sticky'" class="sticky-report-tab" :class="{ 'is-loading': loadingPdf || loadingHtml, 'recorder-active': dossierStore.isEnabled && dossierStore.sections.length > 0 }">
       <div class="tab-trigger" @click="toggleMenu">
         <span v-if="loadingPdf || loadingHtml" class="spinner-small"></span>
         <span v-else class="tab-icon">📊</span>
@@ -132,8 +132,10 @@ import { ref, onUnmounted, computed, nextTick, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { fetchReport } from '../api';
 import { ElMessage } from 'element-plus';
+import { useDossierStore } from '../stores/dossier';
 
 const { t, locale } = useI18n();
+const dossierStore = useDossierStore();
 
 const props = defineProps({
   type: String, // 'attack' | 'ip' | 'telnet'
@@ -315,7 +317,8 @@ onUnmounted(() => {
 }
 
 .is-mobile-menu.mode-sticky {
-  bottom: 120px !important;
+  bottom: 150px !important;
+  top: auto !important;
 }
 
 .popover-menu .menu-item {
@@ -622,9 +625,17 @@ onUnmounted(() => {
 
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* Mobile Adjustments */
 @media (max-width: 768px) {
-  .sticky-report-tab { top: auto; bottom: 40px; transform: none; }
+  .sticky-report-tab { 
+    top: auto; 
+    bottom: 90px; 
+    transform: none; 
+    transition: bottom 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .sticky-report-tab.recorder-active {
+    bottom: 150px;
+  }
   
   .preview-modal-content { 
     width: 100vw; 

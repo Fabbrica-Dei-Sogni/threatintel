@@ -1,6 +1,7 @@
 {
     "common": {
         "save": "Enregistrer",
+        "add": "Ajouter",
         "cancel": "Annuler",
         "close": "Fermer",
         "confirm": "Confirmer",

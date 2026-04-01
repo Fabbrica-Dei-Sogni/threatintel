@@ -1,6 +1,7 @@
 {
     "common": {
         "save": "Zapisz",
+        "add": "Dodaj",
         "cancel": "Anuluj",
         "close": "Zamknij",
         "confirm": "Potwierdź",

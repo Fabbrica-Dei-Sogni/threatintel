@@ -1,6 +1,7 @@
 {
     "common": {
         "save": "Speichern",
+        "add": "Hinzufügen",
         "cancel": "Abbrechen",
         "close": "Schließen",
         "confirm": "Bestätigen",

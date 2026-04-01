@@ -43,6 +43,13 @@
 
         <!-- Rendered Sections -->
         <div class="sections-timeline">
+           <!-- New Section Button at the TOP -->
+           <div class="add-section-action top-action" v-if="!isSaving && dossier && !isEditing && editingSectionIndex === -1">
+             <button @click="addNewGenericSection" class="back-btn add-btn-full">
+                + {{ t('common.add').toUpperCase() }}
+             </button>
+           </div>
+
            <div v-for="(section, index) in dossier.sections" :key="index" class="section-preview glass-card">
               <div class="section-header">
                 <div>
@@ -94,7 +101,7 @@
         </div>
       </div>
     </div>
-  </div>
+</div>
 </template>
 
 <script setup lang="ts">
@@ -189,15 +196,17 @@ const saveSection = async (index) => {
   
   isSaving.value = true;
   try {
-    const updatedSections = [...dossier.value.sections];
+    // Preparazione array aggiornato e ordinato
+    const updatedSections = sortSections([...dossier.value.sections]);
     updatedSections[index] = {
       ...updatedSections[index],
       type: sectionEditForm.value.type,
       data: finalData
     };
     
-    await updateDossier(dossier.value._id, { sections: updatedSections });
-    dossier.value.sections = updatedSections;
+    const finalizedSections = sortSections(updatedSections);
+    await updateDossier(dossier.value._id, { sections: finalizedSections });
+    dossier.value.sections = finalizedSections;
     editingSectionIndex.value = -1;
     ElMessage.success(t('common.save') + ' OK');
   } catch (error) {
@@ -218,6 +227,52 @@ const deleteSection = async (index) => {
     if (editingSectionIndex.value === index) editingSectionIndex.value = -1;
     ElMessage.success(t('common.delete') + ' OK');
   } catch (error) {
+    ElMessage.error(t('common.error'));
+  } finally {
+    isSaving.value = false;
+  }
+};
+
+// Helper per ordinare le sezioni: generic prima, poi il resto (per timestamp desc)
+const sortSections = (sections) => {
+  return [...sections].sort((a, b) => {
+    // Tipo generic ha sempre la precedenza
+    if (a.type === 'generic' && b.type !== 'generic') return -1;
+    if (a.type !== 'generic' && b.type === 'generic') return 1;
+    
+    // All'interno dello stesso gruppo, ordiniamo per data (più recenti in alto)
+    return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
+  });
+};
+
+const addNewGenericSection = async () => {
+  if (!dossier.value) return;
+  
+  isSaving.value = true;
+  try {
+    const newSection = {
+      templateKey: 'clipboard.generic',
+      type: 'generic',
+      data: { text: '' },
+      timestamp: new Date().toISOString(),
+      order: 0
+    };
+    
+    // Aggiunta in testa e ri-ordinamento
+    const updatedSections = sortSections([newSection, ...dossier.value.sections]);
+    
+    // Salvataggio su database
+    await updateDossier(dossier.value._id, { sections: updatedSections });
+    
+    // Aggiornamento stato locale
+    dossier.value.sections = updatedSections;
+    
+    // Attivazione immediata dell'edit per la nuova sezione (che sarà all'indice 0)
+    startEditSection(0, newSection);
+    
+    ElMessage.success(t('common.add') + ' OK');
+  } catch (error) {
+    console.error('[DossierDetail] Errore aggiunta sezione:', error);
     ElMessage.error(t('common.error'));
   } finally {
     isSaving.value = false;
@@ -442,4 +497,29 @@ onMounted(loadDossier);
 
 .action-icon-btn.success-text:hover { background: rgba(16, 185, 129, 0.2); border-color: rgba(16, 185, 129, 0.5); }
 .action-icon-btn.danger-text:hover { background: rgba(239, 68, 68, 0.2); border-color: rgba(239, 68, 68, 0.5); }
+
+.add-section-action {
+  margin-top: 30px;
+  display: flex;
+  justify-content: center;
+  padding-bottom: 50px;
+}
+
+.add-btn-full {
+  width: 100%;
+  max-width: 400px;
+  border-style: dashed;
+  background: rgba(99, 102, 241, 0.05);
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  letter-spacing: 2px;
+}
+
+.add-btn-full:hover {
+  border-style: solid;
+  background: rgba(99, 102, 241, 0.15);
+}
 </style>

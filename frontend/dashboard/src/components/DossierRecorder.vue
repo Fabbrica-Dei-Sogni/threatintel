@@ -37,10 +37,11 @@
             <div class="divider"></div>
 
             <div class="style-selector-pill">
-              <button class="style-opt" :class="{ active: selectedStyle === 'classic' }"
-                @click="selectedStyle = 'classic'" :title="t('dossierRecorder.institutionalStyle')">CLASSIC</button>
-              <button class="style-opt" :class="{ active: selectedStyle === 'hud' }" @click="selectedStyle = 'hud'"
-                :title="t('dossierRecorder.tacticalHudStyle')">HUD</button>
+              <button v-for="style in AVAILABLE_STYLES" :key="style.id" class="style-opt"
+                :class="{ active: selectedStyle === style.id, [style.id]: true }" @click="selectedStyle = style.id"
+                :title="t(style.titleKey)">
+                {{ style.label }}
+              </button>
             </div>
 
             <button class="btn-tool preview" @click="generateCustomReport('html', selectedStyle)"
@@ -120,6 +121,13 @@ const showPreview = ref(false);
 const htmlContent = ref('');
 const loadingHtml = ref(false);
 const loadingPdf = ref(false);
+
+const AVAILABLE_STYLES = [
+  { id: 'classic', label: 'CLASSIC', titleKey: 'common.dossierStyleAdmin', color: '#10b981' },
+  { id: 'hud', label: 'HUD', titleKey: 'common.dossierStyleTactical', color: '#3b82f6' },
+  { id: 'telex', label: 'TELEX', titleKey: 'common.dossierStyleForensic', color: '#f59e0b' }
+];
+
 const selectedStyle = ref('classic');
 const scaleFactor = ref(1);
 const reportWidth = 794;
@@ -211,7 +219,7 @@ const handleSave = async () => {
     else if (firstSection.type === 'telnet') subject = firstSection.data.ip || subject;
   }
 
-  const defaultTitle = `Dossier ${subject} - ${now}`;
+  const defaultTitle = t('dossierRecorder.defaultTitleTemplate', { subject, date: now });
   const count = dossierStore.sections.length;
   const defaultDescription = t('dossierRecorder.defaultDescription', {
     count: count,
@@ -491,10 +499,19 @@ onUnmounted(() => window.removeEventListener('resize', updateScale));
   letter-spacing: 0.5px;
 }
 
-.style-opt.active {
-  background: var(--primary-light, #3b82f6);
+.style-opt.active.classic {
+  background: #10b981;
+  color: #064e3b;
+}
+
+.style-opt.active.hud {
+  background: #3b82f6;
   color: #fff;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.style-opt.active.telex {
+  background: #f59e0b;
+  color: #451a03;
 }
 
 .style-opt:hover:not(.active) {

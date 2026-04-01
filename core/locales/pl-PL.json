@@ -167,7 +167,7 @@
                 "timeWindow": "OKNO CZASOWE",
                 "score": "WYNIK",
                 "timestamp": "ZNACZNIK CZASU",
-                "indicators": "WSKAŹNIKI",
+                "indicators": "INDICATORI",
                 "userAgent": "USER AGENT",
                 "extractedPayload": "WYDOBYTY ŁADUNEK (PAYLOAD)",
                 "abuseReportEvidence": "DOWODY RAPORTU O NADUŻYCIACH",
@@ -199,7 +199,7 @@
                 "attackSummaryTitle": "HUD TAKTYCZNY: PODSUMOWANIE ATAKU",
                 "geolocDataTitle": "HUD TAKTYCZNY: DANE GEOLOKALIZACYJNE",
                 "networkInfoTitle": "HUD TAKTYCZNY: INFO O SIECI",
-                "reputationAnalysisTitle": "HUD TAKTYCZNY: ANALIZA REPUTACIJI",
+                "reputationAnalysisTitle": "HUD TAKTYCZNY: ANALIZA REPUTACJI",
                 "abuseInterceptTitle": "SZCZEGÓŁOWE PRZECHWYCENIE NADUŻYCIA",
                 "defcon": "DEFCON",
                 "score": "WYNIK",
@@ -220,123 +220,6 @@
                 "rawPayload": "RAW PAYLOAD"
             }
         }
-    },
-    "clipboard": {
-        "ipDetails": {
-            "geo": [
-                "--- INTELIGENCJA GEOGRAFICZNA ---",
-                "IP: {ip}",
-                "Kraj: {country}",
-                "Miasto/Region: {city}, {region}",
-                "Strefa czasowa: {timezone}",
-                "Współrzędne GPS: {gps}",
-                "-------------------------------"
-            ],
-            "net": [
-                "--- INFORMACJE SIECIOWE ---",
-                "IP: {ip}",
-                "Organizacja: {org}",
-                "Nazwa hosta/ISP: {hostname}",
-                "----------------------------"
-            ],
-            "abuse": [
-                "--- PODSUMOWANIE ZGŁOSZEŃ (ABUSEIPDB) ---",
-                "IP: {ip}",
-                "Wskaźnik ufności: {score}%",
-                "Na czarnej liście: {listed}",
-                "Łącznie zgłoszeń: {total}",
-                "Ostatnie zgłoszenie: {lastReport}",
-                "----------------------------------------"
-            ],
-            "whois": [
-                "--- PRZECHWYCENIE REKORDU WHOIS ---",
-                "IP: {ip}",
-                "",
-                "{rawData}",
-                "----------------------------------"
-            ],
-            "abuseLog": [
-                "--- SZCZEGÓŁY RAPORTU O NADUŻYCIACH ---",
-                "Data: {date}",
-                "Kategorie: {categories}",
-                "Zgłaszający: {reporter}",
-                "",
-                "Komentarz:",
-                "{comment}",
-                "---------------------------------------"
-            ]
-        },
-        "attackDetail": {
-            "summary": [
-                "--- HUD TAKTYCZNY: PODSUMOWANIE ATAKU ---",
-                "Docelowy IP: {ip}",
-                "Poziom Defcon: {defcon} ({score}/10)",
-                "",
-                "[GŁÓWNE METRYKI]",
-                "- Łącznie logów: {totalLogs}",
-                "- Czas trwania: {duration}",
-                "- Średni RPS: {rps}",
-                "",
-                "[PROFIL ATAKU]",
-                "- Techniki: {techniques}",
-                "- Pierwszy raz widziany: {firstSeen}",
-                "- Ostatni raz widziany: {lastSeen}",
-                "- Intensywność: {intensity}",
-                "- Średni wynik forensyczny: {avgScore}",
-                "-----------------------------------------"
-            ],
-            "log": [
-                "--- PEŁNY SZCZEGÓŁ LOGU ZAGROŻENIA ---",
-                "Znacznik czasu: {timestamp}",
-                "Metoda: {method}",
-                "URL: {url}",
-                "Wynik forensyczny: {score}",
-                "Wskaźniki: {indicators}",
-                "User Agent: {userAgent}",
-                "Źródłowy IP: {ip}",
-                "",
-                "Ładunek (Payload):",
-                "{payload}",
-                "--------------------------------------"
-            ],
-            "timelineRow": "[{timestamp}] {eventName}\n> {message}{details}",
-            "timelineHeader": [
-                "--- TELNET OPERATIONAL TIMELINE ---",
-                "Session ID: {sessionId}",
-                "-----------------------------------"
-            ],
-            "firewall": {
-                "block": [
-                    "--- PRZECHWYCENIE FIREWALL ---",
-                    "ZDARZENIE: {event}",
-                    "ŹRÓDŁO: {source}",
-                    "TTL: {ttl}",
-                    "DŁUGOŚĆ: {length}",
-                    "TOS: {tos}",
-                    "------------------------------"
-                ]
-            }
-        },
-        "telnetDetail": {
-            "summary": [
-                "--- PODSUMOWANIE SESJI TELNET ---",
-                "ID Sesji: {sessionId}",
-                "Wrogi IP: {ip}",
-                "Okno czasowe: {timeWindow}",
-                "Pochodzenie: {origin}",
-                "Łącznie zdarzeń: {totalEvents}",
-                "----------------------------------"
-            ],
-            "timelineRow": "[{timestamp}] {eventName}\n> {message}{details}"
-        },
-        "ip": [
-            "--- IDENTYFIKACJA PODMIOTU ---",
-            "ADRES IP: {ip}",
-            "-------------------------------"
-        ],
-        "generic": "{text}",
-        "attackSummary": "PODSUMOWANIE ATAKU:\nIP: {ip}\nZagrożenie: {dangerLevel} ({dangerScore})\nLogi: {totaleLogs}\nCzas trwania: {duration}\nRPS: {rps}",
-        "attackTechnique": "Wykryta technika: {tech}"
     },
     "common": {
         "yes": "TAK",

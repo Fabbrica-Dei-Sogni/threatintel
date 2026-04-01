@@ -1,4 +1,5 @@
 import "reflect-metadata";
+import { IDossierSection } from '../models/DossierSchema';
 import { ReportService } from '../services/ReportService';
 import { ThreatLogService } from '../services/ThreatLogService';
 import { CowrieService } from '../services/CowrieService';
@@ -100,9 +101,9 @@ describe('ReportService', () => {
     });
 
     it('dovrebbe generare un dossier personalizzato (custom) con più sezioni', async () => {
-        const mockSections = [
-            { templateKey: 'clipboard.ipDetails.geo', data: { ip: '1.1.1.1' }, type: 'ip' },
-            { templateKey: 'clipboard.telnetDetail.summary', data: { sessionId: 'abc' }, type: 'telnet' }
+        const mockSections: IDossierSection[] = [
+            { templateKey: 'clipboard.ipDetails.geo', data: { ip: '1.1.1.1' }, type: 'ip', order: 0, timestamp: new Date() },
+            { templateKey: 'clipboard.telnetDetail.summary', data: { sessionId: 'abc' }, type: 'telnet', order: 1, timestamp: new Date() }
         ];
 
         mockI18nService.tm.mockImplementation((key) => {
@@ -126,9 +127,9 @@ describe('ReportService', () => {
     });
 
     it('dovrebbe generare un dossier Classic con timeline Telnet mappata correttamente', async () => {
-        const mockSections = [
-            { templateKey: 'clipboard.telnetDetail.timelineHeader', data: { sessionId: 'telnet-123' }, type: 'telnet' },
-            { templateKey: 'clipboard.telnetDetail.timelineRow', data: { message: 'login success' }, type: 'telnet' }
+        const mockSections: IDossierSection[] = [
+            { templateKey: 'clipboard.telnetDetail.timelineHeader', data: { sessionId: 'telnet-123' }, type: 'telnet', order: 0, timestamp: new Date() },
+            { templateKey: 'clipboard.telnetDetail.timelineRow', data: { message: 'login success' }, type: 'telnet', order: 1, timestamp: new Date() }
         ];
 
         (ejs.renderFile as jest.Mock).mockResolvedValue('<html>Classic Dossier</html>');

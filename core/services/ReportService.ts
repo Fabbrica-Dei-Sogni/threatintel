@@ -91,10 +91,8 @@ export class ReportService {
         // Prepariamo le sezioni renderizzando il testo lato server per massima precisione
         const enrichedSections = sections.map(s => {
             const sanitizedData = this.sanitizeSectionData(s.data);
-            // Forza il re-rendering basato sul locale richiesto se abbiamo un templateKey
-            const newRenderedText = (s.templateKey) 
-                ? this.renderSection(s.templateKey, sanitizedData, locale) 
-                : (s.renderedText || '');
+            // Priorità al testo già renderizzato dal frontend (Sorgente di verità i18n)
+            const newRenderedText = s.renderedText || (s.templateKey ? this.renderSection(s.templateKey, sanitizedData, locale) : '');
 
             return {
                 ...s,
@@ -183,10 +181,8 @@ export class ReportService {
         // Arricchiamo le sezioni con il testo renderizzato per i casi di fallback (telex extracts)
         const enrichedSections = sections.map(s => {
             const sanitizedData = this.sanitizeSectionData(s.data);
-            // Forza il re-rendering basato sul locale richiesto
-            const newRenderedText = (s.templateKey)
-                ? this.renderSection(s.templateKey, sanitizedData, locale)
-                : (s.renderedText || '');
+            // Priorità al testo già renderizzato dal frontend (Sorgente di verità i18n)
+            const newRenderedText = s.renderedText || (s.templateKey ? this.renderSection(s.templateKey, sanitizedData, locale) : '');
 
             return {
                 ...s,

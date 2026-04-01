@@ -106,7 +106,7 @@
             },
             "geolocation": "3. Geographic Localization",
             "geoNote": "Note: Geolocation is based on public ISP records.",
-            "reportsTimeline": "4. Abuse Reporting Chronology",
+            "reportsTimeline": "4. Cronologia Segnalazioni di Abuso",
             "reportTable": {
                 "date": "Event Date",
                 "categories": "Detected Categories",
@@ -220,122 +220,6 @@
                 "rawPayload": "RAW PAYLOAD"
             }
         }
-    },
-    "clipboard": {
-        "ipDetails": {
-            "geo": [
-                "--- GEOGRAPHIC INTELLIGENCE ---",
-                "IP: {ip}",
-                "Country: {country}",
-                "City/Region: {city}, {region}",
-                "Timezone: {timezone}",
-                "GPS Coordinates: {gps}",
-                "-------------------------------"
-            ],
-            "net": [
-                "--- NETWORK INTELLIGENCE ---",
-                "IP: {ip}",
-                "Organization: {org}",
-                "Hostname/ISP: {hostname}",
-                "-----------------------------"
-            ],
-            "abuse": [
-                "--- ABUSE REPORTING SUMMARY (ABUSEIPDB) ---",
-                "IP: {ip}",
-                "Confidence Score: {score}%",
-                "Is Listed: {listed}",
-                "Total Reports: {total}",
-                "Last Reported: {lastReport}",
-                "-------------------------------------------"
-            ],
-            "whois": [
-                "--- FULL WHOIS DATA ---",
-                "IP: {ip}",
-                "",
-                "{rawData}",
-                "-----------------------"
-            ],
-            "abuseLog": [
-                "--- ABUSE REPORT DETAIL ---",
-                "Date: {date}",
-                "Categories: {categories}",
-                "Reporter: {reporter}",
-                "",
-                "Comment:",
-                "{comment}",
-                "---------------------------"
-            ]
-        },
-        "attackDetail": {
-            "summary": [
-                "--- TACTICAL HUD: ATTACK SUMMARY ---",
-                "Target IP: {ip}",
-                "Defcon Level: {defcon} ({score}/10)",
-                "",
-                "[MAIN METRICS]",
-                "- Total Logs: {totalLogs}",
-                "- Duration: {duration}",
-                "- Avg RPS: {rps}",
-                "",
-                "[ATTACK PROFILE]",
-                "- Techniques: {techniques}",
-                "- First Seen: {firstSeen}",
-                "- Last Seen: {lastSeen}",
-                "- Intensity: {intensity}",
-                "- Avg Forensic Score: {avgScore}",
-                "--------------------------------------"
-            ],
-            "log": [
-                "--- FULL THREAT LOG DETAIL ---",
-                "Timestamp: {timestamp}",
-                "Method: {method}",
-                "URL: {url}",
-                "Forensic Score: {score}",
-                "Indicators: {indicators}",
-                "User Agent: {userAgent}",
-                "Source IP: {ip}",
-                "",
-                "Payload:",
-                "{payload}",
-                "--------------------------------------"
-            ]
-        },
-        "telnetDetail": {
-            "summary": [
-                "--- TELNET SESSION SUMMARY ---",
-                "Session ID: {sessionId}",
-                "Hostile IP: {ip}",
-                "Time Window: {timeWindow}",
-                "Origin: {origin}",
-                "Total Events: {totalEvents}",
-                "------------------------------"
-            ],
-            "timelineRow": "[{timestamp}] {eventName}\n> {message}{details}",
-            "timelineHeader": [
-                "--- TELNET OPERATIONAL TIMELINE ---",
-                "Session ID: {sessionId}",
-                "-----------------------------------"
-            ],
-            "firewall": {
-                "block": [
-                    "--- FIREWALL INTERCEPT ---",
-                    "EVENT: {event}",
-                    "SOURCE: {source}",
-                    "TTL: {ttl}",
-                    "LENGTH: {length}",
-                    "TOS: {tos}",
-                    "--------------------------"
-                ]
-            }
-        },
-        "ip": [
-            "--- SUBJECT IDENTIFICATION ---",
-            "IP ADDRESS: {ip}",
-            "-------------------------------"
-        ],
-        "generic": "{text}",
-        "attackSummary": "ATTACK SUMMARY:\nIP: {ip}\nDanger: {dangerLevel} ({dangerScore})\nLogs: {totaleLogs}\nDuration: {duration}\nRPS: {rps}",
-        "attackTechnique": "Technique Detected: {tech}"
     },
     "common": {
         "yes": "YES",

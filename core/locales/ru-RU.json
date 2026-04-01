@@ -55,13 +55,13 @@
             "patterns": "Обнаруженные шаблоны техник",
             "noPatterns": "Конкретные шаблоны не найдены",
             "forensicFingerprint": "3. Криминалистический отпечаток",
-            "riskClass": "Класс риска",
+            "riskClass": "Klasa di Rischio",
             "fingerprintScore": "Оценка цифрового отпечатка",
             "botDetection": "Обнаружение ботов",
             "isBot": "ДА (Идентифицирован)",
             "notBot": "Нет / Неизвестно",
             "dangerIndicators": "Индикаторы опасности",
-            "neutralAnalysis": "Нейтральный анализ",
+            "neutralAnalysis": "Analisi neutra",
             "sourceIntelligence": "4. Разведка источника (геолокация IP и репутация)",
             "abuseConfidence": "Оценка доверия к злоупотреблениям",
             "totalReports": "Всего отчетов",
@@ -104,7 +104,7 @@
                 "suspicious": "ПОДОЗРИТЕЛЬНАЯ АКТИВНОСТЬ",
                 "whitelisted": "ОБЪЕКТ ИЗ БЕЛОГО СПИСКА"
             },
-            "geolocation": "3. Географическая локализация",
+            "geolocation": "3. Localizzazione Geografica",
             "geoNote": "Примечание: Геолокация основана на общедоступных записях ISP.",
             "reportsTimeline": "4. Хронология жалоб на злоупотребления",
             "reportTable": {
@@ -167,8 +167,8 @@
                 "timeWindow": "ВРЕМЕННОЕ ОКНО",
                 "score": "ОЦЕНКА",
                 "timestamp": "МЕТКА ВРЕМЕНИ",
-                "indicators": "ИНДИКАТОРЫ",
-                "userAgent": "ПОЛЬЗОВАТЕЛЬСКИЙ АГЕНТ",
+                "indicators": "INDICATORI",
+                "userAgent": "USER AGENT",
                 "extractedPayload": "ИЗВЛЕЧЕННАЯ ПОЛЕЗНАЯ НАГРУЗКА",
                 "abuseReportEvidence": "ДОКАЗАТЕЛЬСТВА МАЛИНГОВОЙ АКТИВНОСТИ",
                 "reportDate": "ДАТА ПРЕДСТАВЛЕНИЯ",
@@ -204,7 +204,7 @@
                 "defcon": "DEFCON",
                 "score": "СЧЕТ",
                 "logs": "ЛОГИ",
-                "intensity": "ИНТЕНСИВНОСТЬ",
+                "intensity": "INTENSITÀ",
                 "detectedTechniques": "ВЫЯВЛЕННЫЕ ТЕХНИКИ",
                 "window": "ОКНО",
                 "asn": "ASN",
@@ -220,123 +220,6 @@
                 "rawPayload": "RAW: ПОЛЕЗНАЯ НАГРУЗКА"
             }
         }
-    },
-    "clipboard": {
-        "ipDetails": {
-            "geo": [
-                "--- ГЕОГРАФИЧЕСКИЕ ДАННЫЕ ---",
-                "IP: {ip}",
-                "Страна: {country}",
-                "Город/Регион: {city}, {region}",
-                "Часовой пояс: {timezone}",
-                "Координаты GPS: {gps}",
-                "------------------------------"
-            ],
-            "net": [
-                "--- СЕТЕВЫЕ ДАННЫЕ ---",
-                "IP: {ip}",
-                "Организация: {org}",
-                "Хост/Провайдер: {hostname}",
-                "----------------------"
-            ],
-            "abuse": [
-                "--- СВОДКА НАРУШЕНИЙ (ABUSEIPDB) ---",
-                "IP: {ip}",
-                "Уровень доверия: {score}%",
-                "В черном списке: {listed}",
-                "Всего отчетов: {total}",
-                "Последний отчет: {lastReport}",
-                "------------------------------------"
-            ],
-            "whois": [
-                "--- ПОЛНЫЕ ДАННЫЕ WHOIS ---",
-                "IP: {ip}",
-                "",
-                "{rawData}",
-                "---------------------------"
-            ],
-            "abuseLog": [
-                "--- ДЕТАЛИ ОТЧЕТА О ЗЛОУПОТРЕБЛЕНИИ ---",
-                "Дата: {date}",
-                "Категории: {categories}",
-                "Репортер: {reporter}",
-                "",
-                "Комментарий:",
-                "{comment}",
-                "---------------------------------------"
-            ]
-        },
-        "attackDetail": {
-            "summary": [
-                "--- ТАКТИЧЕСКИЙ HUD: СВОДКА АТАКИ ---",
-                "Целевой IP: {ip}",
-                "Уровень Defcon: {defcon} ({score}/10)",
-                "",
-                "[ОСНОВНЫЕ МЕТРИКИ]",
-                "- Всего логов: {totalLogs}",
-                "- Длительность: {duration}",
-                "- Среднее RPS: {rps}",
-                "",
-                "[ПРОФИЛЬ АТАКИ]",
-                "- Техники: {techniques}",
-                "- Впервые обнаружен: {firstSeen}",
-                "- Последний раз обнаружен: {lastSeen}",
-                "- Интенсивность: {intensity}",
-                "- Ср. криминалистический балл: {avgScore}",
-                "-------------------------------------"
-            ],
-            "log": [
-                "--- ПОДРОБНОСТИ ЛОГА УГРОЗЫ ---",
-                "Временная метка: {timestamp}",
-                "Метод: {method}",
-                "URL: {url}",
-                "Крим. балл: {score}",
-                "Индикаторы: {indicators}",
-                "User Agent: {userAgent}",
-                "Source IP: {ip}",
-                "",
-                "Данные (Payload):",
-                "{payload}",
-                "--------------------------------"
-            ],
-            "timelineRow": "[{timestamp}] {eventName}\n> {message}{details}",
-            "timelineHeader": [
-                "--- TELNET OPERATIONAL TIMELINE ---",
-                "Session ID: {sessionId}",
-                "-----------------------------------"
-            ],
-            "firewall": {
-                "block": [
-                    "--- ПЕРЕХВАТ FIREWALL ---",
-                    "СОБЫТИЕ: {event}",
-                    "ИСТОЧНИК: {source}",
-                    "TTL: {ttl}",
-                    "ДЛИНА: {length}",
-                    "TOS: {tos}",
-                    "-------------------------"
-                ]
-            }
-        },
-        "telnetDetail": {
-            "summary": [
-                "--- СВОДКА СЕССИИ TELNET ---",
-                "ID Сессии: {sessionId}",
-                "Враждебный IP: {ip}",
-                "Временное Окно: {timeWindow}",
-                "Происхождение: {origin}",
-                "Всего событий: {totalEvents}",
-                "----------------------------"
-            ],
-            "timelineRow": "[{timestamp}] {eventName}\n> {message}{details}"
-        },
-        "ip": [
-            "--- ИДЕНТИФИКАЦИЯ СУБЪЕКТА ---",
-            "IP-АДРЕС: {ip}",
-            "-------------------------------"
-        ],
-        "generic": "{text}",
-        "attackSummary": "СВОДКА АТАКИ:\nIP: {ip}\nОпасность: {dangerLevel} ({dangerScore})\nЛоги: {totaleLogs}\nДлительность: {duration}\nRPS: {rps}",
-        "attackTechnique": "Обнаруженная техника: {tech}"
     },
     "common": {
         "yes": "ДА",

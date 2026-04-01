@@ -520,11 +520,21 @@
                 "-------------------------------------------"
             ],
             "whois": [
-                "--- DONNÉES WHOIS COMPLÈTES ---",
+                "--- INTERCEPTION D'ENREGISTREMENT WHOIS ---",
                 "IP: {ip}",
                 "",
                 "{rawData}",
-                "-------------------------------"
+                "------------------------------------------"
+            ],
+            "abuseLog": [
+                "--- DÉTAIL DU RAPPORT D'ABUS ---",
+                "Date: {date}",
+                "Catégories: {categories}",
+                "Rapporteur: {reporter}",
+                "",
+                "Commentaire:",
+                "{comment}",
+                "--------------------------------"
             ]
         },
         "attackDetail": {

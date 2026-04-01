@@ -175,6 +175,16 @@
                 "",
                 "{rawData}",
                 "-----------------------"
+            ],
+            "abuseLog": [
+                "--- ABUSE REPORT DETAIL ---",
+                "Date: {date}",
+                "Categories: {categories}",
+                "Reporter: {reporter}",
+                "",
+                "Comment:",
+                "{comment}",
+                "---------------------------"
             ]
         },
         "attackDetail": {

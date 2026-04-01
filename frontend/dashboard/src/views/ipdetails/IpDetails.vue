@@ -200,7 +200,8 @@
                         <strong>{{ t('ipDetails.reporterCountryCode') }}:</strong> {{ report.reporterCountryCode ||
                           t('common.notAvailable') }}
                       </span>
-                      <span class="copy-log-btn" @click.stop="copyToClipboard(report.comment)" :title="t('common.copyComment')">📋</span>
+                      <span class="copy-log-btn" @click.stop="copyLogReport(report)"
+                        :title="t('common.copyComment')">📋</span>
                     </div>
                     <div class="report-comment-box">
                       {{ report.comment }}
@@ -572,6 +573,20 @@ const copyWhoisRaw = () => {
     ip: ip.value,
     rawData: JSON.stringify(ipInfo.value.whois_raw, null, 2)
   });
+};
+
+const copyLogReport = (report) => {
+  if (!report) return;
+  
+  // Prepariamo i dati per il template i18n e il frammento PDF
+  const data = {
+    date: dayjs(report.reportedAt).format('DD/MM/YYYY HH:mm:ss'),
+    categories: report.categories.map(c => c.name).join(', '),
+    reporter: report.reporterCountryCode || t('common.unknown'),
+    comment: report.comment
+  };
+
+  copyFormatted('clipboard.ipDetails.abuseLog', data);
 };
 
 onMounted(() => {

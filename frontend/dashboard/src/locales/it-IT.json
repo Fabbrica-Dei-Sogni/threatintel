@@ -525,6 +525,16 @@
                 "",
                 "{rawData}",
                 "---------------------------"
+            ],
+            "abuseLog": [
+                "--- DETTAGLIO SEGNALAZIONE ABUSO ---",
+                "Data: {date}",
+                "Categorie: {categories}",
+                "Reporter: {reporter}",
+                "",
+                "Commento:",
+                "{comment}",
+                "-----------------------------------"
             ]
         },
         "attackDetail": {

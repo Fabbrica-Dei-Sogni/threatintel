@@ -175,6 +175,16 @@
                 "",
                 "{rawData}",
                 "--------------------------------"
+            ],
+            "abuseLog": [
+                "--- MISSBRAUCHSBERICHT-DETAIL ---",
+                "Datum: {date}",
+                "Kategorien: {categories}",
+                "Berichterstatter: {reporter}",
+                "",
+                "Kommentar:",
+                "{comment}",
+                "---------------------------------"
             ]
         },
         "attackDetail": {

@@ -16,6 +16,7 @@
             --border-light: #e2e8f0;
             --font-sans: 'Inter', 'Helvetica', 'Arial', sans-serif;
             --font-mono: 'JetBrains Mono', 'Courier New', Courier, monospace;
+            --font-serif: 'Courier New', Courier, 'Lucida Sans Typewriter', monospace;
         }
 
         @page {
@@ -327,6 +328,7 @@
                             else if (section.templateKey === 'clipboard.ipDetails.net') fragmentName = 'ip-net';
                             else if (section.templateKey === 'clipboard.ipDetails.abuse') fragmentName = 'ip-abuse';
                             else if (section.templateKey === 'clipboard.ipDetails.whois') fragmentName = 'ip-whois';
+                            else if (section.templateKey === 'clipboard.ipDetails.abuseLog') fragmentName = 'abuse-log';
                             else if (section.templateKey === 'clipboard.telnetDetail.summary') fragmentName = 'telnet-summary';
                             else if (section.templateKey === 'clipboard.telnetDetail.timelineRow') fragmentName = 'telnet-timeline';
                             else if (section.templateKey === 'clipboard.firewall.block') fragmentName = 'firewall-block';

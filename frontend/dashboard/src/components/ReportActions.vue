@@ -329,8 +329,8 @@ onUnmounted(() => {
 .sticky-report-tab {
   position: fixed;
   right: 0;
-  top: 50%;
-  transform: translateY(-50%);
+  top: 15vh;
+  transform: none;
   display: flex;
   flex-direction: row-reverse;
   align-items: flex-start;
@@ -627,14 +627,10 @@ onUnmounted(() => {
 
 @media (max-width: 768px) {
   .sticky-report-tab { 
-    top: auto; 
-    bottom: 90px; 
+    top: 18vh; 
+    bottom: auto; 
     transform: none; 
-    transition: bottom 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .sticky-report-tab.recorder-active {
-    bottom: 150px;
+    transition: top 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   }
   
   .preview-modal-content { 

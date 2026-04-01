@@ -6,7 +6,9 @@
     <DossierToggle />
 
     <!-- Floating Settings Button -->
-    <router-link to="/settings" class="floating-settings" :class="{ 'recorder-active': dossierStore.isEnabled && dossierStore.sections.length > 0 }" :title="t('nav.settings')">
+    <router-link to="/settings" class="floating-settings"
+      :class="{ 'recorder-active': dossierStore.isEnabled && dossierStore.sections.length > 0 }"
+      :title="t('nav.settings')">
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="3"></circle>
@@ -15,7 +17,7 @@
         </path>
       </svg>
     </router-link>
-    
+
     <GlobalNavMenu />
   </div>
 </template>
@@ -110,7 +112,11 @@ onMounted(() => {
     width: 44px;
     height: 44px;
   }
-  .floating-settings svg { width: 20px; height: 20px; }
+
+  .floating-settings svg {
+    width: 20px;
+    height: 20px;
+  }
 
   .floating-settings.recorder-active {
     bottom: 84px !important;

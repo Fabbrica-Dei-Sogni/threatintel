@@ -69,32 +69,76 @@
                 </div>
                 <transition name="collapse">
                     <div v-if="toggles.request" class="section-body">
-                        <p class="link">
-                            <span @click="goToIpDetails(log.request.ip)" style="cursor: pointer;"> {{ log.request.ip ||
-                                t('common.notAvailable') }} </span>
-                            <span class="copy-btn-inline" @click.stop="copyFormatted('clipboard.ip', { ip: log.request.ip })"
-                                :title="t('common.copyIp')">📋</span>
-                        </p>
-                        <p><strong>{{ t('threatLog.method') }}:</strong> {{ log.request.method ||
-                            t('common.notAvailable') }}</p>
-                        <p><strong>{{ t('threatLog.url') }}:</strong> {{ log.request.url ||
-                            t('common.notAvailable') }}</p>
-                        <p><strong>{{ t('threatLog.userAgent') }}:</strong> {{ log.request.userAgent ||
-                            t('common.notAvailable')
-                        }}</p>
-                        <!--
-                        <p><strong>Referer:</strong> {{ log.request.referer || t('components.radar.notAvailable') }}</p>
-                    -->
-                        <HexViewer v-if="log.request" :raw-data="log.request" :label="t('threatLog.request')" />
-                        <HexViewer v-if="log.request.body" :raw-data="log.request.body" :label="t('threatLog.body')" />
-                        <HexViewer v-if="log.request.headers" :raw-data="log.request.headers"
-                            :label="t('threatLog.headers')" />
-                        <HexViewer v-if="log.response" :raw-data="log.response" :label="t('threatLog.response')" />
-                        <!-- commentati perchè forse informazioni inutili-->
-                        <!--
-                        <HexViewer v-if="log.response.query" :raw-data="log.response.query" label="Query" />
-                        <HexViewer v-if="log.response.cookies" :raw-data="log.response.cookies" label="Cookies" />
-                        -->
+                        <div class="log-details-meta" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px;">
+                            <p class="link" style="margin-bottom: 5px;">
+                                <span @click="goToIpDetails(log.request.ip)" style="cursor: pointer; font-weight: bold; font-size: 1.1em; color: #FFD700;"> 
+                                    {{ log.request.ip || t('common.notAvailable') }} 
+                                </span>
+                                <span class="copy-btn-inline" @click.stop="copyFormatted('clipboard.ip', { ip: log.request.ip })" :title="t('common.copyIp')">📋</span>
+                            </p>
+                            <div class="meta-row" style="display: flex; align-items: center; gap: 10px;">
+                                <span class="meta-label" style="color: #BBA685; font-weight: 800; font-size: 0.8rem; text-transform: uppercase;">{{ t('threatLog.method') }}:</span>
+                                <span class="method-badge" style="background: rgba(255, 179, 0, 0.15); color: #FFB300; padding: 2px 8px; border-radius: 4px; font-weight: 800; font-size: 0.8em; border: 1px solid rgba(255, 179, 0, 0.3);">
+                                    {{ log.request.method || t('common.notAvailable') }}
+                                </span>
+                            </div>
+                            <div class="meta-row" style="display: flex; align-items: center; gap: 10px;">
+                                <span class="meta-label" style="color: #BBA685; font-weight: 800; font-size: 0.8rem; text-transform: uppercase;">{{ t('threatLog.url') }}:</span>
+                                <span class="url-text" :title="log.request.url" style="color: #F4EBD0; opacity: 0.9; font-family: 'JetBrains Mono', monospace; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 60vw;">
+                                    {{ log.request.url || t('common.notAvailable') }}
+                                </span>
+                            </div>
+                            <div class="meta-row" style="display: flex; align-items: flex-start; gap: 10px;">
+                                <span class="meta-label" style="color: #BBA685; font-weight: 800; font-size: 0.8rem; text-transform: uppercase;">{{ t('threatLog.userAgent') }}:</span>
+                                <span class="ua-value" :title="log.request.userAgent" style="color: #aaa; font-style: italic; font-size: 0.8rem;">
+                                    {{ log.request.userAgent || t('common.notAvailable') }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Tabs System -->
+                        <div class="log-tabs-container">
+                            <div class="log-tabs" style="display: flex; gap: 4px; border-bottom: 1px solid rgba(230, 33, 23, 0.2); margin-bottom: 12px;">
+                                <button
+                                    @click="activeLogTab = 'request'"
+                                    class="tab-btn"
+                                    :class="{ active: activeLogTab === 'request' }"
+                                >
+                                    {{ t('threatLog.request').toUpperCase() }}
+                                </button>
+                                <button
+                                    v-if="log.request.headers"
+                                    @click="activeLogTab = 'headers'"
+                                    class="tab-btn"
+                                    :class="{ active: activeLogTab === 'headers' }"
+                                >
+                                    {{ t('threatLog.headers').toUpperCase() }}
+                                </button>
+                                <button
+                                    v-if="log.request.body"
+                                    @click="activeLogTab = 'body'"
+                                    class="tab-btn"
+                                    :class="{ active: activeLogTab === 'body' }"
+                                >
+                                    {{ t('threatLog.body').toUpperCase() }}
+                                </button>
+                                <button
+                                    v-if="log.response"
+                                    @click="activeLogTab = 'response'"
+                                    class="tab-btn"
+                                    :class="{ active: activeLogTab === 'response' }"
+                                >
+                                    {{ t('threatLog.response').toUpperCase() }}
+                                </button>
+                            </div>
+
+                            <div class="tab-content" style="animation: tabFadeIn 0.3s ease-out; background-color: #050303; padding: 15px; border-radius: 8px; border: 1px solid rgba(230, 33, 23, 0.15);">
+                                <HexViewer v-if="activeLogTab === 'request'" :raw-data="log.request" :label="t('threatLog.request')" />
+                                <HexViewer v-if="activeLogTab === 'headers'" :raw-data="log.request.headers" :label="t('threatLog.headers')" />
+                                <HexViewer v-if="activeLogTab === 'body'" :raw-data="log.request.body" :label="t('threatLog.body')" />
+                                <HexViewer v-if="activeLogTab === 'response'" :raw-data="log.response" :label="t('threatLog.response')" />
+                            </div>
+                        </div>
                     </div>
                 </transition>
             </div>
@@ -147,6 +191,7 @@ const id = ref('')
 const log = ref(null)
 const loading = ref(false)
 const error = ref(false)
+const activeLogTab = ref('request')
 
 const toggles = reactive({
     general: true,

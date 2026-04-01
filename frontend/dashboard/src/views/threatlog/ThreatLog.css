@@ -199,3 +199,51 @@ h1 {
     padding: 15px;
   }
 }
+
+/* === TAB SYSTEM (Request/Response) === */
+.log-tabs-container {
+  margin-top: 15px;
+}
+
+.log-tabs {
+  display: flex;
+  gap: 8px;
+  border-bottom: 1px solid rgba(255, 179, 0, 0.2);
+  margin-bottom: 15px;
+}
+
+.tab-btn {
+  background: transparent;
+  border: none;
+  padding: 8px 16px;
+  color: rgba(244, 235, 208, 0.5); /* Parchment faded */
+  font-weight: 800;
+  font-size: 0.8rem;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  text-transform: uppercase;
+}
+
+.tab-btn:hover {
+  color: #FFD700;
+  background: rgba(255, 179, 0, 0.05);
+}
+
+.tab-btn.active {
+  color: #FFB300;
+  border-bottom: 2px solid #FFB300;
+  background: rgba(255, 179, 0, 0.1);
+  text-shadow: 0 0 8px rgba(255, 179, 0, 0.4);
+}
+
+.tab-content {
+  animation: tabFadeIn 0.3s ease-out;
+}
+
+@keyframes tabFadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}

@@ -323,6 +323,7 @@
         "geolocation": "Геолокация",
         "coordinates": "Координаты",
         "analysis": "Анализ",
+        "hash": "Хэш (Hash)",
         "techniques": "Обнаруженные техники",
         "request": "Запрос",
         "userAgent": "Пользовательский агент﻿",

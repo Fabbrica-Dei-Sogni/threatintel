@@ -323,6 +323,7 @@
         "geolocation": "Geolokalizacja",
         "coordinates": "Współrzędne",
         "analysis": "Analiza",
+        "hash": "Hash",
         "techniques": "Wykryte techniki",
         "request": "Żądanie",
         "userAgent": "Agent użytkownika",

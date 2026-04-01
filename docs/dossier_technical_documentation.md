@@ -17,7 +17,15 @@ The dossier system is built upon a distributed, reactive architecture that bridg
 
 ---
 
-## 2. Dossier Generation Flows
+## 2. Dossier Data Schema: Types & TemplateKeys
+
+Forensic evidence is structured using a hierarchical mapping of **Macro-Categories (`type`)** and **Specific Templates (`templateKey`)**.
+
+For a detailed list of all supported 12 TemplateKeys and 4 Macro-Types, refer to the **[Forensic Dossier Data Schema](./dossier_data_schema.md)**.
+
+---
+
+## 3. Dossier Generation Flows
 
 ### Flow A: Dynamic Capture (On-the-fly)
 When the user clicks "Preview" or "Download PDF" in the recorder bar:

@@ -1,13 +1,19 @@
 <template>
   <div class="dossier-archive-view detail-mode">
     <div class="header-top">
-      <h1 v-if="dossier">{{ dossier.title }}</h1>
+      <h1 v-if="dossier && !isEditing">{{ dossier.title }}</h1>
+      <input v-else-if="dossier && isEditing" v-model="editForm.title" class="edit-title-input" />
       <LanguageSwitcher />
     </div>
 
-    <div class="archive-header">
+    <div class="archive-header" style="flex-wrap: wrap; gap: 15px;">
       <div class="title-with-back">
-        <button @click="goBack" class="back-btn">← {{ t('common.back').toUpperCase() }}</button>
+        <button @click="goBack" class="back-btn" :disabled="isSaving">← {{ t('common.back').toUpperCase() }}</button>
+        <button v-if="dossier && !isEditing" @click="startEdit" class="back-btn edit-btn">✎ {{ t('common.edit').toUpperCase() }}</button>
+        <template v-if="dossier && isEditing">
+          <button @click="saveEdit" class="back-btn save-btn" :disabled="isSaving">✓ {{ t('common.save').toUpperCase() }}</button>
+          <button @click="cancelEdit" class="back-btn cancel-btn" :disabled="isSaving">✗ {{ t('common.cancel').toUpperCase() }}</button>
+        </template>
       </div>
       <div class="header-actions" v-if="dossier">
         <DossierReportActions :dossierId="dossier._id" />
@@ -23,7 +29,8 @@
       <!-- Info Sidebar -->
       <div class="detail-content">
         <div class="info-card glass-card">
-          <p class="description">{{ dossier.description || t('common.noDescription') }}</p>
+          <p class="description" v-if="!isEditing">{{ dossier.description || t('common.noDescription') }}</p>
+          <textarea v-else v-model="editForm.description" class="edit-desc-input" rows="3"></textarea>
           <div class="dossier-meta">
             <div class="meta-item"><strong>{{ t('common.id') }}:</strong> {{ dossier._id }}</div>
             <div class="meta-item"><strong>{{ t('common.timestamp') }}:</strong> {{ formatDate(dossier.createdAt) }}</div>
@@ -61,7 +68,7 @@
 import { ref, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
-import { fetchDossierById } from '../../api';
+import { fetchDossierById, updateDossier } from '../../api';
 import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
 import DossierReportActions from '../../components/DossierReportActions.vue';
 import { ElMessage } from 'element-plus';
@@ -75,6 +82,41 @@ const { t } = useI18n();
 const dossier = ref(null);
 const loading = ref(true);
 const showRaw = ref(false);
+
+const isEditing = ref(false);
+const isSaving = ref(false);
+const editForm = ref({ title: '', description: '' });
+
+const startEdit = () => {
+  editForm.value = {
+    title: dossier.value.title,
+    description: dossier.value.description || ''
+  };
+  isEditing.value = true;
+};
+
+const cancelEdit = () => {
+  isEditing.value = false;
+};
+
+const saveEdit = async () => {
+  if (!editForm.value.title.trim()) {
+    ElMessage.warning('Title required / Titolo richiesto');
+    return;
+  }
+  isSaving.value = true;
+  try {
+    const updated = await updateDossier(dossier.value._id, editForm.value);
+    dossier.value.title = updated.title || editForm.value.title;
+    dossier.value.description = updated.description || editForm.value.description;
+    isEditing.value = false;
+    ElMessage.success(t('common.save') + ' OK');
+  } catch (error) {
+    ElMessage.error(t('common.error'));
+  } finally {
+    isSaving.value = false;
+  }
+};
 
 const loadDossier = async () => {
   loading.value = true;
@@ -242,4 +284,38 @@ onMounted(loadDossier);
   transform: translateY(-2px);
   border-color: #6366f1;
 }
+
+.save-btn { border-color: #10b981; color: #10b981; }
+.save-btn:hover { background: #10b981; border-color: #10b981; }
+.cancel-btn { border-color: #ef4444; color: #ef4444; }
+.cancel-btn:hover { background: #ef4444; border-color: #ef4444; }
+
+.edit-title-input {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(99, 102, 241, 0.5);
+  color: white;
+  font-size: 2rem;
+  font-weight: 800;
+  padding: 10px 15px;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 600px;
+  outline: none;
+}
+.edit-title-input:focus { border-color: #6366f1; background: rgba(0, 0, 0, 0.2); }
+
+.edit-desc-input {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px dashed rgba(99, 102, 241, 0.5);
+  color: #a5b4fc;
+  font-size: 1rem;
+  padding: 15px;
+  border-radius: 8px;
+  width: 100%;
+  resize: vertical;
+  margin-bottom: 20px;
+  outline: none;
+  font-family: inherit;
+}
+.edit-desc-input:focus { border-color: #6366f1; }
 </style>

@@ -4,9 +4,9 @@ import { ReportService, ReportType } from '../services/ReportService';
 
 @injectable()
 export class ReportController {
-    constructor(private readonly reportService: ReportService) {}
+    constructor(private readonly reportService: ReportService) { }
 
-    async generateAttackReport(req: Request, res: Response) {
+    async generateDetailReport(req: Request, res: Response) {
         try {
             const { ip, sessionId, type, locale } = req.query;
             const format = (req.query.format as 'html' | 'pdf') || 'pdf';
@@ -16,7 +16,7 @@ export class ReportController {
             const id = (reportType === 'telnet' ? sessionId : ip) as string;
 
             if (!id) {
-                const errorMsg = lang.startsWith('it') 
+                const errorMsg = lang.startsWith('it')
                     ? `È necessario fornire un ID valido per il tipo ${reportType}`
                     : `A valid ID is required for type ${reportType}`;
                 return res.status(400).json({ error: errorMsg });

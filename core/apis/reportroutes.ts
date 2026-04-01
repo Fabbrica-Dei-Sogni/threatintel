@@ -8,7 +8,7 @@ export default (reportController: ReportController) => {
      * @route GET /api/reports/attack
      * @desc Genera un report dossier per un attacco (IP o sessionId)
      */
-    router.get('/api/reports/dettaglio', (req, res) => reportController.generateAttackReport(req, res));
+    router.get('/api/reports/dettaglio', (req, res) => reportController.generateDetailReport(req, res));
     router.post('/api/reports/custom', (req, res) => reportController.generateCustomReport(req, res));
 
     return router;

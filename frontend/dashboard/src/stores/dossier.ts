@@ -18,6 +18,7 @@ export const useDossierStore = defineStore('dossier', () => {
     const sections = ref<DossierSection[]>([]);
     const clipboardBuffer = ref('');
     const isSaving = ref(false);
+    const lastSavedAt = ref<number | null>(null);
 
 
     // Caricamento iniziale da localStorage
@@ -112,9 +113,8 @@ export const useDossierStore = defineStore('dossier', () => {
 
             const saved = await saveDossier(payload);
             
-            // Opzionale: puliamo il recorder dopo il salvataggio? 
-            // Per ora lo lasciamo così l'utente può scaricare anche il PDF se vuole, 
-            // o pulire manualmente.
+            // Trigger per il refresh delle viste interessate (es: Archivio)
+            lastSavedAt.value = Date.now();
             
             return saved;
         } catch (error) {
@@ -131,6 +131,7 @@ export const useDossierStore = defineStore('dossier', () => {
         sections,
         clipboardBuffer,
         isSaving,
+        lastSavedAt,
         startRecording,
         stopRecording,
         reset,

@@ -108,16 +108,18 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue';
+import { ref, reactive, onMounted, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { fetchDossiers, deleteDossier, exportDossier } from '../../api';
 import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
 import { ElMessageBox, ElMessage } from 'element-plus';
+import { useDossierStore } from '../../stores/dossier';
 import dayjs from 'dayjs';
 
 const { t } = useI18n();
 const router = useRouter();
+const dossierStore = useDossierStore();
 
 const dossiers = ref([]);
 const totalDossiers = ref(0);
@@ -150,6 +152,13 @@ const fetchData = async () => {
     loading.value = false;
   }
 };
+
+// Sincronizzazione automatica: se viene salvato un dossier mentre siamo qui, ricarichiamo la lista
+watch(() => dossierStore.lastSavedAt, (newVal) => {
+  if (newVal) {
+    fetchData();
+  }
+});
 
 let searchTimeout = null;
 const handleSearch = () => {

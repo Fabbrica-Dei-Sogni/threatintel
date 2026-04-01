@@ -149,7 +149,7 @@
         </div>
 
         <div class="meta-info">
-            <strong>ID Report:</strong> TR-<%= Math.random().toString(36).substr(2, 9).toUpperCase() %><br>
+            <strong><%= t('reports.common.id') %> Report:</strong> TR-<%= Math.random().toString(36).substr(2, 9).toUpperCase() %><br>
                 <strong><%= t('reports.common.generatedAt') %>:</strong>
                 <%= data.generatedAt %><br>
                     <strong><%= t('reports.attackDetail.riskClass') %>:</strong>
@@ -211,12 +211,12 @@
                         </td>
                         <td class="log-entry">
                             <% if (event.input) { %>
-                                COMMAND: <%= event.input %>
+                                <%= t('reports.common.command').toUpperCase() %>: <%= event.input %>
                                     <% } else if (event.request) { %>
-                                        URL: <%= event.request.url %><br>
-                                            UA: <%= event.request.userAgent %>
+                                        <%= t('reports.common.url').toUpperCase() %>: <%= event.request.url %><br>
+                                            <%= t('reports.common.userAgent').toUpperCase() %>: <%= event.request.userAgent %>
                                                 <% } else if (event.username) { %>
-                                                    AUTH ATTEMPT: <%= event.username %> / <%= event.password || '****'
+                                                    <%= t('reports.common.authAttempt').toUpperCase() %>: <%= event.username %> / <%= event.password || '****'
                                                             %>
                                                             <% } else { %>
                                                                 <%= JSON.stringify(event).substring(0, 200) %>...

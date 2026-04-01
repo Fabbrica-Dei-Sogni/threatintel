@@ -316,8 +316,8 @@
                     <div style="font-size: 40px; color: var(--text-cyan);">⌬</div>
                 <% } %>
                 <div class="brand-text">
-                    <h1>THREAT-INTEL</h1>
-                    <p>FORENSIC INVESTIGATIVE DOSSIER</p>
+                    <h1><%= t('reports.common.agencyName') %></h1>
+                    <p><%= t('reports.common.investigativeDossier').toUpperCase() %> • <%= t('reports.common.hudStyle') %></p>
                 </div>
             </div>
             <div class="header-meta">
@@ -355,13 +355,13 @@
                 <% }); %>
             <% } else { %>
                 <div class="hud-item" style="text-align: center; border-left: 2px solid var(--text-red);">
-                    <p style="color: var(--text-red); font-weight: 900;">[ WARNING ] NO FORENSIC DATA CAPTURED IN THIS SESSION</p>
+                    <p style="color: var(--text-red); font-weight: 900;">[ WARNING ] <%= t('reports.common.noDataCaptured').toUpperCase() %></p>
                 </div>
             <% } %>
         </div>
 
         <footer class="footer-hud">
-            SYSTEM-GENERATED REPORT • THREATINTEL V2.4 • CONFIDENTIAL ASSETS
+            <%= t('reports.common.hudFooter').toUpperCase() %>
         </footer>
     </div>
 </body>

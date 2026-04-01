@@ -1,7 +1,7 @@
 <div class="classic-item ip-geo-formal">
     <div class="formal-header-bar">
         <span class="formal-title"><%= t('reports.fragments.ipGeoTitle') %></span>
-        <span class="formal-id">GEO-DATA-REF: <%= data.ip %></span>
+        <span class="formal-id"><%= t('reports.fragments.classic.geoDataRef') %>: <%= data.ip %></span>
     </div>
     <table class="formal-data-grid">
         <tr>
@@ -23,7 +23,7 @@
     </table>
     <% if (data.timezone) { %>
     <div style="margin-top: 8px; font-size: 0.85em; color: #666;">
-        <strong>TIMEZONE:</strong> <%= data.timezone %>
+        <strong><%= t('reports.fragments.classic.timezone') %>:</strong> <%= data.timezone %>
     </div>
     <% } %>
 </div>

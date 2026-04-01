@@ -298,7 +298,7 @@
                 </div>
                 <div class="brand-text">
                     <h1><%= t('reports.common.agencyName') %></h1>
-                    <p><%= t('reports.common.investigativeDossier') %> • CLASSIC-ADMIN-STYLE</p>
+                    <p><%= t('reports.common.investigativeDossier') %> • <%= t('reports.common.classicStyle') %></p>
                 </div>
             </div>
             <div class="header-meta">
@@ -311,9 +311,8 @@
 
         <!-- SUBTITLE STRIP -->
         <div class="classic-metadata-bar">
-            <span>GEN: THREATINTEL-CORE-V2</span>
+            <span><%= t('reports.common.generationEngine') %></span>
             <span>LOCALE: <%= locale.toUpperCase() %></span>
-            <span>SYSTEM: FORENSIC-ENGINE-PUPPETEER</span>
         </div>
 
         <!-- DYNAMIC CONTENT SECTIONS -->
@@ -344,7 +343,7 @@
                 <% }); %>
             <% } else { %>
                 <div style="text-align: center; color: var(--text-muted); padding: 40px; border: 1px dashed var(--border);">
-                    <p>NESSUN DATO ACQUISITO PER QUESTO DOSSIER.</p>
+                    <p><%= t('reports.common.noDataCaptured') %></p>
                 </div>
             <% } %>
         </div>

@@ -1,27 +1,27 @@
 <div class="classic-item attack-card-formal">
     <div class="formal-header-bar">
-        <span class="formal-title">RIEPILOGO ESECUTIVO ATTACCO</span>
-        <span class="formal-id">REF-ID: <%= Math.random().toString(36).substring(7).toUpperCase() %></span>
+        <span class="formal-title"><%= t('reports.fragments.classic.attackSummaryTitle') %></span>
+        <span class="formal-id"><%= t('reports.fragments.classic.refId') %>: <%= Math.random().toString(36).substring(7).toUpperCase() %></span>
     </div>
     <table class="formal-data-grid">
         <tr>
-            <th width="30%">INDIVIDUO SOGGETTO</th>
+            <th width="30%"><%= t('reports.fragments.classic.subjectIndividual') %></th>
             <td><strong><%= data.ip %></strong></td>
         </tr>
         <tr>
-            <th>DANGER SCORE</th>
+            <th><%= t('reports.fragments.classic.dangerScore') %></th>
             <td><span class="classic-danger-val"><%= (data.score || 0).toFixed(2) %> / 10.00</span></td>
         </tr>
         <tr>
-            <th>VOLUME LOGS</th>
-            <td><%= data.totalLogs %> EVENTI RILEVATI</td>
+            <th><%= t('reports.fragments.classic.volumeLogs') %></th>
+            <td><%= t('reports.fragments.classic.eventsDetected', { count: data.totalLogs }) %></td>
         </tr>
         <tr>
-            <th>TECNICHE IDENTIFICATE</th>
-            <td><%= data.techniques || 'NESSUN PATTERN SPECIFICO' %></td>
+            <th><%= t('reports.fragments.classic.techniquesIdentified') %></th>
+            <td><%= data.techniques || t('reports.fragments.classic.noneSpecified') %></td>
         </tr>
         <tr>
-            <th>FINESTRA TEMPORALE</th>
+            <th><%= t('reports.fragments.classic.timeWindow') %></th>
             <td><%= data.firstSeen %> — <%= data.lastSeen %></td>
         </tr>
     </table>

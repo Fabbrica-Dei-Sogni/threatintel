@@ -1,31 +1,31 @@
 <div class="hud-item net-hud-box">
     <div class="hud-box-header">
-        <span class="hud-box-title">TACTICAL HUD: NETWORK INFO</span>
-        <span class="hud-box-subtitle">ASN: <%= data.asn %></span>
+        <span class="hud-box-title"><%= t('reports.fragments.hud.networkInfoTitle') %></span>
+        <span class="hud-box-subtitle"><%= t('reports.fragments.asn') %>: <%= data.asn %></span>
     </div>
     <div class="hud-grid-4">
         <div class="hud-metric">
-            <span class="hud-metric-label">ASN</span>
+            <span class="hud-metric-label"><%= t('reports.fragments.asn') %></span>
             <span class="hud-metric-value"><%= data.asn || 'N/A' %></span>
         </div>
         <div class="hud-metric">
-            <span class="hud-metric-label">USAGE</span>
+            <span class="hud-metric-label"><%= t('reports.fragments.usageType').toUpperCase() %></span>
             <span class="hud-metric-value" style="font-size: 11px;"><%= data.usageType || data.hostname || 'N/A' %></span>
         </div>
         <div class="hud-metric">
-            <span class="hud-metric-label">TOR</span>
+            <span class="hud-metric-label"><%= t('reports.fragments.isTor').toUpperCase() %></span>
             <span class="hud-metric-value <%= data.isTor ? 'text-red' : '' %>">
                 <%= data.isTor ? t('common.yes') : t('common.no') %>
             </span>
         </div>
         <div class="hud-metric">
-            <span class="hud-metric-label">SAFE</span>
+            <span class="hud-metric-label"><%= t('reports.fragments.isWhitelisted').toUpperCase() %></span>
             <span class="hud-metric-value <%= data.isWhitelisted ? 'text-green' : '' %>">
                 <%= data.isWhitelisted ? t('common.yes') : t('common.no') %>
             </span>
         </div>
     </div>
     <div class="hud-footer-details">
-        <strong>ORGANIZATION:</strong> <%= data.org || 'N/A' %>
+        <strong><%= t('reports.fragments.org').toUpperCase() %>:</strong> <%= data.org || 'N/A' %>
     </div>
 </div>

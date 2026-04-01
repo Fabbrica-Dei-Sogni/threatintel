@@ -59,7 +59,25 @@
         "previewDossier": "Preview Dossier",
         "recordingActive": "RECORDING ACTIVE",
         "noSectionsCaptured": "No sections captured",
-        "sectionsCaptured": "{count} sections captured"
+        "sectionsCaptured": "{count} sections captured",
+        "investigations": "Investigations",
+        "searchByTitleOrIp": "Search by title or IP...",
+        "allStatus": "All States",
+        "noDossiersFound": "No dossiers found in archive.",
+        "sections": "Sections",
+        "exporting": "Exporting...",
+        "errorLoadingDossiers": "Error loading dossiers",
+        "errorExporting": "Error during export",
+        "confirmDeleteDossier": "Are you sure you want to permanently delete this investigation?",
+        "dossierDeleted": "Investigation deleted.",
+        "noDescription": "No description provided.",
+        "view": "View",
+        "dossierStyleAdmin": "ADMINISTRATIVE FORMAL",
+        "dossierStyleTactical": "TACTICAL HUD",
+        "dossierStyleForensic": "FORENSIC TELEX",
+        "dossierPreviewTitle": "INVESTIGATIVE DOSSIER PREVIEW",
+        "dossierFormatA4": "FORMAT: A4 (ISO 216)",
+        "dossierZoom": "ZOOM"
     },
     "auth": {
         "login": "Login",
@@ -103,7 +121,12 @@
             "rootDirectory": "main entry point",
             "lastAttacks": "Recent Detections: Incursions identified from IPs {ips} in the latest sessions.",
             "lastSessions": "Honeypot Activity: New access attempts recorded from {ips}."
-        }
+        },
+        "forensicIntelligence": "FORENSIC INTELLIGENCE",
+        "recentDossiers": "Recent Investigations",
+        "loadingDossiers": "Loading archive...",
+        "errorLoadingDossiers": "Error loading archive",
+        "archive": "ARCHIVE"
     },
     "attacks": {
         "title": "Attacks",
@@ -408,7 +431,8 @@
         "attacks": "Attacks",
         "logs": "Log Requests",
         "configuration": "Configuration",
-        "settings": "Settings"
+        "settings": "Settings",
+        "archive": "Investigative Archive"
     },
     "config": {
         "title": "Honeypot Configuration",
@@ -590,7 +614,7 @@
             "-------------------------------"
         ],
         "generic": "{text}",
-        "attackSummary": "RIEPILOGO ATTACCO:\nIP: {ip}\nPericolo: {dangerLevel} ({dangerScore})\nLogs: {totaleLogs}\nDurata: {duration}\nRPS: {rps}",
-        "attackTechnique": "Tecnica Rilevata: {tech}"
+        "attackSummary": "ATTACK SUMMARY:\nIP: {ip}\nDanger: {dangerLevel} ({dangerScore})\nLogs: {totaleLogs}\nDuration: {duration}\nRPS: {rps}",
+        "attackTechnique": "Technique Detected: {tech}"
     }
 }

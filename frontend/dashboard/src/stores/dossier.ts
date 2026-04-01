@@ -1,5 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref, watch } from 'vue';
+import { saveDossier } from '../api';
+
 
 export interface DossierSection {
     id: string;
@@ -15,6 +17,8 @@ export const useDossierStore = defineStore('dossier', () => {
     const isEnabled = ref(true); // Global visibility toggle
     const sections = ref<DossierSection[]>([]);
     const clipboardBuffer = ref('');
+    const isSaving = ref(false);
+
 
     // Caricamento iniziale da localStorage
     const savedDossier = localStorage.getItem('custom_dossier_session');
@@ -84,15 +88,54 @@ export const useDossierStore = defineStore('dossier', () => {
         sections.value = sections.value.filter(s => s.id !== id);
     };
 
+    /**
+     * Salva il dossier corrente nel database MongoDB tramite API.
+     */
+    const persistToDb = async (title: string, description: string = '', tags: string[] = []) => {
+        if (sections.value.length === 0) return;
+        
+        isSaving.value = true;
+        try {
+            const payload = {
+                title,
+                description,
+                status: 'finalized',
+                tags,
+                sections: sections.value.map(s => ({
+                    templateKey: s.templateKey,
+                    data: s.data,
+                    type: s.type,
+                    timestamp: s.timestamp,
+                    renderedText: s.renderedText
+                }))
+            };
+
+            const saved = await saveDossier(payload);
+            
+            // Opzionale: puliamo il recorder dopo il salvataggio? 
+            // Per ora lo lasciamo così l'utente può scaricare anche il PDF se vuole, 
+            // o pulire manualmente.
+            
+            return saved;
+        } catch (error) {
+            console.error('[DossierStore] Errore nel salvataggio su DB:', error);
+            throw error;
+        } finally {
+            isSaving.value = false;
+        }
+    };
+
     return {
         isRecording,
         isEnabled,
         sections,
         clipboardBuffer,
+        isSaving,
         startRecording,
         stopRecording,
         reset,
         addSection,
-        removeSection
+        removeSection,
+        persistToDb
     };
 });

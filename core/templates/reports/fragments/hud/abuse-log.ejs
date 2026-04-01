@@ -1,16 +1,16 @@
 <div class="hud-item abuse-hud-box">
     <div class="hud-box-header">
-        <span class="hud-box-title">ABUSE INTERCEPT DETAILED</span>
-        <span class="hud-box-subtitle">REPORT ANALYST</span>
+        <span class="hud-box-title"><%= t('reports.fragments.hud.abuseInterceptTitle') %></span>
+        <span class="hud-box-subtitle"><%= t('reports.fragments.classic.reporter').toUpperCase() %></span>
     </div>
     
     <div class="hud-grid-2" style="display: flex; gap: 20px; margin-bottom: 10px;">
         <div class="hud-metric">
-            <span class="hud-metric-label">REPORTED AT</span>
+            <span class="hud-metric-label"><%= t('reports.fragments.lastReportedAt').toUpperCase() %></span>
             <span class="hud-metric-value"><%= data.date || 'N/A' %></span>
         </div>
         <div class="hud-metric">
-            <span class="hud-metric-label">SOURCE REPORTER</span>
+            <span class="hud-metric-label"><%= t('reports.fragments.classic.reporter').toUpperCase() %></span>
             <span class="hud-metric-value"><%= data.reporter || 'N/A' %></span>
         </div>
     </div>
@@ -22,7 +22,7 @@
     </div>
 
     <div class="hud-comment-terminal" style="margin-top: 15px; padding: 15px; border: 1px solid rgba(0, 212, 255, 0.2); background: rgba(0,0,0,0.4); position: relative; border-radius: 2px;">
-        <span style="position: absolute; top: -7px; left: 10px; background: var(--bg-dark); padding: 0 8px; font-size: 8px; color: var(--accent-cobalt); font-weight: bold; border: 1px solid rgba(0, 212, 255, 0.2); border-radius: 10px;">RAW_TRANSCRIPT</span>
+        <span style="position: absolute; top: -7px; left: 10px; background: var(--bg-dark); padding: 0 8px; font-size: 8px; color: var(--accent-cobalt); font-weight: bold; border: 1px solid rgba(0, 212, 255, 0.2); border-radius: 10px;"><%= t('reports.fragments.classic.investigativeTranscription').toUpperCase().replace(/ /g, '_') %></span>
         <div class="terminal-text" style="color: #cbd5e1; line-height: 1.6; font-family: var(--font-serif); font-size: 13px; letter-spacing: -0.2px;">
             <span style="color: var(--accent-cobalt); font-family: var(--font-mono); font-style: normal; font-size: 11px;">>>> </span>
             <%= data.comment %>

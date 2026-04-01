@@ -13,13 +13,13 @@
         <% } %>
         <% if (data.username || data.password) { %>
             <div class="hud-log-row">
-                <span class="hud-log-label">AUTH DATA</span>
+                <span class="hud-log-label"><%= t('reports.fragments.hud.authData').toUpperCase() %></span>
                 <span class="hud-log-val-red"><%= data.username || '-' %></span> / <span class="hud-log-val-red"><%= data.password || '-' %></span>
             </div>
         <% } %>
         <% if (data.input) { %>
             <div class="hud-log-row">
-                <span class="hud-log-label">REMOTE INPUT</span>
+                <span class="hud-log-label"><%= t('reports.fragments.hud.remoteInput').toUpperCase() %></span>
                 <span style="color: #33ff33; font-family: var(--mono); font-weight: 900;"><%= data.input %></span>
             </div>
         <% } %>

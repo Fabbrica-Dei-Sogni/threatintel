@@ -1,26 +1,26 @@
 <div class="classic-section abuse-log-formal">
     <div class="formal-header-bar" style="background: var(--bg-soft); border-left: 4px solid var(--accent-cobalt); padding: 8px 12px; margin-bottom: 10px;">
-        <span class="formal-title" style="font-weight: 800; font-size: 11px; letter-spacing: 0.5px; color: var(--primary-dark);">ABUSE REPORT EVIDENCE</span>
+        <span class="formal-title" style="font-weight: 800; font-size: 11px; letter-spacing: 0.5px; color: var(--primary-dark);"><%= t('reports.fragments.classic.abuseReportEvidence') %></span>
     </div>
 
     <table class="formal-data-grid" style="width: 100%; border-collapse: collapse;">
         <tr>
-            <th style="text-align: left; padding: 6px; border-bottom: 1px solid var(--border-light); font-size: 10px; color: var(--text-muted);" width="30%">REPORT DATE</th>
+            <th style="text-align: left; padding: 6px; border-bottom: 1px solid var(--border-light); font-size: 10px; color: var(--text-muted);" width="30%"><%= t('reports.fragments.classic.reportDate') %></th>
             <td style="padding: 6px; border-bottom: 1px solid var(--border-light);"><strong><%= data.date || 'N/A' %></strong></td>
         </tr>
         <tr>
-            <th style="text-align: left; padding: 6px; border-bottom: 1px solid var(--border-light); font-size: 10px; color: var(--text-muted);">REPORTER</th>
+            <th style="text-align: left; padding: 6px; border-bottom: 1px solid var(--border-light); font-size: 10px; color: var(--text-muted);"><%= t('reports.fragments.classic.reporter') %></th>
             <td style="padding: 6px; border-bottom: 1px solid var(--border-light);"><span class="classic-tag blue"><%= data.reporter || 'N/A' %></span></td>
         </tr>
         <tr>
-            <th style="text-align: left; padding: 6px; border-bottom: 1px solid var(--border-light); font-size: 10px; color: var(--text-muted);">CATEGORIES</th>
+            <th style="text-align: left; padding: 6px; border-bottom: 1px solid var(--border-light); font-size: 10px; color: var(--text-muted);"><%= t('reports.fragments.classic.categories') %></th>
             <td style="padding: 6px; border-bottom: 1px solid var(--border-light);"><%= data.categories || 'N/A' %></td>
         </tr>
         <tr>
             <td colspan="2" style="padding: 15px; background: #fffdf5; border: 1px solid #e1dbbd; position: relative; margin-top: 5px;">
                 <div style="position: absolute; top: -5px; right: 20px; width: 30px; height: 10px; background: rgba(0,0,0,0.05); border-radius: 2px; transform: rotate(5deg);"></div> <!-- Simbolo graffetta -->
                 <div style="font-family: var(--font-serif); font-size: 13px; line-height: 1.5; color: #4338ca; font-weight: 600; text-transform: uppercase; margin-bottom: 8px; border-bottom: 1px dashed #e1dbbd; padding-bottom: 4px;">
-                    Investigative Transcription
+                    <%= t('reports.fragments.classic.investigativeTranscription') %>
                 </div>
                 <div style="font-family: var(--font-serif); font-size: 14px; line-height: 1.6; color: #2d3748; letter-spacing: -0.2px;">
                     <%= data.comment || 'N/A' %>

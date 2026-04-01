@@ -1,7 +1,7 @@
 <div class="hud-item geo-hud-box">
     <div class="hud-box-header">
-        <span class="hud-box-title">TACTICAL HUD: GEOLOC DATA</span>
-        <span class="hud-box-subtitle">IP: <%= data.ip %></span>
+        <span class="hud-box-title"><%= t('reports.fragments.hud.geolocDataTitle') %></span>
+        <span class="hud-box-subtitle"><%= t('reports.common.targetIp') %>: <%= data.ip %></span>
     </div>
     <div class="hud-grid-4">
         <div class="hud-metric">
@@ -9,16 +9,16 @@
             <span class="hud-value"><%= data.country %></span>
         </div>
         <div class="hud-sub-item">
-            <span class="hud-label">CITY / REGION</span>
+            <span class="hud-label"><%= t('reports.fragments.city').toUpperCase() %></span>
             <span class="hud-value"><%= data.city %><% if (data.region) { %> / <%= data.region %><% } %></span>
         </div>
         <div class="hud-sub-item">
-            <span class="hud-label">COORDS</span>
+            <span class="hud-label"><%= t('reports.fragments.coordinates').toUpperCase() %></span>
             <span class="hud-value mono"><%= data.coordinates || data.gps %></span>
         </div>
         <% if (data.timezone) { %>
         <div class="hud-sub-item">
-            <span class="hud-label">TIMEZONE</span>
+            <span class="hud-label"><%= t('reports.fragments.classic.timezone').toUpperCase() %></span>
             <span class="hud-value"><%= data.timezone %></span>
         </div>
         <% } %>

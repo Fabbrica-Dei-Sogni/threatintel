@@ -47,8 +47,8 @@
         "copied": "Copiato",
         "copyComment": "Copia Commento",
         "generateReport": "Genera Dossier",
-        "downloadPdf": "DOWNLOAD PDF",
-        "viewHtml": "Visualizza HTML",
+        "downloadPdf": "SCARICA PDF",
+        "viewHtml": "VISUALIZZA HTML",
         "preview": "Anteprima",
         "addedToDossier": "Aggiunto al dossier personalizzato",
         "dossier": "Dossier Personalizzato",
@@ -59,7 +59,25 @@
         "previewDossier": "Anteprima Dossier",
         "recordingActive": "REGISTRAZIONE ATTIVA",
         "noSectionsCaptured": "Nessuna sezione catturata",
-        "sectionsCaptured": "{count} sezioni catturate"
+        "sectionsCaptured": "{count} sezioni catturate",
+        "investigations": "Investigazioni",
+        "searchByTitleOrIp": "Cerca per titolo o IP...",
+        "allStatus": "Tutti gli stati",
+        "noDossiersFound": "Nessun dossier trovato nell'archivio.",
+        "sections": "Sezioni",
+        "exporting": "Esportazione in corso...",
+        "errorLoadingDossiers": "Errore nel caricamento dei dossier",
+        "errorExporting": "Errore durante l'esportazione",
+        "confirmDeleteDossier": "Sei sicuro di voler eliminare definitivamente questa investigazione?",
+        "dossierDeleted": "Investigazione eliminata.",
+        "noDescription": "Nessuna descrizione fornita.",
+        "view": "Visualizza",
+        "dossierStyleAdmin": "ADMINISTRATIVO FORMALE",
+        "dossierStyleTactical": "TACTICAL HUD",
+        "dossierStyleForensic": "FORENSIC TELEX",
+        "dossierPreviewTitle": "ANTEPRIMA DOSSIER INVESTIGATIVO",
+        "dossierFormatA4": "FORMATO: A4 (ISO 216)",
+        "dossierZoom": "ZOOM"
     },
     "auth": {
         "login": "Login",
@@ -103,7 +121,12 @@
             "rootDirectory": "punto di ingresso principale",
             "lastAttacks": "Rilevamenti Recenti: Incursioni identificate dagli IP {ips} nelle ultime sessioni.",
             "lastSessions": "Attività Honeypot: Nuovi tentativi di accesso registrati da {ips}."
-        }
+        },
+        "forensicIntelligence": "INTELLIGENZA FORENSE",
+        "recentDossiers": "Ultime Investigazioni",
+        "loadingDossiers": "Caricamento archivio...",
+        "errorLoadingDossiers": "Errore caricamento archivio",
+        "archive": "ARCHIVIO"
     },
     "attacks": {
         "title": "Attacchi",
@@ -408,7 +431,8 @@
         "attacks": "Attacchi",
         "logs": "Log Richieste",
         "configuration": "Configurazione",
-        "settings": "Impostazioni"
+        "settings": "Impostazioni",
+        "archive": "Archivio Investigativo"
     },
     "config": {
         "title": "Configurazione Honeypot",

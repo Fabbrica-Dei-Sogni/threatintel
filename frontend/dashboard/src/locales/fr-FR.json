@@ -47,8 +47,8 @@
         "copied": "Copié",
         "copyComment": "Copier le commentaire",
         "generateReport": "Générer un dossier",
-        "downloadPdf": "DOWNLOAD PDF",
-        "viewHtml": "Voir le HTML",
+        "downloadPdf": "TÉLÉCHARGER LE PDF",
+        "viewHtml": "VOIR LE HTML",
         "preview": "Aperçu",
         "addedToDossier": "Ajouté au dossier personnalisé",
         "dossier": "Dossier personnalisé",
@@ -59,7 +59,25 @@
         "previewDossier": "Aperçu du dossier",
         "recordingActive": "ENREGISTREMENT ACTIF",
         "noSectionsCaptured": "Aucune section capturée",
-        "sectionsCaptured": "{count} sections capturées"
+        "sectionsCaptured": "{count} sections capturées",
+        "investigations": "Investigations",
+        "searchByTitleOrIp": "Chercher par titre ou IP...",
+        "allStatus": "Tous les statuts",
+        "noDossiersFound": "Aucun dossier trouvé dans l'archive.",
+        "sections": "Sections",
+        "exporting": "Exportation en cours...",
+        "errorLoadingDossiers": "Erreur lors du chargement des dossiers",
+        "errorExporting": "Erreur lors de l'exportation",
+        "confirmDeleteDossier": "Êtes-vous sûr de vouloir supprimer définitivement cette investigation?",
+        "dossierDeleted": "Investigation supprimée.",
+        "noDescription": "Aucune description fournie.",
+        "view": "Voir",
+        "dossierStyleAdmin": "ADMINISTRATIF FORMEL",
+        "dossierStyleTactical": "HUD TACTIQUE",
+        "dossierStyleForensic": "TÉLEX FORENSIQUE",
+        "dossierPreviewTitle": "APERÇU DU DOSSIER D'INVESTIGATION",
+        "dossierFormatA4": "FORMAT : A4 (ISO 216)",
+        "dossierZoom": "ZOOM"
     },
     "auth": {
         "login": "Connexion",
@@ -103,7 +121,12 @@
             "rootDirectory": "point d'entrée principal",
             "lastAttacks": "Détections Récentes : Incursions identifiées à partir des IP {ips} lors delle ultime sessioni.",
             "lastSessions": "Activité Honeypot : Nouvelles tentatives d'accès enregistrées depuis {ips}."
-        }
+        },
+        "forensicIntelligence": "INTELLIGENCE FORENSIC",
+        "recentDossiers": "Enquêtes Récentes",
+        "loadingDossiers": "Chargement de l'archive...",
+        "errorLoadingDossiers": "Erreur lors du chargement de l'archive",
+        "archive": "ARCHIVER"
     },
     "attacks": {
         "title": "Attaques",
@@ -408,7 +431,8 @@
         "attacks": "Attaques",
         "logs": "Journaux de requêtes",
         "configuration": "Configuration",
-        "settings": "Paramètres"
+        "settings": "Paramètres",
+        "archive": "Archive d'investigation"
     },
     "config": {
         "title": "Configuration Honeypot",
@@ -590,7 +614,7 @@
             "-------------------------------"
         ],
         "generic": "{text}",
-        "attackSummary": "RIEPILOGO ATTACCO:\nIP: {ip}\nPericolo: {dangerLevel} ({dangerScore})\nLogs: {totaleLogs}\nDurata: {duration}\nRPS: {rps}",
-        "attackTechnique": "Tecnica Rilevata: {tech}"
+        "attackSummary": "RÉSUMÉ DE L'ATTAQUE :\nIP: {ip}\nDanger: {dangerLevel} ({dangerScore})\nLogs: {totaleLogs}\nDurée: {duration}\nRPS: {rps}",
+        "attackTechnique": "Technique Détectée: {tech}"
     }
 }

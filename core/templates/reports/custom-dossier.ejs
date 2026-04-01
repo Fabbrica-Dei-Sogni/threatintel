@@ -167,11 +167,11 @@
                 </div>
             </div>
             <div class="header-right">
-                <div class="security-stamp">INTERNAL RECIPIENT ONLY</div>
+                <div class="security-stamp"><%= t('reports.common.internalUseOnly').toUpperCase() %></div>
                 <div class="dossier-info">
-                    ID: CUSTOM-<%= new Date().getTime() %><br>
-                    DATE: <%= new Date().toLocaleString(locale) %><br>
-                    LOCALE: <%= locale %>
+                    <%= t('reports.common.id').toUpperCase() %>: CUSTOM-<%= new Date().getTime() %><br>
+                    <%= t('reports.common.date').toUpperCase() %>: <%= new Date().toLocaleString(locale) %><br>
+                    <%= t('reports.common.locale').toUpperCase() %>: <%= locale %>
                 </div>
             </div>
         </div>
@@ -183,9 +183,9 @@
                     <div class="section-card">
                         <div class="section-header">
                             <span class="section-title">
-                                [SECTION #<%= index + 1 %>] <%= section.type.toUpperCase() %> ANALYSIS
+                                [SECTION #<%= index + 1 %>] <%= section.type.toUpperCase() %> <%= t('reports.common.analysis').toUpperCase() %>
                             </span>
-                            <span class="section-timestamp">CAPTURED AT: <%= section.timestamp ? new Date(section.timestamp).toLocaleTimeString() : 'N/A' %></span>
+                            <span class="section-timestamp"><%= t('reports.common.capturedAt').toUpperCase() %>: <%= section.timestamp ? new Date(section.timestamp).toLocaleTimeString() : t('reports.common.notAvailable') %></span>
                         </div>
                         <div class="section-body">
                             <div class="blueprint-container">
@@ -195,7 +195,7 @@
                     </div>
                 <% }); %>
             <% } else { %>
-                <p>Nessun dato catturato in questo dossier.</p>
+                <p><%= t('reports.common.noDataCaptured') %></p>
             <% } %>
         </div>
 

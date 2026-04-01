@@ -325,3 +325,85 @@ export async function fetchCustomReport(payload: any, format: string = 'pdf', st
         throw error;
     }
 }
+
+// ==========================
+// DOSSIER (PERSISTENCE) API
+// ==========================
+
+export async function fetchDossiers(params: any = {}): Promise<any> {
+    try {
+        const response = await apiClient.get('/dossiers', { params });
+        return response.data;
+    } catch (error) {
+        console.error('[fetchDossiers] Error:', error);
+        throw error;
+    }
+}
+
+export async function fetchDossierById(id: string): Promise<any> {
+    try {
+        const response = await apiClient.get(`/dossiers/${id}`);
+        return response.data;
+    } catch (error) {
+        console.error('[fetchDossierById] Error:', error);
+        throw error;
+    }
+}
+
+export async function saveDossier(payload: any): Promise<any> {
+    try {
+        const response = await apiClient.post('/dossiers', payload);
+        return response.data;
+    } catch (error) {
+        console.error('[saveDossier] Error:', error);
+        throw error;
+    }
+}
+
+export async function updateDossier(id: string, payload: any): Promise<any> {
+    try {
+        const response = await apiClient.patch(`/dossiers/${id}`, payload);
+        return response.data;
+    } catch (error) {
+        console.error('[updateDossier] Error:', error);
+        throw error;
+    }
+}
+
+export async function deleteDossier(id: string): Promise<any> {
+    try {
+        const response = await apiClient.delete(`/dossiers/${id}`);
+        return response.data;
+    } catch (error) {
+        console.error('[deleteDossier] Error:', error);
+        throw error;
+    }
+}
+
+/**
+ * Esporta un dossier salvato in formato PDF o HTML
+ */
+export async function exportDossier(id: string, format: string = 'pdf', style: string = 'classic', locale: string = 'it-IT'): Promise<any> {
+    try {
+        const response = await apiClient.get(`/dossiers/${id}/export`, {
+            params: { format, style, locale },
+            responseType: format === 'pdf' ? 'blob' : 'text'
+        });
+
+        if (format === 'pdf') {
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `dossier_${id}_${new Date().getTime()}.pdf`);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            return null;
+        }
+
+        return response.data;
+    } catch (error) {
+        console.error('[exportDossier] Error:', error);
+        throw error;
+    }
+}

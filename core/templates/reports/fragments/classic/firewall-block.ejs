@@ -1,23 +1,23 @@
 <div class="classic-section firewall-log-formal">
     <div class="formal-header-bar">
         <span class="formal-title"><%= t('reports.fragments.firewallBlockTitle').toUpperCase() %></span>
-        <span class="formal-id">LOG-ID: FW-<%= Math.floor(Math.random() * 1000000) %></span>
+        <span class="formal-id"><%= t('reports.fragments.classic.logId') %>: FW-<%= Math.floor(Math.random() * 1000000) %></span>
     </div>
 
     <table class="formal-data-grid">
         <tr>
-            <th width="30%">EVENT</th>
+            <th width="30%"><%= t('reports.fragments.classic.event') %></th>
             <td><span class="classic-danger-val"><%= data.event || 'N/A' %></span></td>
         </tr>
         <tr>
-            <th>SOURCE</th>
+            <th><%= t('reports.fragments.classic.source') %></th>
             <td><strong><%= data.source || 'N/A' %></strong></td>
         </tr>
         <tr>
-            <th>METRICS</th>
+            <th><%= t('reports.fragments.classic.metrics') %></th>
             <td>
                 TTL: <%= data.ttl || 'N/A' %> | 
-                LENTH: <%= data.length || 'N/A' %> | 
+                LENGTH: <%= data.length || 'N/A' %> | 
                 TOS: <%= data.tos || 'N/A' %>
             </td>
         </tr>

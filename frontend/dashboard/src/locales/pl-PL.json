@@ -47,8 +47,8 @@
         "copied": "Skopiowano",
         "copyComment": "Kopiuj komentarz",
         "generateReport": "Generuj dossier",
-        "downloadPdf": "DOWNLOAD PDF",
-        "viewHtml": "Zobacz HTML",
+        "downloadPdf": "POBIERZ PDF",
+        "viewHtml": "ZOBACZ HTML",
         "preview": "Podgląd",
         "addedToDossier": "Dodano do własnego dossier",
         "dossier": "Własne dossier",
@@ -59,7 +59,25 @@
         "previewDossier": "Podgląd dossier",
         "recordingActive": "NAGRYWANIE AKTYWNE",
         "noSectionsCaptured": "Nie uchwycono żadnych sekcji",
-        "sectionsCaptured": "Uchwycono {count} sekcji"
+        "sectionsCaptured": "Uchwycono {count} sekcji",
+        "investigations": "Dochodzenia",
+        "searchByTitleOrIp": "Szukaj po tytule lub IP...",
+        "allStatus": "Wszystkie statusy",
+        "noDossiersFound": "Nie znaleziono dossier w archiwum.",
+        "sections": "Sekcje",
+        "exporting": "Eksportowanie...",
+        "errorLoadingDossiers": "Błąd ładowania dossier",
+        "errorExporting": "Błąd podczas eksportu",
+        "confirmDeleteDossier": "Czy na pewno chcesz trwale usunąć to dochodzenie?",
+        "dossierDeleted": "Dochodzenie usunięte.",
+        "noDescription": "Brak opisu.",
+        "view": "Widok",
+        "dossierStyleAdmin": "FORMALNE ADMINISTRACYJNE",
+        "dossierStyleTactical": "HUD TAKTYCZNY",
+        "dossierStyleForensic": "TELEX ŚLEDCZY",
+        "dossierPreviewTitle": "PODGLĄD DOSSIER ŚLEDCZEGO",
+        "dossierFormatA4": "FORMAT: A4 (ISO 216)",
+        "dossierZoom": "POWIĘKSZENIE (ZOOM)"
     },
     "auth": {
         "login": "Zaloguj się",
@@ -103,7 +121,12 @@
             "rootDirectory": "główny punkt wejścia",
             "lastAttacks": "Ostatnie Wykrycia: Incursje zidentyfikowane z adresów IP {ips} w ostatnich sesjach.",
             "lastSessions": "Aktywność Honeypot: Zarejestrowano nowe próby dostępu z {ips}."
-        }
+        },
+        "forensicIntelligence": "INTELIGENCJA ŚLEDCZA",
+        "recentDossiers": "Ostatnie Dochodzenia",
+        "loadingDossiers": "Ładowanie archiwum...",
+        "errorLoadingDossiers": "Błąd ładowania archiwum",
+        "archive": "ARCHIWUM"
     },
     "attacks": {
         "title": "Ataki",
@@ -408,7 +431,8 @@
         "attacks": "Ataki",
         "logs": "Dzienniki żądań",
         "configuration": "Konfiguracja",
-        "settings": "Ustawienia"
+        "settings": "Ustawienia",
+        "archive": "Archiwum śledcze"
     },
     "config": {
         "title": "Konfiguracja Honeypota",
@@ -590,7 +614,7 @@
             "-------------------------------"
         ],
         "generic": "{text}",
-        "attackSummary": "RIEPILOGO ATTACCO:\nIP: {ip}\nPericolo: {dangerLevel} ({dangerScore})\nLogs: {totaleLogs}\nDurata: {duration}\nRPS: {rps}",
-        "attackTechnique": "Tecnica Rilevata: {tech}"
+        "attackSummary": "PODSUMOWANIE ATAKU:\nIP: {ip}\nZagrożenie: {dangerLevel} ({dangerScore})\nLogi: {totaleLogs}\nCzas trwania: {duration}\nRPS: {rps}",
+        "attackTechnique": "Wykryta technika: {tech}"
     }
 }

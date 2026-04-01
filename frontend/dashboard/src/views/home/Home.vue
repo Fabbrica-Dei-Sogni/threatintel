@@ -199,6 +199,57 @@
           </div>
         </transition>
       </div>
+
+      <!-- DOMINIO: FORENSIC INTELLIGENCE -->
+      <div class="domain-section" style="margin-top: 40px;">
+        <h2 class="domain-title" @click="toggles.forensic = !toggles.forensic">
+          <div class="title-content">
+            <span class="icon">📁</span> {{ t('home.forensicIntelligence') }}
+          </div>
+          <span class="arrow" :class="{ open: toggles.forensic }"></span>
+        </h2>
+
+        <transition name="collapse">
+          <div v-if="toggles.forensic">
+            <section class="actions">
+              <button @click="goToArchive" class="btn-action">📟 {{ t('home.archive') }}</button>
+            </section>
+
+            <div class="primary-intel">
+              <div class="list-side glass-card full-width-widget">
+                <div class="widget-header clickable-header" @click="toggles.recentDossiers = !toggles.recentDossiers">
+                  <div class="title-content">
+                    <h3>{{ $t('home.recentDossiers').toUpperCase() }}</h3>
+                  </div>
+                  <span class="arrow" :class="{ open: toggles.recentDossiers }"></span>
+                </div>
+                <transition name="collapse">
+                  <div v-if="toggles.recentDossiers">
+                    <ul class="scroll-list">
+                      <li v-for="dossier in recentDossiers" :key="dossier._id" class="dossier-item">
+                        <div class="indicator-group" :data-url-tooltip="`Dossier: ${dossier.title}\nID: ${dossier._id}`">
+                           <span class="status-dot-mini" :class="dossier.status.toLowerCase()"></span>
+                        </div>
+                        <span class="dossier-title-link" @click="router.push(`/dossiers/${dossier._id}`)">{{ dossier.title }}</span>
+                        <div class="column-spacer"></div>
+                        <div class="dossier-info">
+                           <span class="badge-mini">{{ dossier.sections?.length || 0 }} {{ t('common.sections') }}</span>
+                           <span class="timestamp-mini">{{ formatDate(dossier.createdAt) }}</span>
+                        </div>
+                      </li>
+                      <li v-if="recentDossiers.length === 0 && !loadingDossiers" class="no-data">
+                        {{ $t('common.noDataFound') }}
+                      </li>
+                    </ul>
+                    <div v-if="loadingDossiers" class="loading">{{ $t('home.loadingDossiers') }}</div>
+                    <div v-if="errorDossiers" class="error">{{ $t('home.errorLoadingDossiers') }}</div>
+                  </div>
+                </transition>
+              </div>
+            </div>
+          </div>
+        </transition>
+      </div>
     </section>
 
   </div>
@@ -212,6 +263,7 @@ import { useCowrieSessions } from '../../composable/useCowrieSessions';
 import { useRouter } from 'vue-router'
 import { computed, onMounted, watch, ref, reactive } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { fetchDossiers } from '../../api';
 import dayjs from 'dayjs';
 import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
 import CountryFlag from '../../components/CountryFlag.vue';
@@ -230,7 +282,9 @@ const toggles = reactive({
   recentLogs: false,
   honeypot: true,
   recentSessions: true,
-  sessionsMap: false
+  sessionsMap: false,
+  forensic: true,
+  recentDossiers: true
 });
 
 const showTicker = ref(true);
@@ -250,6 +304,10 @@ function goToLogs() {
 }
 function goToTelnet() {
   router.push('/telnet-sessions')
+}
+
+function goToArchive() {
+  router.push('/dossiers')
 }
 
 function goToIpDetails(ip) {
@@ -305,6 +363,25 @@ const recentSessionsNormalized = computed(() => recentSessions.value.map(s => ({
   firstSeen: s.starttime
 })));
 
+// Dossier - ultimi 5
+const recentDossiers = ref([]);
+const loadingDossiers = ref(false);
+const errorDossiers = ref(false);
+
+const fetchRecentDossiers = async () => {
+  loadingDossiers.value = true;
+  errorDossiers.value = false;
+  try {
+    const response = await fetchDossiers({ page: 1, pageSize: 5 });
+    recentDossiers.value = response.items || [];
+  } catch (error) {
+    console.error('Error loading recent dossiers:', error);
+    errorDossiers.value = true;
+  } finally {
+    loadingDossiers.value = false;
+  }
+};
+
 import { useProfileStore } from '../../stores/profiles';
 
 const profileStore = useProfileStore();
@@ -314,6 +391,7 @@ const loadAll = () => {
   fetchAttacks();
   fetchLogs();
   fetchSessions();
+  fetchRecentDossiers();
 };
 
 onMounted(loadAll);

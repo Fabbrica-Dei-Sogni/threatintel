@@ -15,19 +15,19 @@
         <% } %>
         <% if (data.username || data.password) { %>
             <div class="log-row">
-                <strong>CREDENTIALS:</strong> 
+                <strong><%= t('reports.fragments.classic.credentials') %>:</strong> 
                 <span class="indicator-text"><%= data.username || '-' %> / <%= data.password || '-' %></span>
             </div>
         <% } %>
         <% if (data.input) { %>
             <div class="log-row">
-                <strong>INPUT:</strong> 
+                <strong><%= t('reports.fragments.classic.input') %>:</strong> 
                 <span style="font-family: var(--font-mono); color: var(--danger); font-weight: 800;"><%= data.input %></span>
             </div>
         <% } %>
         <% if (data.message && !data.details) { %>
             <div class="log-row">
-                <strong>MESSAGE:</strong> <%= data.message %>
+                <strong><%= t('reports.fragments.classic.message') %>:</strong> <%= data.message %>
             </div>
         <% } %>
     </div>

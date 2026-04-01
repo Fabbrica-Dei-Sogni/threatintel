@@ -103,6 +103,8 @@ const routes: RouteRecordRaw[] = [
         }),
     },
     { path: '/telnet-attack-detail/:id', name: 'CowrieAttackDetail', component: CowrieAttackDetail },
+    { path: '/dossiers', name: 'Dossiers', component: () => import('../views/dossiers/Dossiers.vue') },
+    { path: '/dossiers/:id', name: 'DossierDetail', component: () => import('../views/dossiers/DossierDetail.vue'), props: true },
 ];
 
 const router = createRouter({

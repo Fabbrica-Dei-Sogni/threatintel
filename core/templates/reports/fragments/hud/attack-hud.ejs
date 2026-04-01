@@ -1,32 +1,32 @@
 <div class="hud-item attack-hud-box">
     <div class="hud-box-header">
-        <span class="hud-box-title">TACTICAL HUD: ATTACK SUMMARY</span>
-        <span class="hud-box-subtitle">IP: <%= data.ip %></span>
+        <span class="hud-box-title"><%= t('reports.fragments.hud.attackSummaryTitle') %></span>
+        <span class="hud-box-subtitle"><%= t('reports.common.targetIp') %>: <%= data.ip %></span>
     </div>
     <div class="hud-grid-4">
         <div class="hud-metric danger-<%= data.defcon %>">
-            <span class="hud-metric-label">DEFCON</span>
+            <span class="hud-metric-label"><%= t('reports.fragments.hud.defcon') %></span>
             <span class="hud-metric-value"><%= data.defcon %></span>
         </div>
         <div class="hud-metric">
-            <span class="hud-metric-label">SCORE</span>
+            <span class="hud-metric-label"><%= t('reports.fragments.hud.score') %></span>
             <span class="hud-metric-value"><%= (data.score || 0).toFixed(2) %></span>
         </div>
         <div class="hud-metric">
-            <span class="hud-metric-label">LOGS</span>
+            <span class="hud-metric-label"><%= t('reports.fragments.hud.logs') %></span>
             <span class="hud-metric-value"><%= data.totalLogs %></span>
         </div>
         <div class="hud-metric">
-            <span class="hud-metric-label">INTENSITY</span>
+            <span class="hud-metric-label"><%= t('reports.fragments.hud.intensity') %></span>
             <span class="hud-metric-value"><%= data.intensity %></span>
         </div>
     </div>
     <div class="hud-footer-details">
         <div class="hud-tech-tags">
-            <strong>DETECTED TECHNIQUES:</strong> <%= data.techniques %>
+            <strong><%= t('reports.fragments.hud.detectedTechniques') %>:</strong> <%= data.techniques %>
         </div>
         <div class="hud-timeline-brief">
-            <strong>WINDOW:</strong> <%= data.firstSeen %> — <%= data.lastSeen %>
+            <strong><%= t('reports.fragments.hud.window') %>:</strong> <%= data.firstSeen %> — <%= data.lastSeen %>
         </div>
     </div>
 </div>

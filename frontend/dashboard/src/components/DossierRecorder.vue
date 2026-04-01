@@ -49,8 +49,13 @@
               <span v-else class="icon">📄</span> 
               <span class="btn-text h-900">{{ t('common.downloadPdf') }}</span>
             </button>
+            <button class="btn-tool save" @click="handleSave" :disabled="dossierStore.isSaving" title="Salva nel Database">
+               <span v-if="dossierStore.isSaving" class="spinner-tiny"></span>
+              <span v-else class="icon">💾</span> 
+              <span class="btn-text h-900">{{ t('common.save').toUpperCase() }}</span>
+            </button>
             <button class="btn-tool reset" @click="confirmReset" :title="t('common.clearDossier')">
-              <span class="icon">🗑️</span>
+               <span class="icon">🗑️</span>
             </button>
           </template>
         </div>
@@ -97,6 +102,7 @@ import { useDossierStore } from '../stores/dossier';
 import { useI18n } from 'vue-i18n';
 import { ElMessageBox, ElMessage } from 'element-plus';
 import { fetchCustomReport } from '../api';
+import dayjs from 'dayjs';
 
 const dossierStore = useDossierStore();
 const { t, locale } = useI18n();
@@ -180,6 +186,46 @@ const generateCustomReport = async (format, style = 'telex') => {
   } finally {
     loadingHtml.value = false;
     loadingPdf.value = false;
+  }
+};
+
+const handleSave = async () => {
+  if (dossierStore.sections.length === 0) return;
+  
+  try {
+    // Genera un titolo smart di default
+    const now = dayjs().format('YYYY-MM-DD HH:mm');
+    let subject = 'Intelligence';
+    const firstSection = dossierStore.sections[0];
+    
+    if (firstSection) {
+      if (firstSection.type === 'ip') subject = firstSection.data.ip || subject;
+      else if (firstSection.type === 'attack') subject = firstSection.data.attacker || firstSection.data.id || subject;
+      else if (firstSection.type === 'telnet') subject = firstSection.data.ip || subject;
+    }
+
+    const defaultTitle = `Dossier ${subject} - ${now}`;
+
+    const { value: title } = await ElMessageBox.prompt(
+      'Inserisci un titolo per questa investigazione', 
+      'Salva Dossier', 
+      {
+        confirmButtonText: 'Salva',
+        cancelButtonText: 'Annulla',
+        inputValue: defaultTitle,
+        inputPlaceholder: 'Es: Analisi Botnet March 2024',
+        inputValidator: (val) => val ? true : 'Il titolo è obbligatorio'
+      }
+    );
+
+    if (title) {
+      await dossierStore.persistToDb(title);
+      ElMessage.success('Dossier salvato correttamente nell\'archivio.');
+    }
+  } catch (error) {
+    if (error !== 'cancel') {
+      ElMessage.error('Errore durante il salvataggio.');
+    }
   }
 };
 
@@ -306,6 +352,18 @@ onUnmounted(() => window.removeEventListener('resize', updateScale));
   background: rgba(16, 185, 129, 0.15);
   color: #fff;
   border-color: #10b981;
+}
+
+.btn-tool.save {
+  background: rgba(59, 130, 246, 0.1);
+  color: #60a5fa;
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+.btn-tool.save:hover:not(:disabled) {
+  background: rgba(59, 130, 246, 0.2);
+  color: #fff;
+  border-color: #3b82f6;
 }
 
 .btn-tool.reset:hover { border-color: #ef4444; color: #f87171; background: rgba(239, 68, 68, 0.1); }

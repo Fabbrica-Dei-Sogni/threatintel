@@ -1,9 +1,9 @@
 <div class="classic-item ip-info-classic">
     <div class="classic-header-block">
-        <div class="classic-badge-formal">SUBJECT IDENTIFIED</div>
+        <div class="classic-badge-formal"><%= t('reports.fragments.classic.subjectIdentified').toUpperCase() %></div>
         <div class="classic-ip-formal"><%= data.ip %></div>
     </div>
     <div class="classic-meta-info">
-        <p>IDENTITÀ SOGGETTO RIVELATA - PROTOCOLLO FORENSE [<%= locale.toUpperCase() %>]</p>
+        <p><%= t('reports.fragments.classic.subjectIdentityRevealed', { locale: locale.toUpperCase() }) %></p>
     </div>
 </div>

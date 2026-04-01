@@ -47,8 +47,8 @@
         "copied": "Kopiert",
         "copyComment": "Kommentar kopieren",
         "generateReport": "Dossier erstellen",
-        "downloadPdf": "DOWNLOAD PDF",
-        "viewHtml": "HTML anzeigen",
+        "downloadPdf": "PDF HERUNTERLADEN",
+        "viewHtml": "HTML ANZEIGEN",
         "preview": "Vorschau",
         "addedToDossier": "Zum benutzerdefinierten Dossier hinzugefügt",
         "dossier": "Benutzerdefiniertes Dossier",
@@ -59,7 +59,25 @@
         "previewDossier": "Dossier-Vorschau",
         "recordingActive": "AUFNAHME AKTIV",
         "noSectionsCaptured": "Keine Abschnitte erfasst",
-        "sectionsCaptured": "{count} Abschnitte erfasst"
+        "sectionsCaptured": "{count} Abschnitte erfasst",
+        "investigations": "Untersuchungen",
+        "searchByTitleOrIp": "Suche nach Titel oder IP...",
+        "allStatus": "Alle Status",
+        "noDossiersFound": "Keine Dossiers im Archiv gefunden.",
+        "sections": "Abschnitte",
+        "exporting": "Exportieren...",
+        "errorLoadingDossiers": "Fehler beim Laden der Dossiers",
+        "errorExporting": "Fehler beim Exportieren",
+        "confirmDeleteDossier": "Sind Sie sicher, dass Sie diese Untersuchung dauerhaft löschen möchten?",
+        "dossierDeleted": "Untersuchung gelöscht.",
+        "noDescription": "Keine Beschreibung angegeben.",
+        "view": "Ansicht",
+        "dossierStyleAdmin": "FORMALE VERWALTUNG",
+        "dossierStyleTactical": "TAKTIK-HUD",
+        "dossierStyleForensic": "FORENSISCHER TELEX",
+        "dossierPreviewTitle": "VORSCHAU DER INVESTIGATIVEN DOSSIERS",
+        "dossierFormatA4": "FORMAT: A4 (ISO 216)",
+        "dossierZoom": "ZOOM"
     },
     "auth": {
         "login": "Anmelden",
@@ -103,7 +121,12 @@
             "rootDirectory": "Haupteinstiegspunkt",
             "lastAttacks": "Aktuelle Erkennungen: In den letzten Sitzungen identifizierte Übergriffe von den IPs {ips}.",
             "lastSessions": "Honeypot-Aktivität: Neue Zugriffsversuche von {ips} registriert."
-        }
+        },
+        "forensicIntelligence": "FORENSISCHE INTELLIGENZ",
+        "recentDossiers": "Neueste Untersuchungen",
+        "loadingDossiers": "Archiv wird geladen...",
+        "errorLoadingDossiers": "Fehler beim Laden des Archivs",
+        "archive": "ARCHIV"
     },
     "attacks": {
         "title": "Angriffe",
@@ -408,7 +431,8 @@
         "attacks": "Angriffe",
         "logs": "Protokoll-Anfragen",
         "configuration": "Konfiguration",
-        "settings": "Einstellungen"
+        "settings": "Einstellungen",
+        "archive": "Investigatives Archiv"
     },
     "config": {
         "title": "Honeypot-Konfiguration",
@@ -590,7 +614,7 @@
             "-------------------------------"
         ],
         "generic": "{text}",
-        "attackSummary": "RIEPILOGO ATTACCO:\nIP: {ip}\nPericolo: {dangerLevel} ({dangerScore})\nLogs: {totaleLogs}\nDurata: {duration}\nRPS: {rps}",
-        "attackTechnique": "Tecnica Rilevata: {tech}"
+        "attackSummary": "ANGRIFFSZUSAMMENFASSUNG:\nIP: {ip}\nGefahr: {dangerLevel} ({dangerScore})\nLogs: {totaleLogs}\nDauer: {duration}\nRPS: {rps}",
+        "attackTechnique": "Erkannte Technik: {tech}"
     }
 }

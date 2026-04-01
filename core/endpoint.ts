@@ -18,6 +18,9 @@ import { RateLimitController } from "./controllers/RateLimitController";
 import { ManageLimitController } from "./controllers/ManageLimitController";
 import { FakeLoginController } from "./controllers/FakeLoginController";
 import { ReportController } from "./controllers/ReportController";
+import { DossierController } from "./controllers/DossierController";
+import dossierroutes from './apis/dossierroutes';
+
 
 // Instantiate controllers via DI container
 const threatController = getComponent(ThreatController);
@@ -27,6 +30,8 @@ const manageLimitController = getComponent(ManageLimitController);
 const fakeLoginController = getComponent(FakeLoginController);
 const cowrieController = getComponent(CowrieController);
 const reportController = getComponent(ReportController);
+const dossierController = getComponent(DossierController);
+
 
 const threatLogger = getComponent(ThreatLogger);
 import { RateLimitMiddleware } from "./rateLimitMiddleware";
@@ -54,10 +59,15 @@ router.use('/', configroutes(configController));
 import cowrieroutes from './apis/cowrieroutes';
 router.use('/', cowrieroutes(logger, cowrieController));
 
-// API Honeypot Trap e Fake Login
-router.use('/', routes(logger, fakeLoginController, rateLimitMiddleware));
+// API Dossier (Persistenza investigazioni)
+router.use('/', dossierroutes(dossierController));
 
 // API Gestione Limiti (Blacklist manuale)
 router.use('/', managelimitroutes(manageLimitController));
+
+//XXX: ogni nuova api da importare definirlo prima di questa istruzione
+// API Honeypot Trap e Fake Login
+router.use('/', routes(logger, fakeLoginController, rateLimitMiddleware));
+
 
 export default router;

@@ -47,7 +47,7 @@
         "copied": "Скопировано",
         "copyComment": "Копировать комментарий",
         "generateReport": "Создать досье",
-        "downloadPdf": "DOWNLOAD PDF",
+        "downloadPdf": "Скачать PDF",
         "viewHtml": "Просмотреть HTML",
         "preview": "Предпросмотр",
         "addedToDossier": "Добавлено в пользовательское досье",
@@ -59,7 +59,25 @@
         "previewDossier": "Предпросмотр досье",
         "recordingActive": "ЗАПИСЬ АКТИВНА",
         "noSectionsCaptured": "Разделы не захвачены",
-        "sectionsCaptured": "Захвачено разделов: {count}"
+        "sectionsCaptured": "Захвачено разделов: {count}",
+        "investigations": "Расследования",
+        "searchByTitleOrIp": "Поиск по названию или IP...",
+        "allStatus": "Все статусы",
+        "noDossiersFound": "Досье в архиве не найдены.",
+        "sections": "Секции",
+        "exporting": "Экспорт...",
+        "errorLoadingDossiers": "Ошибка загрузки досье",
+        "errorExporting": "Ошибка при экспорте",
+        "confirmDeleteDossier": "Вы уверены, что хотите навсегда удалить это расследование?",
+        "dossierDeleted": "Расследование удалено.",
+        "noDescription": "Описание отсутствует.",
+        "view": "Просмотр",
+        "dossierStyleAdmin": "АДМИНИСТРАТИВНЫЙ ФОРМАЛЬНЫЙ",
+        "dossierStyleTactical": "ТАКТИЧЕСКИЙ HUD",
+        "dossierStyleForensic": "СУДЕБНЫЙ ТЕЛЕКС",
+        "dossierPreviewTitle": "ПРЕДВАРИТЕЛЬНЫЙ ПРОСМОТР СЛЕДСТВЕННОГО ДОСЬЕ",
+        "dossierFormatA4": "ФОРМАТ: A4 (ISO 216)",
+        "dossierZoom": "МАСШТАБ"
     },
     "auth": {
         "login": "Войти",
@@ -103,7 +121,12 @@
             "rootDirectory": "основная точка входа",
             "lastAttacks": "Последние обнаружения: Вторжения, выявленные с IP {ips} в последних сеансах.",
             "lastSessions": "Активность Honeypot: Зафиксированы новые попытки доступа с {ips}."
-        }
+        },
+        "forensicIntelligence": "СЛЕДСТВЕННАЯ РАЗВЕДКА",
+        "recentDossiers": "Последние расследования",
+        "loadingDossiers": "Загрузка архива...",
+        "errorLoadingDossiers": "Ошибка загрузки архива",
+        "archive": "АРХИВ"
     },
     "attacks": {
         "title": "Атаки",
@@ -408,7 +431,8 @@
         "attacks": "Атаки",
         "logs": "Журналы запросов",
         "configuration": "Конфигурация",
-        "settings": "Настройки"
+        "settings": "Настройки",
+        "archive": "Следственный архив"
     },
     "config": {
         "title": "Конфигурация Honeypot",
@@ -590,7 +614,7 @@
             "-------------------------------"
         ],
         "generic": "{text}",
-        "attackSummary": "RIEPILOGO ATTACCO:\nIP: {ip}\nPericolo: {dangerLevel} ({dangerScore})\nLogs: {totaleLogs}\nDurata: {duration}\nRPS: {rps}",
-        "attackTechnique": "Tecnica Rilevata: {tech}"
+        "attackSummary": "СВОДКА АТАКИ:\nIP: {ip}\nОпасность: {dangerLevel} ({dangerScore})\nЛоги: {totaleLogs}\nДлительность: {duration}\nRPS: {rps}",
+        "attackTechnique": "Обнаруженная техника: {tech}"
     }
 }

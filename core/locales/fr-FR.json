@@ -217,7 +217,15 @@
                 "tag": "TAG",
                 "indicators": "INDICATEURS",
                 "userAgent": "USER AGENT",
-                "rawPayload": "CHARGE UTILE BRUTE"
+                "rawPayload": "CHARGE UTILE BRUTE",
+                "rateBreachTitle": "TACTICAL HUD : DÉTAIL DE LA VIOLATION DU TAUX",
+                "limitType": "TYPE DE LIMITE",
+                "ip": "IP CIBLE",
+                "method": "MÉTHODE",
+                "path": "CHEMIN",
+                "honeypotId": "ID HONEYPOT",
+                "timestamp": "HORODATAGE",
+                "message": "MESSAGE D'ERREUR"
             }
         }
     },

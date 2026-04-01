@@ -60,6 +60,17 @@ export interface IAttackLogSectionData extends IIpSectionData {
   payload: string;
 }
 
+export interface IRateBreachSectionData extends IBaseSectionData {
+  timestamp: string;
+  ip: string;
+  limitType: string;
+  path: string;
+  method: string;
+  userAgent: string;
+  honeypotId: string;
+  message: string;
+}
+
 export interface ITelnetSummarySectionData extends IIpSectionData {
   sessionId: string;
   timeWindow: string;

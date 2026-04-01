@@ -1,0 +1,41 @@
+<div class="classic-item rate-breach-classic">
+    <div class="classic-section-title">
+        <span class="classic-icon">⚡</span>
+        <%= t('reports.fragments.classic.rateBreachTitle').toUpperCase() %>
+    </div>
+    
+    <table class="classic-data-table" style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+        <tr>
+            <th width="30%" style="text-align: left; padding: 6px 10px; border: 1px solid var(--border-light); background: var(--accent);"><%= t('reports.fragments.classic.timestamp') %></th>
+            <td style="padding: 6px 10px; border: 1px solid var(--border-light);"><%= data.timestamp %></td>
+        </tr>
+        <tr>
+            <th style="text-align: left; padding: 6px 10px; border: 1px solid var(--border-light); background: var(--accent);"><%= t('reports.fragments.classic.ip') %></th>
+            <td class="bold-value" style="padding: 6px 10px; border: 1px solid var(--border-light); font-weight: 800; color: var(--primary-dark);"><%= data.ip %></td>
+        </tr>
+        <tr>
+            <th style="text-align: left; padding: 6px 10px; border: 1px solid var(--border-light); background: var(--accent);"><%= t('reports.fragments.classic.limitType') %></th>
+            <td style="padding: 6px 10px; border: 1px solid var(--border-light);"><span class="classic-badge-red" style="background: #fee2e2; color: #991b1b; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; text-transform: uppercase;"><%= data.limitType %></span></td>
+        </tr>
+        <tr>
+            <th style="text-align: left; padding: 6px 10px; border: 1px solid var(--border-light); background: var(--accent);"><%= t('reports.fragments.classic.method') %></th>
+            <td class="bold-value" style="padding: 6px 10px; border: 1px solid var(--border-light); font-weight: 800; color: var(--primary-dark);"><%= data.method %></td>
+        </tr>
+        <tr>
+            <th style="text-align: left; padding: 6px 10px; border: 1px solid var(--border-light); background: var(--accent);"><%= t('reports.fragments.classic.path') %></th>
+            <td class="mono-value" style="padding: 6px 10px; border: 1px solid var(--border-light); font-family: var(--font-mono); font-size: 11px;"><%= data.path %></td>
+        </tr>
+        <tr>
+            <th style="text-align: left; padding: 6px 10px; border: 1px solid var(--border-light); background: var(--accent);"><%= t('reports.fragments.classic.userAgent') %></th>
+            <td class="small-text" style="padding: 6px 10px; border: 1px solid var(--border-light); font-size: 9px; color: var(--text-muted);"><%= data.userAgent %></td>
+        </tr>
+        <tr>
+            <th style="text-align: left; padding: 6px 10px; border: 1px solid var(--border-light); background: var(--accent);"><%= t('reports.fragments.classic.honeypotId') %></th>
+            <td style="padding: 6px 10px; border: 1px solid var(--border-light);"><%= data.honeypotId %></td>
+        </tr>
+        <tr>
+            <th style="text-align: left; padding: 6px 10px; border: 1px solid var(--border-light); background: var(--accent);"><%= t('reports.fragments.classic.message') %></th>
+            <td class="error-text" style="padding: 6px 10px; border: 1px solid var(--border-light); color: #dc2626; font-style: italic;"><%= data.message %></td>
+        </tr>
+    </table>
+</div>

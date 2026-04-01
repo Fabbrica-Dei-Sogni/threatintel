@@ -1,0 +1,49 @@
+<div class="hud-item rate-breach-hud" style="border-left-color: #f97316;">
+    <div class="hud-box-header" style="color: #f97316; margin-bottom: 15px;">
+        <span class="hud-box-icon">⚡</span>
+        <span class="hud-box-title" style="font-weight: 900; letter-spacing: 2px;"><%= t('reports.fragments.hud.rateBreachTitle').toUpperCase() %></span>
+    </div>
+    
+    <div class="hud-box-body">
+        <div class="hud-grid-row" style="display: flex; gap: 20px; margin-bottom: 12px;">
+            <div class="hud-grid-col" style="flex: 1;">
+                <span class="hud-label" style="display: block; font-size: 10px; text-transform: uppercase; color: var(--text-slate); margin-bottom: 4px;"><%= t('reports.fragments.hud.timestamp') %></span>
+                <span class="hud-value" style="font-family: var(--mono); color: #fff;"><%= data.timestamp %></span>
+            </div>
+            <div class="hud-grid-col" style="flex: 1;">
+                <span class="hud-label" style="display: block; font-size: 10px; text-transform: uppercase; color: var(--text-slate); margin-bottom: 4px;"><%= t('reports.fragments.hud.ip') %></span>
+                <span class="hud-value" style="font-family: var(--mono); color: var(--text-cyan); font-weight: 900;"><%= data.ip %></span>
+            </div>
+        </div>
+        <div class="hud-grid-row" style="display: flex; gap: 20px; margin-bottom: 12px;">
+            <div class="hud-grid-col" style="flex: 1;">
+                <span class="hud-label" style="display: block; font-size: 10px; text-transform: uppercase; color: var(--text-slate); margin-bottom: 4px;"><%= t('reports.fragments.hud.limitType') %></span>
+                <span class="hud-badge-magma" style="background: linear-gradient(135deg, #ff4d4d, #f97316); color: white; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 900; text-transform: uppercase; display: inline-block;"><%= data.limitType %></span>
+            </div>
+            <div class="hud-grid-col" style="flex: 1;">
+                <span class="hud-label" style="display: block; font-size: 10px; text-transform: uppercase; color: var(--text-slate); margin-bottom: 4px;"><%= t('reports.fragments.hud.method') %></span>
+                <span class="hud-value" style="font-weight: 900; color: var(--text-amber);"><%= data.method %></span>
+            </div>
+        </div>
+        <div class="hud-full-row" style="margin-bottom: 12px;">
+            <span class="hud-label" style="display: block; font-size: 10px; text-transform: uppercase; color: var(--text-slate); margin-bottom: 4px;"><%= t('reports.fragments.hud.path').toUpperCase() %></span>
+            <div class="hud-mono-box" style="background: rgba(0,0,0,0.3); padding: 8px; border: 1px solid var(--border-color); font-family: var(--mono); color: var(--text-emerald); font-size: 12px; border-radius: 4px;"><%= data.path %></div>
+        </div>
+        <div class="hud-full-row" style="margin-bottom: 12px;">
+            <span class="hud-label" style="display: block; font-size: 10px; text-transform: uppercase; color: var(--text-slate); margin-bottom: 4px;"><%= t('reports.fragments.hud.userAgent').toUpperCase() %></span>
+            <div class="hud-text-small" style="font-size: 10px; color: var(--text-slate);"><%= data.userAgent %></div>
+        </div>
+        <div class="hud-grid-row" style="display: flex; gap: 20px; margin-bottom: 12px;">
+            <div class="hud-grid-col" style="flex: 1;">
+                <span class="hud-label" style="display: block; font-size: 10px; text-transform: uppercase; color: var(--text-slate); margin-bottom: 4px;"><%= t('reports.fragments.hud.honeypotId') %></span>
+                <span class="hud-value" style="color: #3b82f6;"><%= data.honeypotId %></span>
+            </div>
+        </div>
+        <% if (data.message && data.message !== '-') { %>
+        <div class="hud-full-row" style="margin-top: 10px;">
+            <span class="hud-label" style="display: block; font-size: 10px; text-transform: uppercase; color: var(--text-slate); margin-bottom: 4px;"><%= t('reports.fragments.hud.message').toUpperCase() %></span>
+            <div class="hud-error-box" style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #ef4444; padding: 10px; font-family: var(--mono); font-size: 11px; border-radius: 4px;"><%= data.message %></div>
+        </div>
+        <% } %>
+    </div>
+</div>

@@ -217,7 +217,15 @@
                 "tag": "TAG",
                 "indicators": "INDIKATOREN",
                 "userAgent": "USER AGENT",
-                "rawPayload": "ROH-PAYLOAD"
+                "rawPayload": "ROH-PAYLOAD",
+                "rateBreachTitle": "TACTICAL HUD: RATE-BREACH-DETAIL",
+                "limitType": "LIMIT-TYP",
+                "ip": "TARGET-IP",
+                "method": "METHODE",
+                "path": "PFAD",
+                "honeypotId": "HONEYPOT-ID",
+                "timestamp": "ZEITSTEMPEL",
+                "message": "FEHLERMELDUNG"
             }
         }
     },

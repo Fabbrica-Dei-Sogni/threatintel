@@ -8,7 +8,7 @@ export interface DossierSection {
     templateKey: string;
     data: any;
     renderedText: string;
-    type: 'ip' | 'attack' | 'telnet' | 'generic';
+    type: 'ip' | 'attack' | 'telnet' | 'rate_breach' | 'generic';
     timestamp: string;
 }
 
@@ -66,6 +66,7 @@ export const useDossierStore = defineStore('dossier', () => {
         // Determiniamo il tipo in base alla chiave del template
         let type: DossierSection['type'] = 'generic';
         if (templateKey.includes('ipDetails')) type = 'ip';
+        else if (templateKey.includes('attackDetail.rateLimitEvent')) type = 'rate_breach';
         else if (templateKey.includes('attackDetail')) type = 'attack';
         else if (templateKey.includes('telnetDetail')) type = 'telnet';
 

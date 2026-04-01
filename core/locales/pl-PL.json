@@ -217,7 +217,15 @@
                 "tag": "TAG",
                 "indicators": "WSKAŹNIKI",
                 "userAgent": "USER AGENT",
-                "rawPayload": "RAW PAYLOAD"
+                "rawPayload": "RAW PAYLOAD",
+                "rateBreachTitle": "TACTICAL HUD: SZCZEGÓŁY NARUSZENIA RATE LIMIT",
+                "limitType": "TYP LIMITU",
+                "ip": "DOCELOWY IP",
+                "method": "METODA",
+                "path": "ŚCIEŻKA",
+                "honeypotId": "ID HONEYPOTA",
+                "timestamp": "ZNACZNIK CZASU",
+                "message": "KOMUNIKAT BŁĘDU"
             }
         }
     },

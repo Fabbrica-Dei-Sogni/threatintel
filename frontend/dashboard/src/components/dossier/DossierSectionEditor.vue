@@ -27,6 +27,7 @@ const editorsMap: Record<string, any> = {
   'clipboard.ipDetails.abuseLog': defineAsyncComponent(() => import('./editors/IpAbuseLogEditor.vue')),
   'clipboard.attackDetail.summary': defineAsyncComponent(() => import('./editors/AttackSummaryEditor.vue')),
   'clipboard.attackDetail.log': defineAsyncComponent(() => import('./editors/AttackLogEditor.vue')),
+  'clipboard.attackDetail.rateLimitEvent': defineAsyncComponent(() => import('./editors/RateBreachEditor.vue')),
   'clipboard.telnetDetail.summary': defineAsyncComponent(() => import('./editors/TelnetSummaryEditor.vue')),
   'clipboard.telnetDetail.timelineRow': defineAsyncComponent(() => import('./editors/TelnetTimelineRowEditor.vue')),
   'clipboard.attackTechnique': defineAsyncComponent(() => import('./editors/AttackTechniqueEditor.vue')),

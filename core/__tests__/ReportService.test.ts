@@ -126,6 +126,39 @@ describe('ReportService', () => {
         expect(ejsArgs.sections[1].renderedText).toBe('SESS: abc');
     });
 
+    it('dovrebbe generare un dossier Classic con sezione Rate Breach mappata correttamente', async () => {
+        const mockSections: IDossierSection[] = [
+            { 
+                templateKey: 'clipboard.attackDetail.rateLimitEvent', 
+                data: { ip: '1.2.3.4', limitType: 'ddos-protection' }, 
+                type: 'rate_breach', 
+                order: 0, 
+                timestamp: new Date() 
+            }
+        ];
+
+        mockI18nService.tm.mockImplementation((key) => {
+            if (key === 'clipboard.attackDetail.rateLimitEvent') return ['IP: {ip}', 'Limit: {limitType}'];
+            return null;
+        });
+
+        (ejs.renderFile as jest.Mock).mockResolvedValue('<html>Classic Dossier Rate Breach</html>');
+
+        await reportService.generateClassicReport(mockSections, 'it-IT', 'html');
+
+        expect(ejs.renderFile).toHaveBeenCalledWith(
+            expect.stringContaining('classic-dossier.ejs'),
+            expect.objectContaining({
+                sections: expect.arrayContaining([
+                    expect.objectContaining({ 
+                        templateKey: 'clipboard.attackDetail.rateLimitEvent',
+                        renderedText: 'IP: 1.2.3.4\nLimit: ddos-protection'
+                    })
+                ])
+            })
+        );
+    });
+
     it('dovrebbe generare un dossier Classic con timeline Telnet mappata correttamente', async () => {
         const mockSections: IDossierSection[] = [
             { templateKey: 'clipboard.telnetDetail.timelineHeader', data: { sessionId: 'telnet-123' }, type: 'telnet', order: 0, timestamp: new Date() },

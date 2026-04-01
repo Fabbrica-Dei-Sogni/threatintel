@@ -693,6 +693,9 @@
         "generalInfo": "Informations Générales",
         "networkInfo": "Informations Réseau",
         "locationInfo": "Informations Géographiques",
-        "abuseInfo": "Preuves d'Abus"
+        "abuseInfo": "Preuves d'Abus",
+        "rateBreachTitle": "DÉTAIL DE LA VIOLATION DU RATE LIMIT",
+        "limitType": "Type de Limite",
+        "honeypotId": "ID Honeypot"
     }
 }

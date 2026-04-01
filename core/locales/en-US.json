@@ -193,7 +193,13 @@
                 "session": "SESSION",
                 "sessionRef": "SESSION-REF",
                 "subjectIdentified": "SUBJECT IDENTIFIED",
-                "subjectIdentityRevealed": "SUBJECT IDENTITY REVEALED - FORENSIC PROTOCOL [{locale}]"
+                "subjectIdentityRevealed": "SUBJECT IDENTITY REVEALED - FORENSIC PROTOCOL [{locale}]",
+                "rateBreachTitle": "RATE LIMIT VIOLATION DETAIL",
+                "limitType": "LIMIT TYPE",
+                "ip": "IP ADDRESS",
+                "method": "HTTP METHOD",
+                "path": "PATH",
+                "honeypotId": "HONEYPOT ID"
             },
             "hud": {
                 "attackSummaryTitle": "TACTICAL HUD: ATTACK SUMMARY",
@@ -217,7 +223,15 @@
                 "tag": "TAG",
                 "indicators": "INDICATORS",
                 "userAgent": "USER AGENT",
-                "rawPayload": "RAW PAYLOAD"
+                "rawPayload": "RAW PAYLOAD",
+                "rateBreachTitle": "TACTICAL HUD: RATE BREACH DETAIL",
+                "limitType": "LIMIT TYPE",
+                "ip": "TARGET IP",
+                "method": "METHOD",
+                "path": "PATH",
+                "honeypotId": "HONEYPOT ID",
+                "timestamp": "TIMESTAMP",
+                "message": "ERROR MESSAGE"
             }
         }
     },

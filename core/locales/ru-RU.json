@@ -217,7 +217,15 @@
                 "tag": "ТЕГ",
                 "indicators": "ИНДИКАТОРЫ",
                 "userAgent": "USER AGENT",
-                "rawPayload": "RAW: ПОЛЕЗНАЯ НАГРУЗКА"
+                "rawPayload": "RAW: ПОЛЕЗНАЯ НАГРУЗКА",
+                "rateBreachTitle": "TACTICAL HUD: ДЕТАЛИ НАРУШЕНИЯ RATE LIMIT",
+                "limitType": "ТИП ЛИМИТА",
+                "ip": "ЦЕЛЕВОЙ IP",
+                "method": "МЕТОД",
+                "path": "ПУТЬ",
+                "honeypotId": "ID HONEYPOT",
+                "timestamp": "ВРЕМЕННАЯ МЕТКА",
+                "message": "СООБЩЕНИЕ ОБ ОШИБКЕ"
             }
         }
     },

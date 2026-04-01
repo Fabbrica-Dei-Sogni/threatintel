@@ -623,12 +623,74 @@
 .log-header, .event-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: center; /* keep arrow centered vertically */
     cursor: pointer;
     font-weight: 600;
     color: #fff;
     font-size: clamp(0.85rem, 2.5vw, 0.95rem);
     line-height: 1.5;
+    gap: 15px; /* Ensures space between content and arrow */
+}
+
+/* Rate Breach Styling Restyling */
+.event-header-content {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+}
+
+.event-time {
+    color: #a1a1aa;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8em;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 3px 8px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.event-ip {
+    color: #e2e8f0;
+    font-weight: 800;
+    background: rgba(230, 33, 23, 0.1);
+    border: 1px solid rgba(230, 33, 23, 0.2);
+    padding: 3px 10px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    letter-spacing: 0.5px;
+}
+
+.event-limit-badge {
+    background: #e62117;
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 20px;
+    letter-spacing: 1px;
+    border: 1px solid #ff4c4c;
+    box-shadow: 0 0 10px rgba(230, 33, 23, 0.4);
+}
+
+.pulse-magma-mini {
+    animation: pulse-magma-mini 2s infinite;
+}
+
+@keyframes pulse-magma-mini {
+    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(230, 33, 23, 0.7); }
+    70% { transform: scale(1.05); box-shadow: 0 0 0 6px rgba(230, 33, 23, 0); }
+    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(230, 33, 23, 0); }
+}
+
+.event-header-content .icon {
+    font-size: 1.1em;
+    opacity: 0.8;
 }
 
 .log-info-main {

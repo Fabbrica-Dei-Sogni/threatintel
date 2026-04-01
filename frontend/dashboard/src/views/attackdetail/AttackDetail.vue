@@ -319,7 +319,11 @@
                         <div v-for="event in paginatedRateLimitEvents" :key="event._id || event.id"
                             class="rate-limit-event-entry">
                             <div class="event-header" @click="toggleEvent(event._id || event.id)">
-                                <span>{{ formatDate(event.timestamp) }} - {{ event.ip }} - {{ event.limitType }}</span>
+                                <div class="event-header-content">
+                                    <span class="event-time"><span class="icon">🕒</span> {{ formatDate(event.timestamp) }}</span>
+                                    <span class="event-ip"><span class="icon">🎯</span> {{ event.ip }}</span>
+                                    <span class="event-limit-badge pulse-magma-mini">{{ event.limitType }}</span>
+                                </div>
                                 <span class="arrow magenta-arrow" :class="{ 'open': expandedEvents[event._id || event.id] }"></span>
                             </div>
                             <transition name="collapse">

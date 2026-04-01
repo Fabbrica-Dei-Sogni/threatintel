@@ -62,6 +62,7 @@
                   </template>
                   <template v-else>
                     <button @click="saveSection(index)" class="action-icon-btn success-text" title="Salva Sezione" :disabled="isSaving">✓</button>
+                    <button @click="showRawEdit = !showRawEdit" class="action-icon-btn btn-expert" :class="{ 'active-expert': showRawEdit }" title="Expert Mode (JSON)">{...}</button>
                     <button @click="cancelEditSection()" class="action-icon-btn" title="Annulla" :disabled="isSaving">✗</button>
                   </template>
                 </div>
@@ -76,10 +77,18 @@
                        <pre>{{ JSON.stringify(section.data, null, 2) }}</pre>
                     </div>
                   </template>
-                 <template v-else>
-                   <label style="font-size: 0.8rem; color: #818cf8; font-weight: bold; margin-bottom: 5px; display: block;">PAYLOAD DATI (JSON):</label>
-                   <textarea v-model="sectionEditForm.dataString" class="edit-desc-input" rows="12" style="font-family: monospace;"></textarea>
-                 </template>
+                  <template v-else>
+                    <div v-if="!showRawEdit" class="typed-editor-container">
+                      <DossierSectionEditor 
+                        :templateKey="section.templateKey" 
+                        v-model="sectionEditForm.data" 
+                      />
+                    </div>
+                    <div v-else class="expert-editor-container">
+                      <label style="font-size: 0.8rem; color: #fbbf24; font-weight: bold; margin-bottom: 5px; display: block;">EXPERT MODE: RAW JSON DATA</label>
+                      <textarea v-model="sectionEditForm.dataString" class="edit-desc-input expert-json" rows="18" style="font-family: monospace;"></textarea>
+                    </div>
+                  </template>
               </div>
            </div>
         </div>
@@ -88,7 +97,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router';
@@ -96,8 +105,10 @@ import { fetchDossierById, updateDossier } from '../../api';
 import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
 import DossierReportActions from '../../components/DossierReportActions.vue';
 import DossierSectionRenderer from '../../components/dossier/DossierSectionRenderer.vue';
+import DossierSectionEditor from '../../components/dossier/DossierSectionEditor.vue';
 import { ElMessage } from 'element-plus';
 import dayjs from 'dayjs';
+import type { IDossier, IDossierSection } from '../../models/DossierDTO';
 
 const route = useRoute();
 const router = useRouter();
@@ -110,6 +121,7 @@ const showRaw = ref(false);
 
 const isEditing = ref(false);
 const isSaving = ref(false);
+const showRawEdit = ref(false);
 const editForm = ref({ title: '', description: '' });
 
 const startEdit = () => {
@@ -145,12 +157,14 @@ const saveEdit = async () => {
 
 // === GESTIONE EDIT SEZIONI ===
 const editingSectionIndex = ref(-1);
-const sectionEditForm = ref({ type: '', dataString: '' });
+const sectionEditForm = ref({ type: '', data: {}, dataString: '' });
 
 const startEditSection = (index, section) => {
   editingSectionIndex.value = index;
+  showRawEdit.value = false;
   sectionEditForm.value = {
     type: section.type,
+    data: JSON.parse(JSON.stringify(section.data || {})), // Deep copy reattivo
     dataString: section.data ? JSON.stringify(section.data, null, 2) : '{}'
   };
 };
@@ -160,12 +174,17 @@ const cancelEditSection = () => {
 };
 
 const saveSection = async (index) => {
-  let parsedData = {};
-  try {
-    parsedData = JSON.parse(sectionEditForm.value.dataString);
-  } catch (e) {
-    ElMessage.error('JSON non valido nel Payload Dati.');
-    return;
+  let finalData = {};
+  
+  if (showRawEdit.value) {
+    try {
+      finalData = JSON.parse(sectionEditForm.value.dataString);
+    } catch (e) {
+      ElMessage.error('JSON non valido nel Payload Dati.');
+      return;
+    }
+  } else {
+    finalData = sectionEditForm.value.data;
   }
   
   isSaving.value = true;
@@ -174,7 +193,7 @@ const saveSection = async (index) => {
     updatedSections[index] = {
       ...updatedSections[index],
       type: sectionEditForm.value.type,
-      data: parsedData
+      data: finalData
     };
     
     await updateDossier(dossier.value._id, { sections: updatedSections });
@@ -209,7 +228,7 @@ const deleteSection = async (index) => {
 const loadDossier = async () => {
   loading.value = true;
   try {
-    const id = route.params.id;
+    const id = route.params.id as string;
     const data = await fetchDossierById(id);
     dossier.value = data;
   } catch (error) {
@@ -416,8 +435,11 @@ onMounted(loadDossier);
   justify-content: center;
 }
 .action-icon-btn:hover { background: rgba(99, 102, 241, 0.2); transform: scale(1.05); border-color: rgba(99, 102, 241, 0.5); }
-.success-text { color: #10b981; }
-.danger-text { color: #ef4444; }
+.active-expert { background: #fbbf24 !important; color: black !important; border-color: #fbbf24 !important; box-shadow: 0 0 10px rgba(251, 191, 36, 0.3) !important; }
+.btn-expert { font-size: 0.7rem !important; font-weight: 800; font-family: monospace; }
+.expert-json { border-color: #fbbf24 !important; color: #fbbf24 !important; }
+.expert-json:focus { box-shadow: none !important; }
+
 .action-icon-btn.success-text:hover { background: rgba(16, 185, 129, 0.2); border-color: rgba(16, 185, 129, 0.5); }
 .action-icon-btn.danger-text:hover { background: rgba(239, 68, 68, 0.2); border-color: rgba(239, 68, 68, 0.5); }
 </style>

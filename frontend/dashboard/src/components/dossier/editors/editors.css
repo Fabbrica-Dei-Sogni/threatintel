@@ -1,0 +1,113 @@
+.dossier-editor {
+  --el-input-bg-color: rgba(0, 0, 0, 0.3);
+  --el-input-border-color: rgba(99, 102, 241, 0.2);
+  --el-input-hover-border-color: rgba(99, 102, 241, 0.5);
+  --el-input-focus-border-color: #6366f1;
+  --el-input-text-color: #e2e8f0;
+  --el-fill-color-blank: transparent;
+  
+  background: rgba(15, 23, 42, 0.2) !important;
+  padding: 12px !important;
+  border-radius: 4px !important;
+  border: 1px solid rgba(99, 102, 241, 0.1) !important;
+}
+
+:deep(.el-form-item) {
+  margin-bottom: 8px !important;
+}
+
+:deep(.el-form-item__label) {
+  color: #475569 !important;
+  font-weight: 800 !important;
+  font-size: 10px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1.5px !important;
+  padding-bottom: 0 !important;
+  line-height: 20px !important;
+}
+
+:deep(.el-input__wrapper),
+:deep(.el-textarea__inner) {
+  background-color: var(--el-input-bg-color) !important;
+  box-shadow: none !important;
+  border: 1px solid var(--el-input-border-color) !important;
+  padding: 0 8px !important;
+  border-radius: 2px !important;
+}
+
+:deep(.el-input__inner) {
+  height: 24px !important;
+  font-size: 12px !important;
+  font-family: 'Fira Code', monospace !important;
+}
+
+:deep(.el-textarea__inner) {
+  padding: 6px 8px !important;
+  min-height: 24px !important;
+  line-height: 1.4 !important;
+}
+
+:deep(.el-input-number) {
+  width: 100% !important;
+  max-width: 140px !important;
+}
+
+:deep(.el-input-number .el-input-number__decrease),
+:deep(.el-input-number .el-input-number__increase) {
+  background: rgba(255, 255, 255, 0.03) !important;
+  border-color: var(--el-input-border-color) !important;
+  color: #64748b !important;
+  height: 22px !important;
+  width: 22px !important;
+}
+
+:deep(.el-input-number.is-controls-right .el-input__wrapper) {
+  padding-left: 8px !important;
+  padding-right: 28px !important;
+}
+
+/* DEFCON Segmented Control */
+.defcon-selector {
+  display: flex;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 4px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  gap: 4px;
+  width: fit-content;
+}
+
+.defcon-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  font-family: monospace;
+  font-weight: 900;
+  font-size: 14px;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid transparent;
+}
+
+.defcon-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #94a3b8;
+}
+
+.defcon-btn.active.lvl-5 { background: rgba(16, 185, 129, 0.1); color: #10b981; border-color: rgba(16, 185, 129, 0.3); box-shadow: 0 0 10px rgba(16, 185, 129, 0.2); }
+.defcon-btn.active.lvl-4 { background: rgba(59, 130, 246, 0.1); color: #3b82f6; border-color: rgba(59, 130, 246, 0.3); box-shadow: 0 0 10px rgba(59, 130, 246, 0.2); }
+.defcon-btn.active.lvl-3 { background: rgba(245, 158, 11, 0.1); color: #f59e0b; border-color: rgba(245, 158, 11, 0.3); box-shadow: 0 0 10px rgba(245, 158, 11, 0.2); }
+.defcon-btn.active.lvl-2 { background: rgba(239, 68, 68, 0.1); color: #ef4444; border-color: rgba(239, 68, 68, 0.3); box-shadow: 0 0 10px rgba(239, 68, 68, 0.2); }
+.defcon-btn.active.lvl-1 { background: rgba(127, 29, 29, 0.1); color: #f43f5e; border-color: rgba(127, 29, 29, 0.3); box-shadow: 0 0 10px rgba(127, 29, 29, 0.2); }
+
+.editor-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 15px;
+}
+
+.full-width { grid-column: 1 / -1; }

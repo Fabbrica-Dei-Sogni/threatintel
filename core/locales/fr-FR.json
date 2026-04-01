@@ -232,6 +232,11 @@
                 "------------------------------------"
             ],
             "timelineRow": "[{timestamp}] {eventName}\n> {message}{details}",
+            "timelineHeader": [
+                "--- TELNET OPERATIONAL TIMELINE ---",
+                "Session ID: {sessionId}",
+                "-----------------------------------"
+            ],
             "firewall": {
                 "block": [
                     "--- INTERCEPTION FIREWALL ---",

@@ -124,4 +124,26 @@ describe('ReportService', () => {
         expect(ejsArgs.sections[0].renderedText).toBe('IP: 1.1.1.1');
         expect(ejsArgs.sections[1].renderedText).toBe('SESS: abc');
     });
+
+    it('dovrebbe generare un dossier Classic con timeline Telnet mappata correttamente', async () => {
+        const mockSections = [
+            { templateKey: 'clipboard.telnetDetail.timelineHeader', data: { sessionId: 'telnet-123' }, type: 'telnet' },
+            { templateKey: 'clipboard.telnetDetail.timelineRow', data: { message: 'login success' }, type: 'telnet' }
+        ];
+
+        (ejs.renderFile as jest.Mock).mockResolvedValue('<html>Classic Dossier</html>');
+
+        await reportService.generateClassicReport(mockSections, 'it-IT', 'html');
+
+        // Verifica che ejs sia chiamato con il path corretto per il template Classic
+        expect(ejs.renderFile).toHaveBeenCalledWith(
+            expect.stringContaining('classic-dossier.ejs'),
+            expect.objectContaining({
+                sections: expect.arrayContaining([
+                    expect.objectContaining({ templateKey: 'clipboard.telnetDetail.timelineHeader' }),
+                    expect.objectContaining({ templateKey: 'clipboard.telnetDetail.timelineRow' })
+                ])
+            })
+        );
+    });
 });

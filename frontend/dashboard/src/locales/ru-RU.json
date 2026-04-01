@@ -29,6 +29,7 @@
         "showChart": "Показать график",
         "hideChart": "Скрыть график",
         "copyToClipboard": "Копировать в буфер обмена",
+        "copy": "Копировать",
         "copyToFilter": "Копировать в фильтр",
         "notAvailable": "Н/Д",
         "infoIp": "Информация об IP",

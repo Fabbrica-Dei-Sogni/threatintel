@@ -142,13 +142,16 @@ import { useRoute, useRouter } from 'vue-router';
 import dayjs from 'dayjs';
 import { useI18n } from '../../composable/useI18n';
 import { useClipboard } from '../../composable/useClipboard';
+import { useDossierStore } from '../../stores/dossier';
 import { fetchCowrieSessionDetails, fetchCowrieSessionEvents } from '../../api';
+import { ElMessage } from 'element-plus';
 import AttackMap from '../../components/AttackMap.vue';
 import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
 import ReportActions from '../../components/ReportActions.vue';
 
 const { t } = useI18n();
 const { copyToClipboard, copyFormatted, renderTemplate } = useClipboard();
+const dossierStore = useDossierStore();
 const route = useRoute();
 const router = useRouter();
 const sessionId = route.params.id;
@@ -179,26 +182,59 @@ const copySessionSummary = () => {
 const copyEventTimeline = () => {
     if (events.value.length === 0) return;
     
-    // Generiamo le righe della timeline usando il template strutturato
+    const isRecording = dossierStore.isRecording;
+    
+    // Generiamo l'anteprima testuale per la clipboard
     const renderedEvents = events.value.map(event => {
-        let details = '';
-        if (event.input) details += `\n  CMD: ${event.input}`;
-        if (event.username) details += `\n  AUTH: ${event.username} / ${event.password}`;
-        if (event.url) details += `\n  URL: ${event.url}`;
-        
-        return renderTemplate('clipboard.telnetDetail.timelineRow', {
+        const rowData = {
             timestamp: dayjs(event.timestamp).format('HH:mm:ss'),
             eventName: formatEventName(event.eventid),
             message: event.message,
-            details
-        });
+            input: event.input,
+            username: event.username,
+            password: event.password,
+            url: event.url,
+            details: (event.input ? `\n  CMD: ${event.input}` : '') + 
+                     (event.username ? `\n  AUTH: ${event.username} / ${event.password}` : '') + 
+                     (event.url ? `\n  URL: ${event.url}` : '')
+        };
+        
+        const rendered = renderTemplate('clipboard.telnetDetail.timelineRow', rowData);
+        
+        // Se siamo in registrazione, aggiungiamo la sezione strutturata al dossier
+        if (isRecording) {
+            dossierStore.addSection('clipboard.telnetDetail.timelineRow', rowData, rendered);
+        }
+        
+        return rendered;
     }).join('\n\n');
     
-    // Componiamo il testo finale con header/footer standard (si potrebbe anche qui usare un template dedicato volendo)
-    const header = `--- TELNET OPERATIONAL TIMELINE ---\nSession ID: ${sessionId}\n\n`;
+    const headerText = renderTemplate('clipboard.telnetDetail.timelineHeader', { sessionId });
     const footer = `\n-----------------------------------`;
-    
-    copyToClipboard(header + renderedEvents + footer);
+    const fullText = headerText + '\n\n' + renderedEvents + footer;
+
+    if (isRecording) {
+        // Registriamo anche l'header come sezione separata (all'inizio)
+        // Usiamo un trucco per metterlo prima: lo aggiungiamo manualmente al dossierStore
+        dossierStore.sections.splice(dossierStore.sections.length - events.value.length, 0, {
+            templateKey: 'clipboard.telnetDetail.timelineHeader',
+            data: { sessionId },
+            renderedText: headerText,
+            timestamp: new Date().toISOString(),
+            type: 'telnet'
+        });
+        
+        ElMessage({
+            message: `🔴 [REC] Timeline caricata nel dossier (${events.value.length} eventi)`,
+            type: 'warning',
+            duration: 3000
+        });
+        
+        // Copiamo comunque il testo completo per comodità
+        copyToClipboard(fullText, true); 
+    } else {
+        copyToClipboard(fullText);
+    }
 };
 
 const mapAttackData = computed(() => {

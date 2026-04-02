@@ -1,73 +1,76 @@
 <template>
-    <div class="config-page">
-        <!-- Header -->
-        <header class="header-top">
-            <div class="header-left">
-                <button class="back-btn" @click="goBack" :title="t('common.back')">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="19" y1="12" x2="5" y2="12"></line>
-                        <polyline points="12 19 5 12 12 5"></polyline>
-                    </svg>
+    <div class="config-page-view">
+        <!-- Dashboard Header -->
+        <header class="hub-header-top">
+            <div class="header-left-hub">
+                <button class="back-accent-btn" @click="goBack">
+                    <span class="btn-icon-back">←</span>
                 </button>
-                <h1 class="page-title">{{ t('config.title') }}</h1>
+                <div class="hub-title-group">
+                    <h1 class="hub-page-title">{{ t('config.title').toUpperCase() }}</h1>
+                    <span class="system-status-indicator">● ALGORITHM ENGINE ACTIVE</span>
+                </div>
             </div>
             <LanguageSwitcher />
         </header>
 
-        <!-- Toolbar -->
-        <div class="toolbar">
-            <div class="search-wrapper">
-                <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
-                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="11" cy="11" r="8"></circle>
-                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                </svg>
-                <input type="text" v-model="searchQuery" :placeholder="t('config.searchPlaceholder')"
-                    class="search-input" />
-                <button v-if="searchQuery" class="clear-search-btn" @click="searchQuery = ''">×</button>
+        <!-- Tactical Toolbar -->
+        <div class="forensic-toolbar glass-morphism">
+            <div class="search-input-tactical">
+                <span class="search-indicator">🔎</span>
+                <input type="text" v-model="searchQuery" :placeholder="t('config.searchPlaceholder')" />
+                <button v-if="searchQuery" class="clear-input" @click="searchQuery = ''">✕</button>
             </div>
-            <div class="actions-group">
-                <button class="btn btn-warning btn-reanalyze" @click="handleReanalyze" :disabled="saving">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path
-                            d="M21.5 2v6h-6M2.5 22v-6h6M2 12c0-4.4 3.6-8 8-8 3.3 0 6.2 2 7.4 5M22 12c0 4.4-3.6 8-8 8-3.3 0-6.2-2-7.4-5">
-                        </path>
-                    </svg>
-                    {{ t('config.reanalyzeAll') }}
+            <div class="toolbar-actions">
+                <button class="btn btn-tactical-warning reanalyze-btn pulse-glow" @click="handleReanalyze" :disabled="saving">
+                    <span v-if="saving" class="spinner-mini"></span>
+                    <span v-else>🔄</span>
+                    {{ t('config.reanalyzeAll').toUpperCase() }}
                 </button>
             </div>
         </div>
 
-        <!-- Loading State -->
-        <div v-if="loading" class="loading-state">
-            <div class="spinner"></div>
-            <p>{{ t('common.loading') }}</p>
+        <!-- Content Area -->
+        <div class="config-content-scroll scrollable-body">
+            <!-- Loading State -->
+            <div v-if="loading" class="loading-hud">
+                <div class="pulse-ring"></div>
+                <div class="hud-text">{{ t('common.loading').toUpperCase() }}...</div>
+            </div>
+
+            <!-- Error State -->
+            <div v-else-if="error" class="error-hud card-glass">
+                <span class="error-icon">⚠️</span>
+                <p class="error-text">{{ error }}</p>
+                <button class="btn btn-hud-action" @click="loadConfigs">{{ t('config.retry').toUpperCase() }}</button>
+            </div>
+
+            <!-- Empty State -->
+            <div v-else-if="filteredConfigs.length === 0" class="empty-hud card-glass">
+                <span class="empty-icon">📭</span>
+                <p>{{ searchQuery ? t('config.noSearchResults') : t('config.noConfigs') }}</p>
+            </div>
+
+            <!-- Config List Grid -->
+            <div v-else class="algorithm-grid">
+                <ConfigEditor v-for="config in filteredConfigs" :key="config.key" :config-key="config.key"
+                    :model-value="config.value" :saving="saving" @save="handleSave" @delete="handleDelete" />
+            </div>
         </div>
 
-        <!-- Error State -->
-        <div v-else-if="error" class="error-state">
-            <p class="error-message">{{ error }}</p>
-            <button class="btn btn-secondary" @click="loadConfigs">{{ t('config.retry') }}</button>
-        </div>
-
-        <!-- Empty State -->
-        <div v-else-if="filteredConfigs.length === 0" class="empty-state">
-            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="3" y="3" width="7" height="7"></rect>
-                <rect x="14" y="3" width="7" height="7"></rect>
-                <rect x="14" y="14" width="7" height="7"></rect>
-                <rect x="3" y="14" width="7" height="7"></rect>
-            </svg>
-            <p>{{ searchQuery ? t('config.noSearchResults') : t('config.noConfigs') }}</p>
-        </div>
-
-        <!-- Config List -->
-        <div v-else class="config-list">
-            <ConfigEditor v-for="config in filteredConfigs" :key="config.key" :config-key="config.key"
-                :model-value="config.value" :saving="saving" @save="handleSave" @delete="handleDelete" />
+        <!-- Tactical Reanalyze Progress Modal -->
+        <div v-if="isReanalyzing" class="reanalyze-overlay glass-morphism">
+            <div class="radar-container">
+                <div class="radar-circle"></div>
+                <div class="radar-sweep"></div>
+                <div class="radar-content">
+                    <span class="radar-label">ENGINE RE-SCAN</span>
+                    <span class="radar-sub">SYNCING ALGORITHMS...</span>
+                </div>
+            </div>
+            <div class="scanning-dots">
+                <span v-for="i in 3" :key="i" class="dot">.</span>
+            </div>
         </div>
 
         <!-- Success Toast -->
@@ -109,7 +112,8 @@ const {
     reanalyzeAll
 } = useConfig();
 
-// Toast message
+// Caricamento stati
+const isReanalyzing = ref(false);
 const successMessage = ref('');
 
 // Navigation
@@ -135,9 +139,14 @@ async function handleDelete(key: string) {
 async function handleReanalyze() {
     if (!confirm(t('config.confirmReanalyze'))) return;
 
-    const result = await reanalyzeAll();
-    if (result) {
-        showSuccess(t('config.reanalyzeSuccess', { analyzed: result.analyzed, updated: result.updated, errors: result.errors }));
+    isReanalyzing.value = true;
+    try {
+        const result = await reanalyzeAll();
+        if (result) {
+            showSuccess(t('config.reanalyzeSuccess', { analyzed: result.analyzed, updated: result.updated, errors: result.errors }));
+        }
+    } finally {
+        isReanalyzing.value = false;
     }
 }
 

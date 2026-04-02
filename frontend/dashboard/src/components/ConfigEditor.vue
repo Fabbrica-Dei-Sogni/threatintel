@@ -1,129 +1,115 @@
 <template>
-  <div class="config-editor">
-    <!-- Header con chiave -->
-    <div class="config-header" @click="toggleExpanded">
-      <div class="config-key-section">
-        <span class="expand-icon">{{ isExpanded ? '▼' : '▶' }}</span>
-        <span class="config-key">{{ configKey }}</span>
-        <span class="config-type-badge" :class="valueType">{{ $t(`config.types.${valueType}`) }}</span>
+  <div class="algorithm-module glass-morphism" :class="{ 'is-expanded': isExpanded }">
+    <!-- Module Header -->
+    <div class="module-header" @click="toggleExpanded">
+      <div class="module-identity">
+        <div class="status-dot"></div>
+        <span class="module-key">{{ configKey }}</span>
+        <span class="type-pill" :class="valueType">{{ $t(`config.types.${valueType}`).toUpperCase() }}</span>
       </div>
-      <div class="config-actions" @click.stop>
-        <button class="btn-icon btn-edit" @click="startEdit" :title="$t('common.edit')">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-          </svg>
+      <div class="module-actions" @click.stop>
+        <button class="action-icon-btn edit-btn" @click="startEdit" :title="$t('common.edit')">
+          <span>📝</span>
         </button>
-        <button class="btn-icon btn-delete" @click="confirmDelete" :title="$t('common.delete')">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="3 6 5 6 21 6"></polyline>
-            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-          </svg>
+        <button class="action-icon-btn delete-btn" @click="confirmDelete" :title="$t('common.delete')">
+          <span>🗑️</span>
         </button>
+        <div class="expansion-indicator">
+          <span class="chevron">{{ isExpanded ? '▲' : '▼' }}</span>
+        </div>
       </div>
     </div>
 
-    <!-- Preview (collapsed) -->
-    <div v-if="!isExpanded && !isEditing" class="config-preview">
-      <span class="preview-text">{{ previewText }}</span>
+    <!-- Preview Section -->
+    <div v-if="!isExpanded && !isEditing" class="module-preview">
+      <span class="preview-text-hud">{{ previewText }}</span>
     </div>
 
-    <!-- Contenuto espanso -->
-    <div v-if="isExpanded && !isEditing" class="config-content">
-      <!-- Vista lista/tag -->
-      <div v-if="valueType === 'list'" class="tag-container">
-        <span v-for="(tag, index) in tags" :key="index" class="tag">{{ tag }}</span>
+    <!-- Details Section -->
+    <div v-if="isExpanded && !isEditing" class="module-details">
+      <!-- List View -->
+      <div v-if="valueType === 'list'" class="tactical-tags">
+        <span v-for="(tag, index) in tags" :key="index" class="tactical-tag">{{ tag }}</span>
       </div>
 
-      <!-- Vista chiave:valore -->
-      <div v-else-if="valueType === 'keyvalue'" class="keyvalue-container">
-        <div v-for="(item, index) in keyValuePairs" :key="index" class="keyvalue-item">
-          <span class="kv-key">{{ item.key }}</span>
-          <span class="kv-separator">:</span>
-          <span class="kv-value">{{ item.value }}</span>
+      <!-- Key-Value View -->
+      <div v-else-if="valueType === 'keyvalue'" class="tactical-kv-grid">
+        <div v-for="(item, index) in keyValuePairs" :key="index" class="kv-card-mini">
+          <span class="kv-label">{{ item.key }}</span>
+          <span class="kv-val">{{ item.value }}</span>
         </div>
       </div>
 
-      <!-- Vista testo semplice -->
-      <div v-else class="text-container">
-        <p class="text-value">{{ modelValue }}</p>
+      <!-- Simple Text View -->
+      <div v-else class="tactical-text-box">
+        <p class="raw-data">{{ modelValue }}</p>
       </div>
     </div>
 
-    <!-- Modal di editing -->
-    <div v-if="isEditing" class="config-editor-modal" @click.self="cancelEdit">
-      <div class="editor-content">
-        <h3 class="editor-title">{{ $t('config.editConfig') }}: {{ configKey }}</h3>
+    <!-- Advanced Tactical Editor Modal -->
+    <div v-if="isEditing" class="tactical-modal-overlay" @click.self="cancelEdit">
+      <div class="tactical-modal-content card-glass">
+        <div class="modal-header-tactical">
+          <h3 class="modal-title-hud">{{ $t('config.editConfig').toUpperCase() }}</h3>
+          <span class="modal-subtitle">{{ configKey }}</span>
+        </div>
 
-        <!-- Editor per lista -->
-        <div v-if="valueType === 'list'" class="list-editor">
-          <div class="tags-edit-container">
-            <div v-for="(tag, index) in editTags" :key="index" class="tag-editable">
-              <span>{{ tag }}</span>
-              <button class="tag-remove" @click="removeTag(index)" :title="$t('common.delete')">×</button>
+        <div class="modal-body-tactical">
+          <!-- List Editor -->
+          <div v-if="valueType === 'list'" class="editor-hub-list">
+            <div class="tags-cluster">
+              <div v-for="(tag, index) in editTags" :key="index" class="cluster-pill">
+                <span>{{ tag }}</span>
+                <button class="pill-remove" @click="removeTag(index)">✕</button>
+              </div>
+            </div>
+            <div class="tactical-add-row">
+              <input type="text" v-model="newTag" :placeholder="$t('config.addTagPlaceholder')" @keyup.enter="addTag" />
+              <button class="btn btn-add-pulse" @click="addTag">+</button>
             </div>
           </div>
-          <div class="tag-add-row">
-            <input 
-              type="text" 
-              v-model="newTag" 
-              :placeholder="$t('config.addTagPlaceholder')"
-              @keyup.enter="addTag"
-              class="tag-input"
-            />
-            <button class="btn btn-accent btn-add-tag" @click="addTag">+</button>
-          </div>
-        </div>
 
-        <!-- Editor per chiave:valore -->
-        <div v-else-if="valueType === 'keyvalue'" class="keyvalue-editor">
-          <div class="keyvalue-edit-container">
-            <div v-for="(item, index) in editKeyValuePairs" :key="index" class="keyvalue-edit-item">
-              <input type="text" v-model="item.key" class="kv-key-input" :placeholder="$t('config.keyPlaceholder')" />
-              <span class="kv-separator">:</span>
-              <input type="text" v-model="item.value" class="kv-value-input" :placeholder="$t('config.valuePlaceholder')" />
-              <button class="btn-icon btn-remove-kv" @click="removeKeyValue(index)">×</button>
+          <!-- Key-Value Editor -->
+          <div v-else-if="valueType === 'keyvalue'" class="editor-hub-kv">
+            <div class="kv-scroll-list">
+              <div v-for="(item, index) in editKeyValuePairs" :key="index" class="kv-edit-row">
+                <input type="text" v-model="item.key" placeholder="KEY" />
+                <span class="kv-sep">:</span>
+                <input type="text" v-model="item.value" placeholder="VALUE" />
+                <button class="btn-remove-tactical" @click="removeKeyValue(index)">✕</button>
+              </div>
+            </div>
+            <div class="kv-add-tactical">
+              <input type="text" v-model="newKvKey" placeholder="NEW KEY" />
+              <input type="text" v-model="newKvValue" placeholder="NEW VALUE" @keyup.enter="addKeyValue" />
+              <button class="btn btn-add-pulse" @click="addKeyValue">+</button>
             </div>
           </div>
-          <div class="kv-add-row">
-            <input type="text" v-model="newKvKey" :placeholder="$t('config.keyPlaceholder')" class="kv-key-input" />
-            <span class="kv-separator">:</span>
-            <input type="text" v-model="newKvValue" :placeholder="$t('config.valuePlaceholder')" class="kv-value-input" @keyup.enter="addKeyValue" />
-            <button class="btn btn-accent btn-add-kv" @click="addKeyValue">+</button>
+
+          <!-- Text Editor -->
+          <div v-else class="editor-hub-text">
+            <textarea v-model="editText" :placeholder="$t('config.textPlaceholder')" rows="6" class="cyber-textarea"></textarea>
           </div>
         </div>
 
-        <!-- Editor per testo semplice -->
-        <div v-else class="text-editor">
-          <textarea 
-            v-model="editText" 
-            :placeholder="$t('config.textPlaceholder')"
-            class="text-input"
-            rows="4"
-          ></textarea>
-        </div>
-
-        <!-- Azioni editor -->
-        <div class="editor-actions">
-          <button class="btn btn-secondary" @click="cancelEdit">{{ $t('common.cancel') }}</button>
-          <button class="btn btn-primary" @click="saveEdit" :disabled="saving">
-            {{ saving ? $t('common.loading') : $t('common.save') }}
+        <div class="modal-actions-tactical">
+          <button class="btn btn-ghost-hud" @click="cancelEdit">{{ $t('common.cancel').toUpperCase() }}</button>
+          <button class="btn btn-primary-hud shadow-glow" @click="saveEdit" :disabled="saving">
+            {{ (saving ? $t('common.loading') : $t('common.save')).toUpperCase() }}
           </button>
         </div>
       </div>
     </div>
 
-    <!-- Dialog conferma eliminazione -->
-    <div v-if="showDeleteConfirm" class="delete-confirm-overlay" @click.self="showDeleteConfirm = false">
-      <div class="delete-confirm-dialog">
-        <h3>{{ $t('config.confirmDeleteTitle') }}</h3>
-        <p>{{ $t('config.confirmDeleteMessage', { key: configKey }) }}</p>
-        <div class="dialog-actions">
-          <button class="btn btn-secondary" @click="showDeleteConfirm = false">{{ $t('common.cancel') }}</button>
-          <button class="btn btn-danger" @click="executeDelete" :disabled="saving">
-            {{ saving ? $t('common.loading') : $t('common.delete') }}
+    <!-- Confirmation Dialog -->
+    <div v-if="showDeleteConfirm" class="tactical-modal-overlay" @click.self="showDeleteConfirm = false">
+      <div class="delete-dialog card-glass">
+        <h3 class="error-accent">{{ $t('config.confirmDeleteTitle').toUpperCase() }}</h3>
+        <p class="dialog-msg">{{ $t('config.confirmDeleteMessage', { key: configKey }) }}</p>
+        <div class="dialog-actions-tactical">
+          <button class="btn btn-ghost-hud" @click="showDeleteConfirm = false">{{ $t('common.cancel').toUpperCase() }}</button>
+          <button class="btn btn-danger-hud" @click="executeDelete" :disabled="saving">
+            {{ (saving ? $t('common.loading') : $t('common.delete')).toUpperCase() }}
           </button>
         </div>
       </div>
@@ -297,473 +283,389 @@ function executeDelete() {
 </script>
 
 <style scoped>
-.config-editor {
-  background-color: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  margin-bottom: 1rem;
+.algorithm-module {
+  background: rgba(15, 23, 42, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  margin-bottom: 15px;
   overflow: hidden;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
 }
 
-.config-editor:hover {
-  border-color: rgba(255, 255, 255, 0.15);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+.algorithm-module:hover {
+  border-color: rgba(99, 102, 241, 0.3);
+  background: rgba(15, 23, 42, 0.6);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
-.config-header {
+.algorithm-module.is-expanded {
+  border-color: rgba(99, 102, 241, 0.4);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+}
+
+.module-header {
+  padding: 18px 25px;
+  cursor: pointer;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 1.25rem;
-  cursor: pointer;
-  background: rgba(255, 255, 255, 0.02);
-  transition: background 0.2s;
+  user-select: none;
 }
 
-.config-header:hover {
-  background: rgba(255, 255, 255, 0.04);
-}
-
-.config-key-section {
+.module-identity {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 12px;
 }
 
-.expand-icon {
-  font-size: 0.7rem;
-  color: var(--text-muted);
-  transition: transform 0.2s;
+.status-dot {
+  width: 8px;
+  height: 8px;
+  background: #6366f1;
+  border-radius: 50%;
+  box-shadow: 0 0 10px #6366f1;
 }
 
-.config-key {
-  font-weight: 600;
-  font-size: 0.95rem;
-  color: var(--text-color);
+.module-key {
   font-family: 'Source Code Pro', monospace;
-}
-
-.config-type-badge {
-  font-size: 0.65rem;
-  padding: 0.15rem 0.5rem;
-  border-radius: 4px;
-  text-transform: uppercase;
-  font-weight: 600;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #e2e8f0;
   letter-spacing: 0.5px;
 }
 
-.config-type-badge.list {
-  background: rgba(59, 130, 246, 0.2);
-  color: #60a5fa;
-}
-
-.config-type-badge.keyvalue {
-  background: rgba(168, 85, 247, 0.2);
-  color: #c084fc;
-}
-
-.config-type-badge.text {
-  background: rgba(34, 197, 94, 0.2);
-  color: #4ade80;
-}
-
-.config-actions {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.btn-icon {
-  background: transparent;
-  border: 1px solid transparent;
-  color: var(--text-muted);
-  padding: 0.5rem;
+.type-pill {
+  font-size: 0.6rem;
+  font-weight: 950;
+  letter-spacing: 1.5px;
+  padding: 3px 10px;
   border-radius: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #94a3b8;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.type-pill.list { color: #60a5fa; border-color: rgba(96, 165, 250, 0.3); }
+.type-pill.keyvalue { color: #c084fc; border-color: rgba(192, 132, 252, 0.3); }
+.type-pill.text { color: #4ade80; border-color: rgba(74, 222, 128, 0.3); }
+
+.module-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.action-icon-btn {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 8px;
+  border-radius: 8px;
   cursor: pointer;
+  font-size: 0.9rem;
   transition: all 0.2s;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.btn-icon:hover {
-  background: rgba(255, 255, 255, 0.08);
-  color: var(--text-color);
+.action-icon-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: scale(1.1);
 }
 
-.btn-edit:hover {
-  color: #60a5fa;
+.edit-btn:hover { border-color: #60a5fa; }
+.delete-btn:hover { border-color: #f87171; }
+
+.expansion-indicator {
+  margin-left: 5px;
+  color: #64748b;
+  font-size: 0.7rem;
 }
 
-.btn-delete:hover {
-  color: #f87171;
+/* Content Views */
+.module-preview {
+  padding: 0 25px 18px 45px;
+  opacity: 0.6;
 }
 
-.config-preview {
-  padding: 0 1.25rem 1rem;
-  color: var(--text-muted);
-  font-size: 0.85rem;
-}
-
-.preview-text {
-  opacity: 0.8;
-}
-
-.config-content {
-  padding: 0 1.25rem 1.25rem;
-}
-
-/* Tags */
-.tag-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-
-.tag {
-  background: rgba(var(--primary-rgb), 0.15);
-  color: var(--primary-color);
-  padding: 0.35rem 0.75rem;
-  border-radius: 6px;
+.preview-text-hud {
   font-size: 0.8rem;
   font-family: 'Source Code Pro', monospace;
+  color: #94a3b8;
+  display: block;
 }
 
-/* Key-Value */
-.keyvalue-container {
+.module-details {
+  padding: 0 25px 25px 45px;
+  border-top: 1px solid rgba(255, 255, 255, 0.03);
+  padding-top: 15px;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.tactical-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: 8px;
 }
 
-.keyvalue-item {
-  display: flex;
-  align-items: center;
-  background: rgba(168, 85, 247, 0.1);
+.tactical-tag {
+  background: rgba(99, 102, 241, 0.15);
+  color: #818cf8;
+  padding: 4px 12px;
   border-radius: 6px;
-  padding: 0.35rem 0.75rem;
-  font-size: 0.8rem;
-}
-
-.kv-key {
-  color: #c084fc;
-  font-weight: 600;
+  font-size: 0.75rem;
   font-family: 'Source Code Pro', monospace;
+  border: 1px solid rgba(99, 102, 241, 0.2);
 }
 
-.kv-separator {
-  color: var(--text-muted);
-  margin: 0 0.25rem;
+.tactical-kv-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 10px;
 }
 
-.kv-value {
-  color: var(--text-color);
-  font-family: 'Source Code Pro', monospace;
-}
-
-/* Text */
-.text-container {
+.kv-card-mini {
   background: rgba(255, 255, 255, 0.03);
-  border-radius: 8px;
-  padding: 1rem;
+  padding: 8px 15px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.text-value {
+.kv-label {
+  display: block;
+  font-size: 0.6rem;
+  font-weight: 800;
+  color: #64748b;
+  text-transform: uppercase;
+}
+
+.kv-val {
+  font-size: 0.85rem;
+  color: #fff;
+  font-family: 'Source Code Pro', monospace;
+}
+
+.tactical-text-box {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 15px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.raw-data {
   margin: 0;
-  color: var(--text-color);
-  font-size: 0.9rem;
-  line-height: 1.5;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  font-family: 'Source Code Pro', monospace;
 }
 
-/* Editor Modal */
-.config-editor-modal {
+/* Specialized Editor Modals */
+.tactical-modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(2, 6, 23, 0.85);
+  backdrop-filter: blur(10px);
+  z-index: 3000;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
-  padding: 1rem;
+  padding: 20px;
 }
 
-.editor-content {
-  background: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 16px;
-  padding: 2rem;
+.tactical-modal-content {
   width: 100%;
-  max-width: 600px;
-  max-height: 80vh;
-  overflow-y: auto;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  max-width: 650px;
+  background: rgba(15, 23, 42, 0.95);
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
+  padding: 35px;
 }
 
-.editor-title {
-  margin: 0 0 1.5rem;
+.modal-header-tactical {
+  margin-bottom: 25px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding-bottom: 20px;
+}
+
+.modal-title-hud {
   font-size: 1.25rem;
-  color: var(--text-color);
+  font-weight: 900;
+  letter-spacing: 3px;
+  margin: 0;
+  color: #fff;
 }
 
-/* List Editor */
-.tags-edit-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
-  max-height: 300px;
-  overflow-y: auto;
-  padding: 0.5rem;
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 8px;
-}
-
-.tag-editable {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: rgba(var(--primary-rgb), 0.2);
-  color: var(--primary-color);
-  padding: 0.4rem 0.75rem;
-  border-radius: 6px;
-  font-size: 0.85rem;
+.modal-subtitle {
+  font-size: 0.8rem;
+  color: #6366f1;
   font-family: 'Source Code Pro', monospace;
 }
 
-.tag-remove {
+.modal-body-tactical { margin-bottom: 30px; }
+
+/* Cluster Pills */
+.tags-cluster {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 15px;
+  border-radius: 12px;
+  margin-bottom: 15px;
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+.cluster-pill {
+  background: #1e293b;
+  padding: 6px 12px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.85rem;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.pill-remove {
   background: transparent;
   border: none;
-  color: #f87171;
-  font-size: 1.1rem;
+  color: #ef4444;
   cursor: pointer;
-  padding: 0;
-  line-height: 1;
-  opacity: 0.7;
-  transition: opacity 0.2s;
+  font-size: 0.7rem;
 }
 
-.tag-remove:hover {
-  opacity: 1;
-}
-
-.tag-add-row {
+.tactical-add-row, .kv-add-tactical {
   display: flex;
-  gap: 0.5rem;
+  gap: 10px;
 }
 
-.tag-input {
+.tactical-add-row input, .kv-add-tactical input, .cyber-textarea, .kv-edit-row input {
   flex: 1;
-  padding: 0.75rem 1rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  color: var(--text-color);
-  font-size: 0.9rem;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 12px 15px;
+  border-radius: 10px;
+  color: #fff;
+  transition: all 0.3s;
 }
 
-.tag-input:focus {
+.tactical-add-row input:focus, .cyber-textarea:focus {
+  border-color: #6366f1;
   outline: none;
-  border-color: var(--primary-color);
+  background: rgba(0, 0, 0, 0.6);
 }
 
-/* Key-Value Editor */
-.keyvalue-edit-container {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
-  max-height: 300px;
-  overflow-y: auto;
-  padding: 0.5rem;
+.btn-add-pulse {
+  background: #6366f1;
+  color: #fff;
+  border: none;
+  width: 45px;
+  border-radius: 10px;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+/* KV Scroll List */
+.kv-scroll-list {
   background: rgba(0, 0, 0, 0.2);
-  border-radius: 8px;
+  padding: 15px;
+  border-radius: 12px;
+  margin-bottom: 15px;
+  max-height: 250px;
+  overflow-y: auto;
 }
 
-.keyvalue-edit-item {
+.kv-edit-row {
   display: flex;
+  gap: 10px;
   align-items: center;
-  gap: 0.5rem;
+  margin-bottom: 10px;
 }
 
-.kv-key-input, .kv-value-input {
-  padding: 0.6rem 0.75rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-  color: var(--text-color);
-  font-size: 0.85rem;
-  font-family: 'Source Code Pro', monospace;
+.kv-sep { opacity: 0.3; }
+
+.btn-remove-tactical {
+  background: transparent;
+  border: none;
+  color: #ef4444;
+  cursor: pointer;
+  font-size: 1rem;
 }
 
-.kv-key-input {
-  width: 40%;
-}
-
-.kv-value-input {
-  flex: 1;
-}
-
-.kv-key-input:focus, .kv-value-input:focus {
-  outline: none;
-  border-color: var(--primary-color);
-}
-
-.kv-add-row {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.btn-remove-kv {
-  font-size: 1.2rem;
-  color: #f87171;
-}
-
-/* Text Editor */
-.text-input {
-  width: 100%;
-  padding: 1rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  color: var(--text-color);
-  font-size: 0.9rem;
-  resize: vertical;
-  min-height: 100px;
-}
-
-.text-input:focus {
-  outline: none;
-  border-color: var(--primary-color);
-}
-
-/* Editor Actions */
-.editor-actions {
+/* Actions */
+.modal-actions-tactical {
   display: flex;
   justify-content: flex-end;
-  gap: 0.75rem;
-  margin-top: 1.5rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--border-color);
+  gap: 15px;
 }
 
-/* Buttons */
-.btn {
-  padding: 0.65rem 1.25rem;
-  border: 1px solid transparent;
-  border-radius: 8px;
-  font-weight: 600;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.btn-primary {
-  background-color: var(--primary-color);
-  color: white;
-}
-
-.btn-primary:hover:not(:disabled) {
-  filter: brightness(1.1);
-}
-
-.btn-secondary {
+.btn-ghost-hud {
   background: transparent;
-  border-color: var(--border-color);
-  color: var(--text-color);
+  border: none;
+  color: #94a3b8;
+  font-weight: 800;
+  letter-spacing: 2px;
+  cursor: pointer;
+  padding: 12px 20px;
 }
 
-.btn-secondary:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.05);
-}
-
-.btn-accent {
-  background-color: #3b82f6;
-  color: white;
-  padding: 0.65rem 1rem;
-}
-
-.btn-danger {
-  background-color: #ef4444;
-  color: white;
-}
-
-.btn-add-tag, .btn-add-kv {
-  font-size: 1.2rem;
-  line-height: 1;
-}
-
-/* Delete Confirm Dialog */
-.delete-confirm-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1100;
-  padding: 1rem;
-}
-
-.delete-confirm-dialog {
-  background: var(--card-bg);
-  border: 1px solid var(--border-color);
+.btn-primary-hud {
+  background: #6366f1;
+  color: #fff;
+  border: none;
+  padding: 12px 25px;
   border-radius: 12px;
-  padding: 1.5rem;
-  max-width: 400px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  cursor: pointer;
+}
+
+.btn-danger-hud {
+  background: #ef4444;
+  color: #fff;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 12px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  cursor: pointer;
+}
+
+.delete-dialog {
+  max-width: 450px;
+  padding: 40px;
   text-align: center;
 }
 
-.delete-confirm-dialog h3 {
-  margin: 0 0 0.75rem;
-  color: #f87171;
-}
-
-.delete-confirm-dialog p {
-  margin: 0 0 1.5rem;
-  color: var(--text-muted);
-  font-size: 0.9rem;
-}
-
-.dialog-actions {
+.error-accent { color: #ef4444; margin: 0 0 15px 0; }
+.dialog-msg { color: #94a3b8; margin-bottom: 30px; }
+.dialog-actions-tactical {
   display: flex;
   justify-content: center;
-  gap: 0.75rem;
+  gap: 15px;
 }
 
-/* Responsive */
-@media (max-width: 640px) {
-  .config-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.75rem;
-  }
+/* Generic Glass */
+.glass-morphism {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
 
-  .config-actions {
-    align-self: flex-end;
-  }
+.card-glass {
+  background: rgba(15, 23, 42, 0.8);
+  backdrop-filter: blur(20px);
+}
 
-  .editor-content {
-    padding: 1.25rem;
-  }
+.shadow-glow {
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+}
 
-  .keyvalue-edit-item, .kv-add-row {
-    flex-wrap: wrap;
-  }
-
-  .kv-key-input {
-    width: 100%;
-  }
+@media (max-width: 600px) {
+  .kv-edit-row { flex-direction: column; align-items: stretch; gap: 5px; }
 }
 </style>

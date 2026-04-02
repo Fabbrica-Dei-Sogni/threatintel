@@ -94,8 +94,8 @@
         "errorRegister": "Errore durante la registrazione"
     },
     "home": {
-        "title": "Dashboard",
-        "dashboard": "Cruscotto",
+        "title": "FORENSIC OPS CONSOLE",
+        "dashboard": "FORENSIC OPS CONSOLE",
         "attacks": "Attacchi",
         "logRequests": "Log requests",
         "recentAttacks": "Ultimi 10 attacchi",
@@ -132,7 +132,7 @@
     },
     "attacks": {
         "title": "Attacchi",
-        "dashboard": "Cruscotto",
+        "dashboard": "FORENSIC OPS CONSOLE",
         "logRequests": "Log requests",
         "minLogsLabel": "Numero minimo di log per attacco:",
         "timeFilter": "Filtro temporale:",
@@ -289,7 +289,7 @@
     },
     "threatLogs": {
         "title": "Log minacce",
-        "dashboard": "Cruscotto",
+        "dashboard": "FORENSIC OPS CONSOLE",
         "attacks": "Attacchi",
         "filterByIp": "Filtra per IP...",
         "filterByUrl": "Filtra per URL...",
@@ -433,7 +433,7 @@
     "nav": {
         "menu": "Menu",
         "menuTitle": "Navigazione",
-        "dashboard": "Dashboard",
+        "dashboard": "FORENSIC OPS CONSOLE",
         "attacks": "Attacchi",
         "logs": "Log Richieste",
         "configuration": "Configurazione",
@@ -476,7 +476,7 @@
     "cowrie": {
         "sessions": {
             "title": "Sessioni Telnet",
-            "backToDashboard": "Cruscotto",
+            "backToDashboard": "FORENSIC OPS CONSOLE",
             "emptyState": "Nessuna attività honeypot rilevata.",
             "filterByIp": "Filtra per IP...",
             "clearIpFilter": "Svuota filtro IP",

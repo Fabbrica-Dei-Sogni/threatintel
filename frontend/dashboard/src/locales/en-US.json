@@ -94,8 +94,8 @@
         "errorRegister": "Error during registration"
     },
     "home": {
-        "title": "Dashboard",
-        "dashboard": "Dashboard",
+        "title": "Forensic Ops Console",
+        "dashboard": "Forensic Ops Console",
         "attacks": "Attacks",
         "logRequests": "Log requests",
         "recentAttacks": "Last 10 attacks",
@@ -132,7 +132,7 @@
     },
     "attacks": {
         "title": "Attacks",
-        "dashboard": "Dashboard",
+        "dashboard": "Forensic Ops Console",
         "logRequests": "Log requests",
         "minLogsLabel": "Minimum number of logs per attack:",
         "timeFilter": "Time filter:",
@@ -288,8 +288,8 @@
         "systemOperational": "SYSTEM OPERATIONAL : NODE ACTIVE"
     },
     "threatLogs": {
-        "title": "Threat logs",
-        "dashboard": "Dashboard",
+        "title": "Threat Logs",
+        "dashboard": "FORENSIC OPS CONSOLE",
         "attacks": "Attacks",
         "filterByIp": "Filter by IP...",
         "filterByUrl": "Filter by URL...",
@@ -433,7 +433,7 @@
     "nav": {
         "menu": "Menu",
         "menuTitle": "Navigation",
-        "dashboard": "Dashboard",
+        "dashboard": "Forensic Ops Console",
         "attacks": "Attacks",
         "logs": "Log Requests",
         "configuration": "Configuration",
@@ -476,7 +476,7 @@
     "cowrie": {
         "sessions": {
             "title": "Telnet Sessions",
-            "backToDashboard": "Dashboard",
+            "backToDashboard": "Forensic Ops Console",
             "emptyState": "No honeypot activity detected yet.",
             "filterByIp": "Filter by IP...",
             "clearIpFilter": "Clear IP filter",

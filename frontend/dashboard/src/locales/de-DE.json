@@ -94,8 +94,8 @@
         "errorRegister": "Fehler bei der Registrierung"
     },
     "home": {
-        "title": "Dashboard",
-        "dashboard": "Dashboard",
+        "title": "Forensische Ops-Konsole",
+        "dashboard": "Forensische Ops-Konsole",
         "attacks": "Angriffe",
         "logRequests": "Protokoll-Anfragen",
         "recentAttacks": "Letzte 10 Angriffe",
@@ -132,7 +132,7 @@
     },
     "attacks": {
         "title": "Angriffe",
-        "dashboard": "Dashboard",
+        "dashboard": "Forensische Ops-Konsole",
         "logRequests": "Protokoll-Anfragen",
         "minLogsLabel": "Minimale Anzahl von Protokollen pro Angriff:",
         "timeFilter": "Zeitfilter:",
@@ -289,7 +289,7 @@
     },
     "threatLogs": {
         "title": "Bedrohungsprotokolle",
-        "dashboard": "Dashboard",
+        "dashboard": "Forensische Ops-Konsole",
         "attacks": "Angriffe",
         "filterByIp": "Nach IP filtern...",
         "filterByUrl": "Nach URL filtern...",
@@ -433,7 +433,7 @@
     "nav": {
         "menu": "Menü",
         "menuTitle": "Navigation",
-        "dashboard": "Dashboard",
+        "dashboard": "Forensische Ops-Konsole",
         "attacks": "Angriffe",
         "logs": "Protokoll-Anfragen",
         "configuration": "Konfiguration",
@@ -476,7 +476,7 @@
     "cowrie": {
         "sessions": {
             "title": "Telnet-Sitzungen",
-            "backToDashboard": "Dashboard",
+            "backToDashboard": "Forensische Ops-Konsole",
             "emptyState": "Noch keine Honeypot-Aktivität erkannt.",
             "filterByIp": "Nach IP filtern...",
             "clearIpFilter": "IP-Filter löschen",

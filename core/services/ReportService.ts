@@ -71,7 +71,7 @@ export class ReportService {
     }
 
     
-    async generateCommonReport(templatePath: string,sections: IDossierSection[], locale: string, format: 'html' | 'pdf' = 'pdf'): Promise<Buffer | string> { 
+    async generateCommonReport(templatePath: string,sections: IDossierSection[], locale: string, format: 'html' | 'pdf' = 'pdf', isTelex: boolean = false): Promise<Buffer | string> { 
         
         let logoBase64 = '';
         try {
@@ -89,9 +89,14 @@ export class ReportService {
         const enrichedSections = sections.map(s => {
             const sanitizedData = this.sanitizeSectionData(s.data);
             // Forza il re-rendering basato sul locale richiesto
-            const newRenderedText = (s.templateKey)
-                ? this.renderSection(s.templateKey, sanitizedData, locale)
+
+            var newRenderedText = (s.templateKey)
+                    ? this.renderSection(s.templateKey, sanitizedData, locale)
                 : (s.renderedText || '');
+            
+            if (isTelex) { 
+                newRenderedText = (s.renderedText) ? (s.renderedText) : ( (s.templateKey) ? this.renderSection(s.templateKey, sanitizedData, locale) : 'N/D' );
+            }
 
             return {
                 ...s,
@@ -120,7 +125,7 @@ export class ReportService {
 
         const templatePath = path.join(__dirname, `../templates/reports/custom-dossier.ejs`);
         
-        return this.generateCommonReport(templatePath, sections, locale, format);
+        return this.generateCommonReport(templatePath, sections, locale, format, true);
     }
 
     /**

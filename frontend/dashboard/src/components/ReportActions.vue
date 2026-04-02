@@ -10,9 +10,9 @@
         <span class="tab-text">{{ t('common.generateReport').toUpperCase() }}</span>
       </div>
       
-      <Teleport to="body" :disabled="!isMobile">
+      <Teleport to="body">
         <transition name="slide-card">
-          <div v-if="showMenu" class="action-menu glass-morphism" :class="{ 'is-mobile-menu mode-sticky': isMobile }">
+          <div v-if="showMenu" class="action-menu glass-morphism" :class="['mode-sticky', { 'is-mobile-menu': isMobile }]">
             <div class="menu-header">
               <strong>COMMAND CENTER</strong>
               <span class="status-dot pulse"></span>
@@ -258,7 +258,7 @@ onUnmounted(() => {
 
 <style scoped>
 .report-actions-wrapper {
-  z-index: 2000;
+  z-index: 9500; /* Increased to be above backdrop */
   --theme-color: v-bind(accentColor);
 }
 
@@ -303,7 +303,7 @@ onUnmounted(() => {
   right: 0;
   margin-top: 10px;
   width: 220px;
-  z-index: 9500;
+  z-index: 9600; /* Higher than backdrop */
   border-radius: 12px;
 }
 
@@ -316,9 +316,24 @@ onUnmounted(() => {
   z-index: 9500;
 }
 
+/* Unify Sticky Menu Position */
+.action-menu.mode-sticky,
 .is-mobile-menu.mode-sticky {
-  bottom: 150px !important;
-  top: auto !important;
+  position: fixed !important;
+  top: 15vh !important;
+  right: 64px !important;
+  width: 280px !important;
+  bottom: auto !important;
+  z-index: 9600;
+}
+
+@media (max-width: 768px) {
+  .action-menu.mode-sticky,
+  .is-mobile-menu.mode-sticky {
+    top: 18vh !important;
+    right: 54px !important;
+    width: clamp(260px, 80vw, 300px) !important;
+  }
 }
 
 .popover-menu .menu-item {
@@ -334,7 +349,8 @@ onUnmounted(() => {
   display: flex;
   flex-direction: row-reverse;
   align-items: flex-start;
-  z-index: 2100;
+  z-index: 9501; /* Must be above everything */
+  transition: top 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .tab-trigger {
@@ -379,9 +395,8 @@ onUnmounted(() => {
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+/* Removed relative margin logic as it is now Teleported/Fixed */
 .mode-sticky .action-menu {
-  width: 280px;
-  margin-right: 20px;
   transform-origin: right center;
   border-color: rgba(255, 255, 255, 0.1);
 }

@@ -226,7 +226,7 @@ onUnmounted(() => {
 
 <style scoped>
 .report-actions-wrapper {
-  z-index: 2000;
+  z-index: 9500; /* Increased to be above backdrop */
   --theme-color: v-bind(accentColor);
 }
 
@@ -270,18 +270,22 @@ onUnmounted(() => {
   right: 0;
   margin-top: 10px;
   width: 280px;
-  z-index: 9500;
+  z-index: 9600; /* Higher than backdrop */
   border-radius: 12px;
   padding: 10px 0;
 }
 
 .is-mobile-menu {
   position: fixed !important;
-  bottom: 80px !important;
-  right: 20px !important;
-  top: auto !important;
-  width: calc(100% - 40px) !important;
-  z-index: 9500;
+  /* Centered popover on mobile for consistency */
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  bottom: auto !important;
+  right: auto !important;
+  width: min(320px, 90vw) !important;
+  z-index: 9700;
+  margin: 0 !important;
 }
 
 .style-group {

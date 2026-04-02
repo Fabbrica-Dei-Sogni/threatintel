@@ -15,50 +15,58 @@
         <transition name="popover">
           <div v-if="showMenu" class="action-menu popover-menu glass-morphism" :class="{ 'is-mobile-menu': isMobile }">
             <div class="menu-header mini">
-              <strong>{{ t('common.preview').toUpperCase() }}</strong>
+              <strong>{{ t('common.generateDossier').toUpperCase() }}</strong>
+              <div class="header-status">
+                <span class="status-label">READY</span>
+                <span class="status-dot pulse"></span>
+              </div>
             </div>
             
-            <!-- Classic Admin Style -->
-            <div class="style-group">
-              <div class="group-label">{{ t('common.dossierStyleAdmin').toUpperCase() }}</div>
-              <div class="action-buttons">
-                <button @click="handlePreview('classic')" class="menu-item mini" :disabled="loadingHtml">
-                  <span class="icon-mini">👁️</span> {{ t('common.preview') }}
-                </button>
-                <button @click="handleDownload('classic')" class="menu-item mini" :disabled="loadingPdf">
-                  <span class="icon-mini">📥</span> PDF
-                </button>
+            <div class="selection-grid mini">
+              <!-- Admin Style -->
+              <div class="style-row mini">
+                <div class="style-info">
+                  <span class="style-name">{{ t('common.dossierStyleAdmin') }}</span>
+                  <span class="style-desc">Formal technical review</span>
+                </div>
+                <div class="style-actions">
+                  <button @click="handlePreview('classic')" class="action-btn-mini">👁️</button>
+                  <button @click="handleDownload('classic')" class="action-btn-mini">📥</button>
+                </div>
+              </div>
+
+              <div class="row-divider"></div>
+
+              <!-- Tactical HUD Style -->
+              <div class="style-row mini">
+                <div class="style-info">
+                  <span class="style-name">{{ t('common.dossierStyleTactical') }}</span>
+                  <span class="style-desc">Cyber-sleek visual HUD</span>
+                </div>
+                <div class="style-actions">
+                  <button @click="handlePreview('hud')" class="action-btn-mini">👁️</button>
+                  <button @click="handleDownload('hud')" class="action-btn-mini">📥</button>
+                </div>
+              </div>
+
+              <div class="row-divider"></div>
+
+              <!-- Forensic Telex Style -->
+              <div class="style-row mini">
+                <div class="style-info">
+                  <span class="style-name">{{ t('common.dossierStyleForensic') }}</span>
+                  <span class="style-desc">Raw forensic teletype</span>
+                </div>
+                <div class="style-actions">
+                  <button @click="handlePreview('telex')" class="action-btn-mini">👁️</button>
+                  <button @click="handleDownload('telex')" class="action-btn-mini">📥</button>
+                </div>
               </div>
             </div>
 
-            <div class="menu-divider"></div>
-
-            <!-- Tactical HUD Style -->
-            <div class="style-group">
-              <div class="group-label">{{ t('common.dossierStyleTactical').toUpperCase() }}</div>
-              <div class="action-buttons">
-                <button @click="handlePreview('hud')" class="menu-item mini" :disabled="loadingHtml">
-                  <span class="icon-mini">👁️</span> {{ t('common.preview') }}
-                </button>
-                <button @click="handleDownload('hud')" class="menu-item mini" :disabled="loadingPdf">
-                  <span class="icon-mini">📥</span> PDF
-                </button>
-              </div>
-            </div>
-
-             <div class="menu-divider"></div>
-
-            <!-- Forensic Telex Style -->
-            <div class="style-group">
-              <div class="group-label">{{ t('common.dossierStyleForensic').toUpperCase() }}</div>
-              <div class="action-buttons">
-                <button @click="handlePreview('telex')" class="menu-item mini" :disabled="loadingHtml">
-                  <span class="icon-mini">👁️</span> {{ t('common.preview') }}
-                </button>
-                <button @click="handleDownload('telex')" class="menu-item mini" :disabled="loadingPdf">
-                  <span class="icon-mini">📥</span> PDF
-                </button>
-              </div>
+            <!-- Loading Overlay -->
+            <div v-if="loadingHtml || loadingPdf" class="menu-loading-overlay mini">
+              <span class="spinner-small"></span>
             </div>
           </div>
         </transition>
@@ -264,74 +272,138 @@ onUnmounted(() => {
   border-color: var(--theme-color);
 }
 
+/* Tactical Selection Grid Sync */
+.selection-grid.mini {
+  padding: 10px 15px 15px;
+}
+
+.style-row.mini {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 8px;
+  border-radius: 10px;
+  transition: background 0.2s;
+}
+
+.style-row.mini:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.style-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.style-name {
+  font-weight: 800;
+  font-size: 0.8rem;
+  color: #fff;
+}
+
+.style-desc {
+  font-size: 0.55rem;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.style-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.action-btn-mini {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #fff;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+}
+
+.action-btn-mini:hover {
+  background: var(--theme-color);
+  border-color: var(--theme-color);
+  transform: translateY(-1px);
+}
+
+.row-divider {
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.05), transparent);
+  margin: 2px 8px;
+}
+
+.header-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-label {
+  font-size: 0.55rem;
+  font-weight: 900;
+  color: #10b981;
+  letter-spacing: 1px;
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  background: #10b981;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #10b981;
+}
+
+.menu-loading-overlay.mini {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+}
+
 .popover-menu {
   position: absolute;
   top: 100%;
   right: 0;
   margin-top: 10px;
   width: 280px;
-  z-index: 9600; /* Higher than backdrop */
-  border-radius: 12px;
-  padding: 10px 0;
+  z-index: 9600;
+  border-radius: 16px;
+  padding: 5px 0;
 }
 
 .is-mobile-menu {
   position: fixed !important;
-  /* Centered popover on mobile for consistency */
   top: 50% !important;
   left: 50% !important;
   transform: translate(-50%, -50%) !important;
   bottom: auto !important;
   right: auto !important;
-  width: min(320px, 90vw) !important;
+  width: min(340px, 92vw) !important;
   z-index: 9700;
   margin: 0 !important;
 }
 
-.style-group {
-  padding: 10px 20px;
-}
-
-.group-label {
-  font-size: 0.65rem;
-  letter-spacing: 2px;
-  color: #64748b;
-  margin-bottom: 8px;
-  font-weight: 900;
-}
-
-.action-buttons {
-  display: flex;
-  gap: 10px;
-}
-
-.menu-item.mini {
-  flex: 1;
-  padding: 8px 12px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 6px;
-  color: #e2e8f0;
-  font-size: 0.75rem;
-  font-weight: 700;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  transition: all 0.2s;
-}
-
-.menu-item.mini:hover {
-  background: rgba(99, 102, 241, 0.2);
-  border-color: var(--theme-color);
-  color: var(--theme-color);
+.pulse { animation: pulse-status 2s infinite; }
+@keyframes pulse-status {
+  0% { opacity: 1; }
+  50% { opacity: 0.4; }
+  100% { opacity: 1; }
 }
 
 .menu-divider {
-  height: 1px;
-  background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.1), transparent);
-  margin: 5px 0;
+  display: none; /* Replaced by row-divider */
 }
 
 .menu-backdrop {

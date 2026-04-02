@@ -14,26 +14,59 @@
         <transition name="slide-card">
           <div v-if="showMenu" class="action-menu glass-morphism" :class="['mode-sticky', { 'is-mobile-menu': isMobile }]">
             <div class="menu-header">
-              <strong>COMMAND CENTER</strong>
-              <span class="status-dot pulse"></span>
+              <strong>FORENSIC GENERATOR</strong>
+              <div class="header-status">
+                <span class="status-label">READY</span>
+                <span class="status-dot pulse"></span>
+              </div>
             </div>
-            <button @click="handlePreview" class="menu-item" :disabled="loadingHtml">
-              <span class="icon">👁️</span>
-              <div class="item-info">
-                <span class="title">{{ t('common.viewHtml') }}</span>
-                <span class="subtext">Anteprima Interattiva</span>
+            
+            <div class="selection-grid">
+              <!-- Administrative Style -->
+              <div class="style-row">
+                <div class="style-info">
+                  <span class="style-name">{{ t('common.dossierStyleAdmin') }}</span>
+                  <span class="style-desc">Formal legal/admin format</span>
+                </div>
+                <div class="style-actions">
+                  <button @click="handlePreview('classic')" class="action-btn" :title="t('common.preview')">👁️</button>
+                  <button @click="handleDownload('classic')" class="action-btn" :title="t('common.downloadPdf')">📥</button>
+                </div>
               </div>
-              <span v-if="loadingHtml" class="spinner-tiny"></span>
-            </button>
-            <div class="menu-divider"></div>
-            <button @click="handleDownload" class="menu-item" :disabled="loadingPdf">
-              <span class="icon">📥</span>
-              <div class="item-info">
-                <span class="title">{{ t('common.downloadPdf') }}</span>
-                <span class="subtext">Documento Forense A4</span>
+
+              <div class="row-divider"></div>
+
+              <!-- Tactical Style -->
+              <div class="style-row">
+                <div class="style-info">
+                  <span class="style-name">{{ t('common.dossierStyleTactical') }}</span>
+                  <span class="style-desc">High-density HUD layout</span>
+                </div>
+                <div class="style-actions">
+                  <button @click="handlePreview('hud')" class="action-btn" :title="t('common.preview')">👁️</button>
+                  <button @click="handleDownload('hud')" class="action-btn" :title="t('common.downloadPdf')">📥</button>
+                </div>
               </div>
-              <span v-if="loadingPdf" class="spinner-tiny"></span>
-            </button>
+
+              <div class="row-divider"></div>
+
+              <!-- Forensic Style -->
+              <div class="style-row">
+                <div class="style-info">
+                  <span class="style-name">{{ t('common.dossierStyleForensic') }}</span>
+                  <span class="style-desc">Old-school teletype stream</span>
+                </div>
+                <div class="style-actions">
+                  <button @click="handlePreview('telex')" class="action-btn" :title="t('common.preview')">👁️</button>
+                  <button @click="handleDownload('telex')" class="action-btn" :title="t('common.downloadPdf')">📥</button>
+                </div>
+              </div>
+            </div>
+
+            <div v-if="loadingHtml || loadingPdf" class="menu-loading-overlay">
+              <span class="spinner-large"></span>
+              <span class="loading-text">{{ loadingPdf ? 'GENERATING PDF...' : 'DECRYPTING HTML...' }}</span>
+            </div>
           </div>
         </transition>
       </Teleport>
@@ -53,23 +86,39 @@
         <transition name="popover">
           <div v-if="showMenu" class="action-menu popover-menu glass-morphism" :class="{ 'is-mobile-menu': isMobile }">
             <div class="menu-header mini">
-              <strong>{{ t('common.preview').toUpperCase() }}</strong>
+              <strong>{{ t('common.generateReport').toUpperCase() }}</strong>
             </div>
-            <button @click="handlePreview" class="menu-item" :disabled="loadingHtml">
-              <span class="icon">👁️</span>
-              <div class="item-info">
-                <span class="title">{{ t('common.viewHtml') }}</span>
+            
+            <div class="selection-grid mini">
+              <!-- Admin -->
+              <div class="style-row mini">
+                <span class="style-name">{{ t('common.dossierStyleAdmin') }}</span>
+                <div class="style-actions">
+                  <button @click="handlePreview('classic')" class="action-btn-mini">👁️</button>
+                  <button @click="handleDownload('classic')" class="action-btn-mini">📥</button>
+                </div>
               </div>
-              <span v-if="loadingHtml" class="spinner-tiny"></span>
-            </button>
-            <div class="menu-divider"></div>
-            <button @click="handleDownload" class="menu-item" :disabled="loadingPdf">
-              <span class="icon">📥</span>
-              <div class="item-info">
-                <span class="title">{{ t('common.downloadPdf') }}</span>
+              <!-- HUD -->
+              <div class="style-row mini">
+                <span class="style-name">{{ t('common.dossierStyleTactical') }}</span>
+                <div class="style-actions">
+                  <button @click="handlePreview('hud')" class="action-btn-mini">👁️</button>
+                  <button @click="handleDownload('hud')" class="action-btn-mini">📥</button>
+                </div>
               </div>
-              <span v-if="loadingPdf" class="spinner-tiny"></span>
-            </button>
+              <!-- Telex -->
+              <div class="style-row mini">
+                <span class="style-name">{{ t('common.dossierStyleForensic') }}</span>
+                <div class="style-actions">
+                  <button @click="handlePreview('telex')" class="action-btn-mini">👁️</button>
+                  <button @click="handleDownload('telex')" class="action-btn-mini">📥</button>
+                </div>
+              </div>
+            </div>
+
+            <div v-if="loadingHtml || loadingPdf" class="menu-loading-overlay mini">
+              <span class="spinner-small"></span>
+            </div>
           </div>
         </transition>
       </Teleport>
@@ -88,10 +137,10 @@
             <div class="modal-header">
               <div class="header-title">
                 <span class="header-icon">🔎</span>
-                <h3>INTELLIGENCE DOSSIER PREVIEW</h3>
+                <h3>{{ t('common.dossierPreviewTitle').toUpperCase() }} [{{ currentStyle.toUpperCase() }}]</h3>
               </div>
               <div class="header-actions">
-                 <button @click="handleDownload" class="download-mini-btn" :disabled="loadingPdf">
+                 <button @click="handleDownload(currentStyle)" class="download-mini-btn" :disabled="loadingPdf">
                   <span v-if="loadingPdf" class="spinner-tiny"></span>
                   <span v-else>📥 {{ t('common.downloadPdf') }}</span>
                 </button>
@@ -151,6 +200,7 @@ const showPreview = ref(false);
 const htmlContent = ref('');
 const loadingHtml = ref(false);
 const loadingPdf = ref(false);
+const currentStyle = ref('classic');
 
 const isMobile = ref(false);
 const checkMobile = () => {
@@ -190,8 +240,9 @@ const onFrameLoad = () => {
   }
 };
 
-const handlePreview = async () => {
+const handlePreview = async (style) => {
   showMenu.value = false;
+  currentStyle.value = style;
   loadingHtml.value = true;
   try {
     const blob = await fetchReport({
@@ -199,6 +250,7 @@ const handlePreview = async () => {
       ip: props.ip,
       sessionId: props.sessionId,
       format: 'html',
+      style: style,
       locale: locale.value
     });
     htmlContent.value = await blob.text();
@@ -218,7 +270,7 @@ const closePreview = () => {
   window.removeEventListener('resize', updateScale);
 };
 
-const handleDownload = async () => {
+const handleDownload = async (style) => {
   showMenu.value = false;
   loadingPdf.value = true;
   try {
@@ -227,12 +279,13 @@ const handleDownload = async () => {
       ip: props.ip,
       sessionId: props.sessionId,
       format: 'pdf',
+      style: style || currentStyle.value,
       locale: locale.value
     });
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    const finalFilename = `${props.filename}_${props.ip || props.sessionId}.pdf`;
+    const finalFilename = `${props.filename}_${props.ip || props.sessionId}_${style || 'report'}.pdf`;
     link.setAttribute('download', finalFilename);
     document.body.appendChild(link);
     link.click();
@@ -297,47 +350,158 @@ onUnmounted(() => {
   border-color: var(--theme-color);
 }
 
-.popover-menu {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  margin-top: 10px;
-  width: 220px;
-  z-index: 9600; /* Higher than backdrop */
-  border-radius: 12px;
+/* Tactical Selection Grid */
+.selection-grid {
+  padding: 10px 20px 20px;
 }
 
-.is-mobile-menu {
-  position: fixed !important;
-  bottom: 80px !important;
-  right: 20px !important;
-  top: auto !important;
-  width: calc(100% - 40px) !important;
-  z-index: 9500;
+.style-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 10px;
+  border-radius: 12px;
+  transition: background 0.3s;
+}
+
+.style-row:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.style-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.style-name {
+  font-weight: 800;
+  font-size: 0.85rem;
+  color: #fff;
+  letter-spacing: 1px;
+}
+
+.style-desc {
+  font-size: 0.6rem;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.style-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.action-btn {
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #94a3b8;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-size: 1rem;
+}
+
+.action-btn:hover {
+  border-color: var(--theme-color);
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.row-divider {
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.05), transparent);
+  margin: 0 10px;
+}
+
+.header-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.status-label {
+  font-size: 0.6rem;
+  font-weight: 900;
+  color: #10b981;
+  letter-spacing: 2px;
+}
+
+/* Mini Variants for popover mode */
+.selection-grid.mini {
+  padding: 5px 10px 10px;
+}
+
+.style-row.mini {
+  padding: 8px 10px;
+}
+
+.action-btn-mini {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all 0.2s;
+}
+
+.action-btn-mini:hover {
+  background: var(--theme-color);
+  border-color: var(--theme-color);
+}
+
+.menu-loading-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.8);
+  backdrop-filter: blur(4px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  z-index: 10;
+}
+
+.loading-text {
+  font-size: 0.65rem;
+  font-weight: 950;
+  letter-spacing: 3px;
+  color: #fff;
 }
 
 /* Unify Sticky Menu Position */
-.action-menu.mode-sticky,
-.is-mobile-menu.mode-sticky {
+.action-menu.mode-sticky {
   position: fixed !important;
   top: 15vh !important;
   right: 64px !important;
-  width: 280px !important;
-  bottom: auto !important;
+  width: min(280px, 90vw) !important;
   z-index: 9600;
+  bottom: auto !important;
+  left: auto !important;
+  transform: none;
 }
 
 @media (max-width: 768px) {
-  .action-menu.mode-sticky,
-  .is-mobile-menu.mode-sticky {
-    top: 18vh !important;
-    right: 54px !important;
-    width: clamp(260px, 80vw, 300px) !important;
+  /* Center any mobile menu regardless of mode if it has is-mobile-menu */
+  .action-menu.is-mobile-menu {
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    width: min(340px, 92vw) !important;
+    position: fixed !important;
+    right: auto !important;
+    bottom: auto !important;
+    z-index: 9700 !important;
   }
-}
-
-.popover-menu .menu-item {
-  padding: 14px 18px;
 }
 
 /* Sticky Action Tab Mode */

@@ -283,6 +283,7 @@ export async function fetchReport(params: {
     ip?: string;
     sessionId?: string;
     format?: string;
+    style?: string;
     locale?: string;
 }): Promise<Blob> {
     try {

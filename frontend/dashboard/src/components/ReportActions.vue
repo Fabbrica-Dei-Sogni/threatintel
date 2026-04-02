@@ -21,7 +21,7 @@
           <div class="tab-trigger" @click="toggle">
             <span v-if="loadingPdf || loadingHtml" class="spinner-small"></span>
             <span v-else class="tab-icon">📊</span>
-            <span class="tab-text">{{ t('home.dashboard').toUpperCase() }}</span>
+            <span class="tab-text">{{ t('common.generateReport').toUpperCase() }}</span>
           </div>
         </div>
 
@@ -83,7 +83,7 @@ const handlePreview = async (style) => {
       ip: props.ip,
       sessionId: props.sessionId,
       format: 'html',
-      style: style,
+      style: style || currentStyle.value,
       locale: locale.value
     });
     htmlContent.value = await blob.text();

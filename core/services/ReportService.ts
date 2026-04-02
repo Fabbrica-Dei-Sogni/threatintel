@@ -49,7 +49,7 @@ export class ReportService {
                 throw new Error('Tipo di report non supportato');
         }
 
-        const templatePath = path.join(__dirname, `../templates/reports/${templateName}`);
+        const templatePath = path.join(__dirname, `../templates/reports/details/${templateName}`);
         
         // Carichiamo il logo dal progetto e lo convertiamo in base64 per incorporarlo nel PDF
         let logoBase64 = '';
@@ -69,13 +69,8 @@ export class ReportService {
         return await this.convertToPdf(html);
     }
 
-    /**
-     * Genera un Dossier Investigativo Personalizzato partendo da una lista di sezioni catturate
-     */
-    async generateCustomReport(sections: IDossierSection[], locale: string, format: 'html' | 'pdf' = 'pdf'): Promise<Buffer | string> {
-        this.logger.info(`[ReportService] Generazione Custom Dossier (Telex) (${sections.length} sezioni) [${locale}]`);
-
-        const templatePath = path.join(__dirname, `../templates/reports/custom-dossier.ejs`);
+    
+    async generateCommonReport(templatePath: string,sections: IDossierSection[], locale: string, format: 'html' | 'pdf' = 'pdf'): Promise<Buffer | string> { 
         
         let logoBase64 = '';
         try {
@@ -85,51 +80,8 @@ export class ReportService {
         } catch (e) {
             this.logger.error(`[ReportService] Errore caricamento logo: ${e}`);
         }
-
-        const t = (key: string, params?: any) => this.i18n.t(key, locale, params);
 
         // Prepariamo le sezioni renderizzando il testo lato server per massima precisione
-        const enrichedSections = sections.map(s => {
-            const sanitizedData = this.sanitizeSectionData(s.data);
-            // Priorità al testo già renderizzato dal frontend (Sorgente di verità i18n)
-            const newRenderedText = s.renderedText || (s.templateKey ? this.renderSection(s.templateKey, sanitizedData, locale) : '');
-
-            return {
-                ...s,
-                data: sanitizedData,
-                renderedText: newRenderedText
-            };
-        });
-
-        const html = await ejs.renderFile(templatePath, { 
-            sections: enrichedSections, 
-            logoBase64, 
-            t, 
-            locale 
-        });
-
-        if (format === 'html') return html;
-
-        return await this.convertToPdf(html);
-    }
-
-    /**
-     * Genera un Dossier in stile HUD (Rich UI) usando frammenti EJS modulari
-     */
-    async generateHudReport(sections: IDossierSection[], locale: string, format: 'html' | 'pdf' = 'pdf'): Promise<Buffer | string> {
-        this.logger.info(`[ReportService] Generazione HUD Dossier (${sections.length} sezioni) [${locale}]`);
-
-        const templatePath = path.join(__dirname, `../templates/reports/hud-dossier.ejs`);
-        
-        let logoBase64 = '';
-        try {
-            const logoPath = path.join(__dirname, '../public/assets/intelligence-logo.png');
-            const logoBuffer = fs.readFileSync(logoPath);
-            logoBase64 = `data:image/png;base64,${logoBuffer.toString('base64')}`;
-        } catch (e) {
-            this.logger.error(`[ReportService] Errore caricamento logo: ${e}`);
-        }
-
         const t = (key: string, params?: any) => this.i18n.t(key, locale, params);
 
         // Arricchiamo le sezioni con il testo renderizzato per i casi di fallback (generic blocks)
@@ -145,8 +97,8 @@ export class ReportService {
                 data: sanitizedData,
                 renderedText: newRenderedText
             };
-        });
-
+        });  
+        
         const html = await ejs.renderFile(templatePath, { 
             sections: enrichedSections, 
             logoBase64, 
@@ -156,7 +108,29 @@ export class ReportService {
 
         if (format === 'html') return html;
 
-        return await this.convertToPdf(html);
+        return await this.convertToPdf(html);        
+
+    }
+    /**
+     * Genera un Dossier Investigativo Personalizzato partendo da una lista di sezioni catturate
+     */
+    async generateCustomReport(sections: IDossierSection[], locale: string, format: 'html' | 'pdf' = 'pdf'): Promise<Buffer | string> {
+        this.logger.info(`[ReportService] Generazione Custom Dossier (Telex) (${sections.length} sezioni) [${locale}]`);
+
+        const templatePath = path.join(__dirname, `../templates/reports/custom-dossier.ejs`);
+        
+        return this.generateCommonReport(templatePath, sections, locale, format);
+    }
+
+    /**
+     * Genera un Dossier in stile HUD (Rich UI) usando frammenti EJS modulari
+     */
+    async generateHudReport(sections: IDossierSection[], locale: string, format: 'html' | 'pdf' = 'pdf'): Promise<Buffer | string> {
+        this.logger.info(`[ReportService] Generazione HUD Dossier (${sections.length} sezioni) [${locale}]`);
+
+        const templatePath = path.join(__dirname, `../templates/reports/hud-dossier.ejs`);
+        
+        return this.generateCommonReport(templatePath, sections, locale, format);
     }
 
     /**
@@ -167,40 +141,7 @@ export class ReportService {
 
         const templatePath = path.join(__dirname, `../templates/reports/classic-dossier.ejs`);
         
-        let logoBase64 = '';
-        try {
-            const logoPath = path.join(__dirname, '../public/assets/intelligence-logo.png');
-            const logoBuffer = fs.readFileSync(logoPath);
-            logoBase64 = `data:image/png;base64,${logoBuffer.toString('base64')}`;
-        } catch (e) {
-            this.logger.error(`[ReportService] Errore caricamento logo: ${e}`);
-        }
-
-        const t = (key: string, params?: any) => this.i18n.t(key, locale, params);
-
-        // Arricchiamo le sezioni con il testo renderizzato per i casi di fallback (telex extracts)
-        const enrichedSections = sections.map(s => {
-            const sanitizedData = this.sanitizeSectionData(s.data);
-            // Priorità al testo già renderizzato dal frontend (Sorgente di verità i18n)
-            const newRenderedText = s.renderedText || (s.templateKey ? this.renderSection(s.templateKey, sanitizedData, locale) : '');
-
-            return {
-                ...s,
-                data: sanitizedData,
-                renderedText: newRenderedText
-            };
-        });
-
-        const html = await ejs.renderFile(templatePath, { 
-            sections: enrichedSections, 
-            logoBase64, 
-            t, 
-            locale 
-        });
-
-        if (format === 'html') return html;
-
-        return await this.convertToPdf(html);
+        return this.generateCommonReport(templatePath, sections, locale, format);
     }
 
     /**
@@ -233,6 +174,12 @@ export class ReportService {
         }
     }
 
+    /**
+     * Recupera i dati per la generazione del report di attacco
+     * @param ip 
+     * @param locale 
+     * @returns 
+     */
     private async getAttackReportData(ip: string, locale: string) {
         const attack = await this.threatLogService.getAttackDetail({ ip });
         const logs = await this.threatLogService.getLogs({ filters: { 'request.ip': ip }, pageSize: 100 });
@@ -264,6 +211,12 @@ export class ReportService {
         };
     }
 
+    /**
+     * Recupera i dati per la generazione del report di sessione Telnet
+     * @param sessionId 
+     * @param locale 
+     * @returns 
+     */
     private async getTelnetReportData(sessionId: string, locale: string) {
         const session = await this.cowrieService.getSessionDetails(sessionId);
         if (!session) {
@@ -320,6 +273,12 @@ export class ReportService {
         };
     }
 
+    /**
+     * Recupera i dati per la generazione del report di un dettaglio IP
+     * @param ip 
+     * @param locale 
+     * @returns 
+     */
     private async getIpReportData(ip: string, locale: string) {
         const data = await this.ipDetailsService.getIpDetails(ip);
         const details = data?.ipDetails;

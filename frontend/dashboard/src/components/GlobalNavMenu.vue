@@ -48,10 +48,10 @@ const dossierStore = useDossierStore();
 const isOpen = ref(false);
 
 const allOptions = [
-  { path: '/', domain: 'home', icon: '🏠', label: 'Cruscotto' },
-  { path: '/dossiers', domain: 'dossier', icon: '📁', label: 'Archivio Dossier' },
-  { path: '/attacks', domain: 'attack', icon: '🛰️', label: 'Attacchi HTTP' },
-  { path: '/telnet-sessions', domain: 'telnet', icon: '📟', label: 'Sessioni Telnet' }
+  { path: '/', domain: 'home', icon: '🏠', label: t('home.dashboard') },
+  { path: '/dossiers', domain: 'dossier', icon: '📁', label: t('common.dossier') },
+  { path: '/attacks', domain: 'attack', icon: '🛰️', label: t('attacks.title') },
+  { path: '/telnet-sessions', domain: 'telnet', icon: '📟', label: t('home.telnet') }
 ];
 
 const currentDomain = computed(() => {

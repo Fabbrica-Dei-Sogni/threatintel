@@ -95,7 +95,7 @@
     },
     "home": {
         "title": "FORENSIC OPS CONSOLE",
-        "dashboard": "FORENSIC OPS CONSOLE",
+        "dashboard": "Cruscotto",
         "attacks": "Attacchi",
         "logRequests": "Log requests",
         "recentAttacks": "Ultimi 10 attacchi",
@@ -132,7 +132,7 @@
     },
     "attacks": {
         "title": "Attacchi",
-        "dashboard": "FORENSIC OPS CONSOLE",
+        "dashboard": "Cruscotto",
         "logRequests": "Log requests",
         "minLogsLabel": "Numero minimo di log per attacco:",
         "timeFilter": "Filtro temporale:",
@@ -289,7 +289,7 @@
     },
     "threatLogs": {
         "title": "Log minacce",
-        "dashboard": "FORENSIC OPS CONSOLE",
+        "dashboard": "Cruscotto",
         "attacks": "Attacchi",
         "filterByIp": "Filtra per IP...",
         "filterByUrl": "Filtra per URL...",
@@ -433,7 +433,7 @@
     "nav": {
         "menu": "Menu",
         "menuTitle": "Navigazione",
-        "dashboard": "FORENSIC OPS CONSOLE",
+        "dashboard": "Cruscotto",
         "attacks": "Attacchi",
         "logs": "Log Richieste",
         "configuration": "Configurazione",
@@ -476,7 +476,7 @@
     "cowrie": {
         "sessions": {
             "title": "Sessioni Telnet",
-            "backToDashboard": "FORENSIC OPS CONSOLE",
+            "backToDashboard": "Cruscotto",
             "emptyState": "Nessuna attività honeypot rilevata.",
             "filterByIp": "Filtra per IP...",
             "clearIpFilter": "Svuota filtro IP",

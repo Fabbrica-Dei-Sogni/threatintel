@@ -5,7 +5,8 @@
     align-items: center;
     gap: 15px;
     margin-bottom: 25px;
-    flex-wrap: wrap; /* Permette il wrapping su schermi piccoli */
+    flex-wrap: wrap;
+    /* Permette il wrapping su schermi piccoli */
 }
 
 .header-top :last-child {
@@ -18,6 +19,7 @@
         align-items: flex-start;
         gap: 10px;
     }
+
     .header-top :last-child {
         margin-left: 0;
         width: 100%;
@@ -101,7 +103,8 @@
     background: rgba(0, 0, 0, 0.2);
     border: 1px solid rgba(255, 255, 255, 0.1);
     color: white;
-    padding: 10px 15px 10px 40px; /* Spazio per l'icona */
+    padding: 10px 15px 10px 40px;
+    /* Spazio per l'icona */
     border-radius: 10px;
     width: 100%;
     outline: none;
@@ -113,14 +116,15 @@
         padding: 15px;
         gap: 10px;
     }
-    
+
     .search-box {
         width: 100%;
         min-width: 100%;
         flex: none;
     }
-    
-    .filter-group, .filter-select {
+
+    .filter-group,
+    .filter-select {
         width: 100%;
     }
 

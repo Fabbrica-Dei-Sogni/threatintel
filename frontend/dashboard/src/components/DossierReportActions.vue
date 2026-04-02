@@ -8,7 +8,7 @@
       :htmlContent="htmlContent"
       :showPreview="showPreview"
       :currentStyle="currentStyle"
-      :title="t('common.generateDossier')"
+      :title="t('home.title')"
       @action="handleHUDAction"
       @closePreview="closePreview"
     >
@@ -18,7 +18,7 @@
             <span v-if="loadingPdf || loadingHtml" class="spinner-small"></span>
             <span v-else class="btn-content">
               <span class="icon">📊</span>
-              {{ t('common.generateReport').toUpperCase() }}
+              {{ t('home.dashboard').toUpperCase() }}
             </span>
           </button>
         </div>

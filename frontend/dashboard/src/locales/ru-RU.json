@@ -95,7 +95,7 @@
     },
     "home": {
         "title": "Форензик Опс-Консоль",
-        "dashboard": "Форензик Опс-Консоль",
+        "dashboard": "Панель управления",
         "attacks": "Атаки",
         "logRequests": "Журналы запросов",
         "recentAttacks": "Последние 10 атак",
@@ -132,7 +132,7 @@
     },
     "attacks": {
         "title": "Атаки",
-        "dashboard": "Форензик Опс-Консоль",
+        "dashboard": "Панель управления",
         "logRequests": "Журналы запросов",
         "minLogsLabel": "Минимальное количество журналов на атаку:",
         "timeFilter": "Временной фильтр:",
@@ -289,7 +289,7 @@
     },
     "threatLogs": {
         "title": "Журналы угроз",
-        "dashboard": "Форензик Опс-Консоль",
+        "dashboard": "Панель управления",
         "attacks": "Атаки",
         "filterByIp": "Фильтр по IP...",
         "filterByUrl": "Фильтр по URL...",
@@ -433,7 +433,7 @@
     "nav": {
         "menu": "Меню",
         "menuTitle": "Навигация",
-        "dashboard": "Форензик Опс-Консоль",
+        "dashboard": "Панель управления",
         "attacks": "Атаки",
         "logs": "Журналы запросов",
         "configuration": "Конфигурация",
@@ -475,8 +475,8 @@
     },
     "cowrie": {
         "sessions": {
-            "title": "Сессии Telnet",
-            "backToDashboard": "Форензик Опс-Консоль",
+            "title": "Telnet-сессии",
+            "backToDashboard": "Панель управления",
             "emptyState": "Активность honeypot пока не обнаружена.",
             "filterByIp": "Фильтр по IP...",
             "clearIpFilter": "Очистить фильтр IP",

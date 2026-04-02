@@ -6,7 +6,7 @@
     </div>
 
     <div class="archive-header">
-      <button @click="goBack" class="back-btn">← {{ t('home.dashboard').toUpperCase() }}</button>
+      <button @click="goBack" class="back-btn">{{ t('home.dashboard').toUpperCase() }}</button>
       <div class="header-stats">
         <span class="badge indigo-pulse">{{ total }} {{ t('common.investigations') }}</span>
       </div>
@@ -16,13 +16,8 @@
     <div class="archive-controls glass-morphism">
       <div class="search-box">
         <span class="search-icon">🔍</span>
-        <input 
-          v-model="filterSearch" 
-          type="text" 
-          class="search-input" 
-          :placeholder="t('common.searchByTitleOrIp')"
-          @input="handleSearchInput"
-        />
+        <input v-model="filterSearch" type="text" class="search-input" :placeholder="t('common.searchByTitleOrIp')"
+          @input="handleSearchInput" />
       </div>
       <div class="filter-group">
         <select v-model="filterStatus" class="filter-select">
@@ -36,7 +31,8 @@
         <select @change="handleSortChange" class="filter-select">
           <option value="createdAt:-1">{{ t('sorting.sortTimestamp') }} (Newest)</option>
           <option value="createdAt:1">{{ t('sorting.sortTimestamp') }} (Oldest)</option>
-          <option value="title:1">{{ t('sorting.sortUrl') }} (A-Z)</option> <!-- Using sortUrl because it's available and similar to Title -->
+          <option value="title:1">{{ t('sorting.sortUrl') }} (A-Z)</option>
+          <!-- Using sortUrl because it's available and similar to Title -->
           <option value="status:1">{{ t('common.status') }}</option>
         </select>
       </div>
@@ -50,8 +46,8 @@
     </div>
 
     <div v-else-if="dossiers.length === 0" class="empty-state">
-       <span class="empty-icon">📁</span>
-       <h3>{{ t('common.noDossiersFound') }}</h3>
+      <span class="empty-icon">📁</span>
+      <h3>{{ t('common.noDossiersFound') }}</h3>
     </div>
 
     <div v-else class="dossier-grid">
@@ -60,7 +56,7 @@
           <h3>{{ dossier.title }}</h3>
           <span class="status-dot" :class="dossier.status.toLowerCase()"></span>
         </div>
-        
+
         <p class="description">{{ dossier.description || t('common.noDescription') }}</p>
 
         <div class="dossier-meta">
@@ -71,7 +67,7 @@
             <span class="icon">🧩</span> {{ dossier.sections.length }} {{ t('common.sections') }}
           </div>
           <div class="meta-item" v-if="dossier.tags && dossier.tags.length">
-             <span class="tag-badge" v-for="tag in dossier.tags" :key="tag">{{ tag }}</span>
+            <span class="tag-badge" v-for="tag in dossier.tags" :key="tag">{{ tag }}</span>
           </div>
         </div>
 
@@ -91,24 +87,13 @@
 
     <!-- Pagination -->
     <div class="pagination-controls" v-if="totalPages > 1">
-      <button 
-        class="page-btn" 
-        :disabled="page === 1" 
-        @click="changePage(page - 1)">
+      <button class="page-btn" :disabled="page === 1" @click="changePage(page - 1)">
         &lt;
       </button>
-      <button 
-        v-for="p in totalPages" 
-        :key="p" 
-        class="page-btn" 
-        :class="{ active: p === page }"
-        @click="changePage(p)">
+      <button v-for="p in totalPages" :key="p" class="page-btn" :class="{ active: p === page }" @click="changePage(p)">
         {{ p }}
       </button>
-      <button 
-        class="page-btn" 
-        :disabled="page === totalPages" 
-        @click="changePage(page + 1)">
+      <button class="page-btn" :disabled="page === totalPages" @click="changePage(page + 1)">
         &gt;
       </button>
     </div>
@@ -212,7 +197,7 @@ const goBack = () => {
 
 const exportDossierPdf = async (id) => {
   try {
-    await exportDossier(id, 'pdf', 'classic'); 
+    await exportDossier(id, 'pdf', 'classic');
     ElMessage.success(t('common.downloadPdf'));
   } catch (err) {
     ElMessage.error(t('common.errorExporting'));
@@ -228,7 +213,7 @@ const confirmDelete = (id) => {
     await deleteDossier(id);
     ElMessage.info(t('common.dossierDeleted'));
     fetchData();
-  }).catch(() => {});
+  }).catch(() => { });
 };
 
 const formatDate = (date) => dayjs(date).format('DD/MM/YYYY HH:mm');
@@ -257,9 +242,20 @@ onMounted(() => {
   height: 10px;
   border-radius: 50%;
 }
-.status-dot.finalized { background: #10b981; box-shadow: 0 0 8px #10b981; }
-.status-dot.draft { background: #f59e0b; box-shadow: 0 0 8px #f59e0b; }
-.status-dot.archived { background: #64748b; }
+
+.status-dot.finalized {
+  background: #10b981;
+  box-shadow: 0 0 8px #10b981;
+}
+
+.status-dot.draft {
+  background: #f59e0b;
+  box-shadow: 0 0 8px #f59e0b;
+}
+
+.status-dot.archived {
+  background: #64748b;
+}
 
 .description {
   font-size: 0.85rem;
@@ -274,31 +270,47 @@ onMounted(() => {
 }
 
 .filter-select {
-    background: rgba(0, 0, 0, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: #94a3b8;
-    padding: 10px;
-    border-radius: 10px;
-    outline: none;
-    cursor: pointer;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #94a3b8;
+  padding: 10px;
+  border-radius: 10px;
+  outline: none;
+  cursor: pointer;
 }
 
 .btn-refresh {
-    background: transparent;
-    border: none;
-    font-size: 1.2rem;
-    cursor: pointer;
-    transition: all 0.3s;
+  background: transparent;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.3s;
 }
-.btn-refresh:hover { transform: scale(1.1); }
-.rotating { animation: spin 1s linear infinite; }
 
-@keyframes spin { to { transform: rotate(360deg); } }
-
-.loading-state, .empty-state {
-    padding: 100px;
-    text-align: center;
-    color: #475569;
+.btn-refresh:hover {
+  transform: scale(1.1);
 }
-.empty-icon { font-size: 4rem; display: block; margin-bottom: 20px; }
+
+.rotating {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-state,
+.empty-state {
+  padding: 100px;
+  text-align: center;
+  color: #475569;
+}
+
+.empty-icon {
+  font-size: 4rem;
+  display: block;
+  margin-bottom: 20px;
+}
 </style>

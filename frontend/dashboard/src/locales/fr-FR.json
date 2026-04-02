@@ -95,7 +95,7 @@
     },
     "home": {
         "title": "Console Ops Forensic",
-        "dashboard": "Console Ops Forensic",
+        "dashboard": "Tableau de bord",
         "attacks": "Attaques",
         "logRequests": "Journaux de requêtes",
         "recentAttacks": "10 dernières attaques",
@@ -132,7 +132,7 @@
     },
     "attacks": {
         "title": "Attaques",
-        "dashboard": "Console Ops Forensic",
+        "dashboard": "Tableau de bord",
         "logRequests": "Journaux de requêtes",
         "minLogsLabel": "Nombre minimum de journaux par attaque:",
         "timeFilter": "Filtre temporel:",
@@ -289,7 +289,7 @@
     },
     "threatLogs": {
         "title": "Journaux de menaces",
-        "dashboard": "Console Ops Forensic",
+        "dashboard": "Tableau de bord",
         "attacks": "Attaques",
         "filterByIp": "Filtrer par IP...",
         "filterByUrl": "Filtrer par URL...",
@@ -433,7 +433,7 @@
     "nav": {
         "menu": "Menu",
         "menuTitle": "Navigation",
-        "dashboard": "Console Ops Forensic",
+        "dashboard": "Tableau de bord",
         "attacks": "Attaques",
         "logs": "Journaux de requêtes",
         "configuration": "Configuration",
@@ -476,7 +476,7 @@
     "cowrie": {
         "sessions": {
             "title": "Sessions Telnet",
-            "backToDashboard": "Console Ops Forensic",
+            "backToDashboard": "Tableau de bord",
             "emptyState": "Aucune activité honeypot détectée pour le moment.",
             "filterByIp": "Filtrer par IP...",
             "clearIpFilter": "Effacer le filtre IP",

@@ -8,7 +8,7 @@
       :htmlContent="htmlContent"
       :showPreview="showPreview"
       :currentStyle="currentStyle"
-      :title="t('common.generateReport')"
+      :title="t('home.title')"
       @action="handleHUDAction"
       @closePreview="closePreview"
     >
@@ -21,7 +21,7 @@
           <div class="tab-trigger" @click="toggle">
             <span v-if="loadingPdf || loadingHtml" class="spinner-small"></span>
             <span v-else class="tab-icon">📊</span>
-            <span class="tab-text">{{ t('common.generateReport').toUpperCase() }}</span>
+            <span class="tab-text">{{ t('home.dashboard').toUpperCase() }}</span>
           </div>
         </div>
 
@@ -31,7 +31,7 @@
             <span v-if="loadingPdf || loadingHtml" class="spinner-small"></span>
             <span v-else class="btn-content">
               <span class="icon">📊</span>
-              {{ t('common.generateReport').toUpperCase() }}
+              {{ t('home.dashboard').toUpperCase() }}
             </span>
           </button>
         </div>

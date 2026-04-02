@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="<%= locale.split('-')[0] %>">
+<head>
+    <meta charset="UTF-8">
+    <title>TELEX - SESSION - <%= data.sessionId %></title>
+    <style>
+        body {
+            background-color: #f4f4f4;
+            color: #1a1a1a;
+            font-family: 'Courier New', Courier, monospace;
+            padding: 40px;
+            line-height: 1.2;
+            font-size: 11px;
+        }
+        .telex-container {
+            max-width: 800px;
+            margin: 0 auto;
+            border: 1px solid #ccc;
+            padding: 20px;
+            background: #fff;
+            box-shadow: 2px 2px 0px #000;
+        }
+        .header {
+            border-bottom: 2px solid #000;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+        .section {
+            margin-bottom: 20px;
+        }
+        .section-title {
+            text-decoration: underline;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        pre {
+            white-space: pre-wrap;
+            margin: 0;
+        }
+        .footer {
+            margin-top: 30px;
+            border-top: 1px solid #000;
+            padding-top: 10px;
+            font-size: 10px;
+            text-align: right;
+        }
+        .timeline-item {
+            border-bottom: 1px dashed #ccc;
+            padding: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="telex-container">
+        <div class="header">
+            TELEX-REPORT // <%= t('reports.common.agencyName') %> // <%= t('reports.fragments.telex.sigIntel').toUpperCase() %>
+        </div>
+
+        <div class="section">
+            <div class="section-title"><%= t('reports.fragments.telex.sessionMetadata').toUpperCase() %></div>
+            <pre>
+<%= t('reports.fragments.telex.sessionId').toUpperCase() %>: <%= data.sessionId %>
+<%= t('reports.fragments.telex.sourceIp').toUpperCase() %>: <%= data.ip %>
+<%= t('reports.fragments.telex.startTime').toUpperCase() %>: <%= data.sessionInfo.startTime %>
+<%= t('reports.fragments.telex.protocol').toUpperCase() %>: <%= data.sessionInfo.protocol %>
+<%= t('reports.fragments.telex.duration').toUpperCase() %>: <%= data.sessionInfo.duration %>
+            </pre>
+        </div>
+
+        <div class="section">
+            <div class="section-title"><%= t('reports.fragments.telex.metricsLog').toUpperCase() %></div>
+            <pre>
+<%= t('reports.fragments.telex.eventsCaptured').toUpperCase() %>: <%= data.sessionInfo.totalEvents %>
+<%= t('reports.fragments.telex.authAttempts').toUpperCase() %>: <%= data.sessionInfo.authAttempts %>
+<%= t('reports.fragments.telex.commandsIssued').toUpperCase() %>: <%= data.sessionInfo.commands %>
+            </pre>
+        </div>
+
+        <div class="section">
+            <div class="section-title"><%= t('reports.fragments.telex.signalInterceptStream').toUpperCase() %></div>
+            <div style="font-size: 10px;">
+                <% data.timeline.forEach(event => { %>
+                    <div class="timeline-item">
+                        [<%= new Date(event.timestamp).toISOString() %>] [<%= event.type.toUpperCase() %>]
+                        <% if (event.type.includes('login')) { %>
+                            <%= t('reports.fragments.telex.user').toUpperCase() %>: <%= event.username || '?' %> / <%= t('reports.fragments.telex.pass').toUpperCase() %>: <%= event.password || '?' %>
+                        <% } else if (event.input) { %>
+                            $ <%= event.input %>
+                        <% } else if (event.message) { %>
+                            <%= t('reports.fragments.telex.msg').toUpperCase() %>: <%= event.message %>
+                        <% } %>
+                    </div>
+                <% }); %>
+            </div>
+        </div>
+
+        <div class="footer">
+            <%= t('reports.fragments.telex.endOfTransmission').toUpperCase() %> // <%= t('reports.fragments.telex.date').toUpperCase() %>: <%= data.generatedAt %>
+        </div>
+    </div>
+</body>
+</html>

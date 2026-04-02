@@ -26,29 +26,30 @@ export class ReportService {
     /**
      * Entry point centralizzato per la generazione dei report
      */
-    async generateReport(type: ReportType, id: string, format: 'html' | 'pdf' = 'pdf', locale: string = 'it-IT'): Promise<Buffer | string> {
-        this.logger.info(`[ReportService] Generazione report ${type} per ${id} in formato ${format} [${locale}]`);
+    async generateDetailReport(type: ReportType, id: string, format: 'html' | 'pdf' = 'pdf', locale: string = 'it-IT', style: 'classic' | 'hud' | 'telex' = 'classic'): Promise<Buffer | string> {
+        this.logger.info(`[ReportDetailService] Generazione report ${type} per ${id} in formato ${format} [${locale}] - Stile: ${style}`);
 
         let data: any;
-        let templateName: string;
+        let templateBase: string;
 
         switch (type) {
             case 'attack':
                 data = await this.getAttackReportData(id, locale);
-                templateName = 'attack-detail.ejs';
+                templateBase = 'attack';
                 break;
             case 'telnet':
                 data = await this.getTelnetReportData(id, locale);
-                templateName = 'telnet-detail.ejs';
+                templateBase = 'telnet';
                 break;
             case 'ip':
                 data = await this.getIpReportData(id, locale);
-                templateName = 'ip-detail.ejs';
+                templateBase = 'ip';
                 break;
             default:
                 throw new Error('Tipo di report non supportato');
         }
 
+        const templateName = `${templateBase}-${style}.ejs`;
         const templatePath = path.join(__dirname, `../templates/reports/details/${templateName}`);
         
         // Carichiamo il logo dal progetto e lo convertiamo in base64 per incorporarlo nel PDF
@@ -114,7 +115,7 @@ export class ReportService {
     /**
      * Genera un Dossier Investigativo Personalizzato partendo da una lista di sezioni catturate
      */
-    async generateCustomReport(sections: IDossierSection[], locale: string, format: 'html' | 'pdf' = 'pdf'): Promise<Buffer | string> {
+    async generateTelexReport(sections: IDossierSection[], locale: string, format: 'html' | 'pdf' = 'pdf'): Promise<Buffer | string> {
         this.logger.info(`[ReportService] Generazione Custom Dossier (Telex) (${sections.length} sezioni) [${locale}]`);
 
         const templatePath = path.join(__dirname, `../templates/reports/custom-dossier.ejs`);

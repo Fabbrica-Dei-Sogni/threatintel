@@ -53,7 +53,7 @@ describe('ReportService', () => {
         mockThreatLogService.getLogs.mockResolvedValue(mockLogs as any);
         (ejs.renderFile as jest.Mock).mockResolvedValue('<html>Test Attack</html>');
 
-        const result = await reportService.generateReport('attack', '1.2.3.4', 'html');
+        const result = await reportService.generateDetailReport('attack', '1.2.3.4', 'html');
 
         expect(result).toBe('<html>Test Attack</html>');
         expect(mockThreatLogService.getAttackDetail).toHaveBeenCalledWith({ ip: '1.2.3.4' });
@@ -78,7 +78,7 @@ describe('ReportService', () => {
         };
         (puppeteer.launch as jest.Mock).mockResolvedValue(mockBrowser);
 
-        const result = await reportService.generateReport('telnet', 'sess1', 'pdf');
+        const result = await reportService.generateDetailReport('telnet', 'sess1', 'pdf');
 
         expect(Buffer.isBuffer(result)).toBe(true);
         expect(mockCowrieService.getSessionDetails).toHaveBeenCalledWith('sess1');
@@ -94,10 +94,22 @@ describe('ReportService', () => {
         mockIpDetailsService.getIpDetails.mockResolvedValue(mockIpData as any);
         (ejs.renderFile as jest.Mock).mockResolvedValue('<html>Test IP</html>');
 
-        const result = await reportService.generateReport('ip', '1.2.3.4', 'html');
+        const result = await reportService.generateDetailReport('ip', '1.2.3.4', 'html');
 
         expect(result).toBe('<html>Test IP</html>');
         expect(mockIpDetailsService.getIpDetails).toHaveBeenCalledWith('1.2.3.4');
+    });
+
+    it('dovrebbe supportare stili diversi (hud, telex) nella generazione report dettaglio', async () => {
+        const mockIpData = { ipDetails: { country: 'Italy' }, abuseReports: [] };
+        mockIpDetailsService.getIpDetails.mockResolvedValue(mockIpData as any);
+        (ejs.renderFile as jest.Mock).mockResolvedValue('<html>Styled Report</html>');
+
+        await reportService.generateDetailReport('ip', '1.2.3.4', 'html', 'it-IT', 'hud');
+        expect(ejs.renderFile).toHaveBeenCalledWith(expect.stringContaining('ip-hud.ejs'), expect.anything());
+
+        await reportService.generateDetailReport('ip', '1.2.3.4', 'html', 'it-IT', 'telex');
+        expect(ejs.renderFile).toHaveBeenCalledWith(expect.stringContaining('ip-telex.ejs'), expect.anything());
     });
 
     it('dovrebbe generare un dossier personalizzato (custom) con più sezioni', async () => {
@@ -114,7 +126,7 @@ describe('ReportService', () => {
 
         (ejs.renderFile as jest.Mock).mockResolvedValue('<html>Custom Dossier</html>');
 
-        const result = await reportService.generateCustomReport(mockSections, 'it-IT', 'html');
+        const result = await reportService.generateTelexReport(mockSections, 'it-IT', 'html');
 
         expect(result).toBe('<html>Custom Dossier</html>');
         expect(mockI18nService.tm).toHaveBeenCalledWith('clipboard.ipDetails.geo', 'it-IT');

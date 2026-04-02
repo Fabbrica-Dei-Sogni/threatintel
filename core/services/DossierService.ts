@@ -115,7 +115,7 @@ export class DossierService {
         } else if (style === 'classic') {
             return await this.reportService.generateClassicReport(sections, locale, format);
         } else {
-            return await this.reportService.generateCustomReport(sections, locale, format);
+            return await this.reportService.generateTelexReport(sections, locale, format);
         }
     }
 

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="<%= locale.split('-')[0] %>">
+<head>
+    <meta charset="UTF-8">
+    <title>TELEX - <%= data.ip %></title>
+    <style>
+        body {
+            background-color: #f4f4f4;
+            color: #1a1a1a;
+            font-family: 'Courier New', Courier, monospace;
+            padding: 40px;
+            line-height: 1.2;
+            font-size: 12px;
+        }
+        .telex-container {
+            max-width: 800px;
+            margin: 0 auto;
+            border: 1px solid #ccc;
+            padding: 20px;
+            background: #fff;
+            box-shadow: 2px 2px 0px #000;
+        }
+        .header {
+            border-bottom: 2px solid #000;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+        .section {
+            margin-bottom: 20px;
+        }
+        .section-title {
+            text-decoration: underline;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        pre {
+            white-space: pre-wrap;
+            margin: 0;
+        }
+        .footer {
+            margin-top: 30px;
+            border-top: 1px solid #000;
+            padding-top: 10px;
+            font-size: 10px;
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+    <div class="telex-container">
+        <div class="header">
+            TELEX-REPORT // <%= t('reports.common.agencyName') %> // ID: <%= data.ip %>
+        </div>
+
+        <div class="section">
+            <div class="section-title"><%= t('reports.fragments.telex.subjectIdentification').toUpperCase() %></div>
+            <pre>
+<%= t('reports.fragments.telex.ipAddress').toUpperCase() %>: <%= data.ip %>
+<%= t('reports.fragments.telex.dangerLevel').toUpperCase() %>: <%= data.summary.dangerLevel %>
+<%= t('reports.fragments.telex.dangerScore').toUpperCase() %>: <%= data.summary.dangerScore %>%
+<%= t('reports.fragments.telex.totalLogs').toUpperCase() %>: <%= data.summary.totalLogs %>
+<%= t('reports.fragments.telex.duration').toUpperCase() %>: <%= data.summary.duration %>
+            </pre>
+        </div>
+
+        <div class="section">
+            <div class="section-title"><%= t('reports.fragments.telex.geospatialData').toUpperCase() %></div>
+            <pre>
+<%= t('reports.fragments.telex.country').toUpperCase() %>: <%= data.ipInfo.country %> (<%= data.ipInfo.countryCode %>)
+<%= t('reports.fragments.telex.location').toUpperCase() %>: <%= data.ipInfo.city %>
+<%= t('reports.fragments.telex.isp').toUpperCase() %>: <%= data.ipInfo.isp %>
+<%= t('reports.fragments.telex.coords').toUpperCase() %>: <%= data.ipInfo.coordinates %>
+            </pre>
+        </div>
+
+        <div class="section">
+            <div class="section-title"><%= t('reports.fragments.telex.threatPatterns').toUpperCase() %></div>
+            <pre>
+<%= data.summary.techniques && data.summary.techniques.length > 0 ? data.summary.techniques.join(', ') : t('reports.fragments.telex.noneDetected').toUpperCase() %>
+            </pre>
+        </div>
+
+        <div class="section">
+            <div class="section-title"><%= t('reports.fragments.telex.abuseReputation').toUpperCase() %></div>
+            <pre>
+<%= t('reports.fragments.telex.confidence').toUpperCase() %>: <%= data.abuse.confidenceScore %>%
+<%= t('reports.fragments.telex.totalReports').toUpperCase() %>: <%= data.abuse.totalReports %>
+<%= t('reports.fragments.telex.lastSeen').toUpperCase() %>: <%= data.abuse.lastReportedAt %>
+            </pre>
+        </div>
+
+        <div class="section">
+            <div class="section-title"><%= t('reports.fragments.telex.operationalLogsExtract').toUpperCase() %></div>
+            <pre>
+<% data.events.slice(0, 50).forEach(log => { %>
+[<%= new Date(log.timestamp).toISOString() %>] <%= log.method %> <%= log.url %> -> <%= log.statusCode %>
+<% }); %>
+            </pre>
+        </div>
+
+        <div class="footer">
+            <%= t('reports.fragments.telex.endOfTransmission').toUpperCase() %> // <%= t('reports.fragments.telex.date').toUpperCase() %>: <%= data.generatedAt %>
+        </div>
+    </div>
+</body>
+</html>

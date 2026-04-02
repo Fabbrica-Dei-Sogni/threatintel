@@ -13,6 +13,7 @@ export class ReportController {
             const format = (req.query.format as 'html' | 'pdf') || 'pdf';
             const reportType = (type as ReportType) || 'attack';
             const lang = (locale as string) || 'it-IT';
+            const style = (req.query.style as 'classic' | 'hud' | 'telex') || 'classic';
 
             const id = (reportType === 'telnet' ? sessionId : ip) as string;
 
@@ -23,7 +24,7 @@ export class ReportController {
                 return res.status(400).json({ error: errorMsg });
             }
 
-            const result = await this.reportService.generateReport(reportType, id, format, lang);
+            const result = await this.reportService.generateDetailReport(reportType, id, format, lang, style);
 
             if (format === 'html') {
                 res.setHeader('Content-Type', 'text/html');
@@ -53,14 +54,20 @@ export class ReportController {
             }
 
             let result: Buffer | string;
-            if (style === 'hud') {
-                result = await this.reportService.generateHudReport(sections, locale, format);
-            } else if (style === 'classic') {
-                result = await this.reportService.generateClassicReport(sections, locale, format);
-            } else {
-                result = await this.reportService.generateCustomReport(sections, locale, format);
-            }
 
+            switch (style) {
+                case 'hud':
+                    result = await this.reportService.generateHudReport(sections, locale, format);
+                    break;
+                case 'classic':
+                    result = await this.reportService.generateClassicReport(sections, locale, format);
+                    break;
+                case 'telex':
+                default:
+                    result = await this.reportService.generateTelexReport(sections, locale, format);
+                    break;
+            }
+                
             if (format === 'html') {
                 res.setHeader('Content-Type', 'text/html');
                 return res.send(result);

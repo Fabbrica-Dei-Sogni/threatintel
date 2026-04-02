@@ -18,7 +18,7 @@
             <span v-if="loadingPdf || loadingHtml" class="spinner-small"></span>
             <span v-else class="btn-content">
               <span class="icon">📊</span>
-              {{ t('home.dashboard').toUpperCase() }}
+              {{ t('common.generateReport').toUpperCase() }}
             </span>
           </button>
         </div>

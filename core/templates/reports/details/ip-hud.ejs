@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="<%= locale.split('-')[0] %>">
+<head>
+    <meta charset="UTF-8">
+    <title><%= t('reports.common.agencyName') %> - <%= t('reports.common.forensicReport').toUpperCase() %> - <%= data.ip %></title>
+    <style>
+        :root {
+            --hud-bg: #0a0b0d;
+            --hud-surface: #15191c;
+            --hud-border: #232a2f;
+            --hud-accent: #00d4ff;
+            --hud-text-main: #e0e6ed;
+            --hud-text-dim: #94a3b8;
+            --hud-danger: #f43f5e;
+            --hud-warning: #fbbf24;
+            --hud-success: #10b981;
+            --hud-font: 'JetBrains Mono', 'Segoe UI Mono', monospace;
+        }
+
+        @page {
+            margin: 10mm;
+            size: A4;
+        }
+
+        body {
+            font-family: var(--hud-font);
+            background-color: var(--hud-bg);
+            color: var(--hud-text-main);
+            margin: 0;
+            padding: 0;
+            line-height: 1.2;
+            font-size: 11px;
+        }
+
+        .hud-container { padding: 20px; }
+
+        .hud-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--hud-accent);
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+
+        .hud-header-left { display: flex; align-items: center; gap: 15px; }
+
+        .hud-logo {
+            width: 45px; height: 45px;
+            border: 1px solid var(--hud-accent);
+            padding: 5px; background: rgba(0, 212, 255, 0.05);
+        }
+
+        .hud-logo img {
+            width: 100%; height: 100%; object-fit: contain;
+            filter: brightness(0) invert(1) drop-shadow(0 0 2px var(--hud-accent));
+        }
+
+        .hud-title h1 {
+            margin: 0; font-size: 20px; text-transform: uppercase;
+            letter-spacing: 2px; color: var(--hud-accent);
+            text-shadow: 0 0 8px rgba(0, 212, 255, 0.3);
+        }
+
+        .hud-title p { margin: 2px 0 0; font-size: 9px; color: var(--hud-text-dim); text-transform: uppercase; }
+
+        .hud-header-right { text-align: right; }
+
+        .hud-stamp {
+            border: 1px solid var(--hud-accent); color: var(--hud-accent);
+            padding: 4px 10px; font-size: 10px; font-weight: bold;
+            text-transform: uppercase; background: rgba(0, 212, 255, 0.1);
+        }
+
+        .hud-grid {
+            display: grid; grid-template-columns: repeat(2, 1fr);
+            gap: 15px; margin-bottom: 20px;
+        }
+
+        .hud-block {
+            background: var(--hud-surface); border: 1px solid var(--hud-border);
+            padding: 12px; position: relative;
+        }
+
+        .hud-block::before {
+            content: ""; position: absolute; top: -1px; left: -1px;
+            width: 10px; height: 10px; border-top: 2px solid var(--hud-accent);
+            border-left: 2px solid var(--hud-accent);
+        }
+
+        .hud-block-title {
+            font-size: 10px; color: var(--hud-accent);
+            text-transform: uppercase; margin-bottom: 10px;
+            display: flex; justify-content: space-between;
+        }
+
+        .hud-value-row {
+            display: flex; justify-content: space-between;
+            margin-bottom: 6px; border-bottom: 1px dashed var(--hud-border);
+            padding-bottom: 4px;
+        }
+
+        .hud-label { color: var(--hud-text-dim); }
+        .hud-value { font-weight: bold; color: var(--hud-text-main); }
+
+        .hud-badge {
+            padding: 2px 6px; border-radius: 2px; font-size: 9px; text-transform: uppercase;
+        }
+
+        .badge-danger { background: rgba(244, 63, 94, 0.2); color: var(--hud-danger); border: 1px solid var(--hud-danger); }
+        .badge-success { background: rgba(16, 185, 129, 0.2); color: var(--hud-success); border: 1px solid var(--hud-success); }
+
+        .whois-container {
+            background: #000; border: 1px solid var(--hud-border);
+            padding: 10px; font-family: 'Courier New', monospace;
+            font-size: 9px; color: #00ff00; overflow: hidden;
+            max-height: 300px; line-height: 1.1;
+        }
+
+        table {
+            width: 100%; border-collapse: collapse; font-size: 9px; margin-top: 10px;
+        }
+
+        th {
+            text-align: left; background: rgba(0, 212, 255, 0.05);
+            color: var(--hud-accent); padding: 6px; border-bottom: 1px solid var(--hud-accent);
+            text-transform: uppercase;
+        }
+
+        td { padding: 6px; border-bottom: 1px solid var(--hud-border); color: var(--hud-text-dim); }
+    </style>
+</head>
+<body>
+    <div class="hud-container">
+        <header class="hud-header">
+            <div class="hud-header-left">
+                <div class="hud-logo">
+                    <img src="<%= logoBase64 %>" alt="Agency Logo">
+                </div>
+                <div class="hud-title">
+                    <h1><%= t('reports.fragments.hud.ipOsintReport').toUpperCase() %></h1>
+                    <p><%= t('reports.common.agencyName') %> // <%= t('reports.fragments.telex.netIntel').toUpperCase() %></p>
+                </div>
+            </div>
+            <div class="hud-header-right">
+                <div class="hud-stamp"><%= t('reports.fragments.hud.intelLevel').toUpperCase() %> // <%= t('reports.fragments.hud.clearanceAlpha').toUpperCase() %></div>
+                <p style="font-size: 8px; color: var(--hud-text-dim); margin-top: 5px;"><%= t('reports.fragments.hud.timestamp').toUpperCase() %>: <%= data.generatedAt %></p>
+            </div>
+        </header>
+
+        <div class="hud-grid">
+            <!-- NETWORK INFO -->
+            <div class="hud-block">
+                <div class="hud-block-title">
+                    <span><%= t('reports.fragments.hud.networkSpecifications').toUpperCase() %></span>
+                    <span>[SYS.NET]</span>
+                </div>
+                <div class="hud-value-row">
+                    <span class="hud-label"><%= t('reports.fragments.hud.ip').toUpperCase() %>:</span>
+                    <span class="hud-value" style="color: var(--hud-accent);"><%= data.ip %></span>
+                </div>
+                <div class="hud-value-row">
+                    <span class="hud-label"><%= t('reports.fragments.isp').toUpperCase() %>:</span>
+                    <span class="hud-value"><%= data.details.isp %></span>
+                </div>
+                <div class="hud-value-row">
+                    <span class="hud-label"><%= t('reports.fragments.usageType').toUpperCase() %>:</span>
+                    <span class="hud-value"><%= data.details.usageType %></span>
+                </div>
+                <div class="hud-value-row">
+                    <span class="hud-label"><%= t('reports.fragments.isTor').toUpperCase() %>:</span>
+                    <span class="hud-value"><%= data.details.isTor ? t('reports.fragments.hud.detected').toUpperCase() : t('reports.fragments.hud.notDetected').toUpperCase() %></span>
+                </div>
+            </div>
+
+            <!-- GEO-INTEL -->
+            <div class="hud-block">
+                <div class="hud-block-title">
+                    <span><%= t('reports.fragments.hud.geospatialIntelligence').toUpperCase() %></span>
+                    <span>[SYS.GEO]</span>
+                </div>
+                <div class="hud-value-row">
+                    <span class="hud-label"><%= t('reports.fragments.country').toUpperCase() %>:</span>
+                    <span class="hud-value"><%= data.details.country %> (<%= data.details.countryCode %>)</span>
+                </div>
+                <div class="hud-value-row">
+                    <span class="hud-label"><%= t('reports.fragments.city').toUpperCase() %>:</span>
+                    <span class="hud-value"><%= data.details.city %></span>
+                </div>
+                <div class="hud-value-row">
+                    <span class="hud-label"><%= t('reports.fragments.coordinates').toUpperCase() %>:</span>
+                    <span class="hud-value"><%= data.details.coordinates %></span>
+                </div>
+                <div class="hud-value-row">
+                    <span class="hud-label"><%= t('reports.fragments.ipAbuseTitle').toUpperCase() %>:</span>
+                    <span class="hud-badge <%= data.abuse.confidenceScore > 50 ? 'badge-danger' : 'badge-success' %>">
+                        <%= data.abuse.confidenceScore %>% <%= t('reports.fragments.confidenceScore').toUpperCase() %>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- REPUTATION DETAIL -->
+        <div class="hud-block" style="margin-bottom: 20px;">
+            <div class="hud-block-title">
+                <span><%= t('reports.fragments.hud.reputationIntelStream').toUpperCase() %></span>
+                <span>[ABUSE_DB]</span>
+            </div>
+            <div class="hud-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 0;">
+                <div class="hud-value-row" style="border: none;">
+                    <span class="hud-label"><%= t('reports.fragments.totalReports').toUpperCase() %>:</span>
+                    <span class="hud-value"><%= data.abuse.totalReports %></span>
+                </div>
+                <div class="hud-value-row" style="border: none;">
+                    <span class="hud-label"><%= t('reports.fragments.lastReportedAt').toUpperCase() %>:</span>
+                    <span class="hud-value"><%= data.abuse.lastReportedAt %></span>
+                </div>
+                <div class="hud-value-row" style="border: none;">
+                    <span class="hud-label"><%= t('reports.fragments.domain').toUpperCase() %>:</span>
+                    <span class="hud-value"><%= data.abuse.domain %></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- WHOIS RAW -->
+        <div class="hud-block" style="margin-bottom: 20px;">
+            <div class="hud-block-title">
+                <span><%= t('reports.fragments.hud.whoisDataDump').toUpperCase() %></span>
+                <span>[RAW_INTEL]</span>
+            </div>
+            <div class="whois-container">
+                <pre style="margin: 0; white-space: pre-wrap;"><%= data.whois %></pre>
+            </div>
+        </div>
+
+        <!-- RECENT REPORTS -->
+        <div class="hud-block">
+            <div class="hud-block-title">
+                <span><%= t('reports.fragments.hud.incidentHistory').toUpperCase() %></span>
+                <span>[REPORT_LOGS]</span>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th width="20%"><%= t('reports.common.date').toUpperCase() %></th>
+                        <th width="30%"><%= t('reports.ipDetail.reportTable.categories').toUpperCase() %></th>
+                        <th><%= t('reports.ipDetail.reportTable.comment').toUpperCase() %></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if (data.abuseReports.length > 0) { %>
+                        <% data.abuseReports.forEach(report => { %>
+                            <tr>
+                                <td><%= new Date(report.date).toLocaleDateString(locale) %></td>
+                                <td><%= report.categories.join(', ') %></td>
+                                <td><%= report.comment %></td>
+                            </tr>
+                        <% }); %>
+                    <% } else { %>
+                        <tr>
+                            <td colspan="3" style="text-align: center;"><%= t('reports.ipDetail.noAbuse', locale) %></td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

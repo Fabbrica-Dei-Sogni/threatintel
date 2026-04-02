@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="<%= locale.split('-')[0] %>">
+<head>
+    <meta charset="UTF-8">
+    <title>TELEX - IP ANALYSIS - <%= data.ip %></title>
+    <style>
+        body {
+            background-color: #f4f4f4;
+            color: #1a1a1a;
+            font-family: 'Courier New', Courier, monospace;
+            padding: 40px;
+            line-height: 1.2;
+            font-size: 11px;
+        }
+        .telex-container {
+            max-width: 800px;
+            margin: 0 auto;
+            border: 1px solid #ccc;
+            padding: 20px;
+            background: #fff;
+            box-shadow: 2px 2px 0px #000;
+        }
+        .header {
+            border-bottom: 2px solid #000;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+        .section {
+            margin-bottom: 20px;
+        }
+        .section-title {
+            text-decoration: underline;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        pre {
+            white-space: pre-wrap;
+            margin: 0;
+        }
+        .footer {
+            margin-top: 30px;
+            border-top: 1px solid #000;
+            padding-top: 10px;
+            font-size: 10px;
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+    <div class="telex-container">
+        <div class="header">
+            TELEX-REPORT // <%= t('reports.common.agencyName') %> // <%= t('reports.fragments.telex.netIntel').toUpperCase() %>
+        </div>
+
+        <div class="section">
+            <div class="section-title"><%= t('reports.fragments.telex.subjectIdentification').toUpperCase() %></div>
+            <pre>
+<%= t('reports.fragments.telex.ipAddress').toUpperCase() %>: <%= data.ip %>
+<%= t('reports.fragments.telex.ispName').toUpperCase() %>: <%= data.details.isp %>
+<%= t('reports.fragments.telex.usageType').toUpperCase() %>: <%= data.details.usageType %>
+<%= t('reports.fragments.telex.torNode').toUpperCase() %>: <%= data.details.isTor ? t('reports.fragments.telex.true').toUpperCase() : t('reports.fragments.telex.false').toUpperCase() %>
+            </pre>
+        </div>
+
+        <div class="section">
+            <div class="section-title"><%= t('reports.fragments.telex.geospatialIntel').toUpperCase() %></div>
+            <pre>
+<%= t('reports.fragments.telex.country').toUpperCase() %>: <%= data.details.country %> (<%= data.details.countryCode %>)
+<%= t('reports.fragments.telex.city').toUpperCase() %>: <%= data.details.city %>
+<%= t('reports.fragments.telex.coords').toUpperCase() %>: <%= data.details.coordinates %>
+            </pre>
+        </div>
+
+        <div class="section">
+            <div class="section-title"><%= t('reports.fragments.telex.reputationAnalysis').toUpperCase() %></div>
+            <pre>
+<%= t('reports.fragments.telex.confidenceScore').toUpperCase() %>: <%= data.abuse.confidenceScore %>%
+<%= t('reports.fragments.telex.totalReports').toUpperCase() %>: <%= data.abuse.totalReports %>
+<%= t('reports.fragments.telex.lastReported').toUpperCase() %>: <%= data.abuse.lastReportedAt %>
+<%= t('reports.fragments.telex.domainAffil').toUpperCase() %>: <%= data.abuse.domain %>
+            </pre>
+        </div>
+
+        <div class="section">
+            <div class="section-title"><%= t('reports.fragments.telex.whoisRawDataDump').toUpperCase() %></div>
+            <div style="font-size: 9px; border: 1px solid #eee; padding: 10px;">
+                <pre><%= data.whois %></pre>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title"><%= t('reports.fragments.telex.incidentLogEntries').toUpperCase() %></div>
+            <pre>
+<% if (data.abuseReports.length > 0) { %>
+<% data.abuseReports.slice(0, 20).forEach(report => { %>
+[<%= new Date(report.date).toLocaleDateString(locale) %>] <%= t('reports.fragments.telex.cat').toUpperCase() %>: <%= report.categories.join(', ') %> // <%= t('reports.fragments.telex.comment').toUpperCase() %>: <%= report.comment %>
+<% }); %>
+<% } else { %>
+<%= t('reports.fragments.telex.noReportedIncidents').toUpperCase() %>
+<% } %>
+            </pre>
+        </div>
+
+        <div class="footer">
+            <%= t('reports.fragments.telex.endOfTransmission').toUpperCase() %> // <%= t('reports.fragments.telex.date').toUpperCase() %>: <%= data.generatedAt %>
+        </div>
+    </div>
+</body>
+</html>

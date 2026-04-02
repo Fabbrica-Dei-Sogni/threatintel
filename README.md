@@ -51,9 +51,22 @@ per compilare il package.json e costruire il node modules dell'applicazione.
 
 ## Mappatura direttive proxy nginx
 
-Questa procedura fornisce un override nel file di configurazione di nginx e definisce regole proxy per l'honeypot
+Come azione preliminare è necessario fornire i permessi minimi necessari dell'utente a cui è assegnato il servizio
+
+# Fornisci i permessi a www-data alla working directory
+sudo chown -R www-data:www-data $(pwd)
+sudo chmod -R 755 $(pwd)
+
+Nella mia personale installazione ho utilizzato la mia utenza, anche se di default nginx usa www-data .
+
+In ogni caso, l'utente assegnato al servizio deve appartenere, al gruppo `systemd-journal` affinchè il backend dell'honeypot possa leggere i log da nginx correttamente.
+
+`sudo usermod -aG systemd-journal <USER>`
+
 
 1. Override configurazione nginx.conf
+
+Questa procedura fornisce un override nel file di configurazione di nginx e definisce regole proxy per l'honeypot
 
 `cd /etc/nginx`
 

@@ -45,22 +45,12 @@ Il blocco stream {} deve stare al livello root, mai dentro http {}:
 load_module modules/ngx_stream_module.so;
 ```
 
-load_module modules/ngx_stream_module.so;  # solo se modulo dinamico
-
 ```
-events {
-    worker_connections 1024;
-}
-
-http {
-    # ... configurazione HTTP esistente ...
-    include /etc/nginx/sites-enabled/*;
-}
-
 stream {
     include /etc/nginx/stream.d/*.conf;
 }
 ```
+
 Crea ```/etc/nginx/stream.d/telnet.conf```:
 
 ```

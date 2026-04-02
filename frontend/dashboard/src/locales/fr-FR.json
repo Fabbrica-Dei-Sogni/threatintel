@@ -282,7 +282,10 @@
         "errorGeolocalizing": "Erreur lors de la géolocalisation",
         "errorIpData": "Erreur lors de la récupération des données IP",
         "errorCoordsNotFound": "Coordonnées non trouvées pour cette IP",
-        "successGeoloc": "Coordonnées et nom récupérés !"
+        "successGeoloc": "Coordonnées et nom récupérés !",
+        "hubProfilesDesc": "Gérer les points de terminaison API, les coordonnées et les paramètres des nœuds.",
+        "hubAlgorithmsDesc": "Paramètres de détection, seuils d'alerte et logique médico-légale.",
+        "systemOperational": "SYSTÈME OPÉRATIONNEL : NOEUD ACTIF"
     },
     "threatLogs": {
         "title": "Journaux de menaces",

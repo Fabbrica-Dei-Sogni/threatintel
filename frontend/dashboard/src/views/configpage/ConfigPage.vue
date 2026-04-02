@@ -114,8 +114,7 @@ const successMessage = ref('');
 
 // Navigation
 function goBack() {
-    if (window.history.length > 1) router.back();
-    else router.push('/');
+    router.push('/settings');
 }
 
 // CRUD handlers

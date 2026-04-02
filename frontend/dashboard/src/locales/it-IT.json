@@ -282,7 +282,10 @@
         "errorGeolocalizing": "Errore durante la geolocalizzazione",
         "errorIpData": "Errore nel recupero dati IP",
         "errorCoordsNotFound": "Coordinate non trovate per questo IP",
-        "successGeoloc": "Coordinate e nome recuperati!"
+        "successGeoloc": "Coordinate e nome recuperati!",
+        "hubProfilesDesc": "Modifica gli endpoint API, coordinate e parametri dei nodi monitorati.",
+        "hubAlgorithmsDesc": "Parametri di rilevamento, soglie di allerta e logica forensic.",
+        "systemOperational": "SISTEMA OPERATIVO : NODO ATTIVO"
     },
     "threatLogs": {
         "title": "Log minacce",

@@ -14,110 +14,157 @@
       <LanguageSwitcher />
     </div>
     <div class="settings-layout">
-      <!-- Sidebar Profili -->
-      <aside class="profiles-sidebar">
-        <div class="sidebar-header">
-          <h3>{{ t('settings.profiles') }}</h3>
+      <!-- Profiles Section (Sidebar on Desktop, Top-scroll on Mobile) -->
+      <aside class="profiles-navigator">
+        <div class="nav-header">
+          <div class="header-icon">🛡️</div>
+          <div class="header-text">
+            <h3>{{ t('settings.profiles').toUpperCase() }}</h3>
+            <span class="count-badge">{{ profileStore.profiles.length + 1 }} NODI</span>
+          </div>
         </div>
-        <ul class="profile-list">
-          <li :class="{ active: profileStore.activeProfileId === 'default' || !profileStore.activeProfileId }"
-            @click="profileStore.setActiveProfile(null)">
-            <span class="profile-name">{{ t('settings.defaultProfile') }}</span>
-          </li>
-          <li v-for="p in profileStore.profiles" :key="p.id" :class="{ active: profileStore.activeProfileId === p.id }"
-            @click="profileStore.setActiveProfile(p.id)">
-            <span class="profile-name">{{ p.name }}</span>
-          </li>
-        </ul>
-        <button class="btn btn-outline btn-full btn-new-profile" @click="createNewProfile">
-          <span>+ {{ t('settings.newProfile') }}</span>
+
+        <div class="profile-scroll-area">
+          <ul class="profile-fan">
+            <li 
+              :class="{ active: isDefault }"
+              @click="profileStore.setActiveProfile(null)"
+              class="profile-card glass-morphism"
+            >
+              <div class="node-indicator"></div>
+              <div class="profile-info">
+                <span class="label">{{ t('settings.defaultProfile').toUpperCase() }}</span>
+                <span class="status">PRIMARY</span>
+              </div>
+            </li>
+            
+            <li 
+              v-for="p in profileStore.profiles" 
+              :key="p.id" 
+              :class="{ active: profileStore.activeProfileId === p.id }"
+              @click="profileStore.setActiveProfile(p.id)"
+              class="profile-card glass-morphism"
+            >
+              <div class="node-indicator"></div>
+              <div class="profile-info">
+                <span class="label">{{ p.name.toUpperCase() }}</span>
+                <span class="status">SECONDARY</span>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <button class="btn btn-new-node pulse-glow" @click="createNewProfile">
+          <span class="icon">+</span> {{ t('settings.newProfile').toUpperCase() }}
         </button>
       </aside>
 
       <!-- Editor Profilo -->
-      <main class="settings-card">
-        <div class="settings-header">
-          <div class="header-left">
-            <h2 class="settings-title">{{ isDefault ? t('settings.defaultProfileTitle') : t('settings.editProfileTitle') }}</h2>
+      <!-- Node Editor Section -->
+      <main class="editor-main-card glass-morphism">
+        <div class="editor-header">
+          <div class="header-accent-line" :style="{ backgroundColor: isDefault ? '#3b82f6' : '#6366f1' }"></div>
+          <div class="header-content">
+            <h2 class="editor-title">
+              {{ isDefault ? t('settings.defaultProfileTitle') : t('settings.editProfileTitle') }}
+            </h2>
+            <span class="node-id-chip">UUID: {{ profileStore.activeProfileId || 'DEFAULT' }}</span>
           </div>
         </div>
 
-        <section class="settings-section">
-          <h3 class="section-title">{{ t('settings.generalInfo') }}</h3>
-          <div class="setting-item">
-            <label for="name">{{ t('settings.honeypotName') }}</label>
-            <input type="text" id="name" v-model="form.name" :placeholder="t('settings.honeypotName')" />
-          </div>
-
-          <div class="setting-item">
-            <label for="apiUrl">{{ t('settings.apiUrl') }}</label>
-            <input type="text" id="apiUrl" v-model="form.apiUrl" :placeholder="t('settings.apiUrl')" />
-            <p class="help-text">{{ t('settings.apiUrlHelp') }}</p>
-          </div>
-        </section>
-
-        <section class="settings-section">
-          <h3 class="section-title">{{ t('settings.locationGeoloc') }}</h3>
-
-          <div class="geolocation-tool">
-            <div class="setting-item">
-              <label>{{ t('settings.configFromIp') }}</label>
-              <div class="input-group">
-                <input type="text" v-model="ipToGeolocate" :placeholder="t('settings.configFromIp')"
-                  @keyup.enter="handleGeolocate" />
-                <button class="btn btn-accent" @click="handleGeolocate" :disabled="isGeolocating">
-                  {{ isGeolocating ? t('settings.finding') : t('settings.findPosition') }}
-                </button>
+        <div class="editor-body scrollable-body">
+          <section class="config-hub">
+            <div class="hub-header">
+              <span class="hub-icon">📋</span>
+              <h3 class="section-title">{{ t('settings.generalInfo').toUpperCase() }}</h3>
+            </div>
+            
+            <div class="grid-inputs">
+              <div class="setting-item cyber-input-group">
+                <label for="name">{{ t('settings.honeypotName') }}</label>
+                <div class="input-wrapper">
+                  <input type="text" id="name" v-model="form.name" :placeholder="t('settings.honeypotName')" />
+                  <div class="focus-border"></div>
+                </div>
               </div>
-              <p class="help-text">{{ t('settings.geolocHelp') }}</p>
+
+              <div class="setting-item cyber-input-group">
+                <label for="apiUrl">{{ t('settings.apiUrl') }}</label>
+                <div class="input-wrapper">
+                  <input type="text" id="apiUrl" v-model="form.apiUrl" :placeholder="t('settings.apiUrl')" />
+                  <div class="focus-border"></div>
+                </div>
+                <p class="help-text">{{ t('settings.apiUrlHelp') }}</p>
+              </div>
+            </div>
+          </section>
+
+          <section class="config-hub location-hub">
+            <div class="hub-header">
+              <span class="hub-icon">📍</span>
+              <h3 class="section-title">{{ t('settings.locationGeoloc').toUpperCase() }}</h3>
             </div>
 
-            <div class="map-selection-wrapper">
-              <label>{{ t('settings.mapSelection') }}</label>
-              <div ref="mapContainer" class="settings-map"></div>
-              <p class="help-text">{{ t('settings.mapHelp') }}</p>
-            </div>
-          </div>
+            <div class="geo-panel">
+              <div class="geo-controls">
+                <label>{{ t('settings.configFromIp') }}</label>
+                <div class="cyber-search-group">
+                  <input type="text" v-model="ipToGeolocate" :placeholder="t('settings.configFromIp')"
+                    @keyup.enter="handleGeolocate" />
+                  <button class="btn btn-action-icon" @click="handleGeolocate" :disabled="isGeolocating">
+                    <span v-if="isGeolocating" class="spinner-tiny"></span>
+                    <span v-else>🔍</span>
+                  </button>
+                </div>
+                <p class="help-text">{{ t('settings.geolocHelp') }}</p>
 
-          <div class="setting-row">
-            <div class="setting-item">
-              <label for="lat">{{ t('settings.latitude') }}</label>
-              <input type="number" id="lat" v-model.number="form.lat" step="0.0001" />
-            </div>
-            <div class="setting-item">
-              <label for="lon">{{ t('settings.longitude') }}</label>
-              <input type="number" id="lon" v-model.number="form.lon" step="0.0001" />
-            </div>
-          </div>
-        </section>
+                <div class="coords-manual">
+                  <div class="mini-input">
+                    <label>{{ t('settings.latitude') }}</label>
+                    <input type="number" v-model.number="form.lat" step="0.0001" />
+                  </div>
+                  <div class="mini-input">
+                    <label>{{ t('settings.longitude') }}</label>
+                    <input type="number" v-model.number="form.lon" step="0.0001" />
+                  </div>
+                </div>
+              </div>
 
-        <section class="settings-section" v-if="canInstallPwa">
-          <h3 class="section-title">{{ t('settings.appPwa') }}</h3>
-          <div class="pwa-card">
-            <div class="pwa-info">
-              <h4>{{ t('settings.installDashboard') }}</h4>
-              <p>{{ t('settings.installHelp') }}</p>
+              <div class="map-view-card">
+                <div ref="mapContainer" class="cyber-map"></div>
+                <div class="map-overlay-info">{{ t('settings.mapHelp') }}</div>
+              </div>
             </div>
-            <button v-if="canInstallPwa" class="btn btn-primary btn-pwa" @click="handleInstallPwa">
-              {{ t('settings.installApp') }}
-            </button>
-            <div v-else-if="isAppInstalled" class="pwa-badge pwa-installed">
-              {{ t('settings.appInstalled') }}
-            </div>
-            <div v-else class="pwa-badge">
-              {{ t('settings.waitingBrowser') }}
-            </div>
-          </div>
-        </section>
+          </section>
 
-        <div class="actions">
-          <button v-if="!isDefault" class="btn btn-danger btn-delete-profile" @click="handleDelete">{{
-            t('settings.deleteProfile') }}</button>
-          <div class="spacer"></div>
-          <button v-if="!isDefault" class="btn btn-secondary" @click="resetForm">{{ t('common.cancel') }}</button>
-          <button v-else class="btn btn-secondary" @click="resetToDefault">{{ t('settings.resetToFactory') }}</button>
-          <button class="btn btn-primary" @click="handleSave">{{ t('settings.saveProfile') }}</button>
+          <section class="config-hub pwa-hub" v-if="canInstallPwa">
+            <div class="hub-header">
+              <span class="hub-icon">📲</span>
+              <h3 class="section-title">{{ t('settings.appPwa').toUpperCase() }}</h3>
+            </div>
+            <div class="pwa-tactical-card glass-card">
+              <div class="pwa-text">
+                <h4>{{ t('settings.installDashboard') }}</h4>
+                <p>{{ t('settings.installHelp') }}</p>
+              </div>
+              <button class="btn btn-upgrade pulse-cobalt" @click="handleInstallPwa">
+                {{ t('settings.installApp') }}
+              </button>
+            </div>
+          </section>
         </div>
+
+        <footer class="editor-actions">
+          <button v-if="!isDefault" class="btn btn-danger-minimal" @click="handleDelete">
+            🗑️ {{ t('settings.deleteProfile') }}
+          </button>
+          <div class="flex-spacer"></div>
+          <button v-if="!isDefault" class="btn btn-ghost" @click="resetForm">{{ t('common.cancel') }}</button>
+          <button v-else class="btn btn-ghost" @click="resetToDefault">{{ t('settings.resetToFactory') }}</button>
+          <button class="btn btn-primary btn-save shadow-glow" @click="handleSave">
+            💾 {{ t('settings.saveProfile').toUpperCase() }}
+          </button>
+        </footer>
 
         <div v-if="successMessage" class="success-msg">{{ successMessage }}</div>
         <div v-if="error" class="error-msg">{{ error }}</div>
@@ -348,461 +395,615 @@ const resetToDefault = () => {
   }
 };
 
-const goBack = () => {
-  if (window.history.length > 1) router.back();
-  else router.push('/');
-};
+function goBack() {
+  router.push('/settings');
+}
 </script>
 
 <style scoped>
 .settings-container {
-  padding: 25px 30px;
+  padding: 20px 30px;
   min-height: 100vh;
   color: #e0e7ff;
-  background-color: #001f3f;
-  --text-color: #e0e7ff;
-  --border-color: rgba(136, 170, 255, 0.2);
-  --card-bg: #00294d;
-  --primary-color: #3b82f6;
-  --primary-rgb: 59, 130, 246;
+  background-color: #020617;
+  display: flex;
+  flex-direction: column;
 }
 
 .header-top {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  background-color: #001f3f;
-  padding-top: 12px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid var(--border-color);
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   margin-bottom: 30px;
-}
-
-.settings-layout {
-  display: flex;
-  gap: 2rem;
-  max-width: 1100px;
-  margin: 0 auto;
-}
-
-.profiles-sidebar {
-  flex: 0 0 280px;
-  background-color: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 16px;
-  padding: 1.5rem;
-  height: fit-content;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-}
-
-.sidebar-header {
-  margin-bottom: 1.5rem;
-}
-
-.profile-list {
-  list-style: none;
-  padding: 0;
-  margin: 0 0 1.5rem 0;
-}
-
-.profile-list li {
-  padding: 0.85rem 1rem;
-  border-radius: 8px;
-  cursor: pointer;
-  margin-bottom: 0.5rem;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border: 1px solid transparent;
-  background-color: rgba(255, 255, 255, 0.02);
-}
-
-.profile-list li:hover {
-  background-color: rgba(255, 255, 255, 0.05);
-  transform: translateX(4px);
-}
-
-.profile-list li.active {
-  background: linear-gradient(135deg, var(--primary-color), #2d5a27);
-  color: white;
-  border-color: rgba(255, 255, 255, 0.1);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
-
-.profile-name {
-  font-weight: 500;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.btn-new-profile {
-  margin-top: auto;
-  border-style: dashed;
-}
-
-.settings-card {
-  flex: 1;
-  background-color: var(--card-bg);
-  padding: 2.5rem;
-  border-radius: 16px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
-  border: 1px solid var(--border-color);
-  position: relative;
-  overflow: hidden;
-}
-
-.settings-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(to right, var(--primary-color), #3b82f6);
-  opacity: 0.8;
-}
-
-.settings-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2.5rem;
-  border-bottom: 1px solid var(--border-color);
-  padding-bottom: 1.5rem;
 }
 
 .header-left {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 1.5rem;
 }
 
-.settings-title {
-  margin: 0;
-  color: var(--text-color);
+.page-title {
+  font-size: 1.5rem;
+  font-weight: 900;
+  letter-spacing: 4px;
+  text-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
 }
 
 .back-btn {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--border-color);
-  color: var(--text-color);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #94a3b8;
   cursor: pointer;
   padding: 10px;
-  border-radius: 10px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s;
+  transition: all 0.3s;
 }
 
 .back-btn:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-  transform: translateX(-2px);
+  background-color: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  transform: translateX(-3px);
 }
 
-.settings-section {
-  margin-bottom: 3rem;
-}
-
-.section-title {
-  color: var(--text-muted);
-  margin-bottom: 1.5rem;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.section-title::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: linear-gradient(to right, var(--border-color), transparent);
-}
-
-.setting-item {
-  margin-bottom: 1.5rem;
-}
-
-.setting-row {
-  display: flex;
-  gap: 1.5rem;
-}
-
-.setting-row .setting-item {
+/* Layout Grid */
+.settings-layout {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 30px;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
   flex: 1;
 }
 
-.input-group {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.input-group input {
-  flex: 1;
-}
-
-.geolocation-tool {
-  background-color: rgba(var(--primary-rgb), 0.05);
-  padding: 1.5rem;
-  border-radius: 12px;
-  border: 1px solid rgba(var(--primary-rgb), 0.1);
-  margin-bottom: 1.5rem;
+/* Profiles Navigator */
+.profiles-navigator {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 20px;
 }
 
-.map-selection-wrapper {
-  flex: 1;
-}
-
-.settings-map {
-  height: 250px;
-  width: 100%;
-  border-radius: 8px;
-  border: 1px solid var(--border-color);
-  margin-bottom: 0.5rem;
-  z-index: 1;
-}
-
-.pwa-card {
-  background: rgba(var(--primary-rgb), 0.1);
-  border: 1px solid rgba(var(--primary-rgb), 0.2);
-  border-radius: 12px;
-  padding: 1rem 1.5rem;
+.nav-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  gap: 1rem;
+  gap: 15px;
+  padding: 10px 5px;
 }
 
-.pwa-info h4 {
-  margin: 0 0 0.2rem 0;
-  font-size: 1rem;
+.header-icon {
+  font-size: 1.8rem;
+  filter: drop-shadow(0 0 10px rgba(99, 102, 241, 0.5));
 }
 
-.pwa-info p {
-  margin: 0;
+.header-text h3 {
   font-size: 0.85rem;
-  color: var(--text-muted);
+  font-weight: 800;
+  letter-spacing: 2px;
+  margin: 0;
+  color: #94a3b8;
 }
 
-.pwa-badge {
-  font-size: 0.8rem;
-  color: var(--text-muted);
-  opacity: 0.6;
-  font-style: italic;
+.count-badge {
+  font-size: 0.65rem;
+  font-weight: 900;
+  color: #6366f1;
+  background: rgba(99, 102, 241, 0.1);
+  padding: 2px 8px;
+  border-radius: 4px;
 }
 
-.pwa-installed {
-  color: var(--primary-color);
-  opacity: 1;
-  font-weight: 500;
-  font-style: normal;
+.profile-scroll-area {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 5px;
 }
 
-label {
-  display: block;
-  margin-bottom: 0.6rem;
-  color: var(--text-muted);
+.profile-fan {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
-input {
+.profile-card {
+  padding: 15px 20px;
+  border-radius: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  position: relative;
+}
+
+.node-indicator {
+  width: 6px;
+  height: 35px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  transition: all 0.3s;
+}
+
+.profile-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-info .label {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #e2e8f0;
+  letter-spacing: 1px;
+}
+
+.profile-info .status {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: #64748b;
+  letter-spacing: 1.5px;
+}
+
+.profile-card:hover {
+  background: rgba(255, 255, 255, 0.05);
+  transform: translateX(8px);
+  border-color: rgba(99, 102, 241, 0.2);
+}
+
+.profile-card.active {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(30, 41, 59, 0.4));
+  border-color: rgba(99, 102, 241, 0.5);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.profile-card.active .node-indicator {
+  background: #6366f1;
+  box-shadow: 0 0 15px #6366f1;
+}
+
+.profile-card.active .label {
+  color: #fff;
+}
+
+.btn-new-node {
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px dashed rgba(16, 185, 129, 0.4);
+  color: #10b981;
+  padding: 15px;
+  border-radius: 16px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-new-node:hover {
+  background: rgba(16, 185, 129, 0.2);
+  border-color: #10b981;
+  transform: translateY(-2px);
+}
+
+/* Editor Card */
+.editor-main-card {
+  background: rgba(15, 23, 42, 0.6);
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+}
+
+.editor-header {
+  padding: 25px 35px;
+  position: relative;
+  background: rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.header-accent-line {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
-  padding: 1rem 1.25rem;
-  border-radius: 10px;
-  border: 1px solid var(--border-color);
-  background-color: rgba(255, 255, 255, 0.03);
-  color: var(--text-color);
+  height: 4px;
+}
+
+.editor-title {
+  font-size: 1.4rem;
+  font-weight: 900;
+  letter-spacing: 2px;
+  margin: 0 0 5px 0;
+  color: #fff;
+}
+
+.node-id-chip {
+  font-size: 0.65rem;
+  color: #64748b;
+  font-family: monospace;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.scrollable-body {
+  flex: 1;
+  padding: 35px;
+  overflow-y: auto;
+}
+
+.config-hub {
+  margin-bottom: 40px;
+}
+
+.hub-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 25px;
+}
+
+.hub-icon { font-size: 1.2rem; }
+
+.section-title {
+  font-size: 0.9rem;
+  font-weight: 800;
+  letter-spacing: 3px;
+  color: #94a3b8;
+  margin: 0;
+}
+
+.grid-inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 25px;
+}
+
+.cyber-input-group label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  color: #64748b;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+}
+
+.input-wrapper {
+  position: relative;
+}
+
+.input-wrapper input {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 14px 18px;
+  color: #fff;
   font-size: 1rem;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s;
 }
 
-input:hover {
-  border-color: rgba(255, 255, 255, 0.2);
-  background-color: rgba(255, 255, 255, 0.05);
-}
-
-input:focus {
+.input-wrapper input:focus {
   outline: none;
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 4px rgba(var(--primary-rgb), 0.15), inset 0 2px 4px rgba(0, 0, 0, 0.05);
-  background-color: rgba(255, 255, 255, 0.07);
-  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(99, 102, 241, 0.4);
+}
+
+.focus-border {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background: #6366f1;
+  transition: all 0.4s ease;
+  transform: translateX(-50%);
+}
+
+.input-wrapper input:focus ~ .focus-border {
+  width: 80%;
 }
 
 .help-text {
-  font-size: 0.8rem;
-  color: var(--text-muted);
-  margin-top: 0.4rem;
+  font-size: 0.75rem;
+  color: #475569;
+  margin-top: 8px;
+  font-style: italic;
 }
 
-.error-msg {
-  color: #ff4d4d;
-  font-size: 0.9rem;
-  margin-top: 1rem;
+/* Geo Panel */
+.geo-panel {
+  display: grid;
+  grid-template-columns: 350px 1fr;
+  gap: 25px;
+  background: rgba(255, 255, 255, 0.02);
+  padding: 25px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.03);
 }
 
-.success-msg {
-  color: #4CAF50;
-  margin-top: 1rem;
-  text-align: center;
-  font-weight: bold;
-}
-
-.actions {
+.cyber-search-group {
   display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-top: 3rem;
-  padding-top: 2rem;
-  border-top: 1px solid var(--border-color);
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 12px;
+  padding: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  margin-bottom: 20px;
 }
 
-.spacer {
+.cyber-search-group input {
+  background: transparent;
+  border: none;
+  padding: 10px 15px;
+  color: #fff;
   flex: 1;
 }
 
-.btn {
-  padding: 0.75rem 1.75rem;
-  border: 1px solid transparent;
+.btn-action-icon {
+  background: #1e293b;
+  border: none;
+  width: 40px;
+  height: 40px;
   border-radius: 8px;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  color: #fff;
+  transition: all 0.2s;
+}
+
+.btn-action-icon:hover {
+  background: #334155;
+  transform: scale(1.05);
+}
+
+.coords-manual {
+  display: flex;
+  gap: 15px;
+  margin-top: 25px;
+}
+
+.mini-input { flex: 1; }
+
+.mini-input label {
+  font-size: 0.6rem;
+  font-weight: 800;
+  color: #475569;
+  margin-bottom: 5px;
+  display: block;
+}
+
+.mini-input input {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: #94a3b8;
+  font-family: monospace;
+}
+
+.map-view-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.cyber-map {
+  height: 320px;
+  width: 100%;
+  filter: grayscale(0.5) contrast(1.1) brightness(0.8);
+}
+
+.map-overlay-info {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: rgba(15, 23, 42, 0.8);
+  backdrop-filter: blur(5px);
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-size: 0.65rem;
+  color: #94a3b8;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  z-index: 1000;
+}
+
+/* PWA */
+.pwa-tactical-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 25px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.6), rgba(15, 23, 42, 0.8));
+}
+
+.pwa-text h4 {
+  margin: 0 0 5px 0;
+  font-size: 1.1rem;
+  color: #fff;
+}
+
+.pwa-text p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
+.btn-upgrade {
+  padding: 12px 25px;
+  background: #6366f1;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+}
+
+/* Actions */
+.editor-actions {
+  padding: 25px 35px;
+  background: rgba(255, 255, 255, 0.02);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
+  gap: 15px;
 }
 
-.btn:hover:not(:disabled) {
-  transform: translateY(-1px);
-  filter: brightness(1.1);
-}
+.flex-spacer { flex: 1; }
 
-.btn:active:not(:disabled) {
-  transform: translateY(0);
-}
-
-.btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.btn-primary {
-  background-color: var(--primary-color);
-  color: white;
-  box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.25);
-}
-
-.btn-secondary {
-  background-color: transparent;
-  border-color: var(--border-color);
-  color: var(--text-color);
-}
-
-.btn-secondary:hover {
-  background-color: rgba(255, 255, 255, 0.05);
-}
-
-.btn-accent {
-  background-color: #3b82f6;
-  color: white;
-}
-
-.btn-danger {
-  background-color: rgba(255, 77, 77, 0.1);
-  border-color: rgba(255, 77, 77, 0.2);
-  color: #ff4d4d;
-}
-
-.btn-danger:hover {
-  background-color: #ff4d4d;
-  color: white;
-}
-
-.btn-outline {
+.btn-danger-minimal {
   background: transparent;
-  border-color: var(--border-color);
-  color: var(--text-color);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+  padding: 10px 15px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all 0.3s;
 }
 
-.btn-full {
-  width: 100%;
+.btn-danger-minimal:hover {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: #ef4444;
 }
 
-@media (max-width: 992px) {
+.btn-ghost {
+  background: transparent;
+  border: none;
+  color: #64748b;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.btn-primary.btn-save {
+  background: linear-gradient(to right, #6366f1, #3b82f6);
+  color: #fff;
+  border: none;
+  padding: 14px 30px;
+  border-radius: 12px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  cursor: pointer;
+}
+
+/* Glassmorphism Generic */
+.glass-morphism {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Progress & MSGs */
+.success-msg {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: #10b981;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-weight: 700;
+  animation: slide-in 0.3s ease-out;
+  z-index: 2000;
+}
+
+.error-msg {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: #ef4444;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-weight: 700;
+  animation: slide-in 0.3s ease-out;
+  z-index: 2000;
+}
+
+@keyframes slide-in {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+/* Responsive */
+@media (max-width: 1100px) {
   .settings-layout {
-    flex-direction: column;
-    gap: 1.5rem;
+    grid-template-columns: 1fr;
   }
-
-  .profiles-sidebar {
-    flex: none;
-    width: 100%;
-  }
-
-  .profile-list {
+  
+  .profiles-navigator {
+    background: rgba(15, 23, 42, 0.4);
+    padding: 20px;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
     display: flex;
-    overflow-x: auto;
-    padding-bottom: 0.5rem;
-    gap: 0.75rem;
-    margin-bottom: 1rem;
-    -webkit-overflow-scrolling: touch;
+    flex-direction: column;
+    gap: 20px;
   }
 
-  .profile-list li {
-    flex: 0 0 auto;
-    margin-bottom: 0;
-    min-width: 140px;
+  .nav-header { padding: 0; }
+  
+  .profile-scroll-area { 
+    width: 100%;
+    overflow-x: visible;
+  }
+  
+  .profile-fan {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
+  }
+
+  .profile-card {
+    min-width: 0; /* Allow shrinking */
+  }
+
+  .btn-new-node {
+    width: 100%;
+    max-width: 300px;
+    align-self: center;
   }
 }
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
   .settings-container {
-    padding: 1rem;
+    padding: 15px;
   }
 
-  .settings-card {
-    padding: 1.5rem;
+  .profile-fan {
+    grid-template-columns: 1fr;
   }
-
-  .settings-header {
-    margin-bottom: 2rem;
+  
+  .geo-panel {
+    grid-template-columns: 1fr;
+    padding: 15px;
   }
-
-  .setting-row {
-    flex-direction: column;
-    gap: 0;
+  
+  .grid-inputs {
+    grid-template-columns: 1fr;
   }
-
-  .input-group {
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-
-  .actions {
+  
+  .editor-actions {
     flex-direction: column-reverse;
-    gap: 0.75rem;
-    align-items: stretch;
-  }
-
-  .spacer {
-    display: none;
-  }
-
-  .btn {
-    width: 100%;
-  }
-
-  .btn-delete-profile {
     margin-top: 1rem;
+    padding: 20px;
+  }
+
+  .editor-body {
+    padding: 20px;
   }
 
   .settings-map {

@@ -11,6 +11,7 @@ import ThreatLog from '../views/threatlog/ThreatLog.vue';
 import Attacks from '../views/attacks/Attacks.vue';
 import AttackDetail from '../views/attackdetail/AttackDetail.vue';
 import Settings from '../views/settings/Settings.vue';
+import SettingsHub from '../views/settings/SettingsHub.vue';
 import ConfigPage from '../views/configpage/ConfigPage.vue';
 import CowrieSessions from '../views/cowriesessions/CowrieSessions.vue';
 import CowrieAttackDetail from '../views/cowriesessiondetail/CowrieAttackDetail.vue';
@@ -89,8 +90,10 @@ const routes: RouteRecordRaw[] = [
     { path: '/threatlog/:id', name: 'ThreatLog', component: ThreatLog, props: true },
     { path: '/login', name: 'Login', component: Login },
     { path: '/register', name: 'Register', component: Register },
-    { path: '/config', name: 'Config', component: ConfigPage },
-    { path: '/settings', name: 'Settings', component: Settings },
+    { path: '/settings', name: 'SettingsHub', component: SettingsHub },
+    { path: '/settings/profiles', name: 'Settings', component: Settings },
+    { path: '/settings/algorithms', name: 'Config', component: ConfigPage },
+    { path: '/config', redirect: '/settings/algorithms' },
     {
         path: '/telnet-sessions',
         name: 'CowrieSessions',

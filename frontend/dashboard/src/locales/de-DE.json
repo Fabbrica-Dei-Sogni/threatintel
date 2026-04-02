@@ -282,7 +282,10 @@
         "errorGeolocalizing": "Fehler bei der Geolokalisierung",
         "errorIpData": "Fehler beim Abrufen der IP-Daten",
         "errorCoordsNotFound": "Koordinaten für diese IP nicht gefunden",
-        "successGeoloc": "Koordinaten und Name abgerufen!"
+        "successGeoloc": "Koordinaten und Name abgerufen!",
+        "hubProfilesDesc": "API-Endpunkte, Koordinaten und Knotenparameter verwalten.",
+        "hubAlgorithmsDesc": "Erkennungsparameter, Schwellenwerte und Forensik-Logik.",
+        "systemOperational": "SYSTEM OPERATIV : KNOTEN AKTIV"
     },
     "threatLogs": {
         "title": "Bedrohungsprotokolle",

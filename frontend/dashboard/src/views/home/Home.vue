@@ -3,7 +3,6 @@
     <div class="header-top">
       <div class="header-main-title">
         <h1>
-          <ConfigMenuButton inline class="animated-icon pulse-cobalt" />
           {{ t('home.title').toUpperCase() }}
         </h1>
       </div>

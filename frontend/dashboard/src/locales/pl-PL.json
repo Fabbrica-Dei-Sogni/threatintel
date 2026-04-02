@@ -282,7 +282,10 @@
         "errorGeolocalizing": "Błąd podczas geolokalizacji",
         "errorIpData": "Błąd podczas pobierania danych IP",
         "errorCoordsNotFound": "Nie znaleziono współrzędnych dla tego adresu IP",
-        "successGeoloc": "Pobrano współrzędne i nazwę!"
+        "successGeoloc": "Pobrano współrzędne i nazwę!",
+        "hubProfilesDesc": "Zarządzaj punktami końcowymi API, współrzędnymi i parametrami węzłów.",
+        "hubAlgorithmsDesc": "Parametry wykrywania, progi alertów i logika śledcza.",
+        "systemOperational": "SYSTEM OPERACYJNY : WĘZEŁ AKTYWNY"
     },
     "threatLogs": {
         "title": "Dzienniki zagrożeń",

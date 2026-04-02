@@ -282,7 +282,10 @@
         "errorGeolocalizing": "Error during geolocation",
         "errorIpData": "Error retrieving IP data",
         "errorCoordsNotFound": "Coordinates not found for this IP",
-        "successGeoloc": "Coordinates and name retrieved!"
+        "successGeoloc": "Coordinates and name retrieved!",
+        "hubProfilesDesc": "Manage API endpoints, coordinates and monitored node parameters.",
+        "hubAlgorithmsDesc": "Detection parameters, alert thresholds and forensic logic.",
+        "systemOperational": "SYSTEM OPERATIONAL : NODE ACTIVE"
     },
     "threatLogs": {
         "title": "Threat logs",

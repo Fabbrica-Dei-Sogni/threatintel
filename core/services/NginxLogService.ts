@@ -25,6 +25,7 @@ const DEFAULT_SUSPICIOUS_PATTERNS = [
 
 import { ILongRunningService, ServiceStatus } from '../types/lifecycle';
 import { ThreatIndicator } from '../types/indicators';
+import { log } from 'console';
 
 @singleton()
 export class NginxLogService implements ILongRunningService {
@@ -205,7 +206,7 @@ export class NginxLogService implements ILongRunningService {
             fingerprint: {
                 hash: crypto.createHash('md5').update(`https-${ip}-${url}-${user_agent}`).digest('hex'),
                 suspicious: analysis.suspicious,
-                score: analysis.score,
+                score: analysis.score ? analysis.score : 999,
                 indicators: analysis.indicators
             },
             metadata: {
@@ -216,7 +217,7 @@ export class NginxLogService implements ILongRunningService {
 
         try {
             await this.threatLogService.saveLog(logEntry);
-            this.logger.info(`[NginxLogService] 🛡️ HTTPS sospetto: ${method} ${url} da ${ip} (Score: ${analysis.score})`);
+            this.logger.info(`[NginxLogService] 🛡️ HTTPS sospetto: ${method} ${url} da ${ip} (Score: ${logEntry.fingerprint.score})`);
         } catch (err) {
             this.logger.error('[NginxLogService] Errore salvataggio ThreatLog', err);
         }

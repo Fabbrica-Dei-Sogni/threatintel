@@ -95,7 +95,7 @@
             <pre>
 <% if (data.abuseReports.length > 0) { %>
 <% data.abuseReports.slice(0, 20).forEach(report => { %>
-[<%= new Date(report.date).toLocaleDateString(locale) %>] <%= t('reports.fragments.telex.cat').toUpperCase() %>: <%= report.categories.join(', ') %> // <%= t('reports.fragments.telex.comment').toUpperCase() %>: <%= report.comment %>
+[<%= new Date(report.date).toLocaleDateString(locale) %>] <%= t('reports.fragments.telex.cat').toUpperCase() %>: <%= (report.categories || []).map(function(cat) {     return cat.name;  }).join(', ') %> // <%= t('reports.fragments.telex.comment').toUpperCase() %>: <%= report.comment %>
 <% }); %>
 <% } else { %>
 <%= t('reports.fragments.telex.noReportedIncidents').toUpperCase() %>

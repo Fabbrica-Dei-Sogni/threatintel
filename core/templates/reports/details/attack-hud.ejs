@@ -57,13 +57,17 @@
             border: 1px solid var(--hud-accent);
             padding: 5px;
             background: rgba(0, 212, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .hud-logo img {
             width: 100%;
             height: 100%;
             object-fit: contain;
-            filter: brightness(0) invert(1) drop-shadow(0 0 2px var(--hud-accent));
+            /* Rimosso filtro invert che nascondeva il logo su sfondo scuro */
+            filter: drop-shadow(0 0 2px var(--hud-accent));
         }
 
         .hud-title h1 {
@@ -198,9 +202,9 @@
             <div class="hud-header-left">
                 <div class="hud-logo">
                     <% if (typeof logoBase64 !== 'undefined' && logoBase64) { %>
-                        <img src="<%= logoBase64 %>" class="logo-img" alt="Seal">
+                        <img src="<%= logoBase64 %>" alt="Agency Logo">
                     <% } else { %>
-                        <div style="font-size: 24px; font-weight: bold; color: #cbd5e0;">TI</div>
+                        <div style="font-size: 14px; font-weight: bold; color: var(--hud-accent);">TI</div>
                     <% } %>
                 </div>
                 <div class="hud-title">

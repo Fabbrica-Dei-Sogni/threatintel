@@ -1,37 +1,32 @@
 <template>
   <transition name="hub-bounce">
     <div class="global-nav-container" v-if="!dossierStore.isEnabled" :class="{ 'menu-open': isOpen }">
-    <!-- Overlay backdrop to close menu when clicking outside -->
-    <div class="nav-backdrop" v-if="isOpen" @click="isOpen = false"></div>
+      <!-- Overlay backdrop to close menu when clicking outside -->
+      <div class="nav-backdrop" v-if="isOpen" @click="isOpen = false"></div>
 
-    <div class="fan-menu">
-      <!-- Fan Items -->
-      <router-link
-        v-for="(item, index) in availableOptions"
-        :key="item.path"
-        :to="item.path"
-        class="fan-item shadow-2xl glass-card"
-        :class="[`pos-${index}`]"
-        @click="isOpen = false"
-        :title="item.label"
-      >
-        <span class="fan-icon">{{ item.icon }}</span>
-      </router-link>
+      <div class="fan-menu">
+        <!-- Fan Items -->
+        <router-link v-for="(item, index) in availableOptions" :key="item.path" :to="item.path"
+          class="fan-item shadow-2xl glass-card" :class="[`pos-${index}`]" @click="isOpen = false" :title="item.label">
+          <span class="fan-icon">{{ item.icon }}</span>
+        </router-link>
 
-      <!-- Main Hub Button -->
-      <button class="hub-btn shadow-2xl pulse-glow" :class="`theme-${currentDomain}`" @click="isOpen = !isOpen" :title="t('nav.menu')">
-        <transition name="icon-spin" mode="out-in">
-          <span v-if="isOpen" class="hub-icon close">✕</span>
-          <span v-else class="hub-icon open">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
-              <circle cx="12" cy="12" r="10"></circle>
-            </svg>
-          </span>
-        </transition>
-      </button>
+        <!-- Main Hub Button -->
+        <button class="hub-btn shadow-2xl pulse-glow" :class="`theme-${currentDomain}`" @click="isOpen = !isOpen"
+          :title="t('nav.menu')">
+          <transition name="icon-spin" mode="out-in">
+            <span v-if="isOpen" class="hub-icon close">✕</span>
+            <span v-else class="hub-icon open">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
+                <circle cx="12" cy="12" r="10"></circle>
+              </svg>
+            </span>
+          </transition>
+        </button>
+      </div>
     </div>
-  </div>
   </transition>
 </template>
 
@@ -47,12 +42,12 @@ const dossierStore = useDossierStore();
 
 const isOpen = ref(false);
 
-const allOptions = [
+const allOptions = computed(() => [
   { path: '/', domain: 'home', icon: '🏠', label: t('home.dashboard') },
   { path: '/dossiers', domain: 'dossier', icon: '📁', label: t('common.dossier') },
   { path: '/attacks', domain: 'attack', icon: '🛰️', label: t('attacks.title') },
   { path: '/telnet-sessions', domain: 'telnet', icon: '📟', label: t('home.telnet') }
-];
+]);
 
 const currentDomain = computed(() => {
   const p = route.path;
@@ -63,7 +58,7 @@ const currentDomain = computed(() => {
 });
 
 const availableOptions = computed(() => {
-  return allOptions.filter(opt => opt.domain !== currentDomain.value);
+  return allOptions.value.filter(opt => opt.domain !== currentDomain.value);
 });
 </script>
 
@@ -104,6 +99,7 @@ const availableOptions = computed(() => {
     opacity: 0;
     transform: translateX(-50%) translateY(100px);
   }
+
   100% {
     opacity: 1;
     transform: translateX(-50%) translateY(0);
@@ -115,6 +111,7 @@ const availableOptions = computed(() => {
     opacity: 1;
     transform: translateX(-50%) translateY(0);
   }
+
   100% {
     opacity: 0;
     transform: translateX(-50%) translateY(100px);
@@ -141,7 +138,8 @@ const availableOptions = computed(() => {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  z-index: 1005; /* Must be above fan items */
+  z-index: 1005;
+  /* Must be above fan items */
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   outline: none;
 }
@@ -151,6 +149,7 @@ const availableOptions = computed(() => {
   background: radial-gradient(circle at top left, #1E3799, #0C2461);
   border-color: rgba(136, 170, 255, 0.4);
 }
+
 .theme-home.pulse-glow {
   box-shadow: 0 0 20px rgba(74, 105, 189, 0.5), inset 0 0 10px rgba(255, 255, 255, 0.1);
 }
@@ -159,6 +158,7 @@ const availableOptions = computed(() => {
   background: radial-gradient(circle at top left, #6366f1, #312e81);
   border-color: rgba(99, 102, 241, 0.4);
 }
+
 .theme-dossier.pulse-glow {
   box-shadow: 0 0 20px rgba(99, 102, 241, 0.5), inset 0 0 10px rgba(255, 255, 255, 0.1);
 }
@@ -167,6 +167,7 @@ const availableOptions = computed(() => {
   background: radial-gradient(circle at top left, #e11d48, #881337);
   border-color: rgba(225, 29, 72, 0.4);
 }
+
 .theme-attack.pulse-glow {
   box-shadow: 0 0 20px rgba(225, 29, 72, 0.5), inset 0 0 10px rgba(255, 255, 255, 0.1);
 }
@@ -175,6 +176,7 @@ const availableOptions = computed(() => {
   background: radial-gradient(circle at top left, #10b981, #064e3b);
   border-color: rgba(16, 185, 129, 0.4);
 }
+
 .theme-telnet.pulse-glow {
   box-shadow: 0 0 20px rgba(16, 185, 129, 0.5), inset 0 0 10px rgba(255, 255, 255, 0.1);
 }
@@ -211,8 +213,9 @@ const availableOptions = computed(() => {
   text-decoration: none;
   font-size: 1.4rem;
   color: #fff;
-  z-index: 1000; /* Below the hub button */
-  
+  z-index: 1000;
+  /* Below the hub button */
+
   /* Initial state (hidden under hub) */
   top: 5px;
   left: 5px;
@@ -273,10 +276,12 @@ const availableOptions = computed(() => {
     width: 54px;
     height: 54px;
   }
+
   .fan-menu {
     width: 54px;
     height: 54px;
   }
+
   .fan-item {
     width: 46px;
     height: 46px;
@@ -284,13 +289,15 @@ const availableOptions = computed(() => {
     left: 4px;
     font-size: 1.2rem;
   }
-  
+
   .menu-open .fan-item.pos-0 {
     transform: scale(1) translate(-65px, -45px);
   }
+
   .menu-open .fan-item.pos-1 {
     transform: scale(1) translate(0px, -75px);
   }
+
   .menu-open .fan-item.pos-2 {
     transform: scale(1) translate(65px, -45px);
   }

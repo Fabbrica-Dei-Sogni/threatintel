@@ -691,7 +691,7 @@
         "origin": "Географическое происхождение",
         "eventsCount": "Всего событий",
         "eventName": "Тип события",
-        "message": "Сообщение о событии",
+        "message": "Примечание аналитика",
         "details": "Технические подробности",
         "generalInfo": "Общая информация",
         "networkInfo": "Сетевая информация",
@@ -699,6 +699,19 @@
         "abuseInfo": "Доказательства злоупотреблений",
         "rateBreachTitle": "ДЕТАЛИ НАРУШЕНИЯ RATE LIMIT",
         "limitType": "Тип Лимита",
-        "honeypotId": "ID Honeypot"
+        "honeypotId": "ID Honeypot",
+        "humanObservationTitle": "Судебно-медицинское наблюдение"
+    },
+    "dossier": {
+        "sections": {
+            "ip": "IP",
+            "attack": "АТАКА",
+            "telnet": "TELNET",
+            "session": "СЕССИЯ",
+            "abuse": "ЗЛОУПОТРЕБЛЕНИЕ",
+            "technique": "ТЕХНИКА",
+            "firewall": "БРАНДМАУЭР",
+            "human": "РУЧНАЯ ЗАМЕТКА"
+        }
     }
 }

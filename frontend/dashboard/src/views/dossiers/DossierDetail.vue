@@ -61,10 +61,9 @@
                 <span class="badge" v-if="editingSectionIndex !== index">{{ section.type.toUpperCase() }}</span>
                 <select v-else v-model="sectionEditForm.type" class="edit-title-input"
                   style="width: auto; padding: 4px; font-size: 0.8rem; height: auto;">
-                  <option value="ip">IP</option>
-                  <option value="attack">ATTACK</option>
-                  <option value="telnet">TELNET</option>
-                  <option value="generic">GENERIC</option>
+                  <option v-for="type in DossierSectionType" :key="type" :value="type">
+                    {{ t('dossier.sections.' + type).toUpperCase() }}
+                  </option>
                 </select>
               </div>
               <div style="display: flex; align-items: center; gap: 10px;">

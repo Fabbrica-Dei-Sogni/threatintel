@@ -1,5 +1,10 @@
 <template>
-  <div class="generic-section">
+  <div class="dossier-section human-section">
+    <div class="section-title">
+      <span class="icon">📝</span>
+      <h3>{{ t('dossierSections.humanObservationTitle') }}</h3>
+    </div>
+    
     <div class="text-content">
       {{ data.text || renderedText }}
     </div>
@@ -7,7 +12,10 @@
 </template>
 
 <script setup lang="ts">
-import { DossierSectionType, type IHumanSectionData } from '../../../models/DossierDTO';
+import { useI18n } from 'vue-i18n';
+import type { IHumanSectionData } from '../../../models/DossierDTO';
+
+const { t } = useI18n();
 
 defineProps<{
   data: IHumanSectionData;
@@ -15,12 +23,20 @@ defineProps<{
 }>();
 </script>
 
+<style scoped src="./sections.css"></style>
 <style scoped>
-.generic-section {
-  padding: 10px 0;
-  color: #e2e8f0;
+.human-section {
+  border-left: 2px solid #f59e0b;
+  background: rgba(245, 158, 11, 0.03);
+  padding-left: 15px;
+}
+
+.text-content {
+  color: #fde68a;
+  font-style: italic;
+  font-size: 0.95rem;
   line-height: 1.6;
   white-space: pre-wrap;
-  font-size: 0.95rem;
+  padding: 10px 0;
 }
 </style>

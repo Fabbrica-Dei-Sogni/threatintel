@@ -691,7 +691,7 @@
         "origin": "Geografische Herkunft",
         "eventsCount": "Gesamte Ereignisse",
         "eventName": "Ereignistyp",
-        "message": "Ereignismeldung",
+        "message": "Analystennotiz",
         "details": "Technische Details",
         "generalInfo": "Allgemeine Informationen",
         "networkInfo": "Netzwerkinformationen",
@@ -699,6 +699,19 @@
         "abuseInfo": "Abuse-Beweise",
         "rateBreachTitle": "RATE-LIMIT-VERLETZUNGSDETAIL",
         "limitType": "Limit-Typ",
-        "honeypotId": "Honeypot-ID"
+        "honeypotId": "Honeypot-ID",
+        "humanObservationTitle": "Forensische Beobachtung"
+    },
+    "dossier": {
+        "sections": {
+            "ip": "IP",
+            "attack": "ANGRIFF",
+            "telnet": "TELNET",
+            "session": "SITZUNG",
+            "abuse": "MISSBRAUCH",
+            "technique": "TECHNIK",
+            "firewall": "FIREWALL",
+            "human": "MANUELLE NOTIZ"
+        }
     }
 }

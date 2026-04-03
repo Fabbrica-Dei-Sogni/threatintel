@@ -2,7 +2,7 @@
     "sectionHuman": "{renderedText}",
     "reports": {
         "common": {
-            "analystNote": "Anmerkung",
+            "analystNote": "Analystennotiz",
             "agencyName": "ThreatIntelligence Agency",
             "executiveReport": "Management-Bericht",
             "forensicReport": "IP-Forensik-Bericht",

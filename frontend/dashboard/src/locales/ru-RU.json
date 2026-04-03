@@ -712,6 +712,7 @@
             "technique": "ТЕХНИКА",
             "firewall": "БРАНДМАУЭР",
             "human": "РУЧНАЯ ЗАМЕТКА"
-        }
+        },
+        "addObservationPlaceholder": "Добавить следственную заметку..."
     }
 }

@@ -113,6 +113,7 @@ export interface IDossierSection<T = any> {
   templateKey: string;
   data: T;
   renderedText?: string;
+  observations?: string[];
   order: number;
   timestamp: string | Date;
 }

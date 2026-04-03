@@ -711,7 +711,8 @@
             "abuse": "NADUŻYCIE",
             "technique": "TECHNIKA",
             "firewall": "ZAPORA",
-            "human": "NOTATKA RĘCZNA"
-        }
+            "human": "NOTATKA MANUALNA"
+        },
+        "addObservationPlaceholder": "Dodaj notatkę śledczą..."
     }
 }

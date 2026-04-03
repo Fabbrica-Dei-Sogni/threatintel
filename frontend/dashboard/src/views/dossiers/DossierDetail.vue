@@ -85,6 +85,45 @@
                 <!-- Nuovo sistema di rendering dinamico basato su DTO -->
                 <DossierSectionRenderer :section="section" />
 
+                <!-- Observations Container -->
+                <div class="observations-container" v-if="(section.observations && section.observations.length) || (!isSaving && editingSectionIndex === -1)">
+                  <div v-for="(obs, obsIdx) in section.observations" :key="obsIdx" class="obs-item-wrapper">
+                    <div class="obs-card">
+                      <div class="obs-header-tags">
+                        <span class="obs-label">OSS-{{ obsIdx + 1 }} / {{ t('reports.common.analystNote').toUpperCase() }}</span>
+                        <div class="obs-actions" v-if="!isSaving">
+                          <button @click="startEditObs(index, obsIdx, obs)" class="mini-icon-btn">✎</button>
+                          <button @click="handleRemoveObs(index, obsIdx)" class="mini-icon-btn danger">🗑</button>
+                        </div>
+                      </div>
+                      <div class="obs-text-content">
+                        <pre v-if="editingObsIndex !== `${index}-${obsIdx}`" class="obs-pre">{{ obs }}</pre>
+                        <div v-else class="obs-edit-box">
+                          <textarea v-model="obsEditBuffer" class="obs-edit-area" rows="2"></textarea>
+                          <div class="obs-edit-footer">
+                            <button @click="handleSaveObs(index, obsIdx)" class="btn-confirm-mini">✓</button>
+                            <button @click="cancelObsEdit" class="btn-cancel-mini">✗</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- Add Observation Quick Input -->
+                  <div class="add-obs-box" v-if="!isSaving && editingSectionIndex === -1">
+                    <div class="obs-input-wrapper">
+                      <input 
+                        v-model="newObsBuffers[index]" 
+                        type="text" 
+                        class="obs-quick-input" 
+                        :placeholder="t('dossier.addObservationPlaceholder') || 'Aggiungi nota investigativa...'"
+                        @keyup.enter="handleAddObs(index)"
+                      />
+                      <button @click="handleAddObs(index)" class="obs-quick-add" :disabled="!newObsBuffers[index] || !newObsBuffers[index].trim()">+</button>
+                    </div>
+                  </div>
+                </div>
+
                 <!-- Expandable Data Toggle (for forensic review) -->
                 <div class="data-dump" v-if="showRaw">
                   <pre>{{ JSON.stringify(section.data, null, 2) }}</pre>
@@ -139,13 +178,64 @@ const {
   saveMetadata,
   addHumanSection,
   updateSection,
-  deleteSection
+  deleteSection,
+  addObservation,
+  updateObservation,
+  deleteObservation
 } = useDossierDetail();
 
 const showRaw = ref(false);
 const isEditing = ref(false);
 const showRawEdit = ref(false);
 const editForm = ref({ title: '', description: '' });
+
+// Buffers per le nuove osservazioni (uno per ogni sezione)
+const newObsBuffers = ref<Record<number, string>>({});
+// Buffer per l'editing di un'osservazione specifica
+const editingObsIndex = ref<string | null>(null); // formato "sectionIdx-obsIdx"
+const obsEditBuffer = ref('');
+
+const handleAddObs = async (sectionIndex: number) => {
+  const text = newObsBuffers.value[sectionIndex];
+  if (!text || !text.trim()) return;
+  try {
+    await addObservation(props.id, sectionIndex, text);
+    newObsBuffers.value[sectionIndex] = '';
+    ElMessage.success(t('common.save') + ' OK');
+  } catch (err) {
+    ElMessage.error(t('common.error'));
+  }
+};
+
+const startEditObs = (sectionIndex: number, obsIndex: number, text: string) => {
+  editingObsIndex.value = `${sectionIndex}-${obsIndex}`;
+  obsEditBuffer.value = text;
+};
+
+const cancelObsEdit = () => {
+  editingObsIndex.value = null;
+  obsEditBuffer.value = '';
+};
+
+const handleSaveObs = async (sectionIndex: number, obsIndex: number) => {
+  try {
+    await updateObservation(props.id, sectionIndex, obsIndex, obsEditBuffer.value);
+    editingObsIndex.value = null;
+    ElMessage.success(t('common.save') + ' OK');
+  } catch (err) {
+    ElMessage.error(t('common.error'));
+  }
+};
+
+const handleRemoveObs = async (sectionIndex: number, obsIndex: number) => {
+  try {
+    await ElMessageBox.confirm('Eliminare questa osservazione?', 'Conferma', { type: 'warning' });
+    await deleteObservation(props.id, sectionIndex, obsIndex);
+    ElMessage.success(t('common.delete') + ' OK');
+  } catch (err) {
+    if (err !== 'cancel') ElMessage.error(t('common.error'));
+  }
+};
 
 const startEdit = () => {
   if (!dossier.value) return;
@@ -277,8 +367,6 @@ onMounted(init);
 
 const goBack = () => router.push('/dossiers');
 const formatDate = (date) => dayjs(date).format('DD/MM/YYYY HH:mm:ss');
-
-onMounted(loadDossier);
 </script>
 
 <style scoped src="./Dossiers.css"></style>
@@ -352,6 +440,156 @@ onMounted(loadDossier);
   font-family: inherit;
   font-size: 0.9rem;
   line-height: 1.6;
+}
+
+/* OSSERVAZIONI STYLES */
+.observations-container {
+  margin-top: 25px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 15px;
+  background: rgba(245, 158, 11, 0.03);
+  border: 1px solid rgba(245, 158, 11, 0.15);
+  border-radius: 8px;
+}
+
+.obs-card {
+  background: rgba(0, 0, 0, 0.2);
+  border-left: 3px solid #f59e0b;
+  padding: 12px;
+  border-radius: 0 4px 4px 0;
+}
+
+.obs-header-tags {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.obs-label {
+  font-size: 0.65rem;
+  font-weight: 900;
+  color: #f59e0b;
+  letter-spacing: 1px;
+}
+
+.obs-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.mini-icon-btn {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  font-size: 0.8rem;
+  padding: 2px;
+  transition: all 0.2s;
+}
+
+.mini-icon-btn:hover {
+  color: #f59e0b;
+}
+
+.mini-icon-btn.danger:hover {
+  color: #ef4444;
+}
+
+.obs-pre {
+  margin: 0;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  color: #fde68a;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.obs-edit-area {
+  width: 100%;
+  background: #000;
+  border: 1px solid #f59e0b;
+  color: #fde68a;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  padding: 8px;
+  border-radius: 4px;
+  outline: none;
+}
+
+.obs-edit-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 5px;
+}
+
+.btn-confirm-mini {
+  background: #f59e0b;
+  color: black;
+  border: none;
+  border-radius: 4px;
+  padding: 2px 8px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.btn-cancel-mini {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 2px 8px;
+  cursor: pointer;
+}
+
+.add-obs-box {
+  margin-top: 5px;
+}
+
+.obs-input-wrapper {
+  display: flex;
+  gap: 10px;
+}
+
+.obs-quick-input {
+  flex: 1;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px dashed rgba(245, 158, 11, 0.4);
+  color: #fde68a;
+  padding: 8px 12px;
+  font-size: 0.85rem;
+  border-radius: 4px;
+  outline: none;
+}
+
+.obs-quick-input:focus {
+  border-color: #f59e0b;
+  border-style: solid;
+}
+
+.obs-quick-add {
+  background: #f59e0b;
+  color: black;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  font-weight: 900;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.obs-quick-add:hover:not(:disabled) {
+  transform: scale(1.05);
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
+}
+
+.obs-quick-add:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 /* Override per uniformare i contenuti EJS iniettati */

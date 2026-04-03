@@ -712,6 +712,7 @@
             "technique": "TECHNIQUE",
             "firewall": "PARE-FEU",
             "human": "NOTE MANUELLE"
-        }
+        },
+        "addObservationPlaceholder": "Ajouter une note d'investigation..."
     }
 }

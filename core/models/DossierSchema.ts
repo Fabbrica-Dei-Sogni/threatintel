@@ -13,6 +13,7 @@ export interface IDossierSection {
     renderedText?: string;  // Snapshot testuale nella lingua del creatore
     order: number;          // Ordinamento manuale
     timestamp: Date;        // Quando è stata acquisita la sezione
+    observations?: string[]; // Note investigative collaborative
 }
 
 export interface IDossier extends Document {
@@ -32,7 +33,8 @@ const SectionSchema: Schema = new Schema({
     data: { type: Schema.Types.Mixed, required: true },
     renderedText: { type: String, default: null },
     order: { type: Number, default: 0 },
-    timestamp: { type: Date, default: Date.now }
+    timestamp: { type: Date, default: Date.now },
+    observations: { type: [String], default: [] }
 }, { _id: false });
 
 const DossierSchema: Schema = new Schema({

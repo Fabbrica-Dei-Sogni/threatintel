@@ -23,7 +23,8 @@ export class DossierService {
         const sanitizedSections = (dto.sections || []).map(section => ({
             ...section,
             data: SanitizationUtils.sanitizeObjectData(section.data),
-            timestamp: section.timestamp || new Date()
+            timestamp: section.timestamp || new Date(),
+            observations: section.observations || []
         }));
 
         const dossier = new Dossier({
@@ -77,7 +78,8 @@ export class DossierService {
         if (dto.sections) {
             updateData.sections = dto.sections.map(section => ({
                 ...section,
-                data: SanitizationUtils.sanitizeObjectData(section.data)
+                data: SanitizationUtils.sanitizeObjectData(section.data),
+                observations: section.observations || []
             }));
         }
 
@@ -108,7 +110,8 @@ export class DossierService {
             type: s.type,
             timestamp: s.timestamp,
             renderedText: s.renderedText,
-            order: s.order || 0
+            order: s.order || 0,
+            observations: s.observations || []
         }));
 
         if (style === 'hud') {

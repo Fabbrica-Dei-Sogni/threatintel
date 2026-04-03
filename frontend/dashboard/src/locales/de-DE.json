@@ -712,6 +712,7 @@
             "technique": "TECHNIK",
             "firewall": "FIREWALL",
             "human": "MANUELLE NOTIZ"
-        }
+        },
+        "addObservationPlaceholder": "Investigative Notiz hinzufügen..."
     }
 }

@@ -167,7 +167,6 @@
                 </div>
             </div>
             <div class="header-right">
-                <div class="security-stamp"><%= t('reports.common.internalUseOnly').toUpperCase() %></div>
                 <div class="dossier-info">
                     <%= t('reports.common.id').toUpperCase() %>: CUSTOM-<%= new Date().getTime() %><br>
                     <%= t('reports.common.date').toUpperCase() %>: <%= new Date().toLocaleString(locale) %><br>
@@ -190,6 +189,14 @@
                         <div class="section-body">
                             <div class="blueprint-container">
 <%= section.renderedText %>
+<% if (section.observations && section.observations.length > 0) { %>
+
+--------------------------------------------------------------------------------
+[<%= t('reports.common.analystNote').toUpperCase() %>]
+<% section.observations.forEach((obs, obsIdx) => { %>
+>> OSS-<%= (obsIdx + 1).toString().padStart(2, '0') %>: <%= obs %>
+<% }); %>
+<% } %>
                             </div>
                         </div>
                     </div>

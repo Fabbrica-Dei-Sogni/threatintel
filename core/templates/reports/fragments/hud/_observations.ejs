@@ -1,0 +1,17 @@
+<% if (section.observations && section.observations.length > 0) { %>
+    <div class="hud-observations-list" style="margin-top: 10px; margin-bottom: 20px;">
+        <% section.observations.forEach(function(obs, idx) { %>
+            <div class="hud-item human-note-box" style="margin-bottom: 10px;">
+                <div class="hud-box-header">
+                    <span class="hud-box-title" style="color: #f59e0b;">
+                        > <%= t('reports.common.analystNote').toUpperCase() %> (OSS-<%= idx + 1 %>)
+                    </span>
+                    <span class="hud-box-type" style="border-color: #f59e0b; color: #f59e0b;">[INVESTIGATION_REPORT]</span>
+                </div>
+                <div class="hud-generic-content" style="border-left: 2px solid #f59e0b; background: rgba(245, 158, 11, 0.05); padding: 10px;">
+                    <pre class="hud-mono-text" style="color: #fde68a; font-size: 11px; margin: 0; white-space: pre-wrap;"><%= obs %></pre>
+                </div>
+            </div>
+        <% }); %>
+    </div>
+<% } %>

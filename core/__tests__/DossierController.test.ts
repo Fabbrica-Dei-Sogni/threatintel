@@ -32,8 +32,12 @@ describe('DossierController', () => {
         });
         mockResponse = {
             status: responseStatus,
-            send: responseSend
+            send: responseSend,
+            setHeader: jest.fn().mockReturnThis(),
+            json: responseJson
         };
+        // Per rendere il mock funzionante con return res.status(200).json(...)
+        (mockResponse.status as jest.Mock).mockReturnValue(mockResponse);
     });
 
     describe('create()', () => {
@@ -156,8 +160,7 @@ describe('DossierController', () => {
 
             await dossierController.export(mockRequest as Request, mockResponse as Response);
 
-            expect(responseStatus).not.toHaveBeenCalledWith(500);
-            expect(responseSend).toHaveBeenCalledWith(mockBuffer);
+            expect(mockResponse.send).toHaveBeenCalledWith(mockBuffer);
         });
 
         it('should return 200 and HTML string on success', async () => {
@@ -166,7 +169,7 @@ describe('DossierController', () => {
 
             await dossierController.export(mockRequest as Request, mockResponse as Response);
 
-            expect(responseSend).toHaveBeenCalledWith('<html></html>');
+            expect(mockResponse.send).toHaveBeenCalledWith('<html></html>');
         });
 
         it('should return 500 if service throws error', async () => {

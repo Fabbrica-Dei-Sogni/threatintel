@@ -1,0 +1,15 @@
+<% if (section.observations && section.observations.length > 0) { %>
+    <div class="classic-observations" style="margin-top: 15px; border-top: 1px solid #ddd; padding-top: 10px;">
+        <h4 style="color: #666; font-size: 13px; margin: 0 0 10px 0; letter-spacing: 1px;">
+            <%= t('reports.common.analystNote').toUpperCase() %> / OSSERVAZIONI
+        </h4>
+        <% section.observations.forEach(function(obs, idx) { %>
+            <div class="observation-box" style="background: #fbfbfb; border: 1px solid #eee; border-left: 4px solid #f59e0b; padding: 12px; margin-bottom: 10px; border-radius: 0 4px 4px 0;">
+                <div class="obs-meta" style="font-size: 10px; color: #999; margin-bottom: 5px; font-weight: bold;">
+                    #<%= idx + 1 %>
+                </div>
+                <div class="obs-text" style="font-size: 11px; line-height: 1.5; color: #333; white-space: pre-wrap; font-family: monospace;"><%= obs %></div>
+            </div>
+        <% }); %>
+    </div>
+<% } %>

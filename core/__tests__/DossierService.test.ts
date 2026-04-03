@@ -57,6 +57,20 @@ describe('DossierService', () => {
             // Verifica sanificazione (il campo whois nel mockDto aveva virgolette doppie e \n letterale)
             const savedData = (Dossier as unknown as jest.Mock).mock.calls[0][0];
             expect(savedData.sections[0].data.whois).toBe('Record con \n newlines');
+            expect(savedData.sections[0].observations).toEqual([]);
+        });
+
+        it('should preserve provided observations', async () => {
+            const mockDto = {
+                title: 'Test Dossier',
+                sections: [{ type: 'ip', data: {}, observations: ['note1'] }]
+            };
+            const saveSpy = jest.fn().mockResolvedValue({ _id: '123', ...mockDto });
+            (Dossier as unknown as jest.Mock).mockImplementation(() => ({ save: saveSpy }));
+
+            await dossierService.createDossier(mockDto as any);
+            const savedData = (Dossier as unknown as jest.Mock).mock.calls[0][0];
+            expect(savedData.sections[0].observations).toEqual(['note1']);
         });
     });
 
@@ -93,6 +107,23 @@ describe('DossierService', () => {
                 ])
             }));
         });
+
+        it('should apply owner, tags and ip filters', async () => {
+            (Dossier.countDocuments as jest.Mock).mockResolvedValue(0);
+            (Dossier.find as jest.Mock).mockReturnValue({
+                sort: jest.fn().mockReturnThis(),
+                skip: jest.fn().mockReturnThis(),
+                limit: jest.fn().mockResolvedValue([])
+            });
+
+            await dossierService.listDossiers({ owner: 'user1', tags: ['t1'], ip: '1.1.1.1' });
+
+            expect(Dossier.find).toHaveBeenCalledWith(expect.objectContaining({
+                owner: 'user1',
+                tags: { $in: ['t1'] },
+                'sections.data.ip': '1.1.1.1'
+            }));
+        });
     });
 
     describe('getDossierById()', () => {
@@ -123,6 +154,17 @@ describe('DossierService', () => {
                 expect.objectContaining({ $set: { title: 'Updated' } }),
                 { new: true }
             );
+        });
+
+        it('should sanitize and include observations in section update', async () => {
+            const mockSections = [{ type: 'ip', data: { x: 'y' }, observations: ['obs1'] }];
+            (Dossier.findByIdAndUpdate as jest.Mock).mockResolvedValue({});
+
+            await dossierService.updateDossier('123', { sections: mockSections as any });
+
+            const updateCall = (Dossier.findByIdAndUpdate as jest.Mock).mock.calls[0][1].$set;
+            expect(updateCall.sections[0].observations).toEqual(['obs1']);
+            expect(updateCall.sections[0].data.x).toBe('y');
         });
     });
 
@@ -171,6 +213,21 @@ describe('DossierService', () => {
             (Dossier.findById as jest.Mock).mockResolvedValue(null);
             await expect(dossierService.generatePdfFromDossier('999', 'pdf', 'hud', 'it-IT'))
                 .rejects.toThrow('Dossier not found');
+        });
+
+        it('should call generateTelexReport for other styles', async () => {
+            const dossierWithObs = {
+                ...mockDossier,
+                sections: [{ ...mockDossier.sections[0], observations: ['note'] }]
+            };
+            (Dossier.findById as jest.Mock).mockResolvedValue(dossierWithObs);
+            mockReportService.generateTelexReport.mockResolvedValue('telex-buffer');
+
+            const result = await dossierService.generatePdfFromDossier('123', 'pdf', 'telex', 'it-IT');
+
+            expect(result).toBe('telex-buffer');
+            const sectionsPassed = mockReportService.generateTelexReport.mock.calls[0][0];
+            expect(sectionsPassed[0].observations).toEqual(['note']);
         });
     });
 });

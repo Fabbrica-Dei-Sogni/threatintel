@@ -128,6 +128,68 @@ export function useDossierDetail() {
         }
     };
 
+    const addObservation = async (id: string, sectionIndex: number, text: string) => {
+        if (!id || !dossier.value || !text.trim()) return;
+        isSaving.value = true;
+        try {
+            const updatedSections = [...dossier.value.sections];
+            const section = updatedSections[sectionIndex];
+            if (!section.observations) section.observations = [];
+            section.observations.push(text);
+            
+            await updateDossier(id, { sections: updatedSections });
+            dossier.value.sections = updatedSections;
+            dossierStore.notifySaved();
+        } catch (err) {
+            console.error('[useDossierDetail] Errore aggiunta osservazione:', err);
+            throw err;
+        } finally {
+            isSaving.value = false;
+        }
+    };
+
+    const updateObservation = async (id: string, sectionIndex: number, obsIndex: number, text: string) => {
+        if (!id || !dossier.value) return;
+        isSaving.value = true;
+        try {
+            const updatedSections = [...dossier.value.sections];
+            const section = updatedSections[sectionIndex];
+            if (section.observations) {
+                section.observations[obsIndex] = text;
+            }
+            
+            await updateDossier(id, { sections: updatedSections });
+            dossier.value.sections = updatedSections;
+            dossierStore.notifySaved();
+        } catch (err) {
+            console.error('[useDossierDetail] Errore aggiornamento osservazione:', err);
+            throw err;
+        } finally {
+            isSaving.value = false;
+        }
+    };
+
+    const deleteObservation = async (id: string, sectionIndex: number, obsIndex: number) => {
+        if (!id || !dossier.value) return;
+        isSaving.value = true;
+        try {
+            const updatedSections = [...dossier.value.sections];
+            const section = updatedSections[sectionIndex];
+            if (section.observations) {
+                section.observations.splice(obsIndex, 1);
+            }
+            
+            await updateDossier(id, { sections: updatedSections });
+            dossier.value.sections = updatedSections;
+            dossierStore.notifySaved();
+        } catch (err) {
+            console.error('[useDossierDetail] Errore eliminazione osservazione:', err);
+            throw err;
+        } finally {
+            isSaving.value = false;
+        }
+    };
+
     return {
         dossier,
         loading,
@@ -137,6 +199,9 @@ export function useDossierDetail() {
         saveMetadata,
         addHumanSection,
         updateSection,
-        deleteSection
+        deleteSection,
+        addObservation,
+        updateObservation,
+        deleteObservation
     };
 }

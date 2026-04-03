@@ -712,6 +712,7 @@
             "technique": "TECHNIQUE",
             "firewall": "FIREWALL",
             "human": "MANUAL NOTE"
-        }
+        },
+        "addObservationPlaceholder": "Add investigative note..."
     }
 }

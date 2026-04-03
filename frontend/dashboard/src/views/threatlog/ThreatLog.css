@@ -247,3 +247,158 @@ h1 {
   from { opacity: 0; transform: translateY(4px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+/* === NEW FORENSIC LAYOUT CLASSES (Briefing & HUD) === */
+
+/* Briefing Grid (Geolocalizzazione) */
+.briefing-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-top: 10px;
+}
+
+.briefing-item {
+  background: rgba(40, 30, 15, 0.4);
+  border: 1px solid rgba(255, 179, 0, 0.1);
+  border-radius: 8px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  transition: all 0.3s ease;
+}
+
+.briefing-item:hover {
+  border-color: rgba(255, 179, 0, 0.3);
+  background: rgba(255, 179, 0, 0.05);
+  transform: translateY(-2px);
+}
+
+.briefing-icon {
+  font-size: 1.4rem;
+  filter: drop-shadow(0 0 5px rgba(255, 179, 0, 0.2));
+}
+
+.briefing-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.briefing-label {
+  font-size: 0.65rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #BBA685;
+  letter-spacing: 1px;
+  margin-bottom: 2px;
+}
+
+.briefing-value {
+  font-size: 0.95rem;
+  color: #F4EBD0;
+  font-weight: 600;
+}
+
+/* Tactical HUD (Analisi) */
+.hud-stats-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.hud-stat-box {
+  background: linear-gradient(135deg, rgba(255, 179, 0, 0.1), transparent);
+  border: 1px solid rgba(255, 179, 0, 0.15);
+  border-radius: 6px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-left: 3px solid #FFB300;
+}
+
+.hud-box-icon {
+  font-size: 1.2rem;
+  opacity: 0.8;
+}
+
+.hud-stat-data {
+  display: flex;
+  flex-direction: column;
+}
+
+.hud-label {
+  font-size: 0.6rem;
+  font-weight: 800;
+  color: rgba(255, 179, 0, 0.7);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.hud-value {
+  font-size: 1rem;
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 700;
+  color: #F4EBD0;
+}
+
+.hud-value.highlight {
+  color: #FFB300;
+  text-shadow: 0 0 10px rgba(255, 179, 0, 0.3);
+}
+
+/* Technique Tags */
+.techniques-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.tech-tag {
+  background: rgba(255, 179, 0, 0.1);
+  color: #FFD700;
+  border: 1px solid rgba(255, 179, 0, 0.25);
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  transition: all 0.2s ease;
+}
+
+.tech-tag:hover {
+  background: rgba(255, 179, 0, 0.2);
+  border-color: #FFB300;
+  box-shadow: 0 0 8px rgba(255, 179, 0, 0.2);
+}
+
+/* Indicators (Status Badges) */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  border: 1px solid;
+}
+
+.status-badge.yes {
+  background: rgba(230, 33, 23, 0.15);
+  color: #E62117;
+  border-color: rgba(230, 33, 23, 0.3);
+}
+
+.status-badge.no {
+  background: rgba(255, 255, 255, 0.05);
+  color: #BBA685;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Helper spacing */
+.mt-20 { margin-top: 20px; }
+.mb-10 { margin-bottom: 10px; }

@@ -18,18 +18,36 @@
                 </div>
                 <transition name="collapse">
                     <div v-if="toggles.geo" class="section-body">
-                        <p><strong>{{ t('ipDetails.country') }}:</strong> {{ log.geo.country ||
-                            t('common.notAvailable') }}</p>
-                        <p><strong>{{ t('ipDetails.region') }}:</strong> {{ log.geo.region ||
-                            t('common.notAvailable') }}</p>
-                        <p><strong>{{ t('ipDetails.city') }}:</strong> {{ log.geo.city ||
-                            t('common.notAvailable') }}</p>
-                        <p><strong>{{ t('threatLog.coordinates') }}:</strong> {{ log.geo.coordinates?.join(', ') ||
-                            t('common.notAvailable') }}</p>
-                        <p><strong>{{ t('ipDetails.timezone') }}:</strong> {{ log.geo.timezone ||
-                            t('common.notAvailable') }}</p>
-                        <p><strong>ASN:</strong> {{ log.geo.asn || t('common.notAvailable') }}</p>
-                        <p><strong>ISP:</strong> {{ log.geo.isp || t('common.notAvailable') }}</p>
+                        <div class="briefing-grid">
+                            <div class="briefing-item">
+                                <CountryFlag :countryCode="log.geo.country" class="briefing-flag" />
+                                <div class="briefing-content">
+                                    <span class="briefing-label">{{ t('ipDetails.country').toUpperCase() }}</span>
+                                    <span class="briefing-value">{{ log.geo.country || t('common.notAvailable') }}</span>
+                                </div>
+                            </div>
+                            <div class="briefing-item">
+                                <span class="briefing-icon">📍</span>
+                                <div class="briefing-content">
+                                    <span class="briefing-label">{{ t('ipDetails.city').toUpperCase() }} / {{ t('ipDetails.region').toUpperCase() }}</span>
+                                    <span class="briefing-value">{{ log.geo.city || '-' }}, {{ log.geo.region || '-' }}</span>
+                                </div>
+                            </div>
+                            <div class="briefing-item">
+                                <span class="briefing-icon">🕒</span>
+                                <div class="briefing-content">
+                                    <span class="briefing-label">{{ t('threatLog.coordinates').toUpperCase() }} / GPS</span>
+                                    <div class="briefing-value">{{ log.geo.coordinates?.join(', ') || '-' }} ({{ log.geo.timezone || '-' }})</div>
+                                </div>
+                            </div>
+                            <div class="briefing-item">
+                                <span class="briefing-icon">🏢</span>
+                                <div class="briefing-content">
+                                    <span class="briefing-label">ASN / ISP</span>
+                                    <div class="briefing-value" :title="log.geo.isp">{{ log.geo.asn || '-' }} ({{ log.geo.isp || '-' }})</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </transition>
             </div>
@@ -41,16 +59,57 @@
                 </div>
                 <transition name="collapse">
                     <div v-if="toggles.fingerprint" class="section-body">
-                        <p><strong>{{ t('common.timestamp') }}:</strong> {{ formatDate(log.timestamp) }}</p>
-                        <p><strong>{{ t('threatLog.techniques') }}:</strong></p>
-                        <ul style="margin-bottom: 15px;">
-                            <li v-for="(ind, i) in log.fingerprint.indicators" :key="i">{{ ind }}</li>
-                        </ul>
+                        <!-- Tactical HUD -->
+                        <div class="hud-stats-row">
+                            <div class="hud-stat-box">
+                                <span class="hud-box-icon">🕒</span>
+                                <div class="hud-stat-data">
+                                    <span class="hud-label">{{ t('common.timestamp').toUpperCase() }}</span>
+                                    <div class="hud-value">{{ formatDate(log.timestamp) }}</div>
+                                </div>
+                            </div>
+                            <div v-if="log.metadata?.eventCount > 1" class="hud-stat-box">
+                                <span class="hud-box-icon">📊</span>
+                                <div class="hud-stat-data">
+                                    <span class="hud-label">EVENTS</span>
+                                    <div class="hud-value highlight">x{{ log.metadata.eventCount }}</div>
+                                </div>
+                            </div>
+                            <div class="hud-stat-box">
+                                <span class="hud-box-icon">🤖</span>
+                                <div class="hud-stat-data">
+                                    <span class="hud-label">BOT STATUS</span>
+                                    <div class="hud-value">
+                                        <span class="status-badge" :class="log.metadata.isBot ? 'yes' : 'no'">
+                                            {{ log.metadata.isBot ? t('threatLog.yes') : t('threatLog.no') }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="hud-stat-box">
+                                <span class="hud-box-icon">🕷️</span>
+                                <div class="hud-stat-data">
+                                    <span class="hud-label">CRAWLER</span>
+                                    <div class="hud-value">
+                                        <span class="status-badge" :class="log.metadata.isCrawler ? 'yes' : 'no'">
+                                            {{ log.metadata.isCrawler ? t('threatLog.yes') : t('threatLog.no') }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
-                        <div class="analysis-meta" style="border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 10px; margin-top: 10px;">
-                            <p v-if="log.metadata?.eventCount > 1"><strong>Aggregated Events:</strong> {{ log.metadata.eventCount }}</p>
-                            <p><strong>{{ t('threatLog.isBot') }}</strong> {{ log.metadata.isBot ? t('threatLog.yes') : t('threatLog.no') }}</p>
-                            <p><strong>{{ t('threatLog.isCrawler') }}</strong> {{ log.metadata.isCrawler ? t('threatLog.yes') : t('threatLog.no') }}</p>
+                        <!-- Techniques Tags -->
+                        <div class="analysis-techniques mt-20">
+                            <span class="briefing-label">{{ t('threatLog.techniques').toUpperCase() }}</span>
+                            <div class="techniques-container">
+                                <span v-for="(ind, i) in log.fingerprint.indicators" :key="i" class="tech-tag">
+                                    {{ ind }}
+                                </span>
+                                <span v-if="!log.fingerprint.indicators?.length" class="briefing-value" style="opacity: 0.5; font-style: italic;">
+                                    {{ t('common.notAvailable') }}
+                                </span>
+                            </div>
                         </div>
                     </div>
                 </transition>
@@ -151,6 +210,7 @@ import { useI18n } from 'vue-i18n'
 import HexViewer from '../../components/HexViewer.vue';
 import { useClipboard } from '../../composable/useClipboard';
 import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
+import CountryFlag from '../../components/CountryFlag.vue';
 
 const { t } = useI18n();
 const { copyToClipboard, copyFormatted } = useClipboard();

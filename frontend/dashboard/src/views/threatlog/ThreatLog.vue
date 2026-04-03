@@ -4,7 +4,7 @@
             <button @click="goBack" class="back-btn">← {{ t('threatLog.backToLogs') }}</button>
             <LanguageSwitcher />
         </div>
-        <h1><span class="animated-icon pulse-amber">🗄️</span> {{ t('threatLog.title') }}: {{ id }}</h1>
+        <h1><span class="animated-icon pulse-amber">🗄️</span> {{ t('threatLog.title') }}</h1>
 
         <section v-if="loading" class="loading">{{ t('common.loading') }}</section>
         <section v-if="error" class="error">{{ t('common.error') }}</section>

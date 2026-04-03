@@ -322,7 +322,7 @@
         }
     },
     "threatLog": {
-        "title": "Détail ThreatLog",
+        "title": "Détail de la requête",
         "backToLogs": "Retour",
         "generalInfo": "Informations générales",
         "geolocation": "Géolocalisation",

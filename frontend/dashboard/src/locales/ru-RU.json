@@ -322,7 +322,7 @@
         }
     },
     "threatLog": {
-        "title": "Детали ThreatLog",
+        "title": "Детали запроса",
         "backToLogs": "Назад",
         "generalInfo": "Общая информация",
         "geolocation": "Геолокация",

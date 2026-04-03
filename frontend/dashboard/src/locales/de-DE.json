@@ -97,7 +97,7 @@
         "title": "Forensische Ops-Konsole",
         "dashboard": "Dashboard",
         "attacks": "Angriffe",
-        "logRequests": "Protokoll-Anfragen",
+        "logRequests": "Log-Register",
         "recentAttacks": "Letzte 10 Angriffe",
         "recentLogs": "Letzte 10 Protokolle",
         "attackMap": "Angriffskarte",
@@ -133,7 +133,7 @@
     "attacks": {
         "title": "HTTP/S SSH Angriffe",
         "dashboard": "Dashboard",
-        "logRequests": "Protokoll-Anfragen",
+        "logRequests": "Log-Register",
         "minLogsLabel": "Minimale Anzahl von Protokollen pro Angriff:",
         "timeFilter": "Zeitfilter:",
         "last": "Letzte",
@@ -435,7 +435,7 @@
         "menuTitle": "Navigation",
         "dashboard": "Dashboard",
         "attacks": "Angriffe",
-        "logs": "Protokoll-Anfragen",
+        "logs": "Log-Register",
         "configuration": "Konfiguration",
         "settings": "Einstellungen",
         "archive": "Investigatives Archiv"

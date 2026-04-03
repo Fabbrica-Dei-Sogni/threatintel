@@ -97,7 +97,7 @@
         "title": "FORENSIC OPS CONSOLE",
         "dashboard": "Cruscotto",
         "attacks": "Attacchi",
-        "logRequests": "Log requests",
+        "logRequests": "Registro Log",
         "recentAttacks": "Ultimi 10 attacchi",
         "recentLogs": "Ultimi 10 log",
         "attackMap": "Mappa Attacchi",
@@ -133,7 +133,7 @@
     "attacks": {
         "title": "Attacchi HTTP/S SSH",
         "dashboard": "Cruscotto",
-        "logRequests": "Log requests",
+        "logRequests": "Registro Log",
         "minLogsLabel": "Numero minimo di log per attacco:",
         "timeFilter": "Filtro temporale:",
         "last": "Ultimi",
@@ -435,7 +435,7 @@
         "menuTitle": "Navigazione",
         "dashboard": "Cruscotto",
         "attacks": "Attacchi",
-        "logs": "Log Richieste",
+        "logs": "Registro Log",
         "configuration": "Configurazione",
         "settings": "Impostazioni",
         "archive": "Archivio Investigativo"

@@ -97,7 +97,7 @@
         "title": "Konsola Operacyjna Forensic",
         "dashboard": "Pulpit",
         "attacks": "Ataki",
-        "logRequests": "Dzienniki żądań",
+        "logRequests": "Rejestr Logów",
         "recentAttacks": "Ostatnie 10 ataków",
         "recentLogs": "Ostatnie 10 dzienników",
         "attackMap": "Mapa ataków",
@@ -133,7 +133,7 @@
     "attacks": {
         "title": "Ataki HTTP/S SSH",
         "dashboard": "Pulpit",
-        "logRequests": "Dzienniki żądań",
+        "logRequests": "Rejestr Logów",
         "minLogsLabel": "Minimalna liczba dzienników na atak:",
         "timeFilter": "Filtr czasowy:",
         "last": "Ostatnie",
@@ -435,7 +435,7 @@
         "menuTitle": "Nawigacja",
         "dashboard": "Pulpit",
         "attacks": "Ataki",
-        "logs": "Dzienniki żądań",
+        "logs": "Rejestr Logów",
         "configuration": "Konfiguracja",
         "settings": "Ustawienia",
         "archive": "Archiwum śledcze"

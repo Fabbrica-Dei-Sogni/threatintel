@@ -97,7 +97,7 @@
         "title": "Console Ops Forensic",
         "dashboard": "Tableau de bord",
         "attacks": "Attaques",
-        "logRequests": "Journaux de requêtes",
+        "logRequests": "Registre des Logs",
         "recentAttacks": "10 dernières attaques",
         "recentLogs": "10 derniers journaux",
         "attackMap": "Carte des attaques",
@@ -133,7 +133,7 @@
     "attacks": {
         "title": "Attaques HTTP/S SSH",
         "dashboard": "Tableau de bord",
-        "logRequests": "Journaux de requêtes",
+        "logRequests": "Registre des Logs",
         "minLogsLabel": "Nombre minimum de journaux par attaque:",
         "timeFilter": "Filtre temporel:",
         "last": "Derniers",
@@ -435,7 +435,7 @@
         "menuTitle": "Navigation",
         "dashboard": "Tableau de bord",
         "attacks": "Attaques",
-        "logs": "Journaux de requêtes",
+        "logs": "Registre des Logs",
         "configuration": "Configuration",
         "settings": "Paramètres",
         "archive": "Archive d'investigation"

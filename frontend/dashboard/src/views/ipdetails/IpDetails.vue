@@ -304,7 +304,7 @@
               </div>
             </div>
             <div class="whois-viewer">
-              <pre class="whois-code-box">{{ JSON.stringify(ipInfo.whois_raw, null, 2) }}</pre>
+              <pre class="whois-code-box">{{ ipInfo.whois_raw }}</pre>
             </div>
           </div>
         </transition>
@@ -571,7 +571,7 @@ const copyWhoisRaw = () => {
   if (!ipInfo.value?.whois_raw) return;
   copyFormatted('clipboard.ipDetails.whois', {
     ip: ip.value,
-    rawData: JSON.stringify(ipInfo.value.whois_raw, null, 2)
+    rawData: ipInfo.value.whois_raw
   });
 };
 

@@ -13,9 +13,9 @@
           t('common.edit').toUpperCase() }}</button>
         <template v-if="dossier && isEditing">
           <button @click="saveEdit" class="back-btn save-btn" :disabled="isSaving">✓ {{ t('common.save').toUpperCase()
-            }}</button>
-          <button @click="cancelEdit" class="back-btn cancel-btn" :disabled="isSaving">✗ {{
-            t('common.cancel').toUpperCase() }}</button>
+          }}</button>
+          <button @click="handleAddHumanSection" class="back-btn add-btn" style="margin-left: 10px;">+ {{
+          t('dossier.addHumanSection').toUpperCase() }}</button>
         </template>
       </div>
       <div class="header-actions" v-if="dossier">
@@ -50,7 +50,7 @@
           <!-- New Section Button at the TOP -->
           <div class="add-section-action top-action"
             v-if="!isSaving && dossier && !isEditing && editingSectionIndex === -1">
-            <button @click="handleAddGenericSection" class="back-btn add-btn-full">
+            <button @click="handleAddHumanSection" class="back-btn add-btn-full">
               + {{ t('common.add').toUpperCase() }}
             </button>
           </div>
@@ -126,7 +126,7 @@ import DossierSectionRenderer from '../../components/dossier/DossierSectionRende
 import DossierSectionEditor from '../../components/dossier/DossierSectionEditor.vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import dayjs from 'dayjs';
-import type { IDossier, IDossierSection } from '../../models/DossierDTO';
+import { DossierSectionType, type IDossierSection } from '../../models/DossierDTO';
 
 const props = defineProps<{
   id: string;
@@ -142,7 +142,7 @@ const {
   isSaving,
   loadDossier,
   saveMetadata,
-  addGenericSection,
+  addHumanSection,
   updateSection,
   deleteSection
 } = useDossierDetail();
@@ -211,11 +211,26 @@ const handleSaveSection = async (index: number) => {
     finalData = sectionEditForm.value.data;
   }
 
+  // Logica per popolare renderedText nelle sezioni generiche (Human Observation)
+  const sectionUpdate: any = {
+    type: sectionEditForm.value.type,
+    data: finalData
+  };
+
+  if (sectionUpdate.type === DossierSectionType.HUMAN && finalData.text) {
+    const divider = '---------------------------------------------------';
+    const formatted = `${divider}\n[ HUMAN OBSERVATION ]\n${finalData.text}\n${divider}`;
+    sectionUpdate.renderedText = formatted;
+    sectionUpdate.templateKey = 'sectionHuman'; // Nuova chiave tecnica per il mapping backend
+
+    // Inseriamo renderedText anche in data affinché il ReportService possa usarlo per il Telex
+    sectionUpdate.data.renderedText = formatted;
+  } else {
+    sectionUpdate.templateKey = '';
+  }
+
   try {
-    await updateSection(props.id, index, {
-      type: sectionEditForm.value.type,
-      data: finalData
-    });
+    await updateSection(props.id, index, sectionUpdate);
     editingSectionIndex.value = -1;
     ElMessage.success(t('common.save') + ' OK');
   } catch (err) {
@@ -240,9 +255,9 @@ const handleDeleteSection = async (index: number) => {
   }
 };
 
-const handleAddGenericSection = async () => {
+const handleAddHumanSection = async () => {
   try {
-    await addGenericSection(props.id);
+    await addHumanSection(props.id);
     // L'aggiunta in testa rende la nuova sezione all'indice 0
     if (dossier.value) {
       startEditSection(0, dossier.value.sections[0]);

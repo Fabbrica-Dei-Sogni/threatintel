@@ -1,6 +1,8 @@
 {
+    "sectionHuman": "{renderedText}",
     "reports": {
         "common": {
+            "analystNote": "Notatka",
             "agencyName": "Agencja ThreatIntelligence",
             "executiveReport": "Raport Wykonawczy",
             "forensicReport": "Raport Informatyki Śledczej IP",

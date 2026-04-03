@@ -1,8 +1,8 @@
 // useDossierDetail.ts
-import { ref, watch } from 'vue';
-import { fetchDossierById, updateDossier } from '../api';
-import type { IDossier, IDossierSection } from '../models/DossierDTO';
+import { ref } from 'vue';
+import { DossierSectionType, type IDossier, type IDossierSection } from '../models/DossierDTO';
 import { useDossierStore } from '../stores/dossier';
+import { fetchDossierById, updateDossier } from '../api';
 
 export function useDossierDetail() {
     const dossier = ref<IDossier | null>(null);
@@ -13,13 +13,13 @@ export function useDossierDetail() {
     const dossierStore = useDossierStore();
 
     /**
-     * Helper per ordinare le sezioni: generic prima, poi il resto (per timestamp desc)
+     * Helper per ordinare le sezioni: human prima, poi il resto (per timestamp desc)
      */
     const sortSections = (sections: IDossierSection[]) => {
         return [...sections].sort((a, b) => {
-            // Tipo generic ha sempre la precedenza (Note Investigative First)
-            if (a.type === 'generic' && b.type !== 'generic') return -1;
-            if (a.type !== 'generic' && b.type === 'generic') return 1;
+            // Human First (Note Investigative)
+            if (a.type === DossierSectionType.HUMAN && b.type !== DossierSectionType.HUMAN) return -1;
+            if (a.type !== DossierSectionType.HUMAN && b.type === DossierSectionType.HUMAN) return 1;
             
             // All'interno dello stesso gruppo, ordiniamo per data (più recenti in alto)
             const dateA = new Date(a.timestamp).getTime();
@@ -63,13 +63,13 @@ export function useDossierDetail() {
         }
     };
 
-    const addGenericSection = async (id: string) => {
+    const addHumanSection = async (id: string) => {
         if (!id || !dossier.value) return;
         isSaving.value = true;
         try {
             const newSection: IDossierSection = {
-                templateKey: 'clipboard.generic',
-                type: 'generic',
+                type: DossierSectionType.HUMAN,
+                templateKey: 'sectionHuman',
                 data: { text: '' },
                 timestamp: new Date().toISOString(),
                 order: 0
@@ -135,7 +135,7 @@ export function useDossierDetail() {
         isSaving,
         loadDossier,
         saveMetadata,
-        addGenericSection,
+        addHumanSection,
         updateSection,
         deleteSection
     };

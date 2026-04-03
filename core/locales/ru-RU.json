@@ -1,6 +1,8 @@
 {
+    "sectionHuman": "{renderedText}",
     "reports": {
         "common": {
+            "analystNote": "Примечание",
             "agencyName": "Агентство ThreatIntelligence",
             "executiveReport": "Исполнительный отчет",
             "forensicReport": "Отчет по криминалистике IP",

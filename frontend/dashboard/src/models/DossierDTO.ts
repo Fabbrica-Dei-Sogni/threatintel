@@ -85,7 +85,18 @@ export interface ITelnetTimelineRowData extends IBaseSectionData {
   details: string;
 }
 
-export interface IGenericSectionData extends IBaseSectionData {
+export enum DossierSectionType {
+  IP = 'ip',
+  ATTACK = 'attack',
+  TELNET = 'telnet',
+  SESSION = 'session',
+  ABUSE = 'abuse',
+  TECHNIQUE = 'technique',
+  FIREWALL = 'firewall',
+  HUMAN = 'human'
+}
+
+export interface IHumanSectionData extends IBaseSectionData {
   text: string;
 }
 
@@ -98,7 +109,7 @@ export interface IAttackTechniqueData extends IBaseSectionData {
  * Uses generic T to allow strict typing of the data payload
  */
 export interface IDossierSection<T = any> {
-  type: string;
+  type: DossierSectionType;
   templateKey: string;
   data: T;
   renderedText?: string;

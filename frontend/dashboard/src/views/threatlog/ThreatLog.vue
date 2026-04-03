@@ -122,28 +122,28 @@
                 </div>
                 <transition name="collapse">
                     <div v-if="toggles.request" class="section-body">
-                        <div class="log-details-meta" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px;">
-                            <p class="link" style="margin-bottom: 5px;">
-                                <span @click="goToIpDetails(log.request.ip)" style="cursor: pointer; font-weight: bold; font-size: 1.1em; color: #FFD700;"> 
+                        <div class="log-details-meta">
+                            <p class="attacker-link-row">
+                                <span @click="goToIpDetails(log.request.ip)" class="ip-link-value"> 
                                     {{ log.request.ip || t('common.notAvailable') }} 
                                 </span>
                                 <span class="copy-btn-inline" @click.stop="copyFormatted('clipboard.ip', { ip: log.request.ip })" :title="t('common.copyIp')">📋</span>
                             </p>
-                            <div class="meta-row" style="display: flex; align-items: center; gap: 10px;">
-                                <span class="meta-label" style="color: #BBA685; font-weight: 800; font-size: 0.8rem; text-transform: uppercase;">{{ t('threatLog.method') }}:</span>
-                                <span class="method-badge" style="background: rgba(255, 179, 0, 0.15); color: #FFB300; padding: 2px 8px; border-radius: 4px; font-weight: 800; font-size: 0.8em; border: 1px solid rgba(255, 179, 0, 0.3);">
+                            <div class="meta-row">
+                                <span class="meta-label">{{ t('threatLog.method') }}:</span>
+                                <span class="method-badge-styled">
                                     {{ log.request.method || t('common.notAvailable') }}
                                 </span>
                             </div>
-                            <div class="meta-row" style="display: flex; align-items: center; gap: 10px;">
-                                <span class="meta-label" style="color: #BBA685; font-weight: 800; font-size: 0.8rem; text-transform: uppercase;">{{ t('threatLog.url') }}:</span>
-                                <span class="url-text" :title="log.request.url" style="color: #F4EBD0; opacity: 0.9; font-family: 'JetBrains Mono', monospace; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 60vw;">
+                            <div class="meta-row">
+                                <span class="meta-label">{{ t('threatLog.url') }}:</span>
+                                <span class="url-text-styled" :title="log.request.url">
                                     {{ log.request.url || t('common.notAvailable') }}
                                 </span>
                             </div>
-                            <div class="meta-row" style="display: flex; align-items: flex-start; gap: 10px;">
-                                <span class="meta-label" style="color: #BBA685; font-weight: 800; font-size: 0.8rem; text-transform: uppercase;">{{ t('threatLog.userAgent') }}:</span>
-                                <span class="ua-value" :title="log.request.userAgent" style="color: #aaa; font-style: italic; font-size: 0.8rem;">
+                            <div class="meta-row align-start">
+                                <span class="meta-label">{{ t('threatLog.userAgent') }}:</span>
+                                <span class="ua-value-styled" :title="log.request.userAgent">
                                     {{ log.request.userAgent || t('common.notAvailable') }}
                                 </span>
                             </div>
@@ -151,7 +151,7 @@
 
                         <!-- Tabs System -->
                         <div class="log-tabs-container">
-                            <div class="log-tabs" style="display: flex; gap: 4px; border-bottom: 1px solid rgba(230, 33, 23, 0.2); margin-bottom: 12px;">
+                            <div class="log-tabs-header">
                                 <button
                                     @click="activeLogTab = 'request'"
                                     class="tab-btn"
@@ -185,7 +185,7 @@
                                 </button>
                             </div>
 
-                            <div class="tab-content" style="animation: tabFadeIn 0.3s ease-out; background-color: #050303; padding: 15px; border-radius: 8px; border: 1px solid rgba(230, 33, 23, 0.15);">
+                            <div class="tab-content-viewer">
                                 <HexViewer v-if="activeLogTab === 'request'" :raw-data="log.request" :label="t('threatLog.request')" />
                                 <HexViewer v-if="activeLogTab === 'headers'" :raw-data="log.request.headers" :label="t('threatLog.headers')" />
                                 <HexViewer v-if="activeLogTab === 'body'" :raw-data="log.request.body" :label="t('threatLog.body')" />
@@ -202,7 +202,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import dayjs from 'dayjs'
 import { fetchLogById } from '../../api/index'
@@ -249,10 +249,6 @@ function formatDate(s) {
     return s ? dayjs(s).format('DD/MM/YYYY HH:mm:ss') : t('common.notAvailable')
 }
 
-function formatJson(o) {
-    return o ? JSON.stringify(o, null, 2) : t('common.notAvailable')
-}
-
 function goToIpDetails(ip) {
     router.push(`/ip/${ip}`)
 }
@@ -263,6 +259,10 @@ function goBack() {
 
 onMounted(() => {
     load()
+})
+
+watch(() => route.params.id, (newId) => {
+    if (newId) load()
 })
 </script>
 

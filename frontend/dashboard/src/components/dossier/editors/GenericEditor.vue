@@ -15,12 +15,12 @@
 
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n';
-import type { IGenericSectionData } from '../../../models/DossierDTO';
+import { DossierSectionType, type IHumanSectionData } from '../../../models/DossierDTO';
 
 const { t } = useI18n();
 
 const props = defineProps<{
-  modelValue: IGenericSectionData;
+  modelValue: IHumanSectionData;
 }>();
 </script>
 

@@ -7,10 +7,10 @@
 </template>
 
 <script setup lang="ts">
-import type { IGenericSectionData } from '../../../models/DossierDTO';
+import { DossierSectionType, type IHumanSectionData } from '../../../models/DossierDTO';
 
 defineProps<{
-  data: IGenericSectionData;
+  data: IHumanSectionData;
   renderedText?: string;
 }>();
 </script>

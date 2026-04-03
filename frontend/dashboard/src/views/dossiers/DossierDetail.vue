@@ -126,7 +126,7 @@ import DossierSectionRenderer from '../../components/dossier/DossierSectionRende
 import DossierSectionEditor from '../../components/dossier/DossierSectionEditor.vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import dayjs from 'dayjs';
-import { DossierSectionType, type IDossierSection } from '../../models/DossierDTO';
+import { DossierSectionType, type IDossierSection, type IHumanSectionData } from '../../models/DossierDTO';
 
 const props = defineProps<{
   id: string;
@@ -217,9 +217,9 @@ const handleSaveSection = async (index: number) => {
     data: finalData
   };
 
-  if (sectionUpdate.type === DossierSectionType.HUMAN && finalData.text) {
+  if (sectionUpdate.type === DossierSectionType.HUMAN && (finalData as IHumanSectionData).text) {
     const divider = '---------------------------------------------------';
-    const formatted = `${divider}\n[ HUMAN OBSERVATION ]\n${finalData.text}\n${divider}`;
+    const formatted = `${divider}\n[ HUMAN OBSERVATION ]\n${(finalData as IHumanSectionData).text}\n${divider}`;
     sectionUpdate.renderedText = formatted;
     sectionUpdate.templateKey = 'sectionHuman'; // Nuova chiave tecnica per il mapping backend
 

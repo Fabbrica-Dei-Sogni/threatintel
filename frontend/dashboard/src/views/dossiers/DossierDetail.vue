@@ -58,13 +58,9 @@
           <div v-for="(section, index) in dossier.sections" :key="index" class="section-preview glass-card">
             <div class="section-header">
               <div>
-                <span class="badge" v-if="editingSectionIndex !== index">{{ section.type.toUpperCase() }}</span>
-                <select v-else v-model="sectionEditForm.type" class="edit-title-input"
-                  style="width: auto; padding: 4px; font-size: 0.8rem; height: auto;">
-                  <option v-for="type in DossierSectionType" :key="type" :value="type">
-                    {{ t('dossier.sections.' + type).toUpperCase() }}
-                  </option>
-                </select>
+                <span class="badge" :class="section.type">
+                  {{ t('dossier.sections.' + section.type).toUpperCase() }}
+                </span>
               </div>
               <div style="display: flex; align-items: center; gap: 10px;">
                 <span class="timestamp">{{ formatDate(section.timestamp) }}</span>

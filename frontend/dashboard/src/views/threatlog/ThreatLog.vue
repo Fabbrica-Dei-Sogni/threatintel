@@ -12,18 +12,6 @@
         <div v-if="log" class="sections">
 
             <div class="section">
-                <div class="section-header" @click="toggles.general = !toggles.general">
-                    <h2><span>📑</span> {{ t('threatLog.generalInfo') }}</h2>
-                    <span class="arrow" :class="{ open: toggles.general }"></span>
-                </div>
-                <transition name="collapse">
-                    <div v-if="toggles.general" class="section-body">
-                        <p><strong>{{ t('common.id') }}:</strong> {{ log.id }}</p>
-                        <p><strong>{{ t('common.timestamp') }}:</strong> {{ formatDate(log.timestamp) }}</p>
-                    </div>
-                </transition>
-            </div>
-            <div class="section">
                 <div class="section-header" @click="toggles.geo = !toggles.geo">
                     <h2><span>🛰️</span> {{ t('threatLog.geolocation') }}</h2>
                     <span class="arrow" :class="{ open: toggles.geo }"></span>
@@ -53,11 +41,17 @@
                 </div>
                 <transition name="collapse">
                     <div v-if="toggles.fingerprint" class="section-body">
-                        <p><strong>{{ t('threatLog.hash') }}:</strong> {{ log.fingerprint.hash || t('common.notAvailable') }}</p>
+                        <p><strong>{{ t('common.timestamp') }}:</strong> {{ formatDate(log.timestamp) }}</p>
                         <p><strong>{{ t('threatLog.techniques') }}:</strong></p>
-                        <ul>
+                        <ul style="margin-bottom: 15px;">
                             <li v-for="(ind, i) in log.fingerprint.indicators" :key="i">{{ ind }}</li>
                         </ul>
+
+                        <div class="analysis-meta" style="border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 10px; margin-top: 10px;">
+                            <p v-if="log.metadata?.eventCount > 1"><strong>Aggregated Events:</strong> {{ log.metadata.eventCount }}</p>
+                            <p><strong>{{ t('threatLog.isBot') }}</strong> {{ log.metadata.isBot ? t('threatLog.yes') : t('threatLog.no') }}</p>
+                            <p><strong>{{ t('threatLog.isCrawler') }}</strong> {{ log.metadata.isCrawler ? t('threatLog.yes') : t('threatLog.no') }}</p>
+                        </div>
                     </div>
                 </transition>
             </div>
@@ -143,29 +137,6 @@
                 </transition>
             </div>
 
-            <div class="section">
-                <div class="section-header" @click="toggles.metadata = !toggles.metadata">
-                    <h2><span>⚙️</span> {{ t('threatLog.metadata') }}</h2>
-                    <span class="arrow" :class="{ open: toggles.metadata }"></span>
-                </div>
-                <transition name="collapse">
-                    <div v-if="toggles.metadata" class="section-body">
-                        <!--
-                       <p><strong>{{ t('threatLog.sessionId') }}:</strong> {{ log.metadata.sessionId || t('common.notAvailable')
-                        }}</p>
-                    -->
-                        <p v-if="log.metadata?.eventCount > 1"><strong>Aggregated Events:</strong> {{ log.metadata.eventCount }}</p>
-                        <p><strong>{{ t('threatLog.userAgent') }}</strong></p>
-                        <pre>{{ formatJson(log.metadata.userAgent_parsed) }}</pre>
-                        <p><strong>{{ t('threatLog.isBot') }}</strong> {{ log.metadata.isBot ? t('threatLog.yes') :
-                            t('threatLog.no') }}
-                        </p>
-                        <p><strong>{{ t('threatLog.isCrawler') }}</strong> {{ log.metadata.isCrawler ?
-                            t('threatLog.yes') :
-                            t('threatLog.no') }}</p>
-                    </div>
-                </transition>
-            </div>
 
         </div>
     </div>
@@ -194,10 +165,8 @@ const error = ref(false)
 const activeLogTab = ref('request')
 
 const toggles = reactive({
-    general: true,
     fingerprint: true,
     request: false,
-    metadata: false,
     response: false,
     geo: false
 })

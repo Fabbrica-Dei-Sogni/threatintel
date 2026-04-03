@@ -14,6 +14,7 @@ import { inject, injectable } from 'tsyringe';
 import { LOGGER_TOKEN } from '../di/tokens';
 import { Logger } from 'winston';
 import ipRangeCheck from 'ip-range-check';
+import { IpDetailsMapper } from '../models/dto/IpDetailsDTO';
 
 const whoisAsync = util.promisify(whois.lookup);
 
@@ -194,7 +195,7 @@ export class IpDetailsService {
         }
 
         return {
-            ipDetails,
+            ipDetails: IpDetailsMapper.toDTO(ipDetails),
             abuseReports
         };
 

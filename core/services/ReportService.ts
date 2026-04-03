@@ -10,6 +10,7 @@ import { IpDetailsService } from './IpDetailsService';
 import { I18nService } from './I18nService';
 import fs from 'fs';
 import { IDossierSection } from '../models/DossierSchema';
+import { SanitizationUtils } from '../utils/SanitizationUtils';
 
 export type ReportType = 'attack' | 'telnet' | 'ip';
 
@@ -87,7 +88,7 @@ export class ReportService {
 
         // Arricchiamo le sezioni con il testo renderizzato per i casi di fallback (generic blocks)
         const enrichedSections = sections.map(s => {
-            const sanitizedData = this.sanitizeSectionData(s.data);
+            const sanitizedData = SanitizationUtils.sanitizeObjectData(s.data);
             // Forza il re-rendering basato sul locale richiesto
 
             var newRenderedText = (s.templateKey)
@@ -161,7 +162,7 @@ export class ReportService {
             const replaceTokens = (text: string, d: any) => {
                 if (typeof text !== 'string') return '';
                 return text.replace(/{(\w+)}/g, (match, key) => {
-                    const value = this.sanitizeRawData(d[key]);
+                    const value = SanitizationUtils.sanitizeRawString(d[key]);
                     return (value !== undefined && value !== null && value !== '') 
                         ? String(value) 
                         : this.i18n.t('reports.common.notAvailable', locale);
@@ -306,7 +307,7 @@ export class ReportService {
                 isWhitelisted: abuseDb?.isWhitelisted || (details as any)?.isWhitelisted || false,
                 countryCode: abuseDb?.countryCode || (details as any)?.countryCode || '??'
             },
-            whois: this.sanitizeRawData(details?.whois_raw) || this.i18n.t('reports.ipDetail.noAbuse', locale),
+            whois: SanitizationUtils.sanitizeRawString(details?.whois_raw) || this.i18n.t('reports.ipDetail.noAbuse', locale),
             abuseReports: (data?.abuseReports || []).map((r: any) => ({
                 date: r.reportedAt,
                 categories: r.categories || [],
@@ -316,53 +317,6 @@ export class ReportService {
     }
 
 
-    /**
-     * Pulisce i dati grezzi (come WHOIS o Payload) che potrebbero arrivare 
-     * come stringhe JSON-escaped (con virgolette esterne e \n letterali).
-     */
-    private sanitizeRawData(input: any): string {
-        if (typeof input !== 'string' || !input) return input;
-        
-        let sanitized = input.trim();
-        
-        // Se la stringa è racchiusa tra virgolette doppie, proviamo a unescaparla come JSON
-        if (sanitized.startsWith('"') && sanitized.endsWith('"')) {
-            try {
-                // JSON.parse gestirà correttamente \n, \t e altri caratteri di escape
-                return JSON.parse(sanitized);
-            } catch (e) {
-                // Se non è un JSON valido nonostante le virgolette, rimuoviamole manualmente
-                sanitized = sanitized.slice(1, -1);
-            }
-        }
-        
-        // Fallback: rimpiazza manualmente sequenze letterali di escape \n e \r se presenti come testo
-        return sanitized
-            .replace(/\\n/g, '\n')
-            .replace(/\\r/g, '\r')
-            .replace(/\\"/g, '"')
-            .replace(/\\t/g, '\t');
-    }
-
-    /**
-     * Sanifica ricorsivamente un oggetto data per pulire campi raw noti.
-     */
-    private sanitizeSectionData(data: Record<string, any>): Record<string, any> {
-        if (!data || typeof data !== 'object') return data;
-        
-        const sanitized = { ...data };
-        const fieldsToSanitize = ['whois', 'rawData', 'payload', 'comment', 'input'];
-        
-        for (const key of Object.keys(sanitized)) {
-            if (fieldsToSanitize.includes(key) && typeof sanitized[key] === 'string') {
-                sanitized[key] = this.sanitizeRawData(sanitized[key]);
-            } else if (typeof sanitized[key] === 'object' && sanitized[key] !== null) {
-                sanitized[key] = this.sanitizeSectionData(sanitized[key]);
-            }
-        }
-        
-        return sanitized;
-    }
 
     private normalizeIpDetails(details: any, locale: string) {
         // Estraiamo i dati da ipinfo se presenti (lookups ipinfo.io) o dal root (AbuseIPDB)

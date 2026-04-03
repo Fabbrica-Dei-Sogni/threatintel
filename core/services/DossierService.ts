@@ -4,6 +4,7 @@ import { Logger } from 'winston';
 import Dossier, { IDossier, DossierStatus, IDossierSection } from '../models/DossierSchema';
 import { CreateDossierDTO, UpdateDossierDTO, DossierResponseDTO } from '../models/dto/DossierDTO';
 import { ReportService } from './ReportService';
+import { SanitizationUtils } from '../utils/SanitizationUtils';
 
 @injectable()
 export class DossierService {
@@ -21,7 +22,7 @@ export class DossierService {
         // Sanificazione profonda di tutte le sezioni prima del salvataggio
         const sanitizedSections = (dto.sections || []).map(section => ({
             ...section,
-            data: this.sanitizeSectionData(section.data),
+            data: SanitizationUtils.sanitizeObjectData(section.data),
             timestamp: section.timestamp || new Date()
         }));
 
@@ -76,7 +77,7 @@ export class DossierService {
         if (dto.sections) {
             updateData.sections = dto.sections.map(section => ({
                 ...section,
-                data: this.sanitizeSectionData(section.data)
+                data: SanitizationUtils.sanitizeObjectData(section.data)
             }));
         }
 
@@ -117,45 +118,5 @@ export class DossierService {
         } else {
             return await this.reportService.generateTelexReport(sections, locale, format);
         }
-    }
-
-    /**
-     * Sanifica ricorsivamente un oggetto data per pulire campi raw.
-     * Logica derivata dal ReportService per coerenza.
-     */
-    private sanitizeSectionData(data: Record<string, any>): Record<string, any> {
-        if (!data || typeof data !== 'object') return data;
-        
-        const sanitized = { ...data };
-        const fieldsToSanitize = ['whois', 'rawData', 'payload', 'comment', 'input'];
-        
-        for (const key of Object.keys(sanitized)) {
-            if (fieldsToSanitize.includes(key) && typeof sanitized[key] === 'string') {
-                sanitized[key] = this.sanitizeRawString(sanitized[key]);
-            } else if (typeof sanitized[key] === 'object' && sanitized[key] !== null) {
-                sanitized[key] = this.sanitizeSectionData(sanitized[key]);
-            }
-        }
-        
-        return sanitized;
-    }
-
-    private sanitizeRawString(input: string): string {
-        if (!input) return input;
-        let sanitized = input.trim();
-        
-        if (sanitized.startsWith('"') && sanitized.endsWith('"')) {
-            try {
-                return JSON.parse(sanitized);
-            } catch (e) {
-                sanitized = sanitized.slice(1, -1);
-            }
-        }
-        
-        return sanitized
-            .replace(/\\n/g, '\n')
-            .replace(/\\r/g, '\r')
-            .replace(/\\"/g, '"')
-            .replace(/\\t/g, '\t');
     }
 }

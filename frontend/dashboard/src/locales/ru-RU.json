@@ -288,7 +288,7 @@
         "systemOperational": "СИСТЕМА РАБОТАЕТ : УЗЕЛ АКТИВЕН"
     },
     "threatLogs": {
-        "title": "Журналы угроз",
+        "title": "Журнал логов HTTP/S SSH",
         "dashboard": "Панель управления",
         "attacks": "Атаки",
         "filterByIp": "Фильтр по IP...",

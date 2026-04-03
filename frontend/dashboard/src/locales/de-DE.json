@@ -288,7 +288,7 @@
         "systemOperational": "SYSTEM OPERATIV : KNOTEN AKTIV"
     },
     "threatLogs": {
-        "title": "Bedrohungsprotokolle",
+        "title": "HTTP/S SSH Log-Register",
         "dashboard": "Dashboard",
         "attacks": "Angriffe",
         "filterByIp": "Nach IP filtern...",

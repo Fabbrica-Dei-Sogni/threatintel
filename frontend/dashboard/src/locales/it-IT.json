@@ -288,7 +288,7 @@
         "systemOperational": "SISTEMA OPERATIVO : NODO ATTIVO"
     },
     "threatLogs": {
-        "title": "Log minacce",
+        "title": "Registro log HTTP/S SSH",
         "dashboard": "Cruscotto",
         "attacks": "Attacchi",
         "filterByIp": "Filtra per IP...",

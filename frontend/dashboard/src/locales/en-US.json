@@ -288,7 +288,7 @@
         "systemOperational": "SYSTEM OPERATIONAL : NODE ACTIVE"
     },
     "threatLogs": {
-        "title": "Threat Logs",
+        "title": "HTTP/S SSH Log Registry",
         "dashboard": "Dashboard",
         "attacks": "Attacks",
         "filterByIp": "Filter by IP...",

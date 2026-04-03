@@ -288,7 +288,7 @@
         "systemOperational": "SYSTÈME OPÉRATIONNEL : NOEUD ACTIF"
     },
     "threatLogs": {
-        "title": "Journaux de menaces",
+        "title": "Registre des logs HTTP/S SSH",
         "dashboard": "Tableau de bord",
         "attacks": "Attaques",
         "filterByIp": "Filtrer par IP...",

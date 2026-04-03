@@ -288,7 +288,7 @@
         "systemOperational": "SYSTEM OPERACYJNY : WĘZEŁ AKTYWNY"
     },
     "threatLogs": {
-        "title": "Dzienniki zagrożeń",
+        "title": "Rejestr logów HTTP/S SSH",
         "dashboard": "Pulpit",
         "attacks": "Ataki",
         "filterByIp": "Filtruj według IP...",

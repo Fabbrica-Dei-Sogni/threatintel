@@ -131,7 +131,7 @@
         "archive": "ARCHIVER"
     },
     "attacks": {
-        "title": "Attaques",
+        "title": "Attaques HTTP/S SSH",
         "dashboard": "Tableau de bord",
         "logRequests": "Journaux de requêtes",
         "minLogsLabel": "Nombre minimum de journaux par attaque:",

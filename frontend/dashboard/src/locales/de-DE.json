@@ -131,7 +131,7 @@
         "archive": "ARCHIV"
     },
     "attacks": {
-        "title": "Angriffe",
+        "title": "HTTP/S SSH Angriffe",
         "dashboard": "Dashboard",
         "logRequests": "Protokoll-Anfragen",
         "minLogsLabel": "Minimale Anzahl von Protokollen pro Angriff:",

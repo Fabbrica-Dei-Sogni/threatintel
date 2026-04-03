@@ -131,7 +131,7 @@
         "archive": "АРХИВ"
     },
     "attacks": {
-        "title": "Атаки",
+        "title": "Атаки HTTP/S SSH",
         "dashboard": "Панель управления",
         "logRequests": "Журналы запросов",
         "minLogsLabel": "Минимальное количество журналов на атаку:",

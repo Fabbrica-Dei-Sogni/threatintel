@@ -131,7 +131,7 @@
         "archive": "ARCHIVE"
     },
     "attacks": {
-        "title": "Attacks",
+        "title": "HTTP/S SSH Attacks",
         "dashboard": "Dashboard",
         "logRequests": "Log requests",
         "minLogsLabel": "Minimum number of logs per attack:",

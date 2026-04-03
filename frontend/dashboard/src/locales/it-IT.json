@@ -131,7 +131,7 @@
         "archive": "ARCHIVIO"
     },
     "attacks": {
-        "title": "Attacchi",
+        "title": "Attacchi HTTP/S SSH",
         "dashboard": "Cruscotto",
         "logRequests": "Log requests",
         "minLogsLabel": "Numero minimo di log per attacco:",

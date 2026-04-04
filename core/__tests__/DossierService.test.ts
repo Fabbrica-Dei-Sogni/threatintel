@@ -23,6 +23,7 @@ describe('DossierService', () => {
         mockReportService = {
             generateHudReport: jest.fn(),
             generateClassicReport: jest.fn(),
+            generateTelexReport: jest.fn(),
             generateCustomReport: jest.fn()
         };
 

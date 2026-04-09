@@ -626,11 +626,7 @@
             ],
             "timelineRow": "[{timestamp}] {eventName}\n> {message}{details}"
         },
-        "ip": [
-            "--- IDENTYFIKACJA PODMIOTU ---",
-            "ADRES IP: {ip}",
-            "-------------------------------"
-        ],
+        "ip": "{ip}",
         "generic": "{text}",
         "attackSummary": "PODSUMOWANIE ATAKU:\nIP: {ip}\nZagrożenie: {dangerLevel} ({dangerScore})\nLogi: {totaleLogs}\nCzas trwania: {duration}\nRPS: {rps}",
         "attackTechnique": "Wykryta technika: {tech}"

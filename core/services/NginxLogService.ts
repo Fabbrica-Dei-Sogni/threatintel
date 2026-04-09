@@ -206,7 +206,7 @@ export class NginxLogService implements ILongRunningService {
             fingerprint: {
                 hash: crypto.createHash('md5').update(`https-${ip}-${url}-${user_agent}`).digest('hex'),
                 suspicious: analysis.suspicious,
-                score: analysis.score ? analysis.score : 999,
+                score: analysis.score ? analysis.score : 0,
                 indicators: analysis.indicators
             },
             metadata: {

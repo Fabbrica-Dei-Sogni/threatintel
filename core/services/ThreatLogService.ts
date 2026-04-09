@@ -289,6 +289,7 @@ export class ThreatLogService {
                     // Logica specifica per HTTP: include 'http', null, o campo mancante
                     mongoFilters.$or = [
                         { protocol: 'http' },
+                        { protocol: 'https' },
                         { protocol: { $exists: false } },
                         { protocol: null }
                     ];
@@ -402,6 +403,7 @@ export class ThreatLogService {
         const httpFilter = {
             $or: [
                 { protocol: 'http' },
+                { protocol: 'https' },
                 { protocol: { $exists: false } },
                 { protocol: null }
             ]

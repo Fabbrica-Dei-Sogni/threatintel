@@ -105,7 +105,7 @@ describe('DossierController', () => {
             await dossierController.getById(mockRequest as Request, mockResponse as Response);
 
             expect(responseStatus).toHaveBeenCalledWith(500);
-            expect(responseJson).toHaveBeenCalledWith({ error: 'DB Error' });
+            expect(responseJson).toHaveBeenCalledWith({ error: 'Operazione non riuscita' });
         });
     });
 
@@ -127,7 +127,7 @@ describe('DossierController', () => {
             await dossierController.update(mockRequest as Request, mockResponse as Response);
 
             expect(responseStatus).toHaveBeenCalledWith(500);
-            expect(responseJson).toHaveBeenCalledWith({ error: 'Update failed' });
+            expect(responseJson).toHaveBeenCalledWith({ error: 'Operazione non riuscita' });
         });
     });
 
@@ -148,7 +148,7 @@ describe('DossierController', () => {
             await dossierController.delete(mockRequest as Request, mockResponse as Response);
 
             expect(responseStatus).toHaveBeenCalledWith(500);
-            expect(responseJson).toHaveBeenCalledWith({ error: 'Delete failed' });
+            expect(responseJson).toHaveBeenCalledWith({ error: 'Operazione non riuscita' });
         });
     });
 
@@ -179,7 +179,7 @@ describe('DossierController', () => {
             await dossierController.export(mockRequest as Request, mockResponse as Response);
 
             expect(responseStatus).toHaveBeenCalledWith(500);
-            expect(responseJson).toHaveBeenCalledWith({ error: 'Export failed' });
+            expect(responseJson).toHaveBeenCalledWith({ error: 'Operazione non riuscita' });
         });
     });
 });

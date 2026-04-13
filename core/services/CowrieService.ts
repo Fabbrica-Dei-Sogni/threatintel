@@ -9,6 +9,13 @@ import CowrieInput from '../models/CowrieInputSchema';
 import CowrieTtyLog from '../models/CowrieTtyLogSchema';
 
 import { ILongRunningService, ServiceStatus } from '../types/lifecycle';
+import {
+    sanitizeSortFields,
+    sanitizeFilters,
+    SortAllowedFields,
+    FilterAllowedFields,
+    escapeRegex
+} from '../utils/queryGuard';
 
 @singleton()
 export class CowrieService implements ILongRunningService {
@@ -19,7 +26,7 @@ export class CowrieService implements ILongRunningService {
     constructor(
         @inject(LOGGER_TOKEN) private readonly logger: Logger,
         private readonly ipDetailsService: IpDetailsService
-    ) {}
+    ) { }
 
     public getStatus(): ServiceStatus {
         return this.status;
@@ -35,10 +42,10 @@ export class CowrieService implements ILongRunningService {
             return;
         }
         this.logger.info('[CowrieService] Avvio job di arricchimento IP in background (ogni 2 minuti).');
-        
+
         // Esegue periodicamente per catturare record inseriti bypassando Node.js
         this.enrichmentInterval = setInterval(() => this.enrichSessions(), 2 * 60 * 1000);
-        
+
         // Esecuzione immediata all'avvio
         await this.enrichSessions();
         this.status = ServiceStatus.RUNNING;
@@ -98,19 +105,15 @@ export class CowrieService implements ILongRunningService {
     ) {
         const skip = (page - 1) * pageSize;
         const mongoFilters = this.buildRegExpFilter(filters);
-        
-        // Se l'ordinamento è su timestamp, ci assicuriamo che sia cronologico e non alfabetico.
-        const effectiveSort: Record<string, any> = {};
-        for (const [key, value] of Object.entries(sortFields)) {
-            // Se il campo è timestamp, usiamo il campo convertito che aggiungeremo nella pipeline
-            if (key === 'timestamp') {
-                effectiveSort['sortTimestamp'] = value;
-            } else {
-                effectiveSort[key] = value;
-            }
-        }
 
-        // Se non ci sono campi di ordinamento, default a decrescente per timestamp
+        // Sanitizza sort contro whitelist
+        const safeSort = sanitizeSortFields(sortFields, SortAllowedFields.cowrieSession);
+
+        // Rimappa 'timestamp' sul campo convertito per ordinamento affidabile
+        const effectiveSort: Record<string, any> = {};
+        for (const [key, value] of Object.entries(safeSort)) {
+            effectiveSort[key === 'timestamp' ? 'sortTimestamp' : key] = value;
+        }
         if (Object.keys(effectiveSort).length === 0) {
             effectiveSort['sortTimestamp'] = -1;
         }
@@ -229,14 +232,16 @@ export class CowrieService implements ILongRunningService {
 
     private buildRegExpFilter(filters: any) {
         const mongoFilters: any = {};
-        for (const [key, value] of Object.entries(filters)) {
-            if (typeof value === 'string' && value.trim() !== '') {
-                // Operatore regex case-insensitive 'like'-style
+        const safeFilters = sanitizeFilters(filters, FilterAllowedFields.cowrieSession);
+
+        for (const [key, value] of Object.entries(safeFilters)) {
+            if (typeof value === 'string') {
                 mongoFilters[key] = { $regex: value, $options: 'i' };
             } else if (value !== undefined && value !== null) {
                 mongoFilters[key] = value;
             }
         }
+
         return mongoFilters;
     }
 
@@ -256,7 +261,7 @@ export class CowrieService implements ILongRunningService {
     async getSessionEvents(sessionId: string) {
         const id = (sessionId || '').trim();
         this.logger.info(`[CowrieService] Aggregating multi-collection forensic events for session: "${id}"`);
-        
+
         // Esegue query parallele su tutte le collezioni forensi
         const [genericEvents, authEvents, inputEvents, ttyLogs] = await Promise.all([
             CowrieEvent.find({ session: id }).lean().exec(),

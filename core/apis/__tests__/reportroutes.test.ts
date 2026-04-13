@@ -92,7 +92,7 @@ describe('ReportRoutes API', () => {
                 .query({ ip: '1.2.3.4' });
 
             expect(response.status).toBe(500);
-            expect(response.body.error).toBe(errorMessage);
+            expect(response.body.error).toBe('Errore durante la generazione del report');
         });
 
         it('should use default report type and format if not provided', async () => {

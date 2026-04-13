@@ -43,6 +43,11 @@ const router = express.Router();
 // **IMPORTANTE: Il middleware di threat logging deve essere PRIMO**
 router.use(threatLogger.middleware());
 
+// Allineamento Sicurezza DDoS Globale (Copertura Frontend + Honeypot)
+router.use(rateLimitMiddleware.violationTracker());
+router.use(rateLimitMiddleware.ddosProtectionLimiter());
+router.use(rateLimitMiddleware.applicationLimiter());
+
 // API Dashboards e statistiche
 router.use('/', threatroutes(threatController));
 

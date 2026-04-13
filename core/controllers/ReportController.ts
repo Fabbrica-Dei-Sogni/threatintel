@@ -7,6 +7,10 @@ import { IDossierSection } from '../models/DossierSchema';
 export class ReportController {
     constructor(private readonly reportService: ReportService) { }
 
+    private safeFilename(value: string): string {
+        return value.replace(/[^a-zA-Z0-9._-]/g, '_').slice(0, 64);
+    }
+
     async generateDetailReport(req: Request, res: Response) {
         try {
             const { ip, sessionId, type, locale } = req.query;
@@ -32,13 +36,13 @@ export class ReportController {
             } else {
                 const pdfBuffer = result as Buffer;
                 res.setHeader('Content-Type', 'application/pdf');
-                res.setHeader('Content-Disposition', `attachment; filename=dossier_${reportType}_${id}.pdf`);
+                res.setHeader('Content-Disposition', `attachment; filename=dossier_${this.safeFilename(reportType)}_${this.safeFilename(id)}.pdf`);
                 res.setHeader('Content-Length', pdfBuffer.length);
                 return res.send(pdfBuffer);
             }
         } catch (error: any) {
             console.error('[ReportController] Errore:', error);
-            res.status(500).json({ error: error.message });
+            res.status(500).json({ error: 'Errore durante la generazione del report' });
         }
     }
 
@@ -67,20 +71,20 @@ export class ReportController {
                     result = await this.reportService.generateTelexReport(sections, locale, format);
                     break;
             }
-                
+
             if (format === 'html') {
                 res.setHeader('Content-Type', 'text/html');
                 return res.send(result);
             } else {
                 const pdfBuffer = result as Buffer;
                 res.setHeader('Content-Type', 'application/pdf');
-                res.setHeader('Content-Disposition', `attachment; filename=custom_dossier_${new Date().getTime()}.pdf`);
+                res.setHeader('Content-Disposition', `attachment; filename=custom_dossier_${Date.now()}.pdf`);
                 res.setHeader('Content-Length', pdfBuffer.length);
                 return res.send(pdfBuffer);
             }
         } catch (error: any) {
             console.error('[ReportController] Errore:', error);
-            res.status(500).json({ error: error.message });
+            res.status(500).json({ error: 'Errore durante la generazione del report' });
         }
     }
 }

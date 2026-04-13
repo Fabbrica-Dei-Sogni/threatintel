@@ -5,6 +5,8 @@ import { IpDetailsService } from '../services/IpDetailsService';
 import { SshLogService } from '../services/SshLogService';
 import { LOGGER_TOKEN } from '../di/tokens';
 import { Logger } from 'winston';
+import { assertPublicIp, IpValidationError } from '../utils/ipValidator';
+import { sanitizePage, sanitizePageSize, sanitizeLimit } from '../utils/queryGuard';
 
 @singleton()
 export class ThreatController {
@@ -13,7 +15,7 @@ export class ThreatController {
         private ipDetailsService: IpDetailsService,
         private sshLogService: SshLogService,
         @inject(LOGGER_TOKEN) private logger: Logger
-    ) {}
+    ) { }
 
     // GET /api/stats
     async getStats(req: Request, res: Response): Promise<void> {
@@ -42,10 +44,13 @@ export class ThreatController {
             if (suspicious === 'true') filters['fingerprint.suspicious'] = true;
             else if (suspicious === 'false') filters['fingerprint.suspicious'] = false;
 
-            const logs = await this.threatLogService.getLogs({ page: Number(page), pageSize: Number(pageSize), filters });
+            const safePage = sanitizePage(page);
+            const safePageSize = sanitizePageSize(pageSize);
+
+            const logs = await this.threatLogService.getLogs({ page: safePage, pageSize: safePageSize, filters });
             const total = await this.threatLogService.countLogs(filters);
 
-            res.json({ logs, total, page: Number(page), pageSize: Number(pageSize) });
+            res.json({ logs, total, page: safePage, pageSize: safePageSize });
         } catch (err: any) {
             res.status(err.status || 500).json({ error: 'Errore recupero log' });
         }
@@ -57,8 +62,8 @@ export class ThreatController {
         try {
             const { page = 1, pageSize = 20, filters = {}, sortFields = {} } = req.body;
 
-            const pageNum = Math.max(1, parseInt(page));
-            const pageSizeNum = Math.max(1, parseInt(pageSize));
+            const pageNum = sanitizePage(page);
+            const pageSizeNum = sanitizePageSize(pageSize);
 
             const logs = await this.threatLogService.getLogs({ page: pageNum, pageSize: pageSizeNum, filters, sortFields });
             const total = await this.threatLogService.countLogs(filters);
@@ -76,17 +81,17 @@ export class ThreatController {
         try {
             const { page = 1, pageSize = 20, filters = {}, minLogsForAttack = 10, timeConfig = {}, sortFields = {} } = req.body;
 
-            const pageNum = Math.max(1, parseInt(page));
-            const pageSizeNum = Math.max(1, parseInt(pageSize));
-            const minLogsForAttackNum = Math.max(1, parseInt(minLogsForAttack));
+            const pageNum = sanitizePage(page);
+            const pageSizeNum = sanitizePageSize(pageSize);
+            const minLogsForAttackNum = Math.min(Math.max(1, parseInt(minLogsForAttack)), 1000);
 
-            const data = await this.threatLogService.getAttacks({ 
-                page: pageNum, 
-                pageSize: pageSizeNum, 
-                filters, 
-                minLogsForAttack: minLogsForAttackNum, 
-                timeConfig, 
-                sortFields 
+            const data = await this.threatLogService.getAttacks({
+                page: pageNum,
+                pageSize: pageSizeNum,
+                filters,
+                minLogsForAttack: minLogsForAttackNum,
+                timeConfig,
+                sortFields
             });
 
             res.json({ attacks: data.items, total: data.totalCount, page: pageNum, pageSize: pageSizeNum });
@@ -106,10 +111,10 @@ export class ThreatController {
                 return;
             }
 
-            const attack = await this.threatLogService.getAttackDetail({ 
-                ip, 
-                minLogsForAttack: parseInt(minLogsForAttack), 
-                timeConfig 
+            const attack = await this.threatLogService.getAttackDetail({
+                ip,
+                minLogsForAttack: parseInt(minLogsForAttack),
+                timeConfig
             });
 
             if (!attack) {
@@ -141,8 +146,8 @@ export class ThreatController {
 
     // GET /api/reputationscore/:ip
     async getReputationScore(req: Request, res: Response): Promise<void> {
-        this.logger.info(`[ThreatController] Requesting reputation score for ${req.params.ip}`);
         try {
+            assertPublicIp(req.params.ip);
             const reputationData = await this.ipDetailsService.enrichWithAbuse(req.params.ip);
             if (!reputationData) {
                 res.status(404).json({ error: 'Reputation score non trovato' });
@@ -150,32 +155,37 @@ export class ThreatController {
             }
             res.json(reputationData);
         } catch (err: any) {
-            res.status(err.status || 500).json({ error: 'Errore recupero reputation score ' + JSON.stringify(err) });
+            if (err instanceof IpValidationError) {
+                res.status(400).json({ error: err.message });
+                return;
+            }
+            res.status(err.status || 500).json({ error: 'Errore recupero reputation score' });
         }
     }
 
     // POST /api/enrichreports/:ip
     async enrichReports(req: Request, res: Response): Promise<void> {
-        this.logger.info(`[ThreatController] Enriching reports for ${req.params.ip}`);
         try {
-            let maxAgeInDays = 2;
-            let perPage = 100;
-
-            const reportsData = await this.ipDetailsService.getAndSaveReportsAbuseIpDb(req.params.ip, maxAgeInDays, perPage);
+            assertPublicIp(req.params.ip);
+            const reportsData = await this.ipDetailsService.getAndSaveReportsAbuseIpDb(req.params.ip, 2, 100);
             if (!reportsData) {
                 res.status(404).json({ error: 'Reports non trovati' });
                 return;
             }
             res.json(reportsData);
         } catch (err: any) {
-            res.status(err.status || 500).json({ error: 'Errore recupero reputation score ' + JSON.stringify(err) });
+            if (err instanceof IpValidationError) {
+                res.status(400).json({ error: err.message });
+                return;
+            }
+            res.status(err.status || 500).json({ error: 'Errore recupero reports' });
         }
     }
 
     // GET /api/ipdetail/:ip
     async getIpDetail(req: Request, res: Response): Promise<void> {
-        this.logger.info(`[ThreatController] Requesting IP detail for ${req.params.ip}`);
         try {
+            assertPublicIp(req.params.ip);
             const ipDetails = await this.ipDetailsService.getIpDetails(req.params.ip);
             if (!ipDetails) {
                 res.status(404).json({ error: 'Ip detail non trovato' });
@@ -183,6 +193,10 @@ export class ThreatController {
             }
             res.json(ipDetails);
         } catch (err: any) {
+            if (err instanceof IpValidationError) {
+                res.status(400).json({ error: err.message });
+                return;
+            }
             this.logger.error('[ThreatController] Error fetching IP detail:', err);
             res.status(err.status || 500).json({ error: 'Errore durante recupero IP' });
         }
@@ -190,14 +204,17 @@ export class ThreatController {
 
     // POST /api/enrich/:ip
     async enrichIp(req: Request, res: Response): Promise<void> {
-        this.logger.info(`[ThreatController] Enriching IP ${req.params.ip}`);
         try {
-            const ip = req.params.ip;
+            assertPublicIp(req.params.ip);
+            const ip = req.params.ip.trim();
             const ipDetailsId = await this.ipDetailsService.findOrCreate(ip, true);
             await this.threatLogService.assignIpDetailsToLogs(ip, ipDetailsId);
-
             res.json({ message: 'Arricchimento IP completato per ' + ip });
         } catch (err: any) {
+            if (err instanceof IpValidationError) {
+                res.status(400).json({ error: err.message });
+                return;
+            }
             this.logger.error('[ThreatController] Error enriching IP:', err);
             res.status(err.status || 500).json({ error: 'Errore durante arricchimento IP' });
         }
@@ -227,8 +244,8 @@ export class ThreatController {
         this.logger.info('[ThreatController] Starting full logs reanalysis');
         try {
             const { batchSize = 100, updateDatabase = true } = req.body;
-            const resultHttp = await this.threatLogService.analyzeLogs({ batchSize, updateDatabase });
-            // const resultSsh = await this.sshLogService.analyzeSshLogs(batchSize);
+            const safeBatchSize = sanitizeLimit(batchSize, 500, 100);
+            const resultHttp = await this.threatLogService.analyzeLogs({ batchSize: safeBatchSize, updateDatabase: updateDatabase === true });            // const resultSsh = await this.sshLogService.analyzeSshLogs(batchSize);
 
             res.json({ http: resultHttp, ssh: null });
         } catch (err: any) {
@@ -241,8 +258,9 @@ export class ThreatController {
     async analyzePreview(req: Request, res: Response): Promise<void> {
         this.logger.info('[ThreatController] Starting reanalysis preview (dry-run)');
         try {
-            const { limit = 1000 } = req.query as any;
-            const result = await this.threatLogService.dryRunAnalyzeLogs(limit.toString());
+            const { limit = '100' } = req.query as any;
+            const safeLimit = sanitizeLimit(parseInt(limit as string, 10), 500, 100);
+            const result = await this.threatLogService.dryRunAnalyzeLogs(safeLimit.toString());
             res.json(result);
         } catch (err: any) {
             this.logger.error('[ThreatController] Error in reanalysis preview:', err);

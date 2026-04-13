@@ -96,7 +96,7 @@ describe('CowrieService', () => {
             const result = await cowrieService.countSessions({ src_ip: '1.2.3.4' });
             expect(result).toBe(42);
             expect(CowrieSession.countDocuments).toHaveBeenCalledWith(expect.objectContaining({
-                src_ip: { $regex: '1.2.3.4', $options: 'i' }
+                src_ip: { $regex: '1\\.2\\.3\\.4', $options: 'i' }
             }));
         });
     });

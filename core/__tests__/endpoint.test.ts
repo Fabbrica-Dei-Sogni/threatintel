@@ -23,7 +23,12 @@ jest.mock('../../logger', () => ({ logger: { info: jest.fn() } }));
 
 // Mocking ThreatLogger and RateLimitMiddleware
 const mockThreatLogger = { middleware: jest.fn(() => mockMiddleware) };
-const mockRateLimitMiddleware = { handle: jest.fn(() => mockMiddleware) };
+const mockRateLimitMiddleware = { 
+    handle: jest.fn(() => mockMiddleware),
+    violationTracker: jest.fn(() => mockMiddleware),
+    ddosProtectionLimiter: jest.fn(() => mockMiddleware),
+    applicationLimiter: jest.fn(() => mockMiddleware)
+};
 
 // I resolve them via container mock later or just mock the getComponent
 jest.mock('../di/container', () => ({
@@ -35,7 +40,12 @@ jest.mock('../di/container', () => ({
     })
 }));
 
-describe('Endpoint Router', () => {
+// Impedisci il tentativo di connessione ioredis
+beforeAll(() => {
+    process.env.REDIS_HOST = '';
+});
+
+describe('Endpoint Router Rate Limits', () => {
     let endpointRouter: any;
 
     beforeAll(() => {
@@ -54,5 +64,17 @@ describe('Endpoint Router', () => {
         const response = await request(app).get('/test');
         expect(response.status).toBe(200);
         expect(response.text).toBe('ok');
+    });
+
+    it('should have applied violationTracker globally to frontend endpoints', () => {
+        expect(mockRateLimitMiddleware.violationTracker).toHaveBeenCalled();
+    });
+
+    it('should have applied ddosProtectionLimiter globally to frontend endpoints', () => {
+        expect(mockRateLimitMiddleware.ddosProtectionLimiter).toHaveBeenCalled();
+    });
+
+    it('should have applied applicationLimiter globally to frontend endpoints', () => {
+        expect(mockRateLimitMiddleware.applicationLimiter).toHaveBeenCalled();
     });
 });

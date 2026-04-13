@@ -12,6 +12,16 @@ import { IpDetailsService } from './IpDetailsService';
 import { LogFilters } from '../types/threat-log.types';
 import { ThreatIndicator } from '../types/indicators';
 import { Types } from 'mongoose';
+import {
+    sanitizeSortFields,
+    sanitizeFilters,
+    sanitizePageSize,
+    sanitizePage,
+    sanitizeLimit,
+    SortAllowedFields,
+    FilterAllowedFields,
+    escapeRegex
+} from '../utils/queryGuard';
 
 dotenv.config();
 
@@ -57,19 +67,18 @@ export class ThreatLogService {
 
     // Lista log paginata e filtrata
     async getLogs({ page = 1, pageSize = 20, filters = {}, sortFields = { timestamp: -1 } }: { page?: number, pageSize?: number, filters?: LogFilters | any, sortFields?: any } = {}) {
-        const skip = (page - 1) * pageSize;
+        const safePage = sanitizePage(page);
+        const safePageSize = sanitizePageSize(pageSize);
+        const safeSort = sanitizeSortFields(sortFields, SortAllowedFields.threatLog);
+        const skip = (safePage - 1) * safePageSize;
 
-        const mongoFilters = this.buildRegExpFilter(filters as any);
-
-        // Se non c'è ordinamento, default a timestamp discendente
-        const sortQuery = sortFields && Object.keys(sortFields).length > 0 ? sortFields : { timestamp: -1 };
+        const mongoFilters = this.buildRegExpFilter(filters);
 
         return await ThreatLog.find(mongoFilters)
-            //.sort({ timestamp: -1 })
-            .sort(sortQuery)
+            .sort(safeSort)
             .skip(skip)
             .populate('ipDetailsId')
-            .limit(Number(pageSize));
+            .limit(safePageSize);
     }
 
     // Conteggio totale log filtrati (per paginazione frontend)
@@ -100,7 +109,8 @@ export class ThreatLogService {
         const mongoFilters = this.buildRegExpFilter(filters);
 
         // Costruisci sort dinamico
-        const sortStage = { $sort: sortFields && Object.keys(sortFields).length ? sortFields : { timestamp: -1 } };
+        const safeSort = sanitizeSortFields(sortFields, SortAllowedFields.threatLog);
+        const sortStage = { $sort: safeSort };
 
         // Pipeline base condivisa: match, group, match(minLogs), replaceRoot
         const basePipeline = await this.forensicService.buildAttackGroupsBasePipeline(mongoFilters, minLogsForAttack, timeConfig);
@@ -181,7 +191,8 @@ export class ThreatLogService {
         const mongoFilters = this.buildRegExpFilter(filters);
 
         // Costruisci sort dinamico
-        const sortStage = { $sort: sortFields && Object.keys(sortFields).length ? sortFields : { timestamp: -1 } };
+        const safeSort = sanitizeSortFields(sortFields, SortAllowedFields.threatLog);
+        const sortStage = { $sort: safeSort };
 
         // Pipeline base costruita col nuovo Builder
         const basePipeline = await this.forensicPipelineService.buildStandardPipeline(mongoFilters, minLogsForAttack, timeConfig);
@@ -282,29 +293,26 @@ export class ThreatLogService {
 
     buildRegExpFilter(filters: any) {
         const mongoFilters: any = {};
+        const safeFilters = sanitizeFilters(filters, FilterAllowedFields.threatLog);
 
-        for (const [key, value] of Object.entries(filters)) {
+        for (const [key, value] of Object.entries(safeFilters)) {
             if (key === 'protocol') {
                 if (value === 'http') {
-                    // Logica specifica per HTTP: include 'http', null, o campo mancante
                     mongoFilters.$or = [
                         { protocol: 'http' },
-                        { protocol: 'https' },
                         { protocol: { $exists: false } },
                         { protocol: null }
                     ];
-                } else if (value && typeof value === 'string') {
-                    // Per altri protocolli (es. ssh), ricerca esatta
+                } else {
                     mongoFilters[key] = value;
                 }
-            } else if (typeof value === 'string' && value.trim() !== '') {
-                // Operatore regex case-insensitive 'like'-style
+            } else if (typeof value === 'string') {
                 mongoFilters[key] = { $regex: value, $options: 'i' };
             } else {
-                // Se il filtro non è stringa (ad esempio boolean), filtro esatto
                 mongoFilters[key] = value;
             }
         }
+
         return mongoFilters;
     }
 
@@ -331,9 +339,11 @@ export class ThreatLogService {
     async dryRunAnalyzeLogs(limit: string) {
 
         // Recupera un campione di log
+        const safeLimit = sanitizeLimit(parseInt(limit, 10), 500, 100);
+
         const logs = await this.getLogs({
             page: 1,
-            pageSize: parseInt(limit),
+            pageSize: safeLimit,
             filters: {}
         });
 

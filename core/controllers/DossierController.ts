@@ -2,11 +2,15 @@ import { Request, Response } from 'express';
 import { injectable } from 'tsyringe';
 import { DossierService } from '../services/DossierService';
 import { CreateDossierDTO, UpdateDossierDTO } from '../models/dto/DossierDTO';
+import { sanitizePage, sanitizePageSize } from '../utils/queryGuard';
 
 @injectable()
 export class DossierController {
-    constructor(private readonly dossierService: DossierService) {}
+    constructor(private readonly dossierService: DossierService) { }
 
+    private safeFilename(value: string): string {
+        return value.replace(/[^a-zA-Z0-9._-]/g, '_').slice(0, 64);
+    }
     /**
      * Crea un nuovo Dossier.
      * POST /api/dossiers
@@ -20,8 +24,8 @@ export class DossierController {
             const dossier = await this.dossierService.createDossier(dto);
             return res.status(201).json(dossier);
         } catch (error: any) {
-            console.error('[DossierController] Create error:', error);
-            return res.status(500).json({ error: error.message });
+            console.error('[DossierController] <NomeMetodo> error:', error);
+            return res.status(500).json({ error: 'Operazione non riuscita' });
         }
     }
 
@@ -33,14 +37,14 @@ export class DossierController {
         try {
             const { status, owner, tags, ip, search, page, pageSize } = req.query;
             const filters = { status, owner, tags, ip, search };
-            const p = parseInt(page as string) || 1;
-            const ps = parseInt(pageSize as string) || 20;
+            const p = sanitizePage(page);
+            const ps = sanitizePageSize(pageSize);
 
             const result = await this.dossierService.listDossiers(filters, p, ps);
             return res.status(200).json(result);
         } catch (error: any) {
-            console.error('[DossierController] List error:', error);
-            return res.status(500).json({ error: error.message });
+            console.error('[DossierController] list error:', error);
+            return res.status(500).json({ error: 'Operazione non riuscita' });
         }
     }
 
@@ -57,8 +61,8 @@ export class DossierController {
             }
             return res.status(200).json(dossier);
         } catch (error: any) {
-            console.error('[DossierController] GetById error:', error);
-            return res.status(500).json({ error: error.message });
+            console.error('[DossierController] <NomeMetodo> error:', error);
+            return res.status(500).json({ error: 'Operazione non riuscita' });
         }
     }
 
@@ -76,8 +80,8 @@ export class DossierController {
             }
             return res.status(200).json(dossier);
         } catch (error: any) {
-            console.error('[DossierController] Update error:', error);
-            return res.status(500).json({ error: error.message });
+            console.error('[DossierController] <NomeMetodo> error:', error);
+            return res.status(500).json({ error: 'Operazione non riuscita' });
         }
     }
 
@@ -94,8 +98,8 @@ export class DossierController {
             }
             return res.status(204).send();
         } catch (error: any) {
-            console.error('[DossierController] Delete error:', error);
-            return res.status(500).json({ error: error.message });
+            console.error('[DossierController] <NomeMetodo> error:', error);
+            return res.status(500).json({ error: 'Operazione non riuscita' });
         }
     }
 
@@ -107,7 +111,7 @@ export class DossierController {
         try {
             const { id } = req.params;
             const { format, style, locale } = req.query;
-            
+
             const resFormat = (format as 'html' | 'pdf') || 'pdf';
             const resStyle = (style as 'hud' | 'classic' | 'telex') || 'classic';
             const resLocale = (locale as string) || 'it-IT';
@@ -120,13 +124,13 @@ export class DossierController {
             } else {
                 const pdfBuffer = result as Buffer;
                 res.setHeader('Content-Type', 'application/pdf');
-                res.setHeader('Content-Disposition', `attachment; filename=dossier_${id}.pdf`);
+                res.setHeader('Content-Disposition', `attachment; filename=dossier_${this.safeFilename(id)}.pdf`);
                 res.setHeader('Content-Length', pdfBuffer.length);
                 return res.send(pdfBuffer);
             }
         } catch (error: any) {
-            console.error('[DossierController] Export error:', error);
-            return res.status(500).json({ error: error.message });
+            console.error('[DossierController] <NomeMetodo> error:', error);
+            return res.status(500).json({ error: 'Operazione non riuscita' });
         }
     }
 }

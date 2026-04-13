@@ -5,20 +5,21 @@ import Dossier, { IDossier, DossierStatus, IDossierSection } from '../models/Dos
 import { CreateDossierDTO, UpdateDossierDTO, DossierResponseDTO } from '../models/dto/DossierDTO';
 import { ReportService } from './ReportService';
 import { SanitizationUtils } from '../utils/SanitizationUtils';
+import { sanitizePage, sanitizePageSize, escapeRegex } from '../utils/queryGuard';
 
 @injectable()
 export class DossierService {
     constructor(
         @inject(LOGGER_TOKEN) private readonly logger: Logger,
         private readonly reportService: ReportService
-    ) {}
+    ) { }
 
     /**
      * Crea un nuovo Dossier sanificando i dati delle sezioni.
      */
     async createDossier(dto: CreateDossierDTO): Promise<IDossier> {
         this.logger.info(`[DossierService] Creazione nuovo dossier: ${dto.title}`);
-        
+
         // Sanificazione profonda di tutte le sezioni prima del salvataggio
         const sanitizedSections = (dto.sections || []).map(section => ({
             ...section,
@@ -45,28 +46,31 @@ export class DossierService {
     /**
      * Elenca i dossier con filtri e paginazione.
      */
-    async listDossiers(filters: any = {}, page: number = 1, pageSize: number = 20) {
+    async listDossiers(filters: any = {}, page: any = 1, pageSize: any = 20) {
+        const safePage = sanitizePage(page);
+        const safePageSize = sanitizePageSize(pageSize);
         const query: any = {};
-        
+
         if (filters.status) query.status = filters.status;
         if (filters.owner) query.owner = filters.owner;
         if (filters.tags) query.tags = { $in: Array.isArray(filters.tags) ? filters.tags : [filters.tags] };
         if (filters.ip) query['sections.data.ip'] = filters.ip;
-        
-        if (filters.search) {
+
+        if (filters.search && typeof filters.search === 'string') {
+            const safeSearch = escapeRegex(filters.search.trim());
             query.$or = [
-                { title: { $regex: filters.search, $options: 'i' } },
-                { description: { $regex: filters.search, $options: 'i' } }
+                { title: { $regex: safeSearch, $options: 'i' } },
+                { description: { $regex: safeSearch, $options: 'i' } }
             ];
         }
 
         const total = await Dossier.countDocuments(query);
         const items = await Dossier.find(query)
             .sort({ createdAt: -1 })
-            .skip((page - 1) * pageSize)
-            .limit(pageSize);
+            .skip((safePage - 1) * safePageSize)
+            .limit(safePageSize);
 
-        return { items, total, page, pageSize };
+        return { items, total, page: safePage, pageSize: safePageSize };
     }
 
     /**
@@ -74,7 +78,7 @@ export class DossierService {
      */
     async updateDossier(id: string, dto: UpdateDossierDTO): Promise<IDossier | null> {
         const updateData: any = { ...dto };
-        
+
         if (dto.sections) {
             updateData.sections = dto.sections.map(section => ({
                 ...section,

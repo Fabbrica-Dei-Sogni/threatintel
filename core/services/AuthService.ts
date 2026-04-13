@@ -10,7 +10,7 @@ const defaultDigitalAuthUri = 'https://alessandromodica.com:3443/auth/api/v1';
 export class AuthService {
     private instance = axios.create({
         httpsAgent: new https.Agent({
-            rejectUnauthorized: false
+            rejectUnauthorized: process.env.AUTH_STRICT_SSL !== 'false'
         })
     });
     

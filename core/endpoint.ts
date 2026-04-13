@@ -39,9 +39,13 @@ const authMiddleware = getComponent(AuthMiddleware);
 
 const threatLogger = getComponent(ThreatLogger);
 import { RateLimitMiddleware } from "./rateLimitMiddleware";
+import { setupSwagger } from "./swagger";
 const rateLimitMiddleware = getComponent(RateLimitMiddleware);
 
 const router = express.Router();
+
+// Integrazione Documentazione Swagger (OpenAPI)
+setupSwagger(router);
 
 // Configurazione Threat Logger
 // **IMPORTANTE: Il middleware di threat logging deve essere PRIMO**
@@ -54,7 +58,50 @@ router.use(rateLimitMiddleware.applicationLimiter());
 
 // Proxy Auth Reale (Pubblico)
 const authRouter = express.Router();
+
+/**
+ * @openapi
+ * /auth/login:
+ *   post:
+ *     tags: [Auth Proxy]
+ *     summary: Effettua il login verso l'Identity Provider
+ *     description: Invia le credenziali al Digital-Auth-TS e restituisce un JWT token.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Login riuscito, token restituito.
+ *       401:
+ *         description: Credenziali non valide.
+ */
 authRouter.post('/auth/login', (req, res) => authController.login(req, res));
+
+/**
+ * @openapi
+ * /auth/register:
+ *   post:
+ *     tags: [Auth Proxy]
+ *     summary: Registra un nuovo utente sull'Identity Provider
+ *     description: Crea un nuovo account associato a questa istanza di ThreatIntel.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     responses:
+ *       201:
+ *         description: Registrazione completata, email di attivazione inviata.
+ */
 authRouter.post('/auth/register', (req, res) => authController.register(req, res));
 router.use('/api', authRouter);
 

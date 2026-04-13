@@ -39,6 +39,10 @@ export default defineConfig({
                         purpose: 'any'
                     }
                 ]
+            },
+            workbox: {
+                // Impedisce al Service Worker di gestire rotte esterne alla app Vue
+                navigateFallbackDenylist: [/^\/honeypot/]
             }
         })
     ],

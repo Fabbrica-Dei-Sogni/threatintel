@@ -1,5 +1,10 @@
 <template>
     <div class="auth-page">
+        <div class="back-nav">
+            <button @click="router.push('/')" class="back-btn-cyber">
+                {{ t('home.dashboard').toUpperCase() }}
+            </button>
+        </div>
         <div class="auth-card glass-card">
             <h2 class="cyber-title-base glow-azure">{{ t('auth.login') }}</h2>
             <form @submit.prevent="onSubmit" class="auth-form">
@@ -9,7 +14,8 @@
                 </div>
                 <div class="form-group">
                     <label for="password" class="cyber-label-muted">{{ t('auth.password') }}</label>
-                    <input v-model="password" id="password" type="password" class="cyber-input-text" required minlength="6" />
+                    <input v-model="password" id="password" type="password" class="cyber-input-text" required
+                        minlength="6" />
                 </div>
                 <button type="submit" class="btn-action glow-azure" :disabled="loading">
                     <span v-if="loading">{{ t('auth.loadingLogin') }}</span>
@@ -131,5 +137,48 @@ async function onSubmit() {
 
 .auth-link:hover {
     text-decoration: underline;
+}
+
+.back-nav {
+    position: fixed;
+    top: 24px;
+    left: 80px;
+    /* Lascia spazio al pulsante login/home se presente, o semplicemente allineato */
+    z-index: 100;
+}
+
+.back-btn-cyber {
+    background: rgba(30, 55, 153, 0.2);
+    color: #5FA5FF;
+    border: 1px solid rgba(95, 165, 255, 0.3);
+    font-weight: 700;
+    padding: 8px 16px;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.back-btn-cyber:hover {
+    background: rgba(30, 55, 153, 0.4);
+    border-color: #5FA5FF;
+    color: #fff;
+    box-shadow: 0 0 15px rgba(95, 165, 255, 0.3);
+    transform: translateX(-5px);
+}
+
+@media (max-width: 600px) {
+    .back-nav {
+        top: 15px;
+        left: 65px;
+    }
+
+    .back-btn-cyber {
+        font-size: 0.7rem;
+        padding: 6px 12px;
+    }
 }
 </style>

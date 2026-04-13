@@ -18,20 +18,33 @@
       </svg>
     </router-link>
 
+    <!-- Floating Login Button -->
+    <router-link v-if="!isAuthPage" to="/login" class="floating-login" :title="t('auth.login')">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+        <circle cx="12" cy="7" r="4"></circle>
+      </svg>
+    </router-link>
+
     <GlobalNavMenu />
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue';
+import { onMounted, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useRoute } from 'vue-router';
 import DossierRecorder from './components/DossierRecorder.vue';
 import DossierToggle from './components/DossierToggle.vue';
 import GlobalNavMenu from './components/GlobalNavMenu.vue';
 import { useDossierStore } from './stores/dossier';
 
 const { t } = useI18n();
+const route = useRoute();
 const dossierStore = useDossierStore();
+
+const isAuthPage = computed(() => route.path === '/login' || route.path === '/register');
 
 onMounted(() => {
   // Controlla se l'app è già in modalità standalone (installata)
@@ -105,6 +118,43 @@ onMounted(() => {
   bottom: 84px !important;
 }
 
+.floating-login {
+  position: fixed;
+  top: 24px;
+  left: 24px;
+  width: 44px;
+  height: 44px;
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+  color: #4ade80;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.floating-login:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: #4ade80;
+  color: #1a1a1a;
+  background-color: #4ade80;
+  transform: scale(1.1) translateY(2px);
+  box-shadow: 0 12px 40px rgba(74, 222, 128, 0.3), 0 0 20px rgba(74, 222, 128, 0.2);
+}
+
+.floating-login svg {
+  width: 20px;
+  height: 20px;
+  transition: transform 0.3s ease;
+}
+
 @media (max-width: 600px) {
   .floating-settings {
     right: 15px;
@@ -120,6 +170,13 @@ onMounted(() => {
 
   .floating-settings.recorder-active {
     bottom: 84px !important;
+  }
+
+  .floating-login {
+    left: 15px;
+    top: 15px;
+    width: 40px;
+    height: 40px;
   }
 }
 </style>

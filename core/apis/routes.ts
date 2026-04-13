@@ -5,9 +5,9 @@ import { FakeLoginController } from '../controllers/FakeLoginController';
 export default (logger: any, fakeLoginController: FakeLoginController, rateLimitMiddleware: RateLimitMiddleware) => {
     const router = express.Router();
 
-    router.use(rateLimitMiddleware.violationTracker());
-    router.use(rateLimitMiddleware.ddosProtectionLimiter());
-    router.use(rateLimitMiddleware.applicationLimiter());
+    // I middleware ddos e application sono già applicati globalmente in endpoint.ts
+    // Non caricarli qui per evitare ERR_ERL_DOUBLE_COUNT
+
 
     /**
      * @openapi

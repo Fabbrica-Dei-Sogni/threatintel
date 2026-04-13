@@ -50,6 +50,15 @@ export class SanitizationUtils {
     static deepClean(input: any): any {
         if (input === null || input === undefined) return input;
 
+        if (input instanceof Date) {
+            return new Date(input.getTime());
+        }
+
+        // Preserva ObjectId di Mongoose senza tentare di iterarli
+        if (input.constructor && (input.constructor.name === 'ObjectId' || input.constructor.name === 'ObjectID')) {
+            return input;
+        }
+
         if (Array.isArray(input)) {
             return input.map(item => this.deepClean(item));
         }

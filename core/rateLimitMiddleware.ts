@@ -133,7 +133,7 @@ export class RateLimitMiddleware {
             standardHeaders: true,
             legacyHeaders: false,
             handler: this.createRateLimitHandler('ddos-protection'),
-            keyGenerator: (req: any) => `ddos:${ipKeyGenerator(req)}`,
+            keyGenerator: (req: any) => `ddos:${req.ip || 'unknown'}`,
             skip: (req: any) => {
                 const excludedIPs = (process.env.EXCLUDED_IPS || '').split(',').map((ip) => ip.trim()).filter(Boolean);
                 return excludedIPs.includes(req.ip);
@@ -151,7 +151,7 @@ export class RateLimitMiddleware {
             standardHeaders: true,
             legacyHeaders: false,
             handler: this.createRateLimitHandler('critical-endpoints'),
-            keyGenerator: (req: any) => `critical:${ipKeyGenerator(req)}:${req.path}`,
+            keyGenerator: (req: any) => `critical:${req.ip || 'unknown'}:${req.path}`,
             skipSuccessfulRequests: false // Conta anche richieste "riuscite" per honeypot
         });
     }
@@ -166,7 +166,7 @@ export class RateLimitMiddleware {
             standardHeaders: true,
             legacyHeaders: false,
             handler: this.createRateLimitHandler('trap-endpoints'),
-            keyGenerator: (req: any) => `trap:${ipKeyGenerator(req)}`
+            keyGenerator: (req: any) => `trap:${req.ip || 'unknown'}`
         });
     }
 
@@ -180,7 +180,7 @@ export class RateLimitMiddleware {
             standardHeaders: true,
             legacyHeaders: false,
             handler: this.createRateLimitHandler('application'),
-            keyGenerator: (req: any) => `app:${ipKeyGenerator(req)}`
+            keyGenerator: (req: any) => `app:${req.ip || 'unknown'}`
         });
     }
 

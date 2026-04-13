@@ -173,6 +173,8 @@ L'autenticazione si riferisce all'endpoint https disponibile dall'esterno espost
 
 `URI_DIGITAL_AUTH=<https://$DIGITAL_AUTH/api/v1/>`
 
+`AUTH_STRICT_SSL=true` (Default: `true`. Se impostato a `false`, disabilita la verifica dei certificati SSL per l'Identity Provider - **PERICOLO MitM**)
+
 ##  Avvio mongodb e redis
 
 Sia mongodb, il database applicativo, che redis, il database legato al rate limiting, una volta avviati risultano sempre disponibili, anche dopo un riavvio dell'host, a meno che non si decida di fermarli. Direttiva docker unless-stopped

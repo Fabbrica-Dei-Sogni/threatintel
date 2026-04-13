@@ -79,10 +79,12 @@
         "dossierStyleForensic": "FORENSISCHER TELEX",
         "dossierPreviewTitle": "VORSCHAU DER INVESTIGATIVEN DOSSIERS",
         "dossierFormatA4": "FORMAT: A4 (ISO 216)",
-        "dossierZoom": "ZOOM"
+        "dossierZoom": "ZOOM",
+        "logout": "Logout"
     },
     "auth": {
         "login": "Anmelden",
+        "logout": "Abmelden",
         "register": "Registrieren",
         "registerHere": "Hier registrieren",
         "loginHere": "Haben Sie bereits ein Konto? Melden Sie sich hier an",

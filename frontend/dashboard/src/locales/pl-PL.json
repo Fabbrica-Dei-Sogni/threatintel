@@ -79,10 +79,12 @@
         "dossierStyleForensic": "TELEX ŚLEDCZY",
         "dossierPreviewTitle": "PODGLĄD DOSSIER ŚLEDCZEGO",
         "dossierFormatA4": "FORMAT: A4 (ISO 216)",
-        "dossierZoom": "POWIĘKSZENIE (ZOOM)"
+        "dossierZoom": "POWIĘKSZENIE (ZOOM)",
+        "logout": "Wyloguj"
     },
     "auth": {
         "login": "Zaloguj się",
+        "logout": "Wyloguj się",
         "register": "Zarejestruj się",
         "registerHere": "Zarejestruj się tutaj",
         "loginHere": "Masz już konto? Zaloguj się tutaj",

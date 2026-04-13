@@ -19,7 +19,10 @@
     </router-link>
 
     <!-- Floating Login / Logout Button -->
-    <div v-if="!isAuthPage" class="floating-auth-group">
+    <div v-if="!isAuthPage" class="floating-auth-group" :class="{
+      'has-settings': authStore.isAdmin,
+      'recorder-active': dossierStore.isEnabled && dossierStore.sections.length > 0
+    }">
       <router-link v-if="!authStore.isAuthenticated" to="/login" class="floating-login" :title="t('auth.login')">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -27,7 +30,7 @@
           <circle cx="12" cy="7" r="4"></circle>
         </svg>
       </router-link>
-      <button v-else @click="authStore.logout()" class="floating-logout" :title="t('common.logout') || 'Logout'">
+      <button v-else @click="authStore.logout()" class="floating-logout" :title="t('auth.logout')">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
@@ -130,76 +133,70 @@ onMounted(() => {
   bottom: 84px !important;
 }
 
-.floating-login {
+.floating-login,
+.floating-logout {
   position: fixed;
-  top: 24px;
-  left: 24px;
-  width: 44px;
-  height: 44px;
+  bottom: 24px;
+  right: 24px;
+  width: 54px;
+  height: 54px;
   background: rgba(255, 255, 255, 0.04);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
-  color: #4ade80;
-  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: 50%;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   z-index: 1000;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   cursor: pointer;
   text-decoration: none;
 }
 
-.floating-login:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: #4ade80;
-  color: #1a1a1a;
-  background-color: #4ade80;
-  transform: scale(1.1) translateY(2px);
-  box-shadow: 0 12px 40px rgba(74, 222, 128, 0.3), 0 0 20px rgba(74, 222, 128, 0.2);
-}
-
-.floating-login svg {
-  width: 20px;
-  height: 20px;
-  transition: transform 0.3s ease;
+.floating-login {
+  color: #4ade80;
 }
 
 .floating-logout {
-  position: fixed;
-  top: 24px;
-  left: 24px;
-  width: 44px;
-  height: 44px;
-  background: rgba(255, 255, 255, 0.04);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
   color: #ff4c4c;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  z-index: 1000;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  cursor: pointer;
+}
+
+/* Logica di posizionamento dinamico */
+.floating-auth-group.has-settings .floating-login,
+.floating-auth-group.has-settings .floating-logout {
+  bottom: 100px; /* Spostato leggermente più su per via delle dimensioni maggiori */
+}
+
+.floating-auth-group.recorder-active .floating-login,
+.floating-auth-group.recorder-active .floating-logout {
+  bottom: 94px;
+}
+
+.floating-auth-group.has-settings.recorder-active .floating-login,
+.floating-auth-group.has-settings.recorder-active .floating-logout {
+  bottom: 170px;
+}
+
+.floating-login:hover {
+  background: #4ade80;
+  color: #1a1a1a;
+  transform: scale(1.1) translateY(-2px);
+  box-shadow: 0 12px 40px rgba(74, 222, 128, 0.3);
 }
 
 .floating-logout:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: #ff4c4c;
+  background: #ff4c4c;
   color: #1a1a1a;
-  background-color: #ff4c4c;
-  transform: scale(1.1) translateY(2px);
-  box-shadow: 0 12px 40px rgba(255, 76, 76, 0.3), 0 0 20px rgba(255, 76, 76, 0.2);
+  transform: scale(1.1) translateY(-2px);
+  box-shadow: 0 12px 40px rgba(255, 76, 76, 0.3);
 }
 
+.floating-login svg,
 .floating-logout svg {
-  width: 20px;
-  height: 20px;
+  width: 26px;
+  height: 26px;
   transition: transform 0.3s ease;
 }
 
@@ -220,11 +217,27 @@ onMounted(() => {
     bottom: 84px !important;
   }
 
-  .floating-login {
-    left: 15px;
-    top: 15px;
-    width: 40px;
-    height: 40px;
+  .floating-login,
+  .floating-logout {
+    right: 15px;
+    bottom: 24px;
+    width: 44px;
+    height: 44px;
+  }
+
+  .floating-auth-group.has-settings .floating-login,
+  .floating-auth-group.has-settings .floating-logout {
+    bottom: 90px;
+  }
+
+  .floating-auth-group.recorder-active .floating-login,
+  .floating-auth-group.recorder-active .floating-logout {
+    bottom: 94px;
+  }
+
+  .floating-auth-group.has-settings.recorder-active .floating-login,
+  .floating-auth-group.has-settings.recorder-active .floating-logout {
+    bottom: 160px;
   }
 }
 </style>

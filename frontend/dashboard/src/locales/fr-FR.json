@@ -79,10 +79,12 @@
         "dossierStyleForensic": "TÉLEX FORENSIQUE",
         "dossierPreviewTitle": "APERÇU DU DOSSIER D'INVESTIGATION",
         "dossierFormatA4": "FORMAT : A4 (ISO 216)",
-        "dossierZoom": "ZOOM"
+        "dossierZoom": "ZOOM",
+        "logout": "Déconnexion"
     },
     "auth": {
         "login": "Connexion",
+        "logout": "Déconnexion",
         "register": "S'inscrire",
         "registerHere": "S'inscrire ici",
         "loginHere": "Vous avez déjà un compte? Connectez-vous ici",

@@ -79,10 +79,12 @@
         "dossierStyleForensic": "СУДЕБНЫЙ ТЕЛЕКС",
         "dossierPreviewTitle": "ПРЕДВАРИТЕЛЬНЫЙ ПРОСМОТР СЛЕДСТВЕННОГО ДОСЬЕ",
         "dossierFormatA4": "ФОРМАТ: A4 (ISO 216)",
-        "dossierZoom": "МАСШТАБ"
+        "dossierZoom": "МАСШТАБ",
+        "logout": "Выход"
     },
     "auth": {
         "login": "Войти",
+        "logout": "Выход",
         "register": "Регистрация",
         "registerHere": "Зарегистрироваться здесь",
         "loginHere": "Уже есть аккаунт? Войдите здесь",

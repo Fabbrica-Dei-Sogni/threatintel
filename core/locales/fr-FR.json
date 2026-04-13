@@ -300,5 +300,19 @@
     "common": {
         "yes": "OUI",
         "no": "NON"
+    },
+    "errors": {
+        "auth": {
+            "tokenMissing": "Accès refusé : jeton manquant",
+            "tokenInvalid": "Jeton invalide ou expiré",
+            "forbidden": "Autorisation refusée",
+            "insufficientPermissions": "Autorisation refusée : permissions insuffisantes (ADMIN requis)"
+        },
+        "system": {
+            "generic": "Une erreur système s'est produite",
+            "notFound": "Ressource introuvable",
+            "fetchError": "Erreur lors de la récupération des données",
+            "searchError": "Erreur lors de la recherche"
+        }
     }
 }

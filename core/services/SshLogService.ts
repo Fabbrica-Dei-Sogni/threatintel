@@ -6,6 +6,7 @@ import { ThreatLogService } from './ThreatLogService';
 import PatternAnalysisService from './PatternAnalysisService';
 import crypto from 'crypto';
 import { ConfigService } from './ConfigService';
+import { SanitizationUtils } from '../utils/SanitizationUtils';
 
 import { ILongRunningService, ServiceStatus } from '../types/lifecycle';
 import { ThreatIndicator } from '../types/indicators';
@@ -409,7 +410,9 @@ export class SshLogService implements ILongRunningService {
         };
 
         try {
-            await this.threatLogService.saveLog(logEntry);
+            // Sanitizzazione globale anti-XSS prima del salvataggio
+            const sanitizedLogEntry = SanitizationUtils.deepClean(logEntry);
+            await this.threatLogService.saveLog(sanitizedLogEntry);
             this.logger.info(`[SshLogService] Rilevato evento SSH ${type} da ${ip} (utente: ${user})`);
         } catch (err) {
             this.logger.error('[SshLogService] Errore nel salvataggio del log SSH come ThreatLog', err);

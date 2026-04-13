@@ -300,5 +300,19 @@
     "common": {
         "yes": "JA",
         "no": "NEIN"
+    },
+    "errors": {
+        "auth": {
+            "tokenMissing": "Zugriff verweigert: Token fehlt",
+            "tokenInvalid": "Ungültiges oder abgelaufenes Token",
+            "forbidden": "Autorisierung verweigert",
+            "insufficientPermissions": "Autorisierung verweigert: unzureichende Berechtigungen (ADMIN erforderlich)"
+        },
+        "system": {
+            "generic": "Ein Systemfehler ist aufgetreten",
+            "notFound": "Ressource nicht gefunden",
+            "fetchError": "Fehler beim Abrufen der Daten",
+            "searchError": "Fehler bei der Suche"
+        }
     }
 }

@@ -44,9 +44,6 @@ const rateLimitMiddleware = getComponent(RateLimitMiddleware);
 
 const router = express.Router();
 
-// Integrazione Documentazione Swagger (OpenAPI)
-setupSwagger(router);
-
 // Configurazione Threat Logger
 // **IMPORTANTE: Il middleware di threat logging deve essere PRIMO**
 router.use(threatLogger.middleware());
@@ -107,6 +104,9 @@ router.use('/api', authRouter);
 
 // Protezione Globale API (Escluso le trap e l'auth che passano prima in questo file)
 router.use('/api', authMiddleware.isAuthenticated());
+
+// Integrazione Documentazione Swagger (OpenAPI) - PROTETTA
+setupSwagger(router);
 
 // API Dashboards e statistiche
 router.use('/', threatroutes(threatController, authMiddleware));

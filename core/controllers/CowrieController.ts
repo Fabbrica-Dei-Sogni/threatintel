@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { inject, singleton } from 'tsyringe';
 import { CowrieService } from '../services/CowrieService';
+import { I18nService } from '../services/I18nService';
 import { LOGGER_TOKEN } from '../di/tokens';
 import { Logger } from 'winston';
 
@@ -8,8 +9,16 @@ import { Logger } from 'winston';
 export class CowrieController {
     constructor(
         private cowrieService: CowrieService,
+        @inject(I18nService) private i18n: I18nService,
         @inject(LOGGER_TOKEN) private logger: Logger
     ) {}
+    
+    private getLocale(req: Request): string {
+        return (req.query.locale as string) || 
+               (req.headers['x-locale'] as string) || 
+               (req.headers['accept-language']?.split(',')[0]?.split(';')[0]) || 
+               'it-IT';
+    }
 
     // GET /api/cowrie/sessions
     async getSessions(req: Request, res: Response): Promise<void> {
@@ -48,7 +57,8 @@ export class CowrieController {
             });
         } catch (error: any) {
             this.logger.error(`[CowrieController] Error in getSessions: ${error.message}`);
-            res.status(500).json({ error: 'Failed to fetch telnet sessions.' });
+            const locale = this.getLocale(req);
+            res.status(500).json({ error: this.i18n.t('errors.system.fetchError', locale) });
         }
     }
 
@@ -70,7 +80,8 @@ export class CowrieController {
             });
         } catch (error: any) {
             this.logger.error(`[CowrieController] Error in searchSessions: ${error.message}`);
-            res.status(500).json({ error: 'Failed to search telnet sessions.' });
+            const locale = this.getLocale(req);
+            res.status(500).json({ error: this.i18n.t('errors.system.searchError', locale) });
         }
     }
 
@@ -80,13 +91,15 @@ export class CowrieController {
             const { id } = req.params;
             const session = await this.cowrieService.getSessionDetails(id);
             if (!session) {
-                res.status(404).json({ error: 'Session not found' });
+                const locale = this.getLocale(req);
+                res.status(404).json({ error: this.i18n.t('errors.system.notFound', locale) });
                 return;
             }
             res.status(200).json(session);
         } catch (error: any) {
             this.logger.error(`[CowrieController] Error in getSessionDetails: ${error.message}`);
-            res.status(500).json({ error: 'Failed to fetch telnet session details.' });
+            const locale = this.getLocale(req);
+            res.status(500).json({ error: this.i18n.t('errors.system.fetchError', locale) });
         }
     }
 
@@ -98,7 +111,8 @@ export class CowrieController {
             res.status(200).json(events);
         } catch (error: any) {
             this.logger.error(`[CowrieController] Error in getSessionEvents: ${error.message}`);
-            res.status(500).json({ error: 'Failed to fetch telnet events.' });
+            const locale = this.getLocale(req);
+            res.status(500).json({ error: this.i18n.t('errors.system.fetchError', locale) });
         }
     }
 }

@@ -6,6 +6,7 @@ import { ThreatLogService } from './ThreatLogService';
 import PatternAnalysisService from './PatternAnalysisService';
 import crypto from 'crypto';
 import dotenv from 'dotenv';
+import { SanitizationUtils } from '../utils/SanitizationUtils';
 dotenv.config();
 
 /**
@@ -216,7 +217,9 @@ export class NginxLogService implements ILongRunningService {
         };
 
         try {
-            await this.threatLogService.saveLog(logEntry);
+            // Sanitizzazione globale anti-XSS prima del salvataggio
+            const sanitizedLogEntry = SanitizationUtils.deepClean(logEntry);
+            await this.threatLogService.saveLog(sanitizedLogEntry);
             this.logger.info(`[NginxLogService] 🛡️ HTTPS sospetto: ${method} ${url} da ${ip} (Score: ${logEntry.fingerprint.score})`);
         } catch (err) {
             this.logger.error('[NginxLogService] Errore salvataggio ThreatLog', err);

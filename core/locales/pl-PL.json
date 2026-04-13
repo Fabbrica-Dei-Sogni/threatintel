@@ -300,5 +300,19 @@
     "common": {
         "yes": "TAK",
         "no": "NIE"
+    },
+    "errors": {
+        "auth": {
+            "tokenMissing": "Odmowa dostępu: brak tokenu",
+            "tokenInvalid": "Nieprawidłowy lub wygasły token",
+            "forbidden": "Brak autoryzacji",
+            "insufficientPermissions": "Brak autoryzacji: niewystarczające uprawnienia (wymagany ADMIN)"
+        },
+        "system": {
+            "generic": "Wystąpił błąd systemu",
+            "notFound": "Zasób nie został znaleziony",
+            "fetchError": "Błąd podczas pobierania danych",
+            "searchError": "Błąd podczas wyszukiwania"
+        }
     }
 }

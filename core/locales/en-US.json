@@ -306,5 +306,19 @@
     "common": {
         "yes": "YES",
         "no": "NO"
+    },
+    "errors": {
+        "auth": {
+            "tokenMissing": "Access denied: token missing",
+            "tokenInvalid": "Invalid or expired token",
+            "forbidden": "Authorization denied",
+            "insufficientPermissions": "Authorization denied: insufficient permissions (ADMIN required)"
+        },
+        "system": {
+            "generic": "A system error occurred",
+            "notFound": "Resource not found",
+            "fetchError": "Error fetching data",
+            "searchError": "Error during search"
+        }
     }
 }

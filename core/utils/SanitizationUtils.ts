@@ -1,38 +1,77 @@
 /**
- * Utility per la sanitizzazione di stringhe grezze (come WHOIS o Payload)
- * che potrebbero arrivare come stringhe JSON-escaped o con caratteri di controllo.
+ * Utility per la sanitizzazione di stringhe grezze e oggetti complessi.
+ * Fornisce protezione contro iniezioni (XSS) e gestione di sequenze JSON-escaped.
  */
 export class SanitizationUtils {
     /**
-     * Pulisce una stringa grezza che potrebbe contenere sequenze letterali di escape
-     * (es. "\n" scritto come testo) o essere racchiusa tra virgolette doppie.
+     * Esegue l'escape dei caratteri HTML speciali per prevenire iniezioni di script (XSS).
+     */
+    static escapeHTML(str: string): string {
+        if (typeof str !== 'string') return str;
+        return str
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    /**
+     * Pulisce una stringa grezza (JSON-unescaping) e applica l'escape HTML.
      */
     static sanitizeRawString(input: any): string {
         if (typeof input !== 'string' || !input) return input || '';
         
         let sanitized = input.trim();
         
-        // Se la stringa è racchiusa tra virgolette doppie, proviamo a unescaparla come JSON
+        // Gestione sequenze racchiuse tra virgolette doppie (JSON unescaping)
         if (sanitized.startsWith('"') && sanitized.endsWith('"')) {
             try {
-                // JSON.parse gestirà correttamente \n, \t e altri caratteri di escape
-                return JSON.parse(sanitized);
+                sanitized = JSON.parse(sanitized);
             } catch (e) {
-                // Se non è un JSON valido nonostante le virgolette, rimuoviamole manualmente
                 sanitized = sanitized.slice(1, -1);
             }
         }
         
-        // Fallback: rimpiazza manualmente sequenze letterali di escape se presenti come testo
-        return sanitized
+        // Rimpiazza sequenze letterali di escape comuni se presenti come testo
+        sanitized = sanitized
             .replace(/\\n/g, '\n')
             .replace(/\\r/g, '\r')
             .replace(/\\"/g, '"')
             .replace(/\\t/g, '\t');
+
+        // APPUNTO DI SICUREZZA: Dopo aver unescapato tutto, applichiamo l'escape HTML finale
+        return this.escapeHTML(sanitized);
     }
 
     /**
-     * Sanifica ricorsivamente un oggetto data per pulire campi raw noti.
+     * Sanifica ricorsivamente un oggetto o un array, applicando l'escape HTML a tutte le stringhe.
+     */
+    static deepClean(input: any): any {
+        if (input === null || input === undefined) return input;
+
+        if (Array.isArray(input)) {
+            return input.map(item => this.deepClean(item));
+        }
+
+        if (typeof input === 'object') {
+            const cleaned: Record<string, any> = {};
+            for (const [key, value] of Object.entries(input)) {
+                cleaned[key] = this.deepClean(value);
+            }
+            return cleaned;
+        }
+
+        if (typeof input === 'string') {
+            return this.escapeHTML(input);
+        }
+
+        return input;
+    }
+
+    /**
+     * Sanifica ricorsivamente un oggetto data per pulire campi specifici (mantenuto per retrocompatibilità).
+     * Ora utilizza il nuovo motore di escape HTML.
      */
     static sanitizeObjectData(data: Record<string, any>, fieldsToSanitize: string[] = ['whois', 'whois_raw', 'rawData', 'payload', 'comment', 'input']): Record<string, any> {
         if (!data || typeof data !== 'object') return data;
@@ -44,6 +83,9 @@ export class SanitizationUtils {
                 sanitized[key] = this.sanitizeRawString(sanitized[key]);
             } else if (typeof sanitized[key] === 'object' && sanitized[key] !== null) {
                 sanitized[key] = this.sanitizeObjectData(sanitized[key], fieldsToSanitize);
+            } else if (typeof sanitized[key] === 'string') {
+                // Anche i campi non specificati vengono scappati per sicurezza globale
+                sanitized[key] = this.escapeHTML(sanitized[key]);
             }
         }
         

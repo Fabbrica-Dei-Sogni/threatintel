@@ -16,6 +16,7 @@ import {
     FilterAllowedFields,
     escapeRegex
 } from '../utils/queryGuard';
+import { SanitizationUtils } from '../utils/SanitizationUtils';
 
 @singleton()
 export class CowrieService implements ILongRunningService {
@@ -220,7 +221,7 @@ export class CowrieService implements ILongRunningService {
         const [result] = await CowrieSession.aggregate(pipeline).allowDiskUse(true).exec();
 
         return {
-            sessions: result?.sessions || [],
+            sessions: SanitizationUtils.deepClean(result?.sessions || []),
             totalCount: result?.totalCount || 0
         };
     }
@@ -286,6 +287,6 @@ export class CowrieService implements ILongRunningService {
         });
 
         this.logger.info(`[CowrieService] Found ${allEvents.length} total forensic events for session "${id}"`);
-        return allEvents;
+        return SanitizationUtils.deepClean(allEvents);
     }
 }

@@ -306,5 +306,19 @@
     "common": {
         "yes": "SI",
         "no": "NO"
+    },
+    "errors": {
+        "auth": {
+            "tokenMissing": "Accesso negato: token mancante",
+            "tokenInvalid": "Token non valido o scaduto",
+            "forbidden": "Autorizzazione negata",
+            "insufficientPermissions": "Autorizzazione negata: permessi insufficienti (ADMIN richiesto)"
+        },
+        "system": {
+            "generic": "Si è verificato un errore di sistema",
+            "notFound": "Risorsa non trovata",
+            "fetchError": "Errore durante il recupero dei dati",
+            "searchError": "Errore durante la ricerca"
+        }
     }
 }

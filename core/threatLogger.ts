@@ -5,6 +5,7 @@ import PatternAnalysisService from './services/PatternAnalysisService';
 import net from 'net';
 import { Request, Response, NextFunction } from 'express';
 import { ThreatLogService } from './services/ThreatLogService';
+import { SanitizationUtils } from './utils/SanitizationUtils';
 import { mongoUri } from './config';
 import { inject, singleton } from 'tsyringe';
 import { LOGGER_TOKEN } from './di/tokens';
@@ -135,7 +136,10 @@ export class ThreatLogger {
                 };
 
                 try {
-                    await this.threatLogService.saveLog(logEntry);
+                    // Sanitizzazione globale di tutti i campi testuali per prevenire XSS nel dashboard
+                    const sanitizedLogEntry = SanitizationUtils.deepClean(logEntry);
+                    
+                    await this.threatLogService.saveLog(sanitizedLogEntry);
 
                     if (analysis.suspicious && analysis.score > 10) {
                         console.warn('[ThreatLogger] ⚠️  Richiesta sospetta rilevata:', JSON.stringify({

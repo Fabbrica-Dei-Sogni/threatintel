@@ -8,7 +8,7 @@ import Configuration from '../../models/ConfigSchema';
 import { container } from '../../di/container';
 import { ConfigService } from '../../services/ConfigService';
 import { SshLogService } from '../../services/SshLogService';
-import { PatternAnalysisService } from '../../services/PatternAnalysisService';
+import { AuthMiddleware } from '../../middlewares/AuthMiddleware';
 
 describe('ConfigRoutes API', () => {
     let app: express.Application;
@@ -22,8 +22,16 @@ describe('ConfigRoutes API', () => {
         app.use(express.json());
 
         configController = container.resolve(ConfigController);
+        
+        // Mock AuthMiddleware
+        const authMiddlewareMock = {
+            isAuthenticated: jest.fn().mockReturnValue((req: any, res: any, next: any) => next()),
+            hasRole: jest.fn().mockImplementation((role: string) => {
+                return (req: any, res: any, next: any) => next();
+            })
+        } as unknown as AuthMiddleware;
 
-        app.use('/', configroutes(configController));
+        app.use('/', configroutes(configController, authMiddlewareMock));
     });
 
     afterAll(async () => {

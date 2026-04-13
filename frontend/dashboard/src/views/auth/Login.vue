@@ -31,10 +31,12 @@
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { loginUser } from '../../api/auth';
+import { login } from '../../api/index';
 import { useI18n } from 'vue-i18n';
+import { useAuthStore } from '../../stores/auth';
 
 const { t } = useI18n();
+const authStore = useAuthStore();
 
 const router = useRouter();
 const username = ref('');
@@ -47,11 +49,16 @@ async function onSubmit() {
     error.value = false;
     loading.value = true;
     try {
-        const res = await loginUser(username.value, password.value);
-        // Qui puoi salvare token o dati utente (es. in Pinia o localStorage)
-        console.log('Login success:', res.data);
-        // Naviga alla dashboard o home protetta
-        router.push('/dashboard');
+        const res = await login({ username: username.value, password: password.value });
+        
+        // Salviamo nello store
+        if (res.token && res.user) {
+            authStore.setAuth(res.token, res.user);
+        }
+
+        console.log('Login success:', res);
+        // Naviga alla dashboard
+        router.push('/');
     } catch (err) {
         error.value = true;
         errorMessage.value = err.response?.data?.message || t('auth.errorLogin');

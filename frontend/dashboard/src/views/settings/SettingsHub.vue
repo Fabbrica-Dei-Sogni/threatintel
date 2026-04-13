@@ -1,5 +1,5 @@
 <template>
-  <div class="settings-hub-container">
+  <div class="settings-hub-container" v-if="authStore.isAdmin">
     <header class="header-top">
       <div class="header-left">
         <button class="back-btn" @click="goHome" :title="t('common.back')">
@@ -45,15 +45,24 @@
       </div>
     </div>
   </div>
+  <div v-else class="settings-hub-container forbidden-view">
+    <div class="error-hud card-glass">
+      <span class="error-icon">🚫</span>
+      <p class="error-text">ACCESSO NEGATO: PERMESSI INSUFFICIENTI</p>
+      <button class="btn-hud-action" @click="goHome">TORNA AL CRUSCOTTO</button>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
+import { useAuthStore } from '../../stores/auth';
 import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
 
 const { t } = useI18n();
 const router = useRouter();
+const authStore = useAuthStore();
 
 const goHome = () => router.push('/');
 const goToProfiles = () => router.push('/settings/profiles');

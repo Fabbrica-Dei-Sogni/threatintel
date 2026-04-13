@@ -46,6 +46,8 @@ app.use(helmet({
 
 // Middleware generali
 app.use(cors({
+    origin: ['http://localhost:5173', 'https://alessandromodica.com:2443'],
+    credentials: true,
     exposedHeaders: ['Content-Disposition', 'Content-Length']
 }));
 app.use(express.json({ limit: '1mb' }));
@@ -58,7 +60,7 @@ app.set('trust proxy', true);
 app.use(api);
 
 const PORT = port;
-app.listen(Number(PORT), '127.0.0.1', async () => {
+app.listen(Number(PORT), '0.0.0.0', async () => {
     logger.info(`🚀 Server threat intelligence avviato su porta ${PORT}`);
     logger.info(`📊 Dashboard statistiche: http://localhost:${PORT}/api/stats`);
     logger.info(`🕸️  Landing page: http://localhost:${PORT}/`);

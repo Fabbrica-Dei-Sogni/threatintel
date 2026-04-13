@@ -1,5 +1,5 @@
 <template>
-    <div class="config-page-view">
+    <div class="config-page-view" v-if="authStore.isAdmin">
         <!-- Dashboard Header -->
         <header class="hub-header-top">
             <div class="header-left-hub">
@@ -84,6 +84,13 @@
             </div>
         </Transition>
     </div>
+    <div v-else class="config-page-view forbidden-view">
+        <div class="error-hud card-glass">
+            <span class="error-icon">🚫</span>
+            <p class="error-text">ACCESSO NEGATO: PERMESSI INSUFFICIENTI</p>
+            <button class="btn btn-hud-action" @click="router.push('/')">TORNA AL CRUSCOTTO</button>
+        </div>
+    </div>
 </template>
 
 <script setup lang="ts">
@@ -92,12 +99,14 @@ import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useConfig } from '../../composable/useConfig';
 import { useProfileStore } from '../../stores/profiles';
+import { useAuthStore } from '../../stores/auth';
 import ConfigEditor from '../../components/ConfigEditor.vue';
 import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
 
 const { t } = useI18n();
 const router = useRouter();
 const profileStore = useProfileStore();
+const authStore = useAuthStore();
 
 // Composable per la gestione delle configurazioni
 const {

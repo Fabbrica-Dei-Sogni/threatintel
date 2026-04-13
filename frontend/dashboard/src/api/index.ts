@@ -23,12 +23,71 @@ const apiClient = axios.create({
     timeout: 30000,
 });
 
-// Interceptor per gestire cambiamenti a runtime
+// Interceptor per gestire cambiamenti a runtime e iniettare il token
 apiClient.interceptors.request.use((config) => {
     config.baseURL = getApiUrl();
+    
+    // Recupera il token dal localStorage
+    const token = localStorage.getItem('auth_token');
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    
     return config;
+}, (error) => {
+    return Promise.reject(error);
 });
 
+// Interceptor per gestire errori di autenticazione (401/403)
+apiClient.interceptors.response.use((response) => {
+    return response;
+}, (error) => {
+    if (error.response && [401, 403].includes(error.response.status)) {
+        // Se siamo in dashboard e riceviamo 401, potremmo voler reindirizzare al login
+        const currentPath = window.location.pathname;
+        if (!currentPath.includes('/auth/login') && !currentPath.includes('/auth/register')) {
+            console.warn('[apiClient] Sessione scaduta o permessi insufficienti. Reindirizzamento...');
+            // Opzionale: pulizia locale storage se 401
+            if (error.response.status === 401) {
+                localStorage.removeItem('auth_token');
+                localStorage.removeItem('user_info');
+            }
+        }
+    }
+    return Promise.reject(error);
+});
+
+
+// ==========================
+// AUTH API WRAPPERS (Proxy)
+// ==========================
+
+export async function login(credentials: any): Promise<any> {
+    try {
+        const response = await apiClient.post('/auth/login', credentials);
+        if (response.data.token) {
+            localStorage.setItem('auth_token', response.data.token);
+            // Salva anche info utente se presenti (restituite dal nuovo verify/login)
+            if (response.data.user) {
+                localStorage.setItem('user_info', JSON.stringify(response.data.user));
+            }
+        }
+        return response.data;
+    } catch (error) {
+        console.error('[login] Error:', error);
+        throw error;
+    }
+}
+
+export async function register(userData: any): Promise<any> {
+    try {
+        const response = await apiClient.post('/auth/register', userData);
+        return response.data;
+    } catch (error) {
+        console.error('[register] Error:', error);
+        throw error;
+    }
+}
 
 
 export async function fetchLogById(id: string): Promise<any> {

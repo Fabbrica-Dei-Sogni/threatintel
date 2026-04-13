@@ -1,5 +1,6 @@
 <template>
   <div class="dashboard">
+    <ConfigMenuButton />
     <div class="header-top">
       <div class="header-main-title">
         <h1>

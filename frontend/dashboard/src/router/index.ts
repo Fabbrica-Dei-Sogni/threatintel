@@ -90,9 +90,9 @@ const routes: RouteRecordRaw[] = [
     { path: '/threatlog/:id', name: 'ThreatLog', component: ThreatLog, props: true },
     { path: '/login', name: 'Login', component: Login },
     { path: '/register', name: 'Register', component: Register },
-    { path: '/settings', name: 'SettingsHub', component: SettingsHub },
-    { path: '/settings/profiles', name: 'Settings', component: Settings },
-    { path: '/settings/algorithms', name: 'Config', component: ConfigPage },
+    { path: '/settings', name: 'SettingsHub', component: SettingsHub, meta: { requiresAdmin: true } },
+    { path: '/settings/profiles', name: 'Settings', component: Settings, meta: { requiresAdmin: true } },
+    { path: '/settings/algorithms', name: 'Config', component: ConfigPage, meta: { requiresAdmin: true } },
     { path: '/config', redirect: '/settings/algorithms' },
     {
         path: '/telnet-sessions',
@@ -123,6 +123,20 @@ const routes: RouteRecordRaw[] = [
 const router = createRouter({
     history: createWebHistory(),
     routes,
+});
+
+// Guard di navigazione per RBAC
+import { useAuthStore } from '../stores/auth';
+
+router.beforeEach((to, from, next) => {
+    const authStore = useAuthStore();
+    
+    if (to.meta.requiresAdmin && !authStore.isAdmin) {
+        console.warn(`[Router] Accesso negato a ${to.path}: richiesto ruolo admin.`);
+        next({ name: 'Home' });
+    } else {
+        next();
+    }
 });
 
 export default router;

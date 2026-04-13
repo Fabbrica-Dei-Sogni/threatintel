@@ -1,7 +1,8 @@
 import express from 'express';
 import { ThreatController } from '../controllers/ThreatController';
+import { AuthMiddleware } from '../middlewares/AuthMiddleware';
 
-export default (threatController: ThreatController) => {
+export default (threatController: ThreatController, authMiddleware: AuthMiddleware) => {
     const router = express.Router();
 
     router.get('/api/stats', (req, res) => threatController.getStats(req, res));
@@ -15,7 +16,7 @@ export default (threatController: ThreatController) => {
     router.get('/api/ipdetail/:ip', (req, res) => threatController.getIpDetail(req, res));
     router.post('/api/enrich/:ip', (req, res) => threatController.enrichIp(req, res));
     router.post('/api/enrich', (req, res) => threatController.batchEnrich(req, res));
-    router.post('/api/reanalyze-all', (req, res) => threatController.reanalyzeAll(req, res));
+    router.post('/api/reanalyze-all', authMiddleware.hasRole('admin'), (req, res) => threatController.reanalyzeAll(req, res));
     router.get('/api/analyze-preview', (req, res) => threatController.analyzePreview(req, res));
 
     return router;

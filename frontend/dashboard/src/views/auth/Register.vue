@@ -2,7 +2,7 @@
     <div class="auth-page">
         <div class="back-nav">
             <button @click="router.push('/')" class="back-btn-cyber">
-                ← {{ t('common.back').toUpperCase() }} {{ t('home.dashboard').toUpperCase() }}
+                {{ t('home.dashboard').toUpperCase() }}
             </button>
         </div>
         <div class="auth-card glass-card">
@@ -18,7 +18,8 @@
                 </div>
                 <div class="form-group">
                     <label for="password" class="cyber-label-muted">{{ t('auth.password') }}</label>
-                    <input v-model="password" id="password" type="password" class="cyber-input-text" required minlength="6" />
+                    <input v-model="password" id="password" type="password" class="cyber-input-text" required
+                        minlength="6" />
                 </div>
                 <button type="submit" class="btn-action glow-azure" :disabled="loading">
                     <span v-if="loading">{{ t('auth.loadingLogin') }}</span>
@@ -34,7 +35,7 @@
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { registerUser } from '../../api/auth';
+import { register } from '../../api/index';
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
@@ -51,7 +52,7 @@ async function onSubmit() {
     error.value = false;
     loading.value = true;
     try {
-        await registerUser(username.value, email.value, password.value);
+        await register({ username: username.value, email: email.value, password: password.value });
         // Dopo registrazione con successo, reindirizza a login
         router.push('/login');
     } catch (err) {
@@ -176,6 +177,7 @@ async function onSubmit() {
         top: 15px;
         left: 65px;
     }
+
     .back-btn-cyber {
         font-size: 0.7rem;
         padding: 6px 12px;

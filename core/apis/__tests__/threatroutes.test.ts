@@ -9,6 +9,7 @@ import { SshLogService } from '../../services/SshLogService';
 import { LOGGER_TOKEN } from '../../di/tokens';
 import threatRoutes from '../threatroutes';
 import { Logger } from 'winston';
+import { AuthMiddleware } from '../../middlewares/AuthMiddleware';
 
 // Mock dei servizi e del logger
 const mockThreatLogService = {
@@ -50,9 +51,18 @@ container.register<Logger>(LOGGER_TOKEN, { useValue: mockLogger });
 
 // Creazione istanza del controller e dell'app express
 const threatController = container.resolve(ThreatController);
+
+// Mock AuthMiddleware
+const authMiddlewareMock = {
+    isAuthenticated: jest.fn().mockReturnValue((req: any, res: any, next: any) => next()),
+    hasRole: jest.fn().mockImplementation((role: string) => {
+        return (req: any, res: any, next: any) => next();
+    })
+} as unknown as AuthMiddleware;
+
 const app = express();
 app.use(express.json());
-app.use('/', threatRoutes(threatController));
+app.use('/', threatRoutes(threatController, authMiddlewareMock));
 
 
 describe('ThreatRoutes API', () => {

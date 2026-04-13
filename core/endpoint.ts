@@ -19,6 +19,8 @@ import { ManageLimitController } from "./controllers/ManageLimitController";
 import { FakeLoginController } from "./controllers/FakeLoginController";
 import { ReportController } from "./controllers/ReportController";
 import { DossierController } from "./controllers/DossierController";
+import { AuthController } from "./controllers/AuthController";
+import { AuthMiddleware } from "./middlewares/AuthMiddleware";
 import dossierroutes from './apis/dossierroutes';
 
 
@@ -31,6 +33,8 @@ const fakeLoginController = getComponent(FakeLoginController);
 const cowrieController = getComponent(CowrieController);
 const reportController = getComponent(ReportController);
 const dossierController = getComponent(DossierController);
+const authController = getComponent(AuthController);
+const authMiddleware = getComponent(AuthMiddleware);
 
 
 const threatLogger = getComponent(ThreatLogger);
@@ -48,8 +52,17 @@ router.use(rateLimitMiddleware.violationTracker());
 router.use(rateLimitMiddleware.ddosProtectionLimiter());
 router.use(rateLimitMiddleware.applicationLimiter());
 
+// Proxy Auth Reale (Pubblico)
+const authRouter = express.Router();
+authRouter.post('/auth/login', (req, res) => authController.login(req, res));
+authRouter.post('/auth/register', (req, res) => authController.register(req, res));
+router.use('/api', authRouter);
+
+// Protezione Globale API (Escluso le trap e l'auth che passano prima in questo file)
+router.use('/api', authMiddleware.isAuthenticated());
+
 // API Dashboards e statistiche
-router.use('/', threatroutes(threatController));
+router.use('/', threatroutes(threatController, authMiddleware));
 
 // API Reports
 router.use('/', reportroutes(reportController));
@@ -58,7 +71,7 @@ router.use('/', reportroutes(reportController));
 router.use('/', ratelimitroutes(rateLimitController));
 
 // API Configurazione
-router.use('/', configroutes(configController));
+router.use('/', configroutes(configController, authMiddleware));
 
 // API Honeypot Telnet (Cowrie)
 import cowrieroutes from './apis/cowrieroutes';

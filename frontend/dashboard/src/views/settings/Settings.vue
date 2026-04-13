@@ -1,5 +1,5 @@
 <template>
-  <div class="settings-container">
+  <div class="settings-container" v-if="authStore.isAdmin">
     <div class="header-top">
       <div class="header-left">
         <button class="back-btn" @click="goBack" :title="t('common.back')">
@@ -171,12 +171,20 @@
       </main>
     </div>
   </div>
+  <div v-else class="settings-container forbidden-view">
+    <div class="error-hud card-glass">
+      <span class="error-icon">🚫</span>
+      <p class="error-text">ACCESSO NEGATO: PERMESSI INSUFFICIENTI</p>
+      <button class="btn btn-hud-action" @click="goBack">TORNA AL CRUSCOTTO</button>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { ref, watch, computed, reactive, onMounted, onBeforeUnmount } from 'vue';
 import { useRouter } from 'vue-router';
 import { useProfileStore } from '../../stores/profiles';
+import { useAuthStore } from '../../stores/auth';
 import { useI18n } from 'vue-i18n';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -197,6 +205,7 @@ L.Icon.Default.mergeOptions({
 
 const router = useRouter();
 const profileStore = useProfileStore();
+const authStore = useAuthStore();
 const { t } = useI18n();
 
 const successMessage = ref('');

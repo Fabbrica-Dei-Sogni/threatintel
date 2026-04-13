@@ -1,5 +1,5 @@
 <template>
-    <div :class="['config-menu', { 'is-inline': inline }]">
+    <div v-if="authStore.isAdmin" :class="['config-menu', { 'is-inline': inline }]">
         <!-- Config Button (hamburger style) -->
         <button class="config-btn" @click="goToConfig" :title="t('nav.configuration')">
             <span class="hamburger-line"></span>
@@ -12,6 +12,7 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
+import { useAuthStore } from '../stores/auth';
 
 const props = defineProps<{
     inline?: boolean
@@ -19,6 +20,7 @@ const props = defineProps<{
 
 const { t } = useI18n();
 const router = useRouter();
+const authStore = useAuthStore();
 
 function goToConfig() {
     router.push('/config');

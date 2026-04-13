@@ -5,8 +5,8 @@
     <DossierRecorder />
     <DossierToggle />
 
-    <!-- Floating Settings Button -->
-    <router-link to="/settings" class="floating-settings"
+    <!-- Floating Settings Button (Solo per Admin) -->
+    <router-link v-if="authStore.isAdmin" to="/settings" class="floating-settings"
       :class="{ 'recorder-active': dossierStore.isEnabled && dossierStore.sections.length > 0 }"
       :title="t('nav.settings')">
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
@@ -18,14 +18,24 @@
       </svg>
     </router-link>
 
-    <!-- Floating Login Button -->
-    <router-link v-if="!isAuthPage" to="/login" class="floating-login" :title="t('auth.login')">
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-        <circle cx="12" cy="7" r="4"></circle>
-      </svg>
-    </router-link>
+    <!-- Floating Login / Logout Button -->
+    <div v-if="!isAuthPage" class="floating-auth-group">
+      <router-link v-if="!authStore.isAuthenticated" to="/login" class="floating-login" :title="t('auth.login')">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+      </router-link>
+      <button v-else @click="authStore.logout()" class="floating-logout" :title="t('common.logout') || 'Logout'">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+          <polyline points="16 17 21 12 16 7"></polyline>
+          <line x1="21" y1="12" x2="9" y2="12"></line>
+        </svg>
+      </button>
+    </div>
 
     <GlobalNavMenu />
   </div>
@@ -39,10 +49,12 @@ import DossierRecorder from './components/DossierRecorder.vue';
 import DossierToggle from './components/DossierToggle.vue';
 import GlobalNavMenu from './components/GlobalNavMenu.vue';
 import { useDossierStore } from './stores/dossier';
+import { useAuthStore } from './stores/auth';
 
 const { t } = useI18n();
 const route = useRoute();
 const dossierStore = useDossierStore();
+const authStore = useAuthStore();
 
 const isAuthPage = computed(() => route.path === '/login' || route.path === '/register');
 
@@ -150,6 +162,42 @@ onMounted(() => {
 }
 
 .floating-login svg {
+  width: 20px;
+  height: 20px;
+  transition: transform 0.3s ease;
+}
+
+.floating-logout {
+  position: fixed;
+  top: 24px;
+  left: 24px;
+  width: 44px;
+  height: 44px;
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+  color: #ff4c4c;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+}
+
+.floating-logout:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: #ff4c4c;
+  color: #1a1a1a;
+  background-color: #ff4c4c;
+  transform: scale(1.1) translateY(2px);
+  box-shadow: 0 12px 40px rgba(255, 76, 76, 0.3), 0 0 20px rgba(255, 76, 76, 0.2);
+}
+
+.floating-logout svg {
   width: 20px;
   height: 20px;
   transition: transform 0.3s ease;

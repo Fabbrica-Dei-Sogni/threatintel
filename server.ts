@@ -1,10 +1,10 @@
 // MUST BE FIRST: reflect-metadata for TSyringe DI
 import "reflect-metadata";
-// Bootstrap DI container (side-effect import)
-import "./core/di/container";
-
 import dotenv from 'dotenv';
 dotenv.config();
+
+// Bootstrap DI container (side-effect import)
+import "./core/di/container";
 
 import { logger } from './logger';
 import express from 'express';
@@ -68,7 +68,7 @@ app.listen(Number(PORT), '0.0.0.0', async () => {
     // Bootstrap dei servizi in background tramite LifecycleManager
     try {
         const lifecycleManager = getComponent(LifecycleManager);
-        
+
         // Registrazione servizi
         lifecycleManager.register(getComponent(SshLogService));
         lifecycleManager.register(getComponent(NginxLogService));

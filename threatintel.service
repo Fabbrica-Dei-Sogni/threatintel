@@ -5,21 +5,22 @@ Wants=network-online.target docker.service
 
 [Service]
 Type=simple
-#User=www-data
 User=amodica
 WorkingDirectory=/home/amodica/workspaces/threatintel
-ExecStartPre=/bin/bash /home/amodica/workspaces/threatintel/redis/check-redis.sh
-ExecStartPre=/bin/bash /home/amodica/workspaces/threatintel/mongodb/check-mongodb.sh
-ExecStart=npm run start
-Restart=always
-RestartSec=5
+Environment=PATH=/home/amodica/.nvm/versions/node/v24.6.0/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 Environment=NODE_ENV=production
+Environment=NODE_OPTIONS=--openssl-legacy-provider
 Environment=PORT=3999
 Environment=MONGO_URI=mongodb://intelagent:intelagent@127.0.0.1:17017/threatinteldb
 Environment=REDIS_HOST=127.0.0.1
 Environment=REDIS_PORT=6379
 Environment=REDIS_PASSWORD=!!!HoneyPotRedis!!!
 Environment=REDIS_DB=0
+ExecStartPre=/bin/bash /home/amodica/workspaces/threatintel/redis/check-redis.sh
+ExecStartPre=/bin/bash /home/amodica/workspaces/threatintel/mongodb/check-mongodb.sh
+ExecStart=npm run start
+Restart=always
+RestartSec=5
 
 [Install]
 WantedBy=multi-user.target

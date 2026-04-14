@@ -102,11 +102,11 @@ authRouter.post('/auth/login', (req, res) => authController.login(req, res));
 authRouter.post('/auth/register', (req, res) => authController.register(req, res));
 router.use('/api', authRouter);
 
+// Integrazione Documentazione Swagger (OpenAPI) - PUBBLICA (Visualizzazione consentita a tutti)
+setupSwagger(router);
+
 // Protezione Globale API (Escluso le trap e l'auth che passano prima in questo file)
 router.use('/api', authMiddleware.isAuthenticated());
-
-// Integrazione Documentazione Swagger (OpenAPI) - PROTETTA
-setupSwagger(router);
 
 // API Dashboards e statistiche
 router.use('/', threatroutes(threatController, authMiddleware));

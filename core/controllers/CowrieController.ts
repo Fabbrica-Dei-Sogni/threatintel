@@ -14,9 +14,9 @@ export class CowrieController {
     ) {}
     
     private getLocale(req: Request): string {
-        return (req.query.locale as string) || 
-               (req.headers['x-locale'] as string) || 
-               (req.headers['accept-language']?.split(',')[0]?.split(';')[0]) || 
+        return (req?.query?.locale as string) || 
+               (req?.headers ? req.headers['x-locale'] as string : undefined) || 
+               (req?.headers ? req.headers['accept-language']?.split(',')[0]?.split(';')[0] : undefined) || 
                'it-IT';
     }
 

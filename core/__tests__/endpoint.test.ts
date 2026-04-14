@@ -36,6 +36,10 @@ jest.mock('../di/container', () => ({
         // Ritorno un oggetto vuoto o una funzione middleware a seconda del caso
         if (token && token.name === 'ThreatLogger') return mockThreatLogger;
         if (token && token.name === 'RateLimitMiddleware') return mockRateLimitMiddleware;
+        if (token && token.name === 'AuthMiddleware') return { 
+            isAuthenticated: jest.fn(() => (req: any, res: any, next: any) => next()),
+            isAuthorized: jest.fn(() => (req: any, res: any, next: any) => next())
+        };
         return (req: any, res: any, next: any) => next(); 
     })
 }));

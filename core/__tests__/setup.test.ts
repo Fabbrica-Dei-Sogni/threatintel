@@ -9,7 +9,10 @@ describe('Jest Setup Verification', () => {
 
     test('should have test environment variables', () => {
         expect(process.env.NODE_ENV).toBe('test');
-        expect(process.env.MONGO_URI).toContain('threatintel_test');
+        // Accetta sia il database fisico di test che quello in memoria (127.0.0.1)
+        const mongoUri = process.env.MONGO_URI || '';
+        const isTestDb = mongoUri.includes('threatintel_test') || mongoUri.includes('127.0.0.1');
+        expect(isTestDb).toBe(true);
         expect(process.env.ABUSEIPDB_KEY).toBeDefined();
     });
 

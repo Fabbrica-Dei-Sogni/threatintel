@@ -48,7 +48,7 @@ export class DossierController {
             const ps = sanitizePageSize(pageSize);
 
             const isAdmin = user.roles?.some((r: any) => r.name === 'admin');
-            const result = await this.dossierService.listDossiers(filters, p, ps, user.username, isAdmin);
+            const result = await this.dossierService.listDossiers(filters, p, ps);
             
             return res.status(200).json(result);
         } catch (error: any) {
@@ -65,11 +65,9 @@ export class DossierController {
         try {
             const id = req.params.id as string;
             const user = (req as any).user;
-            const isAdmin = user.roles?.some((r: any) => r.name === 'admin');
-
-            const dossier = await this.dossierService.getDossierById(id, user.username, isAdmin);
+            const dossier = await this.dossierService.getDossierById(id);
             if (!dossier) {
-                return res.status(404).json({ error: 'Dossier not found or access denied' });
+                return res.status(404).json({ error: 'Dossier not found' });
             }
             return res.status(200).json(dossier);
         } catch (error: any) {
@@ -89,10 +87,13 @@ export class DossierController {
             const id = req.params.id as string;
             const dossier = await this.dossierService.updateDossier(id, req.body, user.username, isAdmin);
             if (!dossier) {
-                return res.status(404).json({ error: 'Dossier not found or access denied' });
+                return res.status(404).json({ error: 'Dossier not found' });
             }
             return res.status(200).json(dossier);
         } catch (error: any) {
+            if (error.message === 'FORBIDDEN') {
+                return res.status(403).json({ error: 'Non hai i permessi per modificare questo dossier' });
+            }
             console.error('[DossierController] update error:', error);
             return res.status(500).json({ error: 'Operazione non riuscita' });
         }
@@ -109,10 +110,13 @@ export class DossierController {
             const id = req.params.id as string;
             const success = await this.dossierService.deleteDossier(id, user.username, isAdmin);
             if (!success) {
-                return res.status(404).json({ error: 'Dossier not found or access denied' });
+                return res.status(404).json({ error: 'Dossier not found' });
             }
             return res.status(204).send();
         } catch (error: any) {
+            if (error.message === 'FORBIDDEN') {
+                return res.status(403).json({ error: 'Non hai i permessi per eliminare questo dossier' });
+            }
             console.error('[DossierController] delete error:', error);
             return res.status(500).json({ error: 'Operazione non riuscita' });
         }
@@ -126,14 +130,12 @@ export class DossierController {
         try {
             const id = req.params.id as string;
             const { format, style, locale } = req.query;
-            const user = (req as any).user;
-            const isAdmin = user.roles?.some((r: any) => r.name === 'admin');
 
             const resFormat = (format as 'html' | 'pdf') || 'pdf';
             const resStyle = (style as 'hud' | 'classic' | 'telex') || 'classic';
             const resLocale = (locale as string) || 'it-IT';
 
-            const result = await this.dossierService.generatePdfFromDossier(id, resFormat, resStyle, resLocale, user.username, isAdmin);
+            const result = await this.dossierService.generatePdfFromDossier(id, resFormat, resStyle, resLocale);
 
             if (resFormat === 'html') {
                 res.setHeader('Content-Type', 'text/html');

@@ -40,35 +40,20 @@ export class DossierService {
     /**
      * Recupera un dossier per ID, verificando la proprietà.
      */
-    async getDossierById(id: string, owner: string, isAdmin: boolean = false): Promise<IDossier | null> {
-        const dossier = await Dossier.findById(id);
-        if (!dossier) return null;
-        
-        // Verifica IDOR: solo il proprietario o un admin può vedere il dossier
-        if (!isAdmin && dossier.owner !== owner) {
-            this.logger.warn(`[DossierService] Tentativo di accesso non autorizzato al dossier ${id} da parte di ${owner}`);
-            return null;
-        }
-        
-        return dossier;
+    async getDossierById(id: string): Promise<IDossier | null> {
+        return await Dossier.findById(id);
     }
 
     /**
      * Elenca i dossier con filtri e paginazione, limitando la visibilità all'owner (se non admin).
      */
-    async listDossiers(filters: any = {}, page: any = 1, pageSize: any = 20, owner: string, isAdmin: boolean = false) {
+    async listDossiers(filters: any = {}, page: any = 1, pageSize: any = 20) {
         const safePage = sanitizePage(page);
         const safePageSize = sanitizePageSize(pageSize);
         const query: any = {};
 
         if (filters.status) query.status = filters.status;
-        
-        // Isolamento IDOR: Se non è admin, vede solo i propri dossier
-        if (isAdmin) {
-            if (filters.owner) query.owner = filters.owner;
-        } else {
-            query.owner = owner;
-        }
+        if (filters.owner) query.owner = filters.owner;
         if (filters.tags) query.tags = { $in: Array.isArray(filters.tags) ? filters.tags : [filters.tags] };
         if (filters.ip) query['sections.data.ip'] = filters.ip;
 
@@ -93,8 +78,14 @@ export class DossierService {
      * Aggiorna un dossier esistente, verificando la proprietà.
      */
     async updateDossier(id: string, dto: UpdateDossierDTO, owner: string, isAdmin: boolean = false): Promise<IDossier | null> {
-        const dossier = await this.getDossierById(id, owner, isAdmin);
+        const dossier = await Dossier.findById(id);
         if (!dossier) return null;
+
+        // Verifica permessi: solo owner o admin possono modificare
+        if (!isAdmin && dossier.owner !== owner) {
+            this.logger.warn(`[DossierService] Tentativo di modifica non autorizzata del dossier ${id} da parte di ${owner}`);
+            throw new Error('FORBIDDEN');
+        }
 
         const updateData: any = { ...dto };
         // L'owner non può essere cambiato tramite update
@@ -115,8 +106,14 @@ export class DossierService {
      * Elimina un dossier, verificando la proprietà.
      */
     async deleteDossier(id: string, owner: string, isAdmin: boolean = false): Promise<boolean> {
-        const dossier = await this.getDossierById(id, owner, isAdmin);
+        const dossier = await Dossier.findById(id);
         if (!dossier) return false;
+
+        // Verifica permessi: solo owner o admin possono cancellare
+        if (!isAdmin && dossier.owner !== owner) {
+            this.logger.warn(`[DossierService] Tentativo di cancellazione non autorizzata del dossier ${id} da parte di ${owner}`);
+            throw new Error('FORBIDDEN');
+        }
 
         const result = await Dossier.findByIdAndDelete(id);
         return !!result;
@@ -125,11 +122,11 @@ export class DossierService {
     /**
      * Genera un report (PDF o HTML) partendo da un dossier persistente, verificando la proprietà.
      */
-    async generatePdfFromDossier(id: string, format: 'html' | 'pdf' = 'pdf', style: 'hud' | 'classic' | 'telex' = 'classic', locale: string, owner: string, isAdmin: boolean = false): Promise<Buffer | string> {
-        const dossier = await this.getDossierById(id, owner, isAdmin);
-        if (!dossier) throw new Error('Dossier not found or access denied');
+    async generatePdfFromDossier(id: string, format: 'html' | 'pdf' = 'pdf', style: 'hud' | 'classic' | 'telex' = 'classic', locale: string): Promise<Buffer | string> {
+        const dossier = await Dossier.findById(id);
+        if (!dossier) throw new Error('Dossier not found');
 
-        this.logger.info(`[DossierService] Generazione report per dossier salvato: ${id} da parte di: ${owner} [${style}/${format}]`);
+        this.logger.info(`[DossierService] Generazione report per dossier salvato: ${id} [${style}/${format}]`);
 
         // Prepariamo le sezioni mappandole sul formato atteso dai generatori del ReportService
         const sections: IDossierSection[] = dossier.sections.map(s => ({

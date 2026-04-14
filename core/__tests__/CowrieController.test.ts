@@ -36,6 +36,13 @@ describe('CowrieController', () => {
 
         responseJson = jest.fn();
         responseStatus = jest.fn().mockReturnValue({ json: responseJson });
+        
+        mockRequest = {
+            query: {},
+            headers: {},
+            params: {}
+        };
+
         mockResponse = {
             status: responseStatus
         };
@@ -43,13 +50,11 @@ describe('CowrieController', () => {
 
     describe('getSessions()', () => {
         it('should return 200 and sessions data', async () => {
-            mockRequest = {
-                query: {
-                    page: '1',
-                    pageSize: '20',
-                    sort: JSON.stringify({ eventCount: -1 }),
-                    filters: JSON.stringify({ src_ip: '10.0.0.1' })
-                }
+            mockRequest.query = {
+                page: '1',
+                pageSize: '20',
+                sort: JSON.stringify({ eventCount: -1 }),
+                filters: JSON.stringify({ src_ip: '10.0.0.1' })
             };
 
             const mockSessions = [{ session: 'abc', eventCount: 5 }];
@@ -69,11 +74,9 @@ describe('CowrieController', () => {
         });
 
         it('should handle invalid JSON in query params gracefully', async () => {
-            mockRequest = {
-                query: {
-                    sort: 'invalid-json',
-                    filters: 'invalid-json'
-                }
+            mockRequest.query = {
+                sort: 'invalid-json',
+                filters: 'invalid-json'
             };
 
             mockCowrieService.getSessions.mockResolvedValue({ sessions: [], totalCount: 0 });
@@ -86,20 +89,20 @@ describe('CowrieController', () => {
         });
 
         it('should return 500 if service throws error', async () => {
-            mockRequest = { query: {} };
+            mockRequest.query = {};
             mockCowrieService.getSessions.mockRejectedValue(new Error('DB Error'));
 
             await cowrieController.getSessions(mockRequest as Request, mockResponse as Response);
 
             expect(responseStatus).toHaveBeenCalledWith(500);
-            expect(responseJson).toHaveBeenCalledWith({ error: 'Failed to fetch telnet sessions.' });
+            expect(responseJson).toHaveBeenCalledWith({ error: 'errors.system.fetchError' });
             expect(mockLogger.error).toHaveBeenCalled();
         });
     });
 
     describe('getSessionDetails()', () => {
         it('should return 200 and session details', async () => {
-            mockRequest = { params: { id: 'abc' } };
+            mockRequest.params = { id: 'abc' };
             const mockSession = { session: 'abc' };
             mockCowrieService.getSessionDetails.mockResolvedValue(mockSession as any);
 
@@ -110,7 +113,7 @@ describe('CowrieController', () => {
         });
 
         it('should return 404 if session not found', async () => {
-            mockRequest = { params: { id: 'not-found' } };
+            mockRequest.params = { id: 'not-found' };
             mockCowrieService.getSessionDetails.mockResolvedValue(null);
 
             await cowrieController.getSessionDetails(mockRequest as Request, mockResponse as Response);
@@ -121,7 +124,7 @@ describe('CowrieController', () => {
 
     describe('getSessionEvents()', () => {
         it('should return 200 and events', async () => {
-            mockRequest = { params: { id: 'abc' } };
+            mockRequest.params = { id: 'abc' };
             const mockEvents = [{ eventid: 'login' }];
             mockCowrieService.getSessionEvents.mockResolvedValue(mockEvents as any);
 

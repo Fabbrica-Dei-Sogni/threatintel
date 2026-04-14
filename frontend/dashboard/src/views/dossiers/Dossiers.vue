@@ -78,7 +78,7 @@
           <button @click="exportDossierPdf(dossier._id)" class="btn-archive">
             📄 PDF
           </button>
-          <button @click="confirmDelete(dossier._id)" class="btn-archive delete">
+          <button v-if="canDeleteDossier(dossier)" @click="confirmDelete(dossier._id)" class="btn-archive delete" :title="t('common.delete')">
             🗑️
           </button>
         </div>
@@ -108,12 +108,14 @@ import { deleteDossier, exportDossier } from '../../api';
 import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
 import { ElMessageBox, ElMessage } from 'element-plus';
 import { useDossierStore } from '../../stores/dossier';
+import { useAuthStore } from '../../stores/auth';
 import { useDossiersFilter } from '../../composable/useDossiersFilter';
 import dayjs from 'dayjs';
 
 const { t } = useI18n();
 const router = useRouter();
 const dossierStore = useDossierStore();
+const authStore = useAuthStore();
 
 const props = defineProps({
   initialSearch: { type: String, default: '' },
@@ -185,6 +187,11 @@ const handleSortChange = (e) => {
 
 const changePage = (p) => {
   page.value = p;
+};
+
+const canDeleteDossier = (dossier) => {
+  if (!authStore.user) return false;
+  return authStore.isAdmin || dossier.owner === authStore.user.username;
 };
 
 const viewDetail = (id) => {

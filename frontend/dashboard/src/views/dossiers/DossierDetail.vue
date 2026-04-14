@@ -9,9 +9,9 @@
     <div class="archive-header" style="flex-wrap: wrap; gap: 15px;">
       <div class="title-with-back">
         <button @click="goBack" class="back-btn" :disabled="isSaving">{{ t('common.back').toUpperCase() }}</button>
-        <button v-if="dossier && !isEditing" @click="startEdit" class="back-btn edit-btn">✎ {{
+        <button v-if="dossier && !isEditing && canModify" @click="startEdit" class="back-btn edit-btn">✎ {{
           t('common.edit').toUpperCase() }}</button>
-        <template v-if="dossier && isEditing">
+        <template v-if="dossier && isEditing && canModify">
           <button @click="saveEdit" class="back-btn save-btn" :disabled="isSaving">✓ {{ t('common.save').toUpperCase()
           }}</button>
           <button @click="handleAddHumanSection" class="back-btn add-btn" style="margin-left: 10px;">+ {{
@@ -49,7 +49,7 @@
         <div class="sections-timeline">
           <!-- New Section Button at the TOP -->
           <div class="add-section-action top-action"
-            v-if="!isSaving && dossier && !isEditing && editingSectionIndex === -1">
+            v-if="!isSaving && dossier && !isEditing && editingSectionIndex === -1 && canModify">
             <button @click="handleAddHumanSection" class="back-btn add-btn-full">
               + {{ t('common.add').toUpperCase() }}
             </button>
@@ -65,9 +65,9 @@
               <div style="display: flex; align-items: center; gap: 10px;">
                 <span class="timestamp">{{ formatDate(section.timestamp) }}</span>
                 <template v-if="editingSectionIndex !== index">
-                  <button @click="startEditSection(index, section)" class="action-icon-btn"
+                  <button v-if="canModify" @click="startEditSection(index, section)" class="action-icon-btn"
                     title="Modifica Sezione">✎</button>
-                  <button @click="handleDeleteSection(index)" class="action-icon-btn danger-text"
+                  <button v-if="canModify" @click="handleDeleteSection(index)" class="action-icon-btn danger-text"
                     title="Elimina Sezione">🗑</button>
                 </template>
                 <template v-else>
@@ -91,7 +91,7 @@
                     <div class="obs-card">
                       <div class="obs-header-tags">
                         <span class="obs-label">OSS-{{ obsIdx + 1 }} / {{ t('reports.common.analystNote').toUpperCase() }}</span>
-                        <div class="obs-actions" v-if="!isSaving">
+                        <div class="obs-actions" v-if="!isSaving && canModify">
                           <button @click="startEditObs(index, obsIdx, obs)" class="mini-icon-btn">✎</button>
                           <button @click="handleRemoveObs(index, obsIdx)" class="mini-icon-btn danger">🗑</button>
                         </div>
@@ -110,7 +110,7 @@
                   </div>
                   
                   <!-- Add Observation Quick Input -->
-                  <div class="add-obs-box" v-if="!isSaving && editingSectionIndex === -1">
+                  <div class="add-obs-box" v-if="!isSaving && editingSectionIndex === -1 && canModify">
                     <div class="obs-input-wrapper">
                       <input 
                         v-model="newObsBuffers[index]" 
@@ -181,7 +181,8 @@ const {
   deleteSection,
   addObservation,
   updateObservation,
-  deleteObservation
+  deleteObservation,
+  canModify
 } = useDossierDetail();
 
 const showRaw = ref(false);

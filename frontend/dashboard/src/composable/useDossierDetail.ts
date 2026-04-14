@@ -1,7 +1,8 @@
 // useDossierDetail.ts
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { DossierSectionType, type IDossier, type IDossierSection } from '../models/DossierDTO';
 import { useDossierStore } from '../stores/dossier';
+import { useAuthStore } from '../stores/auth';
 import { fetchDossierById, updateDossier } from '../api';
 
 export function useDossierDetail() {
@@ -11,6 +12,15 @@ export function useDossierDetail() {
     const isSaving = ref(false);
     
     const dossierStore = useDossierStore();
+    const authStore = useAuthStore();
+
+    /**
+     * Verifica se l'utente corrente può modificare il dossier
+     */
+    const canModify = computed(() => {
+        if (!dossier.value || !authStore.user) return false;
+        return authStore.isAdmin || dossier.value.owner === authStore.user.username;
+    });
 
     /**
      * Helper per ordinare le sezioni: human prima, poi il resto (per timestamp desc)
@@ -202,6 +212,7 @@ export function useDossierDetail() {
         deleteSection,
         addObservation,
         updateObservation,
-        deleteObservation
+        deleteObservation,
+        canModify
     };
 }

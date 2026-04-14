@@ -122,6 +122,7 @@ export interface IDossier {
   _id: string;
   title: string;
   description?: string;
+  owner?: string;
   sections: IDossierSection[];
   status: string;
   tags?: string[];

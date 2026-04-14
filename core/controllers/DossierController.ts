@@ -17,14 +17,18 @@ export class DossierController {
      */
     async create(req: Request, res: Response) {
         try {
+            const user = (req as any).user;
             const dto: CreateDossierDTO = req.body;
+            
             if (!dto.title || !dto.sections) {
                 return res.status(400).json({ error: 'Title and sections are required' });
             }
-            const dossier = await this.dossierService.createDossier(dto);
+
+            // Forza l'owner con l'utente autenticato (IDOR Protection)
+            const dossier = await this.dossierService.createDossier(dto, user.username);
             return res.status(201).json(dossier);
         } catch (error: any) {
-            console.error('[DossierController] <NomeMetodo> error:', error);
+            console.error('[DossierController] create error:', error);
             return res.status(500).json({ error: 'Operazione non riuscita' });
         }
     }
@@ -35,12 +39,17 @@ export class DossierController {
      */
     async list(req: Request, res: Response) {
         try {
-            const { status, owner, tags, ip, search, page, pageSize } = req.query;
-            const filters = { status, owner, tags, ip, search };
+            const user = (req as any).user;
+            const { status, tags, ip, search, page, pageSize } = req.query;
+            
+            // L'owner viene gestito internamente dal service basandosi sull'identità e i ruoli
+            const filters = { status, tags, ip, search };
             const p = sanitizePage(page);
             const ps = sanitizePageSize(pageSize);
 
-            const result = await this.dossierService.listDossiers(filters, p, ps);
+            const isAdmin = user.roles?.some((r: any) => r.name === 'admin');
+            const result = await this.dossierService.listDossiers(filters, p, ps, user.username, isAdmin);
+            
             return res.status(200).json(result);
         } catch (error: any) {
             console.error('[DossierController] list error:', error);
@@ -55,13 +64,16 @@ export class DossierController {
     async getById(req: Request, res: Response) {
         try {
             const { id } = req.params;
-            const dossier = await this.dossierService.getDossierById(id);
+            const user = (req as any).user;
+            const isAdmin = user.roles?.some((r: any) => r.name === 'admin');
+
+            const dossier = await this.dossierService.getDossierById(id, user.username, isAdmin);
             if (!dossier) {
-                return res.status(404).json({ error: 'Dossier not found' });
+                return res.status(404).json({ error: 'Dossier not found or access denied' });
             }
             return res.status(200).json(dossier);
         } catch (error: any) {
-            console.error('[DossierController] <NomeMetodo> error:', error);
+            console.error('[DossierController] getById error:', error);
             return res.status(500).json({ error: 'Operazione non riuscita' });
         }
     }
@@ -73,14 +85,17 @@ export class DossierController {
     async update(req: Request, res: Response) {
         try {
             const { id } = req.params;
+            const user = (req as any).user;
+            const isAdmin = user.roles?.some((r: any) => r.name === 'admin');
             const dto: UpdateDossierDTO = req.body;
-            const dossier = await this.dossierService.updateDossier(id, dto);
+
+            const dossier = await this.dossierService.updateDossier(id, dto, user.username, isAdmin);
             if (!dossier) {
-                return res.status(404).json({ error: 'Dossier not found' });
+                return res.status(404).json({ error: 'Dossier not found or access denied' });
             }
             return res.status(200).json(dossier);
         } catch (error: any) {
-            console.error('[DossierController] <NomeMetodo> error:', error);
+            console.error('[DossierController] update error:', error);
             return res.status(500).json({ error: 'Operazione non riuscita' });
         }
     }
@@ -92,13 +107,16 @@ export class DossierController {
     async delete(req: Request, res: Response) {
         try {
             const { id } = req.params;
-            const success = await this.dossierService.deleteDossier(id);
+            const user = (req as any).user;
+            const isAdmin = user.roles?.some((r: any) => r.name === 'admin');
+
+            const success = await this.dossierService.deleteDossier(id, user.username, isAdmin);
             if (!success) {
-                return res.status(404).json({ error: 'Dossier not found' });
+                return res.status(404).json({ error: 'Dossier not found or access denied' });
             }
             return res.status(204).send();
         } catch (error: any) {
-            console.error('[DossierController] <NomeMetodo> error:', error);
+            console.error('[DossierController] delete error:', error);
             return res.status(500).json({ error: 'Operazione non riuscita' });
         }
     }
@@ -111,12 +129,14 @@ export class DossierController {
         try {
             const { id } = req.params;
             const { format, style, locale } = req.query;
+            const user = (req as any).user;
+            const isAdmin = user.roles?.some((r: any) => r.name === 'admin');
 
             const resFormat = (format as 'html' | 'pdf') || 'pdf';
             const resStyle = (style as 'hud' | 'classic' | 'telex') || 'classic';
             const resLocale = (locale as string) || 'it-IT';
 
-            const result = await this.dossierService.generatePdfFromDossier(id, resFormat, resStyle, resLocale);
+            const result = await this.dossierService.generatePdfFromDossier(id, resFormat, resStyle, resLocale, user.username, isAdmin);
 
             if (resFormat === 'html') {
                 res.setHeader('Content-Type', 'text/html');
@@ -129,7 +149,7 @@ export class DossierController {
                 return res.send(pdfBuffer);
             }
         } catch (error: any) {
-            console.error('[DossierController] <NomeMetodo> error:', error);
+            console.error('[DossierController] export error:', error);
             return res.status(500).json({ error: 'Operazione non riuscita' });
         }
     }

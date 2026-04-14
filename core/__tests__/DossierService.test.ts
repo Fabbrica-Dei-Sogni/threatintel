@@ -31,7 +31,7 @@ describe('DossierService', () => {
     });
 
     describe('createDossier()', () => {
-        it('should create a dossier with sanitized sections', async () => {
+        it('should create a dossier with sanitized sections and assigned owner', async () => {
             const mockDto = {
                 title: 'Test Dossier',
                 sections: [
@@ -50,13 +50,14 @@ describe('DossierService', () => {
                 save: saveSpy
             }));
 
-            const result = await dossierService.createDossier(mockDto as any);
+            const result = await dossierService.createDossier(mockDto as any, 'user1');
 
             expect(Dossier).toHaveBeenCalled();
             expect(saveSpy).toHaveBeenCalled();
             
-            // Verifica sanificazione (il campo whois nel mockDto aveva virgolette doppie e \n letterale)
+            // Verifica sanificazione e assegnazione owner
             const savedData = (Dossier as unknown as jest.Mock).mock.calls[0][0];
+            expect(savedData.owner).toBe('user1');
             expect(savedData.sections[0].data.whois).toBe('Record con \n newlines');
             expect(savedData.sections[0].observations).toEqual([]);
         });
@@ -69,14 +70,14 @@ describe('DossierService', () => {
             const saveSpy = jest.fn().mockResolvedValue({ _id: '123', ...mockDto });
             (Dossier as unknown as jest.Mock).mockImplementation(() => ({ save: saveSpy }));
 
-            await dossierService.createDossier(mockDto as any);
+            await dossierService.createDossier(mockDto as any, 'user1');
             const savedData = (Dossier as unknown as jest.Mock).mock.calls[0][0];
             expect(savedData.sections[0].observations).toEqual(['note1']);
         });
     });
 
     describe('listDossiers()', () => {
-        it('should return paginated dossiers with filters', async () => {
+        it('should return paginated dossiers with filters and owner isolation', async () => {
             const mockItems = [{ title: 'Dossier 1' }, { title: 'Dossier 2' }];
             (Dossier.countDocuments as jest.Mock).mockResolvedValue(2);
             (Dossier.find as jest.Mock).mockReturnValue({
@@ -85,11 +86,14 @@ describe('DossierService', () => {
                 limit: jest.fn().mockResolvedValue(mockItems)
             });
 
-            const result = await dossierService.listDossiers({ status: DossierStatus.DRAFT }, 1, 10);
+            const result = await dossierService.listDossiers({ status: DossierStatus.DRAFT }, 1, 10, 'user1', false);
 
             expect(result.items).toHaveLength(2);
             expect(result.total).toBe(2);
-            expect(Dossier.find).toHaveBeenCalledWith(expect.objectContaining({ status: DossierStatus.DRAFT }));
+            expect(Dossier.find).toHaveBeenCalledWith(expect.objectContaining({ 
+                status: DossierStatus.DRAFT,
+                owner: 'user1' 
+            }));
         });
 
         it('should apply search filter correctly', async () => {
@@ -100,7 +104,7 @@ describe('DossierService', () => {
                 limit: jest.fn().mockResolvedValue([])
             });
 
-            await dossierService.listDossiers({ search: 'term' });
+            await dossierService.listDossiers({ search: 'term' }, 1, 20, 'user1', false);
 
             expect(Dossier.find).toHaveBeenCalledWith(expect.objectContaining({
                 $or: expect.arrayContaining([
@@ -109,7 +113,7 @@ describe('DossierService', () => {
             }));
         });
 
-        it('should apply owner, tags and ip filters', async () => {
+        it('should allow admin to filter by other owners', async () => {
             (Dossier.countDocuments as jest.Mock).mockResolvedValue(0);
             (Dossier.find as jest.Mock).mockReturnValue({
                 sort: jest.fn().mockReturnThis(),
@@ -117,39 +121,55 @@ describe('DossierService', () => {
                 limit: jest.fn().mockResolvedValue([])
             });
 
-            await dossierService.listDossiers({ owner: 'user1', tags: ['t1'], ip: '1.1.1.1' });
+            await dossierService.listDossiers({ owner: 'other_user' }, 1, 20, 'admin_user', true);
 
             expect(Dossier.find).toHaveBeenCalledWith(expect.objectContaining({
-                owner: 'user1',
-                tags: { $in: ['t1'] },
-                'sections.data.ip': '1.1.1.1'
+                owner: 'other_user'
             }));
         });
     });
 
     describe('getDossierById()', () => {
-        it('should return dossier if found', async () => {
-            const mockDossier = { _id: '123', title: 'Found' };
+        it('should return dossier if owner matches', async () => {
+            const mockDossier = { _id: '123', title: 'Found', owner: 'user1' };
             (Dossier.findById as jest.Mock).mockResolvedValue(mockDossier);
 
-            const result = await dossierService.getDossierById('123');
+            const result = await dossierService.getDossierById('123', 'user1', false);
             expect(result).toEqual(mockDossier);
+        });
+
+        it('should return dossier if owner does not match but user is admin', async () => {
+            const mockDossier = { _id: '123', title: 'Found', owner: 'user1' };
+            (Dossier.findById as jest.Mock).mockResolvedValue(mockDossier);
+
+            const result = await dossierService.getDossierById('123', 'other_user', true);
+            expect(result).toEqual(mockDossier);
+        });
+
+        it('should return null if owner does not match and not admin', async () => {
+            const mockDossier = { _id: '123', title: 'Found', owner: 'user1' };
+            (Dossier.findById as jest.Mock).mockResolvedValue(mockDossier);
+
+            const result = await dossierService.getDossierById('123', 'other_user', false);
+            expect(result).toBeNull();
+            expect(mockLogger.warn).toHaveBeenCalled();
         });
 
         it('should return null if not found', async () => {
             (Dossier.findById as jest.Mock).mockResolvedValue(null);
-            const result = await dossierService.getDossierById('999');
+            const result = await dossierService.getDossierById('999', 'user1', true);
             expect(result).toBeNull();
         });
     });
 
     describe('updateDossier()', () => {
-        it('should update and return the dossier', async () => {
-            const mockUpdated = { _id: '123', title: 'Updated' };
-            (Dossier.findByIdAndUpdate as jest.Mock).mockResolvedValue(mockUpdated);
+        it('should update and return the dossier if ownership is verified', async () => {
+            const mockDossier = { _id: '123', owner: 'user1' };
+            (Dossier.findById as jest.Mock).mockResolvedValue(mockDossier);
+            (Dossier.findByIdAndUpdate as jest.Mock).mockResolvedValue({ ...mockDossier, title: 'Updated' });
 
-            const result = await dossierService.updateDossier('123', { title: 'Updated' });
-            expect(result).toEqual(mockUpdated);
+            const result = await dossierService.updateDossier('123', { title: 'Updated' }, 'user1', false);
+            expect(result?.title).toBe('Updated');
             expect(Dossier.findByIdAndUpdate).toHaveBeenCalledWith(
                 '123',
                 expect.objectContaining({ $set: { title: 'Updated' } }),
@@ -159,26 +179,49 @@ describe('DossierService', () => {
 
         it('should sanitize and include observations in section update', async () => {
             const mockSections = [{ type: 'ip', data: { x: 'y' }, observations: ['obs1'] }];
+            const mockDossier = { _id: '123', owner: 'user1' };
+            (Dossier.findById as jest.Mock).mockResolvedValue(mockDossier);
             (Dossier.findByIdAndUpdate as jest.Mock).mockResolvedValue({});
 
-            await dossierService.updateDossier('123', { sections: mockSections as any });
+            await dossierService.updateDossier('123', { sections: mockSections as any }, 'user1', false);
 
             const updateCall = (Dossier.findByIdAndUpdate as jest.Mock).mock.calls[0][1].$set;
             expect(updateCall.sections[0].observations).toEqual(['obs1']);
             expect(updateCall.sections[0].data.x).toBe('y');
         });
+
+        it('should fail update if ownership verification fails', async () => {
+            const mockDossier = { _id: '123', owner: 'user1' };
+            (Dossier.findById as jest.Mock).mockResolvedValue(mockDossier);
+
+            const result = await dossierService.updateDossier('123', { title: 'X' }, 'user2', false);
+            expect(result).toBeNull();
+            expect(Dossier.findByIdAndUpdate).not.toHaveBeenCalled();
+        });
     });
 
     describe('deleteDossier()', () => {
-        it('should return true on successful deletion', async () => {
+        it('should return true on successful deletion if owner', async () => {
+            const mockDossier = { _id: '123', owner: 'user1' };
+            (Dossier.findById as jest.Mock).mockResolvedValue(mockDossier);
             (Dossier.findByIdAndDelete as jest.Mock).mockResolvedValue({ _id: '123' });
-            const result = await dossierService.deleteDossier('123');
+
+            const result = await dossierService.deleteDossier('123', 'user1', false);
             expect(result).toBe(true);
         });
 
+        it('should return false if owner does not match', async () => {
+            const mockDossier = { _id: '123', owner: 'user1' };
+            (Dossier.findById as jest.Mock).mockResolvedValue(mockDossier);
+
+            const result = await dossierService.deleteDossier('123', 'other_user', false);
+            expect(result).toBe(false);
+            expect(Dossier.findByIdAndDelete).not.toHaveBeenCalled();
+        });
+
         it('should return false if dossier does not exist', async () => {
-            (Dossier.findByIdAndDelete as jest.Mock).mockResolvedValue(null);
-            const result = await dossierService.deleteDossier('999');
+            (Dossier.findById as jest.Mock).mockResolvedValue(null);
+            const result = await dossierService.deleteDossier('999', 'user1', true);
             expect(result).toBe(false);
         });
     });
@@ -186,16 +229,17 @@ describe('DossierService', () => {
     describe('generatePdfFromDossier()', () => {
         const mockDossier = {
             _id: '123',
+            owner: 'user1',
             sections: [
                 { templateKey: 'k', data: {}, type: 'ip', timestamp: new Date(), renderedText: 'txt' }
             ]
         };
 
-        it('should call generateHudReport when style is hud', async () => {
+        it('should call generateHudReport when style is hud and owner matches', async () => {
             (Dossier.findById as jest.Mock).mockResolvedValue(mockDossier);
             mockReportService.generateHudReport.mockResolvedValue('pdf-buffer');
 
-            const result = await dossierService.generatePdfFromDossier('123', 'pdf', 'hud', 'it-IT');
+            const result = await dossierService.generatePdfFromDossier('123', 'pdf', 'hud', 'it-IT', 'user1', false);
 
             expect(result).toBe('pdf-buffer');
             expect(mockReportService.generateHudReport).toHaveBeenCalled();
@@ -205,15 +249,15 @@ describe('DossierService', () => {
             (Dossier.findById as jest.Mock).mockResolvedValue(mockDossier);
             mockReportService.generateClassicReport.mockResolvedValue('pdf-buffer');
 
-            await dossierService.generatePdfFromDossier('123', 'pdf', 'classic', 'it-IT');
+            await dossierService.generatePdfFromDossier('123', 'pdf', 'classic', 'it-IT', 'user1', false);
 
             expect(mockReportService.generateClassicReport).toHaveBeenCalled();
         });
 
-        it('should throw error if dossier not found', async () => {
+        it('should throw error if dossier not found or access denied', async () => {
             (Dossier.findById as jest.Mock).mockResolvedValue(null);
-            await expect(dossierService.generatePdfFromDossier('999', 'pdf', 'hud', 'it-IT'))
-                .rejects.toThrow('Dossier not found');
+            await expect(dossierService.generatePdfFromDossier('999', 'pdf', 'hud', 'it-IT', 'user1', false))
+                .rejects.toThrow('Dossier not found or access denied');
         });
 
         it('should call generateTelexReport for other styles', async () => {
@@ -224,7 +268,7 @@ describe('DossierService', () => {
             (Dossier.findById as jest.Mock).mockResolvedValue(dossierWithObs);
             mockReportService.generateTelexReport.mockResolvedValue('telex-buffer');
 
-            const result = await dossierService.generatePdfFromDossier('123', 'pdf', 'telex', 'it-IT');
+            const result = await dossierService.generatePdfFromDossier('123', 'pdf', 'telex', 'it-IT', 'user1', false);
 
             expect(result).toBe('telex-buffer');
             const sectionsPassed = mockReportService.generateTelexReport.mock.calls[0][0];

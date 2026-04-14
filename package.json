@@ -17,7 +17,7 @@
         "clear-redis": "redis-cli flushdb"
     },
     "dependencies": {
-        "axios": "^1.11.0",
+        "axios": ">=1.15.0",
         "cors": "^2.8.5",
         "dotenv": "^17.2.1",
         "ejs": "^5.0.1",

@@ -1,18 +1,13 @@
-import { spawn } from 'child_process';
 import { inject, singleton } from 'tsyringe';
 import { LOGGER_TOKEN } from '../di/tokens';
 import { Logger } from 'winston';
 import { ThreatLogService } from './ThreatLogService';
 import PatternAnalysisService from './PatternAnalysisService';
-import crypto from 'crypto';
-import dotenv from 'dotenv';
-import { SanitizationUtils } from '../utils/SanitizationUtils';
-dotenv.config();
+import { AppConfigProvider } from './AppConfigProvider';
+import { BaseJournalWatcher } from './BaseJournalWatcher';
+import { ProtocolType, LogHeaderKey } from '../types/CoreConstants';
+import { ThreatLogFactory } from '../utils/ThreatLogFactory';
 
-/**
- * Lista di pattern di URI sospetti da monitorare sul traffico HTTPS.
- * Viene popolata con i COMMON_ENDPOINTS del .env, ma può essere estesa.
- */
 const DEFAULT_SUSPICIOUS_PATTERNS = [
     /^\/(admin|wp-admin|phpmyadmin|manager|console|panel|control|dashboard)/i,
     /\.(env|git|config|bak|sql|zip|tar|gz|log|backup)(\?.*)?$/i,
@@ -24,139 +19,50 @@ const DEFAULT_SUSPICIOUS_PATTERNS = [
     /(<script|javascript:|onerror=|onload=)/i,                // XSS
 ];
 
-import { ILongRunningService, ServiceStatus } from '../types/lifecycle';
-import { ThreatIndicator } from '../types/indicators';
-import { log } from 'console';
-
 @singleton()
-export class NginxLogService implements ILongRunningService {
+export class NginxLogService extends BaseJournalWatcher {
     public readonly serviceName = 'NginxLogService';
-    private status: ServiceStatus = ServiceStatus.IDLE;
-    private journalProcess: any = null;
-    private suspiciousPatterns: RegExp[];
+    private suspiciousPatterns: RegExp[] = [];
 
     constructor(
-        @inject(LOGGER_TOKEN) private readonly logger: Logger,
+        @inject(LOGGER_TOKEN) logger: Logger,
         private readonly threatLogService: ThreatLogService,
-        private readonly patternAnalysisService: PatternAnalysisService
+        private readonly patternAnalysisService: PatternAnalysisService,
+        private readonly configProvider: AppConfigProvider,
+        private readonly threatLogFactory: ThreatLogFactory
     ) {
-        this.suspiciousPatterns = this.buildSuspiciousPatterns();
+        super(logger);
+        this.suspiciousPatterns = [...DEFAULT_SUSPICIOUS_PATTERNS];
     }
 
-    /**
-     * Combina i pattern di default con i COMMON_ENDPOINTS definiti nel .env
-     */
-    private buildSuspiciousPatterns(): RegExp[] {
-        const patterns = [...DEFAULT_SUSPICIOUS_PATTERNS];
+    protected getJournalIdentifier(): string[] {
+        return ['_SYSTEMD_UNIT=nginx.service'];
+    }
 
-        const commonEndpoints = process.env.COMMON_ENDPOINTS;
-        if (commonEndpoints) {
-            const endpoints = commonEndpoints.split(',').map(e => e.trim()).filter(Boolean);
-            for (const endpoint of endpoints) {
-                const escaped = endpoint.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                patterns.push(new RegExp(`^${escaped}`, 'i'));
-            }
+    async start() {
+        this.suspiciousPatterns = await this.buildSuspiciousPatterns();
+        await this.backfillLogs('3 hour ago');
+        await super.start();
+    }
+
+    private async buildSuspiciousPatterns(): Promise<RegExp[]> {
+        const patterns = [...DEFAULT_SUSPICIOUS_PATTERNS];
+        const sharedPatterns = await this.configProvider.getNginxSuspiciousPatterns();
+        
+        for (const endpoint of sharedPatterns) {
+            const escaped = endpoint.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            patterns.push(new RegExp(`^${escaped}`, 'i'));
         }
 
         this.logger.info(`[NginxLogService] Monitoraggio HTTPS attivo con ${patterns.length} pattern sospetti`);
         return patterns;
     }
 
-    /**
-     * Verifica se un URI è sospetto.
-     */
     private isSuspicious(url: string): boolean {
         return this.suspiciousPatterns.some(pattern => pattern.test(url));
     }
 
-    public getStatus(): ServiceStatus {
-        return this.status;
-    }
-
-    /**
-     * Avvia il monitoraggio in tempo reale dei log Nginx tramite journalctl.
-     */
-    async start() {
-        this.status = ServiceStatus.STARTING;
-        if (this.journalProcess) {
-            this.logger.warn('[NginxLogService] Monitoraggio già attivo.');
-            this.status = ServiceStatus.RUNNING;
-            return;
-        }
-
-        await this.backfillLogs('3 hour ago');
-
-        this.logger.info('[NginxLogService] Avvio monitoraggio log Nginx (filtro URI sospetti attivo)...');
-
-        this.journalProcess = spawn('journalctl', ['_SYSTEMD_UNIT=nginx.service', '-f', '-o', 'json', '-n', '0']);
-
-        this.journalProcess.stdout.on('data', (data: Buffer) => {
-            const dataStr = data.toString();
-            const lines = dataStr.split('\n');
-            for (const line of lines) {
-                if (!line.trim()) continue;
-                try {
-                    const entry = JSON.parse(line);
-                    this.processEntry(entry);
-                } catch { /* riga non JSON, ignorata */ }
-            }
-        });
-
-        this.journalProcess.stderr.on('data', (data: Buffer) => {
-            this.logger.error(`[NginxLogService] journalctl stderr: ${data.toString()}`);
-        });
-
-        this.journalProcess.on('close', (code: number) => {
-            this.logger.warn(`[NginxLogService] Processo terminato (code ${code}). Riavvio in 10s...`);
-            this.journalProcess = null;
-            setTimeout(() => this.start(), 10000);
-        });
-
-        this.status = ServiceStatus.RUNNING;
-    }
-
-    /**
-     * Ferma il monitoraggio.
-     */
-    stop() {
-        if (this.journalProcess) {
-            this.journalProcess.kill();
-            this.journalProcess = null;
-            this.logger.info('[NginxLogService] Monitoraggio Nginx fermato.');
-        }
-        this.status = ServiceStatus.IDLE;
-    }
-
-    /**
-     * Recupera i log pregressi da journalctl.
-     */
-    async backfillLogs(since: string = '1 day ago') {
-        this.logger.info(`[NginxLogService] Recupero log pregressi (--since "${since}")...`);
-        return new Promise<void>((resolve) => {
-            const proc = spawn('journalctl', ['_SYSTEMD_UNIT=nginx.service', '--since', since, '-o', 'json', '--no-pager']);
-            let buffer = '';
-
-            proc.stdout.on('data', (data) => {
-                buffer += data.toString();
-                const lines = buffer.split('\n');
-                buffer = lines.pop() || '';
-                for (const line of lines) {
-                    if (!line.trim()) continue;
-                    try {
-                        const entry = JSON.parse(line);
-                        this.processEntry(entry);
-                    } catch { /* ignorata */ }
-                }
-            });
-
-            proc.on('close', () => {
-                this.logger.info('[NginxLogService] Backfill completato.');
-                resolve();
-            });
-        });
-    }
-
-    private async processEntry(entry: any) {
+    protected async processEntry(entry: any) {
         const message = entry.MESSAGE;
         if (!message || !message.includes('nginx_threat:')) return;
 
@@ -166,12 +72,11 @@ export class NginxLogService implements ILongRunningService {
 
             const nginxData = JSON.parse(message.substring(jsonStartIndex));
 
-            // *** FILTRO: processa solo URI sospetti ***
             if (!this.isSuspicious(nginxData.url)) return;
 
             await this.saveAsThreatLog(nginxData, entry.__CURSOR);
         } catch {
-            // riga non valida, ignorata
+            // ignore malformed entry
         }
     }
 
@@ -183,44 +88,27 @@ export class NginxLogService implements ILongRunningService {
             { headers: { 'user-agent': user_agent, 'referer': referer } }
         );
 
-        const geo = this.patternAnalysisService.getGeoLocation(ip);
-
-        const requestId = cursor
-            ? crypto.createHash('md5').update(cursor).digest('hex')
-            : crypto.randomBytes(16).toString('hex');
-
-        const logEntry: any = {
-            id: requestId,
+        const logEntry = this.threatLogFactory.createLog({
+            ip,
+            protocol: ProtocolType.HTTPS,
+            method,
+            url,
+            userAgent: user_agent,
+            referer,
+            headers: {
+                [LogHeaderKey.X_SOURCE]: 'nginx-proxy'
+            },
+            score: analysis.score || 0,
+            indicators: analysis.indicators,
+            suspicious: analysis.suspicious,
+            isBot: analysis.isBot,
             timestamp: new Date(timestamp),
-            protocol: 'https',
-            request: {
-                ip,
-                method,
-                url,
-                userAgent: user_agent,
-                headers: {
-                    'referer': referer,
-                    'x-source': 'nginx-proxy'
-                }
-            },
-            geo,
-            fingerprint: {
-                hash: crypto.createHash('md5').update(`https-${ip}-${url}-${user_agent}`).digest('hex'),
-                suspicious: analysis.suspicious,
-                score: analysis.score ? analysis.score : 0,
-                indicators: analysis.indicators
-            },
-            metadata: {
-                isBot: analysis.isBot,
-                isCrawler: false
-            }
-        };
+            id: cursor
+        });
 
         try {
-            // Sanitizzazione globale anti-XSS prima del salvataggio
-            const sanitizedLogEntry = SanitizationUtils.deepClean(logEntry);
-            await this.threatLogService.saveLog(sanitizedLogEntry);
-            this.logger.info(`[NginxLogService] 🛡️ HTTPS sospetto: ${method} ${url} da ${ip} (Score: ${logEntry.fingerprint.score})`);
+            await this.threatLogService.saveLog(logEntry);
+            this.logger.info(`[NginxLogService] 🛡️ HTTPS sospetto: ${method} ${url} da ${ip} (Score: ${logEntry.fingerprint?.score})`);
         } catch (err) {
             this.logger.error('[NginxLogService] Errore salvataggio ThreatLog', err);
         }

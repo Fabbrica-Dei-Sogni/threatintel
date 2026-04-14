@@ -2,9 +2,9 @@ import 'reflect-metadata';
 import { container } from 'tsyringe';
 import { SshLogService } from '../SshLogService';
 import { ThreatLogService } from '../ThreatLogService';
-import PatternAnalysisService from '../PatternAnalysisService';
-import { ConfigService } from '../ConfigService';
 import { LOGGER_TOKEN } from '../../di/tokens';
+import { AppConfigProvider } from '../AppConfigProvider';
+import { ThreatLogFactory } from '../../utils/ThreatLogFactory';
 import { spawn } from 'child_process';
 import { EventEmitter } from 'events';
 
@@ -17,8 +17,8 @@ describe('SshLogService', () => {
     let service: SshLogService;
     let mockLogger: any;
     let mockThreatLogService: any;
-    let mockPatternAnalysisService: any;
-    let mockConfigService: any;
+    let mockAppConfigProvider: any;
+    let mockThreatLogFactory: any;
 
     beforeEach(() => {
         mockLogger = {
@@ -38,30 +38,35 @@ describe('SshLogService', () => {
             }])
         };
 
-        mockPatternAnalysisService = {
-            getGeoLocation: jest.fn().mockReturnValue({ country: 'US' })
-        };
-
-        mockConfigService = {
-            getConfigValue: jest.fn().mockImplementation((key) => {
+        mockAppConfigProvider = {
+            getDynamicConfig: jest.fn().mockImplementation((key) => {
                 if (key === 'SSH_FAILED_PASSWORD') return '20';
                 if (key === 'SSH_INVALID_USER') return '30';
                 return null;
             })
         };
 
+        mockThreatLogFactory = {
+            createLog: jest.fn().mockImplementation((p) => ({
+                protocol: p.protocol,
+                request: { ip: p.ip, method: p.method, url: p.url, userAgent: p.userAgent },
+                fingerprint: { score: p.score },
+                timestamp: p.timestamp || new Date()
+            }))
+        };
+
         container.clearInstances();
         container.registerInstance(LOGGER_TOKEN, mockLogger);
         container.registerInstance(ThreatLogService, mockThreatLogService);
-        container.registerInstance(PatternAnalysisService, mockPatternAnalysisService);
-        container.registerInstance(ConfigService, mockConfigService);
+        container.registerInstance(AppConfigProvider, mockAppConfigProvider);
+        container.registerInstance(ThreatLogFactory, mockThreatLogFactory);
 
         service = container.resolve(SshLogService);
     });
 
-    describe('loadConfigFromDB', () => {
+    describe('loadConfig', () => {
         it('should load custom scores from config', async () => {
-            await service.loadConfigFromDB();
+            await service.loadConfig();
             expect((service as any).failedPasswordScore).toBe(20);
             expect((service as any).invalidUserScore).toBe(30);
         });

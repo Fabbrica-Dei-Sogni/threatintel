@@ -4,16 +4,20 @@ import { SshLogService } from '../SshLogService';
 import { NginxLogService } from '../NginxLogService';
 import { ThreatLogService } from '../ThreatLogService';
 import PatternAnalysisService from '../PatternAnalysisService';
-import { ConfigService } from '../ConfigService';
 import { Logger } from 'winston';
 import { ServiceStatus } from '../../types/lifecycle';
 import { LOGGER_TOKEN } from '../../di/tokens';
+import { AppConfigProvider } from '../AppConfigProvider';
+import { ThreatLogFactory } from '../../utils/ThreatLogFactory';
+import { ProtocolType } from '../../types/CoreConstants';
+import crypto from 'crypto';
 
 describe('LogServices Booster - Coverage Expansion', () => {
     let mockLogger: jest.Mocked<Logger>;
     let mockThreatLogService: jest.Mocked<ThreatLogService>;
-    let mockPatternAnalysisService: jest.Mocked<PatternAnalysisService>;
-    let mockConfigService: jest.Mocked<ConfigService>;
+    let mockPatternAnalysisService: any;
+    let mockAppConfigProvider: any;
+    let mockThreatLogFactory: any;
 
     beforeEach(() => {
         container.clearInstances();
@@ -33,21 +37,34 @@ describe('LogServices Booster - Coverage Expansion', () => {
         mockPatternAnalysisService = {
             analyze: jest.fn().mockReturnValue({ score: 0, indicators: [], suspicious: false }),
             getGeoLocation: jest.fn().mockReturnValue({}),
-        } as any;
+        };
 
-        mockConfigService = {
-            getConfigValue: jest.fn().mockResolvedValue(null),
-        } as any;
+        mockAppConfigProvider = {
+            getDynamicConfig: jest.fn().mockResolvedValue(null),
+            getNginxSuspiciousPatterns: jest.fn().mockResolvedValue([]),
+        };
+
+        mockThreatLogFactory = {
+            createLog: jest.fn().mockImplementation((p) => ({
+                id: p.id || 'test-id',
+                timestamp: p.timestamp || new Date(),
+                protocol: p.protocol,
+                request: { ip: p.ip, method: (p.method || 'GET').toUpperCase(), url: p.url, userAgent: p.userAgent },
+                fingerprint: { score: p.score || 0, hash: 'test-hash' },
+                metadata: p.metadata || {}
+            }))
+        };
 
         container.registerInstance(LOGGER_TOKEN, mockLogger);
         container.registerInstance(ThreatLogService, mockThreatLogService);
         container.registerInstance(PatternAnalysisService, mockPatternAnalysisService);
-        container.registerInstance(ConfigService, mockConfigService);
+        container.registerInstance(AppConfigProvider, mockAppConfigProvider);
+        container.registerInstance(ThreatLogFactory, mockThreatLogFactory);
     });
 
     describe('SshLogService Catch Blocks', () => {
-        it('should handle loadConfigFromDB errors', async () => {
-            mockConfigService.getConfigValue.mockRejectedValue(new Error('DB Error'));
+        it('should handle loadConfig errors', async () => {
+            mockAppConfigProvider.getDynamicConfig.mockRejectedValue(new Error('DB Error'));
             const service = container.resolve(SshLogService);
             await (service as any).initialized;
             expect(mockLogger.error).toHaveBeenCalledWith(expect.stringContaining('Errore caricamento configurazioni'));
@@ -80,8 +97,9 @@ describe('LogServices Booster - Coverage Expansion', () => {
         it('should handle saveAsThreatLog errors', async () => {
             const service = container.resolve(SshLogService);
             mockThreatLogService.saveLog.mockRejectedValue(new Error('Save Error'));
-            await (service as any).saveAsThreatLog('1.2.3.4', 'user', 'Failed', 'msg', 10, []);
-            expect(mockLogger.error).toHaveBeenCalledWith(expect.stringContaining('Errore nel salvataggio del log SSH'), expect.any(Error));
+            const entry = { ip: '1.2.3.4', user: 'user', type: 'Failed', score: 10, indicators: [], logDate: new Date() };
+            await (service as any).saveAsThreatLog(entry, 'msg');
+            expect(mockLogger.error).toHaveBeenCalledWith(expect.stringContaining('Errore salvataggio log SSH'), expect.any(Error));
         });
     });
 

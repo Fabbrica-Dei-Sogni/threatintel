@@ -1,8 +1,9 @@
 import { Logger } from "winston";
 import { container, type InjectionToken } from "tsyringe";
-import { LOGGER_TOKEN, I18N_TOKEN } from "./tokens";
-import logger from "../../logger";
 import { I18nService } from "../services/I18nService";
+import { AppConfigProvider } from "../services/AppConfigProvider";
+import { LOGGER_TOKEN, I18N_TOKEN, CONFIG_PROVIDER_TOKEN } from "./tokens";
+import logger from "../../logger";
 
 export const coreContainer = container;
 
@@ -44,6 +45,10 @@ registerValue<Logger>(LOGGER_TOKEN, logger);
 // registrazione del servizio i18n come singleton
 coreContainer.registerSingleton(I18nService);
 coreContainer.register(I18N_TOKEN, { useClass: I18nService });
+
+// registrazione del servizio AppConfigProvider come singleton
+coreContainer.registerSingleton(AppConfigProvider);
+coreContainer.register(CONFIG_PROVIDER_TOKEN, { useClass: AppConfigProvider });
 
 
 // nuova funzione generica

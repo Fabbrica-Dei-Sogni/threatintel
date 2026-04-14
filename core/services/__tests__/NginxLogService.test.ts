@@ -4,6 +4,8 @@ import { NginxLogService } from '../NginxLogService';
 import { ThreatLogService } from '../ThreatLogService';
 import PatternAnalysisService from '../PatternAnalysisService';
 import { LOGGER_TOKEN } from '../../di/tokens';
+import { AppConfigProvider } from '../AppConfigProvider';
+import { ThreatLogFactory } from '../../utils/ThreatLogFactory';
 import { spawn } from 'child_process';
 import { EventEmitter } from 'events';
 
@@ -17,6 +19,8 @@ describe('NginxLogService', () => {
     let mockLogger: any;
     let mockThreatLogService: any;
     let mockPatternAnalysisService: any;
+    let mockAppConfigProvider: any;
+    let mockThreatLogFactory: any;
 
     beforeEach(() => {
         mockLogger = {
@@ -39,6 +43,20 @@ describe('NginxLogService', () => {
             }),
             getGeoLocation: jest.fn().mockReturnValue({ country: 'IT' })
         };
+        
+        mockAppConfigProvider = {
+            getNginxSuspiciousPatterns: jest.fn().mockResolvedValue(['/test-endpoint', '/malicious']),
+            getDynamicConfig: jest.fn().mockResolvedValue(null)
+        };
+
+        mockThreatLogFactory = {
+            createLog: jest.fn().mockImplementation((p) => ({
+                protocol: p.protocol,
+                request: { ip: p.ip, method: p.method, url: p.url, userAgent: p.userAgent },
+                fingerprint: { score: p.score },
+                timestamp: p.timestamp || new Date()
+            }))
+        };
 
         process.env.COMMON_ENDPOINTS = '/test-endpoint,/malicious';
 
@@ -46,12 +64,15 @@ describe('NginxLogService', () => {
         container.registerInstance(LOGGER_TOKEN, mockLogger);
         container.registerInstance(ThreatLogService, mockThreatLogService);
         container.registerInstance(PatternAnalysisService, mockPatternAnalysisService);
+        container.registerInstance(AppConfigProvider, mockAppConfigProvider);
+        container.registerInstance(ThreatLogFactory, mockThreatLogFactory);
 
         service = container.resolve(NginxLogService);
     });
 
     describe('buildSuspiciousPatterns', () => {
-        it('should include patterns from COMMON_ENDPOINTS', () => {
+        it('should include patterns from COMMON_ENDPOINTS', async () => {
+            (service as any).suspiciousPatterns = await (service as any).buildSuspiciousPatterns();
             const patterns = (service as any).suspiciousPatterns;
             const hasTestEndpoint = patterns.some((p: RegExp) => p.test('/test-endpoint'));
             const hasMalicious = patterns.some((p: RegExp) => p.test('/malicious'));
@@ -62,7 +83,8 @@ describe('NginxLogService', () => {
     });
 
     describe('isSuspicious', () => {
-        it('should return true for suspicious URLs', () => {
+        it('should return true for suspicious URLs', async () => {
+            (service as any).suspiciousPatterns = await (service as any).buildSuspiciousPatterns();
             expect((service as any).isSuspicious('/admin')).toBe(true);
             expect((service as any).isSuspicious('/etc/passwd')).toBe(true);
             expect((service as any).isSuspicious('/test-endpoint')).toBe(true);

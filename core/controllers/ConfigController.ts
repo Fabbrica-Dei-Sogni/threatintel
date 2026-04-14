@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { inject, singleton } from 'tsyringe';
 import { ConfigService } from '../services/ConfigService';
 import { SshLogService } from '../services/SshLogService';
+import { NginxLogService } from '../services/NginxLogService';
 import { PatternAnalysisService } from '../services/PatternAnalysisService';
 import { LOGGER_TOKEN } from '../di/tokens';
 import { Logger } from 'winston';
@@ -11,6 +12,7 @@ export class ConfigController {
     constructor(
         private configService: ConfigService,
         private sshLogService: SshLogService,
+        private nginxLogService: NginxLogService,
         private patternAnalysisService: PatternAnalysisService,
         @inject(LOGGER_TOKEN) private logger: Logger
     ) {}
@@ -41,7 +43,8 @@ export class ConfigController {
             const result = await this.configService.saveConfig(key, value);
 
             // Reload configurations in dependent services
-            await this.sshLogService.loadConfigFromDB();
+            await this.sshLogService.loadConfig();
+            await this.nginxLogService.start(); // This reloads patterns
             await this.patternAnalysisService.loadConfigFromDB();
 
             res.json(result);

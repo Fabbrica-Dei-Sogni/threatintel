@@ -1,21 +1,16 @@
-import { spawn } from 'child_process';
 import { inject, singleton } from 'tsyringe';
 import { LOGGER_TOKEN } from '../di/tokens';
 import { Logger } from 'winston';
 import { ThreatLogService } from './ThreatLogService';
-import PatternAnalysisService from './PatternAnalysisService';
-import crypto from 'crypto';
-import { ConfigService } from './ConfigService';
-import { SanitizationUtils } from '../utils/SanitizationUtils';
-
-import { ILongRunningService, ServiceStatus } from '../types/lifecycle';
-import { ThreatIndicator } from '../types/indicators';
+import { AppConfigProvider } from './AppConfigProvider';
+import { BaseJournalWatcher } from './BaseJournalWatcher';
+import { ProtocolType, ThreatIndicator, LogHeaderKey, ConfigKey } from '../types/CoreConstants';
+import { ThreatLogFactory } from '../utils/ThreatLogFactory';
 
 @singleton()
-export class SshLogService implements ILongRunningService {
+export class SshLogService extends BaseJournalWatcher {
     public readonly serviceName = 'SshLogService';
-    private status: ServiceStatus = ServiceStatus.IDLE;
-    private journalProcess: any = null;
+    
     private failedPasswordScore: number = 15;
     private invalidUserScore: number = 25;
     private initialized: Promise<void>;
@@ -23,215 +18,65 @@ export class SshLogService implements ILongRunningService {
     // Buffer for batching SSH logs
     private sshBatchBuffer: Map<string, any> = new Map();
     private bufferFlushInterval: NodeJS.Timeout | null = null;
-    private readonly FLUSH_INTERVAL_MS = 60000; // 60 seconds
-
-    // Const keys for config
-    private readonly SSH_FAILED_PASSWORD = ThreatIndicator.SSH_FAILED_PASSWORD;
-    private readonly SSH_INVALID_USER = ThreatIndicator.SSH_INVALID_USER;
+    private readonly FLUSH_INTERVAL_MS = 60000;
 
     constructor(
-        @inject(LOGGER_TOKEN) private readonly logger: Logger,
+        @inject(LOGGER_TOKEN) logger: Logger,
         private readonly threatLogService: ThreatLogService,
-        private readonly patternAnalysisService: PatternAnalysisService,
-        private readonly configService: ConfigService
+        private readonly configProvider: AppConfigProvider,
+        private readonly threatLogFactory: ThreatLogFactory
     ) {
-        this.initialized = this.loadConfigFromDB();
+        super(logger);
+        this.initialized = this.loadConfig();
     }
 
+    protected getJournalIdentifier(): string[] {
+        return ['SYSLOG_IDENTIFIER=sshd'];
+    }
 
-    async loadConfigFromDB() {
+    async loadConfig() {
         try {
-            // Carica configurazioni chiave-valore
-            const [
-                scoreFailedPwd,
-                scoreInvalidUser,
-            ] = await Promise.all([
-                this.configService.getConfigValue(this.SSH_FAILED_PASSWORD),
-                this.configService.getConfigValue(this.SSH_INVALID_USER),
-            ]);
+            const scoreFailedPwd = await this.configProvider.getDynamicConfig(ConfigKey.SSH_FAILED_PASSWORD);
+            const scoreInvalidUser = await this.configProvider.getDynamicConfig(ConfigKey.SSH_INVALID_USER);
 
             if (scoreFailedPwd) this.failedPasswordScore = parseInt(scoreFailedPwd, 10);
             if (scoreInvalidUser) this.invalidUserScore = parseInt(scoreInvalidUser, 10);
 
-            this.logger.info(`[SshLogService] Configurazione caricata: SSH_FAILED_PASSWORD=${this.failedPasswordScore}, SSH_INVALID_USER=${this.invalidUserScore}`);
-
-
+            this.logger.info(`[SshLogService] Configurazione caricata: ${ConfigKey.SSH_FAILED_PASSWORD}=${this.failedPasswordScore}, ${ConfigKey.SSH_INVALID_USER}=${this.invalidUserScore}`);
         } catch (err: any) {
-            this.logger.error(`[SshLogService] Errore caricamento configurazioni da DB: ${err.message}`);
-            // fallback o rilancio errore a seconda del contesto
-            // qui si potrebbe caricare default oppure propagare errore
+            this.logger.error(`[SshLogService] Errore caricamento configurazioni: ${err.message}`);
         }
     }
 
-    public getStatus(): ServiceStatus {
-        return this.status;
-    }
-
-    /**
-     * Avvia il monitoraggio in tempo reale dei log SSH tramite journalctl.
-     */
     async start() {
-        this.status = ServiceStatus.STARTING;
-        try {
-            //inizializza il caricamenti degli score 
-            await this.initialized;
+        await this.initialized;
+        await this.backfillLogs('3 hour ago');
+        await super.start();
 
-            if (this.journalProcess) {
-                this.logger.warn('[SshLogService] Monitoraggio già attivo.');
-                this.status = ServiceStatus.RUNNING;
-                return;
-            }
-
-            // Prima di avviare il monitoraggio real-time, proviamo a recuperare i log recenti (es. ultime 24h)
-            await this.backfillLogs('3 hour ago');
-
-            this.logger.info('[SshLogService] Avvio monitoraggio log SSH (journalctl -u ssh)...');
-
-            // Utilizziamo SYSLOG_IDENTIFIER=sshd invece di -u ssh perché è più universale tra le varie distro
-            // e spesso più accessibile se l'unità è configurata in modo particolare.
-            this.journalProcess = spawn('journalctl', ['SYSLOG_IDENTIFIER=sshd', '-f', '-o', 'json', '-n', '0']);
-
-            this.journalProcess.stdout.on('data', (data: Buffer) => {
-                const dataStr = data.toString();
-                const lines = dataStr.split('\n');
-
-                for (const line of lines) {
-                    if (!line.trim()) continue;
-                    try {
-                        const entry = JSON.parse(line);
-                        this.processEntry(entry);
-                    } catch (err) {
-                        this.logger.error('[SshLogService] Errore nel parsing della riga del journal', { error: err, line });
-                    }
-                }
-            });
-
-            this.journalProcess.stderr.on('data', (data: Buffer) => {
-                const errorMsg = data.toString();
-                if (errorMsg.includes('not seeing messages from other users')) {
-                    this.logger.error('[SshLogService] 🛑 PERMESSI INSUFFICIENTI: Il sistema non ha il permesso di leggere i log di altri utenti (sshd).');
-                    this.logger.error('[SshLogService] 💡 Eseguire: "sudo usermod -aG systemd-journal $USER" e riavviare il server.');
-                } else {
-                    this.logger.error(`[SshLogService] journalctl stderr: ${errorMsg}`);
-                }
-            });
-
-            this.journalProcess.on('close', (code: number) => {
-                this.logger.warn(`[SshLogService] Il processo journalctl è terminato con codice ${code}. Riavvio in 10 secondi...`);
-                this.journalProcess = null;
-                // Se era in RUNNING o FAILED, proviamo a farlo ripartire
-                if (this.status !== ServiceStatus.IDLE) {
-                    setTimeout(() => this.start(), 10000);
-                }
-            });
-
-            this.journalProcess.on('error', (err: Error) => {
-                this.logger.error('[SshLogService] Errore critico nel processo journalctl', err);
-                this.status = ServiceStatus.FAILED;
-            });
-
-            // Start buffer flush interval
-            if (!this.bufferFlushInterval) {
-                this.bufferFlushInterval = setInterval(() => this.flushBuffer(), this.FLUSH_INTERVAL_MS);
-            }
-
-            this.status = ServiceStatus.RUNNING;
-        } catch (err: any) {
-            this.logger.error(`[SshLogService] Errore critico durante lo startup: ${err.message}`);
-            this.status = ServiceStatus.FAILED;
-            throw err;
+        if (!this.bufferFlushInterval) {
+            this.bufferFlushInterval = setInterval(() => this.flushBuffer(), this.FLUSH_INTERVAL_MS);
         }
     }
 
-    /**
-     * Recupera i log passati.
-     * @param since Periodo da recuperare (es. '1 day ago', '1 hour ago')
-     */
-    async backfillLogs(since: string = '1 day ago') {
-        this.logger.info(`[SshLogService] Recupero log SSH pregressi (--since "${since}")...`);
-
-        return new Promise<void>((resolve) => {
-            // Usiamo lo stesso identificatore del monitoraggio real-time
-            const proc = spawn('journalctl', ['SYSLOG_IDENTIFIER=sshd', '--since', since, '-o', 'json', '--no-pager']);
-            let buffer = '';
-            let processedCount = 0;
-
-            proc.stdout.on('data', (data) => {
-                buffer += data.toString();
-                const lines = buffer.split('\n');
-                buffer = lines.pop() || '';
-
-                for (const line of lines) {
-                    if (!line.trim()) continue;
-                    try {
-                        const entry = JSON.parse(line);
-                        this.processEntry(entry);
-                        processedCount++;
-                    } catch (err) {
-                        this.logger.error('[SshLogService] Errore nel parsing del log SSH', { error: err, line });
-                    }
-                }
-            });
-
-            proc.stderr.on('data', (data) => {
-                const errorMsg = data.toString();
-                if (errorMsg.includes('not seeing messages from other users')) {
-                    this.logger.error('[SshLogService] 🛑 PERMESSI INSUFFICIENTI (Backfill): Non posso caricare lo storico senza il gruppo "systemd-journal".');
-                } else {
-                    this.logger.error(`[SshLogService] backfill stderr: ${errorMsg}`);
-                }
-            });
-
-            proc.on('close', async () => {
-                this.logger.info(`[SshLogService] Recupero log pregressi completato. Elaborate ${processedCount} righe.`);
-                // Flush the buffer immediately after backfill
-                await this.flushBuffer();
-                resolve();
-            });
-
-            proc.on('error', (err) => {
-                this.logger.error('[SshLogService] Errore durante il backfill dei log SSH', err);
-                resolve();
-            });
-        });
-    }
-
-    /**
-     * Ferma il monitoraggio.
-     */
     stop() {
-        if (this.journalProcess) {
-            this.journalProcess.kill();
-            this.journalProcess = null;
-            this.logger.info('[SshLogService] Monitoraggio SSH fermato.');
-        }
+        super.stop();
         if (this.bufferFlushInterval) {
             clearInterval(this.bufferFlushInterval);
             this.bufferFlushInterval = null;
-            this.flushBuffer(); // Eseguiamo un ultimo flush sincrono (o quasi) per non perdere dati
+            this.flushBuffer();
         }
-        this.status = ServiceStatus.IDLE;
     }
 
-    private async processEntry(entry: any) {
+    protected async processEntry(entry: any) {
         const message = entry.MESSAGE;
         if (!message) return;
 
-        // Logga ogni riga trovata (debug)
-        this.logger.debug(`[SshLogService] Analisi riga: ${message}`);
-
-        // Filtriamo solo i messaggi che ci interessano (Failed, Accepted, Invalid)
         if (!message.includes('Failed') && !message.includes('Accepted') && !message.includes('Invalid')) {
             return;
         }
 
-        this.logger.info(`[SshLogService] Trovata riga pertinente: ${message}`);
-
-        // Regexp per estrarre IP e username dai messaggi comuni di sshd
         const failedMatch = message.match(/Failed password for (?:invalid user )?(\S+) from ([\d.]+) port/i);
         const invalidMatch = message.match(/Invalid user (\S+) from ([\d.]+) port/i);
-        //esclusi 
-        //const acceptedMatch = message.match(/Accepted password for (\S+) from ([\d.]+) port/i);
 
         let ip = null;
         let user = null;
@@ -244,49 +89,27 @@ export class SshLogService implements ILongRunningService {
             ip = failedMatch[2];
             type = 'Failed';
             score = this.failedPasswordScore;
-            indicators = [this.SSH_FAILED_PASSWORD];
+            indicators = [ThreatIndicator.SSH_FAILED_PASSWORD];
         } else if (invalidMatch) {
             user = invalidMatch[1];
             ip = invalidMatch[2];
             type = 'Invalid';
             score = this.invalidUserScore;
-            indicators = [this.SSH_INVALID_USER];
+            indicators = [ThreatIndicator.SSH_INVALID_USER];
         }
-        /*else if (acceptedMatch) {
-            user = acceptedMatch[1];
-            ip = acceptedMatch[2];
-            type = 'Accepted';
-            score = 0;
-            indicators = ['SSH_ACCEPTED_PASSWORD'];
-        } */
 
         if (ip) {
-            this.logger.info(`[SshLogService] Match riuscito! Tipo: ${type}, User: ${user}, IP: ${ip}`);
-
-            // Estrazione Timestamp:
-            // 1. __REALTIME_TIMESTAMP (microsecondi) dalla entry grezza del journal (più preciso)
-            // 2. SYSLOG_TIMESTAMP (parsing testo) come fallback
-            // 3. Date.now() come ultimo fallback
-
             let logDate = new Date();
-
             if (entry.__REALTIME_TIMESTAMP) {
-                // __REALTIME_TIMESTAMP è in microsecondi, convertiamo in millisecondi
-                const timestampMs = parseInt(entry.__REALTIME_TIMESTAMP, 10) / 1000;
-                logDate = new Date(timestampMs);
-            } else if (entry.SYSLOG_TIMESTAMP) {
-                // SYSLOG_TIMESTAMP non ha l'anno (es: "Jan 9 12:41:48") -> fallback rozzo
-                // Meglio non affidarsi troppo a questo se possibile
-                logDate = new Date(entry.SYSLOG_TIMESTAMP);
+                logDate = new Date(parseInt(entry.__REALTIME_TIMESTAMP, 10) / 1000);
             }
 
             const batchKey = `${ip}_${user}_${type}`;
             if (this.sshBatchBuffer.has(batchKey)) {
                 const existing = this.sshBatchBuffer.get(batchKey)!;
                 existing.count++;
-                existing.logDate = logDate; // aggiorno con l'ultima data vista
+                existing.logDate = logDate;
                 if (entry.__CURSOR) existing.cursor = entry.__CURSOR;
-                // tenere tracce raw
                 if (existing.rawMessages.length < 5) existing.rawMessages.push(message);
             } else {
                 this.sshBatchBuffer.set(batchKey, {
@@ -296,11 +119,56 @@ export class SshLogService implements ILongRunningService {
         }
     }
 
-    async analyzeSshLogs(batchSize: number = 100) {
-        this.logger.info('[SshLogService] Avvio ricalcolo score SSH...');
+    private async flushBuffer() {
+        if (this.sshBatchBuffer.size === 0) return;
 
-        //carica i valori da db
-        await this.loadConfigFromDB();
+        const entriesToFlush = Array.from(this.sshBatchBuffer.values());
+        this.sshBatchBuffer.clear();
+
+        const promises = entriesToFlush.map(async (entry) => {
+            const sampleRawLog = entry.count > 1
+                ? `[Aggregated ${entry.count} events]\nLast message: ${entry.rawMessages[entry.rawMessages.length - 1]}`
+                : entry.rawMessages[0];
+
+            await this.saveAsThreatLog(entry, sampleRawLog);
+        });
+
+        await Promise.allSettled(promises);
+    }
+
+    private async saveAsThreatLog(entry: any, rawMessage: string) {
+        const logEntry = this.threatLogFactory.createLog({
+            ip: entry.ip,
+            protocol: ProtocolType.SSH,
+            method: entry.type,
+            url: `ssh://${entry.user}`,
+            userAgent: 'sshd',
+            headers: {
+                [LogHeaderKey.RAW_LOG]: rawMessage,
+                [LogHeaderKey.SSH_EVENT]: entry.type,
+                [LogHeaderKey.SSH_USER]: entry.user
+            },
+            score: entry.score,
+            indicators: entry.indicators,
+            timestamp: entry.logDate,
+            id: entry.cursor, // Use cursor as seed for ID
+            metadata: {
+                eventCount: entry.count,
+                sshInfo: { user: entry.user, type: entry.type }
+            }
+        });
+
+        try {
+            await this.threatLogService.saveLog(logEntry);
+            this.logger.info(`[SshLogService] Rilevato evento SSH ${entry.type} da ${entry.ip} (utente: ${entry.user})`);
+        } catch (err) {
+            this.logger.error('[SshLogService] Errore salvataggio log SSH', err);
+        }
+    }
+
+    async analyzeSshLogs(batchSize: number = 100) {
+        await this.loadConfig();
+        this.logger.info('[SshLogService] Avvio ricalcolo score SSH...');
 
         let page = 1;
         let processed = 0;
@@ -308,38 +176,35 @@ export class SshLogService implements ILongRunningService {
         let total = 0;
 
         try {
-            // Prima conta totale per log
-            total = await this.threatLogService.countLogs({ protocol: 'ssh' });
+            total = await this.threatLogService.countLogs({ protocol: ProtocolType.SSH });
             this.logger.info(`[SshLogService] Trovati ${total} log SSH da analizzare.`);
 
             while (processed < total) {
                 const logs = await this.threatLogService.getLogs({
                     page,
                     pageSize: batchSize,
-                    filters: { protocol: 'ssh' }
+                    filters: { protocol: ProtocolType.SSH }
                 });
 
                 if (logs.length === 0) break;
 
                 for (const log of logs) {
-                    const sshEvent = log.request?.headers?.['ssh-event'];
+                    const sshEvent = log.request?.headers?.[LogHeaderKey.SSH_EVENT];
                     let newScore = 0;
                     let newIndicators: string[] = [];
                     let shouldUpdate = false;
 
                     if (sshEvent === 'Failed') {
                         newScore = this.failedPasswordScore;
-                        newIndicators = [this.SSH_FAILED_PASSWORD];
+                        newIndicators = [ThreatIndicator.SSH_FAILED_PASSWORD];
                         shouldUpdate = true;
                     } else if (sshEvent === 'Invalid') {
                         newScore = this.invalidUserScore;
-                        newIndicators = [this.SSH_INVALID_USER];
+                        newIndicators = [ThreatIndicator.SSH_INVALID_USER];
                         shouldUpdate = true;
                     }
 
                     if (shouldUpdate) {
-                        // Aggiorna solo se score o indicatori sono diversi (opzionale, ma efficiente)
-                        // In questo caso forziamo l'aggiornamento per allineare tutto
                         log.fingerprint.score = newScore;
                         log.fingerprint.indicators = newIndicators;
                         log.fingerprint.suspicious = newScore > 0;
@@ -361,90 +226,5 @@ export class SshLogService implements ILongRunningService {
             this.logger.error('[SshLogService] Errore durante il ricalcolo score SSH', err);
             throw err;
         }
-    }
-
-    private async saveAsThreatLog(ip: string, user: string, type: string, rawMessage: string, score: number, indicators: string[], cursor?: string, logDate: Date = new Date(), eventCount: number = 1) {
-        const geo = this.patternAnalysisService.getGeoLocation(ip);
-
-        // Usiamo il __CURSOR del journal come ID deterministico per evitare duplicati in caso di riavvio o backfill
-        let requestId: string;
-        if (cursor) {
-            requestId = crypto.createHash('md5').update(cursor).digest('hex');
-        } else {
-            requestId = (crypto as any).randomUUID ? (crypto as any).randomUUID() : crypto.randomBytes(16).toString('hex');
-        }
-
-        // Mappatura dei dati SSH sul modello ThreatLog esistente
-        const logEntry: any = {
-            id: requestId,
-            timestamp: logDate,
-            protocol: 'ssh',
-            request: {
-                ip: ip,
-                method: type.toUpperCase(), // Riutilizziamo method per il tipo di evento
-                url: `ssh://${user}`,       // Riutilizziamo url per mostrare l'utente target
-                userAgent: 'sshd',          // Indichiamo la fonte
-                headers: {
-                    'raw-log': rawMessage,
-                    'ssh-event': type,
-                    'ssh-user': user
-                }
-            },
-            geo: geo,
-            fingerprint: {
-                hash: crypto.createHash('md5').update(`ssh-${ip}-${user}-${type}`).digest('hex'),
-                suspicious: score > 0,
-                score: score,
-                indicators: indicators
-            },
-            metadata: {
-                isBot: false,
-                isCrawler: false,
-                eventCount: eventCount,
-                sshInfo: {
-                    user,
-                    type,
-                    raw: rawMessage
-                }
-            }
-        };
-
-        try {
-            // Sanitizzazione globale anti-XSS prima del salvataggio
-            const sanitizedLogEntry = SanitizationUtils.deepClean(logEntry);
-            await this.threatLogService.saveLog(sanitizedLogEntry);
-            this.logger.info(`[SshLogService] Rilevato evento SSH ${type} da ${ip} (utente: ${user})`);
-        } catch (err) {
-            this.logger.error('[SshLogService] Errore nel salvataggio del log SSH come ThreatLog', err);
-        }
-    }
-
-    private async flushBuffer() {
-        if (this.sshBatchBuffer.size === 0) return;
-
-        const entriesToFlush = Array.from(this.sshBatchBuffer.values());
-        this.sshBatchBuffer.clear();
-
-        this.logger.info(`[SshLogService] Flushing buffer... Saving ${entriesToFlush.length} aggregated SSH events to DB.`);
-
-        const promises = entriesToFlush.map(async (entry) => {
-            const sampleRawLog = entry.count > 1
-                ? `[Aggregated ${entry.count} events]\nLast message: ${entry.rawMessages[entry.rawMessages.length - 1]}`
-                : entry.rawMessages[0];
-
-            await this.saveAsThreatLog(
-                entry.ip,
-                entry.user,
-                entry.type,
-                sampleRawLog,
-                entry.score,
-                entry.indicators,
-                entry.cursor,
-                entry.logDate,
-                entry.count
-            );
-        });
-
-        await Promise.allSettled(promises);
     }
 }

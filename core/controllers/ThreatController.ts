@@ -133,7 +133,7 @@ export class ThreatController {
     async getLogById(req: Request, res: Response): Promise<void> {
         this.logger.info(`[ThreatController] Requesting log ${req.params.id}`);
         try {
-            const log = await this.threatLogService.getLogById(req.params.id);
+            const log = await this.threatLogService.getLogById(req.params.id as string);
             if (!log) {
                 res.status(404).json({ error: 'Log non trovato' });
                 return;
@@ -147,8 +147,8 @@ export class ThreatController {
     // GET /api/reputationscore/:ip
     async getReputationScore(req: Request, res: Response): Promise<void> {
         try {
-            assertPublicIp(req.params.ip);
-            const reputationData = await this.ipDetailsService.enrichWithAbuse(req.params.ip);
+            assertPublicIp(req.params.ip as string);
+            const reputationData = await this.ipDetailsService.enrichWithAbuse(req.params.ip as string);
             if (!reputationData) {
                 res.status(404).json({ error: 'Reputation score non trovato' });
                 return;
@@ -166,8 +166,8 @@ export class ThreatController {
     // POST /api/enrichreports/:ip
     async enrichReports(req: Request, res: Response): Promise<void> {
         try {
-            assertPublicIp(req.params.ip);
-            const reportsData = await this.ipDetailsService.getAndSaveReportsAbuseIpDb(req.params.ip, 2, 100);
+            assertPublicIp(req.params.ip as string);
+            const reportsData = await this.ipDetailsService.getAndSaveReportsAbuseIpDb(req.params.ip as string, 2, 100);
             if (!reportsData) {
                 res.status(404).json({ error: 'Reports non trovati' });
                 return;
@@ -185,8 +185,8 @@ export class ThreatController {
     // GET /api/ipdetail/:ip
     async getIpDetail(req: Request, res: Response): Promise<void> {
         try {
-            assertPublicIp(req.params.ip);
-            const ipDetails = await this.ipDetailsService.getIpDetails(req.params.ip);
+            assertPublicIp(req.params.ip as string);
+            const ipDetails = await this.ipDetailsService.getIpDetails(req.params.ip as string);
             if (!ipDetails) {
                 res.status(404).json({ error: 'Ip detail non trovato' });
                 return;
@@ -205,8 +205,8 @@ export class ThreatController {
     // POST /api/enrich/:ip
     async enrichIp(req: Request, res: Response): Promise<void> {
         try {
-            assertPublicIp(req.params.ip);
-            const ip = req.params.ip.trim();
+            assertPublicIp(req.params.ip as string);
+            const ip = (req.params.ip as string).trim();
             const ipDetailsId = await this.ipDetailsService.findOrCreate(ip, true);
             await this.threatLogService.assignIpDetailsToLogs(ip, ipDetailsId);
             res.json({ message: 'Arricchimento IP completato per ' + ip });

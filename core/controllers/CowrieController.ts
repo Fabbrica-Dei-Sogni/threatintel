@@ -88,7 +88,7 @@ export class CowrieController {
     // GET /api/cowrie/sessions/:id
     async getSessionDetails(req: Request, res: Response): Promise<void> {
         try {
-            const { id } = req.params;
+            const id = req.params.id as string;
             const session = await this.cowrieService.getSessionDetails(id);
             if (!session) {
                 const locale = this.getLocale(req);
@@ -106,7 +106,7 @@ export class CowrieController {
     // GET /api/cowrie/sessions/:id/events
     async getSessionEvents(req: Request, res: Response): Promise<void> {
         try {
-            const { id } = req.params;
+            const id = req.params.id as string;
             const events = await this.cowrieService.getSessionEvents(id);
             res.status(200).json(events);
         } catch (error: any) {

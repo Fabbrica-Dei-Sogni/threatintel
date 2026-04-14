@@ -8,6 +8,7 @@ describe('CowrieController', () => {
     let cowrieController: CowrieController;
     let mockCowrieService: jest.Mocked<CowrieService>;
     let mockLogger: jest.Mocked<Logger>;
+    let mockI18nService: any;
     let mockRequest: Partial<Request>;
     let mockResponse: Partial<Response>;
     let responseJson: jest.Mock;
@@ -27,7 +28,11 @@ describe('CowrieController', () => {
             info: jest.fn()
         } as any;
 
-        cowrieController = new CowrieController(mockCowrieService, mockLogger);
+        mockI18nService = {
+            t: jest.fn().mockImplementation((key: string) => key)
+        };
+
+        cowrieController = new CowrieController(mockCowrieService, mockI18nService, mockLogger);
 
         responseJson = jest.fn();
         responseStatus = jest.fn().mockReturnValue({ json: responseJson });

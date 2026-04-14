@@ -63,7 +63,7 @@ export class DossierController {
      */
     async getById(req: Request, res: Response) {
         try {
-            const { id } = req.params;
+            const id = req.params.id as string;
             const user = (req as any).user;
             const isAdmin = user.roles?.some((r: any) => r.name === 'admin');
 
@@ -84,12 +84,10 @@ export class DossierController {
      */
     async update(req: Request, res: Response) {
         try {
-            const { id } = req.params;
             const user = (req as any).user;
             const isAdmin = user.roles?.some((r: any) => r.name === 'admin');
-            const dto: UpdateDossierDTO = req.body;
-
-            const dossier = await this.dossierService.updateDossier(id, dto, user.username, isAdmin);
+            const id = req.params.id as string;
+            const dossier = await this.dossierService.updateDossier(id, req.body, user.username, isAdmin);
             if (!dossier) {
                 return res.status(404).json({ error: 'Dossier not found or access denied' });
             }
@@ -106,10 +104,9 @@ export class DossierController {
      */
     async delete(req: Request, res: Response) {
         try {
-            const { id } = req.params;
             const user = (req as any).user;
             const isAdmin = user.roles?.some((r: any) => r.name === 'admin');
-
+            const id = req.params.id as string;
             const success = await this.dossierService.deleteDossier(id, user.username, isAdmin);
             if (!success) {
                 return res.status(404).json({ error: 'Dossier not found or access denied' });
@@ -127,7 +124,7 @@ export class DossierController {
      */
     async export(req: Request, res: Response) {
         try {
-            const { id } = req.params;
+            const id = req.params.id as string;
             const { format, style, locale } = req.query;
             const user = (req as any).user;
             const isAdmin = user.roles?.some((r: any) => r.name === 'admin');

@@ -53,7 +53,7 @@ export class ConfigController {
 
     // DELETE /api/config/:key
     async deleteConfig(req: Request, res: Response): Promise<void> {
-        const { key } = req.params;
+        const key = req.params.key as string;
         this.logger.info(`[ConfigController] Deleting configuration: ${key}`);
 
         try {

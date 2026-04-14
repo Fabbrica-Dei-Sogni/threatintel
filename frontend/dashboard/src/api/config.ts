@@ -9,10 +9,19 @@ const apiClient = axios.create({
     timeout: 8000,
 });
 
-// Interceptor per gestire cambiamenti a runtime dell'URL base
+// Interceptor per gestire cambiamenti a runtime dell'URL base e iniettare il token
 apiClient.interceptors.request.use((config) => {
     config.baseURL = getApiUrl();
+    
+    // Recupera il token dal localStorage per abilitare l'autenticazione
+    const token = localStorage.getItem('auth_token');
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    
     return config;
+}, (error) => {
+    return Promise.reject(error);
 });
 
 export interface ConfigItem {

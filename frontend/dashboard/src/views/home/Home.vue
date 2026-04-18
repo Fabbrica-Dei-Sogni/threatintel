@@ -47,6 +47,7 @@
                   <div class="header-actions" @click.stop>
                     <ProtocolSelector v-model="selectedAttackProtocol" :options="['http', 'https', 'ssh']"
                       theme="dark" />
+                    <ViewToggle v-model="toggles.attackMap" :label="$t('common.showMap')" theme="magma" />
                     <span class="arrow" :class="{ open: toggles.recentAttacks }"></span>
                   </div>
                 </div>
@@ -81,19 +82,20 @@
                   </div>
                 </transition>
               </div>
-              <div class="map-side glass-card">
-                <div class="widget-header clickable-header" @click="toggles.attackMap = !toggles.attackMap">
-                  <div class="title-content">
-                    <h3><span class="pulse">📡</span> {{ $t('home.attackMap').toUpperCase() }}</h3>
+
+              <!-- Map side controlled by the list toggle -->
+              <transition name="fade">
+                <div v-if="toggles.attackMap" class="map-side glass-card">
+                  <div class="widget-header">
+                    <div class="title-content">
+                      <h3><span class="pulse">📡</span> {{ $t('home.attackMap').toUpperCase() }}</h3>
+                    </div>
                   </div>
-                  <span class="arrow" :class="{ open: toggles.attackMap }"></span>
-                </div>
-                <transition name="collapse">
-                  <div v-if="toggles.attackMap">
+                  <div>
                     <AttackMap :attacks="recentAttacks" />
                   </div>
-                </transition>
-              </div>
+                </div>
+              </transition>
             </div>
 
             <div class="secondary-intel" style="margin-top: 25px;">
@@ -154,7 +156,10 @@
                   <div class="title-content">
                     <h3>{{ $t('home.recentSessions').toUpperCase() }}</h3>
                   </div>
-                  <span class="arrow" :class="{ open: toggles.recentSessions }"></span>
+                  <div class="header-actions">
+                    <ViewToggle v-model="toggles.sessionsMap" :label="$t('common.showMap')" theme="jade" />
+                    <span class="arrow" :class="{ open: toggles.recentSessions }"></span>
+                  </div>
                 </div>
                 <transition name="collapse">
                   <div v-if="toggles.recentSessions">
@@ -182,19 +187,20 @@
                   </div>
                 </transition>
               </div>
-              <div class="map-side glass-card">
-                <div class="widget-header clickable-header" @click="toggles.sessionsMap = !toggles.sessionsMap">
-                  <div class="title-content">
-                    <h3><span class="pulse">📡</span> {{ $t('home.sessionsMap').toUpperCase() }}</h3>
+
+              <!-- Sessions Map side controlled by the list toggle -->
+              <transition name="fade">
+                <div v-if="toggles.sessionsMap" class="map-side glass-card">
+                  <div class="widget-header">
+                    <div class="title-content">
+                      <h3><span class="pulse">📡</span> {{ $t('home.sessionsMap').toUpperCase() }}</h3>
+                    </div>
                   </div>
-                  <span class="arrow" :class="{ open: toggles.sessionsMap }"></span>
-                </div>
-                <transition name="collapse">
-                  <div v-if="toggles.sessionsMap">
+                  <div>
                     <AttackMap :attacks="recentSessionsNormalized" :showLegend="false" />
                   </div>
-                </transition>
-              </div>
+                </div>
+              </transition>
             </div>
           </div>
         </transition>
@@ -273,6 +279,7 @@ import AttackMap from '../../components/AttackMap.vue';
 import BreakingNews from '../../components/BreakingNews.vue';
 import ConfigMenuButton from '../../components/ConfigMenuButton.vue';
 import ProtocolSelector from '../../components/common/ProtocolSelector.vue';
+import ViewToggle from '../../components/common/ViewToggle.vue';
 import DefconIndicator from '../../components/DefconIndicator.vue';
 
 const { t } = useI18n();

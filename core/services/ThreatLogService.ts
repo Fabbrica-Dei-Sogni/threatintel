@@ -598,7 +598,18 @@ export class ThreatLogService {
                     _id: null,
                     totalRequests: { $sum: 1 },
                     suspiciousRequests: {
-                        $sum: { $cond: ['$fingerprint.suspicious', 1, 0] }
+                        $sum: {
+                            $cond: [
+                                {
+                                    $and: [
+                                        { $eq: ['$fingerprint.suspicious', true] },
+                                        { $gt: ['$fingerprint.score', 15] }
+                                    ]
+                                },
+                                1,
+                                0
+                            ]
+                        }
                     },
                     uniqueIPs: { $addToSet: '$request.ip' },
                     topCountries: { $push: '$geo.country' },

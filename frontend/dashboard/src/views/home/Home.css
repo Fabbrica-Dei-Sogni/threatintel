@@ -665,3 +665,33 @@ li > a:last-child:hover {
     display: none;
   }
 }
+
+/* Mobile Fix for Header Overflow */
+@media (max-width: 600px) {
+  .widget-header {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  
+  .header-actions {
+    width: 100%;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+  
+  .widget-header h3 {
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Nascondi il testo "Mostra Mappa" per risparmiare spazio, lasciando solo il LED */
+  .header-actions :deep(.toggle-label),
+  .header-actions .toggle-label {
+    display: none !important;
+  }
+  
+  .header-actions {
+    gap: 8px;
+  }
+}

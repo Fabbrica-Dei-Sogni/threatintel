@@ -148,7 +148,16 @@ export class ThreatController {
     async getReputationScore(req: Request, res: Response): Promise<void> {
         try {
             assertPublicIp(req.params.ip as string);
-            const reputationData = await this.ipDetailsService.enrichWithAbuse(req.params.ip as string);
+            const user = (req as any).user;
+            let reputationData;
+
+            if (user?.username === 'anonymous') {
+                // Sola lettura dalla cache per anonimi
+                this.logger.info(`[ThreatController] Sola lettura reputazione per anonimo su IP: ${req.params.ip}`);
+                reputationData = await this.ipDetailsService.getAbuseCacheOnly(req.params.ip as string);
+            } else {
+                reputationData = await this.ipDetailsService.enrichWithAbuse(req.params.ip as string);
+            }
             if (!reputationData) {
                 res.status(404).json({ error: 'Reputation score non trovato' });
                 return;
@@ -165,6 +174,12 @@ export class ThreatController {
 
     // POST /api/enrichreports/:ip
     async enrichReports(req: Request, res: Response): Promise<void> {
+        const user = (req as any).user;
+        if (user?.username === 'anonymous') {
+            res.status(403).json({ error: 'Azione consentita solo agli utenti autenticati' });
+            return;
+        }
+
         try {
             assertPublicIp(req.params.ip as string);
             const reportsData = await this.ipDetailsService.getAndSaveReportsAbuseIpDb(req.params.ip as string, 2, 100);
@@ -204,6 +219,12 @@ export class ThreatController {
 
     // POST /api/enrich/:ip
     async enrichIp(req: Request, res: Response): Promise<void> {
+        const user = (req as any).user;
+        if (user?.username === 'anonymous') {
+            res.status(403).json({ error: 'Azione consentita solo agli utenti autenticati' });
+            return;
+        }
+
         try {
             assertPublicIp(req.params.ip as string);
             const ip = (req.params.ip as string).trim();
@@ -222,6 +243,12 @@ export class ThreatController {
 
     // POST /api/enrich
     async batchEnrich(req: Request, res: Response): Promise<void> {
+        const user = (req as any).user;
+        if (user?.username === 'anonymous') {
+            res.status(403).json({ error: 'Azione consentita solo agli utenti autenticati' });
+            return;
+        }
+
         this.logger.info('[ThreatController] Starting batch IP enrichment');
         try {
             const uniqueIps = await this.threatLogService.getDistinctIPs();

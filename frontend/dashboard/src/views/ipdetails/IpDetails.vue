@@ -2,7 +2,7 @@
   <div class="ip-details">
     <div class="header-top">
       <button @click="goBack" class="back-btn">← {{ t('ipDetails.backToAttacks').toUpperCase() }}</button>
-      <button @click="forzaArricchimento" :disabled="loadingEnrich" class="refresh-btn">
+      <button v-if="authStore.isAuthenticated" @click="forzaArricchimento" :disabled="loadingEnrich" class="refresh-btn">
         <span v-if="loadingEnrich" class="spinner"></span>
         {{ (loadingEnrich ? t('common.loading') : t('ipDetails.forceRefresh')).toUpperCase() }}
       </button>
@@ -169,7 +169,7 @@
         </div>
         <transition name="collapse">
           <div v-if="toggles.reports" class="section-body">
-            <div class="reports-controls">
+            <div class="reports-controls" v-if="authStore.isAuthenticated">
               <button @click="aggiornaReports" :disabled="loadingReports" class="update-btn">
                 <span v-if="loadingReports" class="spinner-small"></span>
                 {{ loadingReports ? t('common.loading') : t('ipDetails.syncAbuseReports') }}
@@ -325,10 +325,12 @@ import CountryFlag from '../../components/CountryFlag.vue';
 import ReportActions from '../../components/ReportActions.vue';
 import { ElMessage } from 'element-plus';
 import { useClipboard } from '../../composable/useClipboard';
+import { useAuthStore } from '../../stores/auth';
 
 const route = useRoute()
 const router = useRouter()
 const { t } = useI18n();
+const authStore = useAuthStore();
 const { copyToClipboard, copyFormatted } = useClipboard();
 
 const ip = ref('')

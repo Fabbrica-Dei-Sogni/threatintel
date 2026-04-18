@@ -234,7 +234,16 @@ export class IpDetailsService {
             logger.error(`Errore aggiornamento AbuseIpDb per ${ip}: ${error.message}`);
             return null;
         }
+    }
 
+    async getAbuseCacheOnly(ip: string) {
+        try {
+            const cached = await AbuseIpDb.findOne({ ip });
+            return cached;
+        } catch (error: any) {
+            logger.error(`Errore recupero cache AbuseIpDb per ${ip}: ${error.message}`);
+            return null;
+        }
     }
 
     async getAndSaveReportsAbuseIpDb(ip: string, maxAgeInDays = 2, perPage = 100) {

@@ -156,7 +156,7 @@
                   <div class="title-content">
                     <h3>{{ $t('home.recentSessions').toUpperCase() }}</h3>
                   </div>
-                  <div class="header-actions">
+                  <div class="header-actions" @click.stop>
                     <ViewToggle v-model="toggles.sessionsMap" :label="$t('common.showMap')" theme="jade" />
                     <span class="arrow" :class="{ open: toggles.recentSessions }"></span>
                   </div>
@@ -396,6 +396,23 @@ import { useProfileStore } from '../../stores/profiles';
 const profileStore = useProfileStore();
 const dossierStore = useDossierStore();
 const authStore = useAuthStore();
+
+// Sincronizzazione Mappe/Liste per il cruscotto
+watch(() => toggles.attackMap, (isMapOpen) => {
+  if (isMapOpen) {
+    toggles.recentAttacks = false;
+  } else {
+    toggles.recentAttacks = true;
+  }
+});
+
+watch(() => toggles.sessionsMap, (isMapOpen) => {
+  if (isMapOpen) {
+    toggles.recentSessions = false;
+  } else {
+    toggles.recentSessions = true;
+  }
+});
 
 // Carica i dati solo una volta per la dashboard, ma ricarica se cambia il profilo
 const loadAll = () => {

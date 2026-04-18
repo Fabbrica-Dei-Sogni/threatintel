@@ -32,7 +32,7 @@ const THREAT_LOG_FILTER_FIELDS = new Set([
 ]);
 
 const COWRIE_SESSION_FILTER_FIELDS = new Set([
-    'src_ip', 'session', 'sensor', 'protocol', 'timestamp'
+    'src_ip', 'session', 'sensor', 'protocol', 'timestamp', 'sessionCategory'
 ]);
 
 /**

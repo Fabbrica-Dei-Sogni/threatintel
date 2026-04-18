@@ -498,6 +498,13 @@
                 "events": "События",
                 "exploration": "Исследование",
                 "viewTimeline": "👁️ Посмотреть Timeline"
+            },
+            "filters": {
+                "all": "Все сессии",
+                "scanner": "Сканнеры",
+                "scannerDesc": "Сессии с 0 событий (Атакующие сканеры)",
+                "interaction": "Взаимодействия",
+                "interactionDesc": "Сессии с как минимум одним зарегистрированным событием"
             }
         },
         "attackDetail": {

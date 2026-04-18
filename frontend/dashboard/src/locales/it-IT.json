@@ -498,6 +498,13 @@
                 "events": "Eventi",
                 "exploration": "Esplorazione",
                 "viewTimeline": "👁️ Vedi Timeline"
+            },
+            "filters": {
+                "all": "Tutte le sessioni",
+                "scanner": "Scanner",
+                "scannerDesc": "Sessioni con 0 eventi (Attaccanti Scanner)",
+                "interaction": "Interazioni",
+                "interactionDesc": "Sessioni con almeno un evento registrato"
             }
         },
         "attackDetail": {

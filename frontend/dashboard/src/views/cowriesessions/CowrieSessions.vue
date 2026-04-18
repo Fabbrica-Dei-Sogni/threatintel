@@ -26,6 +26,31 @@
                         ✕
                     </button>
                 </div>
+                <div class="category-filters">
+                    <button 
+                        class="cyber-chip" 
+                        :class="{ active: filterCategory === '' }" 
+                        @click="filterCategory = ''"
+                    >
+                        {{ $t('cowrie.sessions.filters.all') }}
+                    </button>
+                    <button 
+                        class="cyber-chip scanner" 
+                        :class="{ active: filterCategory === 'scanner' }" 
+                        @click="filterCategory = 'scanner'"
+                        :title="$t('cowrie.sessions.filters.scannerDesc')"
+                    >
+                        <span class="dot"></span> {{ $t('cowrie.sessions.filters.scanner') }}
+                    </button>
+                    <button 
+                        class="cyber-chip interaction" 
+                        :class="{ active: filterCategory === 'interaction' }" 
+                        @click="filterCategory = 'interaction'"
+                        :title="$t('cowrie.sessions.filters.interactionDesc')"
+                    >
+                        <span class="dot"></span> {{ $t('cowrie.sessions.filters.interaction') }}
+                    </button>
+                </div>
             </div>
         </section>
 
@@ -273,6 +298,7 @@ const {
     pageSize,
     sortFields,
     filterIp,
+    filterCategory,
     total,
     loading,
     error,
@@ -287,15 +313,24 @@ const {
     props.initialIp
 );
 
+// Sincronizza lo stato iniziale con la query se presente
+onMounted(() => {
+    const query = router.currentRoute.value.query;
+    if (query.category) {
+        filterCategory.value = query.category;
+    }
+});
+
 // Sincronizza l'URL quando cambia lo stato
-watch([page, pageSize, sortFields, filterIp], ([newPage, newPageSize, newSort, newIp]) => {
+watch([page, pageSize, sortFields, filterIp, filterCategory], ([newPage, newPageSize, newSort, newIp, newCat]) => {
     router.replace({
         name: 'CowrieSessions',
         query: {
             page: newPage > 1 ? newPage : undefined,
             pageSize: newPageSize !== 20 ? newPageSize : undefined,
             sortFields: newSort ? JSON.stringify(newSort) : undefined,
-            ip: newIp || undefined
+            ip: newIp || undefined,
+            category: newCat || undefined
         }
     });
 });

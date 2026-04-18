@@ -497,7 +497,14 @@
                 "duration": "Czas trwania",
                 "events": "Zdarzenia",
                 "exploration": "Eksploracja",
-                "viewTimeline": "👁️ Zobacz Timeline"
+                "viewTimeline": "👁️ Zobacz osi czasu"
+            },
+            "filters": {
+                "all": "Wszystkie sesje",
+                "scanner": "Skanery",
+                "scannerDesc": "Sesje z 0 zdarzeniami (Atakujący skanujący)",
+                "interaction": "Interakcje",
+                "interactionDesc": "Sesje z co najmniej jednym zarejestrowanym zdarzeniem"
             }
         },
         "attackDetail": {

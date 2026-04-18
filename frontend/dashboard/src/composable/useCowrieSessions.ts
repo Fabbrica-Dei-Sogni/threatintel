@@ -12,6 +12,7 @@ export function useCowrieSessions(
 ) {
     // Filtri specifici
     const filterIp = ref(initialIp);
+    const filterCategory = ref<string>('interaction');
     const sessions = ref<CowrieSession[]>([]);
 
     // Integrazione useSearchBase
@@ -31,7 +32,7 @@ export function useCowrieSessions(
         initialPage,
         initialPageSize: initialLimit,
         initialSortFields,
-        filterRefs: [filterIp]
+        filterRefs: [filterIp, filterCategory]
     });
 
     async function fetchData(): Promise<void> {
@@ -42,6 +43,7 @@ export function useCowrieSessions(
         try {
             const filters: any = {};
             if (filterIp.value) filters.src_ip = filterIp.value;
+            if (filterCategory.value) filters.sessionCategory = filterCategory.value;
 
             const response: FetchCowrieSessionsResponse = await fetchCowrieSessions(
                 page.value, 
@@ -65,6 +67,7 @@ export function useCowrieSessions(
         pageSize,
         sortFields,
         filterIp,
+        filterCategory,
         total,
         loading,
         error,

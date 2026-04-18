@@ -105,7 +105,9 @@ export class CowrieService implements ILongRunningService {
         filters: any = {}
     ) {
         const skip = (page - 1) * pageSize;
-        const mongoFilters = this.buildRegExpFilter(filters);
+        // Estraggiamo i filtri virtuali come sessionCategory prima di processare quelli DB
+        const { sessionCategory, ...dbFilters } = filters;
+        const mongoFilters = this.buildRegExpFilter(dbFilters);
 
         // Sanitizza sort contro whitelist
         const safeSort = sanitizeSortFields(sortFields, SortAllowedFields.cowrieSession);
@@ -184,7 +186,15 @@ export class CowrieService implements ILongRunningService {
                     }
                 }
             },
-            // FacETING per dati e conteggio totale
+            // Filtro per categoria (Scanner, Interaction)
+            ...(sessionCategory ? [
+                {
+                    $match: sessionCategory === 'scanner' 
+                        ? { eventCount: 0 }
+                        : { eventCount: { $gt: 0 } }
+                }
+            ] : []),
+            // Faceting per dati e conteggio totale
             {
                 $facet: {
                     data: [

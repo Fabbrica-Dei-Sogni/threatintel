@@ -17,16 +17,22 @@ export const useViewSettingsStore = defineStore('viewSettings', () => {
     const sessionsShowMap = ref<boolean>(savedSettings.sessionsShowMap ?? false);
     const sessionsShowChart = ref<boolean>(savedSettings.sessionsShowChart ?? true);
 
+    // Home Dashboard (Persistent Maps)
+    const homeShowAttackMap = ref<boolean>(savedSettings.homeShowAttackMap ?? false);
+    const homeShowSessionsMap = ref<boolean>(savedSettings.homeShowSessionsMap ?? false);
+
     // Persistence logic
     watch(
-        [attacksShowMap, attacksShowChart, logsShowChart, sessionsShowMap, sessionsShowChart],
+        [attacksShowMap, attacksShowChart, logsShowChart, sessionsShowMap, sessionsShowChart, homeShowAttackMap, homeShowSessionsMap],
         () => {
             const settings = {
                 attacksShowMap: attacksShowMap.value,
                 attacksShowChart: attacksShowChart.value,
                 logsShowChart: logsShowChart.value,
                 sessionsShowMap: sessionsShowMap.value,
-                sessionsShowChart: sessionsShowChart.value
+                sessionsShowChart: sessionsShowChart.value,
+                homeShowAttackMap: homeShowAttackMap.value,
+                homeShowSessionsMap: homeShowSessionsMap.value
             };
             localStorage.setItem(storageKey, JSON.stringify(settings));
         },
@@ -38,6 +44,8 @@ export const useViewSettingsStore = defineStore('viewSettings', () => {
         attacksShowChart,
         logsShowChart,
         sessionsShowMap,
-        sessionsShowChart
+        sessionsShowChart,
+        homeShowAttackMap,
+        homeShowSessionsMap
     };
 });

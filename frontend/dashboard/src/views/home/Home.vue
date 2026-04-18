@@ -273,6 +273,8 @@ import { useI18n } from 'vue-i18n'
 import { fetchDossiers } from '../../api';
 import { useDossierStore } from '../../stores/dossier';
 import { useAuthStore } from '../../stores/auth';
+import { useViewSettingsStore } from '../../stores/viewSettings';
+import { storeToRefs } from 'pinia';
 import dayjs from 'dayjs';
 import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
 import CountryFlag from '../../components/CountryFlag.vue';
@@ -286,14 +288,20 @@ import CowrieCategorySelector from '../../components/common/CowrieCategorySelect
 
 const { t } = useI18n();
 
+const viewStore = useViewSettingsStore();
+const { 
+  homeShowAttackMap: attackMap, 
+  homeShowSessionsMap: sessionsMap 
+} = storeToRefs(viewStore);
+
 const toggles = reactive({
   native: true,
-  recentAttacks: true,
-  attackMap: false,
+  recentAttacks: !attackMap.value,
+  attackMap: attackMap,
   recentLogs: false,
   honeypot: true,
-  recentSessions: true,
-  sessionsMap: false,
+  recentSessions: !sessionsMap.value,
+  sessionsMap: sessionsMap,
   forensic: true,
   recentDossiers: true
 });
@@ -392,6 +400,7 @@ const fetchRecentDossiers = async () => {
     loadingDossiers.value = false;
   }
 };
+
 
 import { useProfileStore } from '../../stores/profiles';
 

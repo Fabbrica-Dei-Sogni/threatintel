@@ -164,14 +164,21 @@ const renderAttacks = () => {
     const hp = currentHoneypotLocation.value;
 
     // 1. Draw Honeypot
-    L.marker([hp.lat, hp.lng], { icon: targetIcon })
+    const hpLat = parseFloat(hp.lat);
+    const hpLng = parseFloat(hp.lng);
+
+    L.marker([hpLat, hpLng], { icon: targetIcon })
         .bindPopup(`<b>${hp.label}</b>`)
         .addTo(markersLayer);
 
     // 2. Draw Attackers
-    if (!props.attacks || props.attacks.length === 0) return;
+    if (!props.attacks || props.attacks.length === 0) {
+        map.setView([hpLat, hpLng], 4);
+        return;
+    }
 
-    const validBounds = L.latLngBounds([[hp.lat, hp.lng]]);
+    let maxDLat = 0;
+    let maxDLng = 0;
 
     // Group attacks by location key to handle overlaps
     const grouped = {};
@@ -204,10 +211,14 @@ const renderAttacks = () => {
                 const angle = i * 2.4;
                 const radiusStep = 1.5; // Degrees (~150km, visible on world map)
                 const radius = radiusStep * Math.sqrt(i + 1);
-
+                
+                // Assicuriamoci che hpLat/hpLng siano numeri
                 finalLoc.lat += radius * Math.cos(angle);
                 finalLoc.lng += radius * Math.sin(angle);
             }
+
+            const fLat = parseFloat(finalLoc.lat);
+            const fLng = parseFloat(finalLoc.lng);
 
             // Helper: Quadratic Bezier curve
             const getQuadraticBezierXYatT = (startPt, controlPt, endPt, T) => {
@@ -223,11 +234,10 @@ const renderAttacks = () => {
                 // Project points to simple plane for calculation (Mercatorish approximation locally sufficient for visual curve)
                 // For global "missile" feel, a simple offset to the "North" logic is often visually clearer than perpendicular
                 // relative to the line, but let's try perpendicular for a true arc.
-
                 // Using pixels or simple lat/lng space? Lat/Lng space works for Leaflet polylines usually.
 
                 const startPt = { x: startLng, y: startLat };
-                const endPt = { x: endLng, y: endLat };
+                const endPt = { x: hpLng, y: hpLat };
 
                 // Midpoint
                 const midX = (startPt.x + endPt.x) / 2;
@@ -322,8 +332,8 @@ const renderAttacks = () => {
 
             // Curve: Attacker -> Honeypot
             // Recalculate control point for angle usage
-            const sP = { x: finalLoc.lng, y: finalLoc.lat };
-            const eP = { x: hp.lng, y: hp.lat };
+            const sP = { x: fLng, y: fLat };
+            const eP = { x: hpLng, y: hpLat };
             const dist = Math.sqrt(Math.pow(eP.x - sP.x, 2) + Math.pow(eP.y - sP.y, 2));
             // Control Point Logic mirrored
             const vX = eP.x - sP.x;
@@ -331,7 +341,7 @@ const renderAttacks = () => {
             const arcHeight = 0.2;
             const cP = { x: (sP.x + eP.x) / 2 - vY * arcHeight, y: (sP.y + eP.y) / 2 + vX * arcHeight };
 
-            const curvePoints = getCurvePoints(finalLoc.lat, finalLoc.lng, hp.lat, hp.lng);
+            const curvePoints = getCurvePoints(fLat, fLng, hpLat, hpLng);
 
             // Polyline with flow class
             const polyline = L.polyline(curvePoints, {
@@ -359,15 +369,33 @@ const renderAttacks = () => {
                 zIndexOffset: 50
             }).addTo(markersLayer);
 
-            validBounds.extend([finalLoc.lat, finalLoc.lng]);
+            // Calcolo distanze per bounds simmetrici
+            const dLat = Math.abs(fLat - hpLat);
+            const dLng = Math.abs(fLng - hpLng);
+            if (dLat > maxDLat) maxDLat = dLat;
+            if (dLng > maxDLng) maxDLng = dLng;
         });
     });
 
-    // Center on Honeypot
-    map.setView([hp.lat, hp.lng], map.getZoom());
-    
-    // Optional: we could calculate a zoom that fits most attacks while keeping HP centered, 
-    // but the user explicitly requested the target to be at the center.
+    // Usiamo un piccolo delay garantito per assicurarci che il contenitore DOM 
+    // della mappa sia stato renderizzato con le dimensioni finali
+    setTimeout(() => {
+        if (!map) return;
+        
+        // Forza il ricalcolo delle dimensioni interne di Leaflet
+        map.invalidateSize();
+
+        // Applicazione Zoom Simmetrico con obiettivo centrato
+        if (maxDLat > 0 || maxDLng > 0) {
+            // Creiamo un rettangolo simmetrico attorno all'Honeypot
+            const sw = [hpLat - maxDLat, hpLng - maxDLng];
+            const ne = [hpLat + maxDLat, hpLng + maxDLng];
+            map.fitBounds([sw, ne], { padding: [70, 70], maxZoom: 12, animate: true });
+        } else {
+            // Fallback se non ci sono attacchi o coordinate non valide
+            map.setView([hpLat, hpLng], 4);
+        }
+    }, 150);
 };
 
 onMounted(() => {

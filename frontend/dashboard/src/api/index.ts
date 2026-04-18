@@ -163,7 +163,6 @@ export async function fetchAttackSearch({
     timeConfig = {},
     sortFields = null,
 }: FetchAttackSearchParams): Promise<any> {
-    console.log('[fetchAttackSearch] Params:', { page, pageSize, filters });
     try {
         const pageNum = Math.max(1, Number(page));
         const pageSizeNum = Math.max(1, Number(pageSize));

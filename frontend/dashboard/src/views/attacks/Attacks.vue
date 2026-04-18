@@ -214,10 +214,10 @@
                             <th class="sortable-th" :data-attacks-tooltip="t('attacks.table.attackDuration')">
                                 <div class="sort-control">
                                     <span class="label">{{ t('attacks.table.short.dur') }}</span>
-                                    <button @click="toggleSort('durataAttacco.human')"
+                                    <button @click="toggleSort('durataAttacco.ms')"
                                         :aria-label="t('sorting.sortDuration')" class="sort-button">
-                                        <span v-if="getSortDirection('durataAttacco.human') === 1">▲</span>
-                                        <span v-else-if="getSortDirection('durataAttacco.human') === -1">▼</span>
+                                        <span v-if="getSortDirection('durataAttacco.ms') === 1">▲</span>
+                                        <span v-else-if="getSortDirection('durataAttacco.ms') === -1">▼</span>
                                         <span v-else>⇵</span>
                                     </button>
                                 </div>

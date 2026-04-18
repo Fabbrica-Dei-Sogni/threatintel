@@ -191,7 +191,7 @@ export class ThreatLogService {
         const mongoFilters = this.buildRegExpFilter(filters);
 
         // Costruisci sort dinamico
-        const safeSort = sanitizeSortFields(sortFields, SortAllowedFields.threatLog);
+        const safeSort = sanitizeSortFields(sortFields, SortAllowedFields.attack, { lastSeen: -1 });
         const sortStage = { $sort: safeSort };
 
         // Pipeline base costruita col nuovo Builder
@@ -242,7 +242,6 @@ export class ThreatLogService {
                 }
             }
         ];
-
 
         const [result] = await ThreatLog.aggregate(pipeline).allowDiskUse(true);
 

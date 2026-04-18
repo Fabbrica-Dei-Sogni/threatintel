@@ -9,6 +9,11 @@ const THREAT_LOG_SORT_FIELDS = new Set([
     'fingerprint.score', 'fingerprint.suspicious', 'protocol'
 ]);
 
+const ATTACK_SORT_FIELDS = new Set([
+    'dangerScore', 'averageScore', 'countRateLimit', 'rps', 'totaleLogs', 
+    'durataAttacco.ms', 'firstSeen', 'lastSeen', 'request.ip', 'attackDurationMinutes'
+]);
+
 const COWRIE_SESSION_SORT_FIELDS = new Set([
     'timestamp', 'src_ip', 'duration', 'eventCount',
     'session', 'sensor', 'protocol'
@@ -44,7 +49,7 @@ export function escapeRegex(value: string): string {
  */
 export function sanitizeSortFields(
     sortFields: any,
-    allowedFields: Set<string>,
+    allowedFields?: Set<string> | null,
     defaultSort: Record<string, 1 | -1> = { timestamp: -1 }
 ): Record<string, 1 | -1> {
     if (!sortFields || typeof sortFields !== 'object' || Array.isArray(sortFields)) {
@@ -53,7 +58,11 @@ export function sanitizeSortFields(
 
     const safe: Record<string, 1 | -1> = {};
     for (const [key, value] of Object.entries(sortFields)) {
-        if (allowedFields.has(key) && (value === 1 || value === -1)) {
+        // Se allowedFields è null o undefined, accettiamo qualsiasi chiave (permissivo)
+        // Altrimenti controlliamo che la chiave sia nella whitelist (restrittivo)
+        const isAllowed = !allowedFields || allowedFields.has(key);
+        
+        if (isAllowed && (value === 1 || value === -1)) {
             safe[key] = value;
         }
     }
@@ -119,6 +128,7 @@ export function sanitizeLimit(value: any, max = 1000, defaultVal = 100): number 
 
 export const SortAllowedFields = {
     threatLog: THREAT_LOG_SORT_FIELDS,
+    attack: ATTACK_SORT_FIELDS,
     cowrieSession: COWRIE_SESSION_SORT_FIELDS,
     dossier: DOSSIER_SORT_FIELDS,
 };

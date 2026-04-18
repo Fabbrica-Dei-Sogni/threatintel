@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import { getAuthMode } from '../api/auth';
+import router from '../router';
 
 export const useAuthStore = defineStore('auth', () => {
     const token = ref(localStorage.getItem('auth_token'));
@@ -46,7 +47,7 @@ export const useAuthStore = defineStore('auth', () => {
         user.value = null;
         localStorage.removeItem('auth_token');
         localStorage.removeItem('user_info');
-        window.location.href = '/login';
+        router.push('/login');
     }
 
     return {

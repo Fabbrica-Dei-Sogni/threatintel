@@ -21,6 +21,13 @@ export class AuthController {
         }
     }
 
+    public async getAuthMode(req: Request, res: Response): Promise<void> {
+        res.status(200).json({
+            allowAnonymous: process.env.ALLOW_ANONYMOUS === 'true',
+            anonymousRole: process.env.ANONYMOUS_ROLE || 'viewer'
+        });
+    }
+
     public async register(req: Request, res: Response): Promise<void> {
         try {
             const data = await this.authService.register(req.body);

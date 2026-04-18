@@ -201,7 +201,7 @@
       </div>
 
       <!-- DOMINIO: FORENSIC INTELLIGENCE -->
-      <div class="domain-section" style="margin-top: 40px;">
+      <div v-if="authStore.isAuthenticated" class="domain-section" style="margin-top: 40px;">
         <h2 class="domain-title" @click="toggles.forensic = !toggles.forensic">
           <div class="title-content">
             <span class="icon">📁</span> {{ t('home.forensicIntelligence') }}
@@ -265,6 +265,7 @@ import { computed, onMounted, watch, ref, reactive } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { fetchDossiers } from '../../api';
 import { useDossierStore } from '../../stores/dossier';
+import { useAuthStore } from '../../stores/auth';
 import dayjs from 'dayjs';
 import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
 import CountryFlag from '../../components/CountryFlag.vue';
@@ -387,6 +388,7 @@ import { useProfileStore } from '../../stores/profiles';
 
 const profileStore = useProfileStore();
 const dossierStore = useDossierStore();
+const authStore = useAuthStore();
 
 // Carica i dati solo una volta per la dashboard, ma ricarica se cambia il profilo
 const loadAll = () => {

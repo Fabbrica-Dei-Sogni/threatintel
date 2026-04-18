@@ -35,19 +35,29 @@ import { ref, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useDossierStore } from '../stores/dossier';
+import { useAuthStore } from '../stores/auth';
 
 const { t } = useI18n();
 const route = useRoute();
 const dossierStore = useDossierStore();
+const authStore = useAuthStore();
 
 const isOpen = ref(false);
 
-const allOptions = computed(() => [
-  { path: '/', domain: 'home', icon: '🏠', label: t('home.dashboard') },
-  { path: '/dossiers', domain: 'dossier', icon: '📁', label: t('common.dossier') },
-  { path: '/attacks', domain: 'attack', icon: '🛰️', label: t('attacks.title') },
-  { path: '/telnet-sessions', domain: 'telnet', icon: '📟', label: t('home.telnet') }
-]);
+const allOptions = computed(() => {
+  const options = [
+    { path: '/', domain: 'home', icon: '🏠', label: t('home.dashboard') },
+    { path: '/attacks', domain: 'attack', icon: '🛰️', label: t('attacks.title') },
+    { path: '/telnet-sessions', domain: 'telnet', icon: '📟', label: t('home.telnet') }
+  ];
+
+  // Aggiungi Dossiers solo se l'utente è autenticato (non anonimo)
+  if (authStore.isAuthenticated) {
+    options.splice(1, 0, { path: '/dossiers', domain: 'dossier', icon: '📁', label: t('common.dossier') });
+  }
+
+  return options;
+});
 
 const currentDomain = computed(() => {
   const p = route.path;

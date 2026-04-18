@@ -53,3 +53,12 @@ export async function loginUser(
         throw error;
     }
 }
+
+export async function getAuthMode(): Promise<AxiosResponse<{ allowAnonymous: boolean, anonymousRole: string }>> {
+    try {
+        const response = await apiClient.get('/auth/mode');
+        return response;
+    } catch (error) {
+        throw error;
+    }
+}

@@ -2,8 +2,10 @@
   <div id="app-container">
     <router-view />
 
-    <DossierRecorder />
-    <DossierToggle />
+    <template v-if="authStore.isAuthenticated">
+      <DossierRecorder />
+      <DossierToggle />
+    </template>
 
     <!-- Floating Settings Button (Solo per Admin) -->
     <router-link v-if="authStore.isAdmin" to="/settings" class="floating-settings"

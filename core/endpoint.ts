@@ -100,6 +100,7 @@ authRouter.post('/auth/login', (req, res) => authController.login(req, res));
  *         description: Registrazione completata, email di attivazione inviata.
  */
 authRouter.post('/auth/register', (req, res) => authController.register(req, res));
+authRouter.get('/auth/mode', (req, res) => authController.getAuthMode(req, res));
 router.use('/api', authRouter);
 
 // Integrazione Documentazione Swagger (OpenAPI) - PUBBLICA (Visualizzazione consentita a tutti)

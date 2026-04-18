@@ -27,12 +27,29 @@ export class AuthMiddleware {
                 return next();
             }
 
+            const allowAnonymous = process.env.ALLOW_ANONYMOUS === 'true';
+            const anonymousRole = process.env.ANONYMOUS_ROLE || 'viewer';
+
+            const setAnonymousUser = () => {
+                (req as any).user = {
+                    _id: 'anonymous',
+                    username: 'anonymous',
+                    roles: [{ name: anonymousRole }]
+                };
+                this.logger.info(`[AuthMiddleware] Accesso anonimo concesso (Ruolo: ${anonymousRole})`);
+                next();
+            }
+
             let token = req.headers.authorization;
             if (token && token.startsWith('Bearer ')) {
                 token = token.slice(7, token.length);
             }
 
             if (!token) {
+                if (allowAnonymous) {
+                    return setAnonymousUser();
+                }
+
                 const locale = this.getLocale(req);
                 const message = this.i18n.t('errors.auth.tokenMissing', locale);
                 this.logger.warn(`[AuthMiddleware] Accesso negato: ${message}`);
@@ -45,6 +62,11 @@ export class AuthMiddleware {
                 (req as any).user = user; // Popola request
                 next();
             } catch (error: any) {
+                if (allowAnonymous) {
+                    this.logger.warn(`[AuthMiddleware] Fallback su anonimo a causa di errore auth: ${error.message || 'Errore sconosciuto'}`);
+                    return setAnonymousUser();
+                }
+
                 const locale = this.getLocale(req);
                 const defaultMsg = this.i18n.t('errors.auth.tokenInvalid', locale);
                 const message = error.message || defaultMsg;

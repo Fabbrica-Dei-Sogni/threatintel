@@ -16,7 +16,7 @@ const options: swaggerJsdoc.Options = {
     },
     servers: [
       {
-        url: '/honeypot',
+        url: '/honeypot/api',
         description: 'Server Produzione (Nginx Proxy)'
       }
     ],

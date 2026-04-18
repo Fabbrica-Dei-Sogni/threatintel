@@ -35,7 +35,7 @@ app.use(helmet({
             styleSrc: ["'self'", "'unsafe-inline'"],
             scriptSrc: ["'self'", "'unsafe-inline'"],
             imgSrc: ["'self'", "data:", "https://validator.swagger.io"],
-            connectSrc: ["'self'", "https://alessandromodica.com:2443", "http://82.112.255.186:5173"]
+            connectSrc: ["'self'", "https://alessandromodica.com", "http://82.112.255.186:5173"]
         },
     },
     hsts: {
@@ -47,7 +47,7 @@ app.use(helmet({
 
 // Middleware generali
 app.use(cors({
-    origin: ['http://localhost:5173', 'https://alessandromodica.com:2443', 'http://82.112.255.186:5173'],
+    origin: ['http://localhost:5173', 'https://alessandromodica.com', 'http://82.112.255.186:5173'],
     credentials: true,
     exposedHeaders: ['Content-Disposition', 'Content-Length']
 }));

@@ -1,8 +1,8 @@
 // src/api/auth.ts
 import axios from 'axios';
-import type { AxiosResponse} from 'axios';
+import type { AxiosResponse } from 'axios';
 
-const baseURL: string = import.meta.env.VUE_APP_API_URL || 'https://alessandromodica.com:2443/honeypot';
+const baseURL: string = import.meta.env.VUE_APP_API_URL || 'https://alessandromodica.com/honeypot/api';
 
 const apiClient = axios.create({
     baseURL,

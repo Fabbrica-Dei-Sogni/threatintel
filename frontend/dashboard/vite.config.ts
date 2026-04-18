@@ -3,6 +3,7 @@ import vue from '@vitejs/plugin-vue';
 import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
+    base: '/honeypot/',
     plugins: [
         vue(),
         VitePWA({
@@ -16,8 +17,8 @@ export default defineConfig({
                 theme_color: '#1a1a1a',
                 background_color: '#1a1a1a',
                 display: 'standalone',
-                scope: '/',
-                start_url: '/',
+                scope: '/honeypot/',
+                start_url: '/honeypot/',
                 orientation: 'any',
                 icons: [
                     {
@@ -41,8 +42,8 @@ export default defineConfig({
                 ]
             },
             workbox: {
-                // Impedisce al Service Worker di gestire rotte esterne alla app Vue
-                navigateFallbackDenylist: [/^\/honeypot/]
+                // Impedisce al Service Worker di gestire rotte esterne alla app Vue (API)
+                navigateFallbackDenylist: [/^\/honeypot\/api/]
             }
         })
     ],

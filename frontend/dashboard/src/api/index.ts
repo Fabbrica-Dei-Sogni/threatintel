@@ -15,7 +15,7 @@ export const getApiUrl = (): string => {
         // Silenziamo l'errore se Pinia non è ancora pronto
     }
     // Fallback prioritario al localStorage (vecchio sistema) o ENV
-    return localStorage.getItem('api_url') || import.meta.env.VITE_APP_API_URL || 'https://alessandromodica.com:2443/honeypot';
+    return localStorage.getItem('api_url') || import.meta.env.VITE_APP_API_URL || '/honeypot/api';
 };
 
 const apiClient = axios.create({

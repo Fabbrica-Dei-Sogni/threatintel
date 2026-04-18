@@ -21,7 +21,8 @@ export class ThreatController {
     async getStats(req: Request, res: Response): Promise<void> {
         this.logger.info('[ThreatController] Requesting stats');
         try {
-            const stats = await this.threatLogService.getStats('24h');
+            const timeframe = (req.query.timeframe as string) || '24h';
+            const stats = await this.threatLogService.getStats(timeframe);
             const topThreats = await this.threatLogService.getTopThreats(10);
 
             res.json({

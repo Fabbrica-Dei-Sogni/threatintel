@@ -26,31 +26,7 @@
                         ✕
                     </button>
                 </div>
-                <div class="category-filters">
-                    <button 
-                        class="cyber-chip" 
-                        :class="{ active: filterCategory === '' }" 
-                        @click="filterCategory = ''"
-                    >
-                        {{ $t('cowrie.sessions.filters.all') }}
-                    </button>
-                    <button 
-                        class="cyber-chip scanner" 
-                        :class="{ active: filterCategory === 'scanner' }" 
-                        @click="filterCategory = 'scanner'"
-                        :title="$t('cowrie.sessions.filters.scannerDesc')"
-                    >
-                        <span class="dot"></span> {{ $t('cowrie.sessions.filters.scanner') }}
-                    </button>
-                    <button 
-                        class="cyber-chip interaction" 
-                        :class="{ active: filterCategory === 'interaction' }" 
-                        @click="filterCategory = 'interaction'"
-                        :title="$t('cowrie.sessions.filters.interactionDesc')"
-                    >
-                        <span class="dot"></span> {{ $t('cowrie.sessions.filters.interaction') }}
-                    </button>
-                </div>
+                <CowrieCategorySelector v-model="filterCategory" />
             </div>
         </section>
 
@@ -219,6 +195,7 @@ import CountryFlag from '../../components/CountryFlag.vue';
 import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
 import SessionChart from '../../components/SessionChart.vue';
 import AttackMap from '../../components/AttackMap.vue';
+import CowrieCategorySelector from '../../components/common/CowrieCategorySelector.vue';
 import ViewToggle from '../../components/common/ViewToggle.vue';
 
 const props = defineProps({

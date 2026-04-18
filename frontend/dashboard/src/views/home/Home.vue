@@ -157,6 +157,7 @@
                     <h3>{{ $t('home.recentSessions').toUpperCase() }}</h3>
                   </div>
                   <div class="header-actions" @click.stop>
+                    <CowrieCategorySelector v-model="filterCategory" size="mini" />
                     <ViewToggle v-model="toggles.sessionsMap" :label="$t('common.showMap')" theme="jade" />
                     <span class="arrow" :class="{ open: toggles.recentSessions }"></span>
                   </div>
@@ -281,6 +282,7 @@ import ConfigMenuButton from '../../components/ConfigMenuButton.vue';
 import ProtocolSelector from '../../components/common/ProtocolSelector.vue';
 import ViewToggle from '../../components/common/ViewToggle.vue';
 import DefconIndicator from '../../components/DefconIndicator.vue';
+import CowrieCategorySelector from '../../components/common/CowrieCategorySelector.vue';
 
 const { t } = useI18n();
 
@@ -350,9 +352,9 @@ const {
 
 const recentLogs = computed(() => logs.value.slice(0, 10))
 
-// Sessioni Telnet - ultime 10
 const {
   sessions,
+  filterCategory,
   loading: loadingSessions,
   error: errorSessions,
   fetchData: fetchSessions

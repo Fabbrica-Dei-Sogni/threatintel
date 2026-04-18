@@ -583,8 +583,13 @@ export class ThreatLogService {
     }
 
     async getStats(timeframe = '24h') {
-        const hours = timeframe === '24h' ? 24 : 168; // 1 week
+        let hours = 24;
+        if (timeframe === '1w') hours = 168;
+        else if (timeframe === '1m') hours = 720;
+        else if (timeframe === '1y') hours = 8760;
+
         const since = new Date(Date.now() - hours * 60 * 60 * 1000);
+        this.logger.info(`[ThreatLogService] Calculating stats for timeframe: ${timeframe} (since: ${since.toISOString()})`);
 
         const stats = await ThreatLog.aggregate([
             { $match: { timestamp: { $gte: since } } },

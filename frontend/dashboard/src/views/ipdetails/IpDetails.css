@@ -586,70 +586,160 @@ h1 {
   color: #f0e6d2;
 }
 
-/* Tabella RateLimit override */
-:deep(.el-table) {
-  background-color: #262323 !important;
-  color: #f0e6d2 !important;
-  border-radius: 6px !important;
-  font-size: 14px !important;
-  min-width: 720px !important;
+/* RateLimit Cards Cyber-Sleek Alignment */
+.ratelimit-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 15px;
 }
 
-/* Mobile overrides for el-table */
+.ratelimit-card {
+  background: rgba(15, 23, 42, 0.45);
+  border: 1px solid rgba(0, 212, 255, 0.1);
+  border-radius: 12px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  backdrop-filter: blur(8px);
+}
+
+.ratelimit-card:hover {
+  border-color: rgba(0, 212, 255, 0.3);
+  background: rgba(15, 23, 42, 0.7);
+  transform: translateX(4px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.ratelimit-card.expanded {
+  border-color: rgba(0, 212, 255, 0.5);
+  background: rgba(10, 25, 45, 0.6);
+  box-shadow: 0 10px 30px rgba(0, 168, 255, 0.15);
+  transform: none;
+}
+
+.ratelimit-header {
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.ratelimit-meta {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  min-width: 0;
+  flex: 1;
+}
+
+.ratelimit-time {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.ratelimit-badges {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.limit-badge {
+  background: rgba(255, 183, 77, 0.1) !important;
+  color: #ffb74d !important;
+  border: 1px solid rgba(255, 183, 77, 0.2);
+}
+
+.method-badge {
+  font-family: 'JetBrains Mono', monospace;
+  padding: 2px 10px !important;
+}
+
+.method-badge.post { color: #4ade80 !important; background: rgba(74, 222, 128, 0.1) !important; border-color: rgba(74, 222, 128, 0.2); }
+.method-badge.get { color: #60a5fa !important; background: rgba(96, 165, 250, 0.1) !important; border-color: rgba(96, 165, 250, 0.2); }
+.method-badge.put { color: #facc15 !important; background: rgba(250, 204, 21, 0.1) !important; border-color: rgba(250, 204, 21, 0.2); }
+.method-badge.delete { color: #f87171 !important; background: rgba(248, 113, 113, 0.1) !important; border-color: rgba(248, 113, 113, 0.2); }
+
+.ratelimit-path-short {
+  flex: 2;
+  min-width: 0;
+  color: #94a3b8;
+  font-size: 0.85rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ratelimit-path-short code {
+  color: #00d4ff;
+  opacity: 0.7;
+}
+
+.ratelimit-content {
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.25);
+  border-top: 1px solid rgba(0, 212, 255, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.detail-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.detail-label {
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: #4B6584;
+  letter-spacing: 1px;
+}
+
+.detail-value {
+  color: #e2e8f0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.path-full {
+  display: block;
+  background: rgba(0, 212, 255, 0.05);
+  color: #00d4ff;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.9rem;
+  word-break: break-all;
+  border-left: 2px solid #00d4ff;
+}
+
+.headers-section {
+  margin-top: 8px;
+}
+
 @media (max-width: 768px) {
-  :deep(.el-table) {
-    min-width: 100% !important;
-    /* Force fit width */
-    width: 100% !important;
+  .ratelimit-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .ratelimit-meta {
+    width: 100%;
+    justify-content: space-between;
+    gap: 12px;
   }
 
-  :deep(.el-table .el-table__body),
-  :deep(.el-table .el-table__header) {
-    width: 100% !important;
+  .ratelimit-path-short {
+    width: 100%;
+    font-size: 0.75rem;
   }
-
-  /* Fluid typography for table cells on mobile */
-  :deep(.el-table th),
-  :deep(.el-table td) {
-    font-size: clamp(9px, 1.8vw, 13px) !important;
-    padding: 8px 4px !important;
-  }
-}
-
-:deep(.el-table th) {
-  background-color: rgba(0, 122, 255, 0.15) !important;
-  color: #00D4FF !important;
-  font-weight: 700 !important;
-  user-select: none !important;
-  padding: 12px 10px !important;
-  border-bottom: 1px solid rgba(0, 212, 255, 0.3) !important;
-}
-
-:deep(.el-table td) {
-  background-color: #2f2c2b !important;
-  color: #e0d9c1 !important;
-  font-size: 13px !important;
-  padding: 12px 10px !important;
-}
-
-:deep(.el-table .el-table__expand-icon) {
-  color: #00D4FF !important;
-  font-size: 20px !important;
-  transition: transform 0.3s ease !important;
-}
-
-:deep(.el-table .el-table__expand-icon.is-expand) {
-  transform: rotate(180deg) !important;
-}
-
-:deep(.el-table--border),
-:deep(.el-table--group) {
-  border: 1px solid rgba(0, 212, 255, 0.15) !important;
-}
-
-:deep(.el-table td.el-table__cell),
-:deep(.el-table th.el-table__cell.is-leaf) {
-  border-bottom: 1px solid rgba(0, 212, 255, 0.1) !important;
 }
 
 /* Loading e Error */

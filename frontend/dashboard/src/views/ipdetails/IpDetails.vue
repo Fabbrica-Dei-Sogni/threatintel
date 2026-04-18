@@ -236,34 +236,50 @@
         </div>
         <transition name="collapse">
           <div v-if="toggles.ratelimit" class="section-body">
-            <div class="table-wrapper">
-              <el-table :data="rateLimit.data" style="width: 100%;" :loading="rateLimit.loading"
-                row-class-name="cyber-table-row" border>
-                <el-table-column type="expand">
-                  <template #default="{ row }">
-                    <div class="expanded-details">
-                      <p><strong>{{ t('ipDetails.headers') }}:</strong></p>
-                      <pre class="headers-pre">{{ JSON.stringify(row.headers, null, 2) }}</pre>
-                      <p><strong>{{ t('ipDetails.message') }}:</strong> {{ row.message || '-' }}</p>
-                      <p><strong>{{ t('ipDetails.honeypotId') }}:</strong> {{ row.honeypotId || '-' }}</p>
-                      <p><strong>{{ t('ipDetails.userAgent') }}:</strong> {{ row.userAgent || '-' }}</p>
-                    </div>
-                  </template>
-                </el-table-column>
-
-                <el-table-column prop="timestamp" :label="t('ipDetails.timestamp')" width="180">
-                  <template #default="{ row }">
-                    <div class="time-display">
+            <div class="ratelimit-container">
+              <div v-for="(row, idx) in rateLimit.data" :key="idx" class="ratelimit-card"
+                :class="{ expanded: expandedRateLimit[idx] }">
+                <div class="ratelimit-header" @click="expandedRateLimit[idx] = !expandedRateLimit[idx]">
+                  <div class="ratelimit-meta">
+                    <div class="ratelimit-time">
                       <span class="t-date">{{ dayjs(row.timestamp).format('DD/MM/YYYY') }}</span>
                       <span class="t-hour">{{ dayjs(row.timestamp).format('HH:mm:ss') }}</span>
                     </div>
-                  </template>
-                </el-table-column>
-                <el-table-column prop="limitType" :label="t('ipDetails.limitType')" width="160" />
-                <el-table-column prop="ip" :label="t('ipDetails.ip')" width="140" />
-                <el-table-column prop="method" :label="t('ipDetails.method')" width="90" />
-                <el-table-column prop="path" :label="t('ipDetails.path')" show-overflow-tooltip />
-              </el-table>
+                    <div class="ratelimit-badges">
+                      <span class="cat-badge limit-badge">{{ row.limitType }}</span>
+                      <span class="cat-badge method-badge" :class="row.method?.toLowerCase()">{{ row.method }}</span>
+                    </div>
+                  </div>
+                  <div class="ratelimit-path-short" v-if="!expandedRateLimit[idx]">
+                    <code>{{ row.path }}</code>
+                  </div>
+                  <span class="report-arrow">⌄</span>
+                </div>
+                <transition name="collapse">
+                  <div v-if="expandedRateLimit[idx]" class="ratelimit-content">
+                    <div class="detail-row">
+                      <span class="detail-label">{{ t('ipDetails.path').toUpperCase() }}:</span>
+                      <code class="path-full">{{ row.path }}</code>
+                    </div>
+                    <div class="detail-row" v-if="row.message">
+                      <span class="detail-label">{{ t('ipDetails.message').toUpperCase() }}:</span>
+                      <span class="detail-value">{{ row.message }}</span>
+                    </div>
+                    <div class="detail-row" v-if="row.honeypotId">
+                      <span class="detail-label">{{ t('ipDetails.honeypotId').toUpperCase() }}:</span>
+                      <span class="detail-value">{{ row.honeypotId }}</span>
+                    </div>
+                    <div class="detail-row" v-if="row.userAgent">
+                      <span class="detail-label">{{ t('ipDetails.userAgent').toUpperCase() }}:</span>
+                      <span class="detail-value">{{ row.userAgent }}</span>
+                    </div>
+                    <div class="headers-section">
+                      <span class="detail-label">{{ t('ipDetails.headers').toUpperCase() }}:</span>
+                      <pre class="headers-pre">{{ JSON.stringify(row.headers, null, 2) }}</pre>
+                    </div>
+                  </div>
+                </transition>
+              </div>
             </div>
 
             <div class="pagination-container">
@@ -373,6 +389,7 @@ const reportsMeta = reactive({
   total: 0
 });
 const expandedReports = reactive({});
+const expandedRateLimit = reactive({});
 
 const toggles = reactive({
   abuse: true,

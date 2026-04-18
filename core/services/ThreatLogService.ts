@@ -591,46 +591,72 @@ export class ThreatLogService {
         const since = new Date(Date.now() - hours * 60 * 60 * 1000);
         this.logger.info(`[ThreatLogService] Calculating stats for timeframe: ${timeframe} (since: ${since.toISOString()})`);
 
-        const stats = await ThreatLog.aggregate([
+        const results = await ThreatLog.aggregate([
             { $match: { timestamp: { $gte: since } } },
             {
-                $group: {
-                    _id: null,
-                    totalRequests: { $sum: 1 },
-                    suspiciousRequests: {
-                        $sum: {
-                            $cond: [
-                                {
-                                    $and: [
-                                        { $eq: ['$fingerprint.suspicious', true] },
-                                        { $gt: ['$fingerprint.score', 15] }
-                                    ]
-                                },
-                                1,
-                                0
-                            ]
+                $facet: {
+                    mainStats: [
+                        {
+                            $group: {
+                                _id: null,
+                                totalRequests: { $sum: 1 },
+                                suspiciousRequests: {
+                                    $sum: {
+                                        $cond: [
+                                            {
+                                                $and: [
+                                                    { $eq: ['$fingerprint.suspicious', true] },
+                                                    { $gt: ['$fingerprint.score', 15] }
+                                                ]
+                                            },
+                                            1,
+                                            0
+                                        ]
+                                    }
+                                }
+                            }
                         }
-                    },
-                    uniqueIPs: { $addToSet: '$request.ip' },
-                    topCountries: { $push: '$geo.country' },
-                    topUserAgents: { $push: '$request.userAgent' }
+                    ],
+                    topCountries: [
+                        { $match: { 'geo.country': { $exists: true, $ne: null } } },
+                        { $group: { _id: '$geo.country', count: { $sum: 1 } } },
+                        { $sort: { count: -1 } },
+                        { $limit: 10 }
+                    ],
+                    topIndicators: [
+                        { $match: { 'fingerprint.indicators': { $exists: true, $ne: [] } } },
+                        { $unwind: '$fingerprint.indicators' },
+                        { $group: { _id: '$fingerprint.indicators', count: { $sum: 1 } } },
+                        { $sort: { count: -1 } },
+                        { $limit: 10 }
+                    ]
                 }
             }
         ]);
 
-        return stats[0] || {
-            totalRequests: 0,
-            suspiciousRequests: 0,
-            uniqueIPs: [],
-            topCountries: [],
-            topUserAgents: []
+        const facet = results[0];
+        const stats = facet.mainStats[0] || { totalRequests: 0, suspiciousRequests: 0 };
+        
+        // Formattazione per il frontend: convertiamo gli array di _id/count in mappe Record<string, number>
+        const countriesMap: Record<string, number> = {};
+        facet.topCountries.forEach((c: any) => { countriesMap[c._id] = c.count; });
+        
+        const indicatorsMap: Record<string, number> = {};
+        facet.topIndicators.forEach((i: any) => { indicatorsMap[i._id] = i.count; });
+
+        return {
+            totalRequests: stats.totalRequests,
+            suspiciousRequests: stats.suspiciousRequests,
+            topCountries: countriesMap,
+            topIndicators: indicatorsMap
         };
     }
+
 
     async getTopThreats(limit = 10) {
         return await ThreatLog.find({ 'fingerprint.suspicious': true })
             .sort({ 'fingerprint.score': -1 })
             .limit(limit)
-            .select('request.ip request.url fingerprint.score fingerprint.indicators timestamp');
+            .select('request.ip request.url fingerprint.score fingerprint.indicators geo.country timestamp');
     }
 }

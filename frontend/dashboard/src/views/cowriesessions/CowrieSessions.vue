@@ -309,16 +309,23 @@ const {
 );
 
 
-// Sincronizza l'URL quando cambia lo stato
+// Sincronizzazione Prop -> Ref (per back/forward browser)
+watch(() => props.initialPage,     (v) => { page.value           = v ?? 1; });
+watch(() => props.initialPageSize, (v) => { pageSize.value        = v ?? 20; });
+watch(() => props.initialSortFields,(v) => { sortFields.value     = v ?? {}; }, { deep: true });
+watch(() => props.initialIp,       (v) => { filterIp.value        = v ?? ''; });
+watch(() => props.initialCategory, (v) => { filterCategory.value  = v ?? 'interaction'; });
+
+// Sincronizzazione Ref -> URL query
 watch([page, pageSize, sortFields, filterIp, filterCategory], ([newPage, newPageSize, newSort, newIp, newCat]) => {
     router.replace({
         name: 'CowrieSessions',
         query: {
             page: newPage > 1 ? newPage : undefined,
             pageSize: newPageSize !== 20 ? newPageSize : undefined,
-            sortFields: newSort ? JSON.stringify(newSort) : undefined,
+            sortFields: newSort && Object.keys(newSort).length > 0 ? JSON.stringify(newSort) : undefined,
             ip: newIp || undefined,
-            category: newCat || undefined
+            category: newCat !== 'interaction' ? newCat : undefined
         }
     });
 });

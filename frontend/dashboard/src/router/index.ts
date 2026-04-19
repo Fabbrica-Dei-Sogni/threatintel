@@ -85,10 +85,30 @@ const routes: RouteRecordRaw[] = [
             agoValue: route.query.agoValue ? parseInt(route.query.agoValue as string) : 1,
             agoUnit: route.query.agoUnit || 'days',
             dateRange: route.query.dateRange || [null, null],
+            initialPageLogs: route.query.pLogs ? parseInt(route.query.pLogs as string) : 1,
+            initialPageEvents: route.query.pEvents ? parseInt(route.query.pEvents as string) : 1,
+            initialSearchUrl: typeof route.query.qUrl === 'string' ? route.query.qUrl : '',
         }),
     },
-    { path: '/ip/:ip', name: 'IpDetails', component: IpDetails, props: true },
-    { path: '/threatlog/:id', name: 'ThreatLog', component: ThreatLog, props: true },
+    { 
+        path: '/ip/:ip', 
+        name: 'IpDetails', 
+        component: IpDetails, 
+        props: (route: RouteLocationNormalized) => ({ 
+            ip: route.params.ip,
+            initialPageReports: route.query.pReports ? parseInt(route.query.pReports as string) : 1,
+            initialPageRateLimit: route.query.pRateLimit ? parseInt(route.query.pRateLimit as string) : 1,
+        }) 
+    },
+    { 
+        path: '/threatlog/:id', 
+        name: 'ThreatLog', 
+        component: ThreatLog, 
+        props: (route: RouteLocationNormalized) => ({ 
+            id: route.params.id,
+            initialTab: typeof route.query.tab === 'string' ? route.query.tab : 'request'
+        }) 
+    },
     { path: '/login', name: 'Login', component: Login },
     { path: '/register', name: 'Register', component: Register },
     { path: '/settings', name: 'SettingsHub', component: SettingsHub, meta: { requiresAdmin: true } },
@@ -107,7 +127,12 @@ const routes: RouteRecordRaw[] = [
             initialCategory: typeof route.query.category === 'string' ? route.query.category : 'interaction',
         }),
     },
-    { path: '/telnet-attack-detail/:id', name: 'CowrieAttackDetail', component: CowrieAttackDetail },
+    { 
+        path: '/telnet-attack-detail/:id', 
+        name: 'CowrieAttackDetail', 
+        component: CowrieAttackDetail,
+        props: (route: RouteLocationNormalized) => ({ id: route.params.id })
+    },
     { 
         path: '/dossiers', 
         name: 'Dossiers', 

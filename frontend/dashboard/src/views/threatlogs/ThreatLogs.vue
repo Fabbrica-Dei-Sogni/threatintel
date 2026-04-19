@@ -291,7 +291,14 @@ onUnmounted(() => {
   if (tableScrollRef.value) tableScrollRef.value.removeEventListener('scroll', handleTableScroll);
 });
 
-// Watches
+// Sincronizzazione Prop -> Ref (per back/forward browser)
+watch(() => props.initialIp,         (v) => { filterIp.value       = v ?? ''; });
+watch(() => props.initialUrl,        (v) => { filterUrl.value      = v ?? ''; });
+watch(() => props.initialProtocol,   (v) => { filterProtocol.value = v ?? 'http'; });
+watch(() => props.initialPage,       (v) => { page.value           = v ?? 1; });
+watch(() => props.initialSortFields, (v) => { sortFields.value     = v ?? {}; }, { deep: true });
+
+// Sincronizzazione Ref -> URL query
 watch([filterIp, filterUrl, filterProtocol, page, sortFields], ([newIp, newUrl, newProto, newPage, newSortFields]) => {
   router.replace({
     name: 'ThreatLogs',
@@ -300,7 +307,7 @@ watch([filterIp, filterUrl, filterProtocol, page, sortFields], ([newIp, newUrl, 
       url: newUrl || undefined,
       protocol: newProto !== 'http' ? newProto : undefined,
       page: newPage > 1 ? newPage : undefined,
-      sortFields: newSortFields ? JSON.stringify(newSortFields) : undefined
+      sortFields: newSortFields && Object.keys(newSortFields).length > 0 ? JSON.stringify(newSortFields) : undefined
     },
   });
 });

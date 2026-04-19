@@ -419,6 +419,18 @@ const props = defineProps({
     dateRange: {
         type: Array,
         default: () => [null, null]
+    },
+    initialPageLogs: {
+        type: Number,
+        default: 1
+    },
+    initialPageEvents: {
+        type: Number,
+        default: 1
+    },
+    initialSearchUrl: {
+        type: String,
+        default: ''
     }
 })
 
@@ -438,16 +450,43 @@ const router = useRouter()
 const expanded = reactive({})
 const expandedEvents = reactive({})
 const activeLogTabs = reactive({}) // logId -> 'request' | 'headers' | 'body' | 'response'
-const currentPage = ref(1)
+const currentPage = ref(props.initialPageLogs)
 const pageSize = ref(5)
-const currentPageEvents = ref(1)
+const currentPageEvents = ref(props.initialPageEvents)
 const pageSizeEvents = ref(5)
-const searchUrl = ref('')
+const searchUrl = ref(props.initialSearchUrl)
 
 // Reset page when search changes
 watch(searchUrl, () => {
     currentPage.value = 1
 })
+
+// Sincronizzazione Prop -> Ref (per back/forward browser)
+watch(() => props.ip, (newIp) => {
+    if (newIp && newIp !== attack.value?.request?.ip) {
+        loadAttackData();
+    }
+});
+watch(() => props.initialPageLogs,   (v) => { currentPage.value       = v ?? 1; });
+watch(() => props.initialPageEvents, (v) => { currentPageEvents.value = v ?? 1; });
+watch(() => props.initialSearchUrl,  (v) => { searchUrl.value         = v ?? ''; });
+
+// Sincronizzazione Ref -> URL query
+watch(
+    [() => props.ip, currentPage, currentPageEvents, searchUrl],
+    ([newIp, nPageL, nPageE, nSearch]) => {
+        router.replace({
+            name: 'AttackDetail',
+            params: { ip: newIp },
+            query: {
+                ...route.query, // Mantieni i filtri temporali esistenti
+                pLogs: nPageL > 1 ? nPageL : undefined,
+                pEvents: nPageE > 1 ? nPageE : undefined,
+                qUrl: nSearch || undefined
+            }
+        });
+    }
+);
 
 // Helper for Defcon Level mapping
 /*

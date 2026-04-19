@@ -160,7 +160,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, reactive } from 'vue';
+import { ref, onMounted, computed, reactive, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { formatDateTime, formatFullDateTime, formatHumanDuration } from '../../utils/dateUtils';
 import dayjs from 'dayjs';
@@ -173,12 +173,16 @@ import AttackMap from '../../components/AttackMap.vue';
 import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
 import ReportActions from '../../components/ReportActions.vue';
 
+const props = defineProps({
+    id: { type: String, required: true }
+})
+
 const { t } = useI18n();
 const { copyToClipboard, copyFormatted, renderTemplate } = useClipboard();
 const dossierStore = useDossierStore();
 const route = useRoute();
 const router = useRouter();
-const sessionId = route.params.id;
+const sessionId = ref(props.id);
 
 const sessionDetails = ref(null);
 const events = ref([]);
@@ -302,8 +306,8 @@ const fetchSessionData = async () => {
     error.value = null;
     try {
         const [detailsData, eventsData] = await Promise.all([
-            fetchCowrieSessionDetails(sessionId),
-            fetchCowrieSessionEvents(sessionId)
+            fetchCowrieSessionDetails(sessionId.value),
+            fetchCowrieSessionEvents(sessionId.value)
         ]);
         sessionDetails.value = detailsData;
         // Gestiamo sia il caso array diretto che l'oggetto con property 'data' o 'events'
@@ -356,6 +360,14 @@ const getEventTypeClass = (eventId) => {
 
 onMounted(() => {
     fetchSessionData();
+});
+
+// Sincronizzazione Prop -> Ref (per back/forward browser)
+watch(() => props.id, (newId) => {
+    if (newId && newId !== sessionId.value) {
+        sessionId.value = newId;
+        fetchSessionData();
+    }
 });
 </script>
 

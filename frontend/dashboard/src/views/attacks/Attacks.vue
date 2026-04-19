@@ -435,24 +435,40 @@ const totalPages = computed(() => Math.ceil(total.value / pageSize.value));
 
 // Aggiorna URL query con router.replace al cambiamento dei filtri
 // Aggiorna URL query con router.replace al cambiamento dei filtri
+// Sincronizzazione Prop -> Ref (per back/forward browser)
+watch(() => props.initialIp,              (v) => { filterIp.value          = v ?? ''; });
+watch(() => props.initialProtocol,        (v) => { filterProtocol.value    = v ?? 'http'; });
+watch(() => props.initialPage,            (v) => { page.value              = v ?? 1; });
+watch(() => props.initialMinLogsForAttack,(v) => { minLogsForAttack.value  = v ?? 10; });
+watch(() => props.initTimeMode,           (v) => { timeMode.value          = v ?? 'ago'; });
+watch(() => props.initAgoValue,           (v) => { agoValue.value          = v ?? 10; });
+watch(() => props.initAgoUnit,            (v) => { agoUnit.value           = v ?? 'days'; });
+watch(() => props.initDateRange,          (v) => { dateRange.value         = v ?? [null, null]; }, { deep: true });
+watch(() => props.initFromValue,          (v) => { fromValue.value         = v ?? 60; });
+watch(() => props.initFromUnit,           (v) => { fromUnit.value          = v ?? 'days'; });
+watch(() => props.initToValue,            (v) => { toValue.value           = v ?? 0; });
+watch(() => props.initToUnit,             (v) => { toUnit.value            = v ?? 'days'; });
+watch(() => props.initialSortFields,      (v) => { sortFields.value        = v ?? {}; }, { deep: true });
+
+// Sincronizzazione Ref -> URL query
 watch(
     [filterIp, filterProtocol, minLogsForAttack, timeMode, agoValue, agoUnit, dateRange, fromValue, fromUnit, toValue, toUnit, page, sortFields],
     ([nip, nproto, nmin, ntMode, ngaoVal, ngaoUnit, ndRange, nFromVal, nFromUnit, nToVal, nToUnit, nPage, newSortFields]) => {
         router.replace({
             name: 'Attacks',
             query: {
-                ip: nip,
+                ip: nip || undefined,
                 protocol: nproto !== 'http' ? nproto : undefined,
                 page: nPage > 1 ? nPage : undefined,
-                minLogsForAttack: nmin !== 2 ? nmin : 10,
-                timeMode: ntMode,
-                agoValue: ngaoVal,
-                agoUnit: ngaoUnit,
-                dateRange: ndRange,
-                fromValue: nFromVal,
-                fromUnit: nFromUnit,
-                toValue: nToVal,
-                toUnit: nToUnit,
+                minLogsForAttack: nmin !== 10 ? nmin : undefined,
+                timeMode: ntMode !== 'ago' ? ntMode : undefined,
+                agoValue: ngaoVal !== 10 ? ngaoVal : undefined,
+                agoUnit: ngaoUnit !== 'days' ? ngaoUnit : undefined,
+                dateRange: ndRange && (ndRange[0] || ndRange[1]) ? ndRange : undefined,
+                fromValue: nFromVal !== 60 ? nFromVal : undefined,
+                fromUnit: nFromUnit !== 'days' ? nFromUnit : undefined,
+                toValue: nToVal !== 0 ? nToVal : undefined,
+                toUnit: nToUnit !== 'days' ? nToUnit : undefined,
                 sortFields: newSortFields ? JSON.stringify(newSortFields) : undefined
             }
         });

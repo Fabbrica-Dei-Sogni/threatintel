@@ -326,7 +326,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, onUnmounted, computed } from 'vue'
+import { ref, reactive, onMounted, onUnmounted, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { formatDateTime, formatFullDateTime } from '../../utils/dateUtils';
 import dayjs from 'dayjs'
@@ -339,13 +339,19 @@ import { ElMessage } from 'element-plus';
 import { useClipboard } from '../../composable/useClipboard';
 import { useAuthStore } from '../../stores/auth';
 
+const props = defineProps({
+  ip: { type: String, required: true },
+  initialPageReports: { type: Number, default: 1 },
+  initialPageRateLimit: { type: Number, default: 1 }
+})
+
 const route = useRoute()
 const router = useRouter()
 const { t } = useI18n();
 const authStore = useAuthStore();
 const { copyToClipboard, copyFormatted } = useClipboard();
 
-const ip = ref('')
+const ip = ref(props.ip)
 const ipInfo = ref(null)
 const loading = ref(false)
 const loadingEnrich = ref(false)
@@ -380,7 +386,7 @@ const loadingReports = ref(false);
 const reports = ref([]); // Array di report
 const errorReports = ref(false)
 const reportsMeta = reactive({
-  page: 1,
+  page: props.initialPageReports,
   pageSize: 5,
   total: 0
 });
@@ -399,7 +405,7 @@ const toggles = reactive({
 const rateLimit = reactive({
   data: [],
   loading: false,
-  page: 1,
+  page: props.initialPageRateLimit,
   pageSize: 5,
   total: 0
 })
@@ -431,6 +437,28 @@ function handleReportsPageSizeChange(size) {
   reportsMeta.pageSize = size;
   reportsMeta.page = 1;
 }
+
+// Sincronizzazione Prop -> Ref (per back/forward browser)
+watch(() => props.ip, (newIp) => {
+  if (newIp && newIp !== ip.value) {
+    ip.value = newIp;
+    loadIpDetails();
+  }
+});
+watch(() => props.initialPageReports, (v) => { reportsMeta.page = v ?? 1; });
+watch(() => props.initialPageRateLimit, (v) => { rateLimit.page = v ?? 1; });
+
+// Sincronizzazione Ref -> URL query
+watch([ip, () => reportsMeta.page, () => rateLimit.page], ([newIp, newPRep, newPRat]) => {
+  router.replace({
+    name: 'IpDetails',
+    params: { ip: newIp },
+    query: {
+      pReports: newPRep > 1 ? newPRep : undefined,
+      pRateLimit: newPRat > 1 ? newPRat : undefined
+    }
+  });
+});
 
 // Funzione per aggiornare i report
 async function aggiornaReports() {
@@ -493,14 +521,11 @@ async function loadIpDetails() {
   loading.value = true
   error.value = false
   try {
-    ip.value = route.params.ip
     const response = await fetchIpDetails(ip.value)
 
     ipInfo.value = response.ipDetails || response;
     reports.value = response.abuseReports || [];
     reportsMeta.total = reports.value.length;
-
-    //ipInfo.value = response
 
     if (ipInfo.value && ipInfo.value.ip) {
       await loadRateLimitEvents()

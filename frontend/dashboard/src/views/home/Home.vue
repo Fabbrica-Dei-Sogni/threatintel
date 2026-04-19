@@ -507,7 +507,12 @@ onMounted(loadAll);
 watch(() => profileStore.activeProfileId, loadAll);
 watch(() => dossierStore.lastSavedAt, fetchRecentDossiers);
 
-// Sincronizza i filtri del cruscotto nell'URL (stesso pattern pagine di ricerca).
+// Sincronizzazione Prop -> Ref (per back/forward browser)
+watch(() => props.initialAttackProtocol,  (v) => { selectedAttackProtocol.value = v ?? 'http'; });
+watch(() => props.initialLogProtocol,     (v) => { selectedLogProtocol.value   = v ?? 'http'; });
+watch(() => props.initialSessionCategory, (v) => { filterCategory.value        = v ?? 'interaction'; });
+
+// Sincronizzazione Ref -> URL query
 // Omette il parametro quando è al valore di default per mantenere URL pulito.
 watch([selectedAttackProtocol, selectedLogProtocol, filterCategory], ([ap, lp, sc]) => {
     router.replace({

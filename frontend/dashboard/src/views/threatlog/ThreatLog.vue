@@ -216,14 +216,19 @@ import { formatFullDateTime } from '../../utils/dateUtils';
 const { t } = useI18n();
 const { copyToClipboard, copyFormatted } = useClipboard();
 
+const props = defineProps({
+    id: { type: String, required: true },
+    initialTab: { type: String, default: 'request' }
+})
+
 const route = useRoute()
 const router = useRouter()
 
-const id = ref('')
+const id = ref(props.id)
 const log = ref(null)
 const loading = ref(false)
 const error = ref(false)
-const activeLogTab = ref('request')
+const activeLogTab = ref(props.initialTab)
 
 const toggles = reactive({
     fingerprint: true,
@@ -262,9 +267,25 @@ onMounted(() => {
     load()
 })
 
-watch(() => route.params.id, (newId) => {
-    if (newId) load()
-})
+// Sincronizzazione Prop -> Ref (per back/forward browser)
+watch(() => props.id, (newId) => {
+    if (newId && newId !== id.value) {
+        id.value = newId;
+        load();
+    }
+});
+watch(() => props.initialTab, (v) => { activeLogTab.value = v ?? 'request'; });
+
+// Sincronizzazione Ref -> URL query
+watch([id, activeLogTab], ([newId, newTab]) => {
+    router.replace({
+        name: 'ThreatLog',
+        params: { id: newId },
+        query: {
+            tab: newTab !== 'request' ? newTab : undefined
+        }
+    });
+});
 </script>
 
 <style scoped src="./ThreatLog.css"></style>

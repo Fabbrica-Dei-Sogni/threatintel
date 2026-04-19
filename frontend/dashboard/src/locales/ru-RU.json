@@ -84,16 +84,22 @@
     },
     "auth": {
         "login": "Войти",
-        "logout": "Выход",
+        "logout": "Выйти",
         "register": "Регистрация",
-        "registerHere": "Зарегистрироваться здесь",
+        "registerHere": "Нет учетной записи? Зарегистрируйтесь здесь",
         "loginHere": "Уже есть аккаунт? Войдите здесь",
         "username": "Имя пользователя",
         "email": "Email",
         "password": "Пароль",
-        "loadingLogin": "Загрузка...",
-        "errorLogin": "Ошибка входа",
-        "errorRegister": "Ошибка регистрации"
+        "loadingLogin": "Аутентификация...",
+        "errorLogin": "Ошибка при входе",
+        "errorRegister": "Ошибка при регистрации",
+        "loginTitle": "СИСТЕМА ДОСТУПА",
+        "registerTitle": "РЕГИСТРАЦИЯ УЗЛА",
+        "backToConsole": "ВЕРНУТЬСЯ К ПАНЕЛИ",
+        "usernamePlaceholder": "Введите ваше имя пользователя",
+        "passwordPlaceholder": "Введите ваш пароль",
+        "emailPlaceholder": "Введите ваш адрес электронной почты"
     },
     "home": {
         "title": "Форензик Опс-Консоль",

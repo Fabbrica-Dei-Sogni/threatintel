@@ -83,17 +83,23 @@
         "logout": "Logout"
     },
     "auth": {
-        "login": "Login",
-        "logout": "Logout",
-        "register": "Register",
-        "registerHere": "Register here",
-        "loginHere": "Already have an account? Login here",
-        "username": "Username",
+        "login": "Accedi",
+        "logout": "Esci",
+        "register": "Registrati",
+        "registerHere": "Non hai un account? Registrati qui",
+        "loginHere": "Hai già un account? Accedi qui",
+        "username": "Nome utente",
         "email": "Email",
         "password": "Password",
-        "loadingLogin": "Loading...",
-        "errorLogin": "Errore durante il login",
-        "errorRegister": "Errore durante la registrazione"
+        "loadingLogin": "Autenticazione in corso...",
+        "errorLogin": "Errore durante l'accesso",
+        "errorRegister": "Errore durante la registrazione",
+        "loginTitle": "SISTEMA DI ACCESSO",
+        "registerTitle": "REGISTRAZIONE NODO",
+        "backToConsole": "TORNA AL CRUSCOTTO",
+        "usernamePlaceholder": "Inserisci il tuo nome utente",
+        "passwordPlaceholder": "Inserisci la tua password",
+        "emailPlaceholder": "Inserisci il tuo indirizzo email"
     },
     "home": {
         "title": "FORENSIC OPS CONSOLE",

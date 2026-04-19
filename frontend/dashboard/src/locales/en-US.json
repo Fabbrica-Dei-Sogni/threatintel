@@ -86,14 +86,20 @@
         "login": "Login",
         "logout": "Logout",
         "register": "Register",
-        "registerHere": "Register here",
+        "registerHere": "Don't have an account? Register here",
         "loginHere": "Already have an account? Login here",
         "username": "Username",
         "email": "Email",
         "password": "Password",
-        "loadingLogin": "Loading...",
+        "loadingLogin": "Authenticating...",
         "errorLogin": "Error during login",
-        "errorRegister": "Error during registration"
+        "errorRegister": "Error during registration",
+        "loginTitle": "ACCESS SYSTEM",
+        "registerTitle": "NODE REGISTRATION",
+        "backToConsole": "BACK TO DASHBOARD",
+        "usernamePlaceholder": "Enter your username",
+        "passwordPlaceholder": "Enter your password",
+        "emailPlaceholder": "Enter your email address"
     },
     "home": {
         "title": "FORENSIC OPS CONSOLE",

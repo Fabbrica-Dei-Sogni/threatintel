@@ -86,14 +86,20 @@
         "login": "Anmelden",
         "logout": "Abmelden",
         "register": "Registrieren",
-        "registerHere": "Hier registrieren",
+        "registerHere": "Noch kein Konto? Hier registrieren",
         "loginHere": "Haben Sie bereits ein Konto? Melden Sie sich hier an",
         "username": "Benutzername",
         "email": "E-Mail",
         "password": "Passwort",
-        "loadingLogin": "Laden...",
+        "loadingLogin": "Authentifizierung...",
         "errorLogin": "Fehler bei der Anmeldung",
-        "errorRegister": "Fehler bei der Registrierung"
+        "errorRegister": "Fehler bei der Registrierung",
+        "loginTitle": "ZUGANGSSYSTEM",
+        "registerTitle": "KNOTENREGISTRIERUNG",
+        "backToConsole": "ZURÜCK ZUM DASHBOARD",
+        "usernamePlaceholder": "Geben Sie Ihren Benutzernamen ein",
+        "passwordPlaceholder": "Geben Sie Ihr Passwort ein",
+        "emailPlaceholder": "Geben Sie Ihre E-Mail-Adresse ein"
     },
     "home": {
         "title": "Forensische Ops-Konsole",

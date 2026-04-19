@@ -86,14 +86,20 @@
         "login": "Zaloguj się",
         "logout": "Wyloguj się",
         "register": "Zarejestruj się",
-        "registerHere": "Zarejestruj się tutaj",
+        "registerHere": "Nie masz konta? Zarejestruj się tutaj",
         "loginHere": "Masz już konto? Zaloguj się tutaj",
         "username": "Nazwa użytkownika",
         "email": "Email",
         "password": "Hasło",
-        "loadingLogin": "Ładowanie...",
+        "loadingLogin": "Uwierzytelnianie...",
         "errorLogin": "Błąd podczas logowania",
-        "errorRegister": "Błąd podczas rejestracji"
+        "errorRegister": "Błąd podczas rejestracji",
+        "loginTitle": "SYSTEM DOSTĘPU",
+        "registerTitle": "REJESTRACJA WĘZŁA",
+        "backToConsole": "POWRÓT DO PULPITU",
+        "usernamePlaceholder": "Wprowadź nazwę użytkownika",
+        "passwordPlaceholder": "Wprowadź hasło",
+        "emailPlaceholder": "Wprowadź adres e-mail"
     },
     "home": {
         "title": "Konsola Operacyjna Forensic",

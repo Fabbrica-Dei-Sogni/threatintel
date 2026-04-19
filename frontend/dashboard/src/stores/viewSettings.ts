@@ -17,13 +17,14 @@ export const useViewSettingsStore = defineStore('viewSettings', () => {
     const sessionsShowMap = ref<boolean>(savedSettings.sessionsShowMap ?? false);
     const sessionsShowChart = ref<boolean>(savedSettings.sessionsShowChart ?? true);
 
-    // Home Dashboard (Persistent Maps)
+    // Home Dashboard (Persistent Maps & Skin)
     const homeShowAttackMap = ref<boolean>(savedSettings.homeShowAttackMap ?? false);
     const homeShowSessionsMap = ref<boolean>(savedSettings.homeShowSessionsMap ?? false);
+    const dashboardSkin = ref<string>(savedSettings.dashboardSkin ?? 'cyber');
 
     // Persistence logic
     watch(
-        [attacksShowMap, attacksShowChart, logsShowChart, sessionsShowMap, sessionsShowChart, homeShowAttackMap, homeShowSessionsMap],
+        [attacksShowMap, attacksShowChart, logsShowChart, sessionsShowMap, sessionsShowChart, homeShowAttackMap, homeShowSessionsMap, dashboardSkin],
         () => {
             const settings = {
                 attacksShowMap: attacksShowMap.value,
@@ -32,7 +33,8 @@ export const useViewSettingsStore = defineStore('viewSettings', () => {
                 sessionsShowMap: sessionsShowMap.value,
                 sessionsShowChart: sessionsShowChart.value,
                 homeShowAttackMap: homeShowAttackMap.value,
-                homeShowSessionsMap: homeShowSessionsMap.value
+                homeShowSessionsMap: homeShowSessionsMap.value,
+                dashboardSkin: dashboardSkin.value
             };
             localStorage.setItem(storageKey, JSON.stringify(settings));
         },
@@ -46,6 +48,7 @@ export const useViewSettingsStore = defineStore('viewSettings', () => {
         sessionsShowMap,
         sessionsShowChart,
         homeShowAttackMap,
-        homeShowSessionsMap
+        homeShowSessionsMap,
+        dashboardSkin
     };
 });

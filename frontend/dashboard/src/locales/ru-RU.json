@@ -88,6 +88,10 @@
         "dossierZoom": "МАСШТАБ",
         "logout": "Выход"
     },
+    "skin": {
+        "classic": "Классический",
+        "cyber": "Cyber-Sleek"
+    },
     "auth": {
         "login": "Войти",
         "logout": "Выйти",

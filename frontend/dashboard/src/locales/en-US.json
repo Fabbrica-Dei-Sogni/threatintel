@@ -88,6 +88,10 @@
         "dossierZoom": "ZOOM",
         "logout": "Logout"
     },
+    "skin": {
+        "classic": "Classic",
+        "cyber": "Cyber-Sleek"
+    },
     "auth": {
         "login": "Login",
         "logout": "Logout",

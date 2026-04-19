@@ -1,5 +1,5 @@
 <template>
-  <div class="dashboard">
+  <div class="dashboard" :class="'skin-' + currentSkin">
     <ConfigMenuButton />
     <div class="header-top">
       <div class="header-main-title">
@@ -8,7 +8,10 @@
         </h1>
       </div>
 
-      <LanguageSwitcher />
+      <div class="header-actions">
+        <SkinSwitcher />
+        <LanguageSwitcher />
+      </div>
     </div>
 
     <!-- Breaking News Row -->
@@ -301,19 +304,22 @@ import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
 import CountryFlag from '../../components/CountryFlag.vue';
 import AttackMap from '../../components/AttackMap.vue';
 import BreakingNews from '../../components/BreakingNews.vue';
+import SkinSwitcher from '../../components/SkinSwitcher.vue';
 import ConfigMenuButton from '../../components/ConfigMenuButton.vue';
 import ProtocolSelector from '../../components/common/ProtocolSelector.vue';
 import ViewToggle from '../../components/common/ViewToggle.vue';
 import DefconIndicator from '../../components/DefconIndicator.vue';
 import CowrieCategorySelector from '../../components/common/CowrieCategorySelector.vue';
 import { formatDateTime, formatHumanDuration, formatFullDateTime } from '../../utils/dateUtils';
+import './HomeCyber.css';
 
 const { t } = useI18n();
 
 const viewStore = useViewSettingsStore();
 const { 
   homeShowAttackMap: attackMap, 
-  homeShowSessionsMap: sessionsMap 
+  homeShowSessionsMap: sessionsMap,
+  dashboardSkin: currentSkin
 } = storeToRefs(viewStore);
 
 const toggles = reactive({

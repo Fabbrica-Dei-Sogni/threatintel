@@ -612,7 +612,6 @@ export class ThreatLogService {
                         { $group: { _id: null, min: { $min: "$fingerprint.score" }, max: { $max: "$fingerprint.score" }, avg: { $avg: "$fingerprint.score" } } }
                     ],
                     mainStats: [
-                        { $match: { 'fingerprint.score': { $gte: minScore } } },
                         {
                             $group: {
                                 _id: null,

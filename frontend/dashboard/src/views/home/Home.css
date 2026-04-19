@@ -540,9 +540,10 @@ li > a:last-child:hover {
 @media (max-width: 768px) {
   .dashboard { padding: 10px; }
   .header-top { 
-    padding-left: 10px; 
-    padding-right: 10px; 
-    gap: 10px; /* Reduced gap to fit both elements on the same line */
+    padding: 15px 10px; 
+    flex-direction: column;
+    gap: 15px; 
+    align-items: flex-start;
     margin-bottom: 15px; 
   }
   .header-main-title h1 {
@@ -712,7 +713,7 @@ li > a:last-child:hover {
     gap: 10px;
   }
   
-  .header-actions {
+  .widget-header .header-actions {
     width: 100%;
     justify-content: flex-end;
     gap: 10px;

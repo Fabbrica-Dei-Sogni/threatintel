@@ -172,6 +172,14 @@
                             :tooltip="session.ipDetailsId?.ipinfo ? `${session.ipDetailsId.ipinfo.country} - ${session.ipDetailsId.ipinfo.org || t('common.notAvailable')}` : t('common.notAvailable')" />
                         </div>
                         <span @click="goToIpDetails(session.src_ip)" class="ip-link">{{ session.src_ip }}</span>
+                        
+                        <div class="session-time" :title="t('cowrie.attackDetail.timeWindow')">
+                          <span class="start-time">{{ dayjs(session.starttime).format('HH:mm:ss') }}</span>
+                          <span class="duration-badge" v-if="session.endtime">
+                            ({{ computeDuration(session.starttime, session.endtime) }})
+                          </span>
+                        </div>
+
                         <span class="interaction-count" :class="{ 'high-interaction': (session.eventCount || 0) > 5 }">
                           {{ session.eventCount || 0 }} {{ $t('sessionChart.events').toLowerCase() }}
                         </span>
@@ -336,6 +344,14 @@ function goToIpDetails(ip) {
 // Funzioni per template
 function formatDate(timestamp) {
   return dayjs(timestamp).format('DD/MM/YYYY HH:mm:ss');
+};
+
+const computeDuration = (start, end) => {
+  if (!start || !end) return '-';
+  const s = dayjs(start);
+  const e = dayjs(end);
+  const diff = e.diff(s, 'second');
+  return `${diff}s`;
 };
 
 const selectedAttackProtocol = ref('http');

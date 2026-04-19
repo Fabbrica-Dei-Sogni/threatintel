@@ -285,9 +285,31 @@ li {
   white-space: nowrap;
 }
 
-.column-spacer, .interaction-count { 
+.interaction-count { 
   flex: 1 !important; 
   min-width: 0;
+  text-align: right;
+}
+
+.session-time {
+  flex: 0 0 140px !important;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  font-family: 'JetBrains Mono', monospace;
+  color: #88aaff;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(136, 170, 255, 0.1);
+  white-space: nowrap;
+}
+
+.duration-badge {
+  color: #fbbf24;
+  font-weight: 700;
+  font-size: 0.75rem;
 }
 
 /* Allineamento forzato e ancoraggio GPU dell'azione */
@@ -574,6 +596,10 @@ li > a:last-child:hover {
   .interaction-count {
     font-size: 0.7em;
     padding: 1px 4px;
+  }
+
+  .session-time {
+    display: none;
   }
 
   .breaking-news-row {

@@ -9,7 +9,7 @@ export function useCowrieSessions(
     initialLimit: number = 20,
     initialSortFields: any = {},
     initialIp: string = '',
-    initialCategory: string = 'all'
+    initialCategory: string = 'interaction'
 ) {
     // Filtri specifici
     const filterIp = ref(initialIp);

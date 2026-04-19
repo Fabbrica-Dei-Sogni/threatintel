@@ -105,7 +105,7 @@ const routes: RouteRecordRaw[] = [
             initialPageSize: route.query.pageSize ? parseInt(route.query.pageSize as string) : 20,
             initialSortFields: route.query.sortFields ? JSON.parse(route.query.sortFields as string) : {},
             initialIp: typeof route.query.ip === 'string' ? route.query.ip : '',
-            initialCategory: typeof route.query.category === 'string' ? route.query.category : 'all',
+            initialCategory: typeof route.query.category === 'string' ? route.query.category : 'interaction',
         }),
     },
     { path: '/telnet-attack-detail/:id', name: 'CowrieAttackDetail', component: CowrieAttackDetail },

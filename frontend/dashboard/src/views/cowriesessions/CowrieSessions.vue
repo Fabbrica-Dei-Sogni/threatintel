@@ -202,7 +202,7 @@
 
 <script setup>
 import { onMounted, watch, ref, computed, nextTick, onUnmounted } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
+import { useRouter } from 'vue-router';
 import dayjs from 'dayjs';
 import { useI18n } from '../../composable/useI18n';
 import { useCowrieSessions } from '../../composable/useCowrieSessions';
@@ -220,25 +220,17 @@ const props = defineProps({
     initialPageSize: { type: Number, default: 20 },
     initialSortFields: { type: Object, default: () => ({}) },
     initialIp: { type: String, default: '' },
-    initialCategory: { type: String, default: 'all' }
+    initialCategory: { type: String, default: 'interaction' }
 });
 
 const { t } = useI18n();
 const { copyToClipboard, copyFormatted } = useClipboard();
 const router = useRouter();
-const route = useRoute();
 
 import { useViewSettingsStore } from '../../stores/viewSettings';
 import { storeToRefs } from 'pinia';
 const viewStore = useViewSettingsStore();
-const { sessionsShowMap: showMap, sessionsShowChart: showChart, sessionsLastCategory } = storeToRefs(viewStore);
-
-// Categoria iniziale: dall'URL se presente, altrimenti dall'ultima scelta salvata nello store.
-// Questo consente la persistenza anche quando si naviga tramite i pulsanti del menu
-// (non solo via browser Back, che preserverebbe l'URL).
-const resolvedInitialCategory = typeof route.query.category === 'string'
-    ? route.query.category
-    : sessionsLastCategory.value;
+const { sessionsShowMap: showMap, sessionsShowChart: showChart } = storeToRefs(viewStore);
 const topScrollRef = ref(null);
 const tableScrollRef = ref(null);
 const tableRef = ref(null);
@@ -313,14 +305,9 @@ const {
     props.initialPageSize,
     props.initialSortFields,
     props.initialIp,
-    resolvedInitialCategory
+    props.initialCategory
 );
 
-// Sincronizza la categoria nello store ad ogni cambiamento,
-// per permettere il ripristino anche dopo navigazione via pulsanti di menu
-watch(filterCategory, (newCat) => {
-    sessionsLastCategory.value = newCat;
-}, { immediate: true });
 
 // Sincronizza l'URL quando cambia lo stato
 watch([page, pageSize, sortFields, filterIp, filterCategory], ([newPage, newPageSize, newSort, newIp, newCat]) => {

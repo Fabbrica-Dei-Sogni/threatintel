@@ -23,6 +23,8 @@
   display: flex !important;
   justify-content: space-between !important;
   align-items: center !important;
+  flex-wrap: wrap !important;
+  gap: 15px !important;
 }
 
 .skin-cyber.attacchi .header-actions {

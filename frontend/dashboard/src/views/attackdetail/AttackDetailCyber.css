@@ -21,6 +21,26 @@
   border-bottom: 2px solid var(--cy-primary) !important;
   padding: 12px 24px 15px 24px !important;
   margin-bottom: 30px !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+  gap: 20px !important;
+}
+
+.skin-cyber.attack-detail .header-content-left, 
+.skin-cyber.attack-detail .header-content-right {
+  display: flex !important;
+  align-items: center !important;
+  gap: 15px !important;
+  flex-wrap: wrap !important;
+}
+
+@media (max-width: 900px) {
+  .skin-cyber.attack-detail .header-content-right {
+    width: 100%;
+    justify-content: space-between !important;
+  }
 }
 
 .skin-cyber.attack-detail .header-actions {

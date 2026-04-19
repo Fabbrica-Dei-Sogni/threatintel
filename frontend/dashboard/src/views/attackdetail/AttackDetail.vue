@@ -1,19 +1,20 @@
 <template>
     <div class="attack-detail cyber-view" :class="'skin-' + dashboardSkin">
-        <div class="header-top">
-            <button @click="goBack" class="back-btn">← {{ t('attackDetail.backToAttacks') }}</button>
-            <div class="header-actions">
-                <SkinSwitcher />
-                <LanguageSwitcher />
+        <div class="header-top cyber-sticky-area cyber-sticky-top-0">
+            <div class="header-content-left">
+                <button @click="goBack" class="back-btn">← {{ t('attackDetail.backToAttacks') }}</button>
+                <div class="briefing-info-main">
+                    <span class="animated-icon pulse-magma">🛰️</span>
+                    <h1>{{ t('attackDetail.title') }}</h1>
+                </div>
             </div>
-        </div>
-
-        <div class="header-briefing-top">
-            <div class="briefing-info-main">
-                <span class="animated-icon pulse-magma">🛰️</span>
-                <h1>{{ t('attackDetail.title') }}</h1>
+            <div class="header-content-right">
+                <ReportActions type="attack" :ip="props.ip" filename="dossier_attack" mode="sticky" accentColor="#ff4d4d" />
+                <div class="header-actions">
+                    <SkinSwitcher />
+                    <LanguageSwitcher />
+                </div>
             </div>
-            <ReportActions type="attack" :ip="props.ip" filename="dossier_attack" mode="sticky" accentColor="#ff4d4d" />
         </div>
 
         <!-- Attacker Highlight Card -->

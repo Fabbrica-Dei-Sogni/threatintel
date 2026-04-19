@@ -37,10 +37,9 @@ const routes: RouteRecordRaw[] = [
         name: 'Home',
         component: Home,
         props: (route: RouteLocationNormalized) => ({
-            initialIp: typeof route.query.ip === 'string' ? route.query.ip : '',
-            initialUrl: typeof route.query.url === 'string' ? route.query.url : '',
-            initialPage: route.query.page ? parseInt(route.query.page as string) : 1,
-            initialSortFields: route.query.sortFields ? JSON.parse(route.query.sortFields as string) : undefined,
+            initialAttackProtocol:  typeof route.query.attackProtocol  === 'string' ? route.query.attackProtocol  : 'http',
+            initialLogProtocol:     typeof route.query.logProtocol     === 'string' ? route.query.logProtocol     : 'http',
+            initialSessionCategory: typeof route.query.sessionCategory === 'string' ? route.query.sessionCategory : 'interaction',
         })
     },/*,    
     {

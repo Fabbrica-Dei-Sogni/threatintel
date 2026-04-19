@@ -334,6 +334,12 @@ import CowrieCategorySelector from '../../components/common/CowrieCategorySelect
 import { formatDateTime, formatDateOnly, formatTimeOnly, formatHumanDuration, formatFullDateTime } from '../../utils/dateUtils';
 import './HomeCyber.css';
 
+const props = defineProps({
+    initialAttackProtocol:  { type: String, default: 'http' },
+    initialLogProtocol:     { type: String, default: 'http' },
+    initialSessionCategory: { type: String, default: 'interaction' },
+});
+
 const { t } = useI18n();
 
 const viewStore = useViewSettingsStore();
@@ -402,8 +408,8 @@ const formatAggregatedDurationHome = (session) => {
   return computeDuration(session.starttime, session.endtime);
 };
 
-const selectedAttackProtocol = ref('http');
-const selectedLogProtocol = ref('http');
+const selectedAttackProtocol = ref(props.initialAttackProtocol);
+const selectedLogProtocol = ref(props.initialLogProtocol);
 
 // Attacchi - chiamata base: nessun filtro, prima pagina, ordina per ultimi
 const {
@@ -430,7 +436,7 @@ const {
   loading: loadingSessions,
   error: errorSessions,
   fetchData: fetchSessions
-} = useCowrieSessions(1, 10);
+} = useCowrieSessions(1, 10, {}, '', props.initialSessionCategory);
 
 const recentSessions = computed(() => sessions.value.slice(0, 10))
 
@@ -500,6 +506,19 @@ const loadAll = () => {
 onMounted(loadAll);
 watch(() => profileStore.activeProfileId, loadAll);
 watch(() => dossierStore.lastSavedAt, fetchRecentDossiers);
+
+// Sincronizza i filtri del cruscotto nell'URL (stesso pattern pagine di ricerca).
+// Omette il parametro quando è al valore di default per mantenere URL pulito.
+watch([selectedAttackProtocol, selectedLogProtocol, filterCategory], ([ap, lp, sc]) => {
+    router.replace({
+        name: 'Home',
+        query: {
+            attackProtocol:  ap !== 'http'        ? ap : undefined,
+            logProtocol:     lp !== 'http'        ? lp : undefined,
+            sessionCategory: sc !== 'interaction' ? sc : undefined,
+        }
+    });
+});
 </script>
 
 <style scoped src="./Home.css"></style>

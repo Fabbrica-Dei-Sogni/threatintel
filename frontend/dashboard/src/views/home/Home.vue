@@ -119,6 +119,11 @@
                             :tooltip="log.ipDetailsId?.ipinfo ? `${log.ipDetailsId.ipinfo.country} - ${log.ipDetailsId.ipinfo.org || t('common.notAvailable')}` : t('common.notAvailable')" />
                         </div>
                         <span @click="goToIpDetails(log.request.ip)" class="ip-link">{{ log.request.ip }}</span>
+                        
+                        <div class="log-time">
+                          <span class="time-hour">{{ dayjs(log.timestamp).format('HH:mm:ss') }}</span>
+                        </div>
+
                         <div class="column-spacer"></div>
                         <router-link :to="{ name: 'ThreatLog', params: { id: log.id } }">{{ $t('common.detail')
                           }}</router-link>

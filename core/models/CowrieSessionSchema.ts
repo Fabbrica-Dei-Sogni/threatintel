@@ -19,6 +19,13 @@ export interface ICowrieSession extends Document {
     sshversion?: string | null;
     termsize?: string | null;
     ipDetailsId?: Types.ObjectId | null;
+    isScannerActivity?: boolean;
+    scannerStats?: {
+        totalOccurrences: number;
+        firstSeen: string;
+        lastSeen: string;
+        duration: number;
+    };
 }
 
 const CowrieSessionSchema: Schema = new Schema({

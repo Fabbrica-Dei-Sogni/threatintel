@@ -647,6 +647,10 @@ export class ThreatLogService {
                         { $group: { _id: '$fingerprint.indicators', count: { $sum: 1 } } },
                         { $sort: { count: -1 } },
                         { $limit: 10 }
+                    ],
+                    uniqueIPs: [
+                        { $group: { _id: '$request.ip' } },
+                        { $group: { _id: null, ips: { $push: '$_id' } } }
                     ]
                 }
             }
@@ -667,6 +671,7 @@ export class ThreatLogService {
             suspiciousRequests: stats.suspiciousRequests,
             topCountries: countriesMap,
             topIndicators: indicatorsMap,
+            uniqueIPs: facet.uniqueIPs[0]?.ips || [],
             scoreDistribution: facet.scoreDistribution[0] || { min: 0, max: 100, avg: 15 }
         };
     }

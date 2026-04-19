@@ -248,35 +248,66 @@
             </div>
         </div>
 
-        <!-- TIMELINE -->
+        <!-- FORENSIC ANALYSIS / TIMELINE -->
         <div class="hud-block">
             <div class="hud-block-title">
-                <span><%= t('reports.telnetDetail.timeline').toUpperCase() %></span>
-                <span>[RAW_STREAM]</span>
+                <span><%= (data.isScannerActivity ? t('reports.telnetDetail.scannerAnalysis') : t('reports.telnetDetail.timeline')).toUpperCase() %></span>
+                <span>[<%= data.isScannerActivity ? 'AGGREGATED_FORENSICS' : 'RAW_STREAM' %>]</span>
             </div>
+
             <div class="timeline-container">
-                <% data.timeline.forEach(event => { %>
-                    <div class="timeline-entry">
-                        <div class="timeline-time"><%= new Date(event.timestamp).toLocaleTimeString(locale) %></div>
-                        <div class="timeline-content">
-                            <% if (event.type.includes('login')) { %>
-                                <span class="timeline-type type-login"><%= t('reports.common.authAttempt').toUpperCase() %></span>
-                                <div class="timeline-message">
-                                    <%= t('reports.fragments.hud.usr').toUpperCase() %>: <span style="color: var(--hud-accent);"><%= event.username || '?' %></span> 
-                                    <%= t('reports.fragments.hud.pwd').toUpperCase() %>: <span style="color: var(--hud-warning);"><%= event.password || '?' %></span>
-                                </div>
-                            <% } else if (event.input) { %>
-                                <span class="timeline-type type-command"><%= t('reports.common.command').toUpperCase() %></span>
-                                <div class="timeline-message command-input">$ <%= event.input %></div>
-                            <% } else { %>
-                                <span class="timeline-type type-other"><%= event.type.replace('cowrie.', '').toUpperCase() %></span>
-                                <% if (event.message) { %>
-                                    <div class="timeline-message"><%= event.message %></div>
-                                <% } %>
-                            <% } %>
+                <% if (data.isScannerActivity && data.scannerStats) { %>
+                    <!-- SCANNER METRICS GRID -->
+                    <div class="hud-stats-grid" style="grid-template-columns: repeat(2, 1fr); margin-bottom: 20px;">
+                        <div class="hud-stat-box">
+                            <span class="hud-stat-value"><%= data.scannerStats.totalOccurrences %></span>
+                            <span class="hud-stat-label"><%= t('reports.telnetDetail.scannerOccurrences').toUpperCase() %></span>
+                        </div>
+                        <div class="hud-stat-box">
+                            <span class="hud-stat-value"><%= data.scannerStats.duration %>s</span>
+                            <span class="hud-stat-label"><%= t('reports.telnetDetail.duration').toUpperCase() %> (AGGREGATED)</span>
                         </div>
                     </div>
-                <% }); %>
+                    
+                    <div class="hud-value-row">
+                        <span class="hud-label">FIRST_SEEN:</span>
+                        <span class="hud-value"><%= data.scannerStats.firstSeen %></span>
+                    </div>
+                    <div class="hud-value-row">
+                        <span class="hud-label">LAST_SEEN:</span>
+                        <span class="hud-value"><%= data.scannerStats.lastSeen %></span>
+                    </div>
+
+                    <div style="margin-top: 15px; border-top: 1px solid var(--hud-border); padding-top: 10px; color: var(--hud-text-dim); font-size: 9px;">
+                        // STATUS: ANALYTICS_COLLECTED<br>
+                        // FINDINGS: REPETITIVE_SCANNER_PATTERN_DETECTED<br>
+                        // ACTION: FORENSIC_DUMP_COMPLETE
+                    </div>
+
+                <% } else { %>
+                    <% data.timeline.forEach(event => { %>
+                        <div class="timeline-entry">
+                            <div class="timeline-time"><%= new Date(event.timestamp).toLocaleTimeString(locale) %></div>
+                            <div class="timeline-content">
+                                <% if (event.type.includes('login')) { %>
+                                    <span class="timeline-type type-login"><%= t('reports.common.authAttempt').toUpperCase() %></span>
+                                    <div class="timeline-message">
+                                        <%= t('reports.fragments.hud.usr').toUpperCase() %>: <span style="color: var(--hud-accent);"><%= event.username || '?' %></span> 
+                                        <%= t('reports.fragments.hud.pwd').toUpperCase() %>: <span style="color: var(--hud-warning);"><%= event.password || '?' %></span>
+                                    </div>
+                                <% } else if (event.input) { %>
+                                    <span class="timeline-type type-command"><%= t('reports.common.command').toUpperCase() %></span>
+                                    <div class="timeline-message command-input">$ <%= event.input %></div>
+                                <% } else { %>
+                                    <span class="timeline-type type-other"><%= event.type.replace('cowrie.', '').toUpperCase() %></span>
+                                    <% if (event.message) { %>
+                                        <div class="timeline-message"><%= event.message %></div>
+                                    <% } %>
+                                <% } %>
+                            </div>
+                        </div>
+                    <% }); %>
+                <% } %>
             </div>
         </div>
 

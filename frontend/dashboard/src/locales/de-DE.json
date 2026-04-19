@@ -655,7 +655,18 @@
                 "Gesamt-Ereignisse: {totalEvents}",
                 "--------------------------------------"
             ],
-            "timelineRow": "[{timestamp}] {eventName}\n> {message}{details}"
+            "timelineHeader": "--- CHRONOLOGISCHER SITZUNGSAUSZUG [{sessionId}] ---",
+            "timelineRow": "[{timestamp}] {eventName}\n> {message}{details}",
+            "scannerAnalysis": [
+                "--- SCANNER-FORENSIK-ANALYSE ---",
+                "Quell-IP: {src_ip}",
+                "Erkannte Scans gesamt: {totalOccurrences}",
+                "Zeitfenster: {firstSeen} -> {lastSeen}",
+                "Zuerst gesehen: {firstSeen}",
+                "Zuletzt gesehen: {lastSeen}",
+                "Aggregierte Dauer: {duration}",
+                "--------------------------------------"
+            ]
         },
         "ip": "{ip}",
         "generic": "{text}",

@@ -126,7 +126,11 @@
             "authAttempts": "Tentatives d'authentification",
             "commands": "Commandes exécutées",
             "duration": "Durée",
-            "timeline": "Timeline opérationnelle"
+            "timeline": "Timeline opérationnelle",
+            "scannerAnalysis": "Analyse de l'activité du scanner",
+            "scannerOccurrences": "Occurrences totales",
+            "scannerFirstSeen": "Première détection",
+            "scannerLastSeen": "Dernière détection"
         },
         "fragments": {
             "ipAbuseTitle": "Analyse des Abus (AbuseIPDB)",
@@ -152,6 +156,10 @@
             "firewallBlockTitle": "Interception Firewall (UFW)",
             "ipWhoisTitle": "Interception de l'enregistrement WHOIS",
             "telnetSummaryTitle": "Résumé de la session interceptée",
+            "telnetScannerSummaryTitle": "Analyse Forensique Scanner",
+            "totalScans": "Total des Scans Détectés",
+            "scannerAnalysisTitle": "Analyse de l'Activité Scanner",
+            "activityWindow": "Fenêtre d'Activité",
             "startTime": "Début de la session",
             "duration": "Durée totale",
             "protocol": "Protocole",
@@ -296,6 +304,23 @@
                 "msg": "MSG"
             }
         }
+    },
+    "clipboard": {
+        "ipDetails": {
+            "summary": "INTELLIGENCE IP: {ip} [{countryCode}]\nISP: {isp}\nRÉPUTATION: {abuseScore}%",
+            "geo": "LOCALISATION: {city}, {country}\nCOORD: {loc}"
+        },
+        "attackDetail": {
+            "summary": "ATTAQUE HTTP DÉTECTÉE\nSOURCE: {ip}\nSCORE: {dangerScore}\nLOGS: {totaleLogs}\nINTENSITÉ: {rps} RPS",
+            "rateLimitEvent": "VIOLATION RATE LIMIT\nIP: {ip}\nLIMITE: {type}\nHONEYPOT: {honeypotId}"
+        },
+        "telnetDetail": {
+            "summary": "SESSION TELNET: {session}\nSOURCE: {src_ip}\nPROTOCOLE: {protocol}\nDURÉE: {duration}",
+            "scannerAnalysis": "ANALYSE FORENSIQUE SCANNER\nIP: {src_ip}\nSCANS TOTAUX: {totalOccurrences}\nFENÊTRE: {firstSeen} -> {lastSeen}\nTIMELINE ACTIVITÉ SCANNER\nDÉBUT: {firstSeen}\nFIN: {lastSeen}\nDURÉE AGRÉGÉE: {duration}s",
+            "timelineHeader": "EXTRAIT CHRONOLOGIQUE SESSION [{sessionId}]",
+            "timelineRow": "{timestamp} | {eventName} | {message}{details}"
+        },
+        "generic": "{text}"
     },
     "common": {
         "yes": "OUI",

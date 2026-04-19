@@ -259,6 +259,13 @@ export class ReportService {
             generatedAt: new Date().toLocaleString(locale),
             sessionId,
             ip: session.src_ip,
+            isScannerActivity: session.isScannerActivity || false,
+            scannerStats: session.scannerStats ? {
+                totalOccurrences: session.scannerStats.totalOccurrences,
+                firstSeen: session.scannerStats.firstSeen ? new Date(session.scannerStats.firstSeen).toLocaleString(locale) : this.i18n.t('reports.common.notAvailable', locale),
+                lastSeen: session.scannerStats.lastSeen ? new Date(session.scannerStats.lastSeen).toLocaleString(locale) : this.i18n.t('reports.common.notAvailable', locale),
+                duration: session.scannerStats.duration || 0
+            } : null,
             sessionInfo: {
                 startTime: session.timestamp ? new Date(session.timestamp).toLocaleString(locale) : this.i18n.t('reports.common.notAvailable', locale),
                 duration: duration,

@@ -126,7 +126,11 @@
             "authAttempts": "Tentativi Auth",
             "commands": "Comandi Eseguiti",
             "duration": "Durata",
-            "timeline": "Timeline Operativa"
+            "timeline": "Timeline Operativa",
+            "scannerAnalysis": "Analisi Attività Scanner",
+            "scannerOccurrences": "Occorrenze Totali",
+            "scannerFirstSeen": "Primo Avvistamento",
+            "scannerLastSeen": "Ultimo Avvistamento"
         },
         "fragments": {
             "ipAbuseTitle": "Analisi Abusi (AbuseIPDB)",
@@ -150,8 +154,11 @@
             "isWhitelisted": "In Whitelist",
             "hostname": "Hostname / Insegna",
             "firewallBlockTitle": "Intercettazione Firewall (UFW)",
-            "ipWhoisTitle": "Intercettazione Record WHOIS",
             "telnetSummaryTitle": "Riepilogo Sessione Intercettata",
+            "telnetScannerSummaryTitle": "Analisi Forense Scanner",
+            "totalScans": "Scansioni Totali Rilevate",
+            "scannerAnalysisTitle": "Analisi Attività Scanner",
+            "activityWindow": "Finestra di Attività",
             "startTime": "Inizio Sessione",
             "duration": "Durata Totale",
             "protocol": "Protocollo",
@@ -302,6 +309,23 @@
                 "msg": "MSG"
             }
         }
+    },
+    "clipboard": {
+        "ipDetails": {
+            "summary": "INTELLIGENCE IP: {ip} [{countryCode}]\nISP: {isp}\nREPUTAZIONE: {abuseScore}%",
+            "geo": "LOCATION: {city}, {country}\nCOORDS: {loc}"
+        },
+        "attackDetail": {
+            "summary": "ATTACCO HTTP RILEVATO\nSOURCE: {ip}\nSCORE: {dangerScore}\nLOGS: {totaleLogs}\nINTENSITÀ: {rps} RPS",
+            "rateLimitEvent": "VIOLAZIONE RATE LIMIT\nIP: {ip}\nLIMITE: {type}\nHONEYPOT: {honeypotId}"
+        },
+        "telnetDetail": {
+            "summary": "SESSIONE TELNET: {session}\nSORGENTE: {src_ip}\nPROTOCOLLO: {protocol}\nDURATA: {duration}",
+            "scannerAnalysis": "ANALISI FORENSE SCANNER\nIP: {src_ip}\nSCANSIONI TOTALI: {totalOccurrences}\nFINESTRA: {firstSeen} -> {lastSeen}\nDURATA AGGREGATA: {duration}s",
+            "timelineHeader": "ESTRATTO CRONOLOGICO SESSIONE [{sessionId}]",
+            "timelineRow": "{timestamp} | {eventName} | {message}{details}"
+        },
+        "generic": "{text}"
     },
     "common": {
         "yes": "SI",

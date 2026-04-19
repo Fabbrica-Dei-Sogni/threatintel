@@ -1,0 +1,40 @@
+<div class="hud-item telnet-scanner-card">
+    <div class="hud-box-header">
+        <span class="hud-box-title"><%= t('reports.telnetDetail.scannerAnalysis').toUpperCase() %></span>
+        <span class="hud-box-subtitle">ID: <%= section.id || 'SCANNER-FRNSC' %></span>
+    </div>
+    
+    <!-- METRICS GRID -->
+    <div class="hud-grid-4">
+        <div class="hud-metric">
+            <span class="hud-metric-label"><%= t('reports.telnetDetail.scannerOccurrences').toUpperCase() %></span>
+            <div class="hud-metric-value"><%= data.totalOccurrences %></div>
+        </div>
+        <div class="hud-metric">
+            <span class="hud-metric-label"><%= t('reports.telnetDetail.scannerFirstSeen').toUpperCase() %></span>
+            <div class="hud-metric-value" style="font-size: 11px;"><%= data.firstSeen %></div>
+        </div>
+        <div class="hud-metric">
+            <span class="hud-metric-label"><%= t('reports.telnetDetail.scannerLastSeen').toUpperCase() %></span>
+            <div class="hud-metric-value" style="font-size: 11px;"><%= data.lastSeen %></div>
+        </div>
+        <div class="hud-metric">
+            <span class="hud-metric-label"><%= t('reports.telnetDetail.duration').toUpperCase() %></span>
+            <div class="hud-metric-value"><%= data.duration %></div>
+        </div>
+    </div>
+
+    <!-- TIMELINE TEXT BLOCK -->
+    <div class="hud-mono-text" style="margin-top: 15px; border-top: 1px dashed var(--border-cyan); padding-top: 10px;">
+[ SCANNER ACTIVITY TIMELINE ]
+START:   <%= data.firstSeen %>
+END:     <%= data.lastSeen %>
+IP:      <%= data.src_ip %>
+DUR:     <%= data.duration %>
+STATUS:  COMPLETED_FORENSIC_COLLECTION
+    </div>
+
+    <div class="hud-footer-details">
+        SOURCE_IP: <%= data.src_ip %> | STATUS: AGGREGATED_METRICS
+    </div>
+</div>

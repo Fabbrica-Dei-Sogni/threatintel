@@ -655,6 +655,16 @@
                 "Totale Eventi: {totalEvents}",
                 "-----------------------------------"
             ],
+            "scannerAnalysis": [
+                "--- ANALISI FORENSE SCANNER ---",
+                "IP Sorgente: {src_ip}",
+                "Scansioni Totali Rilevate: {totalOccurrences}",
+                "Inizio Attività: {firstSeen}",
+                "Fine Attività: {lastSeen}",
+                "Durata Aggregata: {duration}",
+                "-----------------------------------"
+            ],
+            "timelineHeader": "--- ESTRATTO CRONOLOGICO SESSIONE [{sessionId}] ---",
             "timelineRow": "[{timestamp}] {eventName}\n> {message}{details}"
         },
         "ip": "{ip}",

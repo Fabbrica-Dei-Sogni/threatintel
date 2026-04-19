@@ -28,6 +28,7 @@
         * {
             box-sizing: border-box;
             -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
         }
 
         body {
@@ -469,59 +470,87 @@
             </div>
         </div>
 
-        <!-- Section 3: Interactive Forensic Timeline -->
+        <!-- Section 3: Forensic Analysis -->
         <div class="section">
             <div class="section-header">
-                <div class="section-title">3. <%= t('reports.telnetDetail.timeline') %></div>
+                <div class="section-title">3. <%= (data.isScannerActivity ? t('reports.telnetDetail.scannerAnalysis') : t('reports.telnetDetail.timeline')).toUpperCase() %></div>
             </div>
-            <table class="event-table">
-                <thead>
+
+            <% if (data.isScannerActivity && data.scannerStats) { %>
+                <table class="detail-table">
                     <tr>
-                        <th style="width: 80px;"><%= t('reports.attackDetail.timelineHeaders.time') %></th>
-                        <th style="width: 120px;"><%= t('reports.common.protocol') %></th>
-                        <th><%= t('reports.attackDetail.operationalDetails') %></th>
+                        <th width="30%"><%= t('reports.telnetDetail.scannerOccurrences') %></th>
+                        <td><%= data.scannerStats.totalOccurrences %></td>
                     </tr>
-                </thead>
-                <tbody>
-                    <% data.timeline.forEach(function(e) { %>
+                    <tr>
+                        <th><%= t('reports.telnetDetail.scannerFirstSeen') %></th>
+                        <td><%= data.scannerStats.firstSeen %></td>
+                    </tr>
+                    <tr>
+                        <th><%= t('reports.telnetDetail.scannerLastSeen') %></th>
+                        <td><%= data.scannerStats.lastSeen %></td>
+                    </tr>
+                    <tr>
+                        <th><%= t('reports.telnetDetail.duration') %></th>
+                        <td><%= data.scannerStats.duration %>s (Aggregated)</td>
+                    </tr>
+                </table>
+                <div class="mono-telex-classic" style="margin-top: 20px; border: 1px dashed var(--border); padding: 15px; background: var(--section-bg); font-family: monospace; font-size: 11px;">
+[ SCANNER ACTIVITY ANALYSIS ]
+IP ADDRESS: <%= data.ip %>
+FINDINGS: Subject identified as iterative automated scanner. 
+No interactive session established. Forensic collection complete.
+                </div>
+            <% } else { %>
+                <table class="event-table">
+                    <thead>
                         <tr>
-                            <td style="font-weight: bold; color: var(--text-muted);">
-                                <%= new Date(e.timestamp).toLocaleTimeString(locale) %>
-                            </td>
-                            <td>
-                                <% if (e.type.includes('login')) { %>
-                                    <span class="badge badge-auth">AUTHENTICATION</span>
-                                    <% } else if (e.input) { %>
-                                        <span class="badge badge-cmd">INPUT COMMAND</span>
-                                        <% } else if (e.type.includes('closed') || e.type.includes('lost')) { %>
-                                            <span class="badge badge-danger">CONNECTION CLOSED</span>
-                                            <% } else { %>
-                                                <span class="badge badge-session">
-                                                    <%= e.type.replace('cowrie.', '' ).toUpperCase() %>
-                                                </span>
-                                                <% } %>
-                            </td>
-                            <td>
-                                <% if (e.type.includes('login')) { %>
-                                    <%= t('reports.telnetDetail.authAttempts') %>: <strong style="color: var(--danger);">
-                                        <%= e.username %>
-                                    </strong> / <strong>
-                                        <%= e.password %>
-                                    </strong>
-                                    <% } else if (e.input) { %>
-                                        <%= t('reports.telnetDetail.commands') %>: <span class="terminal-cmd">$ <%= e.input %></span>
-                                        <% } else if (e.message) { %>
-                                            <span style="color: var(--text-muted);">
-                                                <%= e.message %>
-                                            </span>
-                                            <% } else { %>
-                                                <%= e.type %>
-                                                    <% } %>
-                            </td>
+                            <th style="width: 80px;"><%= t('reports.attackDetail.timelineHeaders.time') %></th>
+                            <th style="width: 120px;"><%= t('reports.common.protocol') %></th>
+                            <th><%= t('reports.attackDetail.operationalDetails') %></th>
                         </tr>
-                        <% }); %>
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        <% data.timeline.forEach(function(e) { %>
+                            <tr>
+                                <td style="font-weight: bold; color: var(--text-muted);">
+                                    <%= new Date(e.timestamp).toLocaleTimeString(locale) %>
+                                </td>
+                                <td>
+                                    <% if (e.type.includes('login')) { %>
+                                        <span class="badge badge-auth">AUTHENTICATION</span>
+                                        <% } else if (e.input) { %>
+                                            <span class="badge badge-cmd">INPUT COMMAND</span>
+                                            <% } else if (e.type.includes('closed') || e.type.includes('lost')) { %>
+                                                <span class="badge badge-danger">CONNECTION CLOSED</span>
+                                                <% } else { %>
+                                                    <span class="badge badge-session">
+                                                        <%= e.type.replace('cowrie.', '' ).toUpperCase() %>
+                                                    </span>
+                                                    <% } %>
+                                </td>
+                                <td>
+                                    <% if (e.type.includes('login')) { %>
+                                        <%= t('reports.telnetDetail.authAttempts') %>: <strong style="color: var(--danger);">
+                                            <%= e.username %>
+                                        </strong> / <strong>
+                                            <%= e.password %>
+                                        </strong>
+                                        <% } else if (e.input) { %>
+                                            <%= t('reports.telnetDetail.commands') %>: <span class="terminal-cmd">$ <%= e.input %></span>
+                                            <% } else if (e.message) { %>
+                                                <span style="color: var(--text-muted);">
+                                                    <%= e.message %>
+                                                </span>
+                                                <% } else { %>
+                                                    <%= e.type %>
+                                                        <% } %>
+                                </td>
+                            </tr>
+                            <% }); %>
+                    </tbody>
+                </table>
+            <% } %>
         </div>
 
         <div class="footer-note">

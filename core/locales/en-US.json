@@ -126,7 +126,11 @@
             "authAttempts": "Auth Attempts",
             "commands": "Executed Commands",
             "duration": "Duration",
-            "timeline": "Operational Timeline"
+            "timeline": "Operational Timeline",
+            "scannerAnalysis": "Scanner Activity Analysis",
+            "scannerOccurrences": "Total Occurrences",
+            "scannerFirstSeen": "First Seen",
+            "scannerLastSeen": "Last Seen"
         },
         "fragments": {
             "ipAbuseTitle": "Abuse Analysis (AbuseIPDB)",
@@ -152,6 +156,10 @@
             "firewallBlockTitle": "Firewall Intercept (UFW)",
             "ipWhoisTitle": "WHOIS Record Intercept",
             "telnetSummaryTitle": "Intercepted Session Summary",
+            "telnetScannerSummaryTitle": "Scanner Forensic Analysis",
+            "totalScans": "Total Scans Detected",
+            "scannerAnalysisTitle": "Scanner Activity Analysis",
+            "activityWindow": "Activity Window",
             "startTime": "Session Start",
             "duration": "Total Duration",
             "protocol": "Protocol",
@@ -302,6 +310,23 @@
                 "msg": "MSG"
             }
         }
+    },
+    "clipboard": {
+        "ipDetails": {
+            "summary": "IP INTELLIGENCE: {ip} [{countryCode}]\nISP: {isp}\nREPUTATION: {abuseScore}%",
+            "geo": "LOCATION: {city}, {country}\nCOORDS: {loc}"
+        },
+        "attackDetail": {
+            "summary": "HTTP ATTACK DETECTED\nSOURCE: {ip}\nSCORE: {dangerScore}\nLOGS: {totaleLogs}\nINTENSITY: {rps} RPS",
+            "rateLimitEvent": "RATE LIMIT BREACH\nIP: {ip}\nLIMIT: {type}\nHONEYPOT: {honeypotId}"
+        },
+        "telnetDetail": {
+            "summary": "TELNET SESSION: {session}\nSOURCE: {src_ip}\nPROTOCOL: {protocol}\nDURATION: {duration}",
+            "scannerAnalysis": "SCANNER FORENSIC ANALYSIS\nIP: {src_ip}\nTOTAL SCANS: {totalOccurrences}\nWINDOW: {firstSeen} -> {lastSeen}\nSCANNER ACTIVITY TIMELINE\nSTART: {firstSeen}\nEND: {lastSeen}\nAGGREGATED DURATION: {duration}s",
+            "timelineHeader": "SESSION CHRONOLOGICAL EXTRACT [{sessionId}]",
+            "timelineRow": "{timestamp} | {eventName} | {message}{details}"
+        },
+        "generic": "{text}"
     },
     "common": {
         "yes": "YES",

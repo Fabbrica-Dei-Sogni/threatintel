@@ -126,7 +126,11 @@
             "authAttempts": "Próby uwierzytelnienia",
             "commands": "Wykonane polecenia",
             "duration": "Czas trwania",
-            "timeline": "Oś czasu operacji"
+            "timeline": "Oś czasu operacji",
+            "scannerAnalysis": "Analiza aktywności skanera",
+            "scannerOccurrences": "Całkowita liczba wystąpień",
+            "scannerFirstSeen": "Pierwsze wystąpienie",
+            "scannerLastSeen": "Ostatnie wystąpienie"
         },
         "fragments": {
             "ipAbuseTitle": "Analiza nadużyć (AbuseIPDB)",
@@ -152,6 +156,10 @@
             "firewallBlockTitle": "Przechwycenie Firewall (UFW)",
             "ipWhoisTitle": "Przejęcie rekordu WHOIS",
             "telnetSummaryTitle": "Podsumowanie przechwyconej sesji",
+            "telnetScannerSummaryTitle": "Analiza forensyczna skanera",
+            "totalScans": "Wykryte skany ogółem",
+            "scannerAnalysisTitle": "Analiza aktywności skanera",
+            "activityWindow": "Okno aktywności",
             "startTime": "Rozpoczęcie sesji",
             "duration": "Całkowity czas trwania",
             "protocol": "Protokół",
@@ -296,6 +304,23 @@
                 "msg": "WIAD"
             }
         }
+    },
+    "clipboard": {
+        "ipDetails": {
+            "summary": "INTELLIGENCJA IP: {ip} [{countryCode}]\nISP: {isp}\nREPUTACJA: {abuseScore}%",
+            "geo": "LOKALIZACJA: {city}, {country}\nWSPÓŁRZĘDNE: {loc}"
+        },
+        "attackDetail": {
+            "summary": "WYKRYTO ATAK HTTP\nŹRÓDŁO: {ip}\nWYNIK: {dangerScore}\nLOGI: {totaleLogs}\nINTENSYWNOŚĆ: {rps} RPS",
+            "rateLimitEvent": "NARUSZENIE LIMITU PRĘDKOŚCI\nIP: {ip}\nTYP LIMITU: {type}\nHONEYPOT: {honeypotId}"
+        },
+        "telnetDetail": {
+            "summary": "SESJA TELNET: {session}\nŹRÓDŁO: {src_ip}\nPROTOKÓŁ: {protocol}\nCZAS TRWANIA: {duration}",
+            "scannerAnalysis": "ANALIZA FORENSYCHNA SKANERA\nIP: {src_ip}\nCAŁKOWICIE SKANÓW: {totalOccurrences}\nOKNO: {firstSeen} -> {lastSeen}\nOŚ CZASU AKTYWNOŚCI SKANERA\nSTART: {firstSeen}\nKONIEC: {lastSeen}\nCZAS ZAGREGOWANY: {duration}s",
+            "timelineHeader": "CHRONOLOGICZNY WYCIĄG Z SESJI [{sessionId}]",
+            "timelineRow": "{timestamp} | {eventName} | {message}{details}"
+        },
+        "generic": "{text}"
     },
     "common": {
         "yes": "TAK",

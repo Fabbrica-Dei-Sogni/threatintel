@@ -1,0 +1,36 @@
+<div class="classic-section scanner-summary-classic">
+    <div class="formal-header-bar">
+        <span class="formal-title"><%= t('reports.telnetDetail.scannerAnalysis').toUpperCase() %></span>
+        <span class="formal-id">FRN-SCN-<%= index %></span>
+    </div>
+    <table class="formal-data-grid">
+        <tr>
+            <th width="30%"><%= t('reports.telnetDetail.scannerOccurrences') %></th>
+            <td><%= data.totalOccurrences %></td>
+        </tr>
+        <tr>
+            <th><%= t('reports.telnetDetail.scannerFirstSeen') %></th>
+            <td><%= data.firstSeen %></td>
+        </tr>
+        <tr>
+            <th><%= t('reports.telnetDetail.scannerLastSeen') %></th>
+            <td><%= data.lastSeen %></td>
+        </tr>
+        <tr>
+            <th><%= t('reports.telnetDetail.duration') %></th>
+            <td><%= data.duration %></td>
+        </tr>
+    </table>
+    
+    <div class="mono-telex-classic" style="margin-top: 15px; border-top: 1px solid #ccc; padding-top: 10px;">
+[ SCANNER ACTIVITY ANALYSIS ]
+IP ADDRESS: <%= data.src_ip %>
+TIME WINDOW: <%= data.firstSeen %> -> <%= data.lastSeen %>
+AGGREGATED DURATION: <%= data.duration %>
+TOTAL SESSIONS: <%= data.totalOccurrences %>
+
+[ ANALYST FINDINGS ]
+Subject identified as iterative automated scanner. 
+No interactive session established. Forensic collection complete.
+    </div>
+</div>

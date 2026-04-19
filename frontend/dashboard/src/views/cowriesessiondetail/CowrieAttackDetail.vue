@@ -59,11 +59,11 @@
         <div class="sub-card timeline-card" v-if="!loading && !error">
             <div class="sub-card-header" @click="toggles.showTimeline = !toggles.showTimeline">
                 <div class="header-title-group">
-                    <span class="animated-icon">📊</span>
-                    <h3>{{ t('cowrie.attackDetail.eventTimeline').toUpperCase() }}</h3>
+                    <span class="animated-icon">{{ sessionDetails?.isScannerActivity ? '📡' : '📊' }}</span>
+                    <h3>{{ (sessionDetails?.isScannerActivity ? t('cowrie.attackDetail.scannerAnalysis') : t('cowrie.attackDetail.eventTimeline')).toUpperCase() }}</h3>
                 </div>
                 <div class="header-actions">
-                    <span class="copy-log-btn" @click.stop="copyEventTimeline()" :title="t('common.copy')">📋</span>
+                    <span class="copy-log-btn" @click.stop="sessionDetails?.isScannerActivity ? copyScannerSummary() : copyEventTimeline()" :title="t('common.copy')">📋</span>
                     <span class="arrow" :class="{ open: toggles.showTimeline }"></span>
                 </div>
             </div>
@@ -72,10 +72,7 @@
                     <section class="timeline-container">
                         <!-- SCANNER AGGREGATE SUMMARY -->
                         <div v-if="sessionDetails?.isScannerActivity" class="scanner-stats-card glass-card">
-                            <div class="stats-header">
-                                <span class="stats-icon">📡</span>
-                                <h4>{{ $t('cowrie.attackDetail.scannerAnalysis') }}</h4>
-                            </div>
+                            <!-- Header rimosso perché già presente nel sub-card-header superiore -->
                             <div class="stats-grid">
                                 <div class="stat-item">
                                     <span class="stat-label">{{ $t('cowrie.attackDetail.scannerOccurrences') }}</span>
@@ -197,13 +194,33 @@ const toggles = reactive({
 const copySessionSummary = () => {
     if (!sessionDetails.value) return;
     const s = sessionDetails.value;
-    copyFormatted('clipboard.telnetDetail.summary', {
+    
+    const data = {
         sessionId,
         ip: s.src_ip,
         timeWindow: `${formatDate(s.starttime)} - ${formatDate(s.endtime)}`,
         origin: s.ipDetailsId?.ipinfo ? `${s.ipDetailsId.ipinfo.city}, ${s.ipDetailsId.ipinfo.country}` : t('common.notAvailable'),
         totalEvents: events.value.length
-    });
+    };
+    
+    copyFormatted('clipboard.telnetDetail.summary', data);
+};
+
+const copyScannerSummary = () => {
+    if (!sessionDetails.value || !sessionDetails.value.scannerStats) return;
+    const s = sessionDetails.value;
+    const stats = s.scannerStats;
+    
+    const data = {
+        src_ip: s.src_ip,
+        totalOccurrences: stats.totalOccurrences,
+        firstSeen: formatDate(stats.firstSeen),
+        lastSeen: formatDate(stats.lastSeen),
+        duration: formatAggregatedDuration(stats.duration)
+    };
+    
+    // Al posto di Summary + Timeline, copiamo un'unica Analisi Scanner consolidata
+    copyFormatted('clipboard.telnetDetail.scannerAnalysis', data);
 };
 
 const copyEventTimeline = () => {

@@ -655,7 +655,18 @@
                 "Всего событий: {totalEvents}",
                 "----------------------------"
             ],
-            "timelineRow": "[{timestamp}] {eventName}\n> {message}{details}"
+            "timelineHeader": "--- ХРОНОЛОГИЧЕСКАЯ ВЫПИСКА ИЗ СЕССИИ [{sessionId}] ---",
+            "timelineRow": "[{timestamp}] {eventName}\n> {message}{details}",
+            "scannerAnalysis": [
+                "--- СУДЕБНО-МЕДИЦИНСКИЙ АНАЛИЗ СКАНЕРА ---",
+                "Source IP: {src_ip}",
+                "Общее количество обнаружений: {totalOccurrences}",
+                "Временное Окно: {firstSeen} -> {lastSeen}",
+                "Первое обнаружение: {firstSeen}",
+                "Последнее обнаружение: {lastSeen}",
+                "Агрегированная длительность: {duration}",
+                "----------------------------"
+            ]
         },
         "ip": "{ip}",
         "generic": "{text}",

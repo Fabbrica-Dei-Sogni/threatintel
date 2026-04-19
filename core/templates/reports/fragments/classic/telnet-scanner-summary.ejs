@@ -1,0 +1,27 @@
+<div class="classic-section scanner-summary-classic">
+    <div class="formal-header-bar">
+        <span class="formal-title"><%= t('reports.telnetDetail.scannerAnalysis').toUpperCase() %></span>
+        <span class="formal-id">FRN-SCN-<%= index %></span>
+    </div>
+    <table class="formal-data-grid">
+        <tr>
+            <th><%= t('reports.telnetDetail.scannerOccurrences') %></th>
+            <td><%= data.totalOccurrences %></td>
+        </tr>
+        <tr>
+            <th><%= t('reports.telnetDetail.scannerFirstSeen') %></th>
+            <td><%= data.firstSeen %></td>
+        </tr>
+        <tr>
+            <th><%= t('reports.telnetDetail.scannerLastSeen') %></th>
+            <td><%= data.lastSeen %></td>
+        </tr>
+        <tr>
+            <th><%= t('reports.telnetDetail.duration') %></th>
+            <td><%= data.duration %></td>
+        </tr>
+    </table>
+    <div class="classic-meta-info" style="margin-top: 5px;">
+        <%= t('reports.common.investigatedIp') %>: <%= data.src_ip %>
+    </div>
+</div>

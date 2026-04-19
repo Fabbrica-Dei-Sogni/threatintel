@@ -126,7 +126,11 @@
             "authAttempts": "Anmeldeversuche",
             "commands": "Ausgeführte Befehle",
             "duration": "Dauer",
-            "timeline": "Operative Zeitachse"
+            "timeline": "Operative Zeitachse",
+            "scannerAnalysis": "Scanner-Aktivitätsanalyse",
+            "scannerOccurrences": "Gesamtvorkommen",
+            "scannerFirstSeen": "Zuerst gesehen",
+            "scannerLastSeen": "Zuletzt gesehen"
         },
         "fragments": {
             "ipAbuseTitle": "Missbrauchsanalyse (AbuseIPDB)",
@@ -152,6 +156,10 @@
             "firewallBlockTitle": "Firewall Abfangung (UFW)",
             "ipWhoisTitle": "WHOIS-Datensatz Abfangen",
             "telnetSummaryTitle": "Zusammenfassung der abgefangenen Sitzung",
+            "telnetScannerSummaryTitle": "Scanner-Forensik-Analyse",
+            "totalScans": "Gesamtzahl der erkannten Scans",
+            "scannerAnalysisTitle": "Scanner-Aktivitätsanalyse",
+            "activityWindow": "Aktivitätsfenster",
             "startTime": "Sitzungsbeginn",
             "duration": "Gesamtdauer",
             "protocol": "Protokoll",
@@ -296,6 +304,23 @@
                 "msg": "NACHR"
             }
         }
+    },
+    "clipboard": {
+        "ipDetails": {
+            "summary": "IP-INTELLIGENZ: {ip} [{countryCode}]\nISP: {isp}\nREPUTATION: {abuseScore}%",
+            "geo": "STANDORT: {city}, {country}\nKOORDINATEN: {loc}"
+        },
+        "attackDetail": {
+            "summary": "HTTP-ANGRIFF ERKANNT\nQUELLE: {ip}\nSCORE: {dangerScore}\nLOGS: {totaleLogs}\nINTENSITÄT: {rps} RPS",
+            "rateLimitEvent": "RATE LIMIT VERLETZUNG\nIP: {ip}\nLIMIT: {type}\nHONEYPOT: {honeypotId}"
+        },
+        "telnetDetail": {
+            "summary": "TELNET-SITZUNG: {session}\nQUELLE: {src_ip}\nPROTOKOLL: {protocol}\nDAUER: {duration}",
+            "scannerAnalysis": "SCANNER-FORENSIK-ANALYSE\nIP: {src_ip}\nSCANS GESAMT: {totalOccurrences}\nFENSTER: {firstSeen} -> {lastSeen}\nSCANNER-AKTIVITÄTS-TIMELINE\nBEGINN: {firstSeen}\nENDE: {lastSeen}\nAGGREGIERTE DAUER: {duration}s",
+            "timelineHeader": "CHRONOLOGISCHER SITZUNGSAUSZUG [{sessionId}]",
+            "timelineRow": "{timestamp} | {eventName} | {message}{details}"
+        },
+        "generic": "{text}"
     },
     "common": {
         "yes": "JA",

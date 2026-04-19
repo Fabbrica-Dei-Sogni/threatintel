@@ -126,7 +126,11 @@
             "authAttempts": "Попытки авторизации",
             "commands": "Выполненные команды",
             "duration": "Длительность",
-            "timeline": "Оперативная хронология"
+            "timeline": "Оперативная хронология",
+            "scannerAnalysis": "Анализ активности сканера",
+            "scannerOccurrences": "Общее количество обнаружений",
+            "scannerFirstSeen": "Первое обнаружение",
+            "scannerLastSeen": "Последнее обнаружение"
         },
         "fragments": {
             "ipAbuseTitle": "Анализ злоупотреблений (AbuseIPDB)",
@@ -152,6 +156,10 @@
             "firewallBlockTitle": "Перехват Firewall (UFW)",
             "ipWhoisTitle": "Перехват записи WHOIS",
             "telnetSummaryTitle": "Сводка перехваченной сессии",
+            "telnetScannerSummaryTitle": "Судебно-медицинский анализ сканера",
+            "totalScans": "Всего обнаружено сканирований",
+            "scannerAnalysisTitle": "Анализ активности сканера",
+            "activityWindow": "Окно активности",
             "startTime": "Начало сессии",
             "duration": "Общая длительность",
             "protocol": "Протокол",
@@ -296,6 +304,23 @@
                 "msg": "СООБЩ"
             }
         }
+    },
+    "clipboard": {
+        "ipDetails": {
+            "summary": "РАЗВЕДКА IP: {ip} [{countryCode}]\nISP: {isp}\nРЕПУТАЦИЯ: {abuseScore}%",
+            "geo": "МЕСТОПОЛОЖЕНИЕ: {city}, {country}\nКООРДИНАТЫ: {loc}"
+        },
+        "attackDetail": {
+            "summary": "ОБНАРУЖЕНА HTTP-АТАКА\nИСТОЧНИК: {ip}\nБАЛЛ: {dangerScore}\nЛОГИ: {totaleLogs}\nИНТЕНСИВНОСТЬ: {rps} RPS",
+            "rateLimitEvent": "НАРУШЕНИЕ ЛИМИТА СКОРОСТИ\nIP: {ip}\nТИП ЛИМИТА: {type}\nHONEYPOT: {honeypotId}"
+        },
+        "telnetDetail": {
+            "summary": "СЕССИЯ TELNET: {session}\nИСТОЧНИК: {src_ip}\nПРОТОКОЛ: {protocol}\nДЛИТЕЛЬНОСТЬ: {duration}",
+            "scannerAnalysis": "АНАЛИЗ АКТИВНОСТИ СКАНЕРА\nIP: {src_ip}\nВСЕГО СКАНОВ: {totalOccurrences}\nОКНО: {firstSeen} -> {lastSeen}\nХРОНОЛОГИЯ АКТИВНОСТИ СКАНЕРА\nНАЧАЛО: {firstSeen}\nКОНЕЦ: {lastSeen}\nАГРЕГИРОВАННАЯ ДЛИТЕЛЬНОСТЬ: {duration}s",
+            "timelineHeader": "ХРОНОЛОГИЧЕСКАЯ ВЫПИСКА ИЗ СЕССИИ [{sessionId}]",
+            "timelineRow": "{timestamp} | {eventName} | {message}{details}"
+        },
+        "generic": "{text}"
     },
     "common": {
         "yes": "ДА",

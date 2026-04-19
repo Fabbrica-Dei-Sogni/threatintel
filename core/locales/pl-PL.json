@@ -126,6 +126,9 @@
             "authAttempts": "Próby uwierzytelnienia",
             "commands": "Wykonane polecenia",
             "duration": "Czas trwania",
+            "division": "Wydział Informatyki Śledczej",
+            "sessionId": "ID Sesji",
+            "sensor": "Czujnik",
             "timeline": "Oś czasu operacji",
             "scannerAnalysis": "Analiza aktywności skanera",
             "scannerOccurrences": "Całkowita liczba wystąpień",
@@ -301,7 +304,10 @@
                 "pass": "HASŁO",
                 "cat": "KAT",
                 "comment": "KOMENTARZ",
-                "msg": "WIAD"
+                "msg": "WIAD",
+                "status": "STATUS",
+                "collectionComplete": "ZBIÓR DANYCH ZAKOŃCZONY",
+                "scannerFindingsDesc": "ZIDENTYFIKOWANO ITERACYJNY WZORZEC SKANERA"
             }
         }
     },

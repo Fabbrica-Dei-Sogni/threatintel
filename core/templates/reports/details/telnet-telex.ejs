@@ -55,54 +55,54 @@
 <body>
     <div class="telex-container">
         <div class="header">
-            TELEX-REPORT // <%= t('reports.common.agencyName') %> // <%= t('reports.telex.sigIntel').toUpperCase() %>
+            TELEX-REPORT // <%= t('reports.common.agencyName') %> // <%= t('reports.fragments.telex.sigIntel').toUpperCase() %>
         </div>
 
         <div class="section">
-            <div class="section-title"><%= t('reports.telex.sessionMetadata').toUpperCase() %></div>
+            <div class="section-title"><%= t('reports.fragments.telex.sessionMetadata').toUpperCase() %></div>
             <pre>
-<%= t('reports.telex.sessionId').toUpperCase() %>: <%= data.sessionId %>
-<%= t('reports.telex.sourceIp').toUpperCase() %>: <%= data.ip %>
-<%= t('reports.telex.startTime').toUpperCase() %>: <%= data.sessionInfo.startTime %>
-<%= t('reports.telex.protocol').toUpperCase() %>: <%= data.sessionInfo.protocol %>
-<%= t('reports.telex.duration').toUpperCase() %>: <%= data.sessionInfo.duration %>
+<%= t('reports.fragments.telex.sessionId').toUpperCase() %>: <%= data.sessionId %>
+<%= t('reports.fragments.telex.sourceIp').toUpperCase() %>: <%= data.ip %>
+<%= t('reports.fragments.telex.startTime').toUpperCase() %>: <%= data.sessionInfo.startTime %>
+<%= t('reports.fragments.telex.protocol').toUpperCase() %>: <%= data.sessionInfo.protocol %>
+<%= t('reports.fragments.telex.duration').toUpperCase() %>: <%= data.sessionInfo.duration %>
             </pre>
         </div>
 
         <div class="section">
-            <div class="section-title"><%= t('reports.telex.metricsLog').toUpperCase() %></div>
+            <div class="section-title"><%= t('reports.fragments.telex.metricsLog').toUpperCase() %></div>
             <pre>
-<%= t('reports.telex.eventsCaptured').toUpperCase() %>: <%= data.sessionInfo.totalEvents %>
-<%= t('reports.telex.authAttempts').toUpperCase() %>: <%= data.sessionInfo.authAttempts %>
-<%= t('reports.telex.commandsIssued').toUpperCase() %>: <%= data.sessionInfo.commands %>
+<%= t('reports.fragments.telex.eventsCaptured').toUpperCase() %>: <%= data.sessionInfo.totalEvents %>
+<%= t('reports.fragments.telex.authAttempts').toUpperCase() %>: <%= data.sessionInfo.authAttempts %>
+<%= t('reports.fragments.telex.commandsIssued').toUpperCase() %>: <%= data.sessionInfo.commands %>
             </pre>
         </div>
 
         <div class="section">
-            <div class="section-title"><%= (data.isScannerActivity ? t('reports.telnetDetail.scannerAnalysis') : t('reports.telex.signalInterceptStream')).toUpperCase() %></div>
+            <div class="section-title"><%= (data.isScannerActivity ? t('reports.telnetDetail.scannerAnalysis') : t('reports.fragments.telex.signalInterceptStream')).toUpperCase() %></div>
             <div style="font-size: 10px;">
                 <% if (data.isScannerActivity && data.scannerStats) { %>
                     <pre>
-[ SCANNER ANALYSIS REPORT ]
+[ <%= t('reports.telnetDetail.scannerAnalysis').toUpperCase() %> ]
 =====================================================
-OCCURRENCES: <%= data.scannerStats.totalOccurrences %>
-FIRST_SEEN:  <%= data.scannerStats.firstSeen %>
-LAST_SEEN:   <%= data.scannerStats.lastSeen %>
-DURATION:    <%= data.scannerStats.duration %>s (AGGREGATED)
+<%= t('reports.telnetDetail.scannerOccurrences').toUpperCase() %>: <%= data.scannerStats.totalOccurrences %>
+<%= t('reports.telnetDetail.scannerFirstSeen').toUpperCase() %>:  <%= data.scannerStats.firstSeen %>
+<%= t('reports.telnetDetail.scannerLastSeen').toUpperCase() %>:   <%= data.scannerStats.lastSeen %>
+<%= t('reports.telnetDetail.duration').toUpperCase() %>:    <%= data.scannerStats.duration %>s (AGGREGATED)
 =====================================================
-FINDINGS: ITERATIVE_SCANNER_PATTERN_IDENTIFIED
-STATUS: COLLECTION_COMPLETE
+FINDINGS: <%= t('reports.fragments.telex.scannerFindingsDesc').toUpperCase() %>
+<%= t('reports.fragments.telex.status').toUpperCase() %>: <%= t('reports.fragments.telex.collectionComplete').toUpperCase() %>
                     </pre>
                 <% } else { %>
                     <% data.timeline.forEach(event => { %>
                         <div class="timeline-item">
                             [<%= new Date(event.timestamp).toISOString() %>] [<%= event.type.toUpperCase() %>]
                             <% if (event.type.includes('login')) { %>
-                                <%= t('reports.telex.user').toUpperCase() %>: <%= event.username || '?' %> / <%= t('reports.telex.pass').toUpperCase() %>: <%= event.password || '?' %>
+                                <%= t('reports.fragments.telex.user').toUpperCase() %>: <%= event.username || '?' %> / <%= t('reports.fragments.telex.pass').toUpperCase() %>: <%= event.password || '?' %>
                             <% } else if (event.input) { %>
                                 $ <%= event.input %>
                             <% } else if (event.message) { %>
-                                <%= t('reports.telex.msg').toUpperCase() %>: <%= event.message %>
+                                <%= t('reports.fragments.telex.msg').toUpperCase() %>: <%= event.message %>
                             <% } %>
                         </div>
                     <% }); %>
@@ -111,7 +111,7 @@ STATUS: COLLECTION_COMPLETE
         </div>
 
         <div class="footer">
-            <%= t('reports.telex.endOfTransmission').toUpperCase() %> // <%= t('reports.telex.date').toUpperCase() %>: <%= data.generatedAt %>
+            <%= t('reports.fragments.telex.endOfTransmission').toUpperCase() %> // <%= t('reports.fragments.telex.date').toUpperCase() %>: <%= data.generatedAt %>
         </div>
     </div>
 </body>

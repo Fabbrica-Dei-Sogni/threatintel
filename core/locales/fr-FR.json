@@ -126,6 +126,9 @@
             "authAttempts": "Tentatives d'authentification",
             "commands": "Commandes exécutées",
             "duration": "Durée",
+            "division": "Division Forensique Cyber",
+            "sessionId": "ID de Session",
+            "sensor": "Capteur",
             "timeline": "Timeline opérationnelle",
             "scannerAnalysis": "Analyse de l'activité du scanner",
             "scannerOccurrences": "Occurrences totales",
@@ -301,7 +304,10 @@
                 "pass": "PASS",
                 "cat": "CAT",
                 "comment": "COMMENTAIRE",
-                "msg": "MSG"
+                "msg": "MSG",
+                "status": "STATUT",
+                "collectionComplete": "COLLECTE COMPLÈTE",
+                "scannerFindingsDesc": "MOTIF DE SCANNER ITÉRATIF IDENTIFIÉ"
             }
         }
     },

@@ -126,6 +126,9 @@
             "authAttempts": "Tentativi Auth",
             "commands": "Comandi Eseguiti",
             "duration": "Durata",
+            "division": "Divisione Investigativa Forense",
+            "sessionId": "ID Sessione",
+            "sensor": "Sensore",
             "timeline": "Timeline Operativa",
             "scannerAnalysis": "Analisi Attività Scanner",
             "scannerOccurrences": "Occorrenze Totali",
@@ -306,7 +309,10 @@
                 "pass": "PASS",
                 "cat": "CAT",
                 "comment": "COMMENTO",
-                "msg": "MSG"
+                "msg": "MSG",
+                "status": "STATO",
+                "collectionComplete": "COLLEZIONE COMPLETATA",
+                "scannerFindingsDesc": "IDENTIFICATO PATTERN SCANNER ITERATIVO"
             }
         }
     },

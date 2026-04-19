@@ -126,6 +126,9 @@
             "authAttempts": "Auth Attempts",
             "commands": "Executed Commands",
             "duration": "Duration",
+            "division": "Cyber Forensic Division",
+            "sessionId": "Session ID",
+            "sensor": "Sensor",
             "timeline": "Operational Timeline",
             "scannerAnalysis": "Scanner Activity Analysis",
             "scannerOccurrences": "Total Occurrences",
@@ -307,7 +310,10 @@
                 "pass": "PASS",
                 "cat": "CAT",
                 "comment": "COMMENT",
-                "msg": "MSG"
+                "msg": "MSG",
+                "status": "STATUS",
+                "collectionComplete": "COLLECTION COMPLETE",
+                "scannerFindingsDesc": "ITERATIVE SCANNER PATTERN IDENTIFIED"
             }
         }
     },

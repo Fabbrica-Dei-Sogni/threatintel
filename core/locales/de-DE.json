@@ -126,6 +126,9 @@
             "authAttempts": "Anmeldeversuche",
             "commands": "Ausgeführte Befehle",
             "duration": "Dauer",
+            "division": "Cyber-Forensik-Abteilung",
+            "sessionId": "Sitzungs-ID",
+            "sensor": "Sensor",
             "timeline": "Operative Zeitachse",
             "scannerAnalysis": "Scanner-Aktivitätsanalyse",
             "scannerOccurrences": "Gesamtvorkommen",
@@ -301,7 +304,10 @@
                 "pass": "PASS",
                 "cat": "KAT",
                 "comment": "KOMMENTAR",
-                "msg": "NACHR"
+                "msg": "NACHR",
+                "status": "STATUS",
+                "collectionComplete": "SAMMLUNG ABGESCHLOSSEN",
+                "scannerFindingsDesc": "ITERATIVES SCANNER-MUSTER IDENTIFIZIERT"
             }
         }
     },

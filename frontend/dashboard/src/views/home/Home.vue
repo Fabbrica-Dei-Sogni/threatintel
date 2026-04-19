@@ -62,6 +62,14 @@
                           <DefconIndicator :level="attack.dangerLevel" :dangerScore="attack.dangerScore" mode="dot" />
                         </div>
                         <span @click="goToIpDetails(attack.request.ip)" class="ip-link">{{ attack.request.ip }}</span>
+                        
+                        <div class="attack-time" :title="t('attackDetail.timeWindow')">
+                          <span class="start-time">{{ dayjs(attack.firstSeen).format('HH:mm:ss') }}</span>
+                          <span class="duration-badge" v-if="attack.lastSeen && attack.lastSeen !== attack.firstSeen">
+                            ({{ computeDuration(attack.firstSeen, attack.lastSeen) }})
+                          </span>
+                        </div>
+
                         <div class="column-spacer"></div>
                         <router-link :to="{
                           name: 'AttackDetail',

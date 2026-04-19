@@ -291,7 +291,7 @@ li {
   text-align: right;
 }
 
-.session-time, .log-time {
+.session-time, .log-time, .attack-time {
   flex: 0 0 auto !important;
   display: flex;
   align-items: center;
@@ -598,7 +598,7 @@ li > a:last-child:hover {
     padding: 1px 4px;
   }
 
-  .session-time, .log-time {
+  .session-time, .log-time, .attack-time {
     display: none;
   }
 

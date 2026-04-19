@@ -1,8 +1,11 @@
 <template>
-    <div class="attack-detail">
+    <div class="attack-detail cyber-view" :class="'skin-' + dashboardSkin">
         <div class="header-top">
             <button @click="goBack" class="back-btn">← {{ t('attackDetail.backToAttacks') }}</button>
-            <LanguageSwitcher />
+            <div class="header-actions">
+                <SkinSwitcher />
+                <LanguageSwitcher />
+            </div>
         </div>
 
         <div class="header-briefing-top">
@@ -377,14 +380,19 @@ import AttackProfileRadar from '../../components/AttackProfileRadar.vue';
 import HexViewer from '../../components/HexViewer.vue';
 import AttackMap from '../../components/AttackMap.vue';
 import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
+import SkinSwitcher from '../../components/SkinSwitcher.vue';
 import ReportActions from '../../components/ReportActions.vue';
 import { Search } from '@element-plus/icons-vue';
 import { fetchAttackDetail } from '../../api';
 
+import { useViewSettingsStore } from '../../stores/viewSettings';
+import { storeToRefs } from 'pinia';
+
 const { t } = useI18n();
 const { copyToClipboard, copyFormatted } = useClipboard();
 
-// Reactive state for sections
+const viewStore = useViewSettingsStore();
+const { dashboardSkin } = storeToRefs(viewStore);
 const toggles = reactive({
     summary: true,
     logs: true,
@@ -657,3 +665,6 @@ const copyAggregatedLog = (log) => {
 </script>
 
 <style scoped src="./AttackDetail.css"></style>
+<style scoped>
+@import "./AttackDetailCyber.css";
+</style>

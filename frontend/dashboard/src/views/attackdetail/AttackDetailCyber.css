@@ -1,0 +1,148 @@
+/* AttackDetailCyber.css - MAGMA EDITION (Isolated Scoped Version) */
+
+/* === CORE VARIABLES (MAGMA) === */
+.skin-cyber.attack-detail {
+  --cy-primary: #ff4d4d;
+  --cy-primary-rgb: 255, 77, 77;
+  --cy-accent: #ff9900;
+  --cy-bg: #0d0505;
+  --cy-surface: rgba(20, 10, 10, 0.9);
+  --cy-border: rgba(255, 77, 77, 0.25);
+  --cy-input-bg: rgba(0, 0, 0, 0.7);
+  
+  background-color: var(--cy-bg) !important;
+  color: #F0E6D2;
+  transition: all 0.3s ease;
+}
+
+/* === HEADER & SWITCHER ALIGNMENT (PERFECT) === */
+.skin-cyber.attack-detail .header-top {
+  background: rgba(15, 5, 5, 0.95) !important;
+  border-bottom: 2px solid var(--cy-primary) !important;
+  padding: 12px 24px 15px 24px !important;
+  margin-bottom: 30px !important;
+}
+
+.skin-cyber.attack-detail .header-actions {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 15px !important;
+}
+
+.skin-cyber.attack-detail h1 {
+  color: var(--cy-primary) !important;
+  text-shadow: 0 0 15px rgba(var(--cy-primary-rgb), 0.6) !important;
+  font-family: var(--font-cyber-mono) !important;
+  letter-spacing: 2px;
+}
+
+.skin-cyber.attack-detail h1::after {
+  content: '_';
+  animation: magma-blink-hud-v7 1s step-end infinite;
+}
+
+@keyframes magma-blink-hud-v7 {
+  50% { opacity: 0; }
+}
+
+/* === HUD SCANLINES (Cyber Only) === */
+.skin-cyber.attack-detail::before {
+  content: "";
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%),
+              linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+  background-size: 100% 4px, 3px 100%;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.25;
+}
+
+/* === CRITICAL DEEP RULES (COLOR PROTECTION) === */
+/* Pierce through Element Plus components in the Logs section */
+
+.skin-cyber.attack-detail :deep(.el-input__wrapper) {
+  background-color: var(--cy-input-bg) !important;
+  box-shadow: 0 0 0 1px var(--cy-border) inset !important;
+  border-radius: 4px !important;
+}
+
+.skin-cyber.attack-detail :deep(.el-input__inner) {
+  color: #fff !important;
+  font-family: var(--font-cyber-mono) !important;
+}
+
+.skin-cyber.attack-detail :deep(.el-pagination.is-background .el-pager li:not(.is-active)) {
+  background-color: var(--cy-input-bg) !important;
+  color: var(--cy-primary) !important;
+  border: 1px solid var(--cy-border) !important;
+}
+
+/* === CARDS & CONTAINERS === */
+.skin-cyber.attack-detail .forensic-card,
+.skin-cyber.attack-detail .attacker-card {
+  background: linear-gradient(135deg, #1A0D0D 0%, #0d0505 100%) !important;
+  border: 1px solid var(--cy-border) !important;
+  border-left: 6px solid var(--cy-primary) !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8) !important;
+}
+
+.skin-cyber.attack-detail .section-header {
+  border-bottom: 1px solid var(--cy-border) !important;
+}
+
+.skin-cyber.attack-detail .hud-stat-box {
+  background: rgba(255, 77, 77, 0.05) !important;
+  border: 1px solid rgba(255, 77, 77, 0.1) !important;
+  box-shadow: inset 0 0 20px rgba(255, 77, 77, 0.05) !important;
+}
+
+.skin-cyber.attack-detail .hud-value.highlight {
+  color: var(--cy-primary) !important;
+  text-shadow: 0 0 10px rgba(255, 77, 77, 0.5) !important;
+}
+
+/* === LOGS & ENTRIES === */
+.skin-cyber.attack-detail .log-entry {
+  background: rgba(20, 10, 10, 0.4) !important;
+  border: 1px solid rgba(255, 77, 77, 0.1) !important;
+  margin-bottom: 4px !important;
+}
+
+.skin-cyber.attack-detail .log-entry:hover {
+  border-color: var(--cy-primary) !important;
+  background: rgba(255, 77, 77, 0.05) !important;
+}
+
+.skin-cyber.attack-detail .method-badge {
+  background: var(--cy-primary) !important;
+  color: #000 !important;
+  font-weight: 800 !important;
+}
+
+.skin-cyber.attack-detail .tab-btn.active {
+  color: var(--cy-primary) !important;
+  border-bottom: 2px solid var(--cy-primary) !important;
+}
+
+/* === BUTTONS === */
+.skin-cyber.attack-detail .back-btn {
+  background: transparent !important;
+  border: 1px solid var(--cy-primary) !important;
+  border-radius: 4px !important;
+  color: var(--cy-primary) !important;
+  box-shadow: none !important;
+}
+
+.skin-cyber.attack-detail .back-btn:hover {
+  background: var(--cy-primary) !important;
+  color: #000 !important;
+  box-shadow: 0 0 20px var(--cy-primary) !important;
+}
+
+.skin-cyber.attack-detail .attacker-action-btn {
+  background: var(--cy-primary) !important;
+  color: #000 !important;
+  border-radius: 4px !important;
+}

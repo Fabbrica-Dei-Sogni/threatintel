@@ -10,14 +10,18 @@
 /* === HEADER TOP & BACK BUTTON === */
 
 .header-top {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    margin-bottom: 24px;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    gap: 15px !important;
+    margin-bottom: 24px !important;
+    padding-bottom: 12px;
 }
 
-.header-top :last-child {
-    margin-left: auto;
+.header-actions {
+    display: flex !important;
+    align-items: center !important;
+    gap: 15px !important;
 }
 
 .back-btn {

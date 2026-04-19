@@ -1,8 +1,11 @@
 <template>
-    <div class="attacchi cyber-view">
+    <div class="attacchi cyber-view" :class="'skin-' + dashboardSkin">
         <div class="header-top cyber-sticky-area cyber-sticky-top-0">
             <h1><span class="animated-icon pulse-magma">📡</span> {{ t('attacks.title') }}</h1>
-            <LanguageSwitcher />
+            <div class="header-actions">
+                <SkinSwitcher />
+                <LanguageSwitcher />
+            </div>
         </div>
         <!-- Pulsante per tornare alla Home principale -->
         <div class="actions cyber-sticky-area cyber-sticky-top-1">
@@ -125,7 +128,7 @@
                             </th>
                             <th :data-attacks-tooltip="t('attacks.table.details')">
                                 {{ t('attacks.table.short.info') }}
-                            </th>                            
+                            </th>
                             <th :data-attacks-tooltip="t('attacks.table.techniques')">
                                 {{ t('attacks.table.short.tech') }}
                             </th>
@@ -256,7 +259,8 @@
                             </td>
 
                             <td class="defcon-cell" :title="attack.dangerScore">
-                                <DefconIndicator :level="attack.dangerLevel" :dangerScore="attack.dangerScore" mode="dot" />
+                                <DefconIndicator :level="attack.dangerLevel" :dangerScore="attack.dangerScore"
+                                    mode="dot" />
                             </td>
                             <td>
                                 <router-link :to="{
@@ -272,13 +276,13 @@
                                 }" class="detail-link">
                                     {{ t('common.detail') }}
                                 </router-link>
-                            </td>                            
+                            </td>
                             <td class="tecniche-cell">
                                 <div class="tech-wrapper">
                                     <span v-for="tech in attack.attackPatterns" :key="tech" class="tech-chip">
                                         <span class="tech-name">{{ tech }}</span>
-                                        <button @click.stop="copyFormatted('clipboard.attackTechnique', { tech: tech })" class="btn-copy-mini-tech"
-                                            :title="t('common.copyToClipboard')">📋</button>
+                                        <button @click.stop="copyFormatted('clipboard.attackTechnique', { tech: tech })"
+                                            class="btn-copy-mini-tech" :title="t('common.copyToClipboard')">📋</button>
                                     </span>
                                 </div>
                             </td>
@@ -287,8 +291,8 @@
                                     <span class="detail-link" @click="goToIpDetails(attack.request.ip)"
                                         style="cursor:pointer;" :title="t('common.infoIp')">{{ attack.request.ip
                                         }}</span>
-                                    <button @click.stop="copyFormatted('clipboard.ip', { ip: attack.request.ip })" class="btn-copy-ip"
-                                        :title="t('common.copyToClipboard')">📋</button>
+                                    <button @click.stop="copyFormatted('clipboard.ip', { ip: attack.request.ip })"
+                                        class="btn-copy-ip" :title="t('common.copyToClipboard')">📋</button>
                                     <button @click.stop="setIpFilter(attack.request.ip)" class="btn-copy-ip"
                                         :title="t('common.copyToFilter')">⬇️</button>
                                 </span>
@@ -357,6 +361,7 @@ import CountryFlag from '../../components/CountryFlag.vue';
 import AttackChart from '../../components/AttackChart.vue';
 import AttackMap from '../../components/AttackMap.vue';
 import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
+import SkinSwitcher from '../../components/SkinSwitcher.vue';
 
 
 
@@ -389,7 +394,11 @@ const previousPageBeforeIpFilter = ref(null);
 import { useViewSettingsStore } from '../../stores/viewSettings';
 import { storeToRefs } from 'pinia';
 const viewStore = useViewSettingsStore();
-const { attacksShowMap: showMap, attacksShowChart: showChart } = storeToRefs(viewStore);
+const { 
+    attacksShowMap: showMap, 
+    attacksShowChart: showChart,
+    dashboardSkin 
+} = storeToRefs(viewStore);
 
 const {
     attacks,
@@ -436,19 +445,19 @@ const totalPages = computed(() => Math.ceil(total.value / pageSize.value));
 // Aggiorna URL query con router.replace al cambiamento dei filtri
 // Aggiorna URL query con router.replace al cambiamento dei filtri
 // Sincronizzazione Prop -> Ref (per back/forward browser)
-watch(() => props.initialIp,              (v) => { filterIp.value          = v ?? ''; });
-watch(() => props.initialProtocol,        (v) => { filterProtocol.value    = v ?? 'http'; });
-watch(() => props.initialPage,            (v) => { page.value              = v ?? 1; });
-watch(() => props.initialMinLogsForAttack,(v) => { minLogsForAttack.value  = v ?? 10; });
-watch(() => props.initTimeMode,           (v) => { timeMode.value          = v ?? 'ago'; });
-watch(() => props.initAgoValue,           (v) => { agoValue.value          = v ?? 10; });
-watch(() => props.initAgoUnit,            (v) => { agoUnit.value           = v ?? 'days'; });
-watch(() => props.initDateRange,          (v) => { dateRange.value         = v ?? [null, null]; }, { deep: true });
-watch(() => props.initFromValue,          (v) => { fromValue.value         = v ?? 60; });
-watch(() => props.initFromUnit,           (v) => { fromUnit.value          = v ?? 'days'; });
-watch(() => props.initToValue,            (v) => { toValue.value           = v ?? 0; });
-watch(() => props.initToUnit,             (v) => { toUnit.value            = v ?? 'days'; });
-watch(() => props.initialSortFields,      (v) => { sortFields.value        = v ?? {}; }, { deep: true });
+watch(() => props.initialIp, (v) => { filterIp.value = v ?? ''; });
+watch(() => props.initialProtocol, (v) => { filterProtocol.value = v ?? 'http'; });
+watch(() => props.initialPage, (v) => { page.value = v ?? 1; });
+watch(() => props.initialMinLogsForAttack, (v) => { minLogsForAttack.value = v ?? 10; });
+watch(() => props.initTimeMode, (v) => { timeMode.value = v ?? 'ago'; });
+watch(() => props.initAgoValue, (v) => { agoValue.value = v ?? 10; });
+watch(() => props.initAgoUnit, (v) => { agoUnit.value = v ?? 'days'; });
+watch(() => props.initDateRange, (v) => { dateRange.value = v ?? [null, null]; }, { deep: true });
+watch(() => props.initFromValue, (v) => { fromValue.value = v ?? 60; });
+watch(() => props.initFromUnit, (v) => { fromUnit.value = v ?? 'days'; });
+watch(() => props.initToValue, (v) => { toValue.value = v ?? 0; });
+watch(() => props.initToUnit, (v) => { toUnit.value = v ?? 'days'; });
+watch(() => props.initialSortFields, (v) => { sortFields.value = v ?? {}; }, { deep: true });
 
 // Sincronizzazione Ref -> URL query
 watch(
@@ -610,3 +619,6 @@ watch(() => attacks.value, () => {
 </script>
 
 <style scoped src="./Attacks.css"></style>
+<style scoped>
+@import "./AttacksCyber.css";
+</style>

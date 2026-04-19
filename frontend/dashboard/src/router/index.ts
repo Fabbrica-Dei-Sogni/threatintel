@@ -27,6 +27,7 @@ const routes: RouteRecordRaw[] = [
         props: (route: RouteLocationNormalized) => ({
             initialIp: typeof route.query.ip === 'string' ? route.query.ip : '',
             initialUrl: typeof route.query.url === 'string' ? route.query.url : '',
+            initialProtocol: typeof route.query.protocol === 'string' ? route.query.protocol : 'http',
             initialPage: route.query.page ? parseInt(route.query.page as string) : 1,
             initialSortFields: route.query.sortFields ? JSON.parse(route.query.sortFields as string) : undefined,
         }),
@@ -59,6 +60,7 @@ const routes: RouteRecordRaw[] = [
         component: Attacks,
         props: (route: RouteLocationNormalized) => ({
             initialIp: typeof route.query.ip === 'string' ? route.query.ip : '',
+            initialProtocol: typeof route.query.protocol === 'string' ? route.query.protocol : 'http',
             //initialUrl: typeof route.query.url === 'string' ? route.query.url : '',
             initialPage: route.query.page ? parseInt(route.query.page as string) : 1,
             initialMinLogsForAttack: route.query.minLogsForAttack ? parseInt(route.query.minLogsForAttack as string) : 10,
@@ -103,7 +105,7 @@ const routes: RouteRecordRaw[] = [
             initialPageSize: route.query.pageSize ? parseInt(route.query.pageSize as string) : 20,
             initialSortFields: route.query.sortFields ? JSON.parse(route.query.sortFields as string) : {},
             initialIp: typeof route.query.ip === 'string' ? route.query.ip : '',
-            initialCategory: typeof route.query.category === 'string' ? route.query.category : 'interaction',
+            initialCategory: typeof route.query.category === 'string' ? route.query.category : 'all',
         }),
     },
     { path: '/telnet-attack-detail/:id', name: 'CowrieAttackDetail', component: CowrieAttackDetail },

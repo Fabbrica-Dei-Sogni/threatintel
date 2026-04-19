@@ -2,8 +2,8 @@
   <div class="cowrie-category-selector" :class="size">
     <button 
       class="cyber-chip" 
-      :class="{ active: modelValue === '' }" 
-      @click="$emit('update:modelValue', '')"
+      :class="{ active: modelValue === 'all' }" 
+      @click="$emit('update:modelValue', 'all')"
     >
       {{ $t('cowrie.sessions.filters.all') }}
     </button>

@@ -9,7 +9,7 @@ export function useCowrieSessions(
     initialLimit: number = 20,
     initialSortFields: any = {},
     initialIp: string = '',
-    initialCategory: string = 'interaction'
+    initialCategory: string = 'all'
 ) {
     // Filtri specifici
     const filterIp = ref(initialIp);
@@ -44,7 +44,9 @@ export function useCowrieSessions(
         try {
             const filters: any = {};
             if (filterIp.value) filters.src_ip = filterIp.value;
-            if (filterCategory.value) filters.sessionCategory = filterCategory.value;
+            // 'all' non viene inviato: il backend restituisce tutte le sessioni
+            // quando sessionCategory è assente (equivalente all'ex stringa vuota)
+            if (filterCategory.value && filterCategory.value !== 'all') filters.sessionCategory = filterCategory.value;
 
             const response: FetchCowrieSessionsResponse = await fetchCowrieSessions(
                 page.value, 

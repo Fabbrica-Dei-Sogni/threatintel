@@ -16,6 +16,7 @@ export const useViewSettingsStore = defineStore('viewSettings', () => {
     // Cowrie Sessions View
     const sessionsShowMap = ref<boolean>(savedSettings.sessionsShowMap ?? false);
     const sessionsShowChart = ref<boolean>(savedSettings.sessionsShowChart ?? true);
+    const sessionsLastCategory = ref<string>(savedSettings.sessionsLastCategory ?? 'all');
 
     // Home Dashboard (Persistent Maps & Skin)
     const homeShowAttackMap = ref<boolean>(savedSettings.homeShowAttackMap ?? false);
@@ -24,7 +25,7 @@ export const useViewSettingsStore = defineStore('viewSettings', () => {
 
     // Persistence logic
     watch(
-        [attacksShowMap, attacksShowChart, logsShowChart, sessionsShowMap, sessionsShowChart, homeShowAttackMap, homeShowSessionsMap, dashboardSkin],
+        [attacksShowMap, attacksShowChart, logsShowChart, sessionsShowMap, sessionsShowChart, sessionsLastCategory, homeShowAttackMap, homeShowSessionsMap, dashboardSkin],
         () => {
             const settings = {
                 attacksShowMap: attacksShowMap.value,
@@ -32,6 +33,7 @@ export const useViewSettingsStore = defineStore('viewSettings', () => {
                 logsShowChart: logsShowChart.value,
                 sessionsShowMap: sessionsShowMap.value,
                 sessionsShowChart: sessionsShowChart.value,
+                sessionsLastCategory: sessionsLastCategory.value,
                 homeShowAttackMap: homeShowAttackMap.value,
                 homeShowSessionsMap: homeShowSessionsMap.value,
                 dashboardSkin: dashboardSkin.value
@@ -47,6 +49,7 @@ export const useViewSettingsStore = defineStore('viewSettings', () => {
         logsShowChart,
         sessionsShowMap,
         sessionsShowChart,
+        sessionsLastCategory,
         homeShowAttackMap,
         homeShowSessionsMap,
         dashboardSkin

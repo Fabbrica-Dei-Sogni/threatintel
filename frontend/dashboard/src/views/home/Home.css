@@ -279,16 +279,51 @@ li {
 }
 
 .ip-link { 
-  flex: 0 0 120px !important; 
+  flex: 0 0 140px !important; 
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  font-weight: 500;
 }
 
-.interaction-count { 
+.activity-badge { 
   flex: 1 !important; 
+  display: flex !important;
+  justify-content: flex-end;
   min-width: 0;
-  text-align: right;
+}
+
+.badge-content {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(13, 20, 33, 0.6);
+  border: 1px solid rgba(136, 170, 255, 0.15);
+  border-radius: 4px;
+  padding: 2px 10px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #94a3b8;
+  backdrop-filter: blur(4px);
+  white-space: nowrap;
+}
+
+.badge-icon {
+  font-size: 0.85rem;
+}
+
+.badge-content.high-interaction {
+  color: #fbbf24;
+  border-color: rgba(251, 191, 36, 0.4);
+  background: rgba(251, 191, 36, 0.1);
+  box-shadow: 0 0 10px rgba(251, 191, 36, 0.1);
+  animation: pulse-activity 2s infinite;
+}
+
+@keyframes pulse-activity {
+  0% { box-shadow: 0 0 0px rgba(251, 191, 36, 0); }
+  50% { box-shadow: 0 0 12px rgba(251, 191, 36, 0.2); }
+  100% { box-shadow: 0 0 0px rgba(251, 191, 36, 0); }
 }
 
 .session-time, .log-time, .attack-time {
@@ -401,23 +436,9 @@ li > a:last-child {
   justify-self: center;
 }
 
-.interaction-count, .activity-hint {
-  font-size: 0.75em;
-  color: #94a3b8;
-  font-weight: 600;
-  background: rgba(0, 0, 0, 0.3);
-  padding: 1px 6px;
-  border-radius: 6px;
-  justify-self: start;
-  border: 1px solid rgba(136, 170, 255, 0.1);
-  white-space: nowrap;
-}
+/* Removed redundant interaction-count style consolidated above */
 
-.high-interaction {
-  color: #fbbf24;
-  background: rgba(251, 191, 36, 0.1);
-  border: 1px solid rgba(251, 191, 36, 0.2);
-}
+/* .high-interaction styles consolidated into .badge-content.high-interaction */
 
 /* Rimossi vecchi media query ridondanti */
 
@@ -581,31 +602,36 @@ li > a:last-child:hover {
 
   li {
     display: flex !important;
-    justify-content: space-between !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
     flex-wrap: nowrap !important;
-    gap: 8px !important;
+    gap: 6px !important;
     width: 100% !important;
     padding: 12px 0 !important;
     box-sizing: border-box !important;
+    overflow: hidden;
   }
 
   .ip-link {
-    flex: 1;
-    min-width: 0;
+    flex: 1 !important;
+    min-width: 0 !important;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    font-size: 0.85em;
+    font-size: 0.8rem;
   }
 
   .indicator-group {
-    flex-shrink: 0;
+    flex: 0 0 48px !important;
+    display: flex;
+    gap: 4px;
+    align-items: center;
   }
 
   li > a:last-child {
-    flex-shrink: 0;
-    font-size: 0.85em;
-    min-width: 30px; /* Ridotto per ospitare solo l'icona */
+    flex: 0 0 28px !important;
+    height: 28px;
+    font-size: 0.8rem;
     text-align: right;
   }
 
@@ -613,27 +639,51 @@ li > a:last-child:hover {
     display: none;
   }
 
-  .interaction-count {
-    font-size: 0.7em;
+  .activity-badge {
+    display: flex !important;
+    flex: 0 0 55px !important;
+    justify-content: center;
+  }
+
+  .activity-badge .badge-content {
     padding: 1px 4px;
+    font-size: 0.65rem;
+    gap: 3px;
+  }
+
+  .activity-badge .badge-icon {
+    font-size: 0.75rem;
   }
 
   .session-time, .log-time, .attack-time {
     display: flex;
     flex-direction: column;
-    flex: 0 0 70px !important;
-    font-size: 0.7rem;
-    padding: 2px 6px;
-    background: rgba(0, 0, 0, 0.4);
-    border-radius: 3px;
-    gap: 2px;
-    min-width: 60px;
+    flex: 0 0 72px !important;
+    font-size: 0.65rem;
+    padding: 2px 0;
+    gap: 0;
+    min-width: 65px;
     justify-content: center;
+    border: none;
+    line-height: 1;
   }
 
-  .session-time .duration-badge,
-  .attack-time .duration-badge {
-    display: none;
+  .date-part {
+    display: block !important;
+    font-size: 0.6rem;
+    opacity: 0.7;
+  }
+
+  .time-part {
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+
+  .duration-badge {
+    display: block !important;
+    font-size: 0.6rem;
+    color: #fbbf24;
+    margin-top: 1px;
   }
 
   .breaking-news-row {

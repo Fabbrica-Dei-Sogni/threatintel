@@ -70,11 +70,16 @@
                           <span class="date-part">{{ formatDateOnly(attack.firstSeen) }}</span>
                           <span class="time-part">{{ formatTimeOnly(attack.firstSeen) }}</span>
                           <span class="duration-badge" v-if="attack.lastSeen && attack.lastSeen !== attack.firstSeen">
-                            {{ computeDuration(attack.firstSeen, attack.lastSeen) }}
+                            ({{ computeDuration(attack.firstSeen, attack.lastSeen) }})
                           </span>
                         </div>
 
-                        <div class="column-spacer"></div>
+                        <div class="activity-badge">
+                          <div class="badge-content" :class="{ 'high-interaction': (attack.totaleLogs || 0) > 50 }" :title="$t('attacks.table.totalLogs')">
+                            <span class="badge-icon">📋</span>
+                            <span class="badge-value">{{ attack.totaleLogs || 0 }}</span>
+                          </div>
+                        </div>
                         <router-link :to="{
                           name: 'AttackDetail',
                           params: { ip: attack.request.ip },
@@ -137,7 +142,12 @@
                           <span class="time-part">{{ formatTimeOnly(log.timestamp) }}</span>
                         </div>
 
-                        <div class="column-spacer"></div>
+                        <div class="activity-badge">
+                          <div class="badge-content" :title="$t('threatLog.method')">
+                            <span class="badge-icon">🌐</span>
+                            <span class="badge-value">{{ log.request.method }}</span>
+                          </div>
+                        </div>
                         <router-link :to="{ name: 'ThreatLog', params: { id: log.id } }" :title="t('common.detail')">👁️</router-link>
                       </li>
                     </ul>
@@ -194,13 +204,16 @@
                           <span class="date-part">{{ formatDateOnly(session.starttime) }}</span>
                           <span class="time-part">{{ formatTimeOnly(session.starttime) }}</span>
                           <span class="duration-badge" v-if="session.endtime">
-                            {{ computeDuration(session.starttime, session.endtime) }}
+                            ({{ computeDuration(session.starttime, session.endtime) }})
                           </span>
                         </div>
 
-                        <span class="interaction-count" :class="{ 'high-interaction': (session.eventCount || 0) > 5 }">
-                          {{ session.eventCount || 0 }} {{ $t('sessionChart.events').toLowerCase() }}
-                        </span>
+                        <div class="activity-badge">
+                          <div class="badge-content" :class="{ 'high-interaction': (session.eventCount || 0) > 10 }" :title="$t('sessionChart.activity')">
+                            <span class="badge-icon">⚡</span>
+                            <span class="badge-value">{{ session.eventCount || 0 }}</span>
+                          </div>
+                        </div>
                         <router-link :to="{ name: 'CowrieAttackDetail', params: { id: session.session } }" :title="t('common.detail')">
                           👁️
                         </router-link>

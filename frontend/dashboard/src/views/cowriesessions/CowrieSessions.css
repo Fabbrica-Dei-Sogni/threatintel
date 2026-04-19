@@ -450,3 +450,23 @@
   padding: 6px 10px !important;
   font-size: 0.85rem !important;
 }
+
+/* Badge occorrenze per vista scanner */
+.occurrence-badge {
+    background: rgba(255, 184, 108, 0.15);
+    color: #ffb86c;
+    padding: 2px 8px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 184, 108, 0.3);
+    font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
+    display: inline-block;
+    box-shadow: 0 0 10px rgba(255, 184, 108, 0.2);
+}
+
+.occurrence-badge:hover {
+    background: rgba(255, 184, 108, 0.25);
+    box-shadow: 0 0 15px rgba(255, 184, 108, 0.4);
+    transform: scale(1.05);
+    transition: all 0.2s ease;
+}

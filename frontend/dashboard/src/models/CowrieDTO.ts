@@ -10,10 +10,14 @@ export interface CowrieSession {
     dst_port: number;
     protocol: string;
     eventCount?: number;
+    occurrenceCount?: number;
+    isAggregated?: boolean;
     ipDetailsId?: {
         ipinfo?: {
             country?: string;
             city?: string;
+            org?: string;
+            loc?: string;
         }
     };
 }

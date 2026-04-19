@@ -505,6 +505,7 @@
                     "startTime": "⏱️",
                     "duration": "⏳",
                     "events": "📊",
+                    "occurrences": "🔢",
                     "exploration": "🔍"
                 },
                 "ip": "IP źródłowe",
@@ -512,6 +513,7 @@
                 "startTime": "Czas rozpoczęcia",
                 "duration": "Czas trwania",
                 "events": "Zdarzenia",
+                "occurrences": "Wystąpienia",
                 "exploration": "Eksploracja",
                 "viewTimeline": "👁️ Zobacz osi czasu"
             },
@@ -545,7 +547,11 @@
             "duration": "Czas trwania",
             "mapTitle": "Mapa Sesji",
             "mainInfo": "GŁÓWNE INFORMACJE",
-            "eventTimeline": "OŚ CZASU DZIAŁANIA"
+            "eventTimeline": "OŚ CZASU DZIAŁANIA",
+            "scannerAnalysis": "ANALIZA AKTYWNOŚCI SKANERA",
+            "scannerOccurrences": "Całkowita liczba wykrytych wystąpień",
+            "scannerFirstSeen": "Pierwsze wykrycie",
+            "scannerLastSeen": "Ostatnie wykrycie"
         }
     },
     "clipboard": {

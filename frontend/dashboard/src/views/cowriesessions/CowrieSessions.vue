@@ -99,7 +99,7 @@
                                     </button>
                                 </div>
                             </th>
-                            <th class="sortable-th" :data-sessions-tooltip="$t('cowrie.sessions.table.duration')">
+                            <th v-if="filterCategory !== 'scanner'" class="sortable-th" :data-sessions-tooltip="$t('cowrie.sessions.table.duration')">
                                 <div class="sort-control">
                                     <span class="label">{{ $t('cowrie.sessions.table.short.duration') }}</span>
                                     <button @click="toggleSort('time')" class="sort-button">
@@ -110,14 +110,26 @@
                                 </div>
                             </th>
                             <th class="sortable-th" :data-sessions-tooltip="$t('cowrie.sessions.table.events')">
-                                <div class="sort-control">
-                                    <span class="label">{{ $t('cowrie.sessions.table.short.events') }}</span>
-                                    <button @click="toggleSort('eventCount')" class="sort-button">
-                                        <span v-if="getSortDirection('eventCount') === 1">▲</span>
-                                        <span v-else-if="getSortDirection('eventCount') === -1">▼</span>
-                                        <span v-else>⇵</span>
-                                    </button>
-                                </div>
+                                <template v-if="filterCategory === 'scanner'">
+                                    <div class="sort-control">
+                                        <span class="label">{{ $t('cowrie.sessions.table.short.occurrences') }}</span>
+                                        <button @click="toggleSort('occurrenceCount')" class="sort-button">
+                                            <span v-if="getSortDirection('occurrenceCount') === 1">▲</span>
+                                            <span v-else-if="getSortDirection('occurrenceCount') === -1">▼</span>
+                                            <span v-else>⇵</span>
+                                        </button>
+                                    </div>
+                                </template>
+                                <template v-else>
+                                    <div class="sort-control">
+                                        <span class="label">{{ $t('cowrie.sessions.table.short.events') }}</span>
+                                        <button @click="toggleSort('eventCount')" class="sort-button">
+                                            <span v-if="getSortDirection('eventCount') === 1">▲</span>
+                                            <span v-else-if="getSortDirection('eventCount') === -1">▼</span>
+                                            <span v-else>⇵</span>
+                                        </button>
+                                    </div>
+                                </template>
                             </th>
                             <th :data-sessions-tooltip="$t('cowrie.sessions.table.exploration')">{{ $t('cowrie.sessions.table.short.exploration') }}</th>
                         </tr>
@@ -146,9 +158,14 @@
                                     <span class="time-hour">{{ formatDateTime(session.starttime) }}</span>
                                 </div>
                             </td>
-                            <td class="duration-cell">{{ computeDuration(session.starttime, session.endtime) }}</td>
+                            <td v-if="filterCategory !== 'scanner'" class="duration-cell">{{ computeDuration(session.starttime, session.endtime) }}</td>
                             <td class="events-cell">
-                                {{ session.eventCount || 0 }}
+                                <span v-if="session.isAggregated" class="occurrence-badge">
+                                    {{ session.occurrenceCount }}
+                                </span>
+                                <span v-else>
+                                    {{ session.eventCount || 0 }}
+                                </span>
                             </td>
                             <td>
                                 <router-link :to="{ name: 'CowrieAttackDetail', params: { id: session.session } }"
@@ -255,9 +272,9 @@ const mapSessions = computed(() => {
             }
         },
         dangerLevel: 2, // Always red for Telnet sessions as requested
-        dangerScore: s.eventCount || 0,
+        dangerScore: s.isAggregated ? (s.occurrenceCount || 0) : (s.eventCount || 0),
         rps: 0,
-        totaleLogs: s.eventCount || 0
+        totaleLogs: s.isAggregated ? (s.occurrenceCount || 0) : (s.eventCount || 0)
     }));
 });
 

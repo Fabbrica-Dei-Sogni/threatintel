@@ -16,7 +16,7 @@ const ATTACK_SORT_FIELDS = new Set([
 
 const COWRIE_SESSION_SORT_FIELDS = new Set([
     'timestamp', 'src_ip', 'duration', 'eventCount',
-    'session', 'sensor', 'protocol'
+    'session', 'sensor', 'protocol', 'occurrenceCount', 'starttime'
 ]);
 
 const DOSSIER_SORT_FIELDS = new Set([

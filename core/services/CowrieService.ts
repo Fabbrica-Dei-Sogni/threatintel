@@ -186,14 +186,32 @@ export class CowrieService implements ILongRunningService {
                     }
                 }
             },
-            // Filtro per categoria (Scanner, Interaction)
-            ...(sessionCategory ? [
+            // Filtro per categoria (Scanner Aggregato, Interaction)
+            ...(sessionCategory === 'scanner' ? [
+                { $match: { eventCount: 0 } },
                 {
-                    $match: sessionCategory === 'scanner' 
-                        ? { eventCount: 0 }
-                        : { eventCount: { $gt: 0 } }
+                    $group: {
+                        _id: "$src_ip",
+                        src_ip: { $first: "$src_ip" },
+                        occurrenceCount: { $sum: 1 },
+                        starttime: { $min: "$starttime" },
+                        timestamp: { $max: "$timestamp" },
+                        ipDetailsId: { $first: "$ipDetailsId" },
+                        session: { $first: "$session" },
+                        sensor: { $first: "$sensor" },
+                        protocol: { $first: "$protocol" },
+                        eventCount: { $first: 0 }
+                    }
+                },
+                {
+                    $addFields: {
+                        isAggregated: true,
+                        sortTimestamp: { $toDate: "$timestamp" }
+                    }
                 }
-            ] : []),
+            ] : (sessionCategory === 'interaction' ? [
+                { $match: { eventCount: { $gt: 1 } } }
+            ] : [])),
             // Faceting per dati e conteggio totale
             {
                 $facet: {
@@ -260,9 +278,87 @@ export class CowrieService implements ILongRunningService {
      * API: Recupera il dettaglio di una singola sessione
      */
     async getSessionDetails(sessionId: string) {
-        return await CowrieSession.findOne({ session: sessionId })
+        const session = await CowrieSession.findOne({ session: sessionId })
             .populate('ipDetailsId')
+            .lean()
             .exec();
+        
+        if (!session) return null;
+
+        // Recuperiamo il conteggio eventi per decidere se arricchire come scanner
+        const events = await this.getSessionEvents(sessionId);
+        
+        if (events.length === 0 && session.src_ip) {
+            // È uno scanner, aggreghiamo i dati per l'intero IP
+            const aggregation = await CowrieSession.aggregate([
+                { $match: { src_ip: session.src_ip } },
+                // Filtriamo per sessioni con 0 eventi (scanners)
+                // Usiamo lo stesso logica del lookup per coerenza
+                {
+                    $lookup: {
+                        from: 'event',
+                        localField: 'session',
+                        foreignField: 'session',
+                        as: 'cnt_event'
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'auth',
+                        localField: 'session',
+                        foreignField: 'session',
+                        as: 'cnt_auth'
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'input',
+                        localField: 'session',
+                        foreignField: 'session',
+                        as: 'cnt_input'
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'ttylog',
+                        localField: 'session',
+                        foreignField: 'session',
+                        as: 'cnt_ttylog'
+                    }
+                },
+                {
+                    $addFields: {
+                        evtCount: {
+                            $add: [
+                                { $size: "$cnt_event" },
+                                { $size: "$cnt_auth" },
+                                { $size: "$cnt_input" },
+                                { $size: "$cnt_ttylog" }
+                            ]
+                        }
+                    }
+                },
+                { $match: { evtCount: 0 } },
+                {
+                    $group: {
+                        _id: "$src_ip",
+                        totalOccurrences: { $sum: 1 },
+                        firstSeen: { $min: "$starttime" },
+                        lastSeen: { $max: "$starttime" }
+                    }
+                }
+            ]);
+
+            if (aggregation && aggregation.length > 0) {
+                return {
+                    ...session,
+                    isScannerActivity: true,
+                    scannerStats: aggregation[0]
+                };
+            }
+        }
+
+        return session;
     }
 
     /**

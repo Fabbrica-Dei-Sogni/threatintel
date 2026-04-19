@@ -505,6 +505,7 @@
                     "startTime": "⏱️",
                     "duration": "⏳",
                     "events": "📊",
+                    "occurrences": "🔢",
                     "exploration": "🔍"
                 },
                 "ip": "IP Source",
@@ -512,6 +513,7 @@
                 "startTime": "Heure de début",
                 "duration": "Durée",
                 "events": "Événements",
+                "occurrences": "Occurrences",
                 "exploration": "Exploration",
                 "viewTimeline": "👁️ Voir la Timeline"
             },
@@ -545,7 +547,11 @@
             "duration": "Durée",
             "mapTitle": "Carte de Session",
             "mainInfo": "INFORMATIONS PRINCIPALES",
-            "eventTimeline": "TIMELINE OPÉRATIONNELLE"
+            "eventTimeline": "TIMELINE OPÉRATIONNELLE",
+            "scannerAnalysis": "ANALYSE DE L'ACTIVITÉ DU SCANNER",
+            "scannerOccurrences": "Total des occurrences détectées",
+            "scannerFirstSeen": "Première détection",
+            "scannerLastSeen": "Dernière détection"
         }
     },
     "clipboard": {

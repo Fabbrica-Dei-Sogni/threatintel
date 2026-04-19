@@ -505,6 +505,7 @@
                     "startTime": "⏱️",
                     "duration": "⏳",
                     "events": "📊",
+                    "occurrences": "🔢",
                     "exploration": "🔍"
                 },
                 "ip": "IP-адрес источника",
@@ -512,6 +513,7 @@
                 "startTime": "Время начала",
                 "duration": "Длительность",
                 "events": "События",
+                "occurrences": "Вхождения",
                 "exploration": "Исследование",
                 "viewTimeline": "👁️ Посмотреть Timeline"
             },
@@ -545,7 +547,11 @@
             "duration": "Продолжительность",
             "mapTitle": "Карта сессии",
             "mainInfo": "ОСНОВНАЯ ИНФОРМАЦИЯ",
-            "eventTimeline": "ОПЕРАТИВНЫЙ ХРОНОГРАФ"
+            "eventTimeline": "ОПЕРАТИВНЫЙ ХРОНОГРАФ",
+            "scannerAnalysis": "АНАЛИЗ АКТИВНОСТИ СКАНЕРА",
+            "scannerOccurrences": "Всего обнаружено вхождений",
+            "scannerFirstSeen": "Первое обнаружение",
+            "scannerLastSeen": "Последнее обнаружение"
         }
     },
     "clipboard": {

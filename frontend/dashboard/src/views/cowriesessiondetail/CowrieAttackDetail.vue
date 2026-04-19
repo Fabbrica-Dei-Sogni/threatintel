@@ -70,7 +70,29 @@
             <transition name="collapse">
                 <div v-if="toggles.showTimeline" class="sub-card-content p-24">
                     <section class="timeline-container">
-                        <ul class="cyber-timeline">
+                        <!-- SCANNER AGGREGATE SUMMARY -->
+                        <div v-if="sessionDetails?.isScannerActivity" class="scanner-stats-card glass-card">
+                            <div class="stats-header">
+                                <span class="stats-icon">📡</span>
+                                <h4>{{ $t('cowrie.attackDetail.scannerAnalysis') }}</h4>
+                            </div>
+                            <div class="stats-grid">
+                                <div class="stat-item">
+                                    <span class="stat-label">{{ $t('cowrie.attackDetail.scannerOccurrences') }}</span>
+                                    <div class="stat-value occurrence">🔢 {{ sessionDetails.scannerStats.totalOccurrences }}</div>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">{{ $t('cowrie.attackDetail.scannerFirstSeen') }}</span>
+                                    <div class="stat-value">⏱️ {{ formatDate(sessionDetails.scannerStats.firstSeen) }}</div>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">{{ $t('cowrie.attackDetail.scannerLastSeen') }}</span>
+                                    <div class="stat-value">🏁 {{ formatDate(sessionDetails.scannerStats.lastSeen) }}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <ul v-if="events.length > 0" class="cyber-timeline">
                             <li v-for="(event, index) in events" :key="event._id" class="timeline-node" :style="{ animationDelay: `${index * 0.05}s` }">
                                 <div class="node-icon" :class="getEventTypeClass(event.eventid)">
                                     <i v-if="event.eventid.includes('login')">🔑</i>
@@ -108,7 +130,7 @@
                                 </div>
                             </li>
                         </ul>
-                        <div v-if="events.length === 0" class="empty-state">
+                        <div v-else-if="!sessionDetails?.isScannerActivity" class="empty-state">
                             {{ $t('cowrie.attackDetail.emptyState') }}
                         </div>
                     </section>

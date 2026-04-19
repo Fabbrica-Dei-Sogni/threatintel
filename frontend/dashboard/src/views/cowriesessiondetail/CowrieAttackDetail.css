@@ -525,3 +525,87 @@
 @keyframes nodeSpin {
     to { transform: rotate(360deg); }
 }
+/* Scanner Aggregate Stats Card */
+.scanner-stats-card {
+    margin-bottom: 30px;
+    background: rgba(255, 170, 0, 0.05);
+    border: 1px solid rgba(255, 170, 0, 0.2);
+    border-left: 4px solid #FFAA00;
+    padding: 20px;
+    box-shadow: 0 0 20px rgba(255, 170, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.scanner-stats-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100px;
+    height: 100px;
+    background: radial-gradient(circle at top right, rgba(255, 170, 0, 0.1), transparent);
+    pointer-events: none;
+}
+
+.stats-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid rgba(255, 170, 0, 0.1);
+    padding-bottom: 10px;
+}
+
+.stats-icon {
+    font-size: 1.4rem;
+    filter: drop-shadow(0 0 8px rgba(255, 170, 0, 0.5));
+}
+
+.stats-header h4 {
+    margin: 0;
+    color: #FFAA00;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 800;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.stat-label {
+    font-size: 0.7rem;
+    color: #BBA685;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.8;
+}
+
+.stat-value {
+    font-family: 'Source Code Pro', monospace;
+    font-size: 0.95rem;
+    color: #F0FAD0;
+    font-weight: 600;
+}
+
+.stat-value.occurrence {
+    color: #FFAA00;
+    font-size: 1.1rem;
+    text-shadow: 0 0 10px rgba(255, 170, 0, 0.3);
+}
+
+@media (max-width: 600px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+}

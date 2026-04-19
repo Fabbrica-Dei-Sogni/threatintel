@@ -99,12 +99,12 @@
                                     </button>
                                 </div>
                             </th>
-                            <th v-if="filterCategory !== 'scanner'" class="sortable-th" :data-sessions-tooltip="$t('cowrie.sessions.table.duration')">
+                            <th class="sortable-th" :data-sessions-tooltip="$t('cowrie.sessions.table.duration')">
                                 <div class="sort-control">
                                     <span class="label">{{ $t('cowrie.sessions.table.short.duration') }}</span>
-                                    <button @click="toggleSort('time')" class="sort-button">
-                                        <span v-if="getSortDirection('time') === 1">▲</span>
-                                        <span v-else-if="getSortDirection('time') === -1">▼</span>
+                                    <button @click="toggleSort('duration')" class="sort-button">
+                                        <span v-if="getSortDirection('duration') === 1">▲</span>
+                                        <span v-else-if="getSortDirection('duration') === -1">▼</span>
                                         <span v-else>⇵</span>
                                     </button>
                                 </div>
@@ -158,7 +158,7 @@
                                     <span class="time-hour">{{ formatDateTime(session.starttime) }}</span>
                                 </div>
                             </td>
-                            <td v-if="filterCategory !== 'scanner'" class="duration-cell">{{ computeDuration(session.starttime, session.endtime) }}</td>
+                            <td class="duration-cell">{{ formatAggregatedDuration(session) }}</td>
                             <td class="events-cell">
                                 <span v-if="session.isAggregated" class="occurrence-badge">
                                     {{ session.occurrenceCount }}
@@ -348,6 +348,13 @@ const changePage = (p) => {
     if (p >= 1 && p <= totalPages.value) {
         page.value = p;
     }
+};
+
+const formatAggregatedDuration = (session) => {
+    if (session.isAggregated && session.duration !== undefined) {
+        return formatHumanDuration(session.duration, t);
+    }
+    return computeDuration(session.starttime, session.endtime);
 };
 
 const goToIpDetails = (ip) => {

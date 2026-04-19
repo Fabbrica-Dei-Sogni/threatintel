@@ -203,13 +203,19 @@
                         <div class="session-time" :title="t('cowrie.attackDetail.timeWindow')">
                           <span class="date-part">{{ formatDateOnly(session.starttime) }}</span>
                           <span class="time-part">{{ formatTimeOnly(session.starttime) }}</span>
-                          <span class="duration-badge" v-if="session.endtime">
-                            ({{ computeDuration(session.starttime, session.endtime) }})
+                          <span class="duration-badge" v-if="session.endtime || session.isAggregated">
+                            ({{ formatAggregatedDurationHome(session) }})
                           </span>
                         </div>
 
                         <div class="activity-badge">
-                          <div class="badge-content" :class="{ 'high-interaction': (session.eventCount || 0) > 10 }" :title="$t('sessionChart.activity')">
+                          <!-- Aggregated Scanner occurrences -->
+                          <div v-if="session.isAggregated" class="badge-content occurrence" :title="$t('cowrie.sessions.table.occurrences')">
+                            <span class="badge-icon">🔢</span>
+                            <span class="badge-value">{{ session.occurrenceCount }}</span>
+                          </div>
+                          <!-- Standard interaction events -->
+                          <div v-else class="badge-content" :class="{ 'high-interaction': (session.eventCount || 0) > 10 }" :title="$t('sessionChart.activity')">
                             <span class="badge-icon">⚡</span>
                             <span class="badge-value">{{ session.eventCount || 0 }}</span>
                           </div>
@@ -387,6 +393,13 @@ function computeDuration(start, end) {
   const e = dayjs(end);
   const diffSeconds = e.diff(s, 'second');
   return formatHumanDuration(diffSeconds, t);
+};
+
+const formatAggregatedDurationHome = (session) => {
+  if (session.isAggregated && session.duration !== undefined) {
+    return formatHumanDuration(session.duration, t);
+  }
+  return computeDuration(session.starttime, session.endtime);
 };
 
 const selectedAttackProtocol = ref('http');

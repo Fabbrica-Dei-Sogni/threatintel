@@ -89,6 +89,10 @@
                                     <span class="stat-label">{{ $t('cowrie.attackDetail.scannerLastSeen') }}</span>
                                     <div class="stat-value">🏁 {{ formatDate(sessionDetails.scannerStats.lastSeen) }}</div>
                                 </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">{{ $t('cowrie.sessions.table.duration') }}</span>
+                                    <div class="stat-value">⏳ {{ formatAggregatedDuration(sessionDetails.scannerStats.duration) }}</div>
+                                </div>
                             </div>
                         </div>
 
@@ -161,7 +165,7 @@
 <script setup>
 import { ref, onMounted, computed, reactive } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { formatDateTime, formatFullDateTime } from '../../utils/dateUtils';
+import { formatDateTime, formatFullDateTime, formatHumanDuration } from '../../utils/dateUtils';
 import dayjs from 'dayjs';
 import { useI18n } from '../../composable/useI18n';
 import { useClipboard } from '../../composable/useClipboard';
@@ -301,6 +305,11 @@ const fetchSessionData = async () => {
     } finally {
         loading.value = false;
     }
+};
+
+const formatAggregatedDuration = (duration) => {
+    if (duration === undefined || duration === null) return '-';
+    return formatHumanDuration(duration, t);
 };
 
 const formatDate = (dateStr) => {

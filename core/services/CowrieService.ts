@@ -206,7 +206,13 @@ export class CowrieService implements ILongRunningService {
                 {
                     $addFields: {
                         isAggregated: true,
-                        sortTimestamp: { $toDate: "$timestamp" }
+                        sortTimestamp: { $toDate: "$timestamp" },
+                        duration: { 
+                            $divide: [ 
+                                { $subtract: [ { $toDate: "$timestamp" }, { $toDate: "$starttime" } ] }, 
+                                1000 
+                            ] 
+                        }
                     }
                 }
             ] : (sessionCategory === 'interaction' ? [
@@ -345,6 +351,16 @@ export class CowrieService implements ILongRunningService {
                         totalOccurrences: { $sum: 1 },
                         firstSeen: { $min: "$starttime" },
                         lastSeen: { $max: "$starttime" }
+                    }
+                },
+                {
+                    $addFields: {
+                        duration: { 
+                            $divide: [ 
+                                { $subtract: [ { $toDate: "$lastSeen" }, { $toDate: "$firstSeen" } ] }, 
+                                1000 
+                            ] 
+                        }
                     }
                 }
             ]);

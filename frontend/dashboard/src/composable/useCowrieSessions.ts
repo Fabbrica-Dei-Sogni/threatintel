@@ -8,11 +8,12 @@ export function useCowrieSessions(
     initialPage: number = 1,
     initialLimit: number = 20,
     initialSortFields: any = {},
-    initialIp: string = ''
+    initialIp: string = '',
+    initialCategory: string = 'interaction'
 ) {
     // Filtri specifici
     const filterIp = ref(initialIp);
-    const filterCategory = ref<string>('interaction');
+    const filterCategory = ref<string>(initialCategory);
     const sessions = ref<CowrieSession[]>([]);
 
     // Integrazione useSearchBase

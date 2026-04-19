@@ -219,7 +219,8 @@ const props = defineProps({
     initialPage: { type: Number, default: 1 },
     initialPageSize: { type: Number, default: 20 },
     initialSortFields: { type: Object, default: () => ({}) },
-    initialIp: { type: String, default: '' }
+    initialIp: { type: String, default: '' },
+    initialCategory: { type: String, default: 'interaction' }
 });
 
 const { t } = useI18n();
@@ -304,16 +305,9 @@ const {
     props.initialPage,
     props.initialPageSize,
     props.initialSortFields,
-    props.initialIp
+    props.initialIp,
+    props.initialCategory
 );
-
-// Sincronizza lo stato iniziale con la query se presente
-onMounted(() => {
-    const query = router.currentRoute.value.query;
-    if (query.category) {
-        filterCategory.value = query.category;
-    }
-});
 
 // Sincronizza l'URL quando cambia lo stato
 watch([page, pageSize, sortFields, filterIp, filterCategory], ([newPage, newPageSize, newSort, newIp, newCat]) => {

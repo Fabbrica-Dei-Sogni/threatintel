@@ -634,14 +634,14 @@ export class ThreatLogService {
                         }
                     ],
                     topCountries: [
-                        { $match: { 'fingerprint.score': { $gte: minScore } } },
+                        { $match: { 'fingerprint.suspicious': true, 'fingerprint.score': { $gte: minScore } } },
                         { $match: { 'geo.country': { $exists: true, $ne: null } } },
                         { $group: { _id: '$geo.country', count: { $sum: 1 } } },
                         { $sort: { count: -1 } },
                         { $limit: 10 }
                     ],
                     topIndicators: [
-                        { $match: { 'fingerprint.score': { $gte: minScore } } },
+                        { $match: { 'fingerprint.suspicious': true, 'fingerprint.score': { $gte: minScore } } },
                         { $match: { 'fingerprint.indicators': { $exists: true, $ne: [] } } },
                         { $unwind: '$fingerprint.indicators' },
                         { $group: { _id: '$fingerprint.indicators', count: { $sum: 1 } } },

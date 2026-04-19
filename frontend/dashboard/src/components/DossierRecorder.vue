@@ -112,6 +112,7 @@ import { useDossierStore } from '../stores/dossier';
 import { useI18n } from 'vue-i18n';
 import { ElMessageBox, ElMessage, ElInput } from 'element-plus';
 import { fetchCustomReport } from '../api';
+import { formatDateTime, formatFullDateTime } from '../utils/dateUtils';
 import dayjs from 'dayjs';
 
 const dossierStore = useDossierStore();
@@ -209,7 +210,7 @@ const handleSave = async () => {
   if (dossierStore.sections.length === 0) return;
 
   // 1. Genera valori di default
-  const now = dayjs().format('YYYY-MM-DD HH:mm');
+  const now = formatFullDateTime(new Date());
   let subject = t('dossierRecorder.defaultSubject');
   const firstSection = dossierStore.sections[0];
   if (firstSection) {
@@ -222,7 +223,7 @@ const handleSave = async () => {
   const count = dossierStore.sections.length;
   const defaultDescription = t('dossierRecorder.defaultDescription', {
     count: count,
-    date: dayjs().format('DD/MM/YYYY')
+    date: formatDateTime(new Date()).split(' ')[0]
   });
 
   // 2. Stato locale per il form all'interno dell'ElMessageBox

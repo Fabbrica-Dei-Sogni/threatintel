@@ -301,17 +301,15 @@
                             <td>{{ attack.countRateLimit }}</td>
                             <td>{{ attack.rps }}</td>
                             <td>{{ attack.totaleLogs }}</td>
-                            <td>{{ attack.durataAttacco.human }}</td>
+                            <td>{{ getHumanDuration(attack.durataAttacco.ms / 1000) }}</td>
                             <td>
                                 <div class="time-display">
-                                    <span class="time-date">{{ dayjs(attack.firstSeen).format('DD/MM/YYYY') }}</span>
-                                    <span class="time-hour">{{ dayjs(attack.firstSeen).format('HH:mm:ss') }}</span>
+                                    <span class="time-hour">{{ formatDateTime(attack.firstSeen) }}</span>
                                 </div>
                             </td>
                             <td>
                                 <div class="time-display">
-                                    <span class="time-date">{{ dayjs(attack.lastSeen).format('DD/MM/YYYY') }}</span>
-                                    <span class="time-hour">{{ dayjs(attack.lastSeen).format('HH:mm:ss') }}</span>
+                                    <span class="time-hour">{{ formatDateTime(attack.lastSeen) }}</span>
                                 </div>
                             </td>
                         </tr>
@@ -348,6 +346,7 @@ import dayjs from 'dayjs';
 import { useAttacksFilter } from '../../composable/useAttacksFilter';
 import { useClipboard } from '../../composable/useClipboard';
 import { useI18n } from 'vue-i18n';
+import { formatDateTime, formatHumanDuration, formatFullDateTime } from '../../utils/dateUtils';
 
 const { copyToClipboard, copyFormatted } = useClipboard();
 const { t } = useI18n();
@@ -476,8 +475,12 @@ watch(inputPage, (newPage) => {
 });
 
 // Funzioni per template
+const getHumanDuration = (seconds) => {
+    return formatHumanDuration(seconds, t);
+};
+
 function formatDate(timestamp) {
-    return dayjs(timestamp).format('DD/MM/YYYY HH:mm:ss');
+    return formatFullDateTime(timestamp);
 };
 
 function goToInputPage() {

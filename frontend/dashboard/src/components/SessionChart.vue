@@ -15,6 +15,7 @@ import {
 import { Line, Scatter } from 'vue-chartjs';
 import 'chartjs-adapter-dayjs-4/dist/chartjs-adapter-dayjs-4.esm';
 import { useI18n } from 'vue-i18n';
+import { formatHumanDuration } from '../utils/dateUtils';
 import dayjs from 'dayjs';
 
 // Register Chart.js components
@@ -90,7 +91,7 @@ const activityData = computed(() => {
         x: new Date(s.starttime).getTime(),
         y: s.eventCount || 0,
         ip: s.src_ip,
-        duration: dayjs(s.endtime).diff(dayjs(s.starttime), 'second') + 's'
+        duration: formatHumanDuration(dayjs(s.endtime).diff(dayjs(s.starttime), 'second'), t)
     }));
 
     return {

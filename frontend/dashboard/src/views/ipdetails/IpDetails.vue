@@ -132,14 +132,13 @@
                 </div>
               </div>
               <div class="briefing-item"
-                :data-briefing-tooltip="ipInfo.abuseipdbId.lastReportedAt ? `${t('ipDetails.lastReportedAt').toUpperCase()}: ${dayjs(ipInfo.abuseipdbId.lastReportedAt).format('DD/MM/YYYY HH:mm:ss')}` : t('common.notAvailable').toUpperCase()">
+                :data-briefing-tooltip="ipInfo.abuseipdbId.lastReportedAt ? `${t('ipDetails.lastReportedAt').toUpperCase()}: ${formatFullDateTime(ipInfo.abuseipdbId.lastReportedAt)}` : t('common.notAvailable').toUpperCase()">
                 <span class="briefing-icon">🕒</span>
                 <div class="briefing-content">
                   <span class="briefing-label">{{ t('ipDetails.lastReportedAt').toUpperCase() }}</span>
                   <div class="briefing-value">
                     <span v-if="ipInfo.abuseipdbId.lastReportedAt">
-                      <span class="t-date">{{ dayjs(ipInfo.abuseipdbId.lastReportedAt).format('DD/MM/YYYY') }}</span>
-                      <span class="t-hour">{{ dayjs(ipInfo.abuseipdbId.lastReportedAt).format('HH:mm:ss') }}</span>
+                      <span class="t-hour">{{ formatDateTime(ipInfo.abuseipdbId.lastReportedAt) }}</span>
                     </span>
                     <span v-else>{{ t('common.notAvailable').toUpperCase() }}</span>
                   </div>
@@ -184,8 +183,7 @@
                 <div class="report-header" @click="toggleReport(report._id)">
                   <div class="report-meta">
                     <div class="report-date">
-                      <span class="t-date">{{ dayjs(report.reportedAt).format('DD/MM/YYYY') }}</span>
-                      <span class="t-hour">{{ dayjs(report.reportedAt).format('HH:mm:ss') }}</span>
+                      <span class="t-hour">{{ formatDateTime(report.reportedAt) }}</span>
                     </div>
                     <div class="report-categories">
                       <span v-for="cat in report.categories" :key="cat.id" class="cat-badge">{{ cat.name }}</span>
@@ -242,8 +240,7 @@
                 <div class="ratelimit-header" @click="expandedRateLimit[idx] = !expandedRateLimit[idx]">
                   <div class="ratelimit-meta">
                     <div class="ratelimit-time">
-                      <span class="t-date">{{ dayjs(row.timestamp).format('DD/MM/YYYY') }}</span>
-                      <span class="t-hour">{{ dayjs(row.timestamp).format('HH:mm:ss') }}</span>
+                      <span class="t-hour">{{ formatDateTime(row.timestamp) }}</span>
                     </div>
                     <div class="ratelimit-badges">
                       <span class="cat-badge limit-badge">{{ row.limitType }}</span>
@@ -310,13 +307,11 @@
             <div class="whois-meta-info">
               <div class="meta-item">
                 <strong>{{ t('ipDetails.firstSeen') }}:</strong>
-                <span class="t-date">{{ dayjs(ipInfo.firstSeenAt).format('DD/MM/YYYY') }}</span>
-                <span class="t-hour">{{ dayjs(ipInfo.firstSeenAt).format('HH:mm:ss') }}</span>
+                <span class="t-hour">{{ formatFullDateTime(ipInfo.firstSeenAt) }}</span>
               </div>
               <div class="meta-item">
                 <strong>{{ t('ipDetails.lastSeen') }}:</strong>
-                <span class="t-date">{{ dayjs(ipInfo.lastSeenAt).format('DD/MM/YYYY') }}</span>
-                <span class="t-hour">{{ dayjs(ipInfo.lastSeenAt).format('HH:mm:ss') }}</span>
+                <span class="t-hour">{{ formatFullDateTime(ipInfo.lastSeenAt) }}</span>
               </div>
             </div>
             <div class="whois-viewer">
@@ -333,6 +328,7 @@
 <script setup>
 import { ref, reactive, onMounted, onUnmounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { formatDateTime, formatFullDateTime } from '../../utils/dateUtils';
 import dayjs from 'dayjs'
 import { fetchIpDetails, fetchRateLimitSearch, enrichReports, enrichReputationScore } from '../../api/index'
 import { useI18n } from 'vue-i18n'
@@ -582,7 +578,7 @@ const copyAbuseSummary = () => {
     score: abuse.abuseConfidenceScore,
     listed: abuse.isListed ? t('common.yes').toUpperCase() : t('common.no').toUpperCase(),
     total: abuse.totalReports || 0,
-    lastReport: abuse.lastReportedAt ? dayjs(abuse.lastReportedAt).format('YYYY-MM-DD HH:mm:ss') : t('common.notAvailable')
+    lastReport: abuse.lastReportedAt ? formatFullDateTime(abuse.lastReportedAt) : t('common.notAvailable')
   });
 };
 
@@ -599,7 +595,7 @@ const copyLogReport = (report) => {
   
   // Prepariamo i dati per il template i18n e il frammento PDF
   const data = {
-    date: dayjs(report.reportedAt).format('DD/MM/YYYY HH:mm:ss'),
+    date: formatFullDateTime(report.reportedAt),
     categories: report.categories.map(c => c.name).join(', '),
     reporter: report.reporterCountryCode || t('common.unknown'),
     comment: report.comment

@@ -14,6 +14,12 @@
         "error": "Ошибка",
         "errorLoadingData": "Ошибка загрузки данных",
         "unit": "Единица",
+        "duration": {
+            "seconds": "s",
+            "minutes": "m",
+            "hours": "h",
+            "days": "d"
+        },
         "search": "Поиск",
         "filter": "Фильтр",
         "clear": "Очистить",

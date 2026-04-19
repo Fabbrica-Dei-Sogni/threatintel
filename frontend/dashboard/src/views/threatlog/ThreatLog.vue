@@ -211,6 +211,7 @@ import HexViewer from '../../components/HexViewer.vue';
 import { useClipboard } from '../../composable/useClipboard';
 import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
 import CountryFlag from '../../components/CountryFlag.vue';
+import { formatFullDateTime } from '../../utils/dateUtils';
 
 const { t } = useI18n();
 const { copyToClipboard, copyFormatted } = useClipboard();
@@ -246,7 +247,7 @@ async function load() {
 }
 
 function formatDate(s) {
-    return s ? dayjs(s).format('DD/MM/YYYY HH:mm:ss') : t('common.notAvailable')
+    return s ? formatFullDateTime(s) : t('common.notAvailable')
 }
 
 function goToIpDetails(ip) {

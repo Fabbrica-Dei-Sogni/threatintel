@@ -16,6 +16,7 @@ import {
 import { Line, Scatter } from 'vue-chartjs';
 import 'chartjs-adapter-dayjs-4/dist/chartjs-adapter-dayjs-4.esm';
 import { useI18n } from 'vue-i18n';
+import { formatHumanDuration } from '../utils/dateUtils';
 import dayjs from 'dayjs';
 
 // Register Chart.js components
@@ -117,6 +118,7 @@ const getDurationData = (attacks) => {
             color: color,
             glowColor: glowColor,
             duration: atk.durataAttacco?.human || 'N/A',
+            ms: atk.durataAttacco?.ms,
             logs: atk.totaleLogs,
             dynamicRadius: radius
         };
@@ -311,7 +313,8 @@ const durationOptions = computed(() => ({
                     const raw = ctx.raw;
                     // Check if raw data exists
                     if (!raw) return '';
-                    return `IP: ${raw.ip} | Score: ${raw.y} | Logs: ${raw.logs} | Time: ${raw.duration}`;
+                    const humanDur = raw.duration && raw.ms ? formatHumanDuration(raw.ms / 1000, t) : raw.duration;
+                    return `IP: ${raw.ip} | Score: ${raw.y} | Logs: ${raw.logs} | Time: ${humanDur}`;
                 }
             }
         }

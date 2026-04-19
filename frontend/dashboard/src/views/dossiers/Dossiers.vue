@@ -61,7 +61,7 @@
 
         <div class="dossier-meta">
           <div class="meta-item">
-            <span class="icon">📅</span> {{ formatDate(dossier.createdAt) }}
+            <span class="icon">📅</span> {{ formatDateTime(dossier.createdAt) }}
           </div>
           <div class="meta-item">
             <span class="icon">🧩</span> {{ dossier.sections.length }} {{ t('common.sections') }}
@@ -110,6 +110,7 @@ import { ElMessageBox, ElMessage } from 'element-plus';
 import { useDossierStore } from '../../stores/dossier';
 import { useAuthStore } from '../../stores/auth';
 import { useDossiersFilter } from '../../composable/useDossiersFilter';
+import { formatDateTime, formatFullDateTime } from '../../utils/dateUtils';
 import dayjs from 'dayjs';
 
 const { t } = useI18n();
@@ -223,7 +224,7 @@ const confirmDelete = (id) => {
   }).catch(() => { });
 };
 
-const formatDate = (date) => dayjs(date).format('DD/MM/YYYY HH:mm');
+const formatDate = (date) => formatFullDateTime(date);
 
 onMounted(() => {
   // fetchData() is already called immediately by useSearchBase watcher

@@ -64,7 +64,7 @@
                         <span @click="goToIpDetails(attack.request.ip)" class="ip-link">{{ attack.request.ip }}</span>
                         
                         <div class="attack-time" :title="t('attackDetail.timeWindow')">
-                          <span class="start-time">{{ dayjs(attack.firstSeen).format('HH:mm:ss') }}</span>
+                          <span class="start-time">{{ formatDateTime(attack.firstSeen) }}</span>
                           <span class="duration-badge" v-if="attack.lastSeen && attack.lastSeen !== attack.firstSeen">
                             ({{ computeDuration(attack.firstSeen, attack.lastSeen) }})
                           </span>
@@ -129,7 +129,7 @@
                         <span @click="goToIpDetails(log.request.ip)" class="ip-link">{{ log.request.ip }}</span>
                         
                         <div class="log-time">
-                          <span class="time-hour">{{ dayjs(log.timestamp).format('HH:mm:ss') }}</span>
+                          <span class="time-hour">{{ formatDateTime(log.timestamp) }}</span>
                         </div>
 
                         <div class="column-spacer"></div>
@@ -187,7 +187,7 @@
                         <span @click="goToIpDetails(session.src_ip)" class="ip-link">{{ session.src_ip }}</span>
                         
                         <div class="session-time" :title="t('cowrie.attackDetail.timeWindow')">
-                          <span class="start-time">{{ dayjs(session.starttime).format('HH:mm:ss') }}</span>
+                          <span class="start-time">{{ formatDateTime(session.starttime) }}</span>
                           <span class="duration-badge" v-if="session.endtime">
                             ({{ computeDuration(session.starttime, session.endtime) }})
                           </span>
@@ -262,7 +262,7 @@
                         <div class="column-spacer"></div>
                         <div class="dossier-info">
                            <span class="badge-mini">{{ dossier.sections?.length || 0 }} {{ t('common.sections') }}</span>
-                           <span class="timestamp-mini">{{ formatDate(dossier.createdAt) }}</span>
+                           <span class="timestamp-mini">{{ formatDateTime(dossier.createdAt) }}</span>
                         </div>
                       </li>
                       <li v-if="recentDossiers.length === 0 && !loadingDossiers" class="no-data">
@@ -306,6 +306,7 @@ import ProtocolSelector from '../../components/common/ProtocolSelector.vue';
 import ViewToggle from '../../components/common/ViewToggle.vue';
 import DefconIndicator from '../../components/DefconIndicator.vue';
 import CowrieCategorySelector from '../../components/common/CowrieCategorySelector.vue';
+import { formatDateTime, formatHumanDuration, formatFullDateTime } from '../../utils/dateUtils';
 
 const { t } = useI18n();
 
@@ -356,15 +357,15 @@ function goToIpDetails(ip) {
 
 // Funzioni per template
 function formatDate(timestamp) {
-  return dayjs(timestamp).format('DD/MM/YYYY HH:mm:ss');
+  return formatFullDateTime(timestamp);
 };
 
-const computeDuration = (start, end) => {
+function computeDuration(start, end) {
   if (!start || !end) return '-';
   const s = dayjs(start);
   const e = dayjs(end);
-  const diff = e.diff(s, 'second');
-  return `${diff}s`;
+  const diffSeconds = e.diff(s, 'second');
+  return formatHumanDuration(diffSeconds, t);
 };
 
 const selectedAttackProtocol = ref('http');

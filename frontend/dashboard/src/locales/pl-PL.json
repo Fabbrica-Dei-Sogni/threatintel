@@ -18,6 +18,12 @@
         "clear": "Wyczyść",
         "prev": "Poprz",
         "unit": "Jednostka",
+        "duration": {
+            "seconds": "s",
+            "minutes": "m",
+            "hours": "h",
+            "days": "d"
+        },
         "showMap": "Pokaż mapę",
         "hideMap": "Ukryj mapę",
         "showChart": "Pokaż wykres",

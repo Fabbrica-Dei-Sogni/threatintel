@@ -159,6 +159,7 @@ import DossierReportActions from '../../components/DossierReportActions.vue';
 import DossierSectionRenderer from '../../components/dossier/DossierSectionRenderer.vue';
 import DossierSectionEditor from '../../components/dossier/DossierSectionEditor.vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
+import { formatFullDateTime } from '../../utils/dateUtils';
 import dayjs from 'dayjs';
 import { DossierSectionType, type IDossierSection, type IHumanSectionData } from '../../models/DossierDTO';
 
@@ -367,7 +368,7 @@ const init = async () => {
 onMounted(init);
 
 const goBack = () => router.push('/dossiers');
-const formatDate = (date) => dayjs(date).format('DD/MM/YYYY HH:mm:ss');
+const formatDate = (date) => formatFullDateTime(date);
 </script>
 
 <style scoped src="./Dossiers.css"></style>

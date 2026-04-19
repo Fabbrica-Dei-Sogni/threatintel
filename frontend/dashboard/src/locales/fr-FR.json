@@ -14,6 +14,12 @@
         "error": "Erreur",
         "errorLoadingData": "Erreur de chargement des données",
         "unit": "Unité",
+        "duration": {
+            "seconds": "s",
+            "minutes": "m",
+            "hours": "h",
+            "days": "d"
+        },
         "search": "Rechercher",
         "filter": "Filtrer",
         "clear": "Effacer",

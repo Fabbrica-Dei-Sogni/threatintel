@@ -70,7 +70,7 @@
                             <span class="hud-box-icon">⏱️</span>
                             <div class="hud-stat-data">
                                 <span class="hud-label">{{ t('attackDetail.attackDuration') }}</span>
-                                <div class="hud-value">{{ attack.durataAttacco.human }}</div>
+                                <div class="hud-value">{{ formatHumanDuration(attack.durataAttacco.ms / 1000, t) }}</div>
                             </div>
                         </div>
                         <div class="hud-stat-box">
@@ -203,7 +203,7 @@
                                         mode="dot" 
                                         class="log-severity-indicator"
                                     /> -->
-                                    <span v-html="formatDate(log.timestamp)"></span>
+                                    <span>{{ formatDateTime(log.timestamp) }}</span>
                                     <span class="log-method-url">
                                         <span class="method-badge">{{ log.request.method }}</span>
                                         <span v-if="log.metadata?.eventCount > 1" class="event-count-badge">
@@ -322,7 +322,7 @@
                                 <div class="event-header-content">
                                     <span class="event-time">
                                         <span class="icon">🕒</span> 
-                                        <span v-html="formatDate(event.timestamp)"></span>
+                                        <span>{{ formatDateTime(event.timestamp) }}</span>
                                     </span>
                                     <span class="event-ip"><span class="icon">🎯</span> {{ event.ip }}</span>
                                     <span class="event-limit-badge pulse-magma-mini">{{ event.limitType }}</span>
@@ -368,6 +368,7 @@
 <script setup>
 import { ref, reactive, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { formatDateTime, formatHumanDuration, formatFullDateTime } from '../../utils/dateUtils';
 import dayjs from 'dayjs'
 import { useI18n } from 'vue-i18n'
 import { useClipboard } from '../../composable/useClipboard';
@@ -518,8 +519,7 @@ onUnmounted(() => {
 // Methods
 function formatDate(ts) {
     if (!ts) return `<span class="t-na">${t('common.notAvailable')}</span>`
-    const d = dayjs(ts)
-    return `<span class="t-date">${d.format('DD/MM/YYYY')}</span> <span class="t-hour">${d.format('HH:mm:ss')}</span>`
+    return `<span class="t-hour">${formatFullDateTime(ts)}</span>`
 }
 
 function formatJson(obj) {
@@ -578,11 +578,11 @@ const copyAttackSummaryFormatted = () => {
         defcon: attack.value.dangerLevel,
         score: attack.value.dangerScore,
         totalLogs: attack.value.totaleLogs,
-        duration: attack.value.durataAttacco?.human,
+        duration: formatHumanDuration(attack.value.durataAttacco.ms / 1000, t),
         rps: attack.value.rps,
         techniques: attack.value.attackPatterns?.join(', '),
-        firstSeen: dayjs(attack.value.firstSeen).format('YYYY-MM-DD HH:mm:ss'),
-        lastSeen: dayjs(attack.value.lastSeen).format('YYYY-MM-DD HH:mm:ss'),
+        firstSeen: formatFullDateTime(attack.value.firstSeen),
+        lastSeen: formatFullDateTime(attack.value.lastSeen),
         intensity: attack.value.intensityAttack,
         avgScore: attack.value.averageScore
     });
@@ -590,7 +590,7 @@ const copyAttackSummaryFormatted = () => {
 
 const copyRateBreachEvent = (event) => {
     copyFormatted('clipboard.attackDetail.rateLimitEvent', {
-        timestamp: dayjs(event.timestamp).format('YYYY-MM-DD HH:mm:ss'),
+        timestamp: formatFullDateTime(event.timestamp),
         ip: event.ip || attack.value?.request?.ip || t('common.notAvailable'),
         limitType: event.limitType || t('common.notAvailable'),
         path: event.path || t('common.notAvailable'),
@@ -603,7 +603,7 @@ const copyRateBreachEvent = (event) => {
 
 const copyAggregatedLog = (log) => {
     copyFormatted('clipboard.attackDetail.log', {
-        timestamp: dayjs(log.timestamp).format('YYYY-MM-DD HH:mm:ss'),
+        timestamp: formatFullDateTime(log.timestamp),
         method: log.request?.method,
         url: log.request?.url,
         score: log.fingerprint?.score,
@@ -617,70 +617,4 @@ const copyAggregatedLog = (log) => {
 };
 </script>
 
-<!--
-<script>
-import { useRoute, useRouter } from 'vue-router'
-import dayjs from 'dayjs'
-
-export default {
-    name: 'AttackDetail',
-    props: {
-        attack: {
-            type: Object,
-            required: true
-        },
-        rateLimitEvents: {  // aggiunto prop per gli eventi di rate limit
-            type: Array,
-            default: () => []
-        }        
-    },    
-    data() {
-        return {
-            expanded: {},             // stato espansione logs aggregati
-            expandedEvents: {},       // nuovo stato espansione per RateLimitEvents
-            currentPage: 1,
-            pageSize: 5,
-            currentPageEvents: 1,     // pagina attiva per eventi rate limit
-            pageSizeEvents: 5         // page size separato per eventi rate limit (configurabile)
-
-        }
-    },
-    setup() {
-        const route = useRoute()
-        const router = useRouter()
-        return { route, router }
-    },
-    computed: {
-        paginatedLogs() {
-            const objs = this.attack.logsRaggruppati || []
-            const start = (this.currentPage - 1) * this.pageSize
-            return objs.slice(start, start + this.pageSize)
-        },
-        paginatedRateLimitEvents() {
-            const objs = this.attack.rateLimitList || []
-            const start = (this.currentPageEvents - 1) * this.pageSizeEvents
-            return objs.slice(start, start + this.pageSizeEvents)
-        }                                
-    },
-    methods: {
-        formatDate(ts) {
-            return ts ? dayjs(ts).format('DD/MM/YYYY HH:mm:ss') : 'N/D'
-        },
-        formatJson(obj) {
-            return obj ? JSON.stringify(obj, null, 2) : 'N/D'
-        },
-        toggleLog(id) {
-            // Assicuriamoci che la proprietà esista e poi inverte il valore
-            this.expanded[id] = !this.expanded[id];
-        },
-        toggleEvent(id) {
-            this.expandedEvents[id] = !this.expandedEvents[id]
-        },
-        goBack() {
-            this.router.back()
-        }
-    }
-}
-</script>
--->
 <style scoped src="./AttackDetail.css"></style>

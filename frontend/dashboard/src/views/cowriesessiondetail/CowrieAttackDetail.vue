@@ -82,7 +82,7 @@
                                 <div class="node-content glass-card">
                                     <div class="node-header">
                                         <h4>{{ formatEventName(event.eventid) }}</h4>
-                                        <span class="node-time">{{ dayjs(event.timestamp).format('HH:mm:ss') }}</span>
+                                        <span class="node-time">{{ formatDateTime(event.timestamp) }}</span>
                                     </div>
                                     <p class="event-msg">{{ event.message }}</p>
                                     
@@ -139,6 +139,7 @@
 <script setup>
 import { ref, onMounted, computed, reactive } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { formatDateTime, formatFullDateTime } from '../../utils/dateUtils';
 import dayjs from 'dayjs';
 import { useI18n } from '../../composable/useI18n';
 import { useClipboard } from '../../composable/useClipboard';
@@ -187,7 +188,7 @@ const copyEventTimeline = () => {
     // Generiamo l'anteprima testuale per la clipboard
     const renderedEvents = events.value.map(event => {
         const rowData = {
-            timestamp: dayjs(event.timestamp).format('HH:mm:ss'),
+            timestamp: formatFullDateTime(event.timestamp),
             eventName: formatEventName(event.eventid),
             message: event.message,
             input: event.input,
@@ -282,7 +283,7 @@ const fetchSessionData = async () => {
 
 const formatDate = (dateStr) => {
     if (!dateStr) return t('common.notAvailable');
-    return dayjs(dateStr).format('DD/MM/YYYY HH:mm:ss');
+    return formatFullDateTime(dateStr);
 };
 
 const goToIpDetails = (ip) => {

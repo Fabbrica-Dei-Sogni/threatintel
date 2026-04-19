@@ -172,8 +172,7 @@
               </td>
               <td class="time-cell">
                 <div class="time-display">
-                  <span class="time-date">{{ dayjs(log.timestamp).format('DD/MM/YYYY') }}</span>
-                  <span class="time-hour">{{ dayjs(log.timestamp).format('HH:mm:ss') }}</span>
+                  <span class="time-hour">{{ formatDateTime(log.timestamp) }}</span>
                 </div>
               </td>
             </tr>
@@ -212,6 +211,7 @@ import dayjs from 'dayjs';
 import CountryFlag from '../../components/CountryFlag.vue';
 import ThreadLogChart from '../../components/ThreadLogChart.vue';
 import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
+import { formatDateTime, formatFullDateTime } from '../../utils/dateUtils';
 
 const { t } = useI18n();
 const { copyToClipboard, copyFormatted } = useClipboard();
@@ -374,7 +374,7 @@ function setUrlFilter(url) {
 }
 
 function formatDate(date) {
-  return dayjs(date).format('YYYY-MM-DD HH:mm:ss');
+  return formatFullDateTime(date);
 }
 
 function changePage(newPage) {

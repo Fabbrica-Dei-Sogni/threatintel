@@ -143,8 +143,7 @@
                             </td>
                             <td class="time-cell">
                                 <div class="time-display">
-                                    <span class="time-date">{{ dayjs(session.starttime).format('DD/MM/YYYY') }}</span>
-                                    <span class="time-hour">{{ dayjs(session.starttime).format('HH:mm:ss') }}</span>
+                                    <span class="time-hour">{{ formatDateTime(session.starttime) }}</span>
                                 </div>
                             </td>
                             <td class="duration-cell">{{ computeDuration(session.starttime, session.endtime) }}</td>
@@ -197,6 +196,7 @@ import SessionChart from '../../components/SessionChart.vue';
 import AttackMap from '../../components/AttackMap.vue';
 import CowrieCategorySelector from '../../components/common/CowrieCategorySelector.vue';
 import ViewToggle from '../../components/common/ViewToggle.vue';
+import { formatDateTime, formatHumanDuration, formatFullDateTime } from '../../utils/dateUtils';
 
 const props = defineProps({
     initialPage: { type: Number, default: 1 },
@@ -346,16 +346,15 @@ const goToIpDetails = (ip) => {
 };
 
 const formatDate = (dateStr) => {
-    if (!dateStr) return '-';
-    return dayjs(dateStr).format('DD/MM/YYYY HH:mm:ss');
+    return formatFullDateTime(dateStr);
 };
 
-const computeDuration = (start, end) => {
+function computeDuration(start, end) {
     if (!start || !end) return '-';
     const s = dayjs(start);
     const e = dayjs(end);
-    const diff = e.diff(s, 'second');
-    return `${diff}s`;
+    const diffSeconds = e.diff(s, 'second');
+    return formatHumanDuration(diffSeconds, t);
 };
 
 // Sincronizza inputPage con page esternamente modificato (es. bottoni Prev/Next)

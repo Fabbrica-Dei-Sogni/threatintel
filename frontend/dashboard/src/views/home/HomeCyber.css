@@ -4,13 +4,18 @@
  * Inspired by Backstage Telemetry
  */
 
-.skin-cyber {
+.skin-cyber.dashboard {
   --neon-cyan: #00ffff;
   --neon-pink: #ff3366;
   --cyber-bg: #0a0e17;
   --cyber-glass: rgba(10, 15, 30, 0.85);
-  --cyber-border: rgba(0, 255, 255, 0.2);
-  --font-cyber: 'JetBrains Mono', 'Courier New', Courier, monospace;
+
+  /* Semantic Mapping for Shared Engine */
+  --cyber-primary: var(--neon-cyan);
+  --cyber-primary-rgb: 0, 255, 255;
+  --cyber-accent: var(--neon-pink);
+  --cyber-accent-rgb: 255, 51, 102;
+  --cyber-surface: var(--cyber-glass);
 }
 
 /* === LAYOUT & CORE (Standalone) === */
@@ -21,7 +26,7 @@
   display: flex;
   flex-direction: column;
   background: radial-gradient(circle at 50% 50%, #1a2333 0%, var(--cyber-bg) 100%) !important;
-  font-family: 'Outfit', sans-serif;
+  font-family: var(--font-cyber-main);
   color: #e0f7fa;
 }
 
@@ -89,7 +94,7 @@
   gap: 20px;
 }
 
-.skin-cyber .domain-title {
+.skin-cyber.dashboard .domain-title {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -97,7 +102,7 @@
   cursor: pointer;
   user-select: none;
   transition: all 0.3s ease;
-  color: var(--neon-cyan);
+  color: var(--cyber-primary);
   font-family: var(--font-cyber);
   background: rgba(0, 255, 255, 0.05);
   padding: 12px 20px;
@@ -438,108 +443,20 @@
   font-family: var(--font-cyber);
 }
 
-/* ProtocolSelector */
-.skin-cyber .options.theme-dark,
-.skin-cyber .options.theme-magma,
-.skin-cyber .options.theme-amber {
-  background: rgba(0, 0, 0, 0.6);
-  border: 1px solid var(--neon-cyan);
-  border-radius: 0;
-}
-
-.skin-cyber .option-btn {
-  color: #8892b0;
-  font-family: var(--font-cyber);
-  font-weight: 700;
-  border-radius: 0;
-}
-
-.skin-cyber .option-btn.active {
-  background: var(--neon-cyan) !important;
-  color: var(--cyber-bg) !important;
-  box-shadow: 0 0 10px var(--neon-cyan) !important;
-}
-
-/* ViewToggle */
-.skin-cyber .view-toggle-wrapper {
-  background: rgba(0, 0, 0, 0.4);
-  border: 1px solid var(--neon-cyan);
-  border-radius: 0;
-}
-
-.skin-cyber .view-toggle-wrapper.is-active {
-  border-color: var(--neon-cyan);
-}
-
-.skin-cyber .view-toggle-wrapper .toggle-label {
-  color: #8892b0;
-  font-family: var(--font-cyber);
-  text-transform: uppercase;
-  font-size: 10px;
-}
-
-.skin-cyber .view-toggle-wrapper.is-active .toggle-label {
-  color: var(--neon-cyan);
-}
-
-.skin-cyber .view-toggle-wrapper.is-active .led {
-  background: var(--neon-cyan) !important;
-  box-shadow: 0 0 8px var(--neon-cyan), 0 0 15px var(--neon-cyan) !important;
-}
-
-/* DefconIndicator */
-.skin-cyber .defcon-dot-container {
-  border-radius: 2px !important;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.skin-cyber .defcon-normal, 
-.skin-cyber .defcon-low, 
-.skin-cyber .defcon-medium {
-  background: var(--neon-cyan) !important;
-  color: var(--cyber-bg) !important;
-}
-
-.skin-cyber .defcon-high, 
-.skin-cyber .defcon-critical {
-  background: var(--neon-pink) !important;
-  color: #fff !important;
-  box-shadow: 0 0 10px var(--neon-pink) !important;
-}
-
-/* ConfigMenuButton */
-.skin-cyber .config-btn {
-  background: transparent !important;
-  border: 1px solid var(--neon-cyan) !important;
-  border-radius: 0 !important;
-}
-
-.skin-cyber .hamburger-line {
-  background: var(--neon-cyan) !important;
-}
-
-/* === RESPONSIVE === */
-
-@media (max-width: 1300px) {
-  .skin-cyber .primary-intel {
-    flex-direction: column;
-    min-height: auto;
-  }
-  .skin-cyber .map-side { height: 400px; }
-  .skin-cyber .list-side { height: 350px; }
+/* Status overlays handled via global CSS */
+.loading {
+    color: var(--cyber-primary);
 }
 
 @media (max-width: 768px) {
   .skin-cyber.dashboard { padding: 10px; }
-  .skin-cyber .header-top { 
+  .skin-cyber.dashboard .header-top { 
     padding: 15px 10px; 
     flex-direction: column;
     gap: 15px; 
     align-items: flex-start;
   }
-  .skin-cyber h1 { font-size: 1.4rem; }
-  
-  .skin-cyber .primary-intel { flex-direction: column; }
+  .skin-cyber.dashboard h1 { font-size: 1.4rem; }
   
   .skin-cyber .list-side, .skin-cyber .widget, .skin-cyber .glass-card {
     padding: 15px !important;
@@ -564,40 +481,6 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     font-size: 0.8rem;
-  }
-
-  .skin-cyber .session-time, 
-  .skin-cyber .log-time, 
-  .skin-cyber .attack-time {
-    display: flex;
-    flex-direction: column;
-    flex: 0 0 72px !important;
-    font-size: 0.65rem;
-    padding: 2px 0;
-    gap: 0;
-    min-width: 65px;
-    justify-content: center;
-    border: none;
-    background: transparent;
-    line-height: 1;
-  }
-
-  .skin-cyber .date-part {
-    display: block !important;
-    font-size: 0.6rem;
-    opacity: 0.7;
-  }
-
-  .skin-cyber .time-part {
-    font-size: 0.75rem;
-    font-weight: 800;
-  }
-
-  .skin-cyber .duration-badge {
-    display: block !important;
-    font-size: 0.6rem;
-    color: var(--neon-pink);
-    margin-top: 1px;
   }
 
   .skin-cyber .activity-badge {

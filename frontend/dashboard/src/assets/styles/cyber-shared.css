@@ -1,0 +1,98 @@
+/**
+ * cyber-shared.css
+ * Standard Design Engine for Cyber-Sleek skins.
+ * Ported from Home experience to be reused across all views.
+ * 
+ * TO ENSURE HOME STABILITY: 
+ * All rules here use semantic variables. The Home continues to use its own variables.
+ */
+
+:root {
+  /* Generic Config */
+  --font-cyber-mono: 'JetBrains Mono', 'Courier New', Courier, monospace;
+  --font-cyber-main: 'Outfit', sans-serif;
+  --cyber-blur: blur(12px);
+  --cyber-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* Semantic Slots (Defaulted to Cyan/Pink but expected to be overridden per view) */
+  --cyber-primary: #00ffff;        
+  --cyber-primary-rgb: 0, 255, 255; 
+  --cyber-accent: #ff3366;         
+  --cyber-accent-rgb: 255, 51, 102;
+  --cyber-bg: #0a0e17;             
+  --cyber-surface: rgba(10, 15, 30, 0.85); 
+  --cyber-border: rgba(var(--cyber-primary-rgb), 0.2);
+}
+
+/* === SHARED HUD PATTERNS === */
+
+.skin-cyber .glass-card-base {
+  background: var(--cyber-surface);
+  border: 1px solid var(--cyber-border);
+  backdrop-filter: var(--cyber-blur);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.skin-cyber .neon-text-primary {
+  color: var(--cyber-primary) !important;
+  text-shadow: 0 0 10px rgba(var(--cyber-primary-rgb), 0.5) !important;
+}
+
+/* === SHARED COMPONENT OVERRIDES (DEEP RULEZ) === */
+
+/* Elements (Select, Input, DatePicker) */
+.skin-cyber ::deep(.el-input__wrapper),
+.skin-cyber ::deep(.el-select__wrapper),
+.skin-cyber ::deep(.el-input-number__increase),
+.skin-cyber ::deep(.el-input-number__decrease) {
+  background-color: rgba(0, 0, 0, 0.4) !important;
+  box-shadow: 0 0 0 1px var(--cyber-border) inset !important;
+  border-radius: 0 !important;
+  transition: var(--cyber-transition);
+}
+
+.skin-cyber ::deep(.el-input__inner),
+.skin-cyber ::deep(.el-select__placeholder),
+.skin-cyber ::deep(.el-range-input) {
+  color: #fff !important;
+  font-family: var(--font-cyber-mono) !important;
+  font-size: 0.8rem;
+}
+
+.skin-cyber ::deep(.el-input__wrapper.is-focus),
+.skin-cyber ::deep(.el-select__wrapper.is-focus) {
+  box-shadow: 0 0 0 1px var(--cyber-primary) inset, 0 0 10px rgba(var(--cyber-primary-rgb), 0.3) !important;
+}
+
+/* Radio Buttons */
+.skin-cyber ::deep(.el-radio-button__inner) {
+  background-color: transparent !important;
+  border: 1px solid var(--cyber-border) !important;
+  color: var(--cyber-primary) !important;
+  border-radius: 0 !important;
+  font-family: var(--font-cyber-mono);
+  text-transform: uppercase;
+  font-size: 0.7rem;
+}
+
+.skin-cyber ::deep(.el-radio-button__original-radio:checked + .el-radio-button__inner) {
+  background-color: var(--cyber-primary) !important;
+  color: var(--cyber-bg) !important;
+  box-shadow: 0 0 15px var(--cyber-primary) !important;
+}
+
+/* Scrollbars */
+.skin-cyber ::-webkit-scrollbar-thumb {
+  background: var(--cyber-primary);
+  box-shadow: 0 0 5px var(--cyber-primary);
+}
+
+/* Base View Transitions */
+.skin-cyber .fade-enter-active,
+.skin-cyber .fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+.skin-cyber .fade-enter-from,
+.skin-cyber .fade-leave-to {
+  opacity: 0;
+}

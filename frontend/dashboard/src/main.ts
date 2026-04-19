@@ -5,6 +5,7 @@ import { createPinia } from 'pinia';
 import ElementPlus from 'element-plus';
 import 'element-plus/dist/index.css';
 import './assets/global.css';
+import './assets/styles/cyber-shared.css';
 import i18n from './locales/index';
 import { registerSW } from 'virtual:pwa-register';
 

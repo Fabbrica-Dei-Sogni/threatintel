@@ -67,9 +67,10 @@
                         <span @click="goToIpDetails(attack.request.ip)" class="ip-link">{{ attack.request.ip }}</span>
                         
                         <div class="attack-time" :title="t('attackDetail.timeWindow')">
-                          <span class="start-time">{{ formatDateTime(attack.firstSeen) }}</span>
+                          <span class="date-part">{{ formatDateOnly(attack.firstSeen) }}</span>
+                          <span class="time-part">{{ formatTimeOnly(attack.firstSeen) }}</span>
                           <span class="duration-badge" v-if="attack.lastSeen && attack.lastSeen !== attack.firstSeen">
-                            ({{ computeDuration(attack.firstSeen, attack.lastSeen) }})
+                            {{ computeDuration(attack.firstSeen, attack.lastSeen) }}
                           </span>
                         </div>
 
@@ -83,8 +84,8 @@
                             agoValue: 90,
                             agoUnit: 'days'
                           }
-                        }">
-                          {{ $t('common.detail') }}
+                        }" :title="t('common.detail')">
+                          👁️
                         </router-link>
                       </li>
                     </ul>
@@ -132,12 +133,12 @@
                         <span @click="goToIpDetails(log.request.ip)" class="ip-link">{{ log.request.ip }}</span>
                         
                         <div class="log-time">
-                          <span class="time-hour">{{ formatDateTime(log.timestamp) }}</span>
+                          <span class="date-part">{{ formatDateOnly(log.timestamp) }}</span>
+                          <span class="time-part">{{ formatTimeOnly(log.timestamp) }}</span>
                         </div>
 
                         <div class="column-spacer"></div>
-                        <router-link :to="{ name: 'ThreatLog', params: { id: log.id } }">{{ $t('common.detail')
-                          }}</router-link>
+                        <router-link :to="{ name: 'ThreatLog', params: { id: log.id } }" :title="t('common.detail')">👁️</router-link>
                       </li>
                     </ul>
                     <div v-if="loadingLogs" class="loading">{{ $t('home.loadingLogs') }}</div>
@@ -190,17 +191,18 @@
                         <span @click="goToIpDetails(session.src_ip)" class="ip-link">{{ session.src_ip }}</span>
                         
                         <div class="session-time" :title="t('cowrie.attackDetail.timeWindow')">
-                          <span class="start-time">{{ formatDateTime(session.starttime) }}</span>
+                          <span class="date-part">{{ formatDateOnly(session.starttime) }}</span>
+                          <span class="time-part">{{ formatTimeOnly(session.starttime) }}</span>
                           <span class="duration-badge" v-if="session.endtime">
-                            ({{ computeDuration(session.starttime, session.endtime) }})
+                            {{ computeDuration(session.starttime, session.endtime) }}
                           </span>
                         </div>
 
                         <span class="interaction-count" :class="{ 'high-interaction': (session.eventCount || 0) > 5 }">
                           {{ session.eventCount || 0 }} {{ $t('sessionChart.events').toLowerCase() }}
                         </span>
-                        <router-link :to="{ name: 'CowrieAttackDetail', params: { id: session.session } }">
-                          {{ $t('common.detail') }}
+                        <router-link :to="{ name: 'CowrieAttackDetail', params: { id: session.session } }" :title="t('common.detail')">
+                          👁️
                         </router-link>
                       </li>
                       <li v-if="recentSessions.length === 0 && !loadingSessions" class="no-data">
@@ -310,7 +312,7 @@ import ProtocolSelector from '../../components/common/ProtocolSelector.vue';
 import ViewToggle from '../../components/common/ViewToggle.vue';
 import DefconIndicator from '../../components/DefconIndicator.vue';
 import CowrieCategorySelector from '../../components/common/CowrieCategorySelector.vue';
-import { formatDateTime, formatHumanDuration, formatFullDateTime } from '../../utils/dateUtils';
+import { formatDateTime, formatDateOnly, formatTimeOnly, formatHumanDuration, formatFullDateTime } from '../../utils/dateUtils';
 import './HomeCyber.css';
 
 const { t } = useI18n();

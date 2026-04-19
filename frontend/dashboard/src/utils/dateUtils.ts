@@ -45,6 +45,26 @@ export function formatDateTime(date: string | Date | number): string {
 }
 
 /**
+ * Formats a timestamp into only a date string.
+ * Example: "19/04" or "19/04/2026"
+ */
+export function formatDateOnly(date: string | Date | number): string {
+  if (!date) return '-';
+  const d = dayjs(date);
+  const now = dayjs();
+  return d.year() !== now.year() ? d.format('DD/MM/YYYY') : d.format('DD/MM');
+}
+
+/**
+ * Formats a timestamp into only a time string.
+ * Example: "10:45:00"
+ */
+export function formatTimeOnly(date: string | Date | number): string {
+  if (!date) return '-';
+  return dayjs(date).format('HH:mm:ss');
+}
+
+/**
  * Formats a timestamp into a full date and time string.
  * Example: "19/04/2026 10:45:00"
  */

@@ -582,20 +582,37 @@ export class ThreatLogService {
         return { message: 'Rianalisi di tutti i log completata', results };
     }
 
-    async getStats(timeframe = '24h') {
-        let hours = 24;
-        if (timeframe === '1w') hours = 168;
-        else if (timeframe === '1m') hours = 720;
-        else if (timeframe === '1y') hours = 8760;
+    private getTimeframeHours(timeframe: string): number {
+        switch (timeframe) {
+            case '1w': return 168;
+            case '1m': return 720;
+            case '1y': return 8760;
+            case '24h':
+            default: return 24;
+        }
+    }
 
-        const since = new Date(Date.now() - hours * 60 * 60 * 1000);
-        this.logger.info(`[ThreatLogService] Calculating stats for timeframe: ${timeframe} (since: ${since.toISOString()})`);
+    async getStats(timeframe = '24h', minScore = 15) {
+        let timeframeMatch: any = {};
+        
+        if (timeframe !== 'all') {
+            const hours = this.getTimeframeHours(timeframe);
+            const since = new Date(Date.now() - hours * 60 * 60 * 1000);
+            timeframeMatch.timestamp = { $gte: since };
+            this.logger.info(`[ThreatLogService] Calculating stats for timeframe: ${timeframe} (since: ${since.toISOString()}) with minScore: ${minScore}`);
+        } else {
+            this.logger.info(`[ThreatLogService] Calculating stats for ALL TIME with minScore: ${minScore}`);
+        }
 
         const results = await ThreatLog.aggregate([
-            { $match: { timestamp: { $gte: since } } },
+            { $match: timeframeMatch },
             {
                 $facet: {
+                    scoreDistribution: [
+                        { $group: { _id: null, min: { $min: "$fingerprint.score" }, max: { $max: "$fingerprint.score" }, avg: { $avg: "$fingerprint.score" } } }
+                    ],
                     mainStats: [
+                        { $match: { 'fingerprint.score': { $gte: minScore } } },
                         {
                             $group: {
                                 _id: null,
@@ -606,7 +623,7 @@ export class ThreatLogService {
                                             {
                                                 $and: [
                                                     { $eq: ['$fingerprint.suspicious', true] },
-                                                    { $gt: ['$fingerprint.score', 15] }
+                                                    { $gte: ['$fingerprint.score', minScore] }
                                                 ]
                                             },
                                             1,
@@ -618,12 +635,14 @@ export class ThreatLogService {
                         }
                     ],
                     topCountries: [
+                        { $match: { 'fingerprint.score': { $gte: minScore } } },
                         { $match: { 'geo.country': { $exists: true, $ne: null } } },
                         { $group: { _id: '$geo.country', count: { $sum: 1 } } },
                         { $sort: { count: -1 } },
                         { $limit: 10 }
                     ],
                     topIndicators: [
+                        { $match: { 'fingerprint.score': { $gte: minScore } } },
                         { $match: { 'fingerprint.indicators': { $exists: true, $ne: [] } } },
                         { $unwind: '$fingerprint.indicators' },
                         { $group: { _id: '$fingerprint.indicators', count: { $sum: 1 } } },
@@ -648,14 +667,27 @@ export class ThreatLogService {
             totalRequests: stats.totalRequests,
             suspiciousRequests: stats.suspiciousRequests,
             topCountries: countriesMap,
-            topIndicators: indicatorsMap
+            topIndicators: indicatorsMap,
+            scoreDistribution: facet.scoreDistribution[0] || { min: 0, max: 100, avg: 15 }
         };
     }
 
 
-    async getTopThreats(limit = 10) {
-        return await ThreatLog.find({ 'fingerprint.suspicious': true })
-            .sort({ 'fingerprint.score': -1 })
+    async getTopThreats(limit = 10, timeframe = '24h', minScore = 15) {
+        let query: any = { 'fingerprint.suspicious': true };
+        
+        if (timeframe !== 'all') {
+            const hours = this.getTimeframeHours(timeframe);
+            const since = new Date(Date.now() - hours * 60 * 60 * 1000);
+            query.timestamp = { $gte: since };
+        }
+
+        if (minScore > 0) {
+            query['fingerprint.score'] = { $gte: minScore };
+        }
+
+        return await ThreatLog.find(query)
+            .sort({ timestamp: -1 })
             .limit(limit)
             .select('request.ip request.url fingerprint.score fingerprint.indicators geo.country timestamp');
     }

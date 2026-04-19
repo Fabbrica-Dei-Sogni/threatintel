@@ -19,6 +19,7 @@
 | [M7: Frontend Enhancements](#m7-frontend-enhancements) | 🟢 In Progress (95%) | 🟠 Medium | 2 settimane |
 | [M8: Log Analysis & Hardening](#m8-log-analysis--hardening) | ✅ Completed | 🔴 High | 1-2 settimane |
 | [M9: Backend Release System](#m9-backend-release-system) | ✅ Completed | 🔴 High | 1 settimana |
+| [M10: Auth Module Consolidation](#m10-auth-module-consolidation) | ⚪ Planned | 🟠 Medium | 1 settimana |
 
 **Legenda:**
 - 🟢 In Progress
@@ -415,5 +416,21 @@ Aprile 2026      M6 (Monitoring)
 
 ---
 
-**Ultimo aggiornamento**: 2026-03-26
+## M10: Auth Module Consolidation
+
+**Obiettivo**: Rafforzare e pulire il flusso di autenticazione e registrazione per gestire più applicazioni in modo agnostico.
+
+**Status**: ⚪ Planned
+
+### Tasks
+- [ ] Implementazione Redirect Agnostico (per `appId`) post-attivazione email.
+- [ ] Review procedura di attivazione account (gestione token e feedback UX).
+- [ ] Centralizzazione mappatura APP -> URL nel modulo Auth.
+- [ ] Integrazione messaggistica di successo su Frontend (ThreatIntel) tramite query parameters.
+
+**Documentazione**: [Consolidamento Redirect Registrazione](./auth-registration-redirection-plan.md)
+
+---
+
+**Ultimo aggiornamento**: 2026-04-19
 **Prossimo checkpoint**: M4 Performance Profiling & Redis Caching

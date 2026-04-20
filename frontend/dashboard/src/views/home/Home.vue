@@ -122,7 +122,7 @@
               </transition>
             </div>
 
-            <div class="secondary-intel" style="margin-top: 25px;">
+            <div class="secondary-intel">
               <div class="widget glass-card">
                 <div class="widget-header clickable-header" @click="toggles.recentLogs = !toggles.recentLogs">
                   <div class="title-content">
@@ -170,7 +170,7 @@
       </div>
 
       <!-- DOMINIO: HONEYPOT INTELLIGENCE -->
-      <div class="domain-section" style="margin-top: 40px;">
+      <div class="domain-section">
         <h2 class="domain-title" @click="toggles.honeypot = !toggles.honeypot">
           <div class="title-content">
             <span class="icon">🔍</span> {{ t('home.honeypotIntelligence') }}
@@ -260,7 +260,7 @@
       </div>
 
       <!-- DOMINIO: FORENSIC INTELLIGENCE -->
-      <div v-if="authStore.isAuthenticated" class="domain-section" style="margin-top: 40px;">
+      <div v-if="authStore.isAuthenticated" class="domain-section">
         <h2 class="domain-title" @click="toggles.forensic = !toggles.forensic">
           <div class="title-content">
             <span class="icon">📁</span> {{ t('home.forensicIntelligence') }}

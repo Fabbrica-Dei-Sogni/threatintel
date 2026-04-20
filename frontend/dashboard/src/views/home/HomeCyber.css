@@ -189,6 +189,15 @@
   display: flex;
   gap: 30px;
   min-height: 400px;
+  margin-bottom: 30px;
+}
+
+.skin-cyber .telemetry-wrapper {
+  margin-bottom: 40px;
+}
+
+.skin-cyber .secondary-intel {
+  margin-bottom: 20px;
 }
 
 .skin-cyber .map-side {

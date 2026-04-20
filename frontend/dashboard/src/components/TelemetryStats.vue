@@ -110,7 +110,6 @@
         <ul class="list-items">
           <li v-for="(count, key) in stats.topIndicators" :key="key" class="list-row">
             <div class="row-label">
-              <defcon-indicator :level="getIndicatorLevel(key)" mode="dot" hide-label />
               <span>{{ key }}</span>
             </div>
             <div class="row-value">{{ count }}</div>

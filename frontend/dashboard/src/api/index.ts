@@ -389,6 +389,27 @@ export async function fetchCustomReport(payload: any, format: string = 'pdf', st
 // DOSSIER (PERSISTENCE) API
 // ==========================
 
+/**
+ * @param timeframe '24h' | '1w' | '1m' | '1y' | 'all'
+ * @param minScore Sogli minima di rischio
+ * @param limit Numero di elementi per le classifiche top (può essere "all" o numero)
+ */
+export async function fetchStats(timeframe: string = '24h', minScore: number = 15, limit: string | number = 10): Promise<any> {
+    try {
+        const response = await apiClient.get('/stats', { 
+            params: { 
+                timeframe, 
+                minScore, 
+                top: limit 
+            } 
+        });
+        return response.data;
+    } catch (error) {
+        console.error('[fetchStats] Error:', error);
+        throw error;
+    }
+}
+
 export async function fetchDossiers(params: any = {}): Promise<any> {
     try {
         const response = await apiClient.get('/dossiers', { params });

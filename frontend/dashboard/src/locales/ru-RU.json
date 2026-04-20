@@ -116,6 +116,7 @@
         "dashboard": "Панель управления",
         "attacks": "Атаки",
         "logRequests": "Реестр логов",
+        "statistics": "Статистика",
         "recentAttacks": "Последние 10 атак",
         "recentLogs": "Последние 10 журналов",
         "attackMap": "Карта атак",
@@ -147,6 +148,22 @@
         "loadingDossiers": "Загрузка архива...",
         "errorLoadingDossiers": "Ошибка загрузки архива",
         "archive": "АРХИВ"
+    },
+    "telemetry": {
+        "title": "ТЕЛЕМЕТРИЯ БЕЗОПАСНОСТИ",
+        "reset_filters": "СБРОСИТЬ ФИЛЬТРЫ",
+        "filter_label": "ВРЕМЕННОЙ ИНТЕРВАЛ",
+        "filter_score_label": "ПОРОГ РИСКА",
+        "top_ranking": "ТОП РЕЙТИНГ",
+        "risk_level_info": "ИНФО (0+)",
+        "risk_level_low": "НИЗКИЙ (5+)",
+        "risk_level_med": "СРЕДНИЙ (15+)",
+        "risk_level_high": "ВЫСОКИЙ (50+)",
+        "label_traffic": "ЗАРЕГИСТРИРОВАННЫЙ ТРАФИК",
+        "label_threats": "ОТСЛЕЖИВАЕМЫЕ УГРОЗЫ",
+        "label_unique_nodes": "УНИКАЛЬНЫЕ УЗЛЫ",
+        "top_indicators": "Топ {count} индикаторов угроз",
+        "top_countries": "Топ {count} стран происхождения"
     },
     "attacks": {
         "title": "Атаки HTTP/S SSH",

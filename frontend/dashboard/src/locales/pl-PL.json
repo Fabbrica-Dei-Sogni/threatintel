@@ -115,7 +115,8 @@
         "title": "Konsola Operacyjna Forensic",
         "dashboard": "Pulpit",
         "attacks": "Ataki",
-        "logRequests": "Rejestr Logów",
+        "logRequests": "Rejestr logów",
+        "statistics": "Statystyki",
         "recentAttacks": "Ostatnie 10 ataków",
         "recentLogs": "Ostatnie 10 dzienników",
         "attackMap": "Mapa ataków",
@@ -147,6 +148,22 @@
         "loadingDossiers": "Ładowanie archiwum...",
         "errorLoadingDossiers": "Błąd ładowania archiwum",
         "archive": "ARCHIWUM"
+    },
+    "telemetry": {
+        "title": "TELEMETRIA BEZPIECZEŃSTWA",
+        "reset_filters": "RESETUJ FILTRY",
+        "filter_label": "OKRES CZASU",
+        "filter_score_label": "PRÓG RYZYKA",
+        "top_ranking": "RANKING TOP",
+        "risk_level_info": "INFO (0+)",
+        "risk_level_low": "NISKI (5+)",
+        "risk_level_med": "ŚREDNI (15+)",
+        "risk_level_high": "WYSOKI (50+)",
+        "label_traffic": "ZAREJESTROWANY RUCH",
+        "label_threats": "MONITOROWANE ZAGROŻENIA",
+        "label_unique_nodes": "UNIKALNE WĘZŁY",
+        "top_indicators": "Top {count} wskaźników zagrożeń",
+        "top_countries": "Top {count} krajów pochodzenia"
     },
     "attacks": {
         "title": "Ataki HTTP/S SSH",

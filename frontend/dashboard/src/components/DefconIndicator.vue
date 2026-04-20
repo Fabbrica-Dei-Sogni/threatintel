@@ -10,7 +10,7 @@
 
         <!-- MODE: DOT -->
         <div v-else class="defcon-dot-container" :class="getDefconClass(level)">
-            <span class="defcon-dot-label">L{{ level }}</span>
+            <span v-if="!hideLabel" class="defcon-dot-label">L{{ level }}</span>
             <div class="pulse-ring"></div>
         </div>
     </div>
@@ -36,6 +36,10 @@ const props = defineProps({
         type: String,
         default: 'bar',
         validator: (value) => ['bar', 'dot'].includes(value)
+    },
+    hideLabel: {
+        type: Boolean,
+        default: false
     }
 });
 

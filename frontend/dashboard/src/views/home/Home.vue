@@ -39,7 +39,14 @@
             <section class="actions">
               <button @click="goToAttacks" class="btn-action">🛰️ {{ t('home.attacks').toUpperCase() }}</button>
               <button @click="goToLogs" class="btn-action">🗄️ {{ t('home.logRequests').toUpperCase() }}</button>
+              <button @click="toggles.telemetryStats = !toggles.telemetryStats" class="btn-action">📊 {{ t('home.statistics').toUpperCase() }}</button>
             </section>
+
+            <transition name="collapse">
+              <div v-if="toggles.telemetryStats" class="telemetry-wrapper">
+                <TelemetryStats />
+              </div>
+            </transition>
 
             <div class="primary-intel">
               <div class="list-side glass-card">
@@ -330,6 +337,7 @@ import ConfigMenuButton from '../../components/ConfigMenuButton.vue';
 import ProtocolSelector from '../../components/common/ProtocolSelector.vue';
 import ViewToggle from '../../components/common/ViewToggle.vue';
 import DefconIndicator from '../../components/DefconIndicator.vue';
+import TelemetryStats from '../../components/TelemetryStats.vue';
 import CowrieCategorySelector from '../../components/common/CowrieCategorySelector.vue';
 import { formatDateTime, formatDateOnly, formatTimeOnly, formatHumanDuration, formatFullDateTime } from '../../utils/dateUtils';
 import './HomeCyber.css';
@@ -354,6 +362,7 @@ const toggles = reactive({
   recentAttacks: !attackMap.value,
   attackMap: attackMap,
   recentLogs: false,
+  telemetryStats: false,
   honeypot: true,
   recentSessions: !sessionsMap.value,
   sessionsMap: sessionsMap,

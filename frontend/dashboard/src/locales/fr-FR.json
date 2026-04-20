@@ -115,7 +115,8 @@
         "title": "Console Ops Forensic",
         "dashboard": "Tableau de bord",
         "attacks": "Attaques",
-        "logRequests": "Registre des Logs",
+        "logRequests": "Registre des logs",
+        "statistics": "Statistiques",
         "recentAttacks": "10 dernières attaques",
         "recentLogs": "10 derniers journaux",
         "attackMap": "Carte des attaques",
@@ -146,7 +147,23 @@
         "recentDossiers": "Enquêtes Récentes",
         "loadingDossiers": "Chargement de l'archive...",
         "errorLoadingDossiers": "Erreur lors du chargement de l'archive",
-        "archive": "ARCHIVER"
+        "archive": "ARCHIVES"
+    },
+    "telemetry": {
+        "title": "TÉLÉMÉTRIE DE SÉCURITÉ",
+        "reset_filters": "RÉINITIALISER LES FILTRES",
+        "filter_label": "PÉRIODE",
+        "filter_score_label": "SEUIL DE RISQUE",
+        "top_ranking": "CLASSEMENT TOP",
+        "risk_level_info": "INFO (0+)",
+        "risk_level_low": "BAS (5+)",
+        "risk_level_med": "MOYEN (15+)",
+        "risk_level_high": "HAUT (50+)",
+        "label_traffic": "TRAFIC ENREGISTRÉ",
+        "label_threats": "MENACES SURVEILLÉES",
+        "label_unique_nodes": "NOEUDS UNIQUES",
+        "top_indicators": "Top {count} indicateurs de menace",
+        "top_countries": "Top {count} pays d'origine"
     },
     "attacks": {
         "title": "Attaques HTTP/S SSH",

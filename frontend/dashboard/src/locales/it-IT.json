@@ -116,6 +116,7 @@
         "dashboard": "Cruscotto",
         "attacks": "Attacchi",
         "logRequests": "Registro Log",
+        "statistics": "Statistiche",
         "recentAttacks": "Ultimi 10 attacchi",
         "recentLogs": "Ultimi 10 log",
         "attackMap": "Mappa Attacchi",
@@ -147,6 +148,22 @@
         "loadingDossiers": "Caricamento archivio...",
         "errorLoadingDossiers": "Errore caricamento archivio",
         "archive": "ARCHIVIO"
+    },
+    "telemetry": {
+        "title": "TELEMETRIA DI SICUREZZA",
+        "reset_filters": "RIPRISTINA FILTRI",
+        "filter_label": "TIMEFRAME",
+        "filter_score_label": "SOGLIA RISCHIO",
+        "top_ranking": "RANKING TOP",
+        "risk_level_info": "INFO (0+)",
+        "risk_level_low": "BASSO (5+)",
+        "risk_level_med": "MEDIO (15+)",
+        "risk_level_high": "ALTO (50+)",
+        "label_traffic": "TRAFFICO REGISTRATO",
+        "label_threats": "MINACCE ATTENZIONATE",
+        "label_unique_nodes": "NODI UNICI",
+        "top_indicators": "Top {count} marcatori di minaccia",
+        "top_countries": "Top {count} paesi di origine"
     },
     "attacks": {
         "title": "Attacchi HTTP/S SSH",

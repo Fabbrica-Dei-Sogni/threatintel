@@ -116,6 +116,7 @@
         "dashboard": "Dashboard",
         "attacks": "Attacks",
         "logRequests": "Log Registry",
+        "statistics": "Statistics",
         "recentAttacks": "Last 10 attacks",
         "recentLogs": "Last 10 logs",
         "attackMap": "Attack Map",
@@ -147,6 +148,22 @@
         "loadingDossiers": "Loading archive...",
         "errorLoadingDossiers": "Error loading archive",
         "archive": "ARCHIVE"
+    },
+    "telemetry": {
+        "title": "SECURITY TELEMETRY",
+        "reset_filters": "RESET FILTERS",
+        "filter_label": "TIMEFRAME",
+        "filter_score_label": "RISK THRESHOLD",
+        "top_ranking": "TOP RANKING",
+        "risk_level_info": "INFO (0+)",
+        "risk_level_low": "LOW (5+)",
+        "risk_level_med": "MEDIUM (15+)",
+        "risk_level_high": "HIGH (50+)",
+        "label_traffic": "REGISTERED TRAFFIC",
+        "label_threats": "MONITORED THREATS",
+        "label_unique_nodes": "UNIQUE NODES",
+        "top_indicators": "Top {count} threat indicators",
+        "top_countries": "Top {count} source countries"
     },
     "attacks": {
         "title": "HTTP/S SSH Attacks",

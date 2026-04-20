@@ -23,7 +23,10 @@ export class ThreatController {
         try {
             const timeframe = (req.query.timeframe as string) || '24h';
             const minScore = parseInt(req.query.minScore as string) || 15;
-            const stats = await this.threatLogService.getStats(timeframe, minScore);
+            const topParam = req.query.top as string;
+            const top = topParam === 'all' ? -1 : parseInt(topParam) || 10;
+
+            const stats = await this.threatLogService.getStats(timeframe, minScore, top);
             const topThreats = await this.threatLogService.getTopThreats(10, timeframe, minScore);
 
             res.json({

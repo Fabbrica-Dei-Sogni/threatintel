@@ -592,17 +592,19 @@ export class ThreatLogService {
         }
     }
 
-    async getStats(timeframe = '24h', minScore = 15) {
+    async getStats(timeframe = '24h', minScore = 15, limit = 10) {
         let timeframeMatch: any = {};
         
         if (timeframe !== 'all') {
             const hours = this.getTimeframeHours(timeframe);
             const since = new Date(Date.now() - hours * 60 * 60 * 1000);
             timeframeMatch.timestamp = { $gte: since };
-            this.logger.info(`[ThreatLogService] Calculating stats for timeframe: ${timeframe} (since: ${since.toISOString()}) with minScore: ${minScore}`);
+            this.logger.info(`[ThreatLogService] Calculating stats for timeframe: ${timeframe} (since: ${since.toISOString()}) with minScore: ${minScore}, limit: ${limit}`);
         } else {
-            this.logger.info(`[ThreatLogService] Calculating stats for ALL TIME with minScore: ${minScore}`);
+            this.logger.info(`[ThreatLogService] Calculating stats for ALL TIME with minScore: ${minScore}, limit: ${limit}`);
         }
+
+        const effectiveLimit = limit > 0 ? limit : 1000;
 
         const results = await ThreatLog.aggregate([
             { $match: timeframeMatch },
@@ -638,7 +640,7 @@ export class ThreatLogService {
                         { $match: { 'geo.country': { $exists: true, $ne: null } } },
                         { $group: { _id: '$geo.country', count: { $sum: 1 } } },
                         { $sort: { count: -1 } },
-                        { $limit: 10 }
+                        { $limit: effectiveLimit }
                     ],
                     topIndicators: [
                         { $match: { 'fingerprint.suspicious': true, 'fingerprint.score': { $gte: minScore } } },
@@ -646,7 +648,7 @@ export class ThreatLogService {
                         { $unwind: '$fingerprint.indicators' },
                         { $group: { _id: '$fingerprint.indicators', count: { $sum: 1 } } },
                         { $sort: { count: -1 } },
-                        { $limit: 10 }
+                        { $limit: effectiveLimit }
                     ],
                     uniqueIPs: [
                         { $group: { _id: '$request.ip' } },

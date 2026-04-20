@@ -645,8 +645,8 @@ export class ThreatLogService {
                     topIndicators: [
                         { $match: { 'fingerprint.suspicious': true, 'fingerprint.score': { $gte: minScore } } },
                         { $match: { 'fingerprint.indicators': { $exists: true, $ne: [] } } },
-                        { $unwind: '$fingerprint.indicators' },
-                        { $group: { _id: '$fingerprint.indicators', count: { $sum: 1 } } },
+                        { $addFields: { primaryIndicator: { $arrayElemAt: ['$fingerprint.indicators', 0] } } },
+                        { $group: { _id: '$primaryIndicator', count: { $sum: 1 } } },
                         { $sort: { count: -1 } },
                         { $limit: effectiveLimit }
                     ],

@@ -1,8 +1,11 @@
 <template>
-    <div class="cowrie-detail attacchi">
+    <div class="cowrie-detail attacchi" :class="'skin-' + dashboardSkin">
         <div class="header-top">
             <h1><span class="animated-icon pulse-jade">👾</span> {{ $t('cowrie.attackDetail.title') }}</h1>
-            <LanguageSwitcher />
+            <div class="header-actions">
+                <SkinSwitcher />
+                <LanguageSwitcher />
+            </div>
         </div>
         <div class="actions">
             <button @click="$router.back()" class="btn-action">{{ $t('cowrie.attackDetail.backToSessions') }}</button>
@@ -171,6 +174,7 @@ import { fetchCowrieSessionDetails, fetchCowrieSessionEvents } from '../../api';
 import { ElMessage } from 'element-plus';
 import AttackMap from '../../components/AttackMap.vue';
 import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
+import SkinSwitcher from '../../components/SkinSwitcher.vue';
 import ReportActions from '../../components/ReportActions.vue';
 
 const props = defineProps({
@@ -183,6 +187,11 @@ const dossierStore = useDossierStore();
 const route = useRoute();
 const router = useRouter();
 const sessionId = ref(props.id);
+
+import { useViewSettingsStore } from '../../stores/viewSettings';
+import { storeToRefs } from 'pinia';
+const viewStore = useViewSettingsStore();
+const { dashboardSkin } = storeToRefs(viewStore);
 
 const sessionDetails = ref(null);
 const events = ref([]);
@@ -372,3 +381,6 @@ watch(() => props.id, (newId) => {
 </script>
 
 <style scoped src="./CowrieAttackDetail.css"></style>
+<style scoped>
+@import "./CowrieAttackDetailCyber.css";
+</style>

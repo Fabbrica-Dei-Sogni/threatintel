@@ -21,11 +21,18 @@
 
 
 .header-top { 
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center; 
-    padding-left: 24px;
-    padding-right: 24px;
+    display: flex !important; 
+    justify-content: space-between !important; 
+    align-items: center !important;
+    flex-wrap: wrap !important;
+    gap: 15px !important;
+    padding: 12px 24px 15px 24px !important;
+}
+
+.header-actions {
+    display: flex !important;
+    align-items: center !important;
+    gap: 15px !important;
 }
 
 

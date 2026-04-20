@@ -1,8 +1,11 @@
 <template>
-    <div class="cowrie-sessions attacchi cyber-view">
+    <div class="cowrie-sessions attacchi cyber-view" :class="'skin-' + dashboardSkin">
         <div class="header-top cyber-sticky-area cyber-sticky-top-0">
             <h1><span class="animated-icon pulse-jade">📟</span> {{ $t('cowrie.sessions.title') }}</h1>
-            <LanguageSwitcher />
+            <div class="header-actions">
+                <SkinSwitcher />
+                <LanguageSwitcher />
+            </div>
         </div>
         <div class="actions cyber-sticky-area cyber-sticky-top-1">
             <div class="nav-actions">
@@ -209,6 +212,7 @@ import { useCowrieSessions } from '../../composable/useCowrieSessions';
 import { useClipboard } from '../../composable/useClipboard';
 import CountryFlag from '../../components/CountryFlag.vue';
 import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
+import SkinSwitcher from '../../components/SkinSwitcher.vue';
 import SessionChart from '../../components/SessionChart.vue';
 import AttackMap from '../../components/AttackMap.vue';
 import CowrieCategorySelector from '../../components/common/CowrieCategorySelector.vue';
@@ -230,7 +234,7 @@ const router = useRouter();
 import { useViewSettingsStore } from '../../stores/viewSettings';
 import { storeToRefs } from 'pinia';
 const viewStore = useViewSettingsStore();
-const { sessionsShowMap: showMap, sessionsShowChart: showChart } = storeToRefs(viewStore);
+const { dashboardSkin, sessionsShowMap: showMap, sessionsShowChart: showChart } = storeToRefs(viewStore);
 const topScrollRef = ref(null);
 const tableScrollRef = ref(null);
 const tableRef = ref(null);
@@ -432,3 +436,6 @@ watch(() => sessions.value, () => {
 </script>
 
 <style scoped src="./CowrieSessions.css"></style>
+<style scoped>
+@import "./CowrieSessionsCyber.css";
+</style>

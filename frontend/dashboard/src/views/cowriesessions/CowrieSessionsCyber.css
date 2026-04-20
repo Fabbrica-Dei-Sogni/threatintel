@@ -1,0 +1,163 @@
+/* CowrieSessionsCyber.css - PHOSPHORUS EDITION (Isolated Scoped Version) */
+
+/* === CORE VARIABLES (PHOSPHORUS) === */
+.skin-cyber.cowrie-sessions.attacchi {
+  --cy-primary: #00ffd0;
+  --cy-primary-rgb: 0, 255, 208;
+  --cy-accent: #33ffcc;
+  --cy-bg: #050d0b;
+  --cy-surface: rgba(10, 20, 18, 0.9);
+  --cy-border: rgba(0, 255, 208, 0.25);
+  --cy-input-bg: rgba(0, 0, 0, 0.7);
+  
+  background-color: var(--cy-bg) !important;
+  color: #fff;
+  transition: all 0.3s ease;
+}
+
+/* === HEADER & SWITCHER ALIGNMENT (PERFECT) === */
+.skin-cyber.cowrie-sessions.attacchi .header-top {
+  background: rgba(5, 15, 12, 0.95) !important;
+  border-bottom: 2px solid var(--cy-primary) !important;
+  padding: 12px 24px 15px 24px !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+  gap: 15px !important;
+  margin-bottom: 0 !important;
+}
+
+.skin-cyber.cowrie-sessions.attacchi .header-actions {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 15px !important;
+}
+
+.skin-cyber.cowrie-sessions.attacchi h1 {
+  color: var(--cy-primary) !important;
+  text-shadow: 0 0 15px rgba(var(--cy-primary-rgb), 0.6) !important;
+  font-family: var(--font-cyber-mono) !important;
+  letter-spacing: 2px;
+}
+
+.skin-cyber.cowrie-sessions.attacchi h1::after {
+  content: '_';
+  animation: phosphorus-blink-hud-v9 1s step-end infinite;
+}
+
+@keyframes phosphorus-blink-hud-v9 {
+  50% { opacity: 0; }
+}
+
+/* === HUD SCANLINES overlays === */
+.skin-cyber.cowrie-sessions.attacchi::before {
+  content: "";
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  background: linear-gradient(rgba(12, 18, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%),
+              linear-gradient(90deg, rgba(0, 255, 208, 0.03), rgba(0, 255, 255, 0.01), rgba(0, 200, 255, 0.03));
+  background-size: 100% 4px, 3px 100%;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.25;
+}
+
+/* === ACTIONS & FILTERS === */
+.skin-cyber.cowrie-sessions.attacchi .actions,
+.skin-cyber.cowrie-sessions.attacchi .filters-container {
+  background: rgba(var(--cy-primary-rgb), 0.05) !important;
+  border-bottom: 1px solid var(--cy-border) !important;
+  backdrop-filter: blur(10px);
+}
+
+.skin-cyber.cowrie-sessions.attacchi .filters-container {
+  border: 1px solid var(--cy-border) !important;
+  background: rgba(0, 0, 0, 0.4) !important;
+  border-radius: 8px !important;
+}
+
+.skin-cyber.cowrie-sessions.attacchi .input {
+  background: var(--cy-input-bg) !important;
+  border: 1px solid var(--cy-border) !important;
+  color: var(--cy-primary) !important;
+}
+
+.skin-cyber.cowrie-sessions.attacchi .input:focus {
+  border-color: var(--cy-primary) !important;
+  box-shadow: 0 0 15px rgba(var(--cy-primary-rgb), 0.4) !important;
+}
+
+/* === MAP & CHART === */
+.skin-cyber.cowrie-sessions.attacchi .map-section,
+.skin-cyber.cowrie-sessions.attacchi .chart-section {
+  background: rgba(0, 0, 0, 0.6) !important;
+  border: 1px solid var(--cy-border) !important;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.8) !important;
+}
+
+/* === TABLE STYLES === */
+.skin-cyber.cowrie-sessions.attacchi .cyber-table {
+  background: rgba(0, 0, 0, 0.4) !important;
+}
+
+.skin-cyber.cowrie-sessions.attacchi .cyber-table th {
+  background: rgba(var(--cy-primary-rgb), 0.15) !important;
+  border-bottom: 2px solid var(--cy-primary) !important;
+  color: var(--cy-primary) !important;
+}
+
+.skin-cyber.cowrie-sessions.attacchi .cyber-row:hover td {
+  background: rgba(var(--cy-primary-rgb), 0.1) !important;
+  box-shadow: inset 0 0 15px rgba(var(--cy-primary-rgb), 0.2) !important;
+}
+
+.skin-cyber.cowrie-sessions.attacchi .ip-link {
+  color: var(--cy-primary) !important;
+  text-decoration-color: var(--cy-border) !important;
+}
+
+.skin-cyber.cowrie-sessions.attacchi .time-hour {
+  color: var(--cy-accent) !important;
+}
+
+.skin-cyber.cowrie-sessions.attacchi .detail-btn {
+  background: rgba(var(--cy-primary-rgb), 0.1) !important;
+  color: var(--cy-primary) !important;
+  border-color: var(--cy-border) !important;
+}
+
+.skin-cyber.cowrie-sessions.attacchi .detail-btn:hover {
+  background: var(--cy-primary) !important;
+  color: #050d0b !important;
+  box-shadow: 0 0 15px var(--cy-primary) !important;
+}
+
+/* === BUTTONS === */
+.skin-cyber.cowrie-sessions.attacchi .btn-action {
+  background: transparent !important;
+  border: 1px solid var(--cy-primary) !important;
+  color: var(--cy-primary) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  text-transform: uppercase;
+  font-weight: 800;
+}
+
+.skin-cyber.cowrie-sessions.attacchi .btn-action:hover {
+  background: var(--cy-primary) !important;
+  color: #050d0b !important;
+  box-shadow: 0 0 30px rgba(var(--cy-primary-rgb), 0.6) !important;
+  font-weight: 900 !important;
+}
+
+/* === PAGINATION === */
+.skin-cyber.cowrie-sessions.attacchi .cyber-pagination {
+  border-top: 1px solid var(--cy-border) !important;
+  background: rgba(0, 0, 0, 0.3) !important;
+}
+
+.skin-cyber.cowrie-sessions.attacchi .pagination-info {
+  color: var(--cy-primary) !important;
+}

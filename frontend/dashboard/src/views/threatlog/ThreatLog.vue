@@ -1,8 +1,11 @@
 <template>
-    <div class="threatlog-details">
+    <div class="threatlog-details" :class="'skin-' + dashboardSkin">
         <div class="header-top">
             <button @click="goBack" class="back-btn">← {{ t('threatLog.backToLogs') }}</button>
-            <LanguageSwitcher />
+            <div class="header-actions">
+                <SkinSwitcher />
+                <LanguageSwitcher />
+            </div>
         </div>
         <h1><span class="animated-icon pulse-amber">🗄️</span> {{ t('threatLog.title') }}</h1>
 
@@ -210,6 +213,7 @@ import { useI18n } from 'vue-i18n'
 import HexViewer from '../../components/HexViewer.vue';
 import { useClipboard } from '../../composable/useClipboard';
 import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
+import SkinSwitcher from '../../components/SkinSwitcher.vue';
 import CountryFlag from '../../components/CountryFlag.vue';
 import { formatFullDateTime } from '../../utils/dateUtils';
 
@@ -236,6 +240,11 @@ const toggles = reactive({
     response: false,
     geo: false
 })
+
+import { useViewSettingsStore } from '../../stores/viewSettings';
+import { storeToRefs } from 'pinia';
+const viewStore = useViewSettingsStore();
+const { dashboardSkin } = storeToRefs(viewStore);
 
 async function load() {
     loading.value = true
@@ -289,3 +298,6 @@ watch([id, activeLogTab], ([newId, newTab]) => {
 </script>
 
 <style scoped src="./ThreatLog.css"></style>
+<style scoped>
+@import "./ThreatLogCyber.css";
+</style>

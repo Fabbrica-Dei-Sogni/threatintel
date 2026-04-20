@@ -1,0 +1,188 @@
+/* ThreatLogCyber.css - AMBER EDITION (Isolated Scoped Version) */
+
+/* === CORE VARIABLES (AMBER) === */
+.skin-cyber.threatlog-details {
+  --cy-primary: #ffb100;
+  --cy-primary-rgb: 255, 177, 0;
+  --cy-accent: #ffcc00;
+  --cy-bg: #0d0b05;
+  --cy-surface: rgba(20, 18, 10, 0.9);
+  --cy-border: rgba(255, 177, 0, 0.25);
+  --cy-input-bg: rgba(0, 0, 0, 0.7);
+  
+  background-color: var(--cy-bg) !important;
+  color: #fff;
+  transition: all 0.3s ease;
+}
+
+/* === HEADER & SWITCHER ALIGNMENT (PERFECT) === */
+.skin-cyber.threatlog-details .header-top {
+  background: rgba(15, 12, 5, 0.95) !important;
+  border-bottom: 2px solid var(--cy-primary) !important;
+  padding: 12px 24px 15px 24px !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+  gap: 15px !important;
+  margin-bottom: 30px !important;
+}
+
+.skin-cyber.threatlog-details .header-actions {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 15px !important;
+}
+
+.skin-cyber.threatlog-details h1 {
+  color: var(--cy-primary) !important;
+  text-shadow: 0 0 15px rgba(var(--cy-primary-rgb), 0.6) !important;
+  font-family: var(--font-cyber-mono) !important;
+  letter-spacing: 2px;
+}
+
+.skin-cyber.threatlog-details h1::after {
+  content: '_';
+  animation: amber-blink-hud-v8 1s step-end infinite;
+}
+
+@keyframes amber-blink-hud-v8 {
+  50% { opacity: 0; }
+}
+
+/* === HUD SCANLINES overlays === */
+.skin-cyber.threatlog-details::before {
+  content: "";
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  background: linear-gradient(rgba(18, 16, 12, 0) 50%, rgba(0, 0, 0, 0.1) 50%),
+              linear-gradient(90deg, rgba(255, 177, 0, 0.03), rgba(255, 200, 0, 0.01), rgba(255, 255, 0, 0.03));
+  background-size: 100% 4px, 3px 100%;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.25;
+}
+
+/* === SECTIONS & CARDS === */
+.skin-cyber.threatlog-details .section {
+  background: linear-gradient(135deg, #1A140A 0%, #0d0b05 100%) !important;
+  border: 1px solid var(--cy-border) !important;
+  border-left: 6px solid var(--cy-primary) !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8) !important;
+}
+
+.skin-cyber.threatlog-details .section-header {
+  background: rgba(var(--cy-primary-rgb), 0.1) !important;
+  border-bottom: 1px solid var(--cy-border) !important;
+}
+
+.skin-cyber.threatlog-details .section-header h2 {
+  color: var(--cy-primary) !important;
+}
+
+.skin-cyber.threatlog-details .arrow {
+  border-top-color: var(--cy-primary) !important;
+}
+
+/* === BRIEFING GRID === */
+.skin-cyber.threatlog-details .briefing-item {
+  background: rgba(0, 0, 0, 0.4) !important;
+  border: 1px solid var(--cy-border) !important;
+}
+
+.skin-cyber.threatlog-details .briefing-item:hover {
+  background: rgba(var(--cy-primary-rgb), 0.05) !important;
+  border-color: var(--cy-primary) !important;
+}
+
+.skin-cyber.threatlog-details .briefing-label {
+  color: var(--cy-primary) !important;
+  opacity: 0.7;
+}
+
+/* === HUD STATS === */
+.skin-cyber.threatlog-details .hud-stat-box {
+  background: rgba(var(--cy-primary-rgb), 0.05) !important;
+  border: 1px solid var(--cy-border) !important;
+  border-left: 4px solid var(--cy-primary) !important;
+}
+
+.skin-cyber.threatlog-details .hud-label {
+  color: var(--cy-primary) !important;
+}
+
+.skin-cyber.threatlog-details .hud-value.highlight {
+  color: var(--cy-primary) !important;
+  text-shadow: 0 0 10px rgba(var(--cy-primary-rgb), 0.5) !important;
+}
+
+/* === TECHNIQUES === */
+.skin-cyber.threatlog-details .tech-tag {
+  background: rgba(var(--cy-primary-rgb), 0.1) !important;
+  border: 1px solid var(--cy-border) !important;
+  color: var(--cy-accent) !important;
+}
+
+.skin-cyber.threatlog-details .tech-tag:hover {
+  background: var(--cy-primary) !important;
+  color: #000 !important;
+  box-shadow: 0 0 15px var(--cy-primary) !important;
+}
+
+/* === REQUEST SECTION === */
+.skin-cyber.threatlog-details .log-details-meta {
+  background: rgba(0, 0, 0, 0.4) !important;
+  border: 1px solid var(--cy-border) !important;
+}
+
+.skin-cyber.threatlog-details .ip-link-value {
+  color: var(--cy-primary) !important;
+}
+
+.skin-cyber.threatlog-details .method-badge-styled {
+  background: var(--cy-primary) !important;
+  color: #000 !important;
+  border: none !important;
+}
+
+.skin-cyber.threatlog-details .url-text-styled {
+  color: var(--cy-accent) !important;
+}
+
+/* === TABS & VIEWER === */
+.skin-cyber.threatlog-details .log-tabs-header {
+  border-bottom: 2px solid var(--cy-border) !important;
+}
+
+.skin-cyber.threatlog-details .tab-btn {
+  color: rgba(var(--cy-primary-rgb), 0.5) !important;
+}
+
+.skin-cyber.threatlog-details .tab-btn.active {
+  color: var(--cy-primary) !important;
+  border-bottom: 2px solid var(--cy-primary) !important;
+  background: rgba(var(--cy-primary-rgb), 0.1) !important;
+}
+
+.skin-cyber.threatlog-details .tab-content-viewer {
+  background: rgba(0, 0, 0, 0.8) !important;
+  border: 1px solid var(--cy-border) !important;
+}
+
+/* === BUTTONS === */
+.skin-cyber.threatlog-details .back-btn {
+  background: transparent !important;
+  border: 1px solid var(--cy-primary) !important;
+  color: var(--cy-primary) !important;
+  border-radius: 0 !important;
+  font-weight: 800;
+  text-transform: uppercase;
+  box-shadow: none !important;
+}
+
+.skin-cyber.threatlog-details .back-btn:hover {
+  background: var(--cy-primary) !important;
+  color: #000 !important;
+  box-shadow: 0 0 20px var(--cy-primary) !important;
+}

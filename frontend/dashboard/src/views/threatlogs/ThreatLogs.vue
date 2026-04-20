@@ -1,8 +1,11 @@
 <template>
-  <div class="threatlogs cyber-view">
+  <div class="threatlogs cyber-view" :class="'skin-' + dashboardSkin">
     <div class="header-top cyber-sticky-area cyber-sticky-top-0">
       <h1><span class="animated-icon pulse-log">🗄️</span> {{ t('threatLogs.title') }}</h1>
-      <LanguageSwitcher />
+      <div class="header-actions">
+        <SkinSwitcher />
+        <LanguageSwitcher />
+      </div>
     </div>
     <!-- Pulsante per navigare alla Home -->
     <div class="actions cyber-sticky-area cyber-sticky-top-1">
@@ -211,6 +214,7 @@ import dayjs from 'dayjs';
 import CountryFlag from '../../components/CountryFlag.vue';
 import ThreadLogChart from '../../components/ThreadLogChart.vue';
 import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
+import SkinSwitcher from '../../components/SkinSwitcher.vue';
 import { formatDateTime, formatFullDateTime } from '../../utils/dateUtils';
 
 const { t } = useI18n();
@@ -250,7 +254,7 @@ const previousPageBeforeIpFilter = ref(null);
 import { useViewSettingsStore } from '../../stores/viewSettings';
 import { storeToRefs } from 'pinia';
 const viewStore = useViewSettingsStore();
-const { logsShowChart: showChart } = storeToRefs(viewStore);
+const { logsShowChart: showChart, dashboardSkin } = storeToRefs(viewStore);
 const inputPage = ref(page.value);
 
 // Dual Scrollbar Sync Support
@@ -394,3 +398,6 @@ function changePage(newPage) {
 </script>
 
 <style scoped src="./ThreatLogs.css"></style>
+<style scoped>
+@import "./ThreatLogsCyber.css";
+</style>

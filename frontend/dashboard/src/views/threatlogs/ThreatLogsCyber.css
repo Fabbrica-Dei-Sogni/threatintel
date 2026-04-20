@@ -1,0 +1,153 @@
+/* ThreatLogsCyber.css - AMBER EDITION (Isolated Scoped Version) */
+
+/* === CORE VARIABLES (AMBER) === */
+.skin-cyber.threatlogs {
+  --cy-primary: #ffb100;
+  --cy-primary-rgb: 255, 177, 0;
+  --cy-accent: #ffcc00;
+  --cy-bg: #0d0b05;
+  --cy-surface: rgba(20, 18, 10, 0.9);
+  --cy-border: rgba(255, 177, 0, 0.25);
+  --cy-input-bg: rgba(0, 0, 0, 0.7);
+  
+  background-color: var(--cy-bg) !important;
+  color: #fff;
+  transition: all 0.3s ease;
+}
+
+/* === HEADER & SWITCHER ALIGNMENT (PERFECT) === */
+.skin-cyber.threatlogs .header-top {
+  background: rgba(15, 12, 5, 0.95) !important;
+  border-bottom: 2px solid var(--cy-primary) !important;
+  padding: 12px 24px 15px 24px !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+  gap: 15px !important;
+}
+
+.skin-cyber.threatlogs .header-actions {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 15px !important;
+}
+
+.skin-cyber.threatlogs h1 {
+  color: var(--cy-primary) !important;
+  text-shadow: 0 0 15px rgba(var(--cy-primary-rgb), 0.6) !important;
+  font-family: var(--font-cyber-mono) !important;
+  letter-spacing: 2px;
+}
+
+.skin-cyber.threatlogs h1::after {
+  content: '_';
+  animation: amber-blink-hud-v7 1s step-end infinite;
+}
+
+@keyframes amber-blink-hud-v7 {
+  50% { opacity: 0; }
+}
+
+/* === HUD SCANLINES overlays === */
+.skin-cyber.threatlogs::before {
+  content: "";
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  background: linear-gradient(rgba(18, 16, 12, 0) 50%, rgba(0, 0, 0, 0.1) 50%),
+              linear-gradient(90deg, rgba(255, 177, 0, 0.03), rgba(255, 200, 0, 0.01), rgba(255, 255, 0, 0.03));
+  background-size: 100% 4px, 3px 100%;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.25;
+}
+
+/* === CRITICAL DEEP RULES (COLOR PROTECTION) === */
+.skin-cyber.threatlogs :deep(.el-input__wrapper),
+.skin-cyber.threatlogs :deep(.el-select__wrapper),
+.skin-cyber.threatlogs :deep(.el-input-number__increase),
+.skin-cyber.threatlogs :deep(.el-input-number__decrease) {
+  background-color: var(--cy-input-bg) !important;
+  box-shadow: 0 0 0 1px var(--cy-border) inset !important;
+  border-radius: 0 !important;
+}
+
+.skin-cyber.threatlogs :deep(.el-input__inner),
+.skin-cyber.threatlogs :deep(.el-select__placeholder) {
+  color: #fff !important;
+  font-family: var(--font-cyber-mono) !important;
+}
+
+.skin-cyber.threatlogs :deep(.el-input__wrapper.is-focus),
+.skin-cyber.threatlogs :deep(.el-select__wrapper.is-focus) {
+  box-shadow: 0 0 0 1px var(--cy-primary) inset, 0 0 10px rgba(var(--cy-primary-rgb), 0.3) !important;
+}
+
+/* === OTHER COMPONENTS === */
+.skin-cyber.threatlogs .filters-container {
+  background: var(--cy-surface) !important;
+  border: 1px solid var(--cy-border) !important;
+  border-left: 5px solid var(--cy-primary) !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6) !important;
+}
+
+.skin-cyber.threatlogs .btn-action {
+  background: transparent !important;
+  border: 1px solid var(--cy-primary) !important;
+  color: var(--cy-primary) !important;
+  border-radius: 0 !important;
+  font-weight: 800;
+  text-transform: uppercase;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.skin-cyber.threatlogs .btn-action:hover {
+  background: var(--cy-primary) !important;
+  color: #000 !important;
+  box-shadow: 0 0 20px var(--cy-primary) !important;
+}
+
+.skin-cyber.threatlogs .cyber-table {
+  background: rgba(10, 8, 5, 0.3) !important;
+  border: 1px solid var(--cy-border) !important;
+}
+
+.skin-cyber.threatlogs .cyber-table th {
+  background: rgba(255, 177, 0, 0.15) !important;
+  color: var(--cy-accent);
+}
+
+.skin-cyber.threatlogs .ip-input {
+  background: var(--cy-input-bg) !important;
+  border: 1px solid var(--cy-border) !important;
+  color: #fff !important;
+  border-radius: 0 !important;
+}
+
+.skin-cyber.threatlogs .ip-input:focus {
+  border-color: var(--cy-primary) !important;
+  box-shadow: 0 0 10px rgba(var(--cy-primary-rgb), 0.3) !important;
+  outline: none !important;
+}
+
+.skin-cyber.threatlogs .info-btn {
+  background: rgba(var(--cy-primary-rgb), 0.1) !important;
+  border: 1px solid var(--cy-border) !important;
+  color: var(--cy-primary) !important;
+  border-radius: 0 !important;
+}
+
+.skin-cyber.threatlogs .info-btn:hover {
+  background: var(--cy-primary) !important;
+  color: #000 !important;
+}
+
+.skin-cyber.threatlogs .url-badge {
+    background: rgba(var(--cy-primary-rgb), 0.05) !important;
+    border: 1px solid var(--cy-border) !important;
+}
+
+.skin-cyber.threatlogs .url-text {
+    color: var(--cy-primary) !important;
+}

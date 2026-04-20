@@ -5,6 +5,21 @@
   min-height: 100vh;
 }
 
+.header-top {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+  gap: 15px !important;
+  margin-bottom: 24px !important;
+}
+
+.header-actions {
+  display: flex !important;
+  align-items: center !important;
+  gap: 15px !important;
+}
+
 /* Pulsante indietro */
 .back-btn {
   background: linear-gradient(135deg, #FFB300, #FF8F00);

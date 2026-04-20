@@ -22,7 +22,7 @@ export function useStats() {
 
   const recalibrateThresholds = (dist: any) => {
     if (!dist) return;
-    
+
     const min = dist.min || 0;
     const max = dist.max || 100;
     const avg = dist.avg || 15;
@@ -55,7 +55,7 @@ export function useStats() {
       const topParam = selectedTop.value === 'all' ? 'all' : parseInt(selectedTop.value as string, 10);
       const data = await fetchStats(selectedTimeframe.value, selectedScore.value, topParam);
       stats.value = data.stats;
-      
+
       if (data.stats?.scoreDistribution) {
         recalibrateThresholds(data.stats.scoreDistribution);
       }

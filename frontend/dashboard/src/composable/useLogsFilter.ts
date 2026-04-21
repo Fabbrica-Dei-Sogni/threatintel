@@ -10,7 +10,8 @@ export function useLogsFilter(
     initialUrl: string = '',
     initialProtocol: string = 'http',
     initialPage: number = 1,
-    initialSortFields: SortFields | null = null
+    initialSortFields: SortFields | null = null,
+    initialPageSize: number = 20
 ) {
     // Filtri specifici
     const filterIp = ref(initialIp);
@@ -33,6 +34,7 @@ export function useLogsFilter(
     } = useSearchBase({
         fetchFn: fetchData,
         initialPage,
+        initialPageSize,
         initialSortFields: initialSortFields ?? { timestamp: -1 },
         filterRefs: [filterIp, filterUrl, filterProtocol]
     });

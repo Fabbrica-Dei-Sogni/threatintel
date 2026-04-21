@@ -18,7 +18,8 @@ export function useAttacksFilter(
     initialFromUnit: string,
     initialToValue: number,
     initialToUnit: string,
-    initialSortFields: SortFields = null
+    initialSortFields: SortFields = null,
+    initialPageSize: number = 20
 ) {
     // Filtri specifici
     const filterIp = ref(initialIp);
@@ -65,6 +66,7 @@ export function useAttacksFilter(
     } = useSearchBase({
         fetchFn: fetchData,
         initialPage,
+        initialPageSize,
         initialSortFields,
         filterRefs
     });

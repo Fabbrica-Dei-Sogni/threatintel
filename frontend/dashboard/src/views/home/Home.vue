@@ -47,14 +47,56 @@
                     :items="recentAttacks"
                     :loading="loadingAttacks"
                     :error="errorAttacks"
-                    defaultLimit="10"
+                    v-model:page="attackPage"
+                    :pageSize="10"
+                    :total="attackTotal"
                     itemStyle="anomalies-ranking"
-                    detailRouteName="AttackDetail"
-                    detailItemKey="request.ip"
-                    detailRouteParam="ip"
                   >
                     <template #header-actions>
                       <ProtocolSelector v-model="selectedAttackProtocol" :options="['http', 'https', 'ssh']" theme="dark" />
+                    </template>
+
+                    <template #filters>
+                      <div class="filters-row">
+                        <!-- Time Range -->
+                        <div class="filter-item">
+                          <span class="filter-label">TIMEFRAME: <span class="active-val">{{ attackTimeValue === null ? 'ALL' : (attackTimeValue + (attackTimeUnit === 'days' ? 'D' : 'H')) }}</span></span>
+                          <div class="tabs-row log-threshold-tabs">
+                            <button 
+                              v-for="opt in [
+                                {v:10, u:'days', l:'10D'}, 
+                                {v:30, u:'days', l:'1M'}, 
+                                {v:90, u:'days', l:'3M'},
+                                {v:180, u:'days', l:'6M'},
+                                {v:365, u:'days', l:'1Y'},
+                                {v:null, u:null, l:'ALL'}
+                              ]" 
+                              :key="opt.l"
+                              class="tab-btn"
+                              :class="{ active: attackTimeValue === opt.v && (opt.v === null || attackTimeUnit === opt.u) }"
+                              @click="attackTimeValue = opt.v; attackTimeUnit = opt.u"
+                            >
+                              {{ opt.l }}
+                            </button>
+                          </div>
+                        </div>
+
+                        <!-- Log Threshold Only -->
+                        <div class="filter-item">
+                          <span class="filter-label">LOG THRESHOLD: <span class="active-val">{{ attackMinLogs }}</span></span>
+                          <div class="tabs-row log-threshold-tabs">
+                            <button 
+                              v-for="val in [3, 5, 10, 20, 40, 50]" 
+                              :key="val"
+                              class="tab-btn"
+                              :class="{ active: attackMinLogs === val }"
+                              @click="attackMinLogs = val"
+                            >
+                              {{ val }}
+                            </button>
+                          </div>
+                        </div>
+                      </div>
                     </template>
 
                     <template #title-meta>
@@ -76,6 +118,13 @@
 
                         <!-- Subject Col -->
                         <div class="item-col item-col-subject">
+                          <router-link 
+                            :to="{ name: 'AttackDetail', params: { ip: item.request.ip } }" 
+                            class="intel-det-btn"
+                            :title="t('common.detail')"
+                          >
+                            DET
+                          </router-link>
                           <span @click="goToIpDetails(item.request.ip)" class="ip-link">{{ item.request.ip }}</span>
                         </div>
                         
@@ -111,9 +160,10 @@
                       :items="recentLogs"
                       :loading="loadingLogs"
                       :error="errorLogs"
-                      defaultLimit="10"
+                      v-model:page="logPage"
+                      :pageSize="10"
+                      :total="logTotal"
                       itemStyle="logs-ranking"
-                      detailRouteName="ThreatLog"
                     >
                       <template #header-actions>
                         <ProtocolSelector v-model="selectedLogProtocol" :options="['http', 'https', 'ssh']" theme="dark" />
@@ -137,6 +187,14 @@
 
                         <!-- Subject Col -->
                         <div class="item-col item-col-subject">
+                          <router-link 
+                            v-if="item.id || item._id"
+                            :to="{ name: 'ThreatLog', params: { id: String(item.id || item._id) } }" 
+                            class="intel-det-btn"
+                            :title="t('common.detail')"
+                          >
+                            DET
+                          </router-link>
                           <span @click="goToIpDetails(item.request.ip)" class="ip-link">{{ item.request.ip }}</span>
                         </div>
                         
@@ -169,10 +227,10 @@
                     :items="recentSessions"
                     :loading="loadingSessions"
                     :error="errorSessions"
-                    defaultLimit="10"
+                    v-model:page="sessionPage"
+                    :pageSize="10"
+                    :total="sessionTotal"
                     itemStyle="sessions-ranking"
-                    detailRouteName="CowrieAttackDetail"
-                    detailItemKey="session"
                   >
                     <template #header-actions>
                       <CowrieCategorySelector v-model="filterCategory" size="mini" />
@@ -194,6 +252,14 @@
 
                         <!-- Subject Col -->
                         <div class="item-col item-col-subject">
+                          <router-link 
+                            v-if="item.session || item.id || item._id"
+                            :to="{ name: 'CowrieAttackDetail', params: { id: String(item.session || item.id || item._id) } }" 
+                            class="intel-det-btn"
+                            :title="t('common.detail')"
+                          >
+                            DET
+                          </router-link>
                           <span @click="goToIpDetails(item.src_ip)" class="ip-link">{{ item.src_ip }}</span>
                         </div>
                         
@@ -367,14 +433,20 @@ const formatAggregatedDurationHome = (session) => {
 
 const selectedAttackProtocol = ref(props.initialAttackProtocol);
 const selectedLogProtocol = ref(props.initialLogProtocol);
+const attackMinLogs = ref(10);
+const attackTimeValue = ref(90);
+const attackTimeUnit = ref('days');
 
-// Anomalie - chiamata base: nessun filtro, prima pagina, ordina per ultimi (limit 50 per classifiche)
+// Anomalie - chiamata base: ora include parametri dinamici per log e tempo
 const {
   attacks,
   loading: loadingAttacks,
   error: errorAttacks,
+  page: attackPage,
+  pageSize: attackPageSize,
+  total: attackTotal,
   fetchData: fetchAttacks
-} = useAttacksFilter('', selectedAttackProtocol, 1, 50, 'ago', 90, 'days', null, 60, 'days', 0, 'days', { firstSeen: -1 })
+} = useAttacksFilter('', selectedAttackProtocol, 1, attackMinLogs, 'ago', attackTimeValue, attackTimeUnit, null, 60, 'days', 0, 'days', { firstSeen: -1 }, 10)
 
 const recentAttacks = computed(() => attacks.value)
 
@@ -382,8 +454,11 @@ const {
   logs,
   loading: loadingLogs,
   error: errorLogs,
+  page: logPage,
+  pageSize: logPageSize,
+  total: logTotal,
   fetchData: fetchLogs
-} = useLogsFilter('', '', selectedLogProtocol, 1, { timestamp: -1 }, 50)
+} = useLogsFilter('', '', selectedLogProtocol, 1, { timestamp: -1 }, 10)
 
 const recentLogs = computed(() => logs.value)
 
@@ -392,8 +467,11 @@ const {
   filterCategory,
   loading: loadingSessions,
   error: errorSessions,
+  page: sessionPage,
+  pageSize: sessionPageSize,
+  total: sessionTotal,
   fetchData: fetchSessions
-} = useCowrieSessions(1, 50, {}, '', props.initialSessionCategory);
+} = useCowrieSessions(1, 10, { starttime: -1 }, '', props.initialSessionCategory);
 
 const recentSessions = computed(() => sessions.value)
 

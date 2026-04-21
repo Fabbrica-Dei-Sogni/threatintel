@@ -11,17 +11,16 @@
       </div>
       
       <div class="header-actions" @click.stop>
-        <!-- Limit Selector (Tabs) -->
-        <div v-if="showLimitSelector" class="limit-tabs">
-          <button 
-            v-for="opt in limitOptions" 
-            :key="opt"
-            class="limit-tab"
-            :class="{ active: internalLimit === opt }"
-            @click="internalLimit = opt"
-          >
-            {{ opt === 'all' ? (t('common.all') || 'ALL') : opt }}
-          </button>
+        <!-- Total Results Indicator -->
+        <div v-if="total > 0" class="header-total">
+          TOTAL: {{ total }}
+        </div>
+
+        <!-- Inline Pagination (Header) -->
+        <div v-if="total > 0 && !isCollapsed" class="mini-pagination">
+          <button class="pag-btn" :disabled="page <= 1" @click="handlePageChange(page - 1)">«</button>
+          <span class="pag-info">{{ page }} / {{ totalPages }}</span>
+          <button class="pag-btn" :disabled="page >= totalPages" @click="handlePageChange(page + 1)">»</button>
         </div>
         
         <!-- Slot for extra actions (ProtocolSelector, etc.) -->
@@ -38,13 +37,18 @@
       </div>
     </transition>
 
+    <!-- Filters Bar Slot -->
+    <div v-if="$slots.filters && !isCollapsed" class="filters-bar">
+      <slot name="filters"></slot>
+    </div>
+
     <!-- List Body -->
     <transition name="collapse">
       <div v-show="!isCollapsed" class="ranking-body">
         <ul class="ranking-list" :class="{ 'has-rank': showRank }">
           <li v-for="(item, index) in displayedItems" :key="getItemKey(item, index)" class="ranking-item">
             <div v-if="showRank" class="rank-indicator" :class="getRankClass(index)">
-              <span class="rank-num">#{{ index + 1 }}</span>
+              <span class="rank-num">#{{ (page - 1) * parseInt(internalLimit) + (index + 1) }}</span>
             </div>
             
             <div class="item-main-content">
@@ -72,6 +76,26 @@
         <div v-if="error" class="ranking-error">
           {{ t('common.errorLoadingData') }}
         </div>
+
+        <!-- Footer Pagination -->
+        <div v-if="total > 0 && !isCollapsed" class="footer-pagination">
+          <div class="pag-controls">
+            <button class="pag-btn large" :disabled="page <= 1" @click="handlePageChange(page - 1)">
+              PREV
+            </button>
+            <div class="page-numbers">
+               <span class="current-page">{{ page }}</span>
+               <span class="separator">/</span>
+               <span class="total-pages">{{ totalPages }}</span>
+            </div>
+            <button class="pag-btn large" :disabled="page >= totalPages" @click="handlePageChange(page + 1)">
+              NEXT
+            </button>
+          </div>
+          <div class="total-indicator">
+            TOTAL: {{ total }}
+          </div>
+        </div>
       </div>
     </transition>
   </div>
@@ -98,13 +122,21 @@ const props = defineProps({
   detailRouteParam: { type: String, default: 'id' },
   detailItemKey: { type: String, default: 'id' },
   emptyText: { type: String, default: '' },
-  showLimitSelector: { type: Boolean, default: true }
+  showLimitSelector: { type: Boolean, default: true },
+  page: { type: Number, default: 1 },
+  total: { type: Number, default: 0 },
+  pageSize: { type: Number, default: 20 }
 });
 
-const emit = defineEmits(['update:limit', 'row-click']);
+const emit = defineEmits(['update:limit', 'update:page', 'row-click']);
 
 const isCollapsed = ref(props.initialCollapsed);
-const internalLimit = ref(props.defaultLimit.toString());
+const internalLimit = ref(props.pageSize.toString());
+
+// Sync internalLimit with pageSize prop
+watch(() => props.pageSize, (newVal) => {
+  internalLimit.value = newVal.toString();
+});
 
 const handleHeaderClick = () => {
   if (props.collapsible) {
@@ -112,7 +144,26 @@ const handleHeaderClick = () => {
   }
 };
 
+const handleLimitChange = (opt) => {
+  internalLimit.value = opt.toString();
+  emit('update:limit', opt === 'all' ? 1000 : parseInt(opt));
+  emit('update:page', 1); // Reset to first page when limit changes
+};
+
+const handlePageChange = (newPage) => {
+  if (newPage < 1 || newPage > totalPages.value) return;
+  emit('update:page', newPage);
+};
+
+const totalPages = computed(() => {
+  if (!props.total || !parseInt(internalLimit.value)) return 1;
+  return Math.ceil(props.total / parseInt(internalLimit.value));
+});
+
 const displayedItems = computed(() => {
+  // If we have total, it means the items are already paginated by the parent
+  if (props.total > 0) return props.items;
+  
   if (internalLimit.value === 'all') return props.items;
   const limit = parseInt(internalLimit.value);
   return props.items.slice(0, limit);
@@ -128,9 +179,10 @@ const getItemKey = (item, index) => {
 };
 
 const getRankClass = (index) => {
-  if (index === 0) return 'gold';
-  if (index === 1) return 'silver';
-  if (index === 2) return 'bronze';
+  const cardinalIndex = (props.page - 1) * parseInt(internalLimit.value) + index;
+  if (cardinalIndex === 0) return 'gold';
+  if (cardinalIndex === 1) return 'silver';
+  if (cardinalIndex === 2) return 'bronze';
   return 'standard';
 };
 
@@ -211,3 +263,5 @@ watch(internalLimit, (newLimit) => {
   transform: translateY(-2px) !important;
 }
 </style>
+
+<style src="./IntelRanking.css"></style>

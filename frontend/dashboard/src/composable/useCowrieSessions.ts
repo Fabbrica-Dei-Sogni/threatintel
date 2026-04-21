@@ -6,7 +6,7 @@ import { useSearchBase } from './useSearchBase';
 
 export function useCowrieSessions(
     initialPage: number = 1,
-    initialLimit: number = 20,
+    initialPageSize: number = 20,
     initialSortFields: any = {},
     initialIp: string = '',
     initialCategory: string = 'interaction'
@@ -31,8 +31,8 @@ export function useCowrieSessions(
     } = useSearchBase({
         fetchFn: fetchData,
         initialPage,
-        initialPageSize: initialLimit,
-        initialSortFields,
+        initialPageSize,
+        initialSortFields: initialSortFields || { starttime: -1 },
         filterRefs: [filterIp, filterCategory]
     });
 

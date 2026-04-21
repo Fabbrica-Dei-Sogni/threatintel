@@ -130,6 +130,7 @@ import CountryFlag from './CountryFlag.vue';
 import DefconIndicator from './DefconIndicator.vue';
 import IntelRanking from './common/IntelRanking.vue';
 import './TelemetryStatsCyber.css';
+import './TelemetryStatsClassic.css';
 
 const { t } = useI18n();
 const {

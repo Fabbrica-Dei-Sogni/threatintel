@@ -118,7 +118,7 @@
     "home": {
         "title": "FORENSIC OPS CONSOLE",
         "dashboard": "Dashboard",
-        "anomalies": "Anomalies",
+        "attacks": "Anomalies",
         "logRequests": "Log Registry",
         "telemetries": "Telemetry",
         "recentAttacks": "Recent anomalies",
@@ -142,7 +142,7 @@
             "targetDiscovery": "Target Discovery: Unusual interest in {path} identified across edge nodes.",
             "generalTrafficAlert": "Traffic Analysis: Detected a peak of {count} suspicious HTTP requests.",
             "rootDirectory": "main entry point",
-            "lastAnomalies": "Recent Detections: Incursions identified from IPs {ips} in the latest sessions.",
+            "lastAttacks": "Recent Detections: Incursions identified from IPs {ips} in the latest sessions.",
             "lastSessions": "Honeypot Activity: New access attempts recorded from {ips}."
         },
         "recentDossiers": "Recent Investigations",
@@ -168,7 +168,7 @@
         "top_countries_title": "Top source countries",
         "top_indicators_title": "Top threat indicators"
     },
-    "anomalies": {
+    "attacks": {
         "title": "HTTP/S SSH Anomalies",
         "dashboard": "Dashboard",
         "logRequests": "Log Registry",
@@ -188,13 +188,13 @@
         "filterByIp": "Filter by IP...",
         "clearIpFilter": "Clear IP filter",
         "copyToFilter": "Copy to IP filter and execute",
-        "noAnomaliesFound": "No anomalies found",
+        "noAttacksFound": "No anomalies found",
         "table": {
             "short": {
                 "origin": "🌍",
                 "defcon": "🚨",
                 "tech": "🛠️",
-                "anomalyer": "👤",
+                "attacker": "👤",
                 "info": "📑",
                 "avg": "📊",
                 "breach": "⚔️",
@@ -205,7 +205,7 @@
                 "last": "🗓️"
             },
             "defcon": "Defcon",
-            "anomalyer": "Anomalyer",
+            "attacker": "Attacker",
             "details": "Details",
             "countryOrg": "Country",
             "techniques": "Techniques",
@@ -215,17 +215,17 @@
             "rateBreach": "Rate breach",
             "rps": "RPS",
             "totalLogs": "Total Logs",
-            "anomalyDuration": "Anomaly Duration",
+            "attackDuration": "Anomaly Duration",
             "firstSeen": "First seen",
             "lastSeen": "Last seen"
         }
     },
-    "anomalyDetail": {
+    "attackDetail": {
         "title": "Anomaly Detail",
         "hudTitle": "TACTICAL HUD",
         "summary": "Anomaly Summary",
-        "backToAnomalies": "Back",
-        "anomalyer": "Anomalyer",
+        "backToAttacks": "Back",
+        "attacker": "Attacker",
         "country": "Country",
         "organization": "Organization",
         "defconLevel": "Defcon Level",
@@ -233,7 +233,7 @@
         "avgScore": "Average score",
         "totalLogs": "Total logs",
         "logsRaggrupati": "Aggregate logs",
-        "anomalyDuration": "Anomaly duration",
+        "attackDuration": "Anomaly duration",
         "firstSeen": "First seen",
         "lastSeen": "Last seen",
         "rps": "RPS",
@@ -241,13 +241,13 @@
         "style": "Style",
         "frequency": "Frequency",
         "rateBreach": "Rate breach",
-        "anomalyProfile": "Anomaly Profile",
+        "attackProfile": "Anomaly Profile",
         "profileTitle": "Anomaly Profile",
         "mapTitle": "Anomaly Map",
         "radarTitle": "Radar Analysis",
         "searchUrlPlaceholder": "Filter by URL..."
     },
-    "anomalyChart": {
+    "attackChart": {
         "title": "Anomalies Analysis Over Time",
         "frequency": "Frequency",
         "severity": "Severity Distribution",
@@ -328,7 +328,7 @@
     "threatLogs": {
         "title": "HTTP/S SSH Log Registry",
         "dashboard": "Dashboard",
-        "anomalies": "Anomalies",
+        "attacks": "Anomalies",
         "filterByIp": "Filter by IP...",
         "filterByUrl": "Filter by URL...",
         "clearIpFilter": "Clear IP filter",
@@ -387,7 +387,7 @@
     },
     "ipDetails": {
         "title": "IP Details",
-        "backToAnomalies": "Back",
+        "backToAttacks": "Back",
         "ipAddress": "IP Address",
         "country": "Country",
         "city": "City",
@@ -396,7 +396,7 @@
         "timezone": "Timezone",
         "location": "Location",
         "additionalInfo": "Additional information",
-        "relatedAnomalies": "Related anomalies",
+        "relatedAttacks": "Related anomalies",
         "relatedLogs": "Related logs",
         "score": "Score",
         "isListed": "Is listed",
@@ -442,7 +442,7 @@
             "breadth": "Breadth",
             "speed": "Speed (RPS)",
             "duration": "Duration",
-            "anomalyProfile": "Anomaly Profile IP",
+            "attackProfile": "Anomaly Profile IP",
             "techniques": "techniques",
             "rps": "RPS",
             "minutes": "min",
@@ -464,7 +464,7 @@
             "ascii": "ASCII"
         },
         "map": {
-            "anomalyer": "Anomalyer",
+            "attacker": "Attacker",
             "target": "Target"
         }
     },
@@ -472,7 +472,7 @@
         "menu": "Menu",
         "menuTitle": "Navigation",
         "dashboard": "Dashboard",
-        "anomalies": "Anomalies",
+        "attacks": "Anomalies",
         "logs": "Log Registry",
         "configuration": "Configuration",
         "settings": "Settings",
@@ -540,12 +540,12 @@
             "filters": {
                 "all": "All Sessions",
                 "scanner": "Scanners",
-                "scannerDesc": "Sessions with 0 events (Scanner Anomalyers)",
+                "scannerDesc": "Sessions with 0 events (Scanner Attackers)",
                 "interaction": "Interactions",
                 "interactionDesc": "Sessions with at least one event recorded"
             }
         },
-        "anomalyDetail": {
+        "attackDetail": {
             "title": "Operation Timeline",
             "subtitle": "Mission Target Session",
             "rawEvents": "Raw Events",
@@ -619,7 +619,7 @@
                 "---------------------------"
             ]
         },
-        "anomalyDetail": {
+        "attackDetail": {
             "summary": [
                 "--- TACTICAL HUD: ANOMALY SUMMARY ---",
                 "Target IP: {ip}",
@@ -630,7 +630,7 @@
                 "- Duration: {duration}",
                 "- Avg RPS: {rps}",
                 "",
-                "[ANOMALY PROFILE]",
+                "[ATTACK PROFILE]",
                 "- Techniques: {techniques}",
                 "- First Seen: {firstSeen}",
                 "- Last Seen: {lastSeen}",
@@ -690,8 +690,8 @@
         },
         "ip": "{ip}",
         "generic": "{text}",
-        "anomalySummary": "ANOMALY SUMMARY:\nIP: {ip}\nDanger: {dangerLevel} ({dangerScore})\nLogs: {totaleLogs}\nDuration: {duration}\nRPS: {rps}",
-        "anomalyTechnique": "Technique Detected: {tech}"
+        "attackSummary": "ANOMALY SUMMARY:\nIP: {ip}\nDanger: {dangerLevel} ({dangerScore})\nLogs: {totaleLogs}\nDuration: {duration}\nRPS: {rps}",
+        "attackTechnique": "Technique Detected: {tech}"
     },
     "dossierRecorder": {
         "institutionalStyle": "Institutional Style",
@@ -763,7 +763,7 @@
     "dossier": {
         "sections": {
             "ip": "IP",
-            "anomaly": "ANOMALY",
+            "attack": "ANOMALY",
             "telnet": "TELNET",
             "session": "SESSION",
             "abuse": "ABUSE",

@@ -30,7 +30,7 @@
               <button @click="toggleWidget('attacks')" :class="{ active: isWidgetActive('attacks') }" class="btn-action">🛰️ {{ t('home.attacks').toUpperCase() }}</button>
               <button @click="toggleWidget('logs')" :class="{ active: isWidgetActive('logs') }" class="btn-action">🗄️ {{ t('home.logRequests').toUpperCase() }}</button>
               <button @click="toggleWidget('sessions')" :class="{ active: isWidgetActive('sessions') }" class="btn-action">📟 {{ t('home.telnet').toUpperCase() }}</button>
-              <button @click="toggleWidget('dossiers')" :class="{ active: isWidgetActive('dossiers') }" class="btn-action">📟 {{ t('home.archive').toUpperCase() }}</button>
+              <button @click="toggleWidget('dossiers')" :class="{ active: isWidgetActive('dossiers') }" class="btn-action">📁 {{ t('home.archive').toUpperCase() }}</button>
             </section>
 
             <transition-group name="widget-dynamic" tag="div" class="widgets-container">
@@ -321,11 +321,10 @@ const {
 } = storeToRefs(viewStore);
 
 function toggleWidget(id) {
-  const index = activeWidgets.value.indexOf(id);
-  if (index > -1) {
-    activeWidgets.value.splice(index, 1);
+  if (activeWidgets.value.includes(id)) {
+    activeWidgets.value = activeWidgets.value.filter(w => w !== id);
   } else {
-    activeWidgets.value.unshift(id);
+    activeWidgets.value = [id, ...activeWidgets.value];
   }
 }
 

@@ -4,6 +4,10 @@
     <div class="widget-header" :class="{ 'clickable-header': collapsible }" @click="handleHeaderClick">
       <div class="title-content">
         <h3>{{ title.toUpperCase() }}</h3>
+        <!-- Slot for meta information (More info links, etc.) -->
+        <div v-if="$slots['title-meta']" class="title-meta">
+          <slot name="title-meta"></slot>
+        </div>
       </div>
       
       <div class="header-actions" @click.stop>
@@ -26,6 +30,13 @@
         <span v-if="collapsible" class="arrow" :class="{ open: !isCollapsed }"></span>
       </div>
     </div>
+
+    <!-- Extra Content Slot (Maps, Charts, etc.) -->
+    <transition name="collapse">
+      <div v-if="$slots['extra-content'] && !isCollapsed" class="extra-content-wrapper">
+        <slot name="extra-content"></slot>
+      </div>
+    </transition>
 
     <!-- List Body -->
     <transition name="collapse">
@@ -141,3 +152,62 @@ watch(internalLimit, (newLimit) => {
 </script>
 
 <style scoped src="./IntelRanking.css"></style>
+
+<style scoped src="./IntelRanking.css"></style>
+
+<style scoped src="./IntelRanking.css"></style>
+
+<!-- Surgical fix for Slot Content (More info button) -->
+<style scoped>
+:deep(.btn-ranking-action) {
+  /* Aligned with Classic .btn-action livery */
+  background: linear-gradient(135deg, #1E3799, #0C2461);
+  color: #E0E7FF;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 8px 20px; /* Aligned with .btn-action */
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-flex;
+  align-items: center;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-top: 10px;
+  box-shadow: 0 4px 15px rgba(12, 36, 97, 0.6);
+  border: none;
+}
+
+:deep(.btn-ranking-action:hover) {
+  background: linear-gradient(135deg, #4A69BD, #1E3799);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(74, 105, 189, 0.4);
+}
+</style>
+
+<!-- Global/External scoping for Skin-Aware buttons -->
+<style>
+.skin-cyber .btn-ranking-action {
+  background: transparent !important;
+  color: #00ffff !important;
+  border: 1px solid #00ffff !important;
+  padding: 10px 22px !important;
+  border-radius: 0 !important;
+  font-weight: 800 !important;
+  font-family: var(--font-cyber) !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1px !important;
+  cursor: pointer;
+  transition: all 0.2s ease !important;
+  box-shadow: none !important;
+  margin-top: 10px;
+}
+
+.skin-cyber .btn-ranking-action:hover {
+  background: #00ffff !important;
+  color: #0a0e17 !important;
+  box-shadow: 0 0 20px #00ffff !important;
+  transform: translateY(-2px) !important;
+}
+</style>

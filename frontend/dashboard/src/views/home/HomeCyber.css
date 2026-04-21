@@ -418,7 +418,8 @@
   transition: all 0.2s ease !important;
 }
 
-.skin-cyber .btn-action:hover {
+.skin-cyber .btn-action:hover,
+.skin-cyber .btn-action.active {
   background: var(--neon-cyan) !important;
   color: var(--cyber-bg) !important;
   box-shadow: 0 0 20px var(--neon-cyan) !important;

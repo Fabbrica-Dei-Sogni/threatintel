@@ -86,7 +86,8 @@ h1 {
   box-shadow: 0 4px 15px rgba(12, 36, 97, 0.6);
 }
 
-.btn-action:hover {
+.btn-action:hover,
+.btn-action.active {
   background: linear-gradient(135deg, #4A69BD, #1E3799);
   box-shadow: 0 6px 20px rgba(74, 105, 189, 0.4);
   transform: translateY(-1px);
@@ -190,21 +191,22 @@ h1 {
   backdrop-filter: blur(10px);
 }
 
-/* Primary Intel */
-.primary-intel {
-  display: flex;
-  gap: 30px;
-  min-height: 400px;
+/* Primary Intel & Modular Containers */
+.intel-ranking-container {
+  width: 100%;
+  margin-bottom: 25px;
 }
 
-.map-side {
-  flex: 1.2;
+.secondary-intel {
+  margin-top: 25px;
   display: flex;
   flex-direction: column;
+  gap: 20px;
 }
 
+/* Removed legacy side-by-side flex layout */
 .list-side {
-  flex: 1;
+  width: 100%;
   display: flex;
   flex-direction: column;
   min-width: 0;

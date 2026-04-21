@@ -6,7 +6,7 @@
         <h3>{{ t('telemetry.title') }}</h3>
       </div>
       <div class="header-right">
-        <button class="reset-btn" @click="resetFilters">
+        <button class="reset-btn" @click="handleReset">
           <i class="el-icon-refresh"></i>
           <span>{{ t('telemetry.reset_filters') }}</span>
         </button>
@@ -67,35 +67,15 @@
       -->
     </div>
 
-    <!-- Top Ranking Filter (Moved into rankings or handled by IntelRanking) -->
-    <!-- The user wanted one row of tabs similar to telemetry, but since we have a generic component, 
-         we can either keep the global filter or use the individual ones. 
-         For Telemetry, the global filter makes sense because it affects both lists at once. -->
-    <div class="ranking-filter-row">
-      <div class="filter-group">
-        <span class="group-label">{{ t('telemetry.top_ranking') }}</span>
-        <div class="tabs-row">
-          <button 
-            v-for="top in ['5', '10', '20', 'all']" 
-            :key="top"
-            class="tab-btn"
-            :class="{ active: selectedTop === top }"
-            @click="setTop(top)"
-          >
-            {{ top.toUpperCase() }}
-          </button>
-        </div>
-      </div>
-    </div>
+    <!-- Top Ranking Filter removed - now handled individually by IntelRanking -->
 
     <!-- Data Lists (Countries & Indicators) -->
     <div v-if="stats" class="data-lists-row">
       <IntelRanking
-        :title="t('telemetry.top_countries', { count: selectedTop })"
+        :title="t('telemetry.top_countries_title')"
         :items="topCountriesList"
         :loading="loading"
         :error="error"
-        :showLimitSelector="false"
         :collapsible="false"
         itemStyle="telemetry-ranking"
       >
@@ -115,11 +95,10 @@
       </IntelRanking>
 
       <IntelRanking
-        :title="t('telemetry.top_indicators', { count: selectedTop })"
+        :title="t('telemetry.top_indicators_title')"
         :items="topIndicatorsList"
         :loading="loading"
         :error="error"
-        :showLimitSelector="false"
         :collapsible="false"
         itemStyle="telemetry-ranking"
       >
@@ -170,8 +149,14 @@ const {
 } = useStats();
 
 onMounted(() => {
-  loadStats();
+  // We fetch 'all' stats to allow local filtering via IntelRanking components
+  setTop('all');
 });
+
+const handleReset = () => {
+  resetFilters();
+  setTop('all');
+};
 
 // Convert objects to arrays for IntelRanking
 const topCountriesList = computed(() => {

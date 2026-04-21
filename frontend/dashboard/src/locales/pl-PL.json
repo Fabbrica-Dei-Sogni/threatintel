@@ -88,7 +88,9 @@
         "dossierPreviewTitle": "PODGLĄD DOSSIER ŚLEDCZEGO",
         "dossierFormatA4": "FORMAT: A4 (ISO 216)",
         "dossierZoom": "POWIĘKSZENIE (ZOOM)",
-        "logout": "Wyloguj"
+        "logout": "Wyloguj",
+        "auth_required_title": "WYMAGANE UPRAWNIENIA",
+        "auth_required_desc": "Akta dochodzeniowe i raporty kryminalistyczne są dostępne wyłącznie dla zidentyfikowanych operatorów."
     },
     "skin": {
         "classic": "Klasyczny",

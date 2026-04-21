@@ -88,7 +88,9 @@
         "dossierPreviewTitle": "APERÇU DU DOSSIER D'INVESTIGATION",
         "dossierFormatA4": "FORMAT : A4 (ISO 216)",
         "dossierZoom": "ZOOM",
-        "logout": "Déconnexion"
+        "logout": "Déconnexion",
+        "auth_required_title": "ACCÈS RÉSERVÉ",
+        "auth_required_desc": "Les dossiers d'investigation et les rapports médico-légaux sont réservés aux analystes identifiés."
     },
     "skin": {
         "classic": "Classique",

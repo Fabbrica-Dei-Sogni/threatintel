@@ -1,7 +1,8 @@
 import express from 'express';
 import { DossierController } from '../controllers/DossierController';
+import { AuthMiddleware } from '../middlewares/AuthMiddleware';
 
-export default (controller: DossierController) => {
+export default (controller: DossierController, authMiddleware: AuthMiddleware) => {
     const router = express.Router();
 
     /**
@@ -14,7 +15,7 @@ export default (controller: DossierController) => {
      *       200:
      *         description: Elenco dossier.
      */
-    router.get('/api/dossiers', (req, res) => controller.list(req, res));
+    router.get('/api/dossiers', authMiddleware.isIdentified(), (req, res) => controller.list(req, res));
 
     /**
      * @openapi
@@ -32,7 +33,7 @@ export default (controller: DossierController) => {
      *       200:
      *         description: Dettaglio dossier.
      */
-    router.get('/api/dossiers/:id', (req, res) => controller.getById(req, res));
+    router.get('/api/dossiers/:id', authMiddleware.isIdentified(), (req, res) => controller.getById(req, res));
 
     /**
      * @openapi
@@ -50,7 +51,7 @@ export default (controller: DossierController) => {
      *       201:
      *         description: Dossier creato.
      */
-    router.post('/api/dossiers', (req, res) => controller.create(req, res));
+    router.post('/api/dossiers', authMiddleware.isIdentified(), (req, res) => controller.create(req, res));
 
     /**
      * @openapi
@@ -68,7 +69,7 @@ export default (controller: DossierController) => {
      *       200:
      *         description: Dossier aggiornato.
      */
-    router.patch('/api/dossiers/:id', (req, res) => controller.update(req, res));
+    router.patch('/api/dossiers/:id', authMiddleware.isIdentified(), (req, res) => controller.update(req, res));
 
     /**
      * @openapi
@@ -86,7 +87,7 @@ export default (controller: DossierController) => {
      *       200:
      *         description: Dossier eliminato.
      */
-    router.delete('/api/dossiers/:id', (req, res) => controller.delete(req, res));
+    router.delete('/api/dossiers/:id', authMiddleware.isIdentified(), (req, res) => controller.delete(req, res));
 
     /**
      * @openapi
@@ -104,7 +105,7 @@ export default (controller: DossierController) => {
      *       200:
      *         description: File esportato con successo.
      */
-    router.get('/api/dossiers/:id/export', (req, res) => controller.export(req, res));
+    router.get('/api/dossiers/:id/export', authMiddleware.isIdentified(), (req, res) => controller.export(req, res));
 
     return router;
 };

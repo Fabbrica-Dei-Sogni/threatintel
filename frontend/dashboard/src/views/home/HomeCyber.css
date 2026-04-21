@@ -595,3 +595,20 @@
     transform: translateY(0) scale(1);
   }
 }
+/* Restricted Intelligence Gate - Cyber override */
+.skin-cyber .restricted-intelligence-gate {
+  background: rgba(0, 0, 0, 0.6) !important;
+  border: 1px solid var(--neon-cyan) !important;
+  border-radius: 0 !important;
+  box-shadow: inset 0 0 15px rgba(0, 255, 255, 0.1) !important;
+}
+
+.skin-cyber .restricted-intelligence-gate h4 {
+  color: var(--neon-cyan) !important;
+  text-shadow: 0 0 10px var(--neon-cyan);
+  font-family: var(--font-cyber) !important;
+}
+
+.skin-cyber .lock-icon {
+  filter: drop-shadow(0 0 12px var(--neon-cyan));
+}

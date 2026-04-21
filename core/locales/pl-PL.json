@@ -337,7 +337,8 @@
             "tokenMissing": "Odmowa dostępu: brak tokenu",
             "tokenInvalid": "Nieprawidłowy lub wygasły token",
             "forbidden": "Brak autoryzacji",
-            "insufficientPermissions": "Brak autoryzacji: niewystarczające uprawnienia (wymagany ADMIN)"
+            "insufficientPermissions": "Brak autoryzacji: niewystarczające uprawnienia (wymagany ADMIN)",
+            "requiresIdentification": "Wymagana identyfikacja: anonimowy dostęp do tego zasobu nie jest dozwolony."
         },
         "system": {
             "generic": "Wystąpił błąd systemu",

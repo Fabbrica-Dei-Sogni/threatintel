@@ -245,7 +245,9 @@
                         <h3>{{ $t('home.recentDossiers').toUpperCase() }}</h3>
                       </div>
                     </div>
-                    <ul class="scroll-list">
+
+                    <!-- Authenticated View -->
+                    <ul v-if="authStore.isAuthenticated" class="scroll-list">
                       <li v-for="dossier in recentDossiers" :key="dossier._id" class="dossier-item">
                         <div class="indicator-group" :data-url-tooltip="`Dossier: ${dossier.title}\nID: ${dossier._id}`">
                             <span class="status-dot-mini" :class="dossier.status.toLowerCase()"></span>
@@ -257,10 +259,10 @@
                             <span class="timestamp-mini">{{ formatDateTime(dossier.createdAt) }}</span>
                         </div>
                       </li>
-                      <li v-if="recentDossiers.length === 0 && !loadingDossiers" class="no-data">
-                        {{ $t('common.noDataFound') }}
-                      </li>
                     </ul>
+
+                    <!-- Restricted View (Anonymous) -->
+                    <RestrictedIntelligenceGate v-else />
                     <div v-if="loadingDossiers" class="loading">{{ $t('home.loadingDossiers') }}</div>
                     <div v-if="errorDossiers" class="error">{{ $t('home.errorLoadingDossiers') }}</div>
                   </div>
@@ -296,6 +298,7 @@ import ProtocolSelector from '../../components/common/ProtocolSelector.vue';
 import ViewToggle from '../../components/common/ViewToggle.vue';
 import DefconIndicator from '../../components/DefconIndicator.vue';
 import TelemetryStats from '../../components/TelemetryStats.vue';
+import RestrictedIntelligenceGate from '../../components/common/RestrictedIntelligenceGate.vue';
 import CowrieCategorySelector from '../../components/common/CowrieCategorySelector.vue';
 import IntelRanking from '../../components/common/IntelRanking.vue';
 import { formatDateTime, formatDateOnly, formatTimeOnly, formatHumanDuration, formatFullDateTime } from '../../utils/dateUtils';
@@ -430,6 +433,8 @@ const loadingDossiers = ref(false);
 const errorDossiers = ref(false);
 
 const fetchRecentDossiers = async () => {
+  if (!authStore.isAuthenticated) return;
+  
   loadingDossiers.value = true;
   errorDossiers.value = false;
   try {

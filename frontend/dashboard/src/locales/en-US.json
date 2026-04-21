@@ -88,7 +88,9 @@
         "dossierPreviewTitle": "INVESTIGATIVE DOSSIER PREVIEW",
         "dossierFormatA4": "FORMAT: A4 (ISO 216)",
         "dossierZoom": "ZOOM",
-        "logout": "Logout"
+        "logout": "Logout",
+        "auth_required_title": "SECURITY CLEARANCE REQUIRED",
+        "auth_required_desc": "Forensic investigation dossiers and reports are restricted to identified operators."
     },
     "skin": {
         "classic": "Classic",

@@ -2,7 +2,8 @@
   <div class="ip-details">
     <div class="header-top">
       <button @click="goBack" class="back-btn">← {{ t('ipDetails.backToAttacks').toUpperCase() }}</button>
-      <button v-if="authStore.isAuthenticated" @click="forzaArricchimento" :disabled="loadingEnrich" class="refresh-btn">
+      <button v-if="authStore.isAuthenticated" @click="forzaArricchimento" :disabled="loadingEnrich"
+        class="refresh-btn">
         <span v-if="loadingEnrich" class="spinner"></span>
         {{ (loadingEnrich ? t('common.loading') : t('ipDetails.forceRefresh')).toUpperCase() }}
       </button>
@@ -93,7 +94,8 @@
       <div class="forensic-briefing briefing-abuse"
         :class="{ 'high-risk': ipInfo.abuseipdbId?.abuseConfidenceScore > 50 }">
         <div class="briefing-header" @click="toggles.abuse = !toggles.abuse">
-          <span class="briefing-icon animated-icon pulse-alarm">🚨</span> {{ t('ipDetails.abuseReportingTitle').toUpperCase() }}
+          <span class="briefing-icon animated-icon pulse-alarm">🚨</span> {{
+            t('ipDetails.abuseReportingTitle').toUpperCase() }}
           <div class="header-actions">
             <span class="copy-log-btn" @click.stop="copyAbuseSummary()" :title="t('common.copy')">📋</span>
             <span class="arrow" :class="{ open: toggles.abuse }"></span>
@@ -162,62 +164,85 @@
       <div class="section abuse-reports-section" v-if="reports.length >= 0">
         <div class="section-header" @click="toggles.reports = !toggles.reports">
           <h2><span class="animated-icon pulse-cobalt">🕵️</span> {{ t('ipDetails.abuseInvestigationLogs').toUpperCase()
-          }}
+            }}
           </h2>
           <span class="arrow" :class="{ open: toggles.reports }"></span>
         </div>
         <transition name="collapse">
           <div v-if="toggles.reports" class="section-body">
-            <div class="reports-controls" v-if="authStore.isAuthenticated">
-              <button @click="aggiornaReports" :disabled="loadingReports" class="update-btn">
-                <span v-if="loadingReports" class="spinner-small"></span>
-                {{ loadingReports ? t('common.loading') : t('ipDetails.syncAbuseReports') }}
-              </button>
-            </div>
 
-            <section v-if="errorReports" class="error-msg">{{ t('common.error') }}</section>
+            <!-- Authenticated View -->
+            <div v-if="authStore.isAuthenticated">
+              <div class="reports-controls">
+                <button @click="aggiornaReports" :disabled="loadingReports" class="update-btn">
+                  <span v-if="loadingReports" class="spinner-small"></span>
+                  {{ loadingReports ? t('common.loading') : t('ipDetails.syncAbuseReports') }}
+                </button>
+              </div>
 
-            <div class="reports-container">
-              <div v-for="report in paginatedReports" :key="report._id" class="report-card"
-                :class="{ expanded: expandedReports[report._id] }">
-                <div class="report-header" @click="toggleReport(report._id)">
-                  <div class="report-meta">
-                    <div class="report-date">
-                      <span class="t-hour">{{ formatDateTime(report.reportedAt) }}</span>
+              <section v-if="errorReports" class="error-msg">{{ t('common.error') }}</section>
+
+              <div class="reports-container">
+                <div v-for="report in paginatedReports" :key="report._id" class="report-card"
+                  :class="{ expanded: expandedReports[report._id] }">
+                  <div class="report-header" @click="toggleReport(report._id)">
+                    <div class="report-meta">
+                      <div class="report-date">
+                        <span class="t-hour">{{ formatDateTime(report.reportedAt) }}</span>
+                      </div>
+                      <div class="report-categories">
+                        <span v-for="cat in report.categories" :key="cat.id" class="cat-badge">{{ cat.name }}</span>
+                      </div>
                     </div>
-                    <div class="report-categories">
-                      <span v-for="cat in report.categories" :key="cat.id" class="cat-badge">{{ cat.name }}</span>
-                    </div>
+                    <span class="report-arrow">⌄</span>
                   </div>
-                  <span class="report-arrow">⌄</span>
+                  <transition name="collapse">
+                    <div v-if="expandedReports[report._id]" class="report-content">
+                      <div class="report-sub-header">
+                        <span class="reporter-info">
+                          <strong>{{ t('ipDetails.reporterCountryCode') }}:</strong> {{ report.reporterCountryCode ||
+                            t('common.notAvailable') }}
+                        </span>
+                        <span class="copy-log-btn" @click.stop="copyLogReport(report)"
+                          :title="t('common.copyComment')">📋</span>
+                      </div>
+                      <div class="report-comment-box">
+                        {{ report.comment }}
+                      </div>
+                    </div>
+                  </transition>
                 </div>
-                <transition name="collapse">
-                  <div v-if="expandedReports[report._id]" class="report-content">
-                    <div class="report-sub-header">
-                      <span class="reporter-info">
-                        <strong>{{ t('ipDetails.reporterCountryCode') }}:</strong> {{ report.reporterCountryCode ||
-                          t('common.notAvailable') }}
-                      </span>
-                      <span class="copy-log-btn" @click.stop="copyLogReport(report)"
-                        :title="t('common.copyComment')">📋</span>
-                    </div>
-                    <div class="report-comment-box">
-                      {{ report.comment }}
-                    </div>
-                  </div>
-                </transition>
+              </div>
+
+              <div class="pagination-container" v-if="reports.length > reportsMeta.pageSize">
+                <el-pagination background :layout="paginationLayout" :total="reportsMeta.total"
+                  :page-size="reportsMeta.pageSize" :current-page="reportsMeta.page" :pager-count="isMobile ? 3 : 7"
+                  @current-change="handleReportsPageChange" class="cyber-pagination">
+                  <template #default v-if="isMobile">
+                    <span class="mobile-pagination-info">{{ reportsMeta.page }} / {{ Math.ceil(reportsMeta.total /
+                      reportsMeta.pageSize) }}</span>
+                  </template>
+                </el-pagination>
               </div>
             </div>
 
-            <div class="pagination-container" v-if="reports.length > reportsMeta.pageSize">
-              <el-pagination background :layout="paginationLayout" :total="reportsMeta.total"
-                :page-size="reportsMeta.pageSize" :current-page="reportsMeta.page" :pager-count="isMobile ? 3 : 7"
-                @current-change="handleReportsPageChange" class="cyber-pagination">
-                <template #default v-if="isMobile">
-                  <span class="mobile-pagination-info">{{ reportsMeta.page }} / {{ Math.ceil(reportsMeta.total /
-                    reportsMeta.pageSize) }}</span>
-                </template>
-              </el-pagination>
+            <!-- Restricted View (Simple button trigger for the security gate modal) -->
+            <div v-else class="reports-controls" style="text-align: center; padding: 20px;">
+              <button @click="showGateReports = true" class="update-btn locked" style="border-style: dashed; opacity: 0.7; color: #94a3b8;">
+                <span class="icon" style="margin-right: 8px;">🔒</span>
+                {{ t('common.auth_required_title') }}
+              </button>
+
+              <el-dialog
+                v-model="showGateReports"
+                :title="t('common.auth_required_title')"
+                width="400px"
+                :custom-class="'cyber-dialog skin-' + dashboardSkin"
+                destroy-on-close
+                append-to-body
+              >
+                <RestrictedIntelligenceGate mode="compact" />
+              </el-dialog>
             </div>
           </div>
         </transition>
@@ -296,7 +321,7 @@
       <div class="section whois-section">
         <div class="section-header" @click="toggles.honeypot = !toggles.honeypot">
           <h2><span class="animated-icon pulse-cobalt">🔎</span> {{ t('ipDetails.fullWhois').toUpperCase()
-          }}</h2>
+            }}</h2>
           <div class="header-actions">
             <span class="copy-log-btn" @click.stop="copyWhoisRaw()" :title="t('common.copy')">📋</span>
             <span class="arrow" :class="{ open: toggles.honeypot }"></span>
@@ -335,6 +360,7 @@ import { useI18n } from 'vue-i18n'
 import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
 import CountryFlag from '../../components/CountryFlag.vue';
 import ReportActions from '../../components/ReportActions.vue';
+import RestrictedIntelligenceGate from '../../components/common/RestrictedIntelligenceGate.vue';
 import { ElMessage } from 'element-plus';
 import { useClipboard } from '../../composable/useClipboard';
 import { useAuthStore } from '../../stores/auth';
@@ -356,6 +382,8 @@ const ipInfo = ref(null)
 const loading = ref(false)
 const loadingEnrich = ref(false)
 const error = ref(false)
+
+const showGateReports = ref(false)
 
 const copiedIds = reactive({});
 const copiedIp = ref(false);
@@ -617,7 +645,7 @@ const copyWhoisRaw = () => {
 
 const copyLogReport = (report) => {
   if (!report) return;
-  
+
   // Prepariamo i dati per il template i18n e il frammento PDF
   const data = {
     date: formatFullDateTime(report.reportedAt),

@@ -1,42 +1,70 @@
 <template>
   <div class="report-actions-wrapper">
-    <BaseDossierHUD
-      :mode="mode"
-      :accentColor="accentColor"
-      :loadingPdf="loadingPdf"
-      :loadingHtml="loadingHtml"
-      :htmlContent="htmlContent"
-      :showPreview="showPreview"
-      :currentStyle="currentStyle"
-      :title="t('home.title')"
-      @action="handleHUDAction"
-      @closePreview="closePreview"
-    >
-      <template #trigger="{ toggle, isOpen }">
-        <!-- MODE: STICKY -->
-        <div v-if="mode === 'sticky'" 
-          class="sticky-report-tab" 
-          :class="{ 'is-loading': loadingPdf || loadingHtml, 'recorder-active': dossierStore.isEnabled && dossierStore.sections.length > 0 }"
-        >
-          <div class="tab-trigger" @click="toggle">
-            <span v-if="loadingPdf || loadingHtml" class="spinner-small"></span>
-            <span v-else class="tab-icon">📊</span>
-            <span class="tab-text">{{ t('common.generateReport').toUpperCase() }}</span>
+    <Teleport to="body" :disabled="mode !== 'sticky'">
+      <BaseDossierHUD
+        v-if="authStore.isAuthenticated"
+        :mode="mode"
+        :accentColor="accentColor"
+        :loadingPdf="loadingPdf"
+        :loadingHtml="loadingHtml"
+        :htmlContent="htmlContent"
+        :showPreview="showPreview"
+        :currentStyle="currentStyle"
+        :title="t('home.title')"
+        @action="handleHUDAction"
+        @closePreview="closePreview"
+      >
+        <template #trigger="{ toggle, isOpen }">
+          <!-- MODE: STICKY -->
+          <div v-if="mode === 'sticky'" 
+            class="sticky-report-tab" 
+            :class="{ 'is-loading': loadingPdf || loadingHtml, 'recorder-active': dossierStore.isEnabled && dossierStore.sections.length > 0 }"
+          >
+            <div class="tab-trigger" @click="toggle">
+              <span v-if="loadingPdf || loadingHtml" class="spinner-small"></span>
+              <span v-else class="tab-icon">📊</span>
+              <span class="tab-text">{{ t('common.generateReport').toUpperCase() }}</span>
+            </div>
           </div>
-        </div>
 
-        <!-- MODE: BUTTON -->
-        <div v-else class="button-report-container">
-          <button @click="toggle" class="cyber-report-btn" :class="{ 'is-active': isOpen }">
-            <span v-if="loadingPdf || loadingHtml" class="spinner-small"></span>
-            <span v-else class="btn-content">
-              <span class="icon">📊</span>
-              {{ t('home.dashboard').toUpperCase() }}
-            </span>
-          </button>
+          <!-- MODE: BUTTON -->
+          <div v-else class="button-report-container">
+            <button @click="toggle" class="cyber-report-btn" :class="{ 'is-active': isOpen }">
+              <span v-if="loadingPdf || loadingHtml" class="spinner-small"></span>
+              <span v-else class="btn-content">
+                <span class="icon">📊</span>
+                {{ t('home.dashboard').toUpperCase() }}
+              </span>
+            </button>
+          </div>
+        </template>
+      </BaseDossierHUD>
+
+      <!-- Gated View for Anonymous -->
+      <div v-else class="report-actions-gated" :class="mode">
+        <div v-if="mode === 'sticky'" class="sticky-report-tab locked" @click="showGate = true">
+            <div class="tab-trigger">
+              <span class="tab-icon">🔒</span>
+              <span class="tab-text">{{ t('common.auth_required_title').split(' ')[0] }}...</span>
+            </div>
         </div>
-      </template>
-    </BaseDossierHUD>
+        <button v-else @click="showGate = true" class="cyber-report-btn locked">
+          <span class="icon">🔒</span>
+          {{ t('common.auth_required_title') }}
+        </button>
+
+        <el-dialog
+          v-model="showGate"
+          :title="t('common.auth_required_title')"
+          width="400px"
+          :custom-class="'cyber-dialog skin-' + viewStore.dashboardSkin"
+          destroy-on-close
+          append-to-body
+        >
+          <RestrictedIntelligenceGate mode="compact" />
+        </el-dialog>
+      </div>
+    </Teleport>
   </div>
 </template>
 
@@ -46,10 +74,17 @@ import { useI18n } from 'vue-i18n';
 import { fetchReport } from '../api';
 import { ElMessage } from 'element-plus';
 import { useDossierStore } from '../stores/dossier';
+import { useAuthStore } from '../stores/auth';
 import BaseDossierHUD from './BaseDossierHUD.vue';
+import RestrictedIntelligenceGate from './common/RestrictedIntelligenceGate.vue';
+import { useViewSettingsStore } from '../stores/viewSettings';
 
 const { t, locale } = useI18n();
 const dossierStore = useDossierStore();
+const authStore = useAuthStore();
+const viewStore = useViewSettingsStore();
+
+const showGate = ref(false);
 
 const props = defineProps({
   type: String, // 'attack' | 'ip' | 'telnet'
@@ -226,5 +261,58 @@ const handleDownload = async (style) => {
 @media (max-width: 768px) {
   .sticky-report-tab { top: 18vh; }
   .cyber-report-btn { padding: 8px 16px; font-size: 0.75rem; }
+}
+
+/* Locked State Overrides */
+.cyber-report-btn.locked {
+  border-style: dashed;
+  opacity: 0.7;
+  color: #94a3b8;
+}
+
+.cyber-report-btn.locked:hover {
+  border-color: #f87171;
+  box-shadow: 0 0 15px rgba(248, 113, 113, 0.3);
+  color: #ef4444;
+}
+
+.sticky-report-tab.locked .tab-trigger {
+  border-style: dashed;
+  color: #94a3b8;
+  opacity: 0.8;
+}
+
+.sticky-report-tab.locked .tab-trigger:hover {
+  background: rgba(248, 113, 113, 0.1);
+  color: #f87171;
+  border-color: #f87171;
+}
+</style>
+
+<style>
+/* Global Dialog Overrides for Cyber Skin */
+.cyber-dialog {
+  background: #1e293b !important;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.cyber-dialog.skin-cyber {
+  background: #0d0505 !important;
+  border: 1px solid #ff4d4d !important;
+}
+
+.cyber-dialog .el-dialog__title {
+  color: #5FA5FF !important;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.cyber-dialog.skin-cyber .el-dialog__title {
+  color: #ff4d4d !important;
+  text-shadow: 0 0 10px rgba(255, 77, 77, 0.5);
+}
+
+.cyber-dialog .el-dialog__headerbtn .el-dialog__close {
+  color: #94a3b8 !important;
 }
 </style>

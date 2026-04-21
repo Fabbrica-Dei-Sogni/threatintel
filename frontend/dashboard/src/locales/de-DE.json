@@ -88,7 +88,9 @@
         "dossierPreviewTitle": "VORSCHAU DER INVESTIGATIVEN DOSSIERS",
         "dossierFormatA4": "FORMAT: A4 (ISO 216)",
         "dossierZoom": "ZOOM",
-        "logout": "Logout"
+        "logout": "Logout",
+        "auth_required_title": "SICHERHEITSFREIGABE ERFORDERLICH",
+        "auth_required_desc": "Forensische Untersuchungsdossiers und Berichte sind auf identifizierte Bediener beschränkt."
     },
     "skin": {
         "classic": "Klassisch",

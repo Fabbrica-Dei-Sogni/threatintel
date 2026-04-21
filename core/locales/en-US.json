@@ -343,7 +343,8 @@
             "tokenMissing": "Access denied: token missing",
             "tokenInvalid": "Invalid or expired token",
             "forbidden": "Authorization denied",
-            "insufficientPermissions": "Authorization denied: insufficient permissions (ADMIN required)"
+            "insufficientPermissions": "Authorization denied: insufficient permissions (ADMIN required)",
+            "requiresIdentification": "Identification required: anonymous access is not allowed for this resource."
         },
         "system": {
             "generic": "A system error occurred",

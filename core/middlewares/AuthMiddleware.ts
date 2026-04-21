@@ -98,4 +98,22 @@ export class AuthMiddleware {
             }
         };
     }
+
+    // Verifica che l'utente sia autenticato REALE (non anonimo)
+    // Utile per sezioni sensibili come Dossier e Report
+    public isIdentified() {
+        return async (req: Request, res: Response, next: NextFunction) => {
+            // Prima eseguiamo l'isathentication standard per popolare req.user
+            await this.isAuthenticated()(req, res, async () => {
+                const user = (req as any).user;
+                if (!user || user._id === 'anonymous') {
+                    const locale = this.getLocale(req);
+                    const message = this.i18n.t('errors.auth.requiresIdentification', locale);
+                    this.logger.warn(`[AuthMiddleware] Accesso negato: richiesta identificazione reale.`);
+                    return res.status(403).json({ message });
+                }
+                next();
+            });
+        };
+    }
 }

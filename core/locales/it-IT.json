@@ -342,7 +342,8 @@
             "tokenMissing": "Accesso negato: token mancante",
             "tokenInvalid": "Token non valido o scaduto",
             "forbidden": "Autorizzazione negata",
-            "insufficientPermissions": "Autorizzazione negata: permessi insufficienti (ADMIN richiesto)"
+            "insufficientPermissions": "Autorizzazione negata: permessi insufficienti (ADMIN richiesto)",
+            "requiresIdentification": "Identificazione richiesta: l'accesso anonimo non è consentito per questa risorsa."
         },
         "system": {
             "generic": "Si è verificato un errore di sistema",

@@ -1207,3 +1207,104 @@ h1 {
     justify-content: center;
   }
 }
+/* Restricted Forensic Trigger Styles */
+.restricted-forensic-trigger {
+  background: rgba(15, 23, 42, 0.4);
+  border: 1px dashed rgba(99, 102, 241, 0.3);
+  border-radius: 12px;
+  padding: 40px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.restricted-forensic-trigger:hover {
+  background: rgba(99, 102, 241, 0.05);
+  border-color: #6366f1;
+  border-style: solid;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+.trigger-top {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.lock-anim {
+  font-size: 2.2rem;
+  animation: gate-pulse 2s infinite ease-in-out;
+  filter: drop-shadow(0 0 10px rgba(99, 102, 241, 0.5));
+}
+
+.restricted-forensic-trigger h3 {
+  color: #818cf8;
+  margin: 0;
+  font-size: 1.1rem;
+  letter-spacing: 2px;
+  font-weight: 800;
+}
+
+.restricted-forensic-trigger p {
+  color: #94a3b8;
+  font-size: 0.85rem;
+  max-width: 400px;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.btn-unlock-hud {
+  margin-top: 10px;
+  background: rgba(99, 102, 241, 0.1);
+  color: #818cf8;
+  border: 1px solid #6366f1;
+  padding: 8px 24px;
+  border-radius: 4px;
+  font-weight: 900;
+  font-size: 0.75rem;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.restricted-forensic-trigger:hover .btn-unlock-hud {
+  background: #6366f1;
+  color: white;
+  box-shadow: 0 0 15px #6366f1;
+}
+
+/* CYBER SKIN OVERRIDES for IP Details Trigger */
+.skin-cyber .restricted-forensic-trigger {
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid #ff4d4d;
+  border-style: dashed;
+  border-radius: 0;
+}
+
+.skin-cyber .restricted-forensic-trigger h3 {
+  color: #ff4d4d;
+  text-shadow: 0 0 10px rgba(255, 77, 77, 0.5);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.skin-cyber .restricted-forensic-trigger .lock-anim {
+  filter: drop-shadow(0 0 12px #ff4d4d);
+}
+
+.skin-cyber .btn-unlock-hud {
+  background: transparent;
+  border-color: #ff4d4d;
+  color: #ff4d4d;
+  border-radius: 0;
+}
+
+.skin-cyber .restricted-forensic-trigger:hover .btn-unlock-hud {
+  background: #ff4d4d;
+  color: #000;
+  box-shadow: 0 0 20px #ff4d4d;
+}

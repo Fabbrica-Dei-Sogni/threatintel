@@ -337,7 +337,8 @@
             "tokenMissing": "Zugriff verweigert: Token fehlt",
             "tokenInvalid": "Ungültiges oder abgelaufenes Token",
             "forbidden": "Autorisierung verweigert",
-            "insufficientPermissions": "Autorisierung verweigert: unzureichende Berechtigungen (ADMIN erforderlich)"
+            "insufficientPermissions": "Autorisierung verweigert: unzureichende Berechtigungen (ADMIN erforderlich)",
+            "requiresIdentification": "Identifizierung erforderlich: Anonymer Zugriff ist für diese Ressource nicht gestattet."
         },
         "system": {
             "generic": "Ein Systemfehler ist aufgetreten",

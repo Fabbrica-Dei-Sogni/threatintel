@@ -88,7 +88,9 @@
         "dossierPreviewTitle": "ANTEPRIMA DOSSIER INVESTIGATIVO",
         "dossierFormatA4": "FORMATO: A4 (ISO 216)",
         "dossierZoom": "ZOOM",
-        "logout": "Logout"
+        "logout": "Logout",
+        "auth_required_title": "ACCESSO RISERVATO",
+        "auth_required_desc": "I dossier investigativi e i report forensi sono accessibili solo ad analisti identificati."
     },
     "skin": {
         "classic": "Classic",

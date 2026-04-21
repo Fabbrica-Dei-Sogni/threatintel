@@ -1,7 +1,8 @@
 import express from 'express';
 import { ReportController } from '../controllers/ReportController';
+import { AuthMiddleware } from '../middlewares/AuthMiddleware';
 
-export default (reportController: ReportController) => {
+export default (reportController: ReportController, authMiddleware: AuthMiddleware) => {
     const router = express.Router();
 
     /**
@@ -14,7 +15,7 @@ export default (reportController: ReportController) => {
      *       200:
      *         description: Report generato.
      */
-    router.get('/api/reports/dettaglio', (req, res) => reportController.generateDetailReport(req, res));
+    router.get('/api/reports/dettaglio', authMiddleware.isIdentified(), (req, res) => reportController.generateDetailReport(req, res));
 
     /**
      * @openapi
@@ -26,7 +27,7 @@ export default (reportController: ReportController) => {
      *       200:
      *         description: Report custom generato.
      */
-    router.post('/api/reports/custom', (req, res) => reportController.generateCustomReport(req, res));
+    router.post('/api/reports/custom', authMiddleware.isIdentified(), (req, res) => reportController.generateCustomReport(req, res));
 
     return router;
 };

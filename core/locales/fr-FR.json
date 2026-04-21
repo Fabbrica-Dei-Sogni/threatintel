@@ -337,7 +337,8 @@
             "tokenMissing": "Accès refusé : jeton manquant",
             "tokenInvalid": "Jeton invalide ou expiré",
             "forbidden": "Autorisation refusée",
-            "insufficientPermissions": "Autorisation refusée : permissions insuffisantes (ADMIN requis)"
+            "insufficientPermissions": "Autorisation refusée : permissions insuffisantes (ADMIN requis)",
+            "requiresIdentification": "Identification requise : l'accès anonyme n'est pas autorisé pour cette ressource."
         },
         "system": {
             "generic": "Une erreur système s'est produite",

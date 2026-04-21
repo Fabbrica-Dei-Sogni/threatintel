@@ -137,6 +137,7 @@ const routes: RouteRecordRaw[] = [
         path: '/dossiers', 
         name: 'Dossiers', 
         component: () => import('../views/dossiers/Dossiers.vue'),
+        meta: { requiresAuth: true },
         props: (route: RouteLocationNormalized) => ({
             initialSearch: typeof route.query.search === 'string' ? route.query.search : '',
             initialStatus: typeof route.query.status === 'string' ? route.query.status : '',
@@ -144,7 +145,13 @@ const routes: RouteRecordRaw[] = [
             initialSortFields: route.query.sortFields ? JSON.parse(route.query.sortFields as string) : undefined,
         }),
     },
-    { path: '/dossiers/:id', name: 'DossierDetail', component: () => import('../views/dossiers/DossierDetail.vue'), props: true },
+    { 
+        path: '/dossiers/:id', 
+        name: 'DossierDetail', 
+        component: () => import('../views/dossiers/DossierDetail.vue'), 
+        meta: { requiresAuth: true },
+        props: true 
+    },
 ];
 
 const router = createRouter({
@@ -152,18 +159,25 @@ const router = createRouter({
     routes,
 });
 
-// Guard di navigazione per RBAC
+// Guard di navigazione per RBAC e Autenticazione
 import { useAuthStore } from '../stores/auth';
 
 router.beforeEach((to, from, next) => {
     const authStore = useAuthStore();
     
+    // Protezione per ADMIN
     if (to.meta.requiresAdmin && !authStore.isAdmin) {
         console.warn(`[Router] Accesso negato a ${to.path}: richiesto ruolo admin.`);
-        next({ name: 'Home' });
-    } else {
-        next();
+        return next({ name: 'Home' });
     }
+
+    // Protezione per UTENTI AUTENTICATI (No Anonimi)
+    if (to.meta.requiresAuth && !authStore.isAuthenticated) {
+        console.warn(`[Router] Accesso negato a ${to.path}: richiesta autenticazione reale.`);
+        return next({ name: 'Login', query: { redirect: to.fullPath } });
+    }
+
+    next();
 });
 
 export default router;

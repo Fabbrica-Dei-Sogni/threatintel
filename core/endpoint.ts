@@ -113,7 +113,7 @@ router.use('/api', authMiddleware.isAuthenticated());
 router.use('/', threatroutes(threatController, authMiddleware));
 
 // API Reports
-router.use('/', reportroutes(reportController));
+router.use('/', reportroutes(reportController, authMiddleware));
 
 // API Rate Limit (Redis)
 router.use('/', ratelimitroutes(rateLimitController));
@@ -126,7 +126,7 @@ import cowrieroutes from './apis/cowrieroutes';
 router.use('/', cowrieroutes(logger, cowrieController));
 
 // API Dossier (Persistenza investigazioni)
-router.use('/', dossierroutes(dossierController));
+router.use('/', dossierroutes(dossierController, authMiddleware));
 
 // API Gestione Limiti (Blacklist manuale)
 router.use('/', managelimitroutes(manageLimitController));

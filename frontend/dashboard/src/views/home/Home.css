@@ -100,6 +100,45 @@ h1 {
   gap: 40px;
 }
 
+/* Dynamic Widgets Animation - Zero Padding for Perfect Alignment */
+.widgets-container {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  width: 100%;
+  position: relative;
+  padding: 0;
+  margin: 0;
+}
+
+.widget-dynamic-enter-active {
+  animation: widget-bounce-in 0.5s ease-out;
+}
+
+.widget-dynamic-leave-active {
+  transition: all 0.3s ease-in;
+  opacity: 0;
+  transform: translateY(-20px);
+  position: absolute;
+  width: 100%;
+  z-index: 1;
+}
+
+.widget-dynamic-move {
+  transition: transform 0.4s ease;
+}
+
+@keyframes widget-bounce-in {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .domain-section {
   display: flex;
   flex-direction: column;

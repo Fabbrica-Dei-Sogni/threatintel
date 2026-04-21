@@ -1,21 +1,18 @@
-/* TelemetryStatsCyber.css */
-/* Cyber Skin for TelemetryStats Component */
-
-.telemetry-stats-component {
+.skin-cyber .telemetry-stats-component {
     margin-top: 20px;
     display: flex;
     flex-direction: column;
     gap: 30px;
-    animation: slideDownIn 0.4s ease-out;
+    animation: cyberSlideDownIn 0.4s ease-out;
 }
 
-@keyframes slideDownIn {
+@keyframes cyberSlideDownIn {
     from { opacity: 0; transform: translateY(-20px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
 /* === FILTERS HEADER === */
-.telemetry-header {
+.skin-cyber .telemetry-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -32,7 +29,7 @@
     letter-spacing: 2px;
 }
 
-.reset-btn {
+.skin-cyber .reset-btn {
     background: transparent;
     border: 1px solid var(--neon-pink);
     color: var(--neon-pink);
@@ -231,7 +228,7 @@
         margin-top: 10px;
     }
 
-    .telemetry-header {
+    .skin-cyber .telemetry-header {
         flex-direction: column;
         align-items: flex-start;
         gap: 15px;
@@ -241,7 +238,7 @@
         font-size: 1rem;
     }
 
-    .reset-btn {
+    .skin-cyber .reset-btn {
         width: 100%;
         text-align: center;
         padding: 8px;

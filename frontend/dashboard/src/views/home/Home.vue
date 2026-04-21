@@ -313,10 +313,9 @@ const viewStore = useViewSettingsStore();
 const { 
   homeShowAttackMap: attackMap, 
   homeShowSessionsMap: sessionsMap,
-  dashboardSkin: currentSkin
+  dashboardSkin: currentSkin,
+  activeWidgets
 } = storeToRefs(viewStore);
-
-const activeWidgets = ref(['telemetries']);
 
 function toggleWidget(id) {
   const index = activeWidgets.value.indexOf(id);

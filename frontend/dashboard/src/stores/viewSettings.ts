@@ -21,10 +21,21 @@ export const useViewSettingsStore = defineStore('viewSettings', () => {
     const homeShowAttackMap = ref<boolean>(savedSettings.homeShowAttackMap ?? false);
     const homeShowSessionsMap = ref<boolean>(savedSettings.homeShowSessionsMap ?? false);
     const dashboardSkin = ref<string>(savedSettings.dashboardSkin ?? 'cyber');
+    const activeWidgets = ref<string[]>(savedSettings.activeWidgets ?? ['telemetries']);
+
+    // Telemetry Specific Filters
+    const telemetryTimeframe = ref<string>(savedSettings.telemetryTimeframe ?? '24h');
+    const telemetryScore = ref<number>(savedSettings.telemetryScore ?? 15);
+    const telemetryLevel = ref<string>(savedSettings.telemetryLevel ?? 'low');
+    const telemetryTop = ref<string>(savedSettings.telemetryTop ?? 'all');
 
     // Persistence logic
     watch(
-        [attacksShowMap, attacksShowChart, logsShowChart, sessionsShowMap, sessionsShowChart, homeShowAttackMap, homeShowSessionsMap, dashboardSkin],
+        [
+            attacksShowMap, attacksShowChart, logsShowChart, sessionsShowMap, sessionsShowChart, 
+            homeShowAttackMap, homeShowSessionsMap, dashboardSkin, activeWidgets,
+            telemetryTimeframe, telemetryScore, telemetryLevel, telemetryTop
+        ],
         () => {
             const settings = {
                 attacksShowMap: attacksShowMap.value,
@@ -34,7 +45,12 @@ export const useViewSettingsStore = defineStore('viewSettings', () => {
                 sessionsShowChart: sessionsShowChart.value,
                 homeShowAttackMap: homeShowAttackMap.value,
                 homeShowSessionsMap: homeShowSessionsMap.value,
-                dashboardSkin: dashboardSkin.value
+                dashboardSkin: dashboardSkin.value,
+                activeWidgets: activeWidgets.value,
+                telemetryTimeframe: telemetryTimeframe.value,
+                telemetryScore: telemetryScore.value,
+                telemetryLevel: telemetryLevel.value,
+                telemetryTop: telemetryTop.value
             };
             localStorage.setItem(storageKey, JSON.stringify(settings));
         },
@@ -49,6 +65,11 @@ export const useViewSettingsStore = defineStore('viewSettings', () => {
         sessionsShowChart,
         homeShowAttackMap,
         homeShowSessionsMap,
-        dashboardSkin
+        dashboardSkin,
+        activeWidgets,
+        telemetryTimeframe,
+        telemetryScore,
+        telemetryLevel,
+        telemetryTop
     };
 });

@@ -1,17 +1,21 @@
 // src/composable/useStats.ts
-import { ref, reactive, watch } from 'vue';
+import { ref, reactive } from 'vue';
 import { fetchStats } from '../api/index';
+import { useViewSettingsStore } from '../stores/viewSettings';
+import { storeToRefs } from 'pinia';
 
 export function useStats() {
   const loading = ref(false);
   const error = ref<string | null>(null);
   const stats = ref<any>(null);
 
-  // Filter state
-  const selectedTimeframe = ref(localStorage.getItem('telemetry_timeframe') || '24h');
-  const selectedScore = ref(parseInt(localStorage.getItem('telemetry_score') || '15', 10));
-  const selectedLevel = ref('low');
-  const selectedTop = ref(localStorage.getItem('telemetry_top') || '10');
+  const viewStore = useViewSettingsStore();
+  const { 
+    telemetryTimeframe: selectedTimeframe,
+    telemetryScore: selectedScore,
+    telemetryLevel: selectedLevel,
+    telemetryTop: selectedTop
+  } = storeToRefs(viewStore);
 
   const dynamicThresholds = reactive({
     info: 0,
@@ -39,11 +43,11 @@ export function useStats() {
     if (dynamicThresholds.high <= dynamicThresholds.med) dynamicThresholds.high = dynamicThresholds.med + 10;
     if (dynamicThresholds.high > 100) dynamicThresholds.high = 100;
 
-    // Sync selectedScore ONLY if it was previously set to a standard threshold
-    // This avoids "jumping" if the user manually adjusted it (if we add a slider later)
-    // For now, it ensures the UI level buttons stay in sync with the data.
+    // Sync selectedScore only if we are in a standard state
     const currentLvl = selectedLevel.value as keyof typeof dynamicThresholds;
-    selectedScore.value = dynamicThresholds[currentLvl];
+    if (dynamicThresholds[currentLvl] !== undefined) {
+      selectedScore.value = dynamicThresholds[currentLvl];
+    }
   };
 
   const loadStats = async () => {
@@ -69,29 +73,24 @@ export function useStats() {
 
   const setTimeframe = (tf: string) => {
     selectedTimeframe.value = tf;
-    localStorage.setItem('telemetry_timeframe', tf);
     loadStats();
   };
 
   const setScore = (score: number, level: string) => {
     selectedScore.value = score;
     selectedLevel.value = level;
-    localStorage.setItem('telemetry_score', score.toString());
     loadStats();
   };
 
   const setTop = (top: string | number) => {
     selectedTop.value = top.toString();
-    localStorage.setItem('telemetry_top', top.toString());
     loadStats();
   };
 
   const resetFilters = () => {
     selectedTimeframe.value = '24h';
     selectedLevel.value = 'low';
-    selectedScore.value = 15; // Standard fallback
-    localStorage.setItem('telemetry_timeframe', '24h');
-    localStorage.setItem('telemetry_score', '15');
+    selectedScore.value = 15;
     loadStats();
   };
 
@@ -102,7 +101,10 @@ export function useStats() {
     else if (selectedScore.value >= dynamicThresholds.low) selectedLevel.value = 'low';
     else selectedLevel.value = 'info';
   };
-  syncLevelFromScore();
+  
+  if (!selectedLevel.value) {
+    syncLevelFromScore();
+  }
 
   return {
     loading,

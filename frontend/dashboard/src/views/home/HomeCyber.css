@@ -16,6 +16,12 @@
   --cyber-accent: var(--neon-pink);
   --cyber-accent-rgb: 255, 51, 102;
   --cyber-surface: var(--cyber-glass);
+
+  /* Tooltip Tokens - Cyber */
+  --tooltip-bg: rgba(5, 10, 20, 0.98);
+  --tooltip-color: var(--neon-cyan);
+  --tooltip-border: var(--neon-cyan);
+  --tooltip-shadow: rgba(0, 255, 255, 0.3);
 }
 
 /* === LAYOUT & CORE (Standalone) === */

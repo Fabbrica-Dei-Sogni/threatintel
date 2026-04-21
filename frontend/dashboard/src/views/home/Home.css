@@ -5,6 +5,12 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+
+  /* Tooltip Tokens - Classic */
+  --tooltip-bg: rgba(15, 23, 42, 0.98);
+  --tooltip-color: #f1f5f9;
+  --tooltip-border: rgba(95, 165, 255, 0.4);
+  --tooltip-shadow: rgba(0, 0, 0, 0.5);
 }
 
 /* Titolo principale e area fissa (Sticky) */

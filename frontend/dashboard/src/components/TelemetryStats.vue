@@ -87,8 +87,8 @@
             <span>{{ item.key }}</span>
           </div>
           <div class="item-col item-col-metrics">
-            <div class="activity-badge">
-              <span class="badge-content">{{ item.value }}</span>
+            <div class="activity-badge" :data-tooltip="`${item.value} match`">
+              <span class="badge-content">{{ ((item.value / (stats?.suspiciousRequests || 1)) * 100).toFixed(1) }}%</span>
             </div>
           </div>
         </template>
@@ -107,8 +107,8 @@
             <span>{{ item.key }}</span>
           </div>
           <div class="item-col item-col-metrics">
-            <div class="activity-badge">
-              <span class="badge-content">{{ item.value }}</span>
+            <div class="activity-badge" :data-tooltip="`${item.value} match`">
+              <span class="badge-content">{{ ((item.value / (stats?.suspiciousRequests || 1)) * 100).toFixed(1) }}%</span>
             </div>
           </div>
         </template>
@@ -178,6 +178,69 @@ const getIndicatorLevel = (indicator) => {
   return 4; // Low
 };
 </script>
+
+<style scoped>
+/* Designer Adaptive Tooltip Engine */
+.activity-badge {
+    position: relative;
+}
+
+.activity-badge[data-tooltip] {
+    cursor: help;
+}
+
+.activity-badge[data-tooltip]::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    right: 110%; /* Posizionato a sinistra del badge */
+    top: 50%;
+    transform: translateY(-50%) translateX(10px);
+    background: var(--tooltip-bg);
+    color: var(--tooltip-color);
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 1px solid var(--tooltip-border);
+    box-shadow: 0 4px 15px var(--tooltip-shadow);
+    backdrop-filter: blur(8px);
+    z-index: 1000;
+    pointer-events: none;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.activity-badge[data-tooltip]::before {
+    content: '';
+    position: absolute;
+    right: 100%;
+    top: 50%;
+    transform: translateY(-50%) translateX(10px);
+    border: 6px solid transparent;
+    border-left-color: var(--tooltip-border); /* Freccia verso il badge */
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    z-index: 1000;
+    pointer-events: none;
+}
+
+.activity-badge[data-tooltip]:hover::after,
+.activity-badge[data-tooltip]:hover::before {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(-50%) translateX(0);
+}
+
+/* Ensure Cyber font if in cyber mode */
+.skin-cyber .activity-badge[data-tooltip]::after {
+    font-family: var(--font-cyber);
+}
+</style>
 
 <style scoped>
 /* Local overrides if necessary, but most is in TelemetryStatsCyber.css */

@@ -413,7 +413,7 @@
 .skin-cyber .btn-action {
   background: transparent !important;
   color: var(--neon-cyan) !important;
-  border: 1px solid var(--neon-cyan) !important;
+  border: 1px solid rgba(0, 255, 255, 0.3) !important;
   padding: 10px 22px;
   border-radius: 0 !important;
   font-weight: 800;
@@ -422,12 +422,23 @@
   letter-spacing: 1px;
   cursor: pointer;
   transition: all 0.2s ease !important;
+  outline: none !important;
 }
 
-.skin-cyber .btn-action:hover,
+/* Hover only on devices that support it (Desktop) */
+@media (hover: hover) {
+  .skin-cyber .btn-action:hover:not(.active) {
+    background: rgba(0, 255, 255, 0.05) !important;
+    border-color: var(--neon-cyan) !important;
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.2) !important;
+    transform: translateY(-1px);
+  }
+}
+
 .skin-cyber .btn-action.active {
   background: var(--neon-cyan) !important;
   color: var(--cyber-bg) !important;
+  border-color: var(--neon-cyan) !important;
   box-shadow: 0 0 20px var(--neon-cyan) !important;
   transform: translateY(-2px);
 }
@@ -529,6 +540,9 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    /* No hover effects on mobile by default to avoid sticky states */
+    transform: none !important;
+    box-shadow: none !important;
   }
 }
 

@@ -398,6 +398,7 @@
 
 .skin-cyber .actions {
   display: flex; 
+  flex-wrap: wrap;
   gap: 16px; 
   margin-bottom: 24px;
   padding: 0 24px;
@@ -508,9 +509,19 @@
     font-size: 0.75rem;
   }
 
+  .skin-cyber .actions {
+    flex-direction: column;
+    padding: 0 10px;
+    gap: 10px;
+  }
+
   .skin-cyber .btn-action {
-    padding: 8px 12px;
-    font-size: 0.8rem;
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 0.85rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 }
 

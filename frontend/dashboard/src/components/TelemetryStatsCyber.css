@@ -224,3 +224,65 @@
 @media (max-width: 1024px) {
     .data-lists-row { grid-template-columns: 1fr; }
 }
+
+@media (max-width: 768px) {
+    .telemetry-stats-component {
+        gap: 20px;
+        margin-top: 10px;
+    }
+
+    .telemetry-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .telemetry-header h3 {
+        font-size: 1rem;
+    }
+
+    .reset-btn {
+        width: 100%;
+        text-align: center;
+        padding: 8px;
+    }
+
+    .filter-sections {
+        gap: 20px;
+        padding: 10px;
+    }
+
+    .filter-group {
+        width: 100%;
+    }
+
+    .tabs-row {
+        flex-wrap: wrap;
+        gap: 5px;
+    }
+
+    .tab-btn {
+        flex: 1 1 calc(33.33% - 5px);
+        min-width: 60px;
+        padding: 6px 4px;
+        font-size: 0.7rem;
+    }
+
+    .stat-val {
+        font-size: 1.8rem;
+    }
+
+    .stat-card {
+        padding: 15px;
+    }
+
+    .data-panel {
+        padding: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .tab-btn {
+        flex: 1 1 calc(50% - 5px);
+    }
+}

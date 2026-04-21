@@ -59,6 +59,7 @@
 .actions { 
   top: 56px; 
   display: flex; 
+  flex-wrap: wrap;
   gap: 16px; 
   margin: 0; 
   padding-left: 24px;
@@ -686,11 +687,21 @@ li > a:last-child:hover {
     margin-top: 1px;
   }
 
-  .breaking-news-row {
-    margin: 5px 0 10px 0;
-    padding: 0 10px;
-    min-height: 38px;
-    border-radius: 6px;
+  .actions {
+    flex-direction: column;
+    padding: 10px;
+    gap: 10px;
+    top: auto; /* Might want to avoid stickiness on mobile if it blocks too much */
+    position: relative;
+  }
+
+  .btn-action {
+    width: 100%;
+    padding: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 0.9rem;
   }
 }
 

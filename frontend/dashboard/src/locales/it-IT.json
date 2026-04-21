@@ -20,6 +20,7 @@
             "hours": "h",
             "days": "d"
         },
+        "all": "Tutti",
         "search": "Cerca",
         "filter": "Filtra",
         "clear": "Svuota",

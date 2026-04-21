@@ -49,62 +49,61 @@
             </transition>
 
             <div class="primary-intel">
-              <div class="list-side glass-card">
-                <div class="widget-header clickable-header" @click="toggles.recentAttacks = !toggles.recentAttacks">
-                  <div class="title-content">
-                    <h3>{{ $t('home.recentAttacks').toUpperCase() }}</h3>
-                  </div>
-                  <div class="header-actions" @click.stop>
-                    <ProtocolSelector v-model="selectedAttackProtocol" :options="['http', 'https', 'ssh']"
-                      theme="dark" />
+              <div class="list-side">
+                <IntelRanking
+                  :title="$t('home.recentAttacks')"
+                  :items="recentAttacks"
+                  :loading="loadingAttacks"
+                  :error="errorAttacks"
+                  defaultLimit="10"
+                  itemStyle="anomalies-ranking"
+                  detailRouteName="AttackDetail"
+                  detailItemKey="request.ip"
+                  detailRouteParam="ip"
+                >
+                  <template #header-actions>
+                    <ProtocolSelector v-model="selectedAttackProtocol" :options="['http', 'https', 'ssh']" theme="dark" />
                     <ViewToggle v-model="toggles.attackMap" :label="$t('common.showMap')" theme="magma" />
-                    <span class="arrow" :class="{ open: toggles.recentAttacks }"></span>
-                  </div>
-                </div>
-                <transition name="collapse">
-                  <div v-if="toggles.recentAttacks">
-                    <ul class="scroll-list">
-                      <li v-for="attack in recentAttacks" :key="attack.id">
-                        <div class="indicator-group"
-                          :data-url-tooltip="`URI: ${attack.request?.url || 'N/A'}\nDATE: ${formatDate(attack.firstSeen)}`">
-                          <CountryFlag :countryCode="attack.ipDetails?.ipinfo?.country"
-                            :tooltip="attack.ipDetails?.ipinfo ? `${attack.ipDetails.ipinfo.country} - ${attack.ipDetails.ipinfo.org || t('common.notAvailable')}` : t('common.notAvailable')" />
-                          <DefconIndicator :level="attack.dangerLevel" :dangerScore="attack.dangerScore" mode="dot" />
-                        </div>
-                        <span @click="goToIpDetails(attack.request.ip)" class="ip-link">{{ attack.request.ip }}</span>
-                        
-                        <div class="attack-time" :title="t('attackDetail.timeWindow')">
-                          <span class="date-part">{{ formatDateOnly(attack.firstSeen) }}</span>
-                          <span class="time-part">{{ formatTimeOnly(attack.firstSeen) }}</span>
-                          <span class="duration-badge" v-if="attack.lastSeen && attack.lastSeen !== attack.firstSeen">
-                            ({{ computeDuration(attack.firstSeen, attack.lastSeen) }})
-                          </span>
-                        </div>
+                  </template>
 
-                        <div class="activity-badge">
-                          <div class="badge-content" :class="{ 'high-interaction': (attack.totaleLogs || 0) > 50 }" :title="$t('attacks.table.totalLogs')">
-                            <span class="badge-icon">📋</span>
-                            <span class="badge-value">{{ attack.totaleLogs || 0 }}</span>
-                          </div>
+                  <template #item="{ item }">
+                    <!-- Origin Col -->
+                    <div class="item-col item-col-origin">
+                      <div class="indicator-group"
+                        :data-url-tooltip="`URI: ${item.request?.url || 'N/A'}\nDATE: ${formatDate(item.firstSeen)}`">
+                        <CountryFlag :countryCode="item.ipDetails?.ipinfo?.country"
+                          :tooltip="item.ipDetails?.ipinfo ? `${item.ipDetails.ipinfo.country} - ${item.ipDetails.ipinfo.org || t('common.notAvailable')}` : t('common.notAvailable')" />
+                        <DefconIndicator :level="item.dangerLevel" :dangerScore="item.dangerScore" mode="dot" />
+                      </div>
+                    </div>
+
+                    <!-- Subject Col -->
+                    <div class="item-col item-col-subject">
+                      <span @click="goToIpDetails(item.request.ip)" class="ip-link">{{ item.request.ip }}</span>
+                    </div>
+                    
+                    <!-- Forensics Col -->
+                    <div class="item-col item-col-forensics" :title="t('attackDetail.timeWindow')">
+                      <div class="time-row">
+                        <span class="date-part">{{ formatDateOnly(item.firstSeen) }}</span>
+                        <span class="time-part">{{ formatTimeOnly(item.firstSeen) }}</span>
+                      </div>
+                      <span class="duration-badge" v-if="item.lastSeen && item.lastSeen !== item.firstSeen">
+                        ({{ computeDuration(item.firstSeen, item.lastSeen) }})
+                      </span>
+                    </div>
+
+                    <!-- Metrics Col -->
+                    <div class="item-col item-col-metrics">
+                      <div class="activity-badge">
+                        <div class="badge-content" :class="{ 'high-interaction': (item.totaleLogs || 0) > 50 }" :title="$t('attacks.table.totalLogs')">
+                          <span class="badge-icon">📋</span>
+                          <span class="badge-value">{{ item.totaleLogs || 0 }}</span>
                         </div>
-                        <router-link :to="{
-                          name: 'AttackDetail',
-                          params: { ip: attack.request.ip },
-                          query: {
-                            minLogsForAttack: 10,
-                            timeMode: 'ago',
-                            agoValue: 90,
-                            agoUnit: 'days'
-                          }
-                        }" :title="t('common.detail')">
-                          👁️
-                        </router-link>
-                      </li>
-                    </ul>
-                    <div v-if="loadingAttacks" class="loading">{{ $t('home.loadingAttacks') }}</div>
-                    <div v-if="errorAttacks" class="error">{{ $t('home.errorLoadingAttacks') }}</div>
-                  </div>
-                </transition>
+                      </div>
+                    </div>
+                  </template>
+                </IntelRanking>
               </div>
 
               <!-- Map side controlled by the list toggle -->
@@ -123,45 +122,54 @@
             </div>
 
             <div class="secondary-intel">
-              <div class="widget glass-card">
-                <div class="widget-header clickable-header" @click="toggles.recentLogs = !toggles.recentLogs">
-                  <div class="title-content">
-                    <h3>{{ $t('home.recentLogs').toUpperCase() }}</h3>
-                  </div>
-                  <div class="header-actions" @click.stop>
+              <div class="widget">
+                <IntelRanking
+                  :title="$t('home.recentLogs')"
+                  :items="recentLogs"
+                  :loading="loadingLogs"
+                  :error="errorLogs"
+                  defaultLimit="10"
+                  itemStyle="logs-ranking"
+                  detailRouteName="ThreatLog"
+                >
+                  <template #header-actions>
                     <ProtocolSelector v-model="selectedLogProtocol" :options="['http', 'https', 'ssh']" theme="dark" />
-                    <span class="arrow" :class="{ open: toggles.recentLogs }"></span>
-                  </div>
-                </div>
-                <transition name="collapse">
-                  <div v-if="toggles.recentLogs">
-                    <ul class="scroll-list">
-                      <li v-for="log in recentLogs" :key="log._id">
-                        <div class="indicator-group"
-                          :data-url-tooltip="`URI: ${log.request?.url || 'N/A'}\nDATE: ${formatDate(log.timestamp)}`">
-                          <CountryFlag :countryCode="log.ipDetailsId?.ipinfo?.country"
-                            :tooltip="log.ipDetailsId?.ipinfo ? `${log.ipDetailsId.ipinfo.country} - ${log.ipDetailsId.ipinfo.org || t('common.notAvailable')}` : t('common.notAvailable')" />
-                        </div>
-                        <span @click="goToIpDetails(log.request.ip)" class="ip-link">{{ log.request.ip }}</span>
-                        
-                        <div class="log-time">
-                          <span class="date-part">{{ formatDateOnly(log.timestamp) }}</span>
-                          <span class="time-part">{{ formatTimeOnly(log.timestamp) }}</span>
-                        </div>
+                  </template>
 
-                        <div class="activity-badge">
-                          <div class="badge-content" :title="$t('threatLog.method')">
-                            <span class="badge-icon">🌐</span>
-                            <span class="badge-value">{{ log.request.method }}</span>
-                          </div>
+                  <template #item="{ item }">
+                    <!-- Origin Col -->
+                    <div class="item-col item-col-origin">
+                      <div class="indicator-group"
+                        :data-url-tooltip="`URI: ${item.request?.url || 'N/A'}\nDATE: ${formatDate(item.timestamp)}`">
+                        <CountryFlag :countryCode="item.ipDetailsId?.ipinfo?.country"
+                          :tooltip="item.ipDetailsId?.ipinfo ? `${item.ipDetailsId.ipinfo.country} - ${item.ipDetailsId.ipinfo.org || t('common.notAvailable')}` : t('common.notAvailable')" />
+                      </div>
+                    </div>
+
+                    <!-- Subject Col -->
+                    <div class="item-col item-col-subject">
+                      <span @click="goToIpDetails(item.request.ip)" class="ip-link">{{ item.request.ip }}</span>
+                    </div>
+                    
+                    <!-- Forensics Col -->
+                    <div class="item-col item-col-forensics">
+                      <div class="time-row">
+                        <span class="date-part">{{ formatDateOnly(item.timestamp) }}</span>
+                        <span class="time-part">{{ formatTimeOnly(item.timestamp) }}</span>
+                      </div>
+                    </div>
+
+                    <!-- Metrics Col -->
+                    <div class="item-col item-col-metrics">
+                      <div class="activity-badge">
+                        <div class="badge-content" :title="$t('threatLog.method')">
+                          <span class="badge-icon">🌐</span>
+                          <span class="badge-value">{{ item.request.method }}</span>
                         </div>
-                        <router-link :to="{ name: 'ThreatLog', params: { id: log.id } }" :title="t('common.detail')">👁️</router-link>
-                      </li>
-                    </ul>
-                    <div v-if="loadingLogs" class="loading">{{ $t('home.loadingLogs') }}</div>
-                    <div v-if="errorLogs" class="error">{{ $t('home.errorLoadingLogs') }}</div>
-                  </div>
-                </transition>
+                      </div>
+                    </div>
+                  </template>
+                </IntelRanking>
               </div>
             </div>
 
@@ -185,60 +193,65 @@
             </section>
 
             <div class="primary-intel">
-              <div class="list-side glass-card">
-                <div class="widget-header clickable-header" @click="toggles.recentSessions = !toggles.recentSessions">
-                  <div class="title-content">
-                    <h3>{{ $t('home.recentSessions').toUpperCase() }}</h3>
-                  </div>
-                  <div class="header-actions" @click.stop>
+              <div class="list-side">
+                <IntelRanking
+                  :title="$t('home.recentSessions')"
+                  :items="recentSessions"
+                  :loading="loadingSessions"
+                  :error="errorSessions"
+                  defaultLimit="10"
+                  itemStyle="sessions-ranking"
+                  detailRouteName="CowrieAttackDetail"
+                  detailItemKey="session"
+                >
+                  <template #header-actions>
                     <CowrieCategorySelector v-model="filterCategory" size="mini" />
                     <ViewToggle v-model="toggles.sessionsMap" :label="$t('common.showMap')" theme="jade" />
-                    <span class="arrow" :class="{ open: toggles.recentSessions }"></span>
-                  </div>
-                </div>
-                <transition name="collapse">
-                  <div v-if="toggles.recentSessions">
-                    <ul class="scroll-list">
-                      <li v-for="session in recentSessions" :key="session.session" class="session-item">
-                        <div class="indicator-group"
-                          :data-url-tooltip="`PROTOCOL: ${session.protocol || 'N/A'}\nDATE: ${formatDate(session.starttime)}`">
-                          <CountryFlag :countryCode="session.ipDetailsId?.ipinfo?.country"
-                            :tooltip="session.ipDetailsId?.ipinfo ? `${session.ipDetailsId.ipinfo.country} - ${session.ipDetailsId.ipinfo.org || t('common.notAvailable')}` : t('common.notAvailable')" />
-                        </div>
-                        <span @click="goToIpDetails(session.src_ip)" class="ip-link">{{ session.src_ip }}</span>
-                        
-                        <div class="session-time" :title="t('cowrie.attackDetail.timeWindow')">
-                          <span class="date-part">{{ formatDateOnly(session.starttime) }}</span>
-                          <span class="time-part">{{ formatTimeOnly(session.starttime) }}</span>
-                          <span class="duration-badge" v-if="session.endtime || session.isAggregated">
-                            ({{ formatAggregatedDurationHome(session) }})
-                          </span>
-                        </div>
+                  </template>
 
-                        <div class="activity-badge">
-                          <!-- Aggregated Scanner occurrences -->
-                          <div v-if="session.isAggregated" class="badge-content occurrence" :title="$t('cowrie.sessions.table.occurrences')">
-                            <span class="badge-icon">🔢</span>
-                            <span class="badge-value">{{ session.occurrenceCount }}</span>
-                          </div>
-                          <!-- Standard interaction events -->
-                          <div v-else class="badge-content" :class="{ 'high-interaction': (session.eventCount || 0) > 10 }" :title="$t('sessionChart.activity')">
-                            <span class="badge-icon">⚡</span>
-                            <span class="badge-value">{{ session.eventCount || 0 }}</span>
-                          </div>
+                  <template #item="{ item }">
+                    <!-- Origin Col -->
+                    <div class="item-col item-col-origin">
+                      <div class="indicator-group"
+                        :data-url-tooltip="`PROTOCOL: ${item.protocol || 'N/A'}\nDATE: ${formatDate(item.starttime)}`">
+                        <CountryFlag :countryCode="item.ipDetailsId?.ipinfo?.country"
+                          :tooltip="item.ipDetailsId?.ipinfo ? `${item.ipDetailsId.ipinfo.country} - ${item.ipDetailsId.ipinfo.org || t('common.notAvailable')}` : t('common.notAvailable')" />
+                      </div>
+                    </div>
+
+                    <!-- Subject Col -->
+                    <div class="item-col item-col-subject">
+                      <span @click="goToIpDetails(item.src_ip)" class="ip-link">{{ item.src_ip }}</span>
+                    </div>
+                    
+                    <!-- Forensics Col -->
+                    <div class="item-col item-col-forensics" :title="t('cowrie.attackDetail.timeWindow')">
+                      <div class="time-row">
+                        <span class="date-part">{{ formatDateOnly(item.starttime) }}</span>
+                        <span class="time-part">{{ formatTimeOnly(item.starttime) }}</span>
+                      </div>
+                      <span class="duration-badge" v-if="item.endtime || item.isAggregated">
+                        ({{ formatAggregatedDurationHome(item) }})
+                      </span>
+                    </div>
+
+                    <!-- Metrics Col -->
+                    <div class="item-col item-col-metrics">
+                      <div class="activity-badge">
+                        <!-- Aggregated Scanner occurrences -->
+                        <div v-if="item.isAggregated" class="badge-content occurrence" :title="$t('cowrie.sessions.table.occurrences')">
+                          <span class="badge-icon">🔢</span>
+                          <span class="badge-value">{{ item.occurrenceCount }}</span>
                         </div>
-                        <router-link :to="{ name: 'CowrieAttackDetail', params: { id: session.session } }" :title="t('common.detail')">
-                          👁️
-                        </router-link>
-                      </li>
-                      <li v-if="recentSessions.length === 0 && !loadingSessions" class="no-data">
-                        {{ $t('common.noDataFound') }}
-                      </li>
-                    </ul>
-                    <div v-if="loadingSessions" class="loading">{{ $t('home.loadingSessions') }}</div>
-                    <div v-if="errorSessions" class="error">{{ $t('home.errorLoadingSessions') }}</div>
-                  </div>
-                </transition>
+                        <!-- Standard interaction events -->
+                        <div v-else class="badge-content" :class="{ 'high-interaction': (item.eventCount || 0) > 10 }" :title="$t('sessionChart.activity')">
+                          <span class="badge-icon">⚡</span>
+                          <span class="badge-value">{{ item.eventCount || 0 }}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </template>
+                </IntelRanking>
               </div>
 
               <!-- Sessions Map side controlled by the list toggle -->
@@ -339,6 +352,7 @@ import ViewToggle from '../../components/common/ViewToggle.vue';
 import DefconIndicator from '../../components/DefconIndicator.vue';
 import TelemetryStats from '../../components/TelemetryStats.vue';
 import CowrieCategorySelector from '../../components/common/CowrieCategorySelector.vue';
+import IntelRanking from '../../components/common/IntelRanking.vue';
 import { formatDateTime, formatDateOnly, formatTimeOnly, formatHumanDuration, formatFullDateTime } from '../../utils/dateUtils';
 import './HomeCyber.css';
 
@@ -420,24 +434,24 @@ const formatAggregatedDurationHome = (session) => {
 const selectedAttackProtocol = ref(props.initialAttackProtocol);
 const selectedLogProtocol = ref(props.initialLogProtocol);
 
-// Attacchi - chiamata base: nessun filtro, prima pagina, ordina per ultimi
+// Anomalie - chiamata base: nessun filtro, prima pagina, ordina per ultimi (limit 50 per classifiche)
 const {
   attacks,
   loading: loadingAttacks,
   error: errorAttacks,
   fetchData: fetchAttacks
-} = useAttacksFilter('', selectedAttackProtocol, 1, 10, 'ago', 90, 'days', null, 60, 'days', 0, 'days', { firstSeen: -1 })
+} = useAttacksFilter('', selectedAttackProtocol, 1, 50, 'ago', 90, 'days', null, 60, 'days', 0, 'days', { firstSeen: -1 })
 
-const recentAttacks = computed(() => attacks.value.slice(0, 10))
+const recentAttacks = computed(() => attacks.value)
 
 const {
   logs,
   loading: loadingLogs,
   error: errorLogs,
   fetchData: fetchLogs
-} = useLogsFilter('', '', selectedLogProtocol, 1, { timestamp: -1 })
+} = useLogsFilter('', '', selectedLogProtocol, 1, { timestamp: -1 }, 50)
 
-const recentLogs = computed(() => logs.value.slice(0, 10))
+const recentLogs = computed(() => logs.value)
 
 const {
   sessions,
@@ -445,9 +459,9 @@ const {
   loading: loadingSessions,
   error: errorSessions,
   fetchData: fetchSessions
-} = useCowrieSessions(1, 10, {}, '', props.initialSessionCategory);
+} = useCowrieSessions(1, 50, {}, '', props.initialSessionCategory);
 
-const recentSessions = computed(() => sessions.value.slice(0, 10))
+const recentSessions = computed(() => sessions.value)
 
 const recentSessionsNormalized = computed(() => recentSessions.value.map(s => ({
   ...s,

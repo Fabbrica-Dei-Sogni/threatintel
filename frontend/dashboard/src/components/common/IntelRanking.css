@@ -1,0 +1,377 @@
+/* IntelRanking.css */
+
+.intel-ranking-widget {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.intel-ranking-widget.collapsed {
+  padding-bottom: 5px;
+}
+
+/* Header */
+.widget-header {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  margin-bottom: 20px;
+  padding: 5px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.clickable-header {
+  cursor: pointer;
+  user-select: none;
+}
+
+.clickable-header:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.title-content h3 {
+  margin: 0;
+  font-size: 1rem;
+  letter-spacing: 0.5px;
+  font-weight: 700;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Limit Tabs Selector */
+.limit-tabs {
+  display: flex;
+  gap: 2px;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 2px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(4px);
+}
+
+.limit-tab {
+  padding: 3px 8px;
+  font-size: 0.65rem;
+  background: transparent;
+  border: none;
+  color: #64748b;
+  cursor: pointer;
+  border-radius: 3px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.limit-tab:hover {
+  color: #94a3b8;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.limit-tab.active {
+  background: #3672ff;
+  color: #fff;
+  box-shadow: 0 0 10px rgba(54, 114, 255, 0.3);
+}
+
+/* Ranking List */
+.ranking-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.ranking-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+}
+
+.ranking-item {
+  display: flex !important;
+  align-items: center !important;
+  padding: 12px 16px !important;
+  margin-bottom: 6px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  border-radius: 8px;
+  gap: 15px !important;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  min-height: 54px;
+  box-sizing: border-box;
+}
+
+.ranking-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+  transform: translateX(4px);
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.ranking-item:last-child {
+  margin-bottom: 0;
+}
+
+/* Rank Indicator */
+.rank-indicator {
+  flex: 0 0 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 800;
+  font-size: 0.75rem;
+  border-radius: 6px;
+  height: 28px;
+  background: rgba(0, 0, 0, 0.2);
+  color: #64748b;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.rank-indicator.gold {
+  color: #ffd700;
+  background: rgba(255, 215, 0, 0.15);
+  border-color: rgba(255, 215, 0, 0.4);
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.15);
+  transform: scale(1.1);
+}
+
+.rank-indicator.silver {
+  color: #e2e8f0;
+  background: rgba(226, 232, 240, 0.1);
+  border-color: rgba(226, 232, 240, 0.3);
+  box-shadow: 0 0 10px rgba(226, 232, 240, 0.1);
+}
+
+.rank-indicator.bronze {
+  color: #cd7f32;
+  background: rgba(205, 127, 50, 0.1);
+  border-color: rgba(205, 127, 50, 0.3);
+}
+
+/* Item Content - Distributed Grid */
+.item-main-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+/* Surgery Column Helpers */
+.item-col {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.item-col-origin {
+  flex: 0 0 80px;
+  gap: 8px;
+}
+
+.item-col-subject {
+  flex: 1;
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.item-col-forensics {
+  flex: 0 0 160px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  font-size: 0.7rem;
+  line-height: 1.2;
+}
+
+.item-col-metrics {
+  flex: 0 0 100px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Item Action */
+.item-details-action {
+  flex: 0 0 32px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.detail-btn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #88aaff;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+}
+
+.detail-btn:hover {
+  background: #3672ff;
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(54, 114, 255, 0.3);
+}
+
+/* States */
+.no-data {
+  padding: 30px;
+  text-align: center;
+  color: #64748b;
+  font-style: italic;
+  font-size: 0.85rem;
+}
+
+.ranking-loading, .ranking-error {
+  padding: 20px;
+  text-align: center;
+  font-size: 0.85rem;
+}
+
+.ranking-loading {
+  color: #3672ff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.loader-pulse {
+  width: 24px;
+  height: 24px;
+  border: 2px solid rgba(54, 114, 255, 0.1);
+  border-top-color: #3672ff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* === SKIN CYBER ADAPTATIONS === */
+.skin-cyber .intel-ranking-widget {
+  --ranking-accent: var(--neon-cyan, #00ffff);
+  --ranking-highlight: var(--neon-pink, #ff3366);
+}
+
+.skin-cyber .title-content h3 {
+  color: var(--ranking-accent);
+  font-family: var(--font-cyber);
+  border-left: 3px solid var(--ranking-accent);
+  padding-left: 10px;
+}
+
+.skin-cyber .limit-tab.active {
+  background: var(--ranking-accent);
+  color: #000;
+  box-shadow: 0 0 15px var(--ranking-accent);
+}
+
+.skin-cyber .rank-indicator {
+  background: rgba(0, 0, 0, 0.6);
+  border-color: rgba(0, 255, 255, 0.2);
+  color: var(--ranking-accent);
+}
+
+.skin-cyber .rank-indicator.gold {
+  color: #ffcc00;
+  border-color: #ffcc00;
+  background: rgba(255, 204, 0, 0.15);
+  box-shadow: 0 0 20px rgba(255, 204, 0, 0.3);
+  text-shadow: 0 0 5px #ffcc00;
+}
+
+.skin-cyber .rank-indicator.silver {
+  color: #ffffff;
+  border-color: #ffffff;
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+}
+
+.skin-cyber .rank-indicator.bronze {
+  color: #ff6600;
+  border-color: #ff6600;
+  background: rgba(255, 102, 0, 0.1);
+}
+
+/* Cyber Typography Improvements */
+.skin-cyber .ip-link,
+.skin-cyber .item-col-subject,
+.skin-cyber .item-col-forensics {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.skin-cyber .item-col-subject {
+  color: #fff;
+  font-size: 0.95rem;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
+}
+
+.skin-cyber .item-col-forensics {
+  color: rgba(0, 255, 255, 0.6);
+}
+
+.skin-cyber .indicator-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.skin-cyber .detail-btn {
+  border: 1px solid var(--ranking-accent);
+  color: var(--ranking-accent);
+}
+
+.skin-cyber .detail-btn:hover {
+  background: var(--ranking-accent);
+  color: #000;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .widget-header {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 12px;
+  }
+  
+  .header-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .limit-tabs {
+    flex-wrap: wrap;
+  }
+  
+  .ranking-item {
+    gap: 8px !important;
+    padding: 8px !important;
+  }
+  
+  .rank-indicator {
+    flex: 0 0 28px;
+    font-size: 0.65rem;
+  }
+}

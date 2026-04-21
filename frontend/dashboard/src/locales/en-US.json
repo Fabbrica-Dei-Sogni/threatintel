@@ -20,6 +20,7 @@
             "hours": "h",
             "days": "d"
         },
+        "all": "All",
         "search": "Search",
         "filter": "Filter",
         "clear": "Clear",

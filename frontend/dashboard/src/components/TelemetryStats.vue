@@ -67,7 +67,10 @@
       -->
     </div>
 
-    <!-- Top Ranking Filter (between stats and lists) -->
+    <!-- Top Ranking Filter (Moved into rankings or handled by IntelRanking) -->
+    <!-- The user wanted one row of tabs similar to telemetry, but since we have a generic component, 
+         we can either keep the global filter or use the individual ones. 
+         For Telemetry, the global filter makes sense because it affects both lists at once. -->
     <div class="ranking-filter-row">
       <div class="filter-group">
         <span class="group-label">{{ t('telemetry.top_ranking') }}</span>
@@ -87,38 +90,50 @@
 
     <!-- Data Lists (Countries & Indicators) -->
     <div v-if="stats" class="data-lists-row">
-      <!-- Countries -->
-      <div class="data-panel">
-        <h4>{{ t('telemetry.top_countries', { count: selectedTop }) }}</h4>
-        <ul class="list-items">
-          <li v-for="(count, key) in stats.topCountries" :key="key" class="list-row">
-            <div class="row-label">
-              <country-flag :country-code="key" size="mini" />
-              <span>{{ key }}</span>
+      <IntelRanking
+        :title="t('telemetry.top_countries', { count: selectedTop })"
+        :items="topCountriesList"
+        :loading="loading"
+        :error="error"
+        :showLimitSelector="false"
+        :collapsible="false"
+        itemStyle="telemetry-ranking"
+      >
+        <template #item="{ item }">
+          <div class="item-col item-col-origin">
+            <country-flag :country-code="item.key" size="mini" />
+          </div>
+          <div class="item-col item-col-subject">
+            <span>{{ item.key }}</span>
+          </div>
+          <div class="item-col item-col-metrics">
+            <div class="activity-badge">
+              <span class="badge-content">{{ item.value }}</span>
             </div>
-            <div class="row-value">{{ count }}</div>
-          </li>
-          <li v-if="Object.keys(stats.topCountries || {}).length === 0" class="list-row empty">
-            {{ t('common.noDataFound') }}
-          </li>
-        </ul>
-      </div>
+          </div>
+        </template>
+      </IntelRanking>
 
-      <!-- Indicators -->
-      <div class="data-panel">
-        <h4>{{ t('telemetry.top_indicators', { count: selectedTop }) }}</h4>
-        <ul class="list-items">
-          <li v-for="(count, key) in stats.topIndicators" :key="key" class="list-row">
-            <div class="row-label">
-              <span>{{ key }}</span>
+      <IntelRanking
+        :title="t('telemetry.top_indicators', { count: selectedTop })"
+        :items="topIndicatorsList"
+        :loading="loading"
+        :error="error"
+        :showLimitSelector="false"
+        :collapsible="false"
+        itemStyle="telemetry-ranking"
+      >
+        <template #item="{ item }">
+          <div class="item-col item-col-subject">
+            <span>{{ item.key }}</span>
+          </div>
+          <div class="item-col item-col-metrics">
+            <div class="activity-badge">
+              <span class="badge-content">{{ item.value }}</span>
             </div>
-            <div class="row-value">{{ count }}</div>
-          </li>
-          <li v-if="Object.keys(stats.topIndicators || {}).length === 0" class="list-row empty">
-            {{ t('common.noDataFound') }}
-          </li>
-        </ul>
-      </div>
+          </div>
+        </template>
+      </IntelRanking>
     </div>
 
     <!-- Error/Loading states handled via v-loading or local template if needed -->
@@ -134,6 +149,7 @@ import { useI18n } from 'vue-i18n';
 import { useStats } from '../composable/useStats';
 import CountryFlag from './CountryFlag.vue';
 import DefconIndicator from './DefconIndicator.vue';
+import IntelRanking from './common/IntelRanking.vue';
 import './TelemetryStatsCyber.css';
 
 const { t } = useI18n();
@@ -155,6 +171,17 @@ const {
 
 onMounted(() => {
   loadStats();
+});
+
+// Convert objects to arrays for IntelRanking
+const topCountriesList = computed(() => {
+  if (!stats.value?.topCountries) return [];
+  return Object.entries(stats.value.topCountries).map(([key, value]) => ({ key, value }));
+});
+
+const topIndicatorsList = computed(() => {
+  if (!stats.value?.topIndicators) return [];
+  return Object.entries(stats.value.topIndicators).map(([key, value]) => ({ key, value }));
 });
 
 // Helper for Defcon levels mapping to numeric 1-5

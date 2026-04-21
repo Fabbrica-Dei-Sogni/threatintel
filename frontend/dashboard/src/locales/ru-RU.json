@@ -13,6 +13,7 @@
         "loading": "Загрузка...",
         "error": "Ошибка",
         "errorLoadingData": "Ошибка загрузки данных",
+        "all": "Все",
         "unit": "Единица",
         "duration": {
             "seconds": "s",

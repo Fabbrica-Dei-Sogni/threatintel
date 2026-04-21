@@ -55,17 +55,12 @@
                   >
                     <template #header-actions>
                       <ProtocolSelector v-model="selectedAttackProtocol" :options="['http', 'https', 'ssh']" theme="dark" />
-                      <ViewToggle v-model="toggles.attackMap" :label="$t('common.showMap')" theme="magma" />
                     </template>
 
                     <template #title-meta>
                       <button class="btn-ranking-action" @click="goToAttacks">
                         {{ t('common.more_info') }}
                       </button>
-                    </template>
-
-                    <template #extra-content>
-                      <AttackMap v-if="toggles.attackMap" :attacks="recentAttacks" />
                     </template>
 
                     <template #item="{ item }">
@@ -181,17 +176,12 @@
                   >
                     <template #header-actions>
                       <CowrieCategorySelector v-model="filterCategory" size="mini" />
-                      <ViewToggle v-model="toggles.sessionsMap" :label="$t('common.showMap')" theme="jade" />
                     </template>
 
                     <template #title-meta>
                       <button class="btn-ranking-action" @click="goToTelnet">
                         {{ t('common.more_info') }}
                       </button>
-                    </template>
-
-                    <template #extra-content>
-                      <AttackMap v-if="toggles.sessionsMap" :attacks="recentSessionsNormalized" :showLegend="false" />
                     </template>
 
                     <template #item="{ item }">
@@ -290,12 +280,10 @@ import { storeToRefs } from 'pinia';
 import dayjs from 'dayjs';
 import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
 import CountryFlag from '../../components/CountryFlag.vue';
-import AttackMap from '../../components/AttackMap.vue';
 import BreakingNews from '../../components/BreakingNews.vue';
 import SkinSwitcher from '../../components/SkinSwitcher.vue';
 import ConfigMenuButton from '../../components/ConfigMenuButton.vue';
 import ProtocolSelector from '../../components/common/ProtocolSelector.vue';
-import ViewToggle from '../../components/common/ViewToggle.vue';
 import DefconIndicator from '../../components/DefconIndicator.vue';
 import TelemetryStats from '../../components/TelemetryStats.vue';
 import RestrictedIntelligenceGate from '../../components/common/RestrictedIntelligenceGate.vue';
@@ -314,8 +302,6 @@ const { t } = useI18n();
 
 const viewStore = useViewSettingsStore();
 const { 
-  homeShowAttackMap: attackMap, 
-  homeShowSessionsMap: sessionsMap,
   dashboardSkin: currentSkin,
   activeWidgets
 } = storeToRefs(viewStore);
@@ -330,10 +316,7 @@ function toggleWidget(id) {
 
 const isWidgetActive = (id) => activeWidgets.value.includes(id);
 
-const toggles = reactive({
-  attackMap: attackMap,
-  sessionsMap: sessionsMap,
-});
+
 
 const showTicker = ref(true);
 
@@ -454,22 +437,7 @@ const profileStore = useProfileStore();
 const dossierStore = useDossierStore();
 const authStore = useAuthStore();
 
-// Sincronizzazione Mappe/Liste per il cruscotto
-watch(() => toggles.attackMap, (isMapOpen) => {
-  if (isMapOpen) {
-    toggles.recentAttacks = false;
-  } else {
-    toggles.recentAttacks = true;
-  }
-});
 
-watch(() => toggles.sessionsMap, (isMapOpen) => {
-  if (isMapOpen) {
-    toggles.recentSessions = false;
-  } else {
-    toggles.recentSessions = true;
-  }
-});
 
 // Carica i dati solo una volta per la dashboard, ma ricarica se cambia il profilo
 const loadAll = () => {

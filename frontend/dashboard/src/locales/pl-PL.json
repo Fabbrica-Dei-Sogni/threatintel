@@ -114,15 +114,15 @@
     "home": {
         "title": "Konsola Operacyjna Forensic",
         "dashboard": "Pulpit",
-        "attacks": "Ataki",
+        "attacks": "Anomalie",
         "logRequests": "Rejestr logów",
         "statistics": "Statystyki",
-        "recentAttacks": "Ostatnie 10 ataków",
+        "recentAttacks": "Ostatnie 10 anomaliaów",
         "recentLogs": "Ostatnie 10 dzienników",
-        "attackMap": "Mapa ataków",
+        "attackMap": "Mapa anomaliaów",
         "sessionsMap": "Mapa sesji Telnet",
-        "loadingAttacks": "Ładowanie ataków...",
-        "errorLoadingAttacks": "Błąd ładowania ataków",
+        "loadingAttacks": "Ładowanie anomaliaów...",
+        "errorLoadingAttacks": "Błąd ładowania anomaliaów",
         "loadingLogs": "Ładowanie dzienników...",
         "errorLoadingLogs": "Błąd ładowania dzienników",
         "recentSessions": "Ostatnie 10 sesji Telnet",
@@ -166,10 +166,10 @@
         "top_countries": "Top {count} krajów pochodzenia"
     },
     "attacks": {
-        "title": "Ataki HTTP/S SSH",
+        "title": "Anomalie HTTP/S SSH",
         "dashboard": "Pulpit",
         "logRequests": "Rejestr Logów",
-        "minLogsLabel": "Minimalna liczba dzienników na atak:",
+        "minLogsLabel": "Minimalna liczba dzienników na anomalia:",
         "timeFilter": "Filtr czasowy:",
         "last": "Ostatnie",
         "range": "Zakres",
@@ -185,7 +185,7 @@
         "filterByIp": "Filtruj według IP...",
         "clearIpFilter": "Wyczyść filtr IP",
         "copyToFilter": "Skopiuj do filtra IP i wykonaj",
-        "noAttacksFound": "Nie znaleziono ataków",
+        "noAttacksFound": "Nie znaleziono anomaliaów",
         "table": {
             "short": {
                 "origin": "🌍",
@@ -202,7 +202,7 @@
                 "last": "🗓️"
             },
             "defcon": "Defcon",
-            "attacker": "Atakujący",
+            "attacker": "Anomaliaujący",
             "details": "Szczegóły",
             "countryOrg": "Kraj",
             "techniques": "Techniki",
@@ -212,17 +212,17 @@
             "rateBreach": "Naruszenie limitu",
             "rps": "RPS",
             "totalLogs": "Łączna liczba dzienników",
-            "attackDuration": "Czas trwania ataku",
+            "attackDuration": "Czas trwania anomaliau",
             "firstSeen": "Pierwsze wykrycie",
             "lastSeen": "Ostatnie wykrycie"
         }
     },
     "attackDetail": {
-        "title": "Szczegóły ataku",
+        "title": "Szczegóły anomaliau",
         "hudTitle": "HUD TAKTYCZNY",
-        "summary": "Podsumowanie ataku",
+        "summary": "Podsumowanie anomaliau",
         "backToAttacks": "Powrót",
-        "attacker": "Atakujący",
+        "attacker": "Anomaliaujący",
         "country": "Kraj",
         "organization": "Organizacja",
         "defconLevel": "Poziom Defcon",
@@ -230,7 +230,7 @@
         "avgScore": "Średni wynik",
         "totalLogs": "Łączna liczba dzienników",
         "logsRaggrupati": "Dzienniki zagregowane",
-        "attackDuration": "Czas trwania ataku",
+        "attackDuration": "Czas trwania anomaliau",
         "firstSeen": "Pierwsze wykrycie",
         "lastSeen": "Ostatnie wykrycie",
         "rps": "RPS",
@@ -238,20 +238,20 @@
         "style": "Styl",
         "frequency": "Częstotliwość",
         "rateBreach": "Naruszenie limitu",
-        "attackProfile": "Profil ataku",
-        "profileTitle": "Profil ataku",
-        "mapTitle": "Mapa Ataku",
+        "attackProfile": "Profil anomaliau",
+        "profileTitle": "Profil anomaliau",
+        "mapTitle": "Mapa Anomaliau",
         "radarTitle": "Analiza Radarowa",
         "searchUrlPlaceholder": "Filtruj według adresu URL..."
     },
     "attackChart": {
-        "title": "Analiza ataków w czasie",
+        "title": "Analiza anomaliaów w czasie",
         "frequency": "Częstotliwość",
         "severity": "Rozkład dotkliwości",
         "duration": "Czas trwania",
-        "frequencyLabel": "Liczba ataków",
-        "severityLabel": "Dotkliwość ataku",
-        "durationLabel": "Czas trwania ataku"
+        "frequencyLabel": "Liczba anomaliaów",
+        "severityLabel": "Dotkliwość anomaliau",
+        "durationLabel": "Czas trwania anomaliau"
     },
     "sessionChart": {
         "title": "Analiza sesji Telnet w czasie",
@@ -325,7 +325,7 @@
     "threatLogs": {
         "title": "Rejestr logów HTTP/S SSH",
         "dashboard": "Pulpit",
-        "attacks": "Ataki",
+        "attacks": "Anomalie",
         "filterByIp": "Filtruj według IP...",
         "filterByUrl": "Filtruj według URL...",
         "clearIpFilter": "Wyczyść filtr IP",
@@ -393,7 +393,7 @@
         "timezone": "Strefa czasowa",
         "location": "Lokalizacja",
         "additionalInfo": "Dodatkowe informacje",
-        "relatedAttacks": "Powiązane ataki",
+        "relatedAttacks": "Powiązane anomalie",
         "relatedLogs": "Powiązane dzienniki",
         "score": "Wynik",
         "isListed": "Na czarnej liście",
@@ -439,7 +439,7 @@
             "breadth": "Szerokość",
             "speed": "Prędkość (RPS)",
             "duration": "Czas trwania",
-            "attackProfile": "Profil ataku IP",
+            "attackProfile": "Profil anomaliau IP",
             "techniques": "techniki",
             "rps": "RPS",
             "minutes": "min",
@@ -461,7 +461,7 @@
             "ascii": "ASCII"
         },
         "map": {
-            "attacker": "Atakujący",
+            "attacker": "Anomaliaujący",
             "target": "Cel"
         }
     },
@@ -469,7 +469,7 @@
         "menu": "Menu",
         "menuTitle": "Nawigacja",
         "dashboard": "Pulpit",
-        "attacks": "Ataki",
+        "attacks": "Anomalie",
         "logs": "Rejestr Logów",
         "configuration": "Konfiguracja",
         "settings": "Ustawienia",
@@ -537,7 +537,7 @@
             "filters": {
                 "all": "Wszystkie sesje",
                 "scanner": "Skanery",
-                "scannerDesc": "Sesje z 0 zdarzeniami (Atakujący skanujący)",
+                "scannerDesc": "Sesje z 0 zdarzeniami (Anomaliaujący skanujący)",
                 "interaction": "Interakcje",
                 "interactionDesc": "Sesje z co najmniej jednym zarejestrowanym zdarzeniem"
             }
@@ -618,7 +618,7 @@
         },
         "attackDetail": {
             "summary": [
-                "--- HUD TAKTYCZNY: PODSUMOWANIE ATAKU ---",
+                "--- HUD TAKTYCZNY: PODSUMOWANIE ANOMALIAU ---",
                 "Docelowy IP: {ip}",
                 "Poziom Defcon: {defcon} ({score}/10)",
                 "",
@@ -627,7 +627,7 @@
                 "- Czas trwania: {duration}",
                 "- Średni RPS: {rps}",
                 "",
-                "[PROFIL ATAKU]",
+                "[PROFIL ANOMALIAU]",
                 "- Techniki: {techniques}",
                 "- Pierwszy raz widziany: {firstSeen}",
                 "- Ostatni raz widziany: {lastSeen}",
@@ -687,7 +687,7 @@
         },
         "ip": "{ip}",
         "generic": "{text}",
-        "attackSummary": "PODSUMOWANIE ATAKU:\nIP: {ip}\nZagrożenie: {dangerLevel} ({dangerScore})\nLogi: {totaleLogs}\nCzas trwania: {duration}\nRPS: {rps}",
+        "attackSummary": "PODSUMOWANIE ANOMALIAU:\nIP: {ip}\nZagrożenie: {dangerLevel} ({dangerScore})\nLogi: {totaleLogs}\nCzas trwania: {duration}\nRPS: {rps}",
         "attackTechnique": "Wykryta technika: {tech}"
     },
     "dossierRecorder": {
@@ -733,7 +733,7 @@
         "techniques": "Wykryte techniki",
         "firstSeen": "Pierwsze wykrycie",
         "lastSeen": "Ostatnia aktywność",
-        "intensity": "Intensywność ataku",
+        "intensity": "Intensywność anomaliau",
         "avgScore": "Średni wynik śledczy",
         "method": "Metoda HTTP",
         "url": "Zażądany URL",
@@ -760,7 +760,7 @@
     "dossier": {
         "sections": {
             "ip": "IP",
-            "attack": "ATAK",
+            "attack": "ANOMALIA",
             "telnet": "TELNET",
             "session": "SESJA",
             "abuse": "NADUŻYCIE",

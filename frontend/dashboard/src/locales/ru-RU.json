@@ -114,7 +114,7 @@
     "home": {
         "title": "Форензик Опс-Консоль",
         "dashboard": "Панель управления",
-        "attacks": "Атаки",
+        "attacks": "Аномалии",
         "logRequests": "Реестр логов",
         "statistics": "Статистика",
         "recentAttacks": "Последние 10 атак",
@@ -166,7 +166,7 @@
         "top_countries": "Топ {count} стран происхождения"
     },
     "attacks": {
-        "title": "Атаки HTTP/S SSH",
+        "title": "Аномалии HTTP/S SSH",
         "dashboard": "Панель управления",
         "logRequests": "Реестр логов",
         "minLogsLabel": "Минимальное количество журналов на атаку:",
@@ -212,15 +212,15 @@
             "rateBreach": "Нарушение частоты",
             "rps": "RPS",
             "totalLogs": "Всего журналов",
-            "attackDuration": "Длительность атаки",
+            "attackDuration": "Длительность аномалии",
             "firstSeen": "Первое обнаружение",
             "lastSeen": "Последнее обнаружение"
         }
     },
     "attackDetail": {
-        "title": "Детали атаки",
+        "title": "Детали аномалии",
         "hudTitle": "ТАКТИЧЕСКИЙ HUD",
-        "summary": "Сводка атаки",
+        "summary": "Сводка аномалии",
         "backToAttacks": "Вернуться",
         "attacker": "Атакующий",
         "country": "Страна",
@@ -230,7 +230,7 @@
         "avgScore": "Средний балл",
         "totalLogs": "Всего журналов",
         "logsRaggrupati": "Агрегированные журналы",
-        "attackDuration": "Длительность атаки",
+        "attackDuration": "Длительность аномалии",
         "firstSeen": "Первое обнаружение",
         "lastSeen": "Последнее обнаружение",
         "rps": "RPS",
@@ -238,8 +238,8 @@
         "style": "Стиль",
         "frequency": "Частота",
         "rateBreach": "Нарушение частоты",
-        "attackProfile": "Профиль атаки",
-        "profileTitle": "Профиль атаки",
+        "attackProfile": "Профиль аномалии",
+        "profileTitle": "Профиль аномалии",
         "mapTitle": "Карта атак",
         "radarTitle": "Радарный анализ",
         "searchUrlPlaceholder": "Фильтровать по URL..."
@@ -250,8 +250,8 @@
         "severity": "Распределение тяжести",
         "duration": "Длительность",
         "frequencyLabel": "Количество атак",
-        "severityLabel": "Тяжесть атаки",
-        "durationLabel": "Длительность атаки"
+        "severityLabel": "Тяжесть аномалии",
+        "durationLabel": "Длительность аномалии"
     },
     "sessionChart": {
         "title": "Анализ сессий Telnet во времени",
@@ -325,7 +325,7 @@
     "threatLogs": {
         "title": "Журнал логов HTTP/S SSH",
         "dashboard": "Панель управления",
-        "attacks": "Атаки",
+        "attacks": "Аномалии",
         "filterByIp": "Фильтр по IP...",
         "filterByUrl": "Фильтр по URL...",
         "clearIpFilter": "Очистить фильтр IP",
@@ -393,7 +393,7 @@
         "timezone": "Часовой пояс",
         "location": "Местоположение",
         "additionalInfo": "Дополнительная информация",
-        "relatedAttacks": "Связанные атаки",
+        "relatedAttacks": "Связанные аномалии",
         "relatedLogs": "Связанные журналы",
         "score": "Балл",
         "isListed": "В черном списке",
@@ -439,7 +439,7 @@
             "breadth": "Ширина",
             "speed": "Скорость (RPS)",
             "duration": "Длительность",
-            "attackProfile": "Профиль атаки IP",
+            "attackProfile": "Профиль аномалии IP",
             "techniques": "техники",
             "rps": "RPS",
             "minutes": "мин",
@@ -469,7 +469,7 @@
         "menu": "Меню",
         "menuTitle": "Навигация",
         "dashboard": "Панель управления",
-        "attacks": "Атаки",
+        "attacks": "Аномалии",
         "logs": "Реестр логов",
         "configuration": "Конфигурация",
         "settings": "Настройки",
@@ -618,7 +618,7 @@
         },
         "attackDetail": {
             "summary": [
-                "--- ТАКТИЧЕСКИЙ HUD: СВОДКА АТАКИ ---",
+                "--- ТАКТИЧЕСКИЙ HUD: СВОДКА АНОМАЛИИ ---",
                 "Целевой IP: {ip}",
                 "Уровень Defcon: {defcon} ({score}/10)",
                 "",
@@ -627,7 +627,7 @@
                 "- Длительность: {duration}",
                 "- Среднее RPS: {rps}",
                 "",
-                "[ПРОФИЛЬ АТАКИ]",
+                "[ПРОФИЛЬ АНОМАЛИИ]",
                 "- Техники: {techniques}",
                 "- Впервые обнаружен: {firstSeen}",
                 "- Последний раз обнаружен: {lastSeen}",
@@ -687,7 +687,7 @@
         },
         "ip": "{ip}",
         "generic": "{text}",
-        "attackSummary": "СВОДКА АТАКИ:\nIP: {ip}\nОпасность: {dangerLevel} ({dangerScore})\nЛоги: {totaleLogs}\nДлительность: {duration}\nRPS: {rps}",
+        "attackSummary": "СВОДКА АНОМАЛИИ:\nIP: {ip}\nОпасность: {dangerLevel} ({dangerScore})\nЛоги: {totaleLogs}\nДлительность: {duration}\nRPS: {rps}",
         "attackTechnique": "Обнаруженная техника: {tech}"
     },
     "dossierRecorder": {
@@ -733,7 +733,7 @@
         "techniques": "Обнаруженные техники",
         "firstSeen": "Первое обнаружение",
         "lastSeen": "Последняя активность",
-        "intensity": "Интенсивность атаки",
+        "intensity": "Интенсивность аномалии",
         "avgScore": "Средний криминалистический балл",
         "method": "Метод HTTP",
         "url": "Запрошенный URL",
@@ -760,7 +760,7 @@
     "dossier": {
         "sections": {
             "ip": "IP",
-            "attack": "АТАКА",
+            "attack": "АНОМАЛИЯ",
             "telnet": "TELNET",
             "session": "СЕССИЯ",
             "abuse": "ЗЛОУПОТРЕБЛЕНИЕ",

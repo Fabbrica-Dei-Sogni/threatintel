@@ -114,15 +114,15 @@
     "home": {
         "title": "Forensische Ops-Konsole",
         "dashboard": "Dashboard",
-        "attacks": "Angriffe",
+        "attacks": "Anomalien",
         "logRequests": "Log-Register",
         "statistics": "Statistiken",
-        "recentAttacks": "Letzte 10 Angriffe",
+        "recentAttacks": "Letzte 10 Anomalien",
         "recentLogs": "Letzte 10 Protokolle",
-        "attackMap": "Angriffskarte",
+        "attackMap": "Anomalieskarte",
         "sessionsMap": "Telnet-Sitzungskarte",
-        "loadingAttacks": "Angriffe werden geladen...",
-        "errorLoadingAttacks": "Fehler beim Laden der Angriffe",
+        "loadingAttacks": "Anomalien werden geladen...",
+        "errorLoadingAttacks": "Fehler beim Laden der Anomalien",
         "loadingLogs": "Protokolle werden geladen...",
         "errorLoadingLogs": "Fehler beim Laden der Protokolle",
         "recentSessions": "Letzte 10 Telnet-Sitzungen",
@@ -166,10 +166,10 @@
         "top_countries": "Top {count} Herkunftsländer"
     },
     "attacks": {
-        "title": "HTTP/S SSH Angriffe",
+        "title": "HTTP/S SSH Anomalien",
         "dashboard": "Dashboard",
         "logRequests": "Log-Register",
-        "minLogsLabel": "Minimale Anzahl von Protokollen pro Angriff:",
+        "minLogsLabel": "Minimale Anzahl von Protokollen pro Anomalie:",
         "timeFilter": "Zeitfilter:",
         "last": "Letzte",
         "range": "Bereich",
@@ -185,7 +185,7 @@
         "filterByIp": "Nach IP filtern...",
         "clearIpFilter": "IP-Filter löschen",
         "copyToFilter": "In IP-Filter kopieren und ausführen",
-        "noAttacksFound": "Keine Angriffe gefunden",
+        "noAttacksFound": "Keine Anomalien gefunden",
         "table": {
             "short": {
                 "origin": "🌍",
@@ -212,15 +212,15 @@
             "rateBreach": "Rate-Verstoß",
             "rps": "RPS",
             "totalLogs": "Gesamt Protokolle",
-            "attackDuration": "Angriffsdauer",
+            "attackDuration": "Anomaliesdauer",
             "firstSeen": "Zuerst gesehen",
             "lastSeen": "Zuletzt gesehen"
         }
     },
     "attackDetail": {
-        "title": "Angriffsdetails",
+        "title": "Anomaliesdetails",
         "hudTitle": "TAKTIK-HUD",
-        "summary": "Angriffszusammenfassung",
+        "summary": "Anomalieszusammenfassung",
         "backToAttacks": "Zurück",
         "attacker": "Angreifer",
         "country": "Land",
@@ -230,7 +230,7 @@
         "avgScore": "Durchschnittliche Punktzahl",
         "totalLogs": "Gesamt Protokolle",
         "logsRaggrupati": "Aggregierte Protokolle",
-        "attackDuration": "Angriffsdauer",
+        "attackDuration": "Anomaliesdauer",
         "firstSeen": "Zuerst gesehen",
         "lastSeen": "Zuletzt gesehen",
         "rps": "RPS",
@@ -238,20 +238,20 @@
         "style": "Stil",
         "frequency": "Häufigkeit",
         "rateBreach": "Rate-Verstoß",
-        "attackProfile": "Angriffsprofil",
-        "profileTitle": "Angriffsprofil",
-        "mapTitle": "Angriffskarte",
+        "attackProfile": "Anomaliesprofil",
+        "profileTitle": "Anomaliesprofil",
+        "mapTitle": "Anomalieskarte",
         "radarTitle": "Radaranalyse",
         "searchUrlPlaceholder": "Nach URL filtern..."
     },
     "attackChart": {
-        "title": "Zeitliche Angriffsanalyse",
+        "title": "Zeitliche Anomaliesanalyse",
         "frequency": "Häufigkeit",
         "severity": "Schweregradverteilung",
         "duration": "Dauer",
-        "frequencyLabel": "Anzahl der Angriffe",
-        "severityLabel": "Angriffsschwere",
-        "durationLabel": "Angriffsdauer"
+        "frequencyLabel": "Anzahl der Anomalien",
+        "severityLabel": "Anomaliesschwere",
+        "durationLabel": "Anomaliesdauer"
     },
     "sessionChart": {
         "title": "Analyse der Telnet-Sitzungen im Zeitverlauf",
@@ -325,7 +325,7 @@
     "threatLogs": {
         "title": "HTTP/S SSH Log-Register",
         "dashboard": "Dashboard",
-        "attacks": "Angriffe",
+        "attacks": "Anomalien",
         "filterByIp": "Nach IP filtern...",
         "filterByUrl": "Nach URL filtern...",
         "clearIpFilter": "IP-Filter löschen",
@@ -384,7 +384,7 @@
     },
     "ipDetails": {
         "title": "IP-Details",
-        "backToAttacks": "Zurück zu Angriffen",
+        "backToAttacks": "Zurück zu Anomalienn",
         "ipAddress": "IP-Adresse",
         "country": "Land",
         "city": "Stadt",
@@ -393,7 +393,7 @@
         "timezone": "Zeitzone",
         "location": "Standort",
         "additionalInfo": "Zusätzliche Informationen",
-        "relatedAttacks": "Verwandte Angriffe",
+        "relatedAttacks": "Verwandte Anomalien",
         "relatedLogs": "Verwandte Protokolle",
         "score": "Punktzahl",
         "isListed": "Auf der schwarzen Liste",
@@ -439,7 +439,7 @@
             "breadth": "Breite",
             "speed": "Geschwindigkeit (RPS)",
             "duration": "Dauer",
-            "attackProfile": "Angriffsprofil IP",
+            "attackProfile": "Anomaliesprofil IP",
             "techniques": "Techniken",
             "rps": "RPS",
             "minutes": "Min",
@@ -469,7 +469,7 @@
         "menu": "Menü",
         "menuTitle": "Navigation",
         "dashboard": "Dashboard",
-        "attacks": "Angriffe",
+        "attacks": "Anomalien",
         "logs": "Log-Register",
         "configuration": "Konfiguration",
         "settings": "Einstellungen",
@@ -618,7 +618,7 @@
         },
         "attackDetail": {
             "summary": [
-                "--- TAKTISCHES HUD: ANGRIFFS-ZUSAMMENFASSUNG ---",
+                "--- TAKTISCHES HUD: ANOMALIES-ZUSAMMENFASSUNG ---",
                 "Ziel-IP: {ip}",
                 "Defcon-Stufe: {defcon} ({score}/10)",
                 "",
@@ -627,7 +627,7 @@
                 "- Dauer: {duration}",
                 "- Durchschnittliche RPS: {rps}",
                 "",
-                "[ANGRIFFSPROFIL]",
+                "[ANOMALIESPROFIL]",
                 "- Techniken: {techniques}",
                 "- Zuerst gesehen: {firstSeen}",
                 "- Zuletzt gesehen: {lastSeen}",
@@ -687,7 +687,7 @@
         },
         "ip": "{ip}",
         "generic": "{text}",
-        "attackSummary": "ANGRIFFSZUSAMMENFASSUNG:\nIP: {ip}\nGefahr: {dangerLevel} ({dangerScore})\nLogs: {totaleLogs}\nDauer: {duration}\nRPS: {rps}",
+        "attackSummary": "ANOMALIESZUSAMMENFASSUNG:\nIP: {ip}\nGefahr: {dangerLevel} ({dangerScore})\nLogs: {totaleLogs}\nDauer: {duration}\nRPS: {rps}",
         "attackTechnique": "Erkannte Technik: {tech}"
     },
     "dossierRecorder": {
@@ -733,7 +733,7 @@
         "techniques": "Erkannte Techniken",
         "firstSeen": "Erste Erkennung",
         "lastSeen": "Letzte Aktivität",
-        "intensity": "Angriffsintensität",
+        "intensity": "Anomaliesintensität",
         "avgScore": "Durchschn. Forensik-Score",
         "method": "HTTP-Methode",
         "url": "Anforderungs-URL",
@@ -760,7 +760,7 @@
     "dossier": {
         "sections": {
             "ip": "IP",
-            "attack": "ANGRIFF",
+            "attack": "ANOMALIE",
             "telnet": "TELNET",
             "session": "SITZUNG",
             "abuse": "MISSBRAUCH",

@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { getApiUrl } from './index';
+import { storage, StorageNamespace } from '../utils/storage';
 
 /**
  * API client per la gestione delle configurazioni honeypot
@@ -9,16 +10,16 @@ export const apiClient = axios.create({
     timeout: 8000,
 });
 
-// Interceptor per gestire cambiamenti a runtime dell'URL base e iniettare il token
+// Interceptor per gestire cambiamenti a runtime e iniettare il token
 apiClient.interceptors.request.use((config) => {
     config.baseURL = getApiUrl();
-    
-    // Recupera il token dal localStorage per abilitare l'autenticazione
-    const token = localStorage.getItem('auth_token');
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
+
+    // Recupera il token dal namespace AUTH
+    const auth = storage.get<{token: string}>(StorageNamespace.AUTH);
+    if (auth?.token) {
+        config.headers.Authorization = `Bearer ${auth.token}`;
     }
-    
+
     return config;
 }, (error) => {
     return Promise.reject(error);

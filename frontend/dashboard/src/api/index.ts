@@ -3,6 +3,8 @@ import type { FetchSearchParams } from '../models/LogDTO';
 import type { FetchAttackSearchParams } from '../models/AttackDTO';
 import { useProfileStore } from '../stores/profiles';
 
+import { storage, StorageNamespace } from '../utils/storage';
+
 // Funzione helper per ottenere l'URL, con fallback sulla gestione dei profili
 export const getApiUrl = (): string => {
     try {
@@ -14,8 +16,9 @@ export const getApiUrl = (): string => {
     } catch (e) {
         // Silenziamo l'errore se Pinia non è ancora pronto
     }
-    // Fallback prioritario al localStorage (vecchio sistema) o ENV
-    return localStorage.getItem('api_url') || import.meta.env.VITE_APP_API_URL || '/honeypot/api';
+    // Fallback prioritario al localStorage (via HP_API namespace se migrato) o ENV
+    const savedApi = storage.get<string>(StorageNamespace.API);
+    return savedApi || import.meta.env.VITE_APP_API_URL || '/honeypot/api';
 };
 
 export const apiClient = axios.create({
@@ -27,10 +30,10 @@ export const apiClient = axios.create({
 apiClient.interceptors.request.use((config) => {
     config.baseURL = getApiUrl();
     
-    // Recupera il token dal localStorage
-    const token = localStorage.getItem('auth_token');
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
+    // Recupera il token dal namespace AUTH
+    const auth = storage.get<{token: string}>(StorageNamespace.AUTH);
+    if (auth?.token) {
+        config.headers.Authorization = `Bearer ${auth.token}`;
     }
     
     return config;
@@ -43,14 +46,11 @@ apiClient.interceptors.response.use((response) => {
     return response;
 }, (error) => {
     if (error.response && [401, 403].includes(error.response.status)) {
-        // Se siamo in dashboard e riceviamo 401, potremmo voler reindirizzare al login
         const currentPath = window.location.pathname;
         if (!currentPath.includes('/auth/login') && !currentPath.includes('/auth/register')) {
             console.warn('[apiClient] Sessione scaduta o permessi insufficienti. Reindirizzamento...');
-            // Opzionale: pulizia locale storage se 401
             if (error.response.status === 401) {
-                localStorage.removeItem('auth_token');
-                localStorage.removeItem('user_info');
+                storage.remove(StorageNamespace.AUTH);
             }
         }
     }
@@ -66,11 +66,11 @@ export async function login(credentials: any): Promise<any> {
     try {
         const response = await apiClient.post('/auth/login', credentials);
         if (response.data.token) {
-            localStorage.setItem('auth_token', response.data.token);
-            // Salva anche info utente se presenti (restituite dal nuovo verify/login)
-            if (response.data.user) {
-                localStorage.setItem('user_info', JSON.stringify(response.data.user));
-            }
+            // Salvataggio tramite StorageManager
+            storage.set(StorageNamespace.AUTH, {
+                token: response.data.token,
+                user: response.data.user || null
+            });
         }
         return response.data;
     } catch (error) {

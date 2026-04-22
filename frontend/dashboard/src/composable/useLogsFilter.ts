@@ -1,22 +1,29 @@
 // src/composables/useLogsFilter.ts
-import { ref } from 'vue';
+import { ref, isRef, type Ref } from 'vue';
 import { fetchSearch } from '../api/index.js';
 import type { SortFields } from '../models/CommonDTO';
 import type { FetchSearchParams, FetchSearchResponse, Log } from '@/models/LogDTO.ts';
 import { useSearchBase } from './useSearchBase';
 
+/**
+ * Helper per normalizzare un input che può essere un valore semplice o un Ref
+ */
+function toRef<T>(val: T | Ref<T>): Ref<T> {
+    return isRef(val) ? val : ref(val) as Ref<T>;
+}
+
 export function useLogsFilter(
-    initialIp: string = '',
-    initialUrl: string = '',
-    initialProtocol: string = 'http',
-    initialPage: number = 1,
+    initialIp: string | Ref<string> = '',
+    initialUrl: string | Ref<string> = '',
+    initialProtocol: string | Ref<string> = 'http',
+    initialPage: number | Ref<number> = 1,
     initialSortFields: SortFields | null = null,
     initialPageSize: number = 20
 ) {
-    // Filtri specifici
-    const filterIp = ref(initialIp);
-    const filterUrl = ref(initialUrl);
-    const filterProtocol = ref(initialProtocol);
+    // Filtri specifici - Normalizzati come Ref
+    const filterIp = toRef(initialIp);
+    const filterUrl = toRef(initialUrl);
+    const filterProtocol = toRef(initialProtocol);
     const logs = ref<Log[]>([]);
 
     // Integrazione useSearchBase

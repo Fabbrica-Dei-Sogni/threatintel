@@ -1,19 +1,26 @@
 // src/composable/useCowrieSessions.ts
-import { ref } from 'vue';
+import { ref, isRef, type Ref } from 'vue';
 import { fetchCowrieSessions } from '../api';
 import type { CowrieSession, FetchCowrieSessionsResponse } from '../models/CowrieDTO';
 import { useSearchBase } from './useSearchBase';
 
+/**
+ * Helper per normalizzare un input che può essere un valore semplice o un Ref
+ */
+function toRef<T>(val: T | Ref<T>): Ref<T> {
+    return isRef(val) ? val : ref(val) as Ref<T>;
+}
+
 export function useCowrieSessions(
-    initialPage: number = 1,
+    initialPage: number | Ref<number> = 1,
     initialPageSize: number = 20,
     initialSortFields: any = {},
-    initialIp: string = '',
-    initialCategory: string = 'interaction'
+    initialIp: string | Ref<string> = '',
+    initialCategory: string | Ref<string> = 'interaction'
 ) {
-    // Filtri specifici
-    const filterIp = ref(initialIp);
-    const filterCategory = ref<string>(initialCategory);
+    // Filtri specifici - Normalizzati come Ref
+    const filterIp = toRef(initialIp);
+    const filterCategory = toRef(initialCategory);
     const sessions = ref<CowrieSession[]>([]);
 
     // Integrazione useSearchBase

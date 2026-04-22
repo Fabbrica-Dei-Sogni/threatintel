@@ -52,14 +52,17 @@ function getBrowserLocale(): string {
     return 'it-IT';
 }
 
+import { storage, StorageNamespace } from '../utils/storage';
+
 /**
  * Determina il locale iniziale con questa priorità:
- * 1. Preferenza salvata dall'utente (localStorage)
+ * 1. Preferenza salvata dall'utente (StorageManager SETTINGS)
  * 2. Lingua del browser
  * 3. Fallback a italiano
  */
 function getInitialLocale(): string {
-    const savedLocale = localStorage.getItem('user-locale');
+    const settings = storage.get<any>(StorageNamespace.SETTINGS);
+    const savedLocale = settings?.userLocale;
 
     if (savedLocale) {
         console.log('🌍 i18n: Using saved locale:', savedLocale);

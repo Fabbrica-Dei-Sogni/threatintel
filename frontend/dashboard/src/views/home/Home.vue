@@ -26,15 +26,15 @@
 
     <section class="intel-center">
             <section class="actions">
-              <button @click="toggleWidget('telemetries')" :class="{ active: isWidgetActive('telemetries') }" class="btn-action">📊 {{ t('home.telemetries').toUpperCase() }}</button>
-              <button @click="toggleWidget('attacks')" :class="{ active: isWidgetActive('attacks') }" class="btn-action">🛰️ {{ t('home.attacks').toUpperCase() }}</button>
-              <button @click="toggleWidget('logs')" :class="{ active: isWidgetActive('logs') }" class="btn-action">🗄️ {{ t('home.logRequests').toUpperCase() }}</button>
-              <button @click="toggleWidget('sessions')" :class="{ active: isWidgetActive('sessions') }" class="btn-action">📟 {{ t('home.telnet').toUpperCase() }}</button>
-              <button @click="toggleWidget('dossiers')" :class="{ active: isWidgetActive('dossiers') }" class="btn-action">📁 {{ t('home.archive').toUpperCase() }}</button>
+              <button @click="dashboardStore.toggleWidget('telemetries')" :class="{ active: dashboardStore.isWidgetActive('telemetries') }" class="btn-action">📊 {{ t('home.telemetries').toUpperCase() }}</button>
+              <button @click="dashboardStore.toggleWidget('attacks')" :class="{ active: dashboardStore.isWidgetActive('attacks') }" class="btn-action">🛰️ {{ t('home.attacks').toUpperCase() }}</button>
+              <button @click="dashboardStore.toggleWidget('logs')" :class="{ active: dashboardStore.isWidgetActive('logs') }" class="btn-action">🗄️ {{ t('home.logRequests').toUpperCase() }}</button>
+              <button @click="dashboardStore.toggleWidget('sessions')" :class="{ active: dashboardStore.isWidgetActive('sessions') }" class="btn-action">📟 {{ t('home.telnet').toUpperCase() }}</button>
+              <button @click="dashboardStore.toggleWidget('dossiers')" :class="{ active: dashboardStore.isWidgetActive('dossiers') }" class="btn-action">📁 {{ t('home.archive').toUpperCase() }}</button>
             </section>
 
             <transition-group name="widget-dynamic" tag="div" class="widgets-container">
-              <div v-for="widget in activeWidgets" :key="widget" class="widget-item">
+              <div v-for="widget in dashboardState.activeWidgets" :key="widget" class="widget-item">
                 <!-- TELEMETRIES -->
                 <div v-if="widget === 'telemetries'" class="telemetry-wrapper">
                   <TelemetryStats />
@@ -47,20 +47,26 @@
                     :items="recentAttacks"
                     :loading="loadingAttacks"
                     :error="errorAttacks"
-                    v-model:page="attackPage"
+                    v-model:page="dashboardState.rankings.attackPage"
                     :pageSize="10"
                     :total="attackTotal"
                     itemStyle="anomalies-ranking"
                   >
                     <template #header-actions>
-                      <ProtocolSelector v-model="selectedAttackProtocol" :options="['http', 'https', 'ssh']" theme="dark" />
+                      <ProtocolSelector v-model="dashboardState.rankings.attackProtocol" :options="['http', 'https', 'ssh']" theme="dark" />
+                      <button class="reset-btn-mini" @click="dashboardStore.resetAttacks" :title="t('telemetry.reset_filters')">
+                        <div class="reset-ascii">
+                           <span></span>
+                           <span></span>
+                        </div>
+                      </button>
                     </template>
 
                     <template #filters>
                       <div class="filters-row">
                         <!-- Time Range -->
                         <div class="filter-item">
-                          <span class="filter-label">{{ t('telemetry.filter_label') }}: <span class="active-val">{{ attackTimeValue === null ? t('common.all').toUpperCase() : (attackTimeValue + (attackTimeUnit === 'days' ? 'D' : 'H')) }}</span></span>
+                          <span class="filter-label">{{ t('telemetry.filter_label') }}: <span class="active-val">{{ dashboardState.rankings.attackTimeValue === null ? t('common.all').toUpperCase() : (dashboardState.rankings.attackTimeValue + (dashboardState.rankings.attackTimeUnit === 'days' ? 'D' : 'H')) }}</span></span>
                           <div class="tabs-row log-threshold-tabs">
                             <button 
                               v-for="opt in [
@@ -73,8 +79,8 @@
                               ]" 
                               :key="opt.l"
                               class="tab-btn"
-                              :class="{ active: attackTimeValue === opt.v && (opt.v === null || attackTimeUnit === opt.u) }"
-                              @click="attackTimeValue = opt.v; attackTimeUnit = opt.u"
+                              :class="{ active: dashboardState.rankings.attackTimeValue === opt.v && (opt.v === null || dashboardState.rankings.attackTimeUnit === opt.u) }"
+                              @click="dashboardState.rankings.attackTimeValue = opt.v; dashboardState.rankings.attackTimeUnit = opt.u"
                             >
                               {{ opt.v === null ? t('common.all').toUpperCase() : opt.l }}
                             </button>
@@ -83,14 +89,14 @@
 
                         <!-- Log Threshold Only -->
                         <div class="filter-item">
-                          <span class="filter-label">{{ t('telemetry.filter_log_threshold_label') }}: <span class="active-val">{{ attackMinLogs }}</span></span>
+                          <span class="filter-label">{{ t('telemetry.filter_log_threshold_label') }}: <span class="active-val">{{ dashboardState.rankings.attackMinLogs }}</span></span>
                           <div class="tabs-row log-threshold-tabs">
                             <button 
                               v-for="val in [3, 5, 10, 20, 40, 50]" 
                               :key="val"
                               class="tab-btn"
-                              :class="{ active: attackMinLogs === val }"
-                              @click="attackMinLogs = val"
+                              :class="{ active: dashboardState.rankings.attackMinLogs === val }"
+                              @click="dashboardState.rankings.attackMinLogs = val"
                             >
                               {{ val }}
                             </button>
@@ -99,14 +105,14 @@
 
                         <!-- Defcon Level (Multi-select) -->
                         <div class="filter-item">
-                          <span class="filter-label">{{ t('telemetry.filter_defcon_label') }}: <span class="active-val">{{ filterDangerLevels.length === 0 ? t('common.all').toUpperCase() : filterDangerLevels.sort().join(',') }}</span></span>
+                          <span class="filter-label">{{ t('telemetry.filter_defcon_label') }}: <span class="active-val">{{ (dashboardState.rankings.dangerLevels || []).length === 0 ? t('common.all').toUpperCase() : [...(dashboardState.rankings.dangerLevels || [])].sort().join(',') }}</span></span>
                           <div class="tabs-row log-threshold-tabs">
                             <button 
                               v-for="lvl in [1, 2, 3, 4, 5]" 
                               :key="lvl"
                               class="tab-btn"
-                              :class="['defcon-btn-' + lvl, { active: filterDangerLevels.includes(lvl) }]"
-                              @click="toggleDefconLevel(lvl)"
+                              :class="['defcon-btn-' + lvl, { active: (dashboardState.rankings.dangerLevels || []).includes(lvl) }]"
+                              @click="dashboardStore.toggleDefconLevel(lvl)"
                             >
                               {{ lvl }}
                             </button>
@@ -176,13 +182,19 @@
                       :items="recentLogs"
                       :loading="loadingLogs"
                       :error="errorLogs"
-                      v-model:page="logPage"
+                      v-model:page="dashboardState.rankings.logPage"
                       :pageSize="10"
                       :total="logTotal"
                       itemStyle="logs-ranking"
                     >
                       <template #header-actions>
-                        <ProtocolSelector v-model="selectedLogProtocol" :options="['http', 'https', 'ssh']" theme="dark" />
+                        <ProtocolSelector v-model="dashboardState.rankings.logProtocol" :options="['http', 'https', 'ssh']" theme="dark" />
+                        <button class="reset-btn-mini" @click="dashboardStore.resetLogs" :title="t('telemetry.reset_filters')">
+                            <div class="reset-ascii">
+                               <span></span>
+                               <span></span>
+                            </div>
+                        </button>
                       </template>
 
                       <template #title-meta>
@@ -243,13 +255,19 @@
                     :items="recentSessions"
                     :loading="loadingSessions"
                     :error="errorSessions"
-                    v-model:page="sessionPage"
+                    v-model:page="dashboardState.rankings.sessionPage"
                     :pageSize="10"
                     :total="sessionTotal"
                     itemStyle="sessions-ranking"
                   >
                     <template #header-actions>
-                      <CowrieCategorySelector v-model="filterCategory" size="mini" />
+                      <CowrieCategorySelector v-model="dashboardState.rankings.sessionCategory" size="mini" />
+                      <button class="reset-btn-mini" @click="dashboardStore.resetSessions" :title="t('telemetry.reset_filters')">
+                        <div class="reset-ascii">
+                           <span></span>
+                           <span></span>
+                        </div>
+                      </button>
                     </template>
 
                     <template #title-meta>
@@ -354,13 +372,11 @@ import { useLogsFilter } from '../../composable/useLogsFilter';
 import { useAttacksFilter } from '../../composable/useAttacksFilter';
 import { useCowrieSessions } from '../../composable/useCowrieSessions';
 import { useRouter } from 'vue-router'
-import { computed, onMounted, watch, ref, reactive } from 'vue'
+import { computed, onMounted, watch, ref, toRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { fetchDossiers } from '../../api';
 import { useDossierStore } from '../../stores/dossier';
 import { useAuthStore } from '../../stores/auth';
-import { useViewSettingsStore } from '../../stores/viewSettings';
-import { storeToRefs } from 'pinia';
 import dayjs from 'dayjs';
 import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
 import CountryFlag from '../../components/CountryFlag.vue';
@@ -376,38 +392,18 @@ import IntelRanking from '../../components/common/IntelRanking.vue';
 import { formatDateTime, formatDateOnly, formatTimeOnly, formatHumanDuration, formatFullDateTime } from '../../utils/dateUtils';
 import './HomeCyber.css';
 
-const props = defineProps({
-    initialAttackProtocol:  { type: String, default: 'http' },
-    initialLogProtocol:     { type: String, default: 'http' },
-    initialSessionCategory: { type: String, default: 'interaction' },
-});
-
 const { t } = useI18n();
 
+import { useDashboardStore } from '../../stores/dashboard';
+import { useViewSettingsStore } from '../../stores/viewSettings';
+import { storeToRefs } from 'pinia';
+
+const dashboardStore = useDashboardStore();
 const viewStore = useViewSettingsStore();
-const { 
-  dashboardSkin: currentSkin,
-  activeWidgets
-} = storeToRefs(viewStore);
-
-function toggleWidget(id) {
-  if (activeWidgets.value.includes(id)) {
-    activeWidgets.value = activeWidgets.value.filter(w => w !== id);
-  } else {
-    activeWidgets.value = [id, ...activeWidgets.value];
-  }
-}
-
-const isWidgetActive = (id) => activeWidgets.value.includes(id);
-
-
+const { state: dashboardState } = dashboardStore;
+const { dashboardSkin: currentSkin } = storeToRefs(viewStore);
 
 const showTicker = ref(true);
-
-// Header ticker remains persistent as requested
-onMounted(() => {
-  // No toggle timer here
-});
 
 // Navigazione
 const router = useRouter()
@@ -449,34 +445,24 @@ const formatAggregatedDurationHome = (session) => {
   return computeDuration(session.starttime, session.endtime);
 };
 
-const selectedAttackProtocol = ref(props.initialAttackProtocol);
-const selectedLogProtocol = ref(props.initialLogProtocol);
-const attackMinLogs = ref(10);
-const attackTimeValue = ref(90);
-const attackTimeUnit = ref('days');
-
-// Anomalie - chiamata base: ora include parametri dinamici per log e tempo
+// Anomalie - chiamata base: ora collegata direttamente allo store persistente tramite toRef
 const {
   attacks,
-  filterDangerLevels,
   loading: loadingAttacks,
   error: errorAttacks,
-  page: attackPage,
-  pageSize: attackPageSize,
   total: attackTotal,
   fetchData: fetchAttacks
-} = useAttacksFilter('', selectedAttackProtocol, 1, attackMinLogs, 'ago', attackTimeValue, attackTimeUnit, null, 60, 'days', 0, 'days', { firstSeen: -1 }, 10)
-
-const toggleDefconLevel = (lvl) => {
-  const current = [...filterDangerLevels.value];
-  const index = current.indexOf(lvl);
-  if (index === -1) {
-    current.push(lvl);
-  } else {
-    current.splice(index, 1);
-  }
-  filterDangerLevels.value = current;
-};
+} = useAttacksFilter(
+    '', 
+    toRef(dashboardState.rankings, 'attackProtocol'), 
+    toRef(dashboardState.rankings, 'attackPage'), 
+    toRef(dashboardState.rankings, 'attackMinLogs'), 
+    'ago', 
+    toRef(dashboardState.rankings, 'attackTimeValue'), 
+    toRef(dashboardState.rankings, 'attackTimeUnit'), 
+    null, 60, 'days', 0, 'days', { firstSeen: -1 }, 10,
+    toRef(dashboardState.rankings, 'dangerLevels')
+)
 
 const recentAttacks = computed(() => attacks.value)
 
@@ -484,38 +470,30 @@ const {
   logs,
   loading: loadingLogs,
   error: errorLogs,
-  page: logPage,
-  pageSize: logPageSize,
   total: logTotal,
   fetchData: fetchLogs
-} = useLogsFilter('', '', selectedLogProtocol, 1, { timestamp: -1 }, 10)
+} = useLogsFilter(
+    '', '', 
+    toRef(dashboardState.rankings, 'logProtocol'), 
+    toRef(dashboardState.rankings, 'logPage'), 
+    { timestamp: -1 }, 10
+)
 
 const recentLogs = computed(() => logs.value)
 
 const {
   sessions,
-  filterCategory,
   loading: loadingSessions,
   error: errorSessions,
-  page: sessionPage,
-  pageSize: sessionPageSize,
   total: sessionTotal,
   fetchData: fetchSessions
-} = useCowrieSessions(1, 10, { starttime: -1 }, '', props.initialSessionCategory);
+} = useCowrieSessions(
+    toRef(dashboardState.rankings, 'sessionPage'), 
+    10, { starttime: -1 }, '', 
+    toRef(dashboardState.rankings, 'sessionCategory')
+);
 
 const recentSessions = computed(() => sessions.value)
-
-const recentSessionsNormalized = computed(() => recentSessions.value.map(s => ({
-  ...s,
-  id: s._id,
-  request: { ip: s.src_ip },
-  ipDetails: s.ipDetailsId,
-  dangerLevel: 2, // High severity for hostile sessions
-  dangerScore: 0,
-  rps: 0,
-  totaleLogs: s.eventCount || 1,
-  firstSeen: s.starttime
-})));
 
 // Dossier - ultimi 5
 const recentDossiers = ref([]);
@@ -559,23 +537,102 @@ onMounted(loadAll);
 watch(() => profileStore.activeProfileId, loadAll);
 watch(() => dossierStore.lastSavedAt, fetchRecentDossiers);
 
-// Sincronizzazione Prop -> Ref (per back/forward browser)
-watch(() => props.initialAttackProtocol,  (v) => { selectedAttackProtocol.value = v ?? 'http'; });
-watch(() => props.initialLogProtocol,     (v) => { selectedLogProtocol.value   = v ?? 'http'; });
-watch(() => props.initialSessionCategory, (v) => { filterCategory.value        = v ?? 'interaction'; });
+// Sincronizzazione automatica dei filtri con ricaricamento dati
+// Osserviamo l'intero oggetto rankings per reagire a qualsiasi cambio di filtro o pagina
+watch(() => dashboardState.rankings, (newRankings, oldRankings) => {
+    // Se è cambiata la pagina o un filtro degli attacchi, ricarichiamo gli attacchi
+    fetchAttacks();
+    // Idem per log e sessioni
+    fetchLogs();
+    fetchSessions();
+}, { deep: true });
 
-// Sincronizzazione Ref -> URL query
-// Omette il parametro quando è al valore di default per mantenere URL pulito.
-watch([selectedAttackProtocol, selectedLogProtocol, filterCategory], ([ap, lp, sc]) => {
-    router.replace({
-        name: 'Home',
-        query: {
-            attackProtocol:  ap !== 'http'        ? ap : undefined,
-            logProtocol:     lp !== 'http'        ? lp : undefined,
-            sessionCategory: sc !== 'interaction' ? sc : undefined,
-        }
-    });
-});
 </script>
 
 <style scoped src="./Home.css"></style>
+<style scoped>
+/* Stunning Cyber-Red Reset Button with ASCII Lines */
+.reset-btn-mini {
+    background: transparent;
+    border: 1px solid rgba(255, 51, 102, 0.4);
+    color: #ff3366;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    margin-left: 12px;
+    position: relative;
+    clip-path: polygon(15% 0%, 100% 0, 100% 85%, 85% 100%, 0 100%, 0% 15%);
+    padding: 0;
+    overflow: hidden;
+}
+
+.reset-ascii {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+.reset-ascii span {
+    display: block;
+    width: 12px;
+    height: 2px;
+    background: #ff3366;
+    box-shadow: 0 0 5px rgba(255, 51, 102, 0.6);
+    transition: all 0.3s ease;
+}
+
+/* Sfasamento orizzontale come richiesto */
+.reset-ascii span:nth-child(1) {
+    transform: translateX(-3px);
+}
+.reset-ascii span:nth-child(2) {
+    transform: translateX(3px);
+}
+
+.reset-btn-mini:hover {
+    background: rgba(255, 51, 102, 0.1);
+    border-color: #ff3366;
+    box-shadow: 0 0 15px rgba(255, 51, 102, 0.4);
+}
+
+.reset-btn-mini:hover .reset-ascii {
+    transform: rotate(180deg);
+}
+
+/* Al hover le linee si allineano e brillano (effetto ricalibrazione) */
+.reset-btn-mini:hover .reset-ascii span {
+    transform: translateX(0);
+    background: #fff;
+    box-shadow: 0 0 10px #fff;
+    width: 14px;
+}
+
+.reset-btn-mini:active {
+    transform: scale(0.8);
+    background: #ff3366;
+}
+
+/* Skin Cyber specific */
+.skin-cyber .reset-btn-mini {
+    border-style: double; /* Doppia linea per un tocco più hardware */
+    border-width: 1px;
+}
+
+/* Skin Classic override */
+.skin-classic .reset-btn-mini {
+    clip-path: none;
+    border-radius: 4px;
+    border-color: #c0392b;
+}
+
+.skin-classic .reset-ascii span {
+    background: #c0392b;
+    box-shadow: none;
+}
+</style>

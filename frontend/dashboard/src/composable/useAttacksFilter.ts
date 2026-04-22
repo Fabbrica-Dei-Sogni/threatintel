@@ -1,40 +1,47 @@
 // src/composables/useAttacksFilter.ts
-import { ref } from 'vue';
+import { ref, isRef, computed, type Ref } from 'vue';
 import { fetchAttackSearch } from '../api/index.js';
 import type { SortFields, TimeConfig } from '../models/CommonDTO';
 import type { AttackLog, FetchAttackSearchParams, FetchAttackSearchResponse } from '@/models/AttackDTO.js';
 import { useSearchBase } from './useSearchBase';
 
+/**
+ * Helper per normalizzare un input che può essere un valore semplice o un Ref
+ */
+function toRef<T>(val: T | Ref<T>): Ref<T> {
+    return isRef(val) ? val : ref(val) as Ref<T>;
+}
+
 export function useAttacksFilter(
-    initialIp: string,
-    initialProtocol: string = 'http',
-    initialPage: number,
-    initialMinLogsForAttack: number,
-    initialTimeMode: 'ago' | 'range',
-    initialAgoValue: number,
-    initialAgoUnit: string,
-    initialDateRange: [string | null, string | null] | null,
-    initialFromValue: number,
-    initialFromUnit: string,
-    initialToValue: number,
-    initialToUnit: string,
+    initialIp: string | Ref<string>,
+    initialProtocol: string | Ref<string> = 'http',
+    initialPage: number | Ref<number>,
+    initialMinLogsForAttack: number | Ref<number>,
+    initialTimeMode: ('ago' | 'range') | Ref<'ago' | 'range'>,
+    initialAgoValue: (number | null) | Ref<number | null>,
+    initialAgoUnit: (string | null) | Ref<string | null>,
+    initialDateRange: ([string | null, string | null] | null) | Ref<[string | null, string | null] | null>,
+    initialFromValue: number | Ref<number>,
+    initialFromUnit: string | Ref<string>,
+    initialToValue: number | Ref<number>,
+    initialToUnit: string | Ref<string>,
     initialSortFields: SortFields = null,
     initialPageSize: number = 20,
-    initialDangerLevels: number[] = []
+    initialDangerLevels: number[] | Ref<number[]> = []
 ) {
-    // Filtri specifici
-    const filterIp = ref(initialIp);
-    const filterProtocol = ref(initialProtocol);
-    const filterDangerLevels = ref<number[]>(initialDangerLevels);
-    const minLogsForAttack = ref(initialMinLogsForAttack);
-    const timeMode = ref(initialTimeMode);
-    const agoValue = ref(initialAgoValue);
-    const agoUnit = ref(initialAgoUnit);
-    const dateRange = ref(initialDateRange);
-    const fromValue = ref(initialFromValue);
-    const fromUnit = ref(initialFromUnit);
-    const toValue = ref(initialToValue);
-    const toUnit = ref(initialToUnit);
+    // Filtri specifici - Normalizzati come Ref (se passati come computed o ref dallo store, rimangono legati)
+    const filterIp = toRef(initialIp);
+    const filterProtocol = toRef(initialProtocol);
+    const filterDangerLevels = toRef(initialDangerLevels);
+    const minLogsForAttack = toRef(initialMinLogsForAttack);
+    const timeMode = toRef(initialTimeMode);
+    const agoValue = toRef(initialAgoValue);
+    const agoUnit = toRef(initialAgoUnit);
+    const dateRange = toRef(initialDateRange);
+    const fromValue = toRef(initialFromValue);
+    const fromUnit = toRef(initialFromUnit);
+    const toValue = toRef(initialToValue);
+    const toUnit = toRef(initialToUnit);
     
     const attacks = ref<AttackLog[]>([]);
 

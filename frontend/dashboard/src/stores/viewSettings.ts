@@ -1,10 +1,10 @@
 import { defineStore } from 'pinia';
 import { ref, watch } from 'vue';
+import { storage, StorageNamespace } from '../utils/storage';
 
 export const useViewSettingsStore = defineStore('viewSettings', () => {
-    // Load initial state from localStorage or use defaults
-    const storageKey = 'hp_view_settings';
-    const savedSettings = JSON.parse(localStorage.getItem(storageKey) || '{}');
+    // Carichiamo lo stato iniziale usando il gestore centralizzato
+    const savedSettings = storage.get<any>(StorageNamespace.SETTINGS) || {};
 
     // Attacks View
     const attacksShowMap = ref<boolean>(savedSettings.attacksShowMap ?? false);
@@ -21,20 +21,24 @@ export const useViewSettingsStore = defineStore('viewSettings', () => {
     const homeShowAttackMap = ref<boolean>(savedSettings.homeShowAttackMap ?? false);
     const homeShowSessionsMap = ref<boolean>(savedSettings.homeShowSessionsMap ?? false);
     const dashboardSkin = ref<string>(savedSettings.dashboardSkin ?? 'cyber');
-    const activeWidgets = ref<string[]>(savedSettings.activeWidgets ?? ['telemetries']);
+    const userLocale = ref<string>(savedSettings.userLocale ?? 'it-IT');
+    
+    // NOTA: activeWidgets è stato spostato in dashboardStore per coerenza con il cruscotto stateful
+    // ma lo manteniamo qui come fallback o alias se necessario per compatibilità.
+    const activeWidgets = ref<string[]>(savedSettings.activeWidgets ?? ['telemetries', 'attacks', 'logs']);
 
-    // Telemetry Specific Filters
+    // Telemetry Specific Filters (Questi potrebbero migrare in un useTelemetryStore futuro)
     const telemetryTimeframe = ref<string>(savedSettings.telemetryTimeframe ?? '24h');
     const telemetryScore = ref<number>(savedSettings.telemetryScore ?? 15);
     const telemetryLevel = ref<string>(savedSettings.telemetryLevel ?? 'low');
     const telemetryTop = ref<string>(savedSettings.telemetryTop ?? 'all');
     const telemetryMinLogs = ref<number>(savedSettings.telemetryMinLogs ?? 10);
 
-    // Persistence logic
+    // Salvataggio automatico centralizzato
     watch(
         [
             attacksShowMap, attacksShowChart, logsShowChart, sessionsShowMap, sessionsShowChart, 
-            homeShowAttackMap, homeShowSessionsMap, dashboardSkin, activeWidgets,
+            homeShowAttackMap, homeShowSessionsMap, dashboardSkin, userLocale, activeWidgets,
             telemetryTimeframe, telemetryScore, telemetryLevel, telemetryTop, telemetryMinLogs
         ],
         () => {
@@ -47,6 +51,7 @@ export const useViewSettingsStore = defineStore('viewSettings', () => {
                 homeShowAttackMap: homeShowAttackMap.value,
                 homeShowSessionsMap: homeShowSessionsMap.value,
                 dashboardSkin: dashboardSkin.value,
+                userLocale: userLocale.value,
                 activeWidgets: activeWidgets.value,
                 telemetryTimeframe: telemetryTimeframe.value,
                 telemetryScore: telemetryScore.value,
@@ -54,7 +59,7 @@ export const useViewSettingsStore = defineStore('viewSettings', () => {
                 telemetryTop: telemetryTop.value,
                 telemetryMinLogs: telemetryMinLogs.value
             };
-            localStorage.setItem(storageKey, JSON.stringify(settings));
+            storage.set(StorageNamespace.SETTINGS, settings);
         },
         { deep: true }
     );
@@ -68,6 +73,7 @@ export const useViewSettingsStore = defineStore('viewSettings', () => {
         homeShowAttackMap,
         homeShowSessionsMap,
         dashboardSkin,
+        userLocale,
         activeWidgets,
         telemetryTimeframe,
         telemetryScore,

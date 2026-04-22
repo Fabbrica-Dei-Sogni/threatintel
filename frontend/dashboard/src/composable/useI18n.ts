@@ -1,5 +1,6 @@
 import { computed } from 'vue';
 import { useI18n as useVueI18n } from 'vue-i18n';
+import { storage, StorageNamespace } from '../utils/storage';
 
 /**
  * Composable personalizzato per gestire l'internazionalizzazione
@@ -13,10 +14,13 @@ export function useI18n() {
         get: () => i18n.locale.value,
         set: (newLocale: string) => {
             i18n.locale.value = newLocale;
-            // Opzionale: salva la preferenza nel localStorage
-            if (typeof window !== 'undefined') {
-                localStorage.setItem('userLocale', newLocale);
-            }
+            
+            // Salva la preferenza nel namespace SETTINGS
+            const currentSettings = storage.get<any>(StorageNamespace.SETTINGS) || {};
+            storage.set(StorageNamespace.SETTINGS, {
+                ...currentSettings,
+                userLocale: newLocale
+            });
         }
     });
 

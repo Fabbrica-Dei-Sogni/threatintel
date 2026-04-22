@@ -28,13 +28,14 @@ export const useViewSettingsStore = defineStore('viewSettings', () => {
     const telemetryScore = ref<number>(savedSettings.telemetryScore ?? 15);
     const telemetryLevel = ref<string>(savedSettings.telemetryLevel ?? 'low');
     const telemetryTop = ref<string>(savedSettings.telemetryTop ?? 'all');
+    const telemetryMinLogs = ref<number>(savedSettings.telemetryMinLogs ?? 10);
 
     // Persistence logic
     watch(
         [
             attacksShowMap, attacksShowChart, logsShowChart, sessionsShowMap, sessionsShowChart, 
             homeShowAttackMap, homeShowSessionsMap, dashboardSkin, activeWidgets,
-            telemetryTimeframe, telemetryScore, telemetryLevel, telemetryTop
+            telemetryTimeframe, telemetryScore, telemetryLevel, telemetryTop, telemetryMinLogs
         ],
         () => {
             const settings = {
@@ -50,7 +51,8 @@ export const useViewSettingsStore = defineStore('viewSettings', () => {
                 telemetryTimeframe: telemetryTimeframe.value,
                 telemetryScore: telemetryScore.value,
                 telemetryLevel: telemetryLevel.value,
-                telemetryTop: telemetryTop.value
+                telemetryTop: telemetryTop.value,
+                telemetryMinLogs: telemetryMinLogs.value
             };
             localStorage.setItem(storageKey, JSON.stringify(settings));
         },
@@ -70,6 +72,7 @@ export const useViewSettingsStore = defineStore('viewSettings', () => {
         telemetryTimeframe,
         telemetryScore,
         telemetryLevel,
-        telemetryTop
+        telemetryTop,
+        telemetryMinLogs
     };
 });

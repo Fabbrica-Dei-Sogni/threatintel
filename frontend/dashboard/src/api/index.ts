@@ -394,13 +394,14 @@ export async function fetchCustomReport(payload: any, format: string = 'pdf', st
  * @param minScore Sogli minima di rischio
  * @param limit Numero di elementi per le classifiche top (può essere "all" o numero)
  */
-export async function fetchStats(timeframe: string = '24h', minScore: number = 15, limit: string | number = 10): Promise<any> {
+export async function fetchStats(timeframe: string = '24h', minScore: number = 15, limit: string | number = 10, minLogs: number = 1): Promise<any> {
     try {
         const response = await apiClient.get('/stats', { 
             params: { 
                 timeframe, 
                 minScore, 
-                top: limit 
+                top: limit,
+                minLogs
             } 
         });
         return response.data;

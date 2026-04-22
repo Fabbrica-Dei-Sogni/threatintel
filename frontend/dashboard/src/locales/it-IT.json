@@ -13,6 +13,7 @@
         "loading": "Caricamento...",
         "error": "Errore",
         "errorLoadingData": "Errore nel caricamento dei dati",
+        "total": "Totale",
         "unit": "Unità",
         "duration": {
             "seconds": "s",
@@ -154,6 +155,7 @@
         "title": "TELEMETRIA DI SICUREZZA",
         "reset_filters": "RIPRISTINA FILTRI",
         "filter_label": "TIMEFRAME",
+        "filter_log_threshold_label": "SOGLIA LOG",
         "filter_score_label": "SOGLIA RISCHIO",
         "top_ranking": "CLASSIFICHE",
         "risk_level_info": "INFO (0+)",

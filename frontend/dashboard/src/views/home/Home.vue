@@ -60,7 +60,7 @@
                       <div class="filters-row">
                         <!-- Time Range -->
                         <div class="filter-item">
-                          <span class="filter-label">TIMEFRAME: <span class="active-val">{{ attackTimeValue === null ? 'ALL' : (attackTimeValue + (attackTimeUnit === 'days' ? 'D' : 'H')) }}</span></span>
+                          <span class="filter-label">{{ t('telemetry.filter_label') }}: <span class="active-val">{{ attackTimeValue === null ? t('common.all').toUpperCase() : (attackTimeValue + (attackTimeUnit === 'days' ? 'D' : 'H')) }}</span></span>
                           <div class="tabs-row log-threshold-tabs">
                             <button 
                               v-for="opt in [
@@ -76,14 +76,14 @@
                               :class="{ active: attackTimeValue === opt.v && (opt.v === null || attackTimeUnit === opt.u) }"
                               @click="attackTimeValue = opt.v; attackTimeUnit = opt.u"
                             >
-                              {{ opt.l }}
+                              {{ opt.v === null ? t('common.all').toUpperCase() : opt.l }}
                             </button>
                           </div>
                         </div>
 
                         <!-- Log Threshold Only -->
                         <div class="filter-item">
-                          <span class="filter-label">LOG THRESHOLD: <span class="active-val">{{ attackMinLogs }}</span></span>
+                          <span class="filter-label">{{ t('telemetry.filter_log_threshold_label') }}: <span class="active-val">{{ attackMinLogs }}</span></span>
                           <div class="tabs-row log-threshold-tabs">
                             <button 
                               v-for="val in [3, 5, 10, 20, 40, 50]" 

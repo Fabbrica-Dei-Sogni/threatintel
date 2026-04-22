@@ -13,7 +13,7 @@
       <div class="header-actions" @click.stop>
         <!-- Total Results Indicator -->
         <div v-if="total > 0" class="header-total">
-          TOTAL: {{ total }}
+          {{ t('common.total').toUpperCase() }}: {{ total }}
         </div>
 
         <!-- Inline Pagination (Header) -->
@@ -81,7 +81,7 @@
         <div v-if="total > 0 && !isCollapsed" class="footer-pagination">
           <div class="pag-controls">
             <button class="pag-btn large" :disabled="page <= 1" @click="handlePageChange(page - 1)">
-              PREV
+              {{ t('common.prev').toUpperCase() }}
             </button>
             <div class="page-numbers">
                <span class="current-page">{{ page }}</span>
@@ -89,11 +89,11 @@
                <span class="total-pages">{{ totalPages }}</span>
             </div>
             <button class="pag-btn large" :disabled="page >= totalPages" @click="handlePageChange(page + 1)">
-              NEXT
+              {{ t('common.next').toUpperCase() }}
             </button>
           </div>
           <div class="total-indicator">
-            TOTAL: {{ total }}
+            {{ t('common.total').toUpperCase() }}: {{ total }}
           </div>
         </div>
       </div>

@@ -46,6 +46,22 @@
           </button>
         </div>
       </div>
+
+      <!-- Log Threshold -->
+      <div class="filter-group">
+        <span class="group-label">{{ t('telemetry.filter_log_threshold_label') }}</span>
+        <div class="tabs-row">
+          <button 
+            v-for="val in [3, 5, 10, 20, 40, 50]" 
+            :key="val"
+            class="tab-btn"
+            :class="{ active: selectedMinLogs === val }"
+            @click="setMinLogs(val)"
+          >
+            {{ val }}
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- Stats Grid -->
@@ -141,11 +157,13 @@ const {
   selectedScore,
   selectedLevel,
   selectedTop,
+  selectedMinLogs,
   dynamicThresholds,
   loadStats,
   setTimeframe,
   setScore,
   setTop,
+  setMinLogs,
   resetFilters
 } = useStats();
 

@@ -14,7 +14,8 @@ export function useStats() {
     telemetryTimeframe: selectedTimeframe,
     telemetryScore: selectedScore,
     telemetryLevel: selectedLevel,
-    telemetryTop: selectedTop
+    telemetryTop: selectedTop,
+    telemetryMinLogs: selectedMinLogs
   } = storeToRefs(viewStore);
 
   const dynamicThresholds = reactive({
@@ -57,7 +58,7 @@ export function useStats() {
     error.value = null;
     try {
       const topParam = selectedTop.value === 'all' ? 'all' : parseInt(selectedTop.value as string, 10);
-      const data = await fetchStats(selectedTimeframe.value, selectedScore.value, topParam);
+      const data = await fetchStats(selectedTimeframe.value, selectedScore.value, topParam, selectedMinLogs.value);
       stats.value = data.stats;
 
       if (data.stats?.scoreDistribution) {
@@ -87,10 +88,16 @@ export function useStats() {
     loadStats();
   };
 
+  const setMinLogs = (val: number) => {
+    selectedMinLogs.value = val;
+    loadStats();
+  };
+
   const resetFilters = () => {
     selectedTimeframe.value = '24h';
     selectedLevel.value = 'low';
     selectedScore.value = 15;
+    selectedMinLogs.value = 10;
     loadStats();
   };
 
@@ -114,11 +121,13 @@ export function useStats() {
     selectedScore,
     selectedLevel,
     selectedTop,
+    selectedMinLogs,
     dynamicThresholds,
     loadStats,
     setTimeframe,
     setScore,
     setTop,
+    setMinLogs,
     resetFilters
   };
 }

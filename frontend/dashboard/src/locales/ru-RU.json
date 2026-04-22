@@ -13,6 +13,7 @@
         "loading": "Загрузка...",
         "error": "Ошибка",
         "errorLoadingData": "Ошибка загрузки данных",
+        "total": "Итого",
         "all": "Все",
         "unit": "Единица",
         "duration": {
@@ -154,6 +155,7 @@
         "title": "ТЕЛЕМЕТРИЯ БЕЗОПАСНОСТИ",
         "reset_filters": "СБРОСИТЬ ФИЛЬТРЫ",
         "filter_label": "ВРЕМЕННОЙ ИНТЕРВАЛ",
+        "filter_log_threshold_label": "ПОРОГ ЛОГОВ",
         "filter_score_label": "ПОРОГ РИСКА",
         "top_ranking": "РЕЙТИНГИ",
         "risk_level_info": "ИНФО (0+)",

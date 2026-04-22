@@ -4,7 +4,7 @@ import type { AxiosResponse } from 'axios';
 
 const baseURL: string = import.meta.env.VUE_APP_API_URL || 'https://alessandromodica.com/honeypot/api';
 
-const apiClient = axios.create({
+export const apiClient = axios.create({
     baseURL,
     timeout: 8000,
 });

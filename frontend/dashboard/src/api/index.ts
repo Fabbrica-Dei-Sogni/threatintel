@@ -18,7 +18,7 @@ export const getApiUrl = (): string => {
     return localStorage.getItem('api_url') || import.meta.env.VITE_APP_API_URL || '/honeypot/api';
 };
 
-const apiClient = axios.create({
+export const apiClient = axios.create({
     baseURL: getApiUrl(),
     timeout: 30000,
 });

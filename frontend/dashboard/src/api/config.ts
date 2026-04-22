@@ -5,7 +5,7 @@ import { getApiUrl } from './index';
  * API client per la gestione delle configurazioni honeypot
  */
 
-const apiClient = axios.create({
+export const apiClient = axios.create({
     timeout: 8000,
 });
 

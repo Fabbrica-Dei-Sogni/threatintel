@@ -237,11 +237,11 @@ import ViewToggle from '../../components/common/ViewToggle.vue';
 import { formatDateTime, formatHumanDuration, formatFullDateTime } from '../../utils/dateUtils';
 
 const props = defineProps({
-    initialPage: { type: Number, default: 1 },
-    initialPageSize: { type: Number, default: 20 },
-    initialSortFields: { type: Object, default: () => ({}) },
-    initialIp: { type: String, default: '' },
-    initialCategory: { type: String, default: 'interaction' }
+    initialPage: Number,
+    initialPageSize: Number,
+    initialSortFields: Object,
+    initialIp: String,
+    initialCategory: String
 });
 
 const { t } = useI18n();

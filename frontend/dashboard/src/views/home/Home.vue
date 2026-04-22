@@ -136,7 +136,16 @@
                               :tooltip="item.ipDetails?.ipinfo ? `${item.ipDetails.ipinfo.country} - ${item.ipDetails.ipinfo.org || t('common.notAvailable')}` : t('common.notAvailable')" />
                             <DefconIndicator :level="item.dangerLevel" :dangerScore="item.dangerScore" mode="dot" />
                             <router-link 
-                              :to="{ name: 'AttackDetail', params: { ip: item.request.ip } }" 
+                              :to="{ 
+                                name: 'AttackDetail', 
+                                params: { ip: item.request.ip },
+                                query: {
+                                  timeMode: 'ago',
+                                  agoValue: dashboardState.rankings.attackTimeValue,
+                                  agoUnit: dashboardState.rankings.attackTimeUnit,
+                                  minLogsForAttack: dashboardState.rankings.attackMinLogs
+                                }
+                              }" 
                               class="intel-det-btn"
                               :data-noc-tooltip="t('common.detail')"
                             >

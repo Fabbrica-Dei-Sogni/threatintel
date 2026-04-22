@@ -271,7 +271,14 @@
                             <td>
                                 <router-link :to="{
                                     name: 'AttackDetail',
-                                    params: { ip: attack.request.ip }
+                                    params: { ip: attack.request.ip },
+                                    query: {
+                                        timeMode: attacksState.filters.timeMode,
+                                        agoValue: attacksState.filters.agoValue,
+                                        agoUnit: attacksState.filters.agoUnit,
+                                        minLogsForAttack: attacksState.filters.minLogs,
+                                        dateRange: attacksState.filters.dateRange && (attacksState.filters.dateRange[0] || attacksState.filters.dateRange[1]) ? JSON.stringify(attacksState.filters.dateRange) : undefined
+                                    }
                                 }" class="detail-link">
                                     {{ t('common.detail') }}
                                 </router-link>

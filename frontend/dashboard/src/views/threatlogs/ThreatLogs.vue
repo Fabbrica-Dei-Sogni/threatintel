@@ -247,9 +247,9 @@ const router = useRouter();
 const props = defineProps({
   initialIp: String,
   initialUrl: String,
-  initialProtocol: { type: String, default: 'http' },
-  initialPage: { type: Number, default: 1 },
-  initialSortFields: { type: Object, default: () => ({}) }
+  initialProtocol: String,
+  initialPage: Number,
+  initialSortFields: Object
 });
 
 // State

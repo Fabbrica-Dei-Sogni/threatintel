@@ -22,10 +22,10 @@ const routes: RouteRecordRaw[] = [
         name: 'ThreatLogs',
         component: ThreatLogs,
         props: (route: RouteLocationNormalized) => ({
-            initialIp: typeof route.query.ip === 'string' ? route.query.ip : '',
-            initialUrl: typeof route.query.url === 'string' ? route.query.url : '',
-            initialProtocol: typeof route.query.protocol === 'string' ? route.query.protocol : 'http',
-            initialPage: route.query.page ? parseInt(route.query.page as string) : 1,
+            initialIp: route.query.ip,
+            initialUrl: route.query.url,
+            initialProtocol: route.query.protocol,
+            initialPage: route.query.page ? parseInt(route.query.page as string) : undefined,
             initialSortFields: route.query.sortFields ? JSON.parse(route.query.sortFields as string) : undefined,
         }),
     },
@@ -136,9 +136,9 @@ const routes: RouteRecordRaw[] = [
         name: 'CowrieSessions',
         component: CowrieSessions,
         props: (route: RouteLocationNormalized) => ({
-            initialPage: route.query.page ? parseInt(route.query.page as string) : 1,
-            initialIp: route.query.ip || '',
-            initialCategory: route.query.category || 'interaction'
+            initialPage: route.query.page ? parseInt(route.query.page as string) : undefined,
+            initialIp: route.query.ip,
+            initialCategory: route.query.category
         })
     },
     {
@@ -162,8 +162,8 @@ router.beforeEach((to, from, next) => {
     const authStore = useAuthStore();
     const searchStore = useSearchStore();
 
-    // 1. Persistenza filtri (Search Memory): escludiamo 'Attacks' perché gestito da hp_attacks
-    const searchRoutes = ['Home', 'ThreatLogs', 'CowrieSessions'];
+    // 1. Persistenza filtri (Search Memory): escludiamo le rotte gestite dai nuovi store dedicati
+    const searchRoutes = ['Home'];
     if (to.name && searchRoutes.includes(to.name as string)) {
         const hasQueryParams = Object.keys(to.query).length > 0;
         const savedQuery = searchStore.getQuery(to.name as string);

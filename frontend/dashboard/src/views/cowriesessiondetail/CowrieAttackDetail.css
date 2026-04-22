@@ -84,25 +84,25 @@
 }
 
 .report-btn {
-    background: rgba(0, 40, 0, 0.4) !important;
-    border: 1px solid rgba(0, 255, 65, 0.3) !important;
-    color: #00FF41 !important;
+    background: rgba(var(--theme-primary-rgb), 0.1) !important;
+    border: 1px solid var(--theme-border) !important;
+    color: var(--theme-primary) !important;
     margin-left: 10px;
 }
 
 .report-btn:hover {
-    background: rgba(0, 60, 0, 0.6) !important;
-    border-color: #00FF41 !important;
-    box-shadow: 0 0 15px rgba(0, 255, 65, 0.4) !important;
+    background: rgba(var(--theme-primary-rgb), 0.2) !important;
+    border-color: var(--theme-primary) !important;
+    box-shadow: 0 0 15px rgba(var(--theme-primary-rgb), 0.4) !important;
 }
 
 .spinner-small {
     display: inline-block;
     width: 14px;
     height: 14px;
-    border: 2px solid rgba(0, 255, 65, 0.3);
+    border: 2px solid rgba(var(--theme-primary-rgb), 0.3);
     border-radius: 50%;
-    border-top-color: #00FF41;
+    border-top-color: var(--theme-primary);
     animation: spin 1s linear infinite;
 }
 

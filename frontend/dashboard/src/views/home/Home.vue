@@ -390,7 +390,6 @@ import RestrictedIntelligenceGate from '../../components/common/RestrictedIntell
 import CowrieCategorySelector from '../../components/common/CowrieCategorySelector.vue';
 import IntelRanking from '../../components/common/IntelRanking.vue';
 import { formatDateTime, formatDateOnly, formatTimeOnly, formatHumanDuration, formatFullDateTime } from '../../utils/dateUtils';
-import './HomeCyber.css';
 
 const { t } = useI18n();
 
@@ -551,6 +550,8 @@ watch(() => dashboardState.rankings, (newRankings, oldRankings) => {
 
 <style scoped src="./Home.css"></style>
 <style scoped>
+@import "./HomeCyber.css";
+
 /* Stunning Cyber-Red Reset Button with ASCII Lines */
 .reset-btn-mini {
     background: transparent;

@@ -1,27 +1,15 @@
 /**
- * cyber-layout.css
- * Core responsive layout and UI patterns for the Cyber Dashboard.
- * Use CSS variables for theme-specific colors.
+ * base-layout.css
+ * Core responsive layout and UI patterns.
+ * Questo file definisce lo SCHELETRO strutturale dell'applicazione.
+ * I colori sono gestiti tramite variabili CSS definite nei temi (es. cyber-theme.css).
  */
-
-:root {
-    /* Semantic Theming for Base HUD */
-    --cyber-primary: var(--theme-primary, #00FF41);
-    --cyber-primary-rgb: var(--theme-primary-rgb, 0, 255, 65);
-    --cyber-secondary: var(--theme-surface, rgba(0, 30, 0, 0.7));
-    --cyber-background: var(--theme-bg, #0A0605);
-    --cyber-surface: var(--theme-surface, rgba(0, 30, 0, 0.3));
-    --cyber-border: var(--theme-border, rgba(0, 255, 65, 0.2));
-    --cyber-text: var(--theme-text, #F0FAD0);
-    --cyber-accent: var(--theme-accent, #33FF33);
-    --cyber-primary-glow: rgba(var(--cyber-primary-rgb), 0.5);
-}
 
 /* Main View Container */
 .cyber-view {
     padding: 25px 30px;
-    color: var(--cyber-text);
-    background-color: var(--cyber-background);
+    color: var(--theme-text);
+    background-color: var(--theme-bg);
     min-height: 100vh;
     display: flex;
     flex-direction: column;
@@ -29,7 +17,6 @@
     overflow-x: hidden;
     box-sizing: border-box;
 }
-
 
 @media (max-width: 768px) {
     .cyber-view {
@@ -41,11 +28,11 @@
 .cyber-sticky-area {
     position: sticky;
     z-index: 110;
-    background: var(--cyber-secondary);
+    background: var(--theme-surface);
     backdrop-filter: blur(12px);
     padding-top: 12px;
     padding-bottom: 12px;
-    border-bottom: 1px solid var(--cyber-border);
+    border-bottom: 1px solid var(--theme-border);
 }
 
 .cyber-sticky-top-0 { top: 0; }
@@ -76,102 +63,108 @@
 }
 
 .cyber-loading-overlay {
-    background: rgba(10, 6, 5, 0.7);
-    color: var(--cyber-primary);
-    text-shadow: 0 0 10px var(--cyber-primary-glow);
+    background: rgba(0, 0, 0, 0.7);
+    color: var(--theme-primary);
+    text-shadow: 0 0 10px rgba(var(--theme-primary-rgb), 0.5);
     font-size: 1.5em;
     font-weight: 700;
 }
 
 .cyber-error-overlay {
-    background: rgba(10, 6, 5, 0.85);
-    color: var(--cyber-accent);
-    text-shadow: 0 0 12px var(--cyber-primary-glow);
-    border: 1px solid var(--cyber-border);
+    background: rgba(0, 0, 0, 0.85);
+    color: var(--theme-accent);
+    text-shadow: 0 0 12px rgba(var(--theme-primary-rgb), 0.5);
+    border: 1px solid var(--theme-border);
     padding: 20px;
     border-radius: 8px;
     font-weight: 700;
 }
 
-/* Standardized Pagination */
+/* Standardized Pagination - Compact Surgical Style */
 .cyber-pagination {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: clamp(8px, 1.5vw, 18px);
-    margin: 28px 0;
+    gap: 12px;
+    margin: 15px 0;
     flex-wrap: wrap;
-    padding: 0 12px;
+    padding: 0 10px;
+    font-family: 'JetBrains Mono', monospace;
 }
 
 .cyber-pagination button {
     background: rgba(0, 0, 0, 0.2);
-    border: 1px solid var(--cyber-border);
-    border-radius: 8px;
-    padding: clamp(6px, 1vw, 10px) clamp(12px, 2vw, 22px);
+    border: 1px solid var(--theme-border);
+    border-radius: 4px;
+    padding: 4px 14px;
     font-weight: 600;
-    font-size: clamp(0.85rem, 1.1vw, 1rem);
-    color: var(--cyber-primary);
+    font-size: 0.8rem;
+    color: var(--theme-primary);
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
     white-space: nowrap;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 .cyber-pagination button:hover:not(:disabled) {
-    background: var(--cyber-border);
-    border-color: var(--cyber-primary);
-    transform: translateY(-2px);
-    box-shadow: 0 0 10px var(--cyber-primary-glow);
+    background: rgba(var(--theme-primary-rgb), 0.1);
+    border-color: var(--theme-primary);
+    box-shadow: 0 0 8px rgba(var(--theme-primary-rgb), 0.5);
 }
 
 .cyber-pagination button:disabled {
-    opacity: 0.5;
+    opacity: 0.3;
     cursor: not-allowed;
+    border-color: rgba(255, 255, 255, 0.05);
 }
 
 .cyber-pagination-info {
-    font-weight: 600;
-    color: var(--cyber-primary);
+    font-weight: 700;
+    color: var(--theme-primary);
     user-select: none;
-    min-width: clamp(100px, 15vw, 130px);
+    min-width: 100px;
     display: inline-block;
     text-align: center;
-    font-size: clamp(0.85rem, 1.1vw, 1rem);
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
 }
 
 /* Pagination Page Input */
 .cyber-page-input-container {
     display: flex;
     align-items: center;
-    gap: clamp(6px, 1vw, 12px);
-    margin-left: clamp(0px, 1vw, 10px);
+    gap: 8px;
+    margin-left: 5px;
 }
 
 .cyber-page-input-container label {
     font-weight: 600;
-    color: var(--cyber-text);
-    opacity: 0.8;
+    color: var(--theme-text);
+    opacity: 0.6;
     user-select: none;
-    font-size: clamp(0.85rem, 1.1vw, 1rem);
+    font-size: 0.7rem;
+    text-transform: uppercase;
 }
 
 .cyber-pagination-input {
-    width: clamp(50px, 8vw, 70px);
-    padding: clamp(6px, 1vw, 9px) clamp(8px, 1.5vw, 12px);
-    background: rgba(0, 0, 0, 0.2);
-    border: 1px solid var(--cyber-border);
-    border-radius: 8px;
+    width: 45px;
+    padding: 3px 6px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--theme-border);
+    border-radius: 4px;
     font-weight: 600;
     text-align: center;
-    color: var(--cyber-primary);
-    transition: all 0.3s ease;
-    font-size: clamp(0.85rem, 1.1vw, 1rem);
+    color: var(--theme-primary);
+    transition: all 0.2s ease;
+    font-size: 0.8rem;
+    font-family: 'JetBrains Mono', monospace;
 }
 
 .cyber-pagination-input:focus {
     outline: none;
-    border-color: var(--cyber-primary);
-    box-shadow: 0 0 12px var(--cyber-primary-glow);
+    border-color: var(--theme-primary);
+    box-shadow: 0 0 12px rgba(var(--theme-primary-rgb), 0.5);
 }
 
 /* Custom Scrollbars */
@@ -181,15 +174,15 @@
 }
 
 .cyber-scrollbar::-webkit-scrollbar-track {
-    background: var(--cyber-background);
+    background: var(--theme-bg);
     border-radius: 6px;
     box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.4);
 }
 
 .cyber-scrollbar::-webkit-scrollbar-thumb {
-    background: linear-gradient(90deg, rgba(0, 0, 0, 0.4), var(--cyber-primary));
+    background: linear-gradient(90deg, rgba(0, 0, 0, 0.4), var(--theme-primary));
     border-radius: 6px;
-    border: 1px solid var(--cyber-border);
+    border: 1px solid var(--theme-border);
 }
 
 /* Container that allows horizontal scrolling for tables without breaking the page layout */
@@ -204,31 +197,31 @@
 .cyber-table {
     width: 100%;
     border-collapse: collapse;
-    background: var(--cyber-surface);
+    background: var(--theme-surface);
     box-shadow: 0 0 25px rgba(0, 0, 0, 0.6);
     border-radius: 12px;
     overflow: hidden;
-    border: 1px solid var(--cyber-border);
+    border: 1px solid var(--theme-border);
 }
 
 .cyber-table th {
     background: rgba(0, 0, 0, 0.4);
-    color: var(--cyber-primary);
+    color: var(--theme-primary);
     padding: 12px 10px;
     font-weight: 700;
-    border-bottom: 2px solid var(--cyber-primary);
+    border-bottom: 2px solid var(--theme-primary);
     font-size: clamp(11px, 1.4vw, 16px);
     text-align: center;
 }
 
 .cyber-table td {
     padding: 10px 10px;
-    border-bottom: 1px solid var(--cyber-border);
+    border-bottom: 1px solid var(--theme-border);
     transition: background 0.2s ease;
     font-size: clamp(11px, 1.3vw, 15px);
     text-align: center;
 }
 
 .cyber-table tr:hover td {
-    background-color: var(--cyber-border);
+    background-color: var(--theme-border);
 }

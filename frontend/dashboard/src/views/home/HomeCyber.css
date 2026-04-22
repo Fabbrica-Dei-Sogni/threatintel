@@ -403,71 +403,77 @@
 /* === ACTIONS & BUTTONS === */
 
 .skin-cyber .actions {
-  display: flex; 
+  display: flex;
   flex-wrap: wrap;
-  gap: 16px; 
-  margin-bottom: 24px;
+  gap: 24px;
+  margin-bottom: 30px;
   padding: 0 24px;
 }
 
 .skin-cyber .btn-action {
-  background: transparent !important;
-  color: var(--neon-cyan) !important;
-  border: 1px solid rgba(0, 255, 255, 0.3) !important;
-  padding: 10px 22px;
-  border-radius: 0 !important;
+  background: rgba(0, 255, 255, 0.02) !important;
+  color: var(--theme-primary, var(--neon-cyan)) !important;
+  border: 1px solid rgba(var(--theme-primary-rgb, 0, 255, 255), 0.3) !important;
+  padding: 12px 28px;
+  border-radius: 4px !important;
   font-weight: 800;
   font-family: var(--font-cyber);
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 2px;
   cursor: pointer;
-  transition: all 0.2s ease !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
   outline: none !important;
+  position: relative;
+  overflow: hidden;
 }
 
 /* Hover only on devices that support it (Desktop) */
 @media (hover: hover) {
   .skin-cyber .btn-action:hover:not(.active) {
-    background: rgba(0, 255, 255, 0.05) !important;
-    border-color: var(--neon-cyan) !important;
-    box-shadow: 0 0 15px rgba(0, 255, 255, 0.2) !important;
-    transform: translateY(-1px);
+    background: rgba(var(--theme-primary-rgb, 0, 255, 255), 0.1) !important;
+    border-color: var(--theme-primary, var(--neon-cyan)) !important;
+    box-shadow: 0 0 20px rgba(var(--theme-primary-rgb, 0, 255, 255), 0.3) !important;
+    transform: translateY(-2px);
   }
 }
 
-.skin-cyber .btn-action.active {
-  background: var(--neon-cyan) !important;
-  color: var(--cyber-bg) !important;
-  border-color: var(--neon-cyan) !important;
-  box-shadow: 0 0 20px var(--neon-cyan) !important;
-  transform: translateY(-2px);
+.skin-cyber .btn-action:active:not(.active) {
+  transform: scale(0.95);
+  box-shadow: 0 0 5px rgba(var(--theme-primary-rgb, 0, 255, 255), 0.4) !important;
 }
 
+.skin-cyber .btn-action.active {
+  background: var(--theme-primary, var(--neon-cyan)) !important;
+  color: var(--cyber-bg) !important;
+  border-color: var(--theme-primary, var(--neon-cyan)) !important;
+  box-shadow: 0 0 25px rgba(var(--theme-primary-rgb, 0, 255, 255), 0.6) !important;
+  transform: translateY(-2px);
+}
 /* === COMPONENT OVERRIDES === */
 
 /* LanguageSwitcher */
 .skin-cyber .language-switcher .select-wrapper {
   background: rgba(0, 0, 0, 0.4);
-  border: 1px solid var(--neon-cyan);
+  border: 1px solid var(--theme-primary, var(--neon-cyan));
   border-radius: 0;
-  box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
+  box-shadow: 0 0 10px rgba(var(--theme-primary-rgb, 0, 255, 255), 0.2);
 }
 
 .skin-cyber .language-switcher .lang-select {
-  color: var(--neon-cyan);
+  color: var(--theme-primary, var(--neon-cyan));
   font-family: var(--font-cyber);
 }
 
 /* SkinSwitcher */
 .skin-cyber .skin-switcher .select-wrapper {
   background: rgba(0, 0, 0, 0.4);
-  border: 1px solid var(--neon-cyan);
+  border: 1px solid var(--theme-primary, var(--neon-cyan));
   border-radius: 0;
-  box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
+  box-shadow: 0 0 10px rgba(var(--theme-primary-rgb, 0, 255, 255), 0.2);
 }
 
 .skin-cyber .skin-switcher .skin-select {
-  color: var(--neon-cyan);
+  color: var(--theme-primary, var(--neon-cyan));
   font-family: var(--font-cyber);
 }
 

@@ -34,9 +34,15 @@ const routes: RouteRecordRaw[] = [
         name: 'Home',
         component: Home,
         props: (route: RouteLocationNormalized) => ({
-            initialAttackProtocol:  typeof route.query.attackProtocol  === 'string' ? route.query.attackProtocol  : 'http',
-            initialLogProtocol:     typeof route.query.logProtocol     === 'string' ? route.query.logProtocol     : 'http',
-            initialSessionCategory: typeof route.query.sessionCategory === 'string' ? route.query.sessionCategory : 'interaction',
+            initialAttackProtocol:  route.query.attackProtocol,
+            initialLogProtocol:     route.query.logProtocol,
+            initialSessionCategory: route.query.sessionCategory,
+            initAttackMinLogs:      route.query.attackMinLogs ? parseInt(route.query.attackMinLogs as string) : undefined,
+            initAttackTimeVal:      route.query.attackTimeVal ? (route.query.attackTimeVal === 'null' ? null : parseInt(route.query.attackTimeVal as string)) : undefined,
+            initAttackTimeUnit:     route.query.attackTimeUnit,
+            initAttackPage:         route.query.attackPage ? parseInt(route.query.attackPage as string) : undefined,
+            initLogPage:            route.query.logPage ? parseInt(route.query.logPage as string) : undefined,
+            initSessionPage:        route.query.sessionPage ? parseInt(route.query.sessionPage as string) : undefined,
         })
     },
     {
@@ -162,7 +168,11 @@ router.beforeEach((to, from, next) => {
         const hasQueryParams = Object.keys(to.query).length > 0;
         const savedQuery = searchStore.getQuery(to.name as string);
 
-        if (!hasQueryParams && savedQuery) {
+        // Procediamo al ripristino solo se:
+        // - L'URL attuale non ha parametri
+        // - Abbiamo dei dati salvati
+        // - I dati salvati non sono un oggetto vuoto (per evitare loop infiniti)
+        if (!hasQueryParams && savedQuery && Object.keys(savedQuery).length > 0) {
             console.log(`[Router] Ripristino filtri salvati per ${String(to.name)}:`, savedQuery);
             return next({ ...to, query: savedQuery });
         }

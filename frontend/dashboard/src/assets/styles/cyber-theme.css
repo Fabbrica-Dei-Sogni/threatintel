@@ -1,0 +1,32 @@
+/**
+ * cyber-theme.css
+ * DNA Cromatico del tema Cyber.
+ * Definisce le variabili neon e i colori base per la skin di default.
+ */
+
+:root {
+    --neon-cyan: #00FF41;
+    --neon-cyan-rgb: 0, 255, 65;
+    --neon-red: #ff3366;
+    --neon-amber: #ffcc00;
+    
+    /* Semantic Mapping per il tema Cyber */
+    --theme-primary: var(--neon-cyan);
+    --theme-primary-rgb: var(--neon-cyan-rgb);
+    --theme-accent: #33FF33;
+    --theme-bg: #0A0605;
+    --theme-surface: rgba(0, 30, 0, 0.3);
+    --theme-border: rgba(0, 255, 65, 0.2);
+    --theme-text: #F0FAD0;
+    
+    /* Variabili legacy per compatibilità motori condivisi */
+    --cyber-primary: var(--theme-primary);
+    --cyber-primary-rgb: var(--theme-primary-rgb);
+    --cyber-secondary: var(--theme-surface);
+    --cyber-background: var(--theme-bg);
+    --cyber-surface: var(--theme-surface);
+    --cyber-border: var(--theme-border);
+    --cyber-text: var(--theme-text);
+    --cyber-accent: var(--theme-accent);
+    --cyber-primary-glow: rgba(var(--cyber-primary-rgb), 0.5);
+}

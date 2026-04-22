@@ -169,7 +169,7 @@
 
               <td>
                 {{ log.request.method }}
-                <span v-if="log.metadata?.eventCount > 1" style="color: #ffb86c; font-size: 0.9em; margin-left: 5px;">
+                <span v-if="log.metadata?.eventCount > 1" class="event-count-badge">
                   (x{{ log.metadata.eventCount }})
                 </span>
               </td>

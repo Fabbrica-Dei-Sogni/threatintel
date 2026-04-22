@@ -1,20 +1,36 @@
-.threatlogs {
-  --cyber-primary: #FFB300;
-  --cyber-primary-glow: rgba(255, 179, 0, 0.5);
-  --cyber-secondary: rgba(26, 20, 10, 0.8);
-  --cyber-background: #18181B;
-  --cyber-surface: linear-gradient(160deg, #2A271A, #18181B);
-  --cyber-border: rgba(255, 179, 0, 0.2);
-  --cyber-text: #F4EBD0;
-  --cyber-accent: #FFD700;
+/* === SEMANTIC THEME MAPPING (AMBER CLASSIC) === */
+.skin-classic.threatlogs {
+  --theme-primary: #FFB300;
+  --theme-primary-rgb: 255, 179, 0;
+  --theme-accent: #FFD700;
+  --theme-bg: #18181B;
+  --theme-surface: rgba(26, 20, 10, 0.4);
+  --theme-border: rgba(255, 179, 0, 0.15);
+  --theme-text: #F4EBD0;
+  --theme-text-muted: #cbb8a5;
+  --theme-radius: 8px;
+  --theme-blur: blur(12px);
+
+  /* Map legacy cyber variables used in shared engines */
+  --cyber-primary: var(--theme-primary);
+  --cyber-primary-rgb: var(--theme-primary-rgb);
+  --cyber-accent: var(--theme-accent);
+  --cyber-border: var(--theme-border);
+  --cyber-surface: var(--theme-surface);
+  --cyber-secondary: var(--theme-surface);
+
+  /* Button specific for Amber Classic */
+  --theme-btn-bg: linear-gradient(135deg, #FFB300, #FF8F00);
+  --theme-btn-text: #0A0605;
+  --theme-btn-shadow: rgba(255, 143, 0, 0.3);
 }
 
-/* Theme-specific overrides for sticky areas */
+/* Theme-aware layout blocks */
 .threatlogs .header-top,
 .threatlogs .actions,
 .threatlogs .filters-container {
-  background: var(--cyber-secondary);
-  border-bottom: 1px solid var(--cyber-border);
+  background: var(--theme-surface);
+  border-bottom: 1px solid var(--theme-border);
 }
 
 
@@ -83,23 +99,22 @@
 .ip-input {
   width: 100%;
   padding: 8px 36px 8px 12px;
-  background: rgba(26, 20, 10, 0.6);
-  border: 1px solid rgba(255, 179, 0, 0.3);
-  border-radius: 6px;
-  color: #f3e7d5;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--theme-border);
+  border-radius: var(--theme-radius);
+  color: var(--theme-text);
   box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.4);
   transition: all 0.3s ease;
 }
 
 .ip-input:focus {
   outline: none;
-  border-color: #FFB300;
-  box-shadow: 0 0 8px rgba(255, 179, 0, 0.4);
+  border-color: var(--theme-primary);
+  box-shadow: 0 0 8px var(--theme-btn-shadow);
 }
 
 .header-top h1 {
-  color: #FFB300;
-  /* Amber */
+  color: var(--theme-primary);
   margin: 0;
 }
 
@@ -154,17 +169,17 @@
 }
 
 .btn-action {
-  background: linear-gradient(135deg, #FFB300, #FF8F00);
-  color: #0A0605;
+  background: var(--theme-btn-bg);
+  color: var(--theme-btn-text);
   border: none;
   padding: 10px 22px;
-  border-radius: 4px;
-  box-shadow: 0 4px 12px rgba(255, 143, 0, 0.3);
+  border-radius: var(--theme-radius);
+  box-shadow: 0 4px 12px var(--theme-btn-shadow);
 }
 
 .btn-action:hover {
-  background: linear-gradient(135deg, #FFD700, #FFB300);
-  box-shadow: 0 6px 20px rgba(255, 179, 0, 0.5);
+  filter: brightness(1.1);
+  box-shadow: 0 6px 20px var(--theme-btn-shadow);
   transform: translateY(-2px);
 }
 
@@ -211,10 +226,10 @@
 .filters .input {
   width: 100%;
   padding: 9px 38px 9px 12px;
-  background: linear-gradient(145deg, #342220, #3a2725);
-  border: 1px solid #4f3b33;
-  border-radius: 6px;
-  color: #f3e7d5;
+  background: var(--theme-surface);
+  border: 1px solid var(--theme-border);
+  border-radius: var(--theme-radius);
+  color: var(--theme-text);
   box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.4);
   transition: background 0.3s ease, box-shadow 0.3s ease;
   box-sizing: border-box;
@@ -222,8 +237,8 @@
 
 .filters .input:focus {
   outline: none;
-  border-color: #FFB300;
-  box-shadow: 0 0 12px rgba(255, 179, 0, 0.4);
+  border-color: var(--theme-primary);
+  box-shadow: 0 0 12px var(--theme-btn-shadow);
 }
 
 .input::placeholder {
@@ -276,8 +291,9 @@
 
 /* Log-table th handled via global .cyber-table */
 .log-table th {
-  background: rgba(45, 30, 10, 0.6) !important;
-  border-bottom: 2px solid var(--cyber-primary);
+  background: rgba(var(--theme-primary-rgb), 0.15) !important;
+  border-bottom: 2px solid var(--theme-primary);
+  color: var(--theme-accent);
 }
 
 
@@ -346,9 +362,16 @@
   }
 }
 
+.event-count-badge {
+  color: var(--theme-accent);
+  font-size: 0.9em;
+  margin-left: 5px;
+  font-weight: 600;
+}
+
 .log-table tr:hover td {
-  background-color: rgba(255, 179, 0, 0.1);
-  box-shadow: inset 0 0 15px rgba(255, 179, 0, 0.2);
+  background-color: rgba(var(--theme-primary-rgb), 0.1);
+  box-shadow: inset 0 0 15px rgba(var(--theme-primary-rgb), 0.2);
 }
 
 /* Pulsanti dettaglio */
@@ -399,7 +422,7 @@ td.url-cell {
 .btn-copy-url {
   border: none;
   background: transparent;
-  color: #FFB300;
+  color: var(--theme-primary);
   cursor: pointer;
   font-size: 14px;
   margin-left: 6px;
@@ -410,8 +433,8 @@ td.url-cell {
 .btn-copy-ip:hover,
 .btn-copy-url:hover {
   opacity: 1;
-  color: #FFD700;
-  text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+  color: var(--theme-accent);
+  text-shadow: 0 0 5px rgba(var(--theme-primary-rgb), 0.5);
 }
 
 
@@ -446,7 +469,7 @@ td.url-cell {
 }
 
 .top-scrollbar-wrapper::-webkit-scrollbar-thumb {
-  background: linear-gradient(90deg, rgba(255, 215, 0, 0.5), #FFD700);
+  background: linear-gradient(90deg, rgba(var(--theme-primary-rgb), 0.5), var(--theme-accent));
   border-radius: 4px;
 }
 

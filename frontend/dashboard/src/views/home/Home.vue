@@ -113,18 +113,18 @@
                             <CountryFlag :countryCode="item.ipDetails?.ipinfo?.country"
                               :tooltip="item.ipDetails?.ipinfo ? `${item.ipDetails.ipinfo.country} - ${item.ipDetails.ipinfo.org || t('common.notAvailable')}` : t('common.notAvailable')" />
                             <DefconIndicator :level="item.dangerLevel" :dangerScore="item.dangerScore" mode="dot" />
+                            <router-link 
+                              :to="{ name: 'AttackDetail', params: { ip: item.request.ip } }" 
+                              class="intel-det-btn"
+                              :title="t('common.detail')"
+                            >
+                              DET
+                            </router-link>
                           </div>
                         </div>
 
                         <!-- Subject Col -->
                         <div class="item-col item-col-subject">
-                          <router-link 
-                            :to="{ name: 'AttackDetail', params: { ip: item.request.ip } }" 
-                            class="intel-det-btn"
-                            :title="t('common.detail')"
-                          >
-                            DET
-                          </router-link>
                           <span @click="goToIpDetails(item.request.ip)" class="ip-link">{{ item.request.ip }}</span>
                         </div>
                         
@@ -182,19 +182,19 @@
                             :data-url-tooltip="`URI: ${item.request?.url || 'N/A'}\nDATE: ${formatDate(item.timestamp)}`">
                             <CountryFlag :countryCode="item.ipDetailsId?.ipinfo?.country"
                               :tooltip="item.ipDetailsId?.ipinfo ? `${item.ipDetailsId.ipinfo.country} - ${item.ipDetailsId.ipinfo.org || t('common.notAvailable')}` : t('common.notAvailable')" />
+                            <router-link 
+                              v-if="item.id || item._id"
+                              :to="{ name: 'ThreatLog', params: { id: String(item.id || item._id) } }" 
+                              class="intel-det-btn"
+                              :title="t('common.detail')"
+                            >
+                              DET
+                            </router-link>
                           </div>
                         </div>
 
                         <!-- Subject Col -->
                         <div class="item-col item-col-subject">
-                          <router-link 
-                            v-if="item.id || item._id"
-                            :to="{ name: 'ThreatLog', params: { id: String(item.id || item._id) } }" 
-                            class="intel-det-btn"
-                            :title="t('common.detail')"
-                          >
-                            DET
-                          </router-link>
                           <span @click="goToIpDetails(item.request.ip)" class="ip-link">{{ item.request.ip }}</span>
                         </div>
                         
@@ -244,22 +244,24 @@
 
                     <template #item="{ item }">
                         <!-- Origin Col -->
-                        <div class="indicator-group"
-                          :data-url-tooltip="`PROTOCOL: ${item.protocol || 'N/A'}\nDATE: ${formatDate(item.starttime)}`">
-                          <CountryFlag :countryCode="item.ipDetailsId?.ipinfo?.country"
-                            :tooltip="item.ipDetailsId?.ipinfo ? `${item.ipDetailsId.ipinfo.country} - ${item.ipDetailsId.ipinfo.org || t('common.notAvailable')}` : t('common.notAvailable')" />
+                        <div class="item-col item-col-origin">
+                          <div class="indicator-group"
+                            :data-url-tooltip="`PROTOCOL: ${item.protocol || 'N/A'}\nDATE: ${formatDate(item.starttime)}`">
+                            <CountryFlag :countryCode="item.ipDetailsId?.ipinfo?.country"
+                              :tooltip="item.ipDetailsId?.ipinfo ? `${item.ipDetailsId.ipinfo.country} - ${item.ipDetailsId.ipinfo.org || t('common.notAvailable')}` : t('common.notAvailable')" />
+                            <router-link 
+                              v-if="item.session || item.id || item._id"
+                              :to="{ name: 'CowrieAttackDetail', params: { id: String(item.session || item.id || item._id) } }" 
+                              class="intel-det-btn"
+                              :title="t('common.detail')"
+                            >
+                              DET
+                            </router-link>
+                          </div>
                         </div>
 
                         <!-- Subject Col -->
                         <div class="item-col item-col-subject">
-                          <router-link 
-                            v-if="item.session || item.id || item._id"
-                            :to="{ name: 'CowrieAttackDetail', params: { id: String(item.session || item.id || item._id) } }" 
-                            class="intel-det-btn"
-                            :title="t('common.detail')"
-                          >
-                            DET
-                          </router-link>
                           <span @click="goToIpDetails(item.src_ip)" class="ip-link">{{ item.src_ip }}</span>
                         </div>
                         

@@ -317,12 +317,6 @@ li {
 }
 
 /* Isolamento Dimensionale (Nulla può spostare queste colonne) */
-.indicator-group { 
-  flex: 0 0 60px !important; 
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
 
 .ip-link { 
   flex: 0 0 140px !important; 
@@ -430,8 +424,12 @@ li > a:last-child {
   grid-column: 3;
 }
 
+.item-col-origin {
+  flex: 0 0 100px !important;
+}
+
 .indicator-group {
-  grid-column: 1;
+  width: 100%;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -712,8 +710,12 @@ li > a:last-child:hover {
     font-size: 0.8rem;
   }
 
+  .item-col-origin {
+    flex: 0 0 90px !important;
+  }
+
   .indicator-group {
-    flex: 0 0 48px !important;
+    width: 100%;
     display: flex;
     gap: 4px;
     align-items: center;

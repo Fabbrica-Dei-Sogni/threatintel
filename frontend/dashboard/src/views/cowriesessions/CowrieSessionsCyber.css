@@ -1,6 +1,7 @@
 /* CowrieSessionsCyber.css - PHOSPHORUS EDITION (Isolated Scoped Version) */
 
 /* === CORE VARIABLES (PHOSPHORUS) === */
+/* === SEMANTIC THEME MAPPING (JADE) === */
 .skin-cyber.cowrie-sessions.attacchi {
   --cy-primary: #00ffd0;
   --cy-primary-rgb: 0, 255, 208;
@@ -9,9 +10,33 @@
   --cy-surface: rgba(10, 20, 18, 0.9);
   --cy-border: rgba(0, 255, 208, 0.25);
   --cy-input-bg: rgba(0, 0, 0, 0.7);
-  
-  background-color: var(--cy-bg) !important;
-  color: #fff;
+
+  --theme-primary: var(--cy-primary);
+  --theme-primary-rgb: var(--cy-primary-rgb);
+  --theme-accent: var(--cy-accent);
+  --theme-bg: var(--cy-bg);
+  --theme-surface: var(--cy-surface);
+  --theme-border: var(--cy-border);
+  --theme-text: #fff;
+  --theme-text-muted: rgba(255, 255, 255, 0.6);
+  --theme-radius: 0px;
+  --theme-blur: blur(10px);
+
+  /* Map legacy cyber variables used in shared engines */
+  --cyber-primary: var(--theme-primary);
+  --cyber-primary-rgb: var(--theme-primary-rgb);
+  --cyber-accent: var(--theme-accent);
+  --cyber-border: var(--theme-border);
+  --cyber-surface: var(--theme-surface);
+  --cyber-secondary: var(--theme-surface);
+
+  /* Button specific for Jade Cyber */
+  --theme-btn-bg: transparent;
+  --theme-btn-text: var(--cy-primary);
+  --theme-btn-shadow: rgba(var(--cy-primary-rgb), 0.3);
+
+  background-color: var(--theme-bg) !important;
+  color: var(--theme-text) !important;
   transition: all 0.3s ease;
 }
 
@@ -67,33 +92,33 @@
 /* === ACTIONS & FILTERS === */
 .skin-cyber.cowrie-sessions.attacchi .actions,
 .skin-cyber.cowrie-sessions.attacchi .filters-container {
-  background: rgba(var(--cy-primary-rgb), 0.05) !important;
-  border-bottom: 1px solid var(--cy-border) !important;
+  background: rgba(var(--theme-primary-rgb), 0.05) !important;
+  border-bottom: 1px solid var(--theme-border) !important;
   backdrop-filter: blur(10px);
 }
 
 .skin-cyber.cowrie-sessions.attacchi .filters-container {
-  border: 1px solid var(--cy-border) !important;
+  border: 1px solid var(--theme-border) !important;
   background: rgba(0, 0, 0, 0.4) !important;
-  border-radius: 8px !important;
+  border-radius: var(--theme-radius) !important;
 }
 
 .skin-cyber.cowrie-sessions.attacchi .input {
   background: var(--cy-input-bg) !important;
-  border: 1px solid var(--cy-border) !important;
-  color: var(--cy-primary) !important;
+  border: 1px solid var(--theme-border) !important;
+  color: var(--theme-primary) !important;
 }
 
 .skin-cyber.cowrie-sessions.attacchi .input:focus {
-  border-color: var(--cy-primary) !important;
-  box-shadow: 0 0 15px rgba(var(--cy-primary-rgb), 0.4) !important;
+  border-color: var(--theme-primary) !important;
+  box-shadow: 0 0 15px rgba(var(--theme-primary-rgb), 0.4) !important;
 }
 
 /* === MAP & CHART === */
 .skin-cyber.cowrie-sessions.attacchi .map-section,
 .skin-cyber.cowrie-sessions.attacchi .chart-section {
   background: rgba(0, 0, 0, 0.6) !important;
-  border: 1px solid var(--cy-border) !important;
+  border: 1px solid var(--theme-border) !important;
   box-shadow: 0 0 30px rgba(0, 0, 0, 0.8) !important;
 }
 
@@ -103,61 +128,62 @@
 }
 
 .skin-cyber.cowrie-sessions.attacchi .cyber-table th {
-  background: rgba(var(--cy-primary-rgb), 0.15) !important;
-  border-bottom: 2px solid var(--cy-primary) !important;
-  color: var(--cy-primary) !important;
+  background: rgba(var(--theme-primary-rgb), 0.15) !important;
+  border-bottom: 2px solid var(--theme-primary) !important;
+  color: var(--theme-primary) !important;
 }
 
 .skin-cyber.cowrie-sessions.attacchi .cyber-row:hover td {
-  background: rgba(var(--cy-primary-rgb), 0.1) !important;
-  box-shadow: inset 0 0 15px rgba(var(--cy-primary-rgb), 0.2) !important;
+  background: rgba(var(--theme-primary-rgb), 0.1) !important;
+  box-shadow: inset 0 0 15px rgba(var(--theme-primary-rgb), 0.2) !important;
 }
 
 .skin-cyber.cowrie-sessions.attacchi .ip-link {
-  color: var(--cy-primary) !important;
-  text-decoration-color: var(--cy-border) !important;
+  color: var(--theme-primary) !important;
+  text-decoration-color: var(--theme-border) !important;
 }
 
 .skin-cyber.cowrie-sessions.attacchi .time-hour {
-  color: var(--cy-accent) !important;
+  color: var(--theme-accent) !important;
 }
 
 .skin-cyber.cowrie-sessions.attacchi .detail-btn {
-  background: rgba(var(--cy-primary-rgb), 0.1) !important;
-  color: var(--cy-primary) !important;
-  border-color: var(--cy-border) !important;
+  background: rgba(var(--theme-primary-rgb), 0.1) !important;
+  color: var(--theme-primary) !important;
+  border: 1px solid var(--theme-border) !important;
+  padding: 4px 8px !important;
 }
 
 .skin-cyber.cowrie-sessions.attacchi .detail-btn:hover {
-  background: var(--cy-primary) !important;
+  background: var(--theme-primary) !important;
   color: #050d0b !important;
-  box-shadow: 0 0 15px var(--cy-primary) !important;
+  box-shadow: 0 0 15px var(--theme-primary) !important;
 }
 
 /* === BUTTONS === */
 .skin-cyber.cowrie-sessions.attacchi .btn-action {
-  background: transparent !important;
-  border: 1px solid var(--cy-primary) !important;
-  color: var(--cy-primary) !important;
-  border-radius: 0 !important;
+  background: var(--theme-btn-bg) !important;
+  border: 1px solid var(--theme-primary) !important;
+  color: var(--theme-btn-text) !important;
+  border-radius: var(--theme-radius) !important;
   box-shadow: none !important;
   text-transform: uppercase;
   font-weight: 800;
 }
 
 .skin-cyber.cowrie-sessions.attacchi .btn-action:hover {
-  background: var(--cy-primary) !important;
+  background: var(--theme-primary) !important;
   color: #050d0b !important;
-  box-shadow: 0 0 30px rgba(var(--cy-primary-rgb), 0.6) !important;
+  box-shadow: 0 0 30px rgba(var(--theme-primary-rgb), 0.6) !important;
   font-weight: 900 !important;
 }
 
 /* === PAGINATION === */
 .skin-cyber.cowrie-sessions.attacchi .cyber-pagination {
-  border-top: 1px solid var(--cy-border) !important;
+  border-top: 1px solid var(--theme-border) !important;
   background: rgba(0, 0, 0, 0.3) !important;
 }
 
 .skin-cyber.cowrie-sessions.attacchi .pagination-info {
-  color: var(--cy-primary) !important;
+  color: var(--theme-primary) !important;
 }

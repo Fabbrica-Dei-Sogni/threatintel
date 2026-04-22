@@ -1,20 +1,41 @@
+/* === SEMANTIC THEME MAPPING (JADE CLASSIC) === */
+.skin-classic.cowrie-sessions.attacchi {
+  --theme-primary: #00FF41;
+  --theme-primary-rgb: 0, 255, 65;
+  --theme-accent: #33FF33;
+  --theme-bg: #18181B;
+  --theme-surface: rgba(0, 30, 0, 0.4);
+  --theme-border: rgba(0, 255, 65, 0.15);
+  --theme-text: #F0FAD0;
+  --theme-text-muted: #94a3b8;
+  --theme-radius: 8px;
+  --theme-blur: blur(12px);
+
+  /* Map legacy cyber variables used in shared engines */
+  --cyber-primary: var(--theme-primary);
+  --cyber-primary-rgb: var(--theme-primary-rgb);
+  --cyber-accent: var(--theme-accent);
+  --cyber-border: var(--theme-border);
+  --cyber-surface: var(--theme-surface);
+  --cyber-secondary: var(--theme-surface);
+
+  /* Button specific for Jade Classic */
+  --theme-btn-bg: linear-gradient(135deg, #00FF41, #008F11);
+  --theme-btn-text: #0A0605;
+  --theme-btn-shadow: rgba(0, 143, 17, 0.3);
+}
+
 .cowrie-sessions.attacchi {
-    --cyber-primary: #00FF41;
-    --cyber-primary-glow: rgba(0, 255, 65, 0.5);
-    --cyber-secondary: rgba(0, 30, 0, 0.8);
-    --cyber-background: #18181B;
-    --cyber-surface: linear-gradient(160deg, #1A2A1A, #18181B);
-    --cyber-border: rgba(0, 255, 65, 0.2);
-    --cyber-text: #F0FAD0;
-    --cyber-accent: #33FF33;
+  background-color: var(--theme-bg);
+  color: var(--theme-text);
 }
 
 /* Theme-specific overrides for sticky areas */
 .cowrie-sessions.attacchi .header-top,
 .cowrie-sessions.attacchi .actions,
 .cowrie-sessions.attacchi .filters-container {
-    background: var(--cyber-secondary);
-    border-bottom: 1px solid var(--cyber-border);
+    background: var(--theme-surface);
+    border-bottom: 1px solid var(--theme-border);
 }
 
 
@@ -61,17 +82,17 @@
 .filters-container { 
     margin-bottom: 24px !important; 
     padding: 16px 24px;
-    border-radius: 12px;
+    border-radius: var(--theme-radius);
     display: flex;
     flex-direction: column;
     gap: 16px;
-    background: rgba(0, 40, 0, 0.4);
-    border: 1px solid rgba(0, 255, 65, 0.15);
+    background: var(--theme-surface);
+    border: 1px solid var(--theme-border);
 }
 
 
 .header-top h1 {
-    color: #00FF41; /* Phosphorus Green */
+    color: var(--theme-primary);
     margin: 0;
 }
 
@@ -105,17 +126,17 @@
 }
 
 .btn-action {
-    background: linear-gradient(135deg, #00FF41, #008F11);
-    color: #0A0605;
+    background: var(--theme-btn-bg);
+    color: var(--theme-btn-text);
     border: none;
     padding: 10px 18px;
-    border-radius: 4px;
-    box-shadow: 0 4px 12px rgba(0, 143, 17, 0.3);
+    border-radius: var(--theme-radius);
+    box-shadow: 0 4px 12px var(--theme-btn-shadow);
 }
 
 .btn-action:hover {
-    background: linear-gradient(135deg, #33FF33, #00FF41);
-    box-shadow: 0 6px 20px rgba(0, 255, 65, 0.5);
+    filter: brightness(1.1);
+    box-shadow: 0 6px 20px var(--theme-btn-shadow);
     transform: translateY(-2px);
 }
 
@@ -142,9 +163,9 @@
 }
 
 .top-scrollbar-wrapper::-webkit-scrollbar-thumb {
-    background: linear-gradient(90deg, #003B00, #00FF41);
+    background: linear-gradient(90deg, rgba(var(--theme-primary-rgb), 0.5), var(--theme-primary));
     border-radius: 6px;
-    border: 1px solid rgba(0, 255, 65, 0.2);
+    border: 1px solid var(--theme-border);
 }
 
 .top-scrollbar-content {
@@ -153,8 +174,8 @@
 
 /* Log-table handle via global classes */
 .log-table th {
-    background: rgba(0, 59, 0, 0.6) !important;
-    border-bottom: 2px solid var(--cyber-primary);
+    background: rgba(var(--theme-primary-rgb), 0.15) !important;
+    border-bottom: 2px solid var(--theme-primary);
 }
 
 
@@ -187,7 +208,7 @@
 }
 
 .ip-link {
-    color: #00FF41;
+    color: var(--theme-primary);
     font-weight: 600;
     cursor: pointer;
     text-decoration: underline dotted;
@@ -195,8 +216,8 @@
 }
 
 .ip-link:hover {
-    color: #33FF33;
-    text-shadow: 0 0 10px rgba(0, 255, 65, 0.8);
+    color: var(--theme-accent);
+    text-shadow: 0 0 10px rgba(var(--theme-primary-rgb), 0.8);
 }
 
 .btn-copy-mini {
@@ -205,13 +226,13 @@
     cursor: pointer;
     font-size: 14px;
     padding: 2px;
-    color: #4aa3ff;
+    color: var(--theme-text-muted);
     opacity: 0.8;
-    transition: color 0.3s ease, transform 0.2s ease;
+    transition: all 0.3s ease, transform 0.2s ease;
 }
 
 .btn-copy-mini:hover {
-    color: #1e6ad7;
+    color: var(--theme-primary);
     transform: scale(1.2);
     opacity: 1;
 }
@@ -229,15 +250,15 @@
 }
 
 .time-hour {
-    color: #00FF41;
+    color: var(--theme-primary);
 }
 
 .detail-btn {
-    background: rgba(0, 255, 65, 0.1);
-    color: #00FF41;
-    border: 1px solid rgba(0, 255, 65, 0.3);
-    padding: 6px 14px;
-    border-radius: 4px;
+    background: rgba(var(--theme-primary-rgb), 0.1);
+    color: var(--theme-primary);
+    border: 1px solid var(--theme-border);
+    padding: 4px 10px;
+    border-radius: var(--theme-radius);
     cursor: pointer;
     transition: all 0.3s ease;
     white-space: nowrap;
@@ -246,10 +267,11 @@
 }
 
 .detail-btn:hover {
-    background: rgba(0, 255, 65, 0.2);
-    border-color: #00FF41;
+    background: var(--theme-primary);
+    color: #000;
+    border-color: var(--theme-primary);
     transform: translateY(-1px);
-    box-shadow: 0 0 10px rgba(0, 255, 65, 0.3);
+    box-shadow: 0 0 10px var(--theme-btn-shadow);
 }
 
 @media (max-width: 768px) {
@@ -293,10 +315,10 @@
 .filters-container .input {
     width: 100%;
     padding: 9px 38px 9px 12px;
-    background: rgba(0, 30, 0, 0.1);
-    border: 1px solid rgba(0, 255, 65, 0.2);
-    border-radius: 6px;
-    color: #00FF41;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--theme-border);
+    border-radius: var(--theme-radius);
+    color: var(--theme-primary);
     box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.4);
     transition: all 0.3s ease;
     box-sizing: border-box;
@@ -304,8 +326,8 @@
 
 .filters .input:focus {
     outline: none;
-    border-color: #00FF41;
-    box-shadow: 0 0 16px rgba(0, 255, 65, 0.5);
+    border-color: var(--theme-primary);
+    box-shadow: 0 0 16px var(--theme-btn-shadow);
 }
 
 /* Pulsante X cancella filtro */
@@ -316,7 +338,7 @@
     transform: translateY(-50%);
     background: transparent;
     border: none;
-    color: #e0bbbb;
+    color: var(--theme-text-muted);
     font-size: 16px;
     cursor: pointer;
     user-select: none;
@@ -325,7 +347,7 @@
 }
 
 .clear-btn:hover {
-    color: #ff4c4c;
+    color: var(--theme-primary);
 }
 
 /* Status overlays handled via global CSS */
@@ -354,7 +376,7 @@
 
 .pagination-info {
     font-weight: 600;
-    color: #00FF41;
+    color: var(--theme-primary);
     user-select: none;
     min-width: 130px; /* Stabilize width against digit changes */
     display: inline-block;
@@ -366,13 +388,13 @@
 
 .map-section,
 .chart-section {
-    background-color: rgba(0, 30, 0, 0.4);
-    border: 1px solid rgba(0, 255, 65, 0.2);
-    border-radius: 12px;
+    background-color: var(--theme-surface);
+    border: 1px solid var(--theme-border);
+    border-radius: var(--theme-radius);
     padding: 20px;
     margin-bottom: 30px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(8px);
+    backdrop-filter: var(--theme-blur);
     box-sizing: border-box; /* Prevent padding from adding to width */
     max-width: 100%;        /* Hard bound */
     overflow: hidden;       /* Clip any escapes */

@@ -1,6 +1,7 @@
 /* CowrieAttackDetailCyber.css - PHOSPHORUS EDITION (Isolated Scoped Version) */
 
 /* === CORE VARIABLES (PHOSPHORUS) === */
+/* === SEMANTIC THEME MAPPING (JADE) === */
 .skin-cyber.cowrie-detail.attacchi {
   --cy-primary: #00ffd0;
   --cy-primary-rgb: 0, 255, 208;
@@ -10,16 +11,40 @@
   --cy-surface: rgba(10, 20, 18, 0.9);
   --cy-border: rgba(0, 255, 208, 0.25);
   --cy-input-bg: rgba(0, 0, 0, 0.7);
-  
-  background-color: var(--cy-bg) !important;
-  color: #fff;
+
+  --theme-primary: var(--cy-primary);
+  --theme-primary-rgb: var(--cy-primary-rgb);
+  --theme-accent: var(--cy-accent);
+  --theme-bg: var(--cy-bg);
+  --theme-surface: var(--cy-surface);
+  --theme-border: var(--cy-border);
+  --theme-text: #fff;
+  --theme-text-muted: rgba(255, 255, 255, 0.6);
+  --theme-radius: 0px;
+  --theme-blur: blur(10px);
+
+  /* Map legacy cyber variables used in shared engines */
+  --cyber-primary: var(--theme-primary);
+  --cyber-primary-rgb: var(--theme-primary-rgb);
+  --cyber-accent: var(--theme-accent);
+  --cyber-border: var(--theme-border);
+  --cyber-surface: var(--theme-surface);
+  --cyber-secondary: var(--theme-surface);
+
+  /* Button specific for Jade Cyber */
+  --theme-btn-bg: transparent;
+  --theme-btn-text: var(--cy-primary);
+  --theme-btn-shadow: rgba(var(--cy-primary-rgb), 0.3);
+
+  background-color: var(--theme-bg) !important;
+  color: var(--theme-text) !important;
   transition: all 0.3s ease;
 }
 
 /* === HEADER & SWITCHER ALIGNMENT === */
 .skin-cyber.cowrie-detail.attacchi .header-top {
-  background: rgba(5, 15, 12, 0.95) !important;
-  border-bottom: 2px solid var(--cy-primary) !important;
+  background: rgba(var(--theme-primary-rgb), 0.05) !important;
+  border-bottom: 2px solid var(--theme-primary) !important;
   padding: 12px 24px 15px 24px !important;
   display: flex !important;
   justify-content: space-between !important;
@@ -37,8 +62,8 @@
 }
 
 .skin-cyber.cowrie-detail.attacchi h1 {
-  color: var(--cy-primary) !important;
-  text-shadow: 0 0 15px rgba(var(--cy-primary-rgb), 0.6) !important;
+  color: var(--theme-primary) !important;
+  text-shadow: 0 0 15px rgba(var(--theme-primary-rgb), 0.6) !important;
 }
 
 /* === HUD SCANLINES overlays === */
@@ -47,7 +72,7 @@
   position: fixed;
   top: 0; left: 0; width: 100vw; height: 100vh;
   background: linear-gradient(rgba(12, 18, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%),
-              linear-gradient(90deg, rgba(0, 255, 208, 0.03), rgba(0, 255, 255, 0.01), rgba(0, 200, 255, 0.03));
+              linear-gradient(90deg, rgba(var(--theme-primary-rgb), 0.03), rgba(0, 255, 255, 0.01), rgba(0, 200, 255, 0.03));
   background-size: 100% 4px, 3px 100%;
   pointer-events: none;
   z-index: 9999;
@@ -56,45 +81,45 @@
 
 /* === SUB-CARDS & HUD === */
 .skin-cyber.cowrie-detail.attacchi .sub-card {
-  background: linear-gradient(135deg, #0A1A14 0%, #050d0b 100%) !important;
-  border: 1px solid var(--cy-border) !important;
-  border-left: 6px solid var(--cy-primary) !important;
+  background: linear-gradient(135deg, rgba(var(--theme-primary-rgb), 0.1) 0%, var(--theme-bg) 100%) !important;
+  border: 1px solid var(--theme-border) !important;
+  border-left: 6px solid var(--theme-primary) !important;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8) !important;
 }
 
 .skin-cyber.cowrie-detail.attacchi .sub-card-header {
-  background: rgba(var(--cy-primary-rgb), 0.1) !important;
-  border-bottom: 1px solid var(--cy-border) !important;
+  background: rgba(var(--theme-primary-rgb), 0.1) !important;
+  border-bottom: 1px solid var(--theme-border) !important;
 }
 
 .skin-cyber.cowrie-detail.attacchi .hud-item {
   background: rgba(0, 0, 0, 0.4) !important;
-  border: 1px solid var(--cy-border) !important;
-  border-left: 4px solid var(--cy-primary) !important;
+  border: 1px solid var(--theme-border) !important;
+  border-left: 4px solid var(--theme-primary) !important;
 }
 
 .skin-cyber.cowrie-detail.attacchi .hud-label {
-  color: var(--cy-primary) !important;
+  color: var(--theme-primary) !important;
 }
 
 /* === TIMELINE === */
 .skin-cyber.cowrie-detail.attacchi .cyber-timeline::before {
-  background: linear-gradient(to bottom, var(--cy-primary), transparent) !important;
+  background: linear-gradient(to bottom, var(--theme-primary), transparent) !important;
 }
 
 .skin-cyber.cowrie-detail.attacchi .node-icon {
   background: #000 !important;
-  border-color: var(--cy-primary) !important;
-  box-shadow: 0 0 15px rgba(var(--cy-primary-rgb), 0.5) !important;
+  border-color: var(--theme-primary) !important;
+  box-shadow: 0 0 15px rgba(var(--theme-primary-rgb), 0.5) !important;
 }
 
 .skin-cyber.cowrie-detail.attacchi .node-content {
-  background: rgba(var(--cy-primary-rgb), 0.05) !important;
-  border: 1px solid var(--cy-border) !important;
+  background: rgba(var(--theme-primary-rgb), 0.05) !important;
+  border: 1px solid var(--theme-border) !important;
 }
 
 .skin-cyber.cowrie-detail.attacchi .node-header h4 {
-  color: var(--cy-primary) !important;
+  color: var(--theme-primary) !important;
 }
 
 /* === PAYLOADS === */
@@ -103,11 +128,11 @@
 .skin-cyber.cowrie-detail.attacchi .dl-payload,
 .skin-cyber.cowrie-detail.attacchi .ttylog-payload {
   background: #000 !important;
-  border: 1px solid var(--cy-border) !important;
+  border: 1px solid var(--theme-border) !important;
 }
 
 .skin-cyber.cowrie-detail.attacchi .prompt {
-  color: var(--cy-primary) !important;
+  color: var(--theme-primary) !important;
 }
 
 /* === SCANNER STATS (Orange Accent) === */
@@ -124,18 +149,18 @@
 
 /* === BUTTONS === */
 .skin-cyber.cowrie-detail.attacchi .btn-action {
-  background: transparent !important;
-  border: 1px solid var(--cy-primary) !important;
-  color: var(--cy-primary) !important;
-  border-radius: 0 !important;
+  background: var(--theme-btn-bg) !important;
+  border: 1px solid var(--theme-primary) !important;
+  color: var(--theme-btn-text) !important;
+  border-radius: var(--theme-radius) !important;
   box-shadow: none !important;
   text-transform: uppercase;
   font-weight: 800;
 }
 
 .skin-cyber.cowrie-detail.attacchi .btn-action:hover {
-  background: var(--cy-primary) !important;
+  background: var(--theme-primary) !important;
   color: #050d0b !important;
-  box-shadow: 0 0 30px rgba(var(--cy-primary-rgb), 0.6) !important;
+  box-shadow: 0 0 30px rgba(var(--theme-primary-rgb), 0.6) !important;
   font-weight: 900 !important;
 }

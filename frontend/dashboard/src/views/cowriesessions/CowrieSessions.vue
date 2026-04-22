@@ -172,8 +172,8 @@
                             </td>
                             <td>
                                 <router-link :to="{ name: 'CowrieAttackDetail', params: { id: session.session } }"
-                                    class="detail-btn">
-                                    {{ $t('cowrie.sessions.table.viewTimeline') }}
+                                    class="detail-btn" :title="$t('cowrie.sessions.table.viewTimeline')">
+                                    👁️
                                 </router-link>
                             </td>
                         </tr>

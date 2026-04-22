@@ -1,5 +1,6 @@
 <template>
   <div class="telemetry-stats-component">
+    <div class="scanning-line"></div>
     <!-- Header with Reset -->
     <div class="telemetry-header">
       <div class="header-left">
@@ -267,5 +268,30 @@ const getIndicatorLevel = (indicator) => {
   font-style: italic;
   font-size: 0.8rem;
   justify-content: center !important;
+}
+
+/* Scanning Line Animation */
+.telemetry-stats-component {
+    position: relative;
+    overflow: hidden;
+}
+
+.scanning-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(to right, transparent, var(--theme-primary, #00d9ff), transparent);
+  box-shadow: 0 0 15px var(--theme-primary, #00d9ff);
+  animation: scan-telemetry 4s linear infinite;
+  z-index: 5;
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+@keyframes scan-telemetry {
+  0% { top: 0; }
+  100% { top: 100%; }
 }
 </style>

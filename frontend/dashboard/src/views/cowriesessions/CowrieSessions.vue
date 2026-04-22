@@ -85,6 +85,9 @@
             <div v-if="error" class="error cyber-status-overlay cyber-error-overlay">{{ $t('common.errorLoadingData') }}
             </div>
 
+            <!-- Scanning Line -->
+            <div class="scanning-line"></div>
+
             <!-- Top Scrollbar Sync Wrapper -->
             <div class="top-scrollbar-wrapper cyber-scrollbar" ref="topScrollRef">
                 <div class="top-scrollbar-content" :style="{ width: tableWidth + 'px' }"></div>
@@ -577,6 +580,31 @@ watch(() => sessions.value, () => {
 .ip-input {
     min-width: 220px;
     font-family: 'JetBrains Mono', monospace !important;
+}
+
+/* Scanning Line Animation */
+.cyber-table-status-container {
+    position: relative;
+    overflow: hidden;
+}
+
+.scanning-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(to right, transparent, var(--theme-primary, #00ff41), transparent);
+  box-shadow: 0 0 15px var(--theme-primary, #00ff41);
+  animation: scan-table 8s linear infinite;
+  z-index: 5;
+  opacity: 0.15;
+  pointer-events: none;
+}
+
+@keyframes scan-table {
+  0% { top: 0; }
+  100% { top: 100%; }
 }
 </style>
 

@@ -331,7 +331,8 @@
 
                 <!-- DOSSIERS -->
                 <div v-if="widget === 'dossiers'" class="primary-intel">
-                  <div class="list-side glass-card full-width-widget">
+                  <div class="list-side glass-card full-width-widget dossier-ranking">
+                    <div class="scanning-line"></div>
                     <div class="widget-header">
                       <div class="title-content">
                         <h3>{{ $t('home.recentDossiers').toUpperCase() }}</h3>
@@ -654,5 +655,30 @@ watch(() => dashboardState.rankings, (newRankings, oldRankings) => {
     min-height: 450px;
     padding: 0;
     margin: 0;
+}
+
+/* Scanning Line for Dossiers */
+.full-width-widget {
+    position: relative;
+    overflow: hidden;
+}
+
+.dossier-ranking .scanning-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(to right, transparent, #6366f1, transparent);
+  box-shadow: 0 0 15px #6366f1;
+  animation: scan-dossier 7s linear infinite;
+  z-index: 5;
+  opacity: 0.25;
+  pointer-events: none;
+}
+
+@keyframes scan-dossier {
+  0% { top: 0; }
+  100% { top: 100%; }
 }
 </style>

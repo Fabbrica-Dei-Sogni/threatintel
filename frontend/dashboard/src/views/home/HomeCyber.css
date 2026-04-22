@@ -173,22 +173,9 @@
   opacity: 0.3;
 }
 
+/* Old Thick Scanline removed in favor of the new scanning-line div */
 .skin-cyber .glass-card::after {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 2px;
-  background: var(--neon-cyan);
-  opacity: 0;
-  animation: skin-cyber-scan 6s linear infinite;
-  z-index: 11;
-}
-
-@keyframes skin-cyber-scan {
-  0% { top: 0; opacity: 0; }
-  5% { opacity: 0.5; }
-  95% { opacity: 0.5; }
-  100% { top: 100%; opacity: 0; }
+  display: none;
 }
 
 .skin-cyber .primary-intel {

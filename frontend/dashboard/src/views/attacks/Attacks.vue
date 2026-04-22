@@ -132,6 +132,9 @@
             <div v-if="error" class="error cyber-status-overlay cyber-error-overlay">{{ t('common.errorLoadingData') }}
             </div>
 
+            <!-- Scanning Line -->
+            <div class="scanning-line"></div>
+
             <!-- Top Scrollbar Sync Wrapper -->
             <div class="top-scrollbar-wrapper cyber-scrollbar" ref="topScrollRef">
                 <div class="top-scrollbar-content" :style="{ width: tableWidth + 'px' }"></div>
@@ -710,6 +713,31 @@ watch(() => attacks.value, () => {
 .reset-view-control[data-noc-tooltip]::after {
     left: auto !important;
     right: calc(100% + 10px) !important;
+}
+
+/* Scanning Line Animation */
+.cyber-table-status-container {
+    position: relative;
+    overflow: hidden;
+}
+
+.scanning-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(to right, transparent, var(--theme-primary, #ff3366), transparent);
+  box-shadow: 0 0 15px var(--theme-primary, #ff3366);
+  animation: scan-table 8s linear infinite;
+  z-index: 5;
+  opacity: 0.15;
+  pointer-events: none;
+}
+
+@keyframes scan-table {
+  0% { top: 0; }
+  100% { top: 100%; }
 }
 
 /* === MOBILE RESPONSIVENESS === */

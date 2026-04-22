@@ -1,5 +1,6 @@
 <template>
   <div class="intel-ranking-widget glass-card" :class="[itemStyle, { collapsed: isCollapsed }]">
+    <div class="scanning-line"></div>
     <!-- Widget Header -->
     <div class="widget-header" :class="{ 'clickable-header': collapsible }" @click="handleHeaderClick">
       <div class="title-content">
@@ -258,6 +259,48 @@ watch(internalLimit, (newLimit) => {
   color: #0a0e17 !important;
   box-shadow: 0 0 20px #00ffff !important;
   transform: translateY(-2px) !important;
+}
+
+/* Scanning Line Animation */
+.intel-ranking-widget {
+    position: relative;
+    overflow: hidden;
+}
+
+.scanning-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(to right, transparent, var(--ranking-accent, #00d9ff), transparent);
+  box-shadow: 0 0 15px var(--ranking-accent, #00d9ff);
+  animation: scan-ranking 6s linear infinite;
+  z-index: 5;
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+/* Color Overrides based on Section */
+.anomalies-ranking {
+  --ranking-accent: #ff3366;
+}
+
+.logs-ranking {
+  --ranking-accent: #ffb300;
+}
+
+.sessions-ranking {
+  --ranking-accent: #00ff41;
+}
+
+.telemetry-ranking {
+  --ranking-accent: #00d9ff;
+}
+
+@keyframes scan-ranking {
+  0% { top: 0; }
+  100% { top: 100%; }
 }
 </style>
 

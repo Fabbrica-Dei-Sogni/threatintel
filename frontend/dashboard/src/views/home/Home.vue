@@ -122,9 +122,14 @@
                     </template>
 
                     <template #title-meta>
-                      <button class="btn-ranking-action" @click="goToAttacks">
-                        {{ t('common.more_info') }}
-                      </button>
+                      <div class="ranking-header-actions">
+                        <button class="btn-ranking-action" @click="goToAttacks(false)">
+                          {{ t('common.more_info') }}
+                        </button>
+                        <button class="sync-btn-header" @click="goToAttacks(true)" :title="t('common.syncFilters')">
+                          🔍
+                        </button>
+                      </div>
                     </template>
 
                     <template #item="{ item }">
@@ -151,6 +156,13 @@
                             >
                               DET
                             </router-link>
+                            <button 
+                              class="intel-det-btn sync-btn-mini" 
+                              @click="syncSingleAttackToSearch(item)"
+                              :data-noc-tooltip="t('common.syncFilters')"
+                            >
+                              🔍
+                            </button>
                           </div>
                         </div>
 
@@ -415,6 +427,9 @@ import { useDashboardStore } from '../../stores/dashboard';
 import { useViewSettingsStore } from '../../stores/viewSettings';
 import { storeToRefs } from 'pinia';
 
+import { useAttacksStore } from '../../stores/attacks';
+
+const attacksStore = useAttacksStore();
 const dashboardStore = useDashboardStore();
 const viewStore = useViewSettingsStore();
 const { state: dashboardState } = dashboardStore;
@@ -424,7 +439,28 @@ const showTicker = ref(true);
 
 // Navigazione
 const router = useRouter()
-function goToAttacks() {
+function goToAttacks(sync = false) {
+  if (sync) {
+    // Sincronizzazione filtri verso AttacksStore
+    attacksStore.state.filters.protocol = dashboardState.rankings.attackProtocol;
+    
+    // Gestione Timeframe: Se ALL (null), impostiamo un valore molto alto per coprire tutto
+    if (dashboardState.rankings.attackTimeValue === null) {
+      attacksStore.state.filters.timeMode = 'ago';
+      attacksStore.state.filters.agoValue = 10;
+      attacksStore.state.filters.agoUnit = 'years';
+    } else {
+      attacksStore.state.filters.timeMode = 'ago';
+      attacksStore.state.filters.agoValue = dashboardState.rankings.attackTimeValue;
+      attacksStore.state.filters.agoUnit = dashboardState.rankings.attackTimeUnit || 'days';
+    }
+
+    attacksStore.state.filters.minLogs = dashboardState.rankings.attackMinLogs;
+    attacksStore.state.filters.dangerLevels = [...(dashboardState.rankings.dangerLevels || [])];
+    attacksStore.state.filters.ip = ''; // Reset IP se sincronizziamo i filtri globali
+    attacksStore.state.pagination.page = 1;
+  }
+  
   router.push('/attacks')
 }
 function goToLogs() {
@@ -440,6 +476,29 @@ function goToArchive() {
 
 function goToIpDetails(ip) {
   router.push(`/ip/${ip}`)
+}
+
+function syncSingleAttackToSearch(item) {
+  // Sincronizzazione filtri verso AttacksStore
+  attacksStore.state.filters.ip = item.request?.ip || '';
+  attacksStore.state.filters.protocol = dashboardState.rankings.attackProtocol;
+  
+  // Gestione Timeframe per singolo attacco
+  if (dashboardState.rankings.attackTimeValue === null) {
+    attacksStore.state.filters.timeMode = 'ago';
+    attacksStore.state.filters.agoValue = 10;
+    attacksStore.state.filters.agoUnit = 'years';
+  } else {
+    attacksStore.state.filters.timeMode = 'ago';
+    attacksStore.state.filters.agoValue = dashboardState.rankings.attackTimeValue;
+    attacksStore.state.filters.agoUnit = dashboardState.rankings.attackTimeUnit || 'days';
+  }
+
+  attacksStore.state.filters.minLogs = dashboardState.rankings.attackMinLogs;
+  attacksStore.state.filters.dangerLevels = [...(dashboardState.rankings.dangerLevels || [])];
+  
+  attacksStore.state.pagination.page = 1;
+  router.push('/attacks');
 }
 
 // Funzioni per template
@@ -689,5 +748,95 @@ watch(() => dashboardState.rankings, (newRankings, oldRankings) => {
 @keyframes scan-dossier {
   0% { top: 0; }
   100% { top: 100%; }
+}
+
+/* Sync Button Styles */
+.sync-btn-mini {
+    margin-left: 6px;
+    border: 1px solid rgba(255, 51, 102, 0.4);
+    background: transparent;
+    color: var(--theme-primary, #ff3366);
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    padding: 0;
+}
+
+.sync-btn-mini:hover {
+    background: rgba(255, 51, 102, 0.1);
+    border-color: var(--theme-primary, #ff3366);
+    box-shadow: 0 0 10px rgba(255, 51, 102, 0.3);
+}
+
+.intel-det-btn {
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Header Sync Styles */
+.ranking-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 12px;
+}
+
+/* Rimuoviamo il margine superiore dal pulsante originale quando è nel container di sync */
+.ranking-header-actions :deep(.btn-ranking-action) {
+    margin-top: 0 !important;
+    height: 36px;
+    display: flex;
+    align-items: center;
+}
+
+.sync-btn-header {
+    background: rgba(255, 51, 102, 0.08);
+    border: 1px solid rgba(255, 51, 102, 0.3);
+    color: var(--theme-primary, #ff3366);
+    padding: 0;
+    width: 36px;
+    height: 36px; /* Uguale all'altezza del pulsante accanto */
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    align-self: center;
+}
+
+.sync-btn-header:hover {
+    background: rgba(255, 51, 102, 0.15);
+    border-color: var(--theme-primary, #ff3366);
+    box-shadow: 0 0 15px rgba(255, 51, 102, 0.4);
+    transform: translateY(-1px);
+}
+
+.sync-btn-header:active {
+    transform: scale(0.9);
+    background: var(--theme-primary, #ff3366);
+    color: #fff;
+}
+
+.skin-cyber .ranking-header-actions :deep(.btn-ranking-action) {
+    height: 38px;
+}
+
+.skin-cyber .sync-btn-header {
+    background: transparent !important;
+    border-radius: 0 !important;
+    border: 1px solid var(--neon-pink) !important;
+    color: var(--neon-pink) !important;
+    height: 38px; 
+    width: 38px;
 }
 </style>

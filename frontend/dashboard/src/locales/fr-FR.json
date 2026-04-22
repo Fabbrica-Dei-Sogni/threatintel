@@ -41,9 +41,11 @@
         "copy": "Copier",
         "copyToFilter": "Copier dans le filtre",
         "notAvailable": "N/D",
-        "infoIp": "Infos IP",
+        "infoIp": "Informations IP",
         "clearFilter": "Effacer le filtre",
+        "syncFilters": "Synchroniser les filtres avec la recherche",
         "more_info": "Plus d'informations...",
+
         "back": "Retour",
         "id": "ID",
         "timestamp": "Horodatage",

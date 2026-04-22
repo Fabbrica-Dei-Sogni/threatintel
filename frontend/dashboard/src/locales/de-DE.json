@@ -43,6 +43,7 @@
         "notAvailable": "N/V",
         "infoIp": "IP-Info",
         "clearFilter": "Filter löschen",
+        "syncFilters": "Filter mit Suche synchronisieren",
         "more_info": "Mehr Informationen...",
         "back": "Zurück",
         "id": "ID",

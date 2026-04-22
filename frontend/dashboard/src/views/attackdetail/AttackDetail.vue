@@ -3,6 +3,9 @@
         <div class="header-top cyber-sticky-area cyber-sticky-top-0">
             <div class="header-content-left">
                 <button @click="goBack" class="back-btn">← {{ t('attackDetail.backToAttacks') }}</button>
+                <button @click="syncFiltersToSearch" class="sync-filters-btn" :title="t('common.syncFilters')">
+                    <span class="animated-icon">🔍</span>
+                </button>
                 <div class="briefing-info-main">
                     <span class="animated-icon pulse-magma">🛰️</span>
                     <h1>{{ t('attackDetail.title') }}</h1>
@@ -382,12 +385,14 @@ import { Search } from '@element-plus/icons-vue';
 import { fetchAttackDetail } from '../../api';
 
 import { useViewSettingsStore } from '../../stores/viewSettings';
+import { useAttacksStore } from '../../stores/attacks';
 import { storeToRefs } from 'pinia';
 
 const { t } = useI18n();
 const { copyToClipboard, copyFormatted } = useClipboard();
 
 const viewStore = useViewSettingsStore();
+const attacksStore = useAttacksStore();
 const { dashboardSkin } = storeToRefs(viewStore);
 const toggles = reactive({
     summary: true,
@@ -569,6 +574,23 @@ function goBack() {
     router.back()
 }
 
+function syncFiltersToSearch() {
+    if (!attack.value) return;
+    
+    // Sincronizzazione filtri verso AttacksStore
+    attacksStore.state.filters.ip = attack.value.request?.ip || '';
+    attacksStore.state.filters.timeMode = props.timeMode;
+    attacksStore.state.filters.agoValue = props.agoValue;
+    attacksStore.state.filters.agoUnit = props.agoUnit;
+    attacksStore.state.filters.dateRange = props.dateRange;
+    attacksStore.state.filters.minLogs = props.minLogsForAttack;
+    
+    // Opzionale: se vogliamo resettare la pagina
+    attacksStore.state.pagination.page = 1;
+
+    router.push({ name: 'Attacks' });
+}
+
 const loadAttackData = async () => {
     loading.value = true
     error.value = null
@@ -644,4 +666,37 @@ const copyAggregatedLog = (log) => {
 <style scoped src="./AttackDetail.css"></style>
 <style scoped>
 @import "./AttackDetailCyber.css";
+
+.sync-filters-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--theme-primary, #ff3366);
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-left: 10px;
+    border-radius: 4px;
+}
+
+.sync-filters-btn:hover {
+    background: rgba(255, 51, 102, 0.1);
+    border-color: var(--theme-primary, #ff3366);
+    box-shadow: 0 0 10px rgba(255, 51, 102, 0.3);
+}
+
+.sync-filters-btn .animated-icon {
+    font-size: 1.2rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+    .sync-filters-btn {
+        width: 32px;
+        height: 32px;
+    }
+}
 </style>

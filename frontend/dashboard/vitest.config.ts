@@ -25,8 +25,17 @@ export default mergeConfig(
           '**/*.config.ts',
           'src/tests/**',
           'src/**/*.test.ts',
-          'src/**/*.spec.ts'
-        ]
+          'src/**/*.spec.ts',
+          '**/*.vue',
+          '**/*.css',
+          '**/*.scss'
+        ],
+        thresholds: {
+          lines: 80,
+          functions: 80,
+          branches: 80,
+          statements: 80
+        }
       },
       include: ['src/**/*.{test,spec}.ts'],
     },

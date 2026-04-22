@@ -48,7 +48,12 @@ describe('API index', () => {
     const mockResponse = { logs: [{ id: '1' }], total: 1 };
     mock.onPost('/search').reply(200, mockResponse);
 
-    const result = await fetchSearch({ page: 1, pageSize: 10 });
+    const result = await fetchSearch({ 
+        page: 1, 
+        pageSize: 10, 
+        filters: {}, 
+        sortFields: null 
+    });
     
     expect(result).toEqual(mockResponse);
     expect(mock.history.post[0].data).toContain('"page":1');
@@ -56,7 +61,12 @@ describe('API index', () => {
 
   it('should handle fetchSearch error', async () => {
     mock.onPost('/search').reply(500);
-    await expect(fetchSearch({})).rejects.toThrow();
+    await expect(fetchSearch({ 
+        page: 1, 
+        pageSize: 10, 
+        filters: {}, 
+        sortFields: null 
+    })).rejects.toThrow();
   });
 
   it('should fetch log by id', async () => {
@@ -266,33 +276,58 @@ describe('API index', () => {
 
   it('should handle fetchCowrieSessions error', async () => {
     mock.onPost('/cowrie/search').reply(500);
-    await expect(fetchCowrieSessions()).rejects.toThrow();
+    await expect(fetchCowrieSessions(1, 10, null, {})).rejects.toThrow();
   });
 
   it('should fetch attack search with params', async () => {
     const mockData = { attacks: [], total: 0 };
     mock.onPost('/attack/search').reply(200, mockData);
-    const result = await fetchAttackSearch({ page: 1, minLogsForAttack: 5 });
+    const result = await fetchAttackSearch({ 
+        page: 1, 
+        pageSize: 20, 
+        filters: {}, 
+        minLogsForAttack: 5, 
+        timeConfig: { hours: 24 }, 
+        sortFields: null 
+    });
     expect(result).toEqual(mockData);
   });
 
   it('should handle fetchAttackSearch error', async () => {
     mock.onPost('/attack/search').reply(500);
-    await expect(fetchAttackSearch({})).rejects.toThrow();
+    await expect(fetchAttackSearch({ 
+        page: 1, 
+        pageSize: 20, 
+        filters: {}, 
+        minLogsForAttack: 5, 
+        timeConfig: { hours: 24 }, 
+        sortFields: null 
+    })).rejects.toThrow();
   });
 
   it('should handle fetchAttackDetail error', async () => {
     mock.onPost('/attack/details').reply(500);
-    await expect(fetchAttackDetail({ ip: '1.2.3.4', minLogsForAttack: 1, timeConfig: {} })).rejects.toThrow();
+    await expect(fetchAttackDetail({ 
+        ip: '1.2.3.4', 
+        minLogsForAttack: 1, 
+        timeConfig: { hours: 1 } 
+    })).rejects.toThrow();
   });
 
   it('should handle fetchRateLimitSearch error', async () => {
     mock.onPost('/ratelimit/search').reply(500);
-    await expect(fetchRateLimitSearch({})).rejects.toThrow();
+    await expect(fetchRateLimitSearch({ 
+        page: 1, 
+        pageSize: 10, 
+        filters: {} 
+    })).rejects.toThrow();
   });
 
   it('should handle fetchCustomReport error', async () => {
     mock.onPost('/reports/custom').reply(500);
-    await expect(fetchCustomReport({})).rejects.toThrow();
+    await expect(fetchCustomReport({ 
+        sections: [],
+        locale: 'it-IT'
+    })).rejects.toThrow();
   });
 });

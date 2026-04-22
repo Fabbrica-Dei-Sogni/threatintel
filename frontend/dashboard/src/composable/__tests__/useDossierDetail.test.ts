@@ -19,8 +19,8 @@ describe('useDossierDetail', () => {
   });
 
   it('should load dossier details successfully', async () => {
-    const mockDossier = { id: '123', title: 'Test Dossier', sections: [] };
-    vi.mocked(api.fetchDossierById).mockResolvedValue(mockDossier);
+    const mockDossier = { _id: '123', title: 'Test Dossier', sections: [] };
+    vi.mocked(api.fetchDossierById).mockResolvedValue(mockDossier as any);
 
     const { dossier, loadDossier, loading } = useDossierDetail();
     
@@ -43,9 +43,9 @@ describe('useDossierDetail', () => {
   });
 
   it('should update dossier metadata', async () => {
-    const mockDossier = { id: '123', title: 'Old', description: 'desc', sections: [] };
-    vi.mocked(api.fetchDossierById).mockResolvedValue(mockDossier);
-    vi.mocked(api.updateDossier).mockResolvedValue({ ...mockDossier, title: 'New' });
+    const mockDossier = { _id: '123', title: 'Old', description: 'desc', sections: [] };
+    vi.mocked(api.fetchDossierById).mockResolvedValue(mockDossier as any);
+    vi.mocked(api.updateDossier).mockResolvedValue({ ...mockDossier, title: 'New' } as any);
 
     const { dossier, loadDossier, saveMetadata } = useDossierDetail();
     await loadDossier('123');
@@ -57,9 +57,9 @@ describe('useDossierDetail', () => {
   });
 
   it('should add a human section', async () => {
-    const mockDossier = { id: '123', sections: [] };
+    const mockDossier = { _id: '123', sections: [] };
     vi.mocked(api.fetchDossierById).mockResolvedValue(mockDossier as any);
-    vi.mocked(api.updateDossier).mockResolvedValue({ ...mockDossier, sections: [{ type: DossierSectionType.HUMAN }] } as any);
+    vi.mocked(api.updateDossier).mockResolvedValue({ ...mockDossier, sections: [{ type: DossierSectionType.HUMAN, templateKey: 'h', order: 0, timestamp: new Date(), data: {} }] } as any);
 
     const { loadDossier, addHumanSection, dossier } = useDossierDetail();
     await loadDossier('123');
@@ -70,9 +70,9 @@ describe('useDossierDetail', () => {
   });
 
   it('should update a section', async () => {
-    const mockDossier = { id: '123', sections: [{ id: 's1', type: 'generic', data: {} }] };
+    const mockDossier = { _id: '123', sections: [{ templateKey: 's1', type: DossierSectionType.ATTACK, data: {}, order: 0, timestamp: new Date() }] };
     vi.mocked(api.fetchDossierById).mockResolvedValue(mockDossier as any);
-    vi.mocked(api.updateDossier).mockResolvedValue({ ...mockDossier, sections: [{ id: 's1', type: 'generic', data: { updated: true } }] } as any);
+    vi.mocked(api.updateDossier).mockResolvedValue({ ...mockDossier, sections: [{ templateKey: 's1', type: DossierSectionType.ATTACK, data: { updated: true }, order: 0, timestamp: new Date() }] } as any);
 
     const { loadDossier, updateSection, dossier } = useDossierDetail();
     await loadDossier('123');
@@ -83,7 +83,7 @@ describe('useDossierDetail', () => {
   });
 
   it('should delete a section', async () => {
-    const mockDossier = { id: '123', sections: [{ id: 's1', type: 'generic' }] };
+    const mockDossier = { _id: '123', sections: [{ templateKey: 's1', type: DossierSectionType.ATTACK, order: 0, timestamp: new Date(), data: {} }] };
     vi.mocked(api.fetchDossierById).mockResolvedValue(mockDossier as any);
     vi.mocked(api.updateDossier).mockResolvedValue({ ...mockDossier, sections: [] } as any);
 
@@ -96,8 +96,8 @@ describe('useDossierDetail', () => {
 
   it('should add an observation to a section', async () => {
     const mockDossier = { 
-        id: '123', 
-        sections: [{ id: 's1', type: 'generic', observations: [] }] 
+        _id: '123', 
+        sections: [{ templateKey: 's1', type: DossierSectionType.ATTACK, observations: [], order: 0, timestamp: new Date(), data: {} }] 
     };
     vi.mocked(api.fetchDossierById).mockResolvedValue(mockDossier as any);
     vi.mocked(api.updateDossier).mockResolvedValue({ ...mockDossier } as any);
@@ -111,8 +111,8 @@ describe('useDossierDetail', () => {
 
   it('should update and delete an observation', async () => {
     const mockDossier = { 
-        id: '123', 
-        sections: [{ id: 's1', type: 'generic', observations: ['Note 1'] }] 
+        _id: '123', 
+        sections: [{ templateKey: 's1', type: DossierSectionType.ATTACK, observations: ['Note 1'], order: 0, timestamp: new Date(), data: {} }] 
     };
     vi.mocked(api.fetchDossierById).mockResolvedValue(mockDossier as any);
     vi.mocked(api.updateDossier).mockResolvedValue({ ...mockDossier } as any);
@@ -136,7 +136,7 @@ describe('useDossierDetail', () => {
     // Not loaded
     expect(canModify.value).toBe(false);
 
-    dossier.value = { id: '123', owner: 'admin', title: 'T', sections: [] } as any;
+    dossier.value = { _id: '123', owner: 'admin', title: 'T', sections: [], status: 'active' } as any;
     
     // Not logged in
     authStore.user = null;
@@ -157,11 +157,11 @@ describe('useDossierDetail', () => {
 
   it('should sort sections correctly (human first, then by date)', async () => {
     const mockDossier = { 
-        id: '123', 
+        _id: '123', 
         sections: [
-            { id: 's1', type: DossierSectionType.GENERIC, timestamp: '2023-01-01T10:00:00Z' },
-            { id: 's2', type: DossierSectionType.HUMAN, timestamp: '2023-01-01T09:00:00Z' },
-            { id: 's3', type: DossierSectionType.GENERIC, timestamp: '2023-01-01T11:00:00Z' }
+            { templateKey: 's1', type: DossierSectionType.ATTACK, timestamp: '2023-01-01T10:00:00Z', order: 1, data: {} },
+            { templateKey: 's2', type: DossierSectionType.HUMAN, timestamp: '2023-01-01T09:00:00Z', order: 2, data: {} },
+            { templateKey: 's3', type: DossierSectionType.ATTACK, timestamp: '2023-01-01T11:00:00Z', order: 3, data: {} }
         ] 
     };
     vi.mocked(api.fetchDossierById).mockResolvedValue(mockDossier as any);
@@ -174,8 +174,8 @@ describe('useDossierDetail', () => {
     await updateSection('123', 0, {});
 
     // Expected order: s2 (human), s3 (newest generic), s1 (oldest generic)
-    expect(dossier.value!.sections[0].id).toBe('s2');
-    expect(dossier.value!.sections[1].id).toBe('s3');
-    expect(dossier.value!.sections[2].id).toBe('s1');
+    expect(dossier.value!.sections[0].templateKey).toBe('s2');
+    expect(dossier.value!.sections[1].templateKey).toBe('s3');
+    expect(dossier.value!.sections[2].templateKey).toBe('s1');
   });
 });

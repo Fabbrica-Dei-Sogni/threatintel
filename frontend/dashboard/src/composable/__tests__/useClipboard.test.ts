@@ -108,7 +108,7 @@ describe('useClipboard', () => {
   });
 
   it('should handle array templates in renderTemplate', () => {
-    i18nState.tm = () => ['Line 1: {val}', 'Line 2'];
+    (i18nState as any).tm = () => ['Line 1: {val}', 'Line 2'];
     const { renderTemplate } = useClipboard();
     
     const result = renderTemplate('some.key', { val: 'test' });

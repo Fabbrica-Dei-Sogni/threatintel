@@ -82,9 +82,62 @@
   font-size: 0.8rem !important;
 }
 
-.skin-cyber .el-input__wrapper.is-focus,
-.skin-cyber .el-select__wrapper.is-focus {
-  box-shadow: 0 0 0 1px var(--cyber-primary) inset, 0 0 10px rgba(var(--cyber-primary-rgb), 0.3) !important;
+/* Radio Buttons HUD Style */
+.skin-cyber .el-radio-button__inner {
+  background-color: transparent !important;
+  border: 1px solid var(--theme-border) !important;
+  color: var(--theme-primary) !important;
+  border-radius: 0 !important;
+  transition: var(--cyber-transition);
+}
+
+.skin-cyber .el-radio-button__original-radio:checked + .el-radio-button__inner {
+  background-color: var(--theme-primary) !important;
+  color: var(--theme-bg, #000) !important;
+  box-shadow: 0 0 15px var(--theme-primary) !important;
+}
+
+/* Input Number Custom Controls */
+.skin-cyber .el-input-number__decrease,
+.skin-cyber .el-input-number__increase {
+  background-color: var(--theme-surface) !important;
+  border-color: var(--theme-border) !important;
+  color: var(--theme-primary) !important;
+}
+
+.skin-cyber .el-input-number__decrease:hover,
+.skin-cyber .el-input-number__increase:hover {
+  color: #fff !important;
+  background-color: var(--theme-primary) !important;
+}
+
+/* Date Picker / Range Picker */
+.skin-cyber .el-range-separator {
+  color: var(--theme-text-muted) !important;
+}
+
+.skin-cyber .el-range__icon,
+.skin-cyber .el-range__close-icon {
+  color: var(--theme-primary) !important;
+}
+
+/* Pagination HUD Style */
+.skin-cyber .el-pagination.is-background .el-pager li:not(.is-active) {
+  background-color: var(--theme-surface) !important;
+  color: var(--theme-primary) !important;
+  border: 1px solid var(--theme-border) !important;
+}
+
+.skin-cyber .el-pagination.is-background .el-pager li.is-active {
+  background-color: var(--theme-primary) !important;
+  color: var(--theme-bg, #000) !important;
+  box-shadow: 0 0 10px var(--theme-primary) !important;
+}
+
+.skin-cyber .el-pagination button {
+  background-color: var(--theme-surface) !important;
+  color: var(--theme-primary) !important;
+  border: 1px solid var(--theme-border) !important;
 }
 
 /* Radio Buttons */

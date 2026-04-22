@@ -2,8 +2,8 @@
 
 .attack-detail {
     padding: clamp(12px, 3vw, 24px);
-    background-color: #18181B; /* Tinged Charcoal */
-    color: #f0e6d2;
+    background-color: var(--theme-bg, #18181B);
+    color: var(--theme-text, #f0e6d2);
     min-height: 100vh;
 }
 
@@ -17,7 +17,7 @@
     gap: 20px !important;
     margin-bottom: 24px !important;
     padding: 12px 24px 15px 24px !important;
-    border-bottom: 1px solid rgba(230, 33, 23, 0.2);
+    border-bottom: 1px solid var(--theme-border, rgba(230, 33, 23, 0.2));
 }
 
 .header-content-left, .header-content-right {
@@ -47,14 +47,14 @@
 }
 
 .back-btn {
-    background: linear-gradient(135deg, #e62117, #b71c1c);
-    color: #fff;
+    background: var(--theme-btn-bg, linear-gradient(135deg, #e62117, #b71c1c));
+    color: var(--theme-btn-text, #fff);
     border: none;
     font-weight: 700;
     padding: 10px 24px;
-    box-shadow: 0 4px 15px rgba(230, 33, 23, 0.4);
+    box-shadow: 0 4px 15px var(--theme-btn-shadow, rgba(230, 33, 23, 0.4));
     transition: all 0.3s ease;
-    border-radius: 4px;
+    border-radius: var(--theme-radius, 4px);
     cursor: pointer;
     font-size: 0.9rem;
     letter-spacing: 0.5px;
@@ -88,9 +88,9 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: linear-gradient(135deg, #2A1A1A 0%, #18181B 100%);
-    border: 1px solid rgba(230, 33, 23, 0.2);
-    border-left: 6px solid #e62117;
+    background: var(--theme-surface, linear-gradient(135deg, #2A1A1A 0%, #18181B 100%));
+    border: 1px solid var(--theme-border, rgba(230, 33, 23, 0.2));
+    border-left: 6px solid var(--theme-primary, #e62117);
     border-radius: 12px;
     padding: clamp(16px, 3vw, 24px) clamp(20px, 4vw, 30px);
     margin-bottom: 30px;
@@ -473,12 +473,16 @@
     padding: 2px 8px;
 }
 
-.hud-content :deep(.t-date) {
+.hud-content .t-date {
     font-size: 0.85em;
+    color: var(--theme-primary);
+    opacity: 0.8;
 }
 
-.hud-content :deep(.t-hour) {
+.hud-content .t-hour {
     font-size: 0.9em;
+    color: var(--theme-text);
+    font-weight: 800;
 }
 
 .log-actions {
@@ -610,32 +614,39 @@
 
 /* === DATA SEARCH INPUT === */
 
+/* === SEMANTIC THEME MAPPING === */
+.skin-classic.attack-detail {
+    --theme-primary: #ff4c4c;
+    --theme-primary-rgb: 255, 76, 76;
+    --theme-accent: #E62117;
+    --theme-bg: #18181B;
+    --theme-surface: rgba(26, 15, 13, 0.4);
+    --theme-border: rgba(230, 33, 23, 0.15);
+    --theme-text: #F0E6D2;
+    --theme-text-muted: #f2a1a1;
+    --theme-radius: 6px;
+    --theme-blur: blur(12px);
+
+    /* Button specific for Classic Attack Detail (Red) */
+    --theme-btn-bg: linear-gradient(135deg, #E62117, #B71C1C);
+    --theme-btn-text: #fff;
+    --theme-btn-shadow: rgba(230, 33, 23, 0.4);
+}
+
 .url-search-input {
     width: clamp(200px, 40vw, 350px);
-}
-
-:deep(.el-input__wrapper) {
-    background-color: rgba(255, 255, 255, 0.03) !important;
-    box-shadow: 0 0 0 1px rgba(230, 33, 23, 0.2) inset !important;
-    border-radius: 6px;
-}
-
-:deep(.el-input__inner) {
-    color: #eee !important;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.85rem;
 }
 
 /* === LOG ENTRIES === */
 
 .log-entry, .rate-limit-event-entry {
-    border-bottom: 1px solid rgba(230, 33, 23, 0.1);
+    border-bottom: 1px solid var(--theme-border);
     padding: 16px 24px;
     transition: background 0.2s ease;
 }
 
 .log-entry:hover, .rate-limit-event-entry:hover {
-    background: rgba(230, 33, 23, 0.03);
+    background: rgba(var(--theme-primary-rgb), 0.03);
 }
 
 .log-header, .event-header {
@@ -644,7 +655,7 @@
     align-items: center; /* keep arrow centered vertically */
     cursor: pointer;
     font-weight: 600;
-    color: #fff;
+    color: var(--theme-text);
     font-size: clamp(0.85rem, 2.5vw, 0.95rem);
     line-height: 1.5;
     gap: 15px; /* Ensures space between content and arrow */
@@ -659,7 +670,7 @@
 }
 
 .event-time {
-    color: #a1a1aa;
+    color: var(--theme-text-muted);
     font-family: 'JetBrains Mono', monospace;
     font-size: 0.8em;
     background: rgba(255, 255, 255, 0.05);
@@ -671,10 +682,10 @@
 }
 
 .event-ip {
-    color: #e2e8f0;
+    color: var(--theme-text);
     font-weight: 800;
-    background: rgba(230, 33, 23, 0.1);
-    border: 1px solid rgba(230, 33, 23, 0.2);
+    background: var(--theme-surface);
+    border: 1px solid var(--theme-border);
     padding: 3px 10px;
     border-radius: 4px;
     display: flex;
@@ -684,7 +695,7 @@
 }
 
 .event-limit-badge {
-    background: #e62117;
+    background: var(--theme-accent);
     color: #fff;
     font-size: 0.75rem;
     font-weight: 900;
@@ -692,8 +703,8 @@
     padding: 3px 10px;
     border-radius: 20px;
     letter-spacing: 1px;
-    border: 1px solid #ff4c4c;
-    box-shadow: 0 0 10px rgba(230, 33, 23, 0.4);
+    border: 1px solid var(--theme-primary);
+    box-shadow: 0 0 10px var(--theme-btn-shadow);
 }
 
 .pulse-magma-mini {
@@ -701,9 +712,9 @@
 }
 
 @keyframes pulse-magma-mini {
-    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(230, 33, 23, 0.7); }
-    70% { transform: scale(1.05); box-shadow: 0 0 0 6px rgba(230, 33, 23, 0); }
-    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(230, 33, 23, 0); }
+    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(var(--theme-primary-rgb), 0.7); }
+    70% { transform: scale(1.05); box-shadow: 0 0 0 6px rgba(var(--theme-primary-rgb), 0); }
+    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(var(--theme-primary-rgb), 0); }
 }
 
 .event-header-content .icon {
@@ -719,13 +730,13 @@
 }
 
 .log-method-url {
-    color: rgba(255, 255, 255, 0.85);
+    color: var(--theme-text);
     font-weight: 500;
 }
 
 .toggle-icon {
     font-size: 14px;
-    color: #ff4c4c;
+    color: var(--theme-primary);
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -734,23 +745,23 @@
 }
 
 .log-body, .event-body {
-    background-color: #050303;
+    background-color: var(--theme-bg);
     padding: clamp(12px, 3vw, 20px);
     margin-top: 15px;
     border-radius: 8px;
-    color: #e6e6e6;
+    color: var(--theme-text);
     font-family: 'JetBrains Mono', monospace;
-    border: 1px solid rgba(230, 33, 23, 0.15);
+    border: 1px solid var(--theme-border);
     font-size: 0.9rem;
 }
 
 .log-body pre, .event-body pre {
-    background-color: rgba(230, 33, 23, 0.05);
+    background-color: rgba(var(--theme-primary-rgb), 0.05);
     padding: 14px;
     border-radius: 6px;
-    border: 1px solid rgba(230, 33, 23, 0.1);
+    border: 1px solid var(--theme-border);
     overflow: auto;
-    color: #ff9999;
+    color: var(--theme-text-muted);
 }
 
 .event-count-badge {
@@ -760,65 +771,17 @@
     font-weight: 800;
 }
 
-/* === DATE STYLING === */
-
-:deep(.t-date) {
-    color: #ff9999;
-    opacity: 0.8;
-    font-weight: 500;
-}
-
-:deep(.t-hour) {
-    color: #fff;
-    font-weight: 800;
-    margin-left: 4px;
-}
-
 /* === PAGINATION (MAGMA) === */
 
 .pagination-container {
     display: flex;
     justify-content: center;
     padding: 24px;
-    background: rgba(230, 33, 23, 0.03);
-}
-
-.cyber-pagination.magenta {
-    --el-pagination-button-bg-color: rgba(230, 33, 23, 0.05);
-    --el-pagination-hover-color: #ff4c4c;
-    --el-pagination-button-color: #ff4c4c;
-}
-
-.cyber-pagination {
-    font-family: 'JetBrains Mono', monospace;
-}
-
-:deep(.cyber-pagination .btn-prev),
-:deep(.cyber-pagination .btn-next) {
-    border: 1px solid rgba(230, 33, 23, 0.15) !important;
-    background: rgba(230, 33, 23, 0.03) !important;
-    color: #ff4c4c !important;
-    border-radius: 4px;
-    min-width: 40px;
-    height: 40px;
-}
-
-:deep(.cyber-pagination .el-pager li) {
-    background: transparent !important;
-    color: rgba(255, 255, 255, 0.4) !important;
-    font-weight: 700;
-    min-width: 32px;
-}
-
-:deep(.cyber-pagination .el-pager li.is-active) {
-    background: rgba(230, 33, 23, 0.1) !important;
-    border: 1px solid rgba(230, 33, 23, 0.4) !important;
-    color: #ff4c4c !important;
-    text-shadow: 0 0 10px rgba(230, 33, 23, 0.5);
+    background: rgba(var(--theme-primary-rgb), 0.03);
 }
 
 .mobile-pagination-info {
-    color: #ff4c4c;
+    color: var(--theme-primary);
     font-weight: 900;
     font-family: 'JetBrains Mono', monospace;
     margin: 0 15px;

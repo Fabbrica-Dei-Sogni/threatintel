@@ -5,15 +5,16 @@
  */
 
 :root {
-    /* Default fallback theme (Phosphorus Green) */
-    --cyber-primary: #00FF41;
-    --cyber-primary-glow: rgba(0, 255, 65, 0.5);
-    --cyber-secondary: rgba(0, 30, 0, 0.7);
-    --cyber-background: #0A0605;
-    --cyber-surface: rgba(0, 30, 0, 0.3);
-    --cyber-border: rgba(0, 255, 65, 0.2);
-    --cyber-text: #F0FAD0;
-    --cyber-accent: #33FF33;
+    /* Semantic Theming for Base HUD */
+    --cyber-primary: var(--theme-primary, #00FF41);
+    --cyber-primary-rgb: var(--theme-primary-rgb, 0, 255, 65);
+    --cyber-secondary: var(--theme-surface, rgba(0, 30, 0, 0.7));
+    --cyber-background: var(--theme-bg, #0A0605);
+    --cyber-surface: var(--theme-surface, rgba(0, 30, 0, 0.3));
+    --cyber-border: var(--theme-border, rgba(0, 255, 65, 0.2));
+    --cyber-text: var(--theme-text, #F0FAD0);
+    --cyber-accent: var(--theme-accent, #33FF33);
+    --cyber-primary-glow: rgba(var(--cyber-primary-rgb), 0.5);
 }
 
 /* Main View Container */

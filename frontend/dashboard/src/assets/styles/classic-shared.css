@@ -52,7 +52,9 @@
   border-radius: 4px !important;
 }
 
-.skin-classic .el-input__inner {
+.skin-classic .el-input__inner,
+.skin-classic .el-select__placeholder,
+.skin-classic .el-range-input {
   color: var(--theme-text) !important;
 }
 
@@ -61,15 +63,47 @@
   box-shadow: 0 0 0 1px var(--theme-primary) inset !important;
 }
 
-/* Radio Buttons */
+/* Radio Buttons Classic NOC Style */
 .skin-classic .el-radio-button__inner {
   background-color: rgba(30, 41, 59, 0.4) !important;
   border: 1px solid var(--theme-border) !important;
   color: var(--theme-text-muted) !important;
+  transition: all 0.3s ease;
 }
 
 .skin-classic .el-radio-button__original-radio:checked + .el-radio-button__inner {
   background-color: var(--theme-primary) !important;
   color: #fff !important;
   border-color: var(--theme-primary) !important;
+}
+
+/* Input Number Classic */
+.skin-classic .el-input-number__decrease,
+.skin-classic .el-input-number__increase {
+  background-color: var(--theme-surface) !important;
+  border-color: var(--theme-border) !important;
+  color: var(--theme-text-muted) !important;
+}
+
+.skin-classic .el-input-number__decrease:hover,
+.skin-classic .el-input-number__increase:hover {
+  color: var(--theme-primary) !important;
+}
+
+/* Pagination Classic Style */
+.skin-classic .el-pagination.is-background .el-pager li:not(.is-active) {
+  background-color: rgba(0, 0, 0, 0.2) !important;
+  color: var(--theme-text-muted) !important;
+  border: 1px solid var(--theme-border) !important;
+}
+
+.skin-classic .el-pagination.is-background .el-pager li.is-active {
+  background-color: var(--theme-primary) !important;
+  color: #fff !important;
+}
+
+.skin-classic .el-pagination button {
+  background-color: rgba(0, 0, 0, 0.2) !important;
+  color: var(--theme-primary) !important;
+  border: 1px solid var(--theme-border) !important;
 }

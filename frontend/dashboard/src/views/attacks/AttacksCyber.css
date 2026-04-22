@@ -63,41 +63,23 @@
   opacity: 0.25;
 }
 
-/* === CRITICAL DEEP RULES (COLOR PROTECTION) === */
-/* These rules pierce through Element Plus components to prevent "White Backgrounds" */
+/* === SEMANTIC THEME MAPPING === */
+.skin-cyber.attacchi {
+  --theme-primary: var(--cy-primary);
+  --theme-primary-rgb: var(--cy-primary-rgb);
+  --theme-accent: var(--cy-accent);
+  --theme-bg: var(--cy-bg);
+  --theme-surface: var(--cy-surface);
+  --theme-border: var(--cy-border);
+  --theme-text: #fff;
+  --theme-text-muted: rgba(255, 255, 255, 0.6);
+  --theme-radius: 0;
+  --theme-blur: blur(10px);
 
-.skin-cyber.attacchi :deep(.el-input__wrapper),
-.skin-cyber.attacchi :deep(.el-select__wrapper),
-.skin-cyber.attacchi :deep(.el-input-number__increase),
-.skin-cyber.attacchi :deep(.el-input-number__decrease) {
-  background-color: var(--cy-input-bg) !important;
-  box-shadow: 0 0 0 1px var(--cy-border) inset !important;
-  border-radius: 0 !important;
-}
-
-.skin-cyber.attacchi :deep(.el-input__inner),
-.skin-cyber.attacchi :deep(.el-select__placeholder) {
-  color: #fff !important;
-  font-family: var(--font-cyber-mono) !important;
-}
-
-.skin-cyber.attacchi :deep(.el-input__wrapper.is-focus),
-.skin-cyber.attacchi :deep(.el-select__wrapper.is-focus) {
-  box-shadow: 0 0 0 1px var(--cy-primary) inset, 0 0 10px rgba(var(--cy-primary-rgb), 0.3) !important;
-}
-
-/* Radio Buttons piercing */
-.skin-cyber.attacchi :deep(.el-radio-button__inner) {
-  background-color: transparent !important;
-  border: 1px solid var(--cy-border) !important;
-  color: var(--cy-primary) !important;
-  border-radius: 0 !important;
-}
-
-.skin-cyber.attacchi :deep(.el-radio-button__original-radio:checked + .el-radio-button__inner) {
-  background-color: var(--cy-primary) !important;
-  color: #000 !important;
-  box-shadow: 0 0 15px var(--cy-primary) !important;
+  /* Button specific for Magma Cyber */
+  --theme-btn-bg: transparent;
+  --theme-btn-text: var(--cy-primary);
+  --theme-btn-shadow: rgba(var(--cy-primary-rgb), 0.3);
 }
 
 /* === OTHER COMPONENTS === */
@@ -109,27 +91,27 @@
 }
 
 .skin-cyber.attacchi .btn-action {
-  background: transparent !important;
-  border: 1px solid var(--cy-primary) !important;
-  color: var(--cy-primary) !important;
-  border-radius: 0 !important;
+  background: var(--theme-btn-bg, transparent) !important;
+  border: 1px solid var(--theme-primary) !important;
+  color: var(--theme-btn-text, var(--theme-primary)) !important;
+  border-radius: var(--theme-radius, 0) !important;
   font-weight: 800;
   text-transform: uppercase;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .skin-cyber.attacchi .btn-action:hover {
-  background: var(--cy-primary) !important;
-  color: #000 !important;
-  box-shadow: 0 0 20px var(--cy-primary) !important;
+  background: var(--theme-primary) !important;
+  color: var(--theme-bg, #000) !important;
+  box-shadow: 0 0 20px var(--theme-btn-shadow, var(--theme-primary)) !important;
 }
 
 .skin-cyber.attacchi .cyber-table {
   background: rgba(10, 5, 5, 0.3) !important;
-  border: 1px solid var(--cy-border) !important;
+  border: 1px solid var(--theme-border) !important;
 }
 
 .skin-cyber.attacchi .cyber-table th {
-  background: rgba(255, 51, 51, 0.15) !important;
-  color: var(--cy-accent);
+  background: rgba(var(--theme-primary-rgb), 0.15) !important;
+  color: var(--theme-accent);
 }

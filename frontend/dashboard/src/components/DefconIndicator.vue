@@ -72,9 +72,9 @@ function getDefconClass(level) {
 .defcon-bar-container {
     height: 18px;
     width: 100%;
-    background-color: #3b3030;
-    border: 1px solid #663a39;
-    border-radius: 4px;
+    background-color: var(--theme-surface, rgba(0, 0, 0, 0.2));
+    border: 1px solid var(--theme-border, rgba(255, 255, 255, 0.1));
+    border-radius: var(--theme-radius, 4px);
     overflow: hidden;
     position: relative;
     min-width: 100px;

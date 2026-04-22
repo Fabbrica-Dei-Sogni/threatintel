@@ -79,24 +79,23 @@
   opacity: 0.25;
 }
 
-/* === CRITICAL DEEP RULES (COLOR PROTECTION) === */
-/* Pierce through Element Plus components in the Logs section */
+/* === SEMANTIC THEME MAPPING (MAGMA) === */
+.skin-cyber.attack-detail {
+  --theme-primary: var(--cy-primary);
+  --theme-primary-rgb: var(--cy-primary-rgb);
+  --theme-accent: var(--cy-accent);
+  --theme-bg: var(--cy-bg);
+  --theme-surface: var(--cy-surface);
+  --theme-border: var(--cy-border);
+  --theme-text: #F0E6D2;
+  --theme-text-muted: rgba(255, 255, 255, 0.6);
+  --theme-radius: 4px;
+  --theme-blur: blur(10px);
 
-.skin-cyber.attack-detail :deep(.el-input__wrapper) {
-  background-color: var(--cy-input-bg) !important;
-  box-shadow: 0 0 0 1px var(--cy-border) inset !important;
-  border-radius: 4px !important;
-}
-
-.skin-cyber.attack-detail :deep(.el-input__inner) {
-  color: #fff !important;
-  font-family: var(--font-cyber-mono) !important;
-}
-
-.skin-cyber.attack-detail :deep(.el-pagination.is-background .el-pager li:not(.is-active)) {
-  background-color: var(--cy-input-bg) !important;
-  color: var(--cy-primary) !important;
-  border: 1px solid var(--cy-border) !important;
+  /* Button specific for Magma Cyber */
+  --theme-btn-bg: transparent;
+  --theme-btn-text: var(--cy-primary);
+  --theme-btn-shadow: rgba(var(--cy-primary-rgb), 0.3);
 }
 
 /* === CARDS & CONTAINERS === */

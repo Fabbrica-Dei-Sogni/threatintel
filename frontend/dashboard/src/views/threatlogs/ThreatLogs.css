@@ -92,8 +92,12 @@
 
 .search-box {
   position: relative;
-  flex-grow: 1;
-  max-width: 400px;
+  flex: 1 1 300px;
+  min-width: 0;
+}
+
+.search-box.url-search {
+  flex: 2 1 350px;
 }
 
 .ip-input {
@@ -105,6 +109,7 @@
   color: var(--theme-text);
   box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.4);
   transition: all 0.3s ease;
+  box-sizing: border-box;
 }
 
 .ip-input:focus {
@@ -346,19 +351,52 @@
     padding: 10px;
   }
 
+  .filter-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 15px;
+  }
+
+  .filter-item {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .filter-item.search-box {
+    width: 100%;
+    flex: none;
+  }
+
   .log-table th,
   .log-table td {
     padding: 6px 3px;
   }
-
-  /* Stack headers if highly needed, but table structure usually kept. 
-     Just ensuring text wraps */
 
   /* Allow URL cell to shrink on mobile */
   td.url-cell {
     width: auto !important;
     min-width: unset !important;
     max-width: none !important;
+  }
+
+  .protocol-selector {
+    width: 100%;
+  }
+
+  .actions {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 15px;
+  }
+
+  .nav-actions {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .view-controls {
+    justify-content: space-between;
+    width: 100%;
   }
 }
 

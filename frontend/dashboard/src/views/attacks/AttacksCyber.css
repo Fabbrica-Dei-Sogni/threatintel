@@ -29,9 +29,15 @@
 
 .skin-cyber.attacchi .header-actions {
   display: flex !important;
-  flex-direction: row !important; /* SIDE-BY-SIDE PERFECT ALIGNMENT */
+  flex-direction: row !important;
   align-items: center !important;
   gap: 15px !important;
+}
+
+@media (max-width: 600px) {
+  .skin-cyber.attacchi .header-actions {
+    gap: 8px !important;
+  }
 }
 
 .skin-cyber.attacchi h1 {

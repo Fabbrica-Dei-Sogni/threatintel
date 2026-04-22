@@ -203,25 +203,26 @@
 
 .search-box {
   position: relative;
-  flex-grow: 1;
-  max-width: 400px;
+  flex: 1 1 300px;
+  min-width: 0; /* Critical for flex children to allow shrink */
 }
 
 .ip-input {
   width: 100%;
   padding: 8px 36px 8px 12px;
-  background: #2b1b17;
-  border: 1px solid #4f3b33;
-  border-radius: 6px;
-  color: #f3e7d5;
+  background: var(--theme-surface);
+  border: 1px solid var(--theme-border);
+  border-radius: var(--theme-radius);
+  color: var(--theme-text);
   box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.4);
   transition: all 0.3s ease;
+  box-sizing: border-box;
 }
 
 .ip-input:focus {
   outline: none;
-  border-color: #ff4c4c;
-  box-shadow: 0 0 8px rgba(255, 76, 76, 0.4);
+  border-color: var(--theme-primary);
+  box-shadow: 0 0 8px rgba(var(--theme-primary-rgb), 0.4);
 }
 
 .clear-btn:hover {
@@ -478,6 +479,17 @@
   .filter-row {
     flex-direction: column;
     align-items: stretch;
+    gap: 15px;
+  }
+
+  .filter-item {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .search-box {
+    width: 100%;
+    flex: none;
   }
 
   .input-wrapper {
@@ -487,6 +499,21 @@
 
   .attacchi {
     padding: 10px;
+  }
+
+  .actions {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 15px;
+  }
+
+  .nav-actions {
+    flex-direction: column;
+  }
+
+  .view-controls {
+    justify-content: space-between;
+    width: 100%;
   }
 }
 

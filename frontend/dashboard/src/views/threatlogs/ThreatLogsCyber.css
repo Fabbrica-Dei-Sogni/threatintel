@@ -34,6 +34,12 @@
   gap: 15px !important;
 }
 
+@media (max-width: 600px) {
+  .skin-cyber.threatlogs .header-actions {
+    gap: 8px !important;
+  }
+}
+
 .skin-cyber.threatlogs h1 {
   color: var(--cy-primary) !important;
   text-shadow: 0 0 15px rgba(var(--cy-primary-rgb), 0.6) !important;

@@ -447,7 +447,12 @@ const totalPages = computed(() => Math.ceil(total.value / pageSize.value));
 // Sincronizzazione Prop -> Ref (per back/forward browser)
 watch(() => props.initialIp, (v) => { filterIp.value = v ?? ''; });
 watch(() => props.initialProtocol, (v) => { filterProtocol.value = v ?? 'http'; });
-watch(() => props.initialPage, (v) => { page.value = v ?? 1; });
+watch(() => props.initialPage, (v) => { 
+    const targetPage = v ?? 1;
+    if (page.value !== targetPage) {
+        page.value = targetPage; 
+    }
+});
 watch(() => props.initialMinLogsForAttack, (v) => { minLogsForAttack.value = v ?? 10; });
 watch(() => props.initTimeMode, (v) => { timeMode.value = v ?? 'ago'; });
 watch(() => props.initAgoValue, (v) => { agoValue.value = v ?? 10; });

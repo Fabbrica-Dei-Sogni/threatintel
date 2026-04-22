@@ -38,27 +38,31 @@ export function useSearchBase(options: UseSearchBaseOptions) {
         }, debounceMs);
     }
 
-    // Flag per distinguere la prima chiamata immediate dalle successive.
-    // Con immediate:true, Vue 3 passa oldVal=[undefined,...] al primo run,
-    // causando filtersChanged=true e il reset errato della pagina iniziale
-    // (caricata dall'URL). Al primo run fetch direttamente senza reset.
-    let isFirstRun = true;
-
     // Watcher unico per tutti i cambiamenti di stato (filtri, pagina, ordinamento)
     watch(
         [...filterRefs, page, pageSize, sortFields],
         (newVal, oldVal) => {
-            // Prima chiamata (immediate): non resettiamo la pagina perché
-            // oldVal è [undefined,...] e non rappresenta un cambio reale di filtri.
-            // Eseguiamo il fetch con lo stato iniziale (che arriva dai props/URL).
-            if (isFirstRun) {
-                isFirstRun = false;
+            // Se oldVal è undefined (primo run di immediate: true), eseguiamo solo il fetch.
+            if (!oldVal) {
                 debouncedFetch();
                 return;
             }
 
             // Verifichiamo se è cambiato uno dei filtri (primi N elementi)
-            const filtersChanged = filterRefs.some((_, i) => newVal[i] !== oldVal[i]);
+            const filtersChanged = filterRefs.some((_, i) => {
+                const nv = newVal[i];
+                const ov = oldVal[i];
+                
+                // Se oldVal è undefined o null, consideriamo che non sia cambiato rispetto all'inizializzazione
+                if (ov === undefined || ov === null) return false;
+
+                // Gestione specifica per Array/Oggetti (es. dateRange o dangerLevels)
+                if (typeof nv === 'object' && nv !== null) {
+                    return JSON.stringify(nv) !== JSON.stringify(ov);
+                }
+
+                return nv !== ov;
+            });
 
             if (filtersChanged && page.value !== 1) {
                 // Se cambiano i filtri, resettiamo sempre alla pagina 1

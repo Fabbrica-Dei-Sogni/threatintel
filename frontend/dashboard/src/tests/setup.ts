@@ -13,11 +13,17 @@ vi.stubGlobal('import.meta', {
   },
 });
 
+import { ref } from 'vue';
+
 // Mock base per vue-i18n
+const mockLocale = ref('it-IT');
+const mockAvailableLocales = ref(['it-IT', 'en-US', 'de-DE', 'fr-FR', 'pl-PL', 'ru-RU']);
+
 vi.mock('vue-i18n', () => ({
   useI18n: () => ({
     t: (key: string) => key,
-    tm: (key: string) => key, // Mock di template manager
-    locale: { value: 'it-IT' }
+    tm: (key: string) => key,
+    locale: mockLocale,
+    availableLocales: mockAvailableLocales
   }),
 }));

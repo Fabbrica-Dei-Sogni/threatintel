@@ -157,7 +157,7 @@ export function useConfig() {
      * Converte un array di tag in stringa valore
      */
     function tagsToValue(tags: string[]): string {
-        return tags.filter(t => t.trim().length > 0).join(',');
+        return tags.map(t => t.trim()).filter(t => t.length > 0).join(',');
     }
 
     return {

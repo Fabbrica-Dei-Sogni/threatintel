@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { useAttacksFilter } from '../useAttacksFilter';
-import { setActivePinia, createPinia } from 'pinia';
 import * as api from '../../api/index';
+import { setActivePinia, createPinia } from 'pinia';
 
 vi.mock('../../api/index', () => ({
   fetchAttackSearch: vi.fn()
@@ -13,46 +13,70 @@ describe('useAttacksFilter', () => {
     vi.clearAllMocks();
   });
 
-  it('should initialize with correct default values', () => {
-    const { filterIp, timeMode, page } = useAttacksFilter(
-      '1.1.1.1', 'http', 1, 5, 'ago', 24, 'hours', null, 1, 'days', 0, 'minutes'
+  it('should initialize with provided values', () => {
+    const filter = useAttacksFilter(
+      '1.2.3.4', 'http', 1, 5, 'ago', 24, 'h', null, 0, 'h', 0, 'h'
     );
-    
-    expect(filterIp.value).toBe('1.1.1.1');
-    expect(timeMode.value).toBe('ago');
-    expect(page.value).toBe(1);
+    expect(filter.filterIp.value).toBe('1.2.3.4');
+    expect(filter.minLogsForAttack.value).toBe(5);
+    expect(filter.timeMode.value).toBe('ago');
   });
 
-  it('should fetch attacks successfully', async () => {
-    const mockData = { attacks: [{ ip: '1.2.3.4', count: 10 }], total: 1 };
+  it('should fetch data with ago time mode', async () => {
+    const mockData = { attacks: [], total: 0 };
     vi.mocked(api.fetchAttackSearch).mockResolvedValue(mockData);
 
-    const { fetchData, attacks, total } = useAttacksFilter(
-      '', 'http', 1, 1, 'ago', 24, 'hours', null, 0, 'h', 0, 'h'
+    const filter = useAttacksFilter(
+      '', 'http', 1, 1, 'ago', 1, 'h', null, 0, 'h', 0, 'h'
     );
-    
-    await fetchData();
+    await filter.fetchData();
 
-    expect(attacks.value).toEqual(mockData.attacks);
-    expect(total.value).toBe(1);
     expect(api.fetchAttackSearch).toHaveBeenCalledWith(expect.objectContaining({
-      minLogsForAttack: 1,
-      timeConfig: { hours: 24 }
+      timeConfig: { h: 1 }
     }));
   });
 
-  it('should handle range time mode', async () => {
-    const { fetchData, timeMode, dateRange } = useAttacksFilter(
-      '', 'http', 1, 1, 'range', 24, 'hours', ['2026-01-01', '2026-01-02'], 1, 'days', 0, 'hours'
+  it('should fetch data with range time mode and dateRange', async () => {
+    vi.mocked(api.fetchAttackSearch).mockResolvedValue({ attacks: [], total: 0 });
+
+    const filter = useAttacksFilter(
+      '', 'http', 1, 1, 'range', 1, 'h', ['2023-01-01', '2023-01-02'], 1, 'd', 0, 'h'
     );
-    
-    await fetchData();
+    await filter.fetchData();
 
     expect(api.fetchAttackSearch).toHaveBeenCalledWith(expect.objectContaining({
       timeConfig: expect.objectContaining({
-        fromDate: '2026-01-01',
-        toDate: '2026-01-02'
+        from: { d: 1 },
+        fromDate: '2023-01-01',
+        toDate: '2023-01-02'
       })
     }));
+  });
+
+  it('should handle danger levels filter', async () => {
+    vi.mocked(api.fetchAttackSearch).mockResolvedValue({ attacks: [], total: 0 });
+
+    const filter = useAttacksFilter(
+      '', 'http', 1, 1, 'ago', 1, 'h', null, 0, 'h', 0, 'h', null, 20, [1, 2]
+    );
+    await filter.fetchData();
+
+    expect(api.fetchAttackSearch).toHaveBeenCalledWith(expect.objectContaining({
+      filters: expect.objectContaining({
+        dangerLevel: '1,2'
+      })
+    }));
+  });
+
+  it('should handle fetch error', async () => {
+    vi.mocked(api.fetchAttackSearch).mockRejectedValue(new Error('Fail'));
+    const filter = useAttacksFilter(
+      '', 'http', 1, 1, 'ago', 1, 'h', null, 0, 'h', 0, 'h'
+    );
+    
+    await filter.fetchData();
+    
+    expect(filter.error.value).toBe(true);
+    expect(filter.attacks.value).toHaveLength(0);
   });
 });

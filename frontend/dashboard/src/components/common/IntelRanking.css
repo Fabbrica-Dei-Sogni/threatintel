@@ -592,12 +592,52 @@
   .header-actions {
     width: 100%;
     justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
   }
   
   .limit-tabs {
-    flex-wrap: wrap;
+    flex: 1 1 100%;
+    justify-content: center;
   }
   
+  .filters-bar {
+    padding: 10px;
+  }
+
+  .filters-row {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 15px !important;
+    overflow-x: visible;
+  }
+
+  .filter-item {
+    width: 100% !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 8px !important;
+  }
+
+  .filter-label {
+    width: 100% !important;
+    justify-content: space-between;
+    box-sizing: border-box;
+  }
+
+  .log-threshold-tabs.tabs-row {
+    width: 100% !important;
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(40px, 1fr));
+    gap: 4px;
+  }
+
+  .log-threshold-tabs .tab-btn {
+    width: 100% !important;
+    min-width: 0 !important;
+    padding: 6px 2px !important;
+  }
+
   .ranking-item {
     gap: 8px !important;
     padding: 8px !important;
@@ -606,6 +646,11 @@
   .rank-indicator {
     flex: 0 0 28px;
     font-size: 0.65rem;
+  }
+
+  .mini-pagination {
+    width: 100%;
+    justify-content: center;
   }
 }
 .intel-det-btn {

@@ -1,0 +1,75 @@
+/**
+ * classic-shared.css
+ * Standard Design Engine for Classic skins.
+ */
+
+:root {
+  /* Core Palette (Sapphire / Slate) */
+  --classic-primary: #5FA5FF;
+  --classic-primary-rgb: 95, 165, 255;
+  --classic-bg: #0B111B;
+  --classic-surface: rgba(15, 23, 42, 0.3);
+  --classic-header-bg: rgba(13, 20, 33, 0.9);
+  --classic-border: rgba(95, 165, 255, 0.12);
+  --classic-header-border: rgba(54, 114, 255, 0.25);
+  --classic-text: #f8fafc;
+  --classic-text-muted: #CBD5E1;
+  --classic-accent: #fca5a5;
+  
+  --classic-radius: 8px;
+  --classic-blur: blur(8px);
+  --classic-header-blur: blur(14px);
+}
+
+.skin-classic {
+  --theme-primary: var(--classic-primary);
+  --theme-primary-rgb: var(--classic-primary-rgb);
+  --theme-bg: var(--classic-bg);
+  --theme-surface: var(--classic-surface);
+  --theme-header: var(--classic-header-bg);
+  --theme-border: var(--classic-border);
+  --theme-header-border: var(--classic-header-border);
+  --theme-text: var(--classic-text);
+  --theme-text-muted: var(--classic-text-muted);
+  --theme-accent: var(--classic-accent);
+  --theme-radius: var(--classic-radius);
+  --theme-blur: var(--classic-blur);
+  --theme-header-blur: var(--classic-header-blur);
+
+  /* Button specific overrides to restore original look */
+  --theme-btn-bg: linear-gradient(135deg, #1E3799, #0C2461);
+  --theme-btn-text: #E0E7FF;
+  --theme-btn-shadow: rgba(12, 36, 97, 0.6);
+}
+
+/* === SHARED COMPONENT OVERRIDES (GLOBAL CLASSIC) === */
+
+/* Elements (Select, Input, DatePicker) */
+.skin-classic .el-input__wrapper,
+.skin-classic .el-select__wrapper {
+  background-color: rgba(0, 0, 0, 0.3) !important;
+  box-shadow: 0 0 0 1px var(--theme-border) inset !important;
+  border-radius: 4px !important;
+}
+
+.skin-classic .el-input__inner {
+  color: var(--theme-text) !important;
+}
+
+.skin-classic .el-input__wrapper.is-focus,
+.skin-classic .el-select__wrapper.is-focus {
+  box-shadow: 0 0 0 1px var(--theme-primary) inset !important;
+}
+
+/* Radio Buttons */
+.skin-classic .el-radio-button__inner {
+  background-color: rgba(30, 41, 59, 0.4) !important;
+  border: 1px solid var(--theme-border) !important;
+  color: var(--theme-text-muted) !important;
+}
+
+.skin-classic .el-radio-button__original-radio:checked + .el-radio-button__inner {
+  background-color: var(--theme-primary) !important;
+  color: #fff !important;
+  border-color: var(--theme-primary) !important;
+}

@@ -82,27 +82,31 @@ function selectProtocol(proto: string) {
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-/* === SKIN CYBER === */
-.skin-cyber .options {
-    --proto-bg: rgba(0, 20, 40, 0.4);
-    --proto-border: rgba(0, 255, 255, 0.15);
-    --proto-text: rgba(0, 255, 255, 0.5);
-    --proto-hover-bg: rgba(0, 255, 255, 0.1);
-    --proto-hover-text: #00ffff;
-    --proto-active-bg: #00ffff;
-    --proto-active-text: #0a0e17;
-    border-radius: 4px;
-    backdrop-filter: blur(4px);
+/* === AGNOSTIC THEME ENGINE === */
+.skin-cyber .options,
+.skin-classic .options {
+    --proto-bg: var(--theme-surface, rgba(15, 23, 42, 0.3));
+    --proto-border: var(--theme-border, rgba(95, 165, 255, 0.12));
+    --proto-text: var(--theme-text-muted, #94a3b8);
+    --proto-hover-bg: rgba(var(--theme-primary-rgb, 95, 165, 255), 0.1);
+    --proto-hover-text: var(--theme-primary, #5FA5FF);
+    --proto-active-bg: var(--theme-primary, #5FA5FF);
+    --proto-active-text: var(--theme-bg, #0B111B);
+    
+    border-radius: var(--theme-radius, 4px);
+    backdrop-filter: var(--theme-blur, blur(8px));
 }
 
-.skin-cyber .option-btn {
-    font-family: 'JetBrains Mono', monospace;
+.skin-cyber .option-btn,
+.skin-classic .option-btn {
+    font-family: var(--font-cyber-mono, 'JetBrains Mono', monospace);
     border-radius: 2px;
     letter-spacing: 0.5px;
 }
 
-.skin-cyber .option-btn.active {
-    box-shadow: 0 0 12px rgba(0, 255, 255, 0.4);
+.skin-cyber .option-btn.active,
+.skin-classic .option-btn.active {
+    box-shadow: 0 0 12px rgba(var(--theme-primary-rgb, 0, 255, 255), 0.4);
 }
 
 /* === THEME OVERRIDES (Backward Compatibility) === */

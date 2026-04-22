@@ -199,16 +199,16 @@ watch(() => props.attacks.length, () => {
   display: flex;
   align-items: center;
   gap: 15px;
-  background: rgba(15, 23, 42, 0.4);
-  border-left: 4px solid #F87171;
+  background: var(--theme-surface, rgba(15, 23, 42, 0.4));
+  border-left: 4px solid var(--theme-accent, #F87171);
   padding: 12px 20px;
   border-radius: 4px;
   height: 50px;
   overflow: hidden;
   margin: 10px 0;
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(248, 113, 113, 0.1);
-  box-shadow: inset 0 0 20px rgba(248, 113, 113, 0.05);
+  backdrop-filter: var(--theme-blur, blur(8px));
+  border: 1px solid rgba(var(--theme-accent-rgb, 248, 113, 113), 0.1);
+  box-shadow: inset 0 0 20px rgba(var(--theme-accent-rgb, 248, 113, 113), 0.05);
   transition: opacity 0.5s ease, transform 0.5s ease;
   opacity: 1;
 }
@@ -216,7 +216,7 @@ watch(() => props.attacks.length, () => {
 .breaking-news-container.ticker {
   background: transparent;
   border: none;
-  border-left: 2px solid #5FA5FF;
+  border-left: 2px solid var(--theme-primary, #5FA5FF);
   box-shadow: none;
   margin: 0;
   height: 40px;
@@ -224,8 +224,8 @@ watch(() => props.attacks.length, () => {
 }
 
 .breaking-news-container.ticker .news-badge {
-  background: #5FA5FF;
-  box-shadow: 0 0 10px rgba(95, 165, 255, 0.3);
+  background: var(--theme-primary, #5FA5FF);
+  box-shadow: 0 0 10px rgba(var(--theme-primary-rgb, 95, 165, 255), 0.3);
   z-index: 10;
 }
 
@@ -261,11 +261,11 @@ watch(() => props.attacks.length, () => {
 }
 
 .news-separator {
-  color: #5FA5FF;
+  color: var(--theme-primary, #5FA5FF);
   font-weight: 800;
   opacity: 0.5;
   margin-left: 10px;
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-cyber-mono, monospace);
 }
 
 .headline-wrapper {
@@ -275,8 +275,8 @@ watch(() => props.attacks.length, () => {
 }
 
 .news-badge {
-  background: #F87171;
-  color: #0F172A;
+  background: var(--theme-accent, #F87171);
+  color: var(--theme-bg, #0F172A);
   font-weight: 800;
   font-size: 0.7rem;
   padding: 3px 8px;
@@ -292,7 +292,7 @@ watch(() => props.attacks.length, () => {
 .pulse-dot {
   width: 6px;
   height: 6px;
-  background: #0F172A;
+  background: var(--theme-bg, #0F172A);
   border-radius: 50%;
   animation: pulse 1s infinite alternate;
 }
@@ -303,9 +303,9 @@ watch(() => props.attacks.length, () => {
 
 .headline-text {
   margin: 0;
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-cyber-mono, monospace);
   font-size: 0.9rem;
-  color: #E2E8F0;
+  color: var(--theme-text, #E2E8F0);
   white-space: nowrap;
 }
 
@@ -313,7 +313,7 @@ watch(() => props.attacks.length, () => {
   display: inline-block;
   width: 2px;
   margin-left: 2px;
-  background: #F87171;
+  background: var(--theme-accent, #F87171);
   animation: blink 1s infinite;
 }
 

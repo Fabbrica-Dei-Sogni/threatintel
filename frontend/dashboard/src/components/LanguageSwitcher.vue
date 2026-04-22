@@ -41,20 +41,21 @@ const handleChange = () => {
     position: relative;
     display: flex;
     align-items: center;
-    background: rgba(255, 255, 255, 0.04);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
-    border-radius: 10px;
+    background: var(--theme-surface, rgba(255, 255, 255, 0.04));
+    backdrop-filter: var(--theme-blur, blur(10px));
+    -webkit-backdrop-filter: var(--theme-blur, blur(10px));
+    border: 1px solid var(--theme-border, rgba(255, 255, 255, 0.1));
+    border-radius: var(--theme-radius, 10px);
     padding: 6px 12px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .select-wrapper:hover {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: var(--primary-color, #4CAF50);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3), 0 0 0 1px var(--primary-color, rgba(76, 175, 80, 0.2));
+    background: var(--theme-surface);
+    filter: brightness(1.2);
+    border-color: var(--theme-primary, #4CAF50);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3), 0 0 0 1px var(--theme-primary, rgba(76, 175, 80, 0.2));
     transform: translateY(-1px);
 }
 
@@ -69,25 +70,25 @@ const handleChange = () => {
     appearance: none;
     background: transparent;
     border: none;
-    color: var(--text-color, #f0e6d2);
+    color: var(--theme-text, #f0e6d2);
     cursor: pointer;
     padding-right: 20px;
     outline: none;
     min-width: 120px;
     color-scheme: dark;
-    accent-color: var(--primary-color, #4CAF50);
+    accent-color: var(--theme-primary, #4CAF50);
 }
 
 .lang-select option {
-    background-color: #1e1b1a !important;
+    background-color: var(--theme-bg, #1e1b1a) !important;
     /* Mantiene coerenza con il colore di sfondo shell */
-    color: #f0e6d2 !important;
+    color: var(--theme-text, #f0e6d2) !important;
     padding: 12px;
 }
 
 .lang-select option:hover,
 .lang-select option:checked {
-    background-color: var(--primary-color, #4CAF50) !important;
+    background-color: var(--theme-primary, #4CAF50) !important;
     color: #ffffff !important;
 }
 
@@ -95,7 +96,7 @@ const handleChange = () => {
     position: absolute;
     right: 10px;
     pointer-events: none;
-    color: var(--text-color, #f0e6d2);
+    color: var(--theme-text, #f0e6d2);
     opacity: 0.5;
     font-size: 8px;
     transition: all 0.2s ease;
@@ -103,7 +104,7 @@ const handleChange = () => {
 
 .select-wrapper:hover .arrow-icon {
     opacity: 1;
-    color: var(--primary-color, #4CAF50);
+    color: var(--theme-primary, #4CAF50);
     transform: translateY(1px);
 }
 

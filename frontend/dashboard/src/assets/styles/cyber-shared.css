@@ -24,6 +24,29 @@
   --cyber-border: rgba(var(--cyber-primary-rgb), 0.2);
 }
 
+.skin-cyber {
+  /* Semantic Theming */
+  --theme-primary: var(--cyber-primary);
+  --theme-primary-rgb: var(--cyber-primary-rgb);
+  --theme-accent: var(--cyber-accent);
+  --theme-accent-rgb: var(--cyber-accent-rgb);
+  --theme-bg: var(--cyber-bg);
+  --theme-surface: var(--cyber-surface);
+  --theme-header: rgba(5, 10, 20, 0.95);
+  --theme-border: var(--cyber-border);
+  --theme-header-border: var(--cyber-border);
+  --theme-text: #fff;
+  --theme-text-muted: rgba(255, 255, 255, 0.6);
+  --theme-radius: 4px;
+  --theme-blur: var(--cyber-blur);
+  --theme-header-blur: blur(14px);
+
+  /* Button specific for Cyber */
+  --theme-btn-bg: var(--cyber-primary);
+  --theme-btn-text: var(--cyber-bg);
+  --theme-btn-shadow: rgba(var(--cyber-primary-rgb), 0.3);
+}
+
 /* === SHARED HUD PATTERNS === */
 
 .skin-cyber .glass-card-base {
@@ -38,44 +61,44 @@
   text-shadow: 0 0 10px rgba(var(--cyber-primary-rgb), 0.5) !important;
 }
 
-/* === SHARED COMPONENT OVERRIDES (DEEP RULEZ) === */
+/* === SHARED COMPONENT OVERRIDES (GLOBAL) === */
 
 /* Elements (Select, Input, DatePicker) */
-.skin-cyber ::deep(.el-input__wrapper),
-.skin-cyber ::deep(.el-select__wrapper),
-.skin-cyber ::deep(.el-input-number__increase),
-.skin-cyber ::deep(.el-input-number__decrease) {
+.skin-cyber .el-input__wrapper,
+.skin-cyber .el-select__wrapper,
+.skin-cyber .el-input-number__increase,
+.skin-cyber .el-input-number__decrease {
   background-color: rgba(0, 0, 0, 0.4) !important;
   box-shadow: 0 0 0 1px var(--cyber-border) inset !important;
   border-radius: 0 !important;
   transition: var(--cyber-transition);
 }
 
-.skin-cyber ::deep(.el-input__inner),
-.skin-cyber ::deep(.el-select__placeholder),
-.skin-cyber ::deep(.el-range-input) {
+.skin-cyber .el-input__inner,
+.skin-cyber .el-select__placeholder,
+.skin-cyber .el-range-input {
   color: #fff !important;
   font-family: var(--font-cyber-mono) !important;
-  font-size: 0.8rem;
+  font-size: 0.8rem !important;
 }
 
-.skin-cyber ::deep(.el-input__wrapper.is-focus),
-.skin-cyber ::deep(.el-select__wrapper.is-focus) {
+.skin-cyber .el-input__wrapper.is-focus,
+.skin-cyber .el-select__wrapper.is-focus {
   box-shadow: 0 0 0 1px var(--cyber-primary) inset, 0 0 10px rgba(var(--cyber-primary-rgb), 0.3) !important;
 }
 
 /* Radio Buttons */
-.skin-cyber ::deep(.el-radio-button__inner) {
+.skin-cyber .el-radio-button__inner {
   background-color: transparent !important;
   border: 1px solid var(--cyber-border) !important;
   color: var(--cyber-primary) !important;
   border-radius: 0 !important;
-  font-family: var(--font-cyber-mono);
+  font-family: var(--font-cyber-mono) !important;
   text-transform: uppercase;
-  font-size: 0.7rem;
+  font-size: 0.7rem !important;
 }
 
-.skin-cyber ::deep(.el-radio-button__original-radio:checked + .el-radio-button__inner) {
+.skin-cyber .el-radio-button__original-radio:checked + .el-radio-button__inner {
   background-color: var(--cyber-primary) !important;
   color: var(--cyber-bg) !important;
   box-shadow: 0 0 15px var(--cyber-primary) !important;

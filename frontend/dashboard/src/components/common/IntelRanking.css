@@ -449,12 +449,19 @@
   white-space: nowrap;
   display: inline-flex;
   align-items: center;
+  /* Fissa la larghezza del blocco etichetta+valore in modo che le pulsantiere adiacenti siano tutte incolonnate verticalmente */
+  min-width: 210px;
+  justify-content: space-between;
 }
 
 .filter-label .active-val {
   color: var(--ranking-accent, #00ffff);
   text-shadow: 0 0 8px rgba(0, 255, 255, 0.4);
   margin-left: 4px;
+  /* Fissa la larghezza del testo dinamico per evitare shift dei pulsanti */
+  min-width: 65px;
+  display: inline-block;
+  text-align: left;
 }
 
 /* Specific styling for the log threshold to distinguish it from page limit */

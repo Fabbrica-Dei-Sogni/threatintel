@@ -122,6 +122,14 @@
         "attacks": "Anomalie",
         "logRequests": "Registro Log",
         "telemetries": "Telemetrie",
+        "system_idle": "Intelligence attiva. Vegliamo sulla sicurezza del Digital Portfolio, ospitato su infrastruttura Cloud dedicata.",
+        "screensaver_phrases": [
+            "Nel silenzio del codice, il predatore attende. Ma noi siamo l'ombra che lo osserva.",
+            "Un sistema sicuro è un sistema spento. Peccato che dobbiamo lavorarci.",
+            "Cercano la crepa nel muro, troveranno un labirinto di specchi.",
+            "La sicurezza è un viaggio, non una destinazione. E oggi il viaggio è tranquillo.",
+            "Ogni bit conta. Ogni attacco insegna. La sentinella non dorme mai."
+        ],
         "recentAttacks": "Ultime anomalie",
         "recentLogs": "Ultimi log",
         "attackMap": "Mappa Anomalie",

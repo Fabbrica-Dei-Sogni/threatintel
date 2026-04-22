@@ -27,7 +27,7 @@
 /* === LAYOUT & CORE (Standalone) === */
 
 .skin-cyber.dashboard {
-  padding: 25px 30px;
+  padding: 25px 30px 160px 30px; /* Aumentato padding inferiore per dare aria ai componenti e superare il menu flottante */
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -91,7 +91,7 @@
 .skin-cyber .intel-center {
   display: flex;
   flex-direction: column;
-  gap: 40px;
+  gap: 15px; /* Ridotto gap da 40px */
 }
 
 .skin-cyber .domain-section {

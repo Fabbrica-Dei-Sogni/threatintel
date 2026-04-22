@@ -122,6 +122,14 @@
         "attacks": "Anomalie",
         "logRequests": "Rejestr logów",
         "telemetries": "Telemetrie",
+        "system_idle": "Intelligence czuwa. Zabezpieczanie ekosystemu Digital Portfolio na dedykowanej infrastrukturze chmurowej.",
+        "screensaver_phrases": [
+            "W ciszy kodu drapieżnik czeka. Ale my jesteśmy cieniem, który go obserwuje.",
+            "Bezpieczny system to system wyłączony. Szkoda, że musimy na nim pracować.",
+            "Szukają pęknięcia w murze; znajdą labirynt luster.",
+            "Bezpieczeństwo to podróż, nie cel. A dzisiaj podróż jest spokojna.",
+            "Każdy bit ma znaczenie. Każdy atak uczy. Strażnik nigdy nie śpi."
+        ],
         "recentAttacks": "Ostatnie anomalie",
         "recentLogs": "Ostatnie logi",
         "attackMap": "Mapa anomalii",

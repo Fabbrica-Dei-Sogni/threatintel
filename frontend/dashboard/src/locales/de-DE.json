@@ -122,6 +122,14 @@
         "attacks": "Anomalien",
         "logRequests": "Log-Register",
         "telemetries": "Telemetrie",
+        "system_idle": "Intelligence ist wachsam. Sicherung des Digital Portfolio-Ökosystems auf dedizierter Cloud-Infrastruktur.",
+        "screensaver_phrases": [
+            "In der Stille des Codes wartet il Raubtier. Aber wir sind der Schatten, der wacht.",
+            "Ein sicheres System ist ein ausgeschaltetes System. Schade, dass wir daran arbeiten müssen.",
+            "Sie suchen den Riss in der Mauer; sie werden ein Spiegelkabinett finden.",
+            "Sicherheit ist eine Reise, kein Ziel. Und heute ist die Reise friedlich.",
+            "Jedes Bit zählt. Jeder Angriff lehrt. Die Wache schläft nie."
+        ],
         "recentAttacks": "Letzte Anomalien",
         "recentLogs": "Letzte Protokolle",
         "attackMap": "Anomalieskarte",

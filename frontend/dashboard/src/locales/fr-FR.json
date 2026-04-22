@@ -122,6 +122,14 @@
         "attacks": "Anomalies",
         "logRequests": "Registre des logs",
         "telemetries": "Télémétries",
+        "system_idle": "Intelligence vigilante. Sécurisation du Digital Portfolio, hébergé sur une infrastructure Cloud dédiée.",
+        "screensaver_phrases": [
+            "Dans le silence du code, le prédateur attend. Mais nous sommes l'ombre qui observe.",
+            "Un système sûr est un système éteint. Dommage che nous devions y travailler.",
+            "Ils cherchent la fissure dans le mur ; ils trouveront un labyrinthe de miroirs.",
+            "La sécurité est un voyage, pas une destination. Et aujourd'hui, le voyage est tranquille.",
+            "Chaque bit compte. Chaque attaque enseigne. La sentinelle ne dort jamais."
+        ],
         "recentAttacks": "Dernières anomalies",
         "recentLogs": "Derniers logs",
         "attackMap": "Carte des anomalies",

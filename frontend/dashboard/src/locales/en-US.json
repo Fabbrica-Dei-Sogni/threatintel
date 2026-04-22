@@ -122,6 +122,14 @@
         "attacks": "Anomalies",
         "logRequests": "Log Registry",
         "telemetries": "Telemetry",
+        "system_idle": "Intelligence is vigilant. Securing the Digital Portfolio ecosystem, hosted on high-performance Cloud infrastructure.",
+        "screensaver_phrases": [
+            "In the silence of the code, the predator waits. But we are the shadow that watches.",
+            "A secure system is a powered-off system. Too bad we have to work on it.",
+            "They seek the crack in the wall; they will find a house of mirrors.",
+            "Security is a journey, not a destination. And today, the journey is peaceful.",
+            "Every bit counts. Every attack teaches. The sentinel never sleeps."
+        ],
         "recentAttacks": "Recent anomalies",
         "recentLogs": "Recent logs",
         "attackMap": "Anomaly Map",

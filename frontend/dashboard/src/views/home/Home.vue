@@ -361,6 +361,13 @@
                 </div>
               </div>
             </transition-group>
+
+            <!-- Screensaver empty state -->
+            <transition name="fade">
+              <div v-if="dashboardState.activeWidgets.length === 0" class="screensaver-wrapper">
+                <CyberScreensaver />
+              </div>
+            </transition>
     </section>
 
   </div>
@@ -389,6 +396,7 @@ import TelemetryStats from '../../components/TelemetryStats.vue';
 import RestrictedIntelligenceGate from '../../components/common/RestrictedIntelligenceGate.vue';
 import CowrieCategorySelector from '../../components/common/CowrieCategorySelector.vue';
 import IntelRanking from '../../components/common/IntelRanking.vue';
+import CyberScreensaver from '../../components/CyberScreensaver.vue';
 import { formatDateTime, formatDateOnly, formatTimeOnly, formatHumanDuration, formatFullDateTime } from '../../utils/dateUtils';
 
 const { t } = useI18n();
@@ -635,5 +643,16 @@ watch(() => dashboardState.rankings, (newRankings, oldRankings) => {
 .skin-classic .reset-ascii span {
     background: #c0392b;
     box-shadow: none;
+}
+
+.screensaver-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    flex: 1;
+    min-height: 450px;
+    padding: 0;
+    margin: 0;
 }
 </style>

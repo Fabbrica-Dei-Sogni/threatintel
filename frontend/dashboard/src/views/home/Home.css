@@ -1,5 +1,5 @@
 .dashboard {
-  padding: 25px 30px;
+  padding: 25px 30px 160px 30px; /* Aumentato padding inferiore per dare aria ai componenti e superare il menu flottante */
   color: var(--theme-text-muted, #CBD5E1);
   background-color: var(--theme-bg, #0B111B);
   min-height: 100vh;
@@ -107,7 +107,7 @@ h1 {
 .intel-center {
   display: flex;
   flex-direction: column;
-  gap: 40px;
+  gap: 15px; /* Ridotto gap da 40px per avvicinare i componenti ai pulsanti */
 }
 
 /* Dynamic Widgets Animation - Zero Padding for Perfect Alignment */

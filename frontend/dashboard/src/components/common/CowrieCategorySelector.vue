@@ -1,11 +1,12 @@
 <template>
   <div class="cowrie-category-selector" :class="size">
     <button 
-      class="cyber-chip" 
-      :class="{ active: modelValue === 'all' }" 
-      @click="$emit('update:modelValue', 'all')"
+      class="cyber-chip interaction" 
+      :class="{ active: modelValue === 'interaction' }" 
+      @click="$emit('update:modelValue', 'interaction')"
+      :title="$t('cowrie.sessions.filters.interactionDesc')"
     >
-      {{ $t('cowrie.sessions.filters.all') }}
+      <span class="dot"></span> {{ $t('cowrie.sessions.filters.interaction') }}
     </button>
     <button 
       class="cyber-chip scanner" 
@@ -16,12 +17,11 @@
       <span class="dot"></span> {{ $t('cowrie.sessions.filters.scanner') }}
     </button>
     <button 
-      class="cyber-chip interaction" 
-      :class="{ active: modelValue === 'interaction' }" 
-      @click="$emit('update:modelValue', 'interaction')"
-      :title="$t('cowrie.sessions.filters.interactionDesc')"
+      class="cyber-chip" 
+      :class="{ active: modelValue === 'all' }" 
+      @click="$emit('update:modelValue', 'all')"
     >
-      <span class="dot"></span> {{ $t('cowrie.sessions.filters.interaction') }}
+      {{ $t('cowrie.sessions.filters.all') }}
     </button>
   </div>
 </template>

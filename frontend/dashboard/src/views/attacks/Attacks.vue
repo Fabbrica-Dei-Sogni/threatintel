@@ -654,6 +654,7 @@ watch(() => attacks.value, () => {
 
 .ip-input {
     min-width: 220px;
+    font-family: 'JetBrains Mono', monospace !important;
 }
 
 .time-filter-group {

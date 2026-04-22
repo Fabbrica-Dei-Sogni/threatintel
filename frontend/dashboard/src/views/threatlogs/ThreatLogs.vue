@@ -31,19 +31,30 @@
 
     <section class="filters-container cyber-sticky-area cyber-sticky-top-2">
       <div class="filter-row main-filters">
-        <ProtocolSelector v-model="filterProtocol" :options="['http', 'https', 'ssh']" theme="amber" />
-        <div class="filter-item search-box">
-          <input type="text" v-model="filterIp" :placeholder="t('threatLogs.filterByIp')" class="ip-input" />
-          <button v-if="filterIp" @click="clearIpFilter" class="clear-btn" :aria-label="t('threatLogs.clearIpFilter')">
-            ×
-          </button>
+        <div class="filter-item">
+          <span class="cyber-label">PROT</span>
+          <ProtocolSelector v-model="filterProtocol" :options="['http', 'https', 'ssh']" theme="amber" />
         </div>
+
+        <div class="filter-item search-box">
+          <span class="cyber-label">IP ADDR</span>
+          <div class="ip-input-wrapper">
+            <input type="text" v-model="filterIp" :placeholder="t('threatLogs.filterByIp')" class="ip-input" />
+            <button v-if="filterIp" @click="clearIpFilter" class="clear-btn" :aria-label="t('threatLogs.clearIpFilter')">
+              ×
+            </button>
+          </div>
+        </div>
+
         <div class="filter-item search-box url-search">
-          <input v-model="filterUrl" :placeholder="t('threatLogs.filterByUrl')" class="ip-input" type="text" />
-          <button v-if="filterUrl" @click="clearUrlFilter" class="clear-btn" :title="t('threatLogs.clearUrlFilter')"
-            type="button" aria-label="Clear URL filter">
-            ✕
-          </button>
+          <span class="cyber-label">URL PATH</span>
+          <div class="ip-input-wrapper">
+            <input v-model="filterUrl" :placeholder="t('threatLogs.filterByUrl')" class="ip-input" type="text" />
+            <button v-if="filterUrl" @click="clearUrlFilter" class="clear-btn" :title="t('threatLogs.clearUrlFilter')"
+              type="button" aria-label="Clear URL filter">
+              ✕
+            </button>
+          </div>
         </div>
       </div>
     </section>
@@ -509,6 +520,35 @@ const handleReset = () => {
 .reset-view-control[data-noc-tooltip]::after {
     left: auto !important;
     right: calc(100% + 10px) !important;
+}
+
+/* === CYBER LABELS === */
+.cyber-label {
+    font-size: 0.65rem;
+    color: var(--theme-primary, #ffb300);
+    opacity: 0.6;
+    font-family: 'JetBrains Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.filter-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 15px;
+}
+
+.ip-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.ip-input {
+    font-family: 'JetBrains Mono', monospace !important;
 }
 </style>
 

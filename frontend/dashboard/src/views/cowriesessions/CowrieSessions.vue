@@ -27,16 +27,23 @@
 
         <section class="filters-container cyber-sticky-area cyber-sticky-top-2">
             <div class="filter-row main-filters">
-                <div class="input-wrapper">
-                    <input v-model="filterIp" :placeholder="$t('cowrie.sessions.filterByIp')"
-                        class="input" type="text" />
-                    <button v-if="filterIp" @click="clearIpFilter" class="clear-btn"
-                        :title="$t('cowrie.sessions.clearIpFilter')" type="button"
-                        :aria-label="$t('cowrie.sessions.clearIpFilter')">
-                        ✕
-                    </button>
+                <div class="filter-item">
+                    <span class="cyber-label">CATEGORY</span>
+                    <CowrieCategorySelector v-model="filterCategory" />
                 </div>
-                <CowrieCategorySelector v-model="filterCategory" />
+                
+                <div class="filter-item search-box">
+                    <span class="cyber-label">IP ADDR</span>
+                    <div class="ip-input-wrapper">
+                        <input v-model="filterIp" :placeholder="$t('cowrie.sessions.filterByIp')"
+                            class="input ip-input" type="text" />
+                        <button v-if="filterIp" @click="clearIpFilter" class="clear-btn"
+                            :title="$t('cowrie.sessions.clearIpFilter')" type="button"
+                            :aria-label="$t('cowrie.sessions.clearIpFilter')">
+                            ✕
+                        </button>
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -540,6 +547,36 @@ watch(() => sessions.value, () => {
 .reset-view-control[data-noc-tooltip]::after {
     left: auto !important;
     right: calc(100% + 10px) !important;
+}
+
+/* === CYBER LABELS === */
+.cyber-label {
+    font-size: 0.65rem;
+    color: var(--theme-primary, var(--neon-jade));
+    opacity: 0.6;
+    font-family: 'JetBrains Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.filter-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 15px;
+}
+
+.ip-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.ip-input {
+    min-width: 220px;
+    font-family: 'JetBrains Mono', monospace !important;
 }
 </style>
 

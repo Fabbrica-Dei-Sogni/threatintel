@@ -86,7 +86,7 @@ export function useAttacksFilter(
             page: page.value,
             pageSize: pageSize.value,
             filters: {
-                ip: filterIp.value,
+                'request.ip': filterIp.value,
                 protocol: filterProtocol.value,
                 dangerLevel: filterDangerLevels.value.length > 0 ? filterDangerLevels.value.join(',') : null
             },

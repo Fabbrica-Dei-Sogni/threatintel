@@ -7,6 +7,7 @@ export enum StorageNamespace {
     AUTH = 'hp_auth',
     SETTINGS = 'hp_settings',
     DASHBOARD = 'hp_dashboard',
+    ATTACKS = 'hp_attacks',
     API = 'hp_api'
 }
 

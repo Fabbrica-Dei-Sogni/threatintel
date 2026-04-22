@@ -15,9 +15,6 @@ import SettingsHub from '../views/settings/SettingsHub.vue';
 import ConfigPage from '../views/configpage/ConfigPage.vue';
 import CowrieSessions from '../views/cowriesessions/CowrieSessions.vue';
 import CowrieAttackDetail from '../views/cowriesessiondetail/CowrieAttackDetail.vue';
-import { useRoute } from 'vue-router';
-
-// Le tipizzazioni sulle props passate via router sono opzionali e possono essere affinate man mano che si tipizza la codebase
 
 const routes: RouteRecordRaw[] = [
     {
@@ -41,36 +38,20 @@ const routes: RouteRecordRaw[] = [
             initialLogProtocol:     typeof route.query.logProtocol     === 'string' ? route.query.logProtocol     : 'http',
             initialSessionCategory: typeof route.query.sessionCategory === 'string' ? route.query.sessionCategory : 'interaction',
         })
-    },/*,    
-    {
-        path: '/',
-        name: 'ThreatLogs',
-        component: ThreatLogs,
-        props: (route: RouteLocationNormalized) => ({
-            initialIp: typeof route.query.ip === 'string' ? route.query.ip : '',
-            initialUrl: typeof route.query.url === 'string' ? route.query.url : '',
-            initialPage: route.query.page ? parseInt(route.query.page as string) : 1,
-            initialSortFields: route.query.sortFields ? JSON.parse(route.query.sortFields as string) : undefined,
-        }),
-    },*/
+    },
     {
         path: '/attacks',
         name: 'Attacks',
         component: Attacks,
         props: (route: RouteLocationNormalized) => ({
-            initialIp: typeof route.query.ip === 'string' ? route.query.ip : '',
-            initialProtocol: typeof route.query.protocol === 'string' ? route.query.protocol : 'http',
-            //initialUrl: typeof route.query.url === 'string' ? route.query.url : '',
-            initialPage: route.query.page ? parseInt(route.query.page as string) : 1,
-            initialMinLogsForAttack: route.query.minLogsForAttack ? parseInt(route.query.minLogsForAttack as string) : 10,
-            initTimeMode: typeof route.query.timeMode === 'string' ? route.query.timeMode : 'ago',
-            initAgoValue: route.query.agoValue ? parseInt(route.query.agoValue as string) : 10,
-            initAgoUnit: typeof route.query.agoUnit === 'string' ? route.query.agoUnit : 'days',
-            initDateRange: (route.query.dateRange as [string | null, string | null]) || [null, null],
-            initFromValue: route.query.fromValue ? parseInt(route.query.fromValue as string) : 60,
-            initFromUnit: typeof route.query.fromUnit === 'string' ? route.query.fromUnit : 'days',
-            initToValue: route.query.toValue ? parseInt(route.query.toValue as string) : 0,
-            initToUnit: typeof route.query.toUnit === 'string' ? route.query.toUnit : 'days',
+            initialIp: route.query.ip,
+            initialProtocol: route.query.protocol,
+            initialPage: route.query.page ? parseInt(route.query.page as string) : undefined,
+            initialMinLogsForAttack: route.query.minLogsForAttack ? parseInt(route.query.minLogsForAttack as string) : undefined,
+            initTimeMode: route.query.timeMode,
+            initAgoValue: route.query.agoValue ? parseInt(route.query.agoValue as string) : undefined,
+            initAgoUnit: route.query.agoUnit,
+            initDateRange: route.query.dateRange ? JSON.parse(route.query.dateRange as string) : undefined,
             initialSortFields: route.query.sortFields ? JSON.parse(route.query.sortFields as string) : undefined,
         }),
     },
@@ -109,61 +90,83 @@ const routes: RouteRecordRaw[] = [
             initialTab: typeof route.query.tab === 'string' ? route.query.tab : 'request'
         }) 
     },
-    { path: '/login', name: 'Login', component: Login },
-    { path: '/register', name: 'Register', component: Register },
-    { path: '/settings', name: 'SettingsHub', component: SettingsHub, meta: { requiresAdmin: true } },
-    { path: '/settings/profiles', name: 'Settings', component: Settings, meta: { requiresAdmin: true } },
-    { path: '/settings/algorithms', name: 'Config', component: ConfigPage, meta: { requiresAdmin: true } },
-    { path: '/config', redirect: '/settings/algorithms' },
+    { 
+        path: '/dossiers', 
+        name: 'Dossiers', 
+        component: () => import('../views/dossiers/Dossiers.vue'),
+        props: (route: RouteLocationNormalized) => ({
+            initialPage: route.query.page ? parseInt(route.query.page as string) : 1,
+            initialSearch: route.query.q || '',
+            initialStatus: route.query.status || ''
+        })
+    },
+    { 
+        path: '/dossiers/:id', 
+        name: 'DossierDetail', 
+        component: () => import('../views/dossiers/DossierDetail.vue'),
+        props: true
+    },
+    {
+        path: '/login',
+        name: 'Login',
+        component: Login
+    },
+    {
+        path: '/register',
+        name: 'Register',
+        component: Register
+    },
+    {
+        path: '/settings',
+        name: 'Settings',
+        component: SettingsHub,
+        children: [
+            { path: '', name: 'SettingsHome', component: Settings },
+            { path: 'config', name: 'ConfigPage', component: ConfigPage }
+        ]
+    },
     {
         path: '/telnet-sessions',
         name: 'CowrieSessions',
         component: CowrieSessions,
         props: (route: RouteLocationNormalized) => ({
             initialPage: route.query.page ? parseInt(route.query.page as string) : 1,
-            initialPageSize: route.query.pageSize ? parseInt(route.query.pageSize as string) : 20,
-            initialSortFields: route.query.sortFields ? JSON.parse(route.query.sortFields as string) : {},
-            initialIp: typeof route.query.ip === 'string' ? route.query.ip : '',
-            initialCategory: typeof route.query.category === 'string' ? route.query.category : 'interaction',
-        }),
+            initialIp: route.query.ip || '',
+            initialCategory: route.query.category || 'interaction'
+        })
     },
-    { 
-        path: '/telnet-attack-detail/:id', 
-        name: 'CowrieAttackDetail', 
+    {
+        path: '/telnet-sessions/:id',
+        name: 'CowrieAttackDetail',
         component: CowrieAttackDetail,
-        props: (route: RouteLocationNormalized) => ({ id: route.params.id })
-    },
-    { 
-        path: '/dossiers', 
-        name: 'Dossiers', 
-        component: () => import('../views/dossiers/Dossiers.vue'),
-        meta: { requiresAuth: true },
-        props: (route: RouteLocationNormalized) => ({
-            initialSearch: typeof route.query.search === 'string' ? route.query.search : '',
-            initialStatus: typeof route.query.status === 'string' ? route.query.status : '',
-            initialPage: route.query.page ? parseInt(route.query.page as string) : 1,
-            initialSortFields: route.query.sortFields ? JSON.parse(route.query.sortFields as string) : undefined,
-        }),
-    },
-    { 
-        path: '/dossiers/:id', 
-        name: 'DossierDetail', 
-        component: () => import('../views/dossiers/DossierDetail.vue'), 
-        meta: { requiresAuth: true },
-        props: true 
-    },
+        props: true
+    }
 ];
 
 const router = createRouter({
-    history: createWebHistory('/honeypot/'),
+    history: createWebHistory(import.meta.env.BASE_URL),
     routes,
 });
 
 // Guard di navigazione per RBAC e Autenticazione
 import { useAuthStore } from '../stores/auth';
+import { useSearchStore } from '../stores/searchPersistence';
 
 router.beforeEach((to, from, next) => {
     const authStore = useAuthStore();
+    const searchStore = useSearchStore();
+
+    // 1. Persistenza filtri (Search Memory): escludiamo 'Attacks' perché gestito da hp_attacks
+    const searchRoutes = ['Home', 'ThreatLogs', 'CowrieSessions'];
+    if (to.name && searchRoutes.includes(to.name as string)) {
+        const hasQueryParams = Object.keys(to.query).length > 0;
+        const savedQuery = searchStore.getQuery(to.name as string);
+
+        if (!hasQueryParams && savedQuery) {
+            console.log(`[Router] Ripristino filtri salvati per ${String(to.name)}:`, savedQuery);
+            return next({ ...to, query: savedQuery });
+        }
+    }
     
     // Protezione per ADMIN
     if (to.meta.requiresAdmin && !authStore.isAdmin) {
@@ -171,7 +174,7 @@ router.beforeEach((to, from, next) => {
         return next({ name: 'Home' });
     }
 
-    // Protezione per UTENTI AUTENTICATI (No Anonimi)
+    // Protezione generale autenticazione
     if (to.meta.requiresAuth && !authStore.isAuthenticated) {
         console.warn(`[Router] Accesso negato a ${to.path}: richiesta autenticazione reale.`);
         return next({ name: 'Login', query: { redirect: to.fullPath } });

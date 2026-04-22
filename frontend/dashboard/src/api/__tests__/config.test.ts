@@ -95,7 +95,9 @@ describe('API config', () => {
   });
 
   it('should inject auth token in interceptor', async () => {
-    localStorage.setItem('auth_token', 'fake-token');
+    const { storage, StorageNamespace } = await import('../../utils/storage');
+    storage.set(StorageNamespace.AUTH, { token: 'fake-token' });
+    
     mock.onGet('/config').reply((config) => {
         if (config.headers?.Authorization === 'Bearer fake-token') {
             return [200, []];

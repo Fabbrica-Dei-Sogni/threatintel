@@ -3,6 +3,7 @@ import { useI18n } from '../useI18n';
 import { setActivePinia, createPinia } from 'pinia';
 import { useI18n as useVueI18n } from 'vue-i18n';
 import { ref } from 'vue';
+import { storage, StorageNamespace } from '../../utils/storage';
 
 vi.mock('vue-i18n', () => ({
   useI18n: vi.fn()
@@ -31,7 +32,9 @@ describe('useI18n', () => {
     
     setLocale('en-US');
     expect(locale.value).toBe('en-US');
-    expect(localStorage.getItem('userLocale')).toBe('en-US');
+    
+    const saved = storage.get<any>(StorageNamespace.SETTINGS);
+    expect(saved.userLocale).toBe('en-US');
   });
 
   it('should translate keys', () => {

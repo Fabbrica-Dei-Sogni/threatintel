@@ -1,4 +1,3 @@
-// src/composables/useAttacksFilter.ts
 import { ref, isRef, computed, type Ref } from 'vue';
 import { fetchAttackSearch } from '../api/index.js';
 import type { SortFields, TimeConfig } from '../models/CommonDTO';
@@ -25,8 +24,8 @@ export function useAttacksFilter(
     initialFromUnit: string | Ref<string>,
     initialToValue: number | Ref<number>,
     initialToUnit: string | Ref<string>,
-    initialSortFields: SortFields = null,
-    initialPageSize: number = 20,
+    initialSortFields: SortFields | Ref<SortFields> = null,
+    initialPageSize: number | Ref<number> = 20,
     initialDangerLevels: number[] | Ref<number[]> = []
 ) {
     // Filtri specifici - Normalizzati come Ref (se passati come computed o ref dallo store, rimangono legati)
@@ -49,7 +48,6 @@ export function useAttacksFilter(
     const filterRefs = [
         filterIp,
         filterProtocol,
-        filterDangerLevels,
         minLogsForAttack,
         timeMode,
         agoValue,
@@ -58,8 +56,57 @@ export function useAttacksFilter(
         fromValue,
         fromUnit,
         toValue,
-        toUnit
+        toUnit,
+        filterDangerLevels
     ];
+
+    async function fetchData() {
+        loading.value = true;
+        error.value = null;
+
+        let timeConfig: TimeConfig = null;
+
+        if (timeMode.value === 'ago') {
+            const unit = agoUnit.value === 'minutes' ? 'm' :
+                         agoUnit.value === 'hours' ? 'h' :
+                         agoUnit.value === 'days' ? 'd' :
+                         agoUnit.value === 'months' ? 'M' :
+                         agoUnit.value === 'years' ? 'y' : 'd';
+            timeConfig = { [unit]: agoValue.value ?? 0 };
+        } else {
+            timeConfig = {
+                from: { [fromUnit.value]: fromValue.value },
+                to: { [toUnit.value]: toValue.value },
+                fromDate: dateRange.value ? dateRange.value[0] : null,
+                toDate: dateRange.value ? dateRange.value[1] : null
+            };
+        }
+
+        const params: FetchAttackSearchParams = {
+            page: page.value,
+            pageSize: pageSize.value,
+            filters: {
+                ip: filterIp.value,
+                protocol: filterProtocol.value,
+                dangerLevel: filterDangerLevels.value.length > 0 ? filterDangerLevels.value.join(',') : null
+            },
+            minLogsForAttack: minLogsForAttack.value,
+            timeConfig,
+            sortFields: sortFields.value
+        };
+
+        try {
+            const response: FetchAttackSearchResponse = await fetchAttackSearch(params);
+            attacks.value = response.attacks;
+            total.value = response.total;
+        } catch (err) {
+            console.error('[useAttacksFilter] Error:', err);
+            error.value = true;
+            attacks.value = [];
+        } finally {
+            loading.value = false;
+        }
+    }
 
     // Integrazione useSearchBase
     const {
@@ -69,76 +116,25 @@ export function useAttacksFilter(
         total,
         loading,
         error,
+        debouncedFetch,
         toggleSort,
         getSortDirection,
-        getSortClass,
-        debouncedFetch
+        getSortClass
     } = useSearchBase({
         fetchFn: fetchData,
         initialPage,
         initialPageSize,
         initialSortFields,
-        filterRefs
+        filterRefs,
+        routeName: 'Attacks'
     });
-
-    // Funzione per recuperare dati
-    async function fetchData(): Promise<void> {
-        if (loading.value) return;
-
-        loading.value = true;
-        error.value = false;
-
-        const filters: Record<string, string> = {};
-        if (filterIp.value) filters['request.ip'] = filterIp.value;
-        if (filterProtocol.value) filters['protocol'] = filterProtocol.value;
-        if (filterDangerLevels.value && filterDangerLevels.value.length > 0) {
-            filters['dangerLevel'] = filterDangerLevels.value.join(',');
-        }
-
-        let timeConfig: TimeConfig = null;
-        if (timeMode.value === 'ago') {
-            timeConfig = { [agoUnit.value]: agoValue.value };
-        } else if (timeMode.value === 'range') {
-            timeConfig = {
-                from: { [fromUnit.value]: fromValue.value },
-                to: { [toUnit.value]: toValue.value },
-                fromDate: dateRange.value?.[0] || null,
-                toDate: dateRange.value?.[1] || null,
-            };
-        }
-
-        const params: FetchAttackSearchParams = {
-            page: page.value,
-            pageSize: pageSize.value,
-            filters,
-            minLogsForAttack: minLogsForAttack.value,
-            timeConfig,
-            sortFields: sortFields.value,
-        };
-
-        try {
-            const data: FetchAttackSearchResponse = await fetchAttackSearch(params);
-
-            attacks.value = data.attacks;
-            total.value = data.total;
-        } catch (err) {
-            error.value = true;
-            attacks.value = [];
-            total.value = 0;
-            console.error('Errore fetch attacks:', err);
-        } finally {
-            loading.value = false;
-        }
-    }
 
     return {
         attacks,
         filterIp,
         filterProtocol,
-        filterDangerLevels,
         sortFields,
         minLogsForAttack,
-        page,
         timeMode,
         agoValue,
         agoUnit,
@@ -147,10 +143,12 @@ export function useAttacksFilter(
         fromUnit,
         toValue,
         toUnit,
+        filterDangerLevels,
         loading,
         error,
         pageSize,
         total,
+        page,
         fetchData,
         onFilterChanged: () => {},
         toggleSort,

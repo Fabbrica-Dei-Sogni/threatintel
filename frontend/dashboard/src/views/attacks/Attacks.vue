@@ -7,7 +7,7 @@
                 <LanguageSwitcher />
             </div>
         </div>
-        <!-- Pulsante per tornare alla Home principale -->
+        <!-- Pulsanti per tornare alla Home principale e View Controls -->
         <div class="actions cyber-sticky-area cyber-sticky-top-1">
             <div class="nav-actions">
                 <button @click="goToHome" class="btn-action">
@@ -18,51 +18,81 @@
                 </button>
             </div>
             <div class="view-controls">
-                <ViewToggle v-model="showMap" :label="t('common.showMap')" theme="magma" />
-                <ViewToggle v-model="showChart" :label="t('common.showChart')" theme="magma" />
+                <ViewToggle v-model="attacksState.view.showMap" :label="t('common.showMap')" theme="magma" />
+                <ViewToggle v-model="attacksState.view.showChart" :label="t('common.showChart')" theme="magma" />
+                <!-- Reset Button -->
+                <button class="reset-btn-mini reset-view-control" @click="handleReset" :title="t('telemetry.reset_filters')">
+                    <div class="reset-ascii">
+                        <span></span>
+                        <span></span>
+                    </div>
+                </button>
             </div>
         </div>
 
         <!-- Filtri Combinati -->
         <section class="filters-container cyber-sticky-area cyber-sticky-top-2">
             <div class="filter-row main-filters">
-                <ProtocolSelector v-model="filterProtocol" :options="['http', 'https', 'ssh']" theme="magma" />
+                <div class="filter-item">
+                    <span class="cyber-label">PROT</span>
+                    <ProtocolSelector v-model="attacksState.filters.protocol" :options="['http', 'https', 'ssh']" theme="magma" />
+                </div>
 
                 <div class="filter-item min-logs">
-                    <label class="min-logs-label" for="minLogsForAttack">{{ t('attacks.minLogsLabel') }}</label>
-                    <el-input-number id="minLogsForAttack" v-model="minLogsForAttack" :min="1" :step="1"
+                    <label class="cyber-label" for="minLogsForAttack">{{ t('attacks.minLogsLabel') }}</label>
+                    <el-input-number id="minLogsForAttack" v-model="attacksState.filters.minLogs" :min="1" :step="1"
                         class="min-logs-input" size="small" />
                 </div>
 
                 <div class="filter-item search-box">
-                    <input type="text" v-model="filterIp" :placeholder="t('attacks.filterByIp')" class="ip-input" />
-                    <button v-if="filterIp" @click="clearIpFilter" class="clear-btn"
-                        :aria-label="t('attacks.clearIpFilter')">×</button>
+                    <span class="cyber-label">IP ADDR</span>
+                    <div class="ip-input-wrapper">
+                        <input type="text" v-model="attacksState.filters.ip" :placeholder="t('attacks.filterByIp')" class="ip-input" />
+                        <button v-if="attacksState.filters.ip" @click="attacksState.filters.ip = ''" class="clear-btn">×</button>
+                    </div>
                 </div>
             </div>
 
             <div class="filter-row secondary-filters">
                 <div class="time-filter-group">
-                    <label>{{ t('attacks.timeFilter') }}</label>
-                    <el-radio-group v-model="timeMode" size="small" @change="onFilterChanged">
-                        <el-radio-button label="ago">{{ t('attacks.last') }}</el-radio-button>
-                        <el-radio-button label="range">{{ t('attacks.range') }}</el-radio-button>
-                    </el-radio-group>
+                    <label class="cyber-label">{{ t('attacks.timeFilter') }}</label>
+                    <div class="time-controls-row">
+                        <el-radio-group v-model="attacksState.filters.timeMode" size="small">
+                            <el-radio-button label="ago">{{ t('attacks.last') }}</el-radio-button>
+                            <el-radio-button label="range">{{ t('attacks.range') }}</el-radio-button>
+                        </el-radio-group>
 
-                    <div v-if="timeMode === 'ago'" class="time-ago-wrapper">
-                        <el-input-number v-model="agoValue" :min="1" size="small" />
-                        <el-select v-model="agoUnit" size="small" :placeholder="t('attacks.unit')">
-                            <el-option :label="t('attacks.minutes')" value="minutes" />
-                            <el-option :label="t('attacks.hours')" value="hours" />
-                            <el-option :label="t('attacks.days')" value="days" />
-                            <el-option :label="t('attacks.months')" value="months" />
-                            <el-option :label="t('attacks.years')" value="years" />
-                        </el-select>
+                        <div v-if="attacksState.filters.timeMode === 'ago'" class="time-ago-wrapper">
+                            <el-input-number v-model="attacksState.filters.agoValue" :min="1" size="small" />
+                            <el-select v-model="attacksState.filters.agoUnit" size="small" :placeholder="t('attacks.unit')">
+                                <el-option :label="t('attacks.minutes')" value="minutes" />
+                                <el-option :label="t('attacks.hours')" value="hours" />
+                                <el-option :label="t('attacks.days')" value="days" />
+                                <el-option :label="t('attacks.months')" value="months" />
+                                <el-option :label="t('attacks.years')" value="years" />
+                            </el-select>
+                        </div>
+                        <div v-else class="time-range-wrapper">
+                            <el-date-picker v-model="attacksState.filters.dateRange" type="daterange" :start-placeholder="t('attacks.startDate')"
+                                :end-placeholder="t('attacks.endDate')" value-format="YYYY-MM-DD" format="DD/MM/YYYY"
+                                unlink-panels size="small" :teleported="true" />
+                        </div>
                     </div>
-                    <div v-else class="time-range-wrapper">
-                        <el-date-picker v-model="dateRange" type="daterange" :start-placeholder="t('attacks.startDate')"
-                            :end-placeholder="t('attacks.endDate')" value-format="YYYY-MM-DD" format="DD/MM/YYYY"
-                            unlink-panels size="small" :teleported="true" />
+                </div>
+
+                <!-- Defcon Filter -->
+                <div class="filter-item defcon-filter">
+                    <label class="cyber-label">DEFCON</label>
+                    <div class="tabs-row">
+                        <button 
+                            v-for="lvl in [1, 2, 3, 4, 5]" 
+                            :key="lvl"
+                            class="tab-btn mini-defcon"
+                            :class="['defcon-btn-' + lvl, { active: (attacksState.filters.dangerLevels || []).includes(lvl) }]"
+                            @click="attacksStore.toggleDangerLevel(lvl)"
+                        >
+                            {{ lvl }}
+                        </button>
                     </div>
                 </div>
             </div>
@@ -70,14 +100,14 @@
 
         <section class="map-controls" style="margin-bottom: 20px;">
             <transition name="fade">
-                <div v-if="showMap" class="map-section" style="margin-top: 10px;">
+                <div v-if="attacksState.view.showMap" class="map-section" style="margin-top: 10px;">
                     <AttackMap :attacks="attacks" />
                 </div>
             </transition>
         </section>
 
         <transition name="fade">
-            <div v-if="showChart">
+            <div v-if="attacksState.view.showChart">
                 <AttackChart v-if="attacks && attacks.length > 0" :attacks="attacks" />
             </div>
         </transition>
@@ -143,33 +173,6 @@
                                     </button>
                                 </div>
                             </th>
-                            <!--
-                        <th>
-                            <div class="org-info">
-                    <span class="org-name">{{ attacker.org || t('common.notAvailable') }}</span>
-                  </div>
-              <button @click="toggleSort('intensityAttack')" aria-label="Ordina Stile"
-                                    class="sort-button">
-                                    <span v-if="getSortDirection('intensityAttack') === 1">▲</span>
-                                    <span v-else-if="getSortDirection('intensityAttack') === -1">▼</span>
-                                    <span v-else>⇵</span>
-                                </button>
-                            </div>
-                        </th>
-                    -->
-                            <!--
-                        <th>
-                            <div class="sort-control">
-                                <span class="label">{{ t('attacks.table.frequency') }}</span>
-                                <button @click="toggleSort('rpsStyle')" aria-label="Ordina Frequenza"
-                                    class="sort-button">
-                                    <span v-if="getSortDirection('rpsStyle') === 1">▲</span>
-                                    <span v-else-if="getSortDirection('rpsStyle') === -1">▼</span>
-                                    <span v-else>⇵</span>
-                                </button>
-                            </div>
-                        </th>
-                    -->
                             <th class="sortable-th" :data-attacks-tooltip="t('attacks.table.avgScore')">
                                 <div class="sort-control">
                                     <span class="label">{{ t('attacks.table.short.avg') }}</span>
@@ -265,14 +268,7 @@
                             <td>
                                 <router-link :to="{
                                     name: 'AttackDetail',
-                                    params: { ip: attack.request.ip },
-                                    query: {
-                                        minLogsForAttack: minLogsForAttack,
-                                        timeMode: timeMode,
-                                        agoValue: agoValue,
-                                        agoUnit: agoUnit,
-                                        dateRange: dateRange
-                                    }
+                                    params: { ip: attack.request.ip }
                                 }" class="detail-link">
                                     {{ t('common.detail') }}
                                 </router-link>
@@ -297,10 +293,6 @@
                                         :title="t('common.copyToFilter')">⬇️</button>
                                 </span>
                             </td>
-                            <!--    
-                        <td>{{ attack.intensityAttack }}</td>
-                        <td>{{ attack.rpsStyle }}</td>
-                    -->
                             <td>{{ attack.averageScore }}</td>
                             <td>{{ attack.countRateLimit }}</td>
                             <td>{{ attack.rps }}</td>
@@ -344,15 +336,17 @@
 </template>
 
 <script setup>
-import { computed, watch, ref, onMounted, onUnmounted, nextTick } from 'vue';
+import { computed, watch, ref, onMounted, onUnmounted, nextTick, toRef } from 'vue';
 import { useRouter } from 'vue-router';
-import dayjs from 'dayjs';
 import { useAttacksFilter } from '../../composable/useAttacksFilter';
 import { useClipboard } from '../../composable/useClipboard';
 import { useI18n } from 'vue-i18n';
 import { formatDateTime, formatHumanDuration, formatFullDateTime } from '../../utils/dateUtils';
+import { useAttacksStore } from '../../stores/attacks';
+import { useViewSettingsStore } from '../../stores/viewSettings';
+import { storeToRefs } from 'pinia';
 
-const { copyToClipboard, copyFormatted } = useClipboard();
+const { copyFormatted } = useClipboard();
 const { t } = useI18n();
 import ProtocolSelector from '../../components/common/ProtocolSelector.vue';
 import ViewToggle from '../../components/common/ViewToggle.vue';
@@ -363,111 +357,89 @@ import AttackMap from '../../components/AttackMap.vue';
 import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
 import SkinSwitcher from '../../components/SkinSwitcher.vue';
 
-
-
-
 const props = defineProps({
     initialIp: String,
-    initialProtocol: { type: String, default: 'http' },
+    initialProtocol: String,
     initialPage: Number,
     initialMinLogsForAttack: Number,
     initTimeMode: String,
     initAgoValue: Number,
     initAgoUnit: String,
-    initDateRange: { type: Array, default: () => [null, null] },
-    initFromValue: Number,
-    initFromUnit: String,
-    initToValue: Number,
-    initToUnit: String,
-    initialSortFields: {
-        type: Object,
-        default: () => ({}),  // default ordinamento
-    }
+    initDateRange: Array,
+    initialSortFields: Object
 });
 
 const router = useRouter();
-
-
-// Variabile per salvare pagina precedente al filtro IP
-const previousPageBeforeIpFilter = ref(null);
-
-import { useViewSettingsStore } from '../../stores/viewSettings';
-import { storeToRefs } from 'pinia';
+const attacksStore = useAttacksStore();
+const { state: attacksState } = attacksStore;
 const viewStore = useViewSettingsStore();
-const { 
-    attacksShowMap: showMap, 
-    attacksShowChart: showChart,
-    dashboardSkin 
-} = storeToRefs(viewStore);
+const { dashboardSkin } = storeToRefs(viewStore);
+
+// Sincronizzazione Props -> Store (Priorità all'URL)
+onMounted(() => {
+    if (props.initialIp !== undefined) attacksState.filters.ip = props.initialIp || '';
+    if (props.initialProtocol !== undefined) attacksState.filters.protocol = props.initialProtocol || 'http';
+    if (props.initialPage !== undefined) attacksState.pagination.page = props.initialPage || 1;
+    if (props.initialMinLogsForAttack !== undefined) attacksState.filters.minLogs = props.initialMinLogsForAttack || 10;
+    if (props.initTimeMode !== undefined) attacksState.filters.timeMode = props.initTimeMode || 'ago';
+    if (props.initAgoValue !== undefined) attacksState.filters.agoValue = props.initAgoValue || 90;
+    if (props.initAgoUnit !== undefined) attacksState.filters.agoUnit = props.initAgoUnit || 'days';
+    if (props.initDateRange !== undefined) attacksState.filters.dateRange = props.initDateRange || [null, null];
+    if (props.initialSortFields !== undefined) attacksState.sort.fields = props.initialSortFields || { firstSeen: -1 };
+});
+
+// Watcher per i bottoni browser (Back/Forward)
+watch(() => props.initialIp, (v) => { attacksState.filters.ip = v ?? ''; });
+watch(() => props.initialProtocol, (v) => { attacksState.filters.protocol = v ?? 'http'; });
+watch(() => props.initialPage, (v) => { attacksState.pagination.page = v ?? 1; });
+watch(() => props.initialMinLogsForAttack, (v) => { attacksState.filters.minLogs = v ?? 10; });
 
 const {
     attacks,
-    filterIp,
-    filterProtocol,
-    sortFields,
-    minLogsForAttack,
-    page,
-    timeMode,
-    agoValue,
-    agoUnit,
-    dateRange,
-    fromValue,
-    fromUnit,
-    toValue,
-    toUnit,
     loading,
     error,
     pageSize,
     total,
-    fetchData,
-    onFilterChanged,
+    page,
+    sortFields,
     toggleSort,
     getSortDirection,
-    getSortClass
+    fetchData
 } = useAttacksFilter(
-    props.initialIp,
-    props.initialProtocol,
-    props.initialPage,
-    props.initialMinLogsForAttack,
-    props.initTimeMode,
-    props.initAgoValue,
-    props.initAgoUnit,
-    props.initDateRange,
-    props.initFromValue,
-    props.initFromUnit,
-    props.initToValue,
-    props.initToUnit,
-    props.initialSortFields,
+    toRef(attacksState.filters, 'ip'),
+    toRef(attacksState.filters, 'protocol'),
+    toRef(attacksState.pagination, 'page'),
+    toRef(attacksState.filters, 'minLogs'),
+    toRef(attacksState.filters, 'timeMode'),
+    toRef(attacksState.filters, 'agoValue'),
+    toRef(attacksState.filters, 'agoUnit'),
+    toRef(attacksState.filters, 'dateRange'),
+    toRef(attacksState.filters, 'fromValue'),
+    toRef(attacksState.filters, 'fromUnit'),
+    toRef(attacksState.filters, 'toValue'),
+    toRef(attacksState.filters, 'toUnit'),
+    toRef(attacksState.sort, 'fields'),
+    toRef(attacksState.pagination, 'pageSize'),
+    toRef(attacksState.filters, 'dangerLevels')
 );
 
 const totalPages = computed(() => Math.ceil(total.value / pageSize.value));
 
-// Aggiorna URL query con router.replace al cambiamento dei filtri
-// Aggiorna URL query con router.replace al cambiamento dei filtri
-// Sincronizzazione Prop -> Ref (per back/forward browser)
-watch(() => props.initialIp, (v) => { filterIp.value = v ?? ''; });
-watch(() => props.initialProtocol, (v) => { filterProtocol.value = v ?? 'http'; });
-watch(() => props.initialPage, (v) => { 
-    const targetPage = v ?? 1;
-    if (page.value !== targetPage) {
-        page.value = targetPage; 
-    }
-});
-watch(() => props.initialMinLogsForAttack, (v) => { minLogsForAttack.value = v ?? 10; });
-watch(() => props.initTimeMode, (v) => { timeMode.value = v ?? 'ago'; });
-watch(() => props.initAgoValue, (v) => { agoValue.value = v ?? 10; });
-watch(() => props.initAgoUnit, (v) => { agoUnit.value = v ?? 'days'; });
-watch(() => props.initDateRange, (v) => { dateRange.value = v ?? [null, null]; }, { deep: true });
-watch(() => props.initFromValue, (v) => { fromValue.value = v ?? 60; });
-watch(() => props.initFromUnit, (v) => { fromUnit.value = v ?? 'days'; });
-watch(() => props.initToValue, (v) => { toValue.value = v ?? 0; });
-watch(() => props.initToUnit, (v) => { toUnit.value = v ?? 'days'; });
-watch(() => props.initialSortFields, (v) => { sortFields.value = v ?? {}; }, { deep: true });
-
-// Sincronizzazione Ref -> URL query
+// Sincronizzazione Store -> URL query
 watch(
-    [filterIp, filterProtocol, minLogsForAttack, timeMode, agoValue, agoUnit, dateRange, fromValue, fromUnit, toValue, toUnit, page, sortFields],
-    ([nip, nproto, nmin, ntMode, ngaoVal, ngaoUnit, ndRange, nFromVal, nFromUnit, nToVal, nToUnit, nPage, newSortFields]) => {
+    [
+        () => attacksState.filters.ip, 
+        () => attacksState.filters.protocol, 
+        () => attacksState.filters.minLogs, 
+        () => attacksState.filters.timeMode, 
+        () => attacksState.filters.agoValue, 
+        () => attacksState.filters.agoUnit, 
+        () => attacksState.filters.dateRange, 
+        () => attacksState.filters.dangerLevels, 
+        () => attacksState.pagination.page, 
+        () => attacksState.sort.fields
+    ],
+    ([nip, nproto, nmin, ntMode, nAgoVal, nAgoUnit, ndRange, nDanger, nPage, nSort]) => {
         router.replace({
             name: 'Attacks',
             query: {
@@ -476,107 +448,57 @@ watch(
                 page: nPage > 1 ? nPage : undefined,
                 minLogsForAttack: nmin !== 10 ? nmin : undefined,
                 timeMode: ntMode !== 'ago' ? ntMode : undefined,
-                agoValue: ngaoVal !== 10 ? ngaoVal : undefined,
-                agoUnit: ngaoUnit !== 'days' ? ngaoUnit : undefined,
-                dateRange: ndRange && (ndRange[0] || ndRange[1]) ? ndRange : undefined,
-                fromValue: nFromVal !== 60 ? nFromVal : undefined,
-                fromUnit: nFromUnit !== 'days' ? nFromUnit : undefined,
-                toValue: nToVal !== 0 ? nToVal : undefined,
-                toUnit: nToUnit !== 'days' ? nToUnit : undefined,
-                sortFields: newSortFields ? JSON.stringify(newSortFields) : undefined
+                agoValue: nAgoVal !== 90 ? nAgoVal : undefined,
+                agoUnit: nAgoUnit !== 'days' ? nAgoUnit : undefined,
+                dateRange: ndRange && (ndRange[0] || ndRange[1]) ? JSON.stringify(ndRange) : undefined,
+                dangerLevels: nDanger && nDanger.length > 0 ? nDanger.join(',') : undefined,
+                sortFields: nSort && Object.keys(nSort).length > 0 ? JSON.stringify(nSort) : undefined
             }
         });
+    }, { deep: true });
+
+const handleReset = () => {
+    attacksStore.resetToDefaults();
+    nextTick(() => {
+        fetchData();
     });
+};
 
 const inputPage = ref(page.value);
+watch(page, (newPage) => { inputPage.value = newPage; });
 
-// Sincronizza inputPage con page esternamente modificato
-watch(page, (newPage) => {
-    inputPage.value = newPage;
-});
-
-// Debounce semplice per evitare troppe chiamate immediate
 let debounceTimer = null;
 watch(inputPage, (newPage) => {
     if (debounceTimer) clearTimeout(debounceTimer);
     debounceTimer = setTimeout(() => {
-        goToInputPage();
+        if (newPage >= 1 && (totalPages.value === 0 || newPage <= totalPages.value)) {
+            page.value = newPage;
+        }
     }, 300);
 });
 
-// Funzioni per template
-const getHumanDuration = (seconds) => {
-    return formatHumanDuration(seconds, t);
-};
-
-function formatDate(timestamp) {
-    return formatFullDateTime(timestamp);
-};
-
-function goToInputPage() {
-    let targetPage = inputPage.value;
-
-    // Validazione: assicurati che sia tra 1 e totalPages
-    if (targetPage < 1) targetPage = 1;
-    if (targetPage > totalPages.value) targetPage = totalPages.value;
-
-    changePage(targetPage);
-}
+const getHumanDuration = (seconds) => formatHumanDuration(seconds, t);
+function formatDate(timestamp) { return formatFullDateTime(timestamp); }
 
 function goToIpDetails(ip) {
-    router.push({
-        name: 'IpDetails',
-        params: { ip },
-        query: {
-            ip: filterIp.value,
-            page: page.value,
-            minLogsForAttack: minLogsForAttack.value,
-            timeConfig: timeMode.value,
-            sortFields: sortFields.value
-        },
-    });
+    router.push({ name: 'IpDetails', params: { ip } });
 }
 
 function setIpFilter(ip) {
-
-    // Salva la pagina corrente solo se il filtro IP si applica per la prima volta
-    if (!filterIp.value) {
-        previousPageBeforeIpFilter.value = page.value;
-    }
-
-    filterIp.value = ip;        // Imposta il filtro
-    page.value = 1;             // Torna alla pagina 1 se serve
-    onFilterChanged();          // Applica il filtro
+    attacksState.filters.ip = ip;
+    attacksState.pagination.page = 1;
 }
 
-function clearIpFilter() {
-    filterIp.value = '';
-
-    // Se c’è una pagina salvata, ripristinala
-    if (previousPageBeforeIpFilter.value !== null) {
-        page.value = previousPageBeforeIpFilter.value;
-        previousPageBeforeIpFilter.value = null;  // reset dopo uso
-    }
-
-    onFilterChanged(false);
-}
-
-function goToLogs() {
-    router.push('/threatlogs');
-}
-
-function goToHome() {
-    router.push('/');
-}
+function goToLogs() { router.push('/threatlogs'); }
+function goToHome() { router.push('/'); }
 
 function changePage(newPage) {
-    if (newPage >= 1 && newPage <= totalPages.value) {
+    if (newPage >= 1 && (totalPages.value === 0 || newPage <= totalPages.value)) {
         page.value = newPage;
     }
 }
 
-
-// Dual Scrollbar Localization Support
+// Dual Scrollbar Logic
 const topScrollRef = ref(null);
 const tableScrollRef = ref(null);
 const tableRef = ref(null);
@@ -592,9 +514,7 @@ const handleTableScroll = () => syncScroll(tableScrollRef.value, topScrollRef.va
 
 const updateTableWidth = () => {
     nextTick(() => {
-        if (tableRef.value) {
-            tableWidth.value = tableRef.value.scrollWidth;
-        }
+        if (tableRef.value) tableWidth.value = tableRef.value.scrollWidth;
     });
 };
 
@@ -604,8 +524,6 @@ onMounted(() => {
         tableScrollRef.value.addEventListener('scroll', handleTableScroll);
     }
     updateTableWidth();
-
-    // Resize periodic check to handle dynamic content
     const interval = setInterval(updateTableWidth, 1000);
     onUnmounted(() => clearInterval(interval));
 });
@@ -615,15 +533,226 @@ onUnmounted(() => {
     if (tableScrollRef.value) tableScrollRef.value.removeEventListener('scroll', handleTableScroll);
 });
 
-// Watch data changes (safely at the end)
 watch(() => attacks.value, () => {
     setTimeout(updateTableWidth, 200);
 }, { deep: true });
-
-// Fetch iniziale rimosso in favore del watcher immediato nel composable
 </script>
 
 <style scoped src="./Attacks.css"></style>
 <style scoped>
 @import "./AttacksCyber.css";
+
+/* Stunning Cyber-Red Reset Button with ASCII Lines */
+.reset-btn-mini {
+    background: transparent;
+    border: 1px solid rgba(255, 51, 102, 0.4);
+    color: #ff3366;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    clip-path: polygon(15% 0%, 100% 0, 100% 85%, 85% 100%, 0 100%, 0% 15%);
+    padding: 0;
+    overflow: hidden;
+}
+
+.reset-ascii {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+.reset-ascii span {
+    display: block;
+    width: 12px;
+    height: 2px;
+    background: #ff3366;
+    box-shadow: 0 0 5px rgba(255, 51, 102, 0.6);
+    transition: all 0.3s ease;
+}
+
+.reset-ascii span:nth-child(1) { transform: translateX(-3px); }
+.reset-ascii span:nth-child(2) { transform: translateX(3px); }
+
+.reset-btn-mini:hover {
+    background: rgba(255, 51, 102, 0.1);
+    border-color: #ff3366;
+    box-shadow: 0 0 15px rgba(255, 51, 102, 0.4);
+}
+
+.reset-btn-mini:hover .reset-ascii { transform: rotate(180deg); }
+
+.reset-btn-mini:hover .reset-ascii span {
+    transform: translateX(0);
+    background: #fff;
+    box-shadow: 0 0 10px #fff;
+    width: 14px;
+}
+
+.reset-btn-mini:active {
+    transform: scale(0.8);
+    background: #ff3366;
+}
+
+.view-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.reset-view-control {
+    margin-left: 10px;
+}
+
+/* === FILTERS LAYOUT REFINEMENT === */
+.filters-container {
+    background: rgba(0, 0, 0, 0.25);
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+.filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 35px;
+}
+
+.filter-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* === CYBER LABELS === */
+.cyber-label {
+    font-size: 0.65rem;
+    color: var(--theme-primary, var(--neon-cyan));
+    opacity: 0.6;
+    font-family: 'JetBrains Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 700;
+}
+
+.ip-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.ip-input {
+    min-width: 220px;
+}
+
+.time-filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.time-controls-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    padding: 4px;
+    border-radius: 6px;
+}
+
+.defcon-filter {
+    background: transparent;
+    padding: 0;
+    border: none;
+}
+
+/* Colorazione coerente dei pulsanti Defcon */
+.defcon-btn-5.active { background-color: #1e88e5 !important; border-color: #1e88e5 !important; box-shadow: 0 0 10px rgba(30, 136, 229, 0.5); color: #fff; }
+.defcon-btn-4.active { background-color: #43a047 !important; border-color: #43a047 !important; box-shadow: 0 0 10px rgba(67, 160, 71, 0.5); color: #fff; }
+.defcon-btn-3.active { background-color: #fdd835 !important; border-color: #fdd835 !important; box-shadow: 0 0 10px rgba(253, 216, 53, 0.5); color: #000 !important; }
+.defcon-btn-2.active { background-color: #e53935 !important; border-color: #e53935 !important; box-shadow: 0 0 10px rgba(229, 57, 53, 0.5); color: #fff; }
+.defcon-btn-1.active { background-color: #ffffff !important; border-color: #ffffff !important; box-shadow: 0 0 15px rgba(255, 255, 255, 0.8); color: #b71c1c !important; }
+
+/* Hover states per Defcon non attivi */
+.defcon-btn-5:hover:not(.active) { border-color: #1e88e5; color: #1e88e5; }
+.defcon-btn-4:hover:not(.active) { border-color: #43a047; color: #43a047; }
+.defcon-btn-3:hover:not(.active) { border-color: #fdd835; color: #fdd835; }
+.defcon-btn-2:hover:not(.active) { border-color: #e53935; color: #e53935; }
+.defcon-btn-1:hover:not(.active) { border-color: #ffffff; color: #ffffff; }
+
+.mini-defcon {
+    min-width: 30px !important;
+    height: 30px;
+    padding: 0 !important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 800;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+}
+
+/* Tooltip alignment for view controls */
+.reset-view-control[data-noc-tooltip]::after {
+    left: auto !important;
+    right: calc(100% + 10px) !important;
+}
+
+/* === MOBILE RESPONSIVENESS === */
+@media (max-width: 768px) {
+    .filters-container {
+        padding: 15px;
+        gap: 15px;
+    }
+
+    .filter-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 15px;
+    }
+
+    .filter-item, .time-filter-group {
+        width: 100%;
+    }
+
+    .time-controls-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+        background: transparent;
+        padding: 0;
+    }
+
+    .ip-input {
+        min-width: 100%;
+    }
+
+    :deep(.el-range-editor.el-input__inner) {
+        width: 100% !important;
+    }
+
+    .defcon-filter .tabs-row {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 5px;
+    }
+
+    .mini-defcon {
+        min-width: unset !important;
+        width: 100%;
+    }
+}
 </style>

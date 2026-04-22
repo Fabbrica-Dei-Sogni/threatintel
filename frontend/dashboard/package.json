@@ -4,9 +4,11 @@
     "private": true,
     "scripts": {
         "dev": "vite --config vite.config.ts --host",
-        "build": "vue-tsc --noEmit && vite build --config vite.config.ts",
+        "build": "vue-tsc -p tsconfig.app.json --noEmit && vite build --config vite.config.ts",
+        "build:full": "vue-tsc --noEmit && vite build --config vite.config.ts",
         "preview": "vite preview",
-        "type-check": "vue-tsc --noEmit",
+        "type-check": "vue-tsc -p tsconfig.app.json --noEmit",
+        "type-check:all": "vue-tsc --noEmit",
         "test": "vitest",
         "test:coverage": "vitest run --coverage"
     },

@@ -2,6 +2,8 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { setActivePinia, createPinia } from 'pinia';
 import { useAuthStore } from '../auth';
 import * as authApi from '../../api/auth';
+import { storage, StorageNamespace } from '../../utils/storage';
+import { nextTick } from 'vue';
 
 // Mock del router
 vi.mock('../../router', () => ({
@@ -12,7 +14,7 @@ vi.mock('../../router', () => ({
 
 // Mock dell'API
 vi.mock('../../api/auth', () => ({
-  getAuthMode: vi.fn()
+  getAuthMode: vi.fn().mockResolvedValue({ data: {} })
 }));
 
 describe('AuthStore', () => {
@@ -29,7 +31,7 @@ describe('AuthStore', () => {
     expect(store.user).toBe(null);
   });
 
-  it('should set authentication correctly', () => {
+  it('should set authentication correctly via StorageManager', async () => {
     const store = useAuthStore();
     const mockUser = { username: 'admin', roles: [{ name: 'admin' }] };
     store.setAuth('fake-token', mockUser);
@@ -38,7 +40,14 @@ describe('AuthStore', () => {
     expect(store.user).toEqual(mockUser);
     expect(store.isAuthenticated).toBe(true);
     expect(store.isAdmin).toBe(true);
-    expect(localStorage.getItem('auth_token')).toBe('fake-token');
+
+    // Attendiamo che il watcher scatti
+    await nextTick();
+
+    const saved = storage.get<any>(StorageNamespace.AUTH);
+    expect(saved).not.toBeNull();
+    expect(saved.token).toBe('fake-token');
+    expect(saved.user).toEqual(mockUser);
   });
 
   it('should identify admin role correctly', () => {
@@ -59,7 +68,7 @@ describe('AuthStore', () => {
 
     expect(store.token).toBe(null);
     expect(store.user).toBe(null);
-    expect(localStorage.getItem('auth_token')).toBe(null);
+    expect(storage.get(StorageNamespace.AUTH)).toBe(null);
     expect(router.push).toHaveBeenCalledWith('/login');
   });
 
@@ -69,8 +78,6 @@ describe('AuthStore', () => {
     } as any);
 
     const store = useAuthStore();
-    // Attendiamo che la promessa in checkAuthMode (chiamata nel setup) si risolva
-    // Poiché viene chiamata immediatamente, dobbiamo aspettare un microtask
     await vi.waitFor(() => store.user !== null);
 
     expect(store.user.username).toBe('anonymous');

@@ -1,4 +1,4 @@
-import { ref, watch, unref, type Ref } from 'vue';
+import { ref, watch, unref, isRef, type Ref } from 'vue';
 import type { SortFields } from '../models/CommonDTO';
 import { useSearchStore } from '../stores/searchPersistence';
 import { useRoute } from 'vue-router';
@@ -7,10 +7,18 @@ interface UseSearchBaseOptions {
     fetchFn: () => Promise<void>;
     initialPage?: number | Ref<number>;
     initialPageSize?: number | Ref<number>;
-    initialSortFields?: SortFields;
+    initialSortFields?: SortFields | Ref<SortFields | null>;
     filterRefs?: Ref<any>[]; // Riferimenti ai filtri da osservare
     debounceMs?: number;
     routeName?: string; // Nome della rotta per la persistenza
+}
+
+/**
+ * Helper interno per garantire di avere un Ref legato all'input originale
+ */
+function linkRef<T>(input: T | Ref<T>, defaultValue: T): Ref<T> {
+    if (isRef(input)) return input;
+    return ref(input ?? defaultValue) as Ref<T>;
 }
 
 export function useSearchBase(options: UseSearchBaseOptions) {
@@ -27,26 +35,25 @@ export function useSearchBase(options: UseSearchBaseOptions) {
     const searchStore = useSearchStore();
     const route = useRoute();
 
-    // Stato di base - usiamo unref per gestire sia valori che Ref passati
-    const page: Ref<number> = ref(unref(initialPage));
-    const pageSize: Ref<number> = ref(unref(initialPageSize));
-    const sortFields: Ref<SortFields> = ref(initialSortFields);
+    // Stato di base - LEGATO ai riferimenti passati (es. dallo store)
+    const page = linkRef(initialPage, 1);
+    const pageSize = linkRef(initialPageSize, 20);
+    const sortFields = linkRef(initialSortFields, {} as SortFields);
+    
     const total: Ref<number> = ref(0);
     const loading: Ref<boolean> = ref(false);
     const error: Ref<any> = ref(null);
 
-    // Funzione helper per salvare lo stato corrente nello store globale
+    // Funzione helper per salvare lo stato corrente nello store globale (routing persistence)
     const persistState = (filtersValues: any[]) => {
         const name = routeName || (route?.name as string);
         if (!name) return;
 
-        // Costruiamo un oggetto query che riflette lo stato attuale dei filtri e della paginazione
         const query: Record<string, any> = {
             page: page.value > 1 ? page.value : undefined,
             sortFields: sortFields.value && Object.keys(sortFields.value).length > 0 ? JSON.stringify(sortFields.value) : undefined,
         };
 
-        // Mappatura dinamica dei filtri basata sulla posizione nell'array filterRefs
         if (name === 'ThreatLogs') {
             query.ip = filtersValues[0] || undefined;
             query.url = filtersValues[1] || undefined;
@@ -80,38 +87,27 @@ export function useSearchBase(options: UseSearchBaseOptions) {
     watch(
         [...filterRefs, page, pageSize, sortFields],
         (newVal, oldVal) => {
-            // Se oldVal è undefined (primo run di immediate: true), eseguiamo solo il fetch.
             if (!oldVal) {
                 debouncedFetch();
                 return;
             }
 
-            // Verifichiamo se è cambiato uno dei filtri (primi N elementi)
             const filtersChanged = filterRefs.some((_, i) => {
                 const nv = newVal[i];
                 const ov = oldVal[i];
-                
-                // Se oldVal è undefined o null, consideriamo che non sia cambiato rispetto all'inizializzazione
                 if (ov === undefined || ov === null) return false;
-
-                // Gestione specifica per Array/Oggetti (es. dateRange o dangerLevels)
                 if (typeof nv === 'object' && nv !== null) {
                     return JSON.stringify(nv) !== JSON.stringify(ov);
                 }
-
                 return nv !== ov;
             });
 
             if (filtersChanged && page.value !== 1) {
-                // Se cambiano i filtri, resettiamo sempre alla pagina 1
                 page.value = 1;
-                // fetchData verrà chiamato dal prossimo ciclo generato dal cambio di page
                 return;
             }
 
-            // Ogni volta che lo stato cambia (filtri o pagina), aggiorniamo lo store globale
             persistState(newVal.slice(0, filterRefs.length));
-
             debouncedFetch();
         },
         { deep: true, immediate: true }

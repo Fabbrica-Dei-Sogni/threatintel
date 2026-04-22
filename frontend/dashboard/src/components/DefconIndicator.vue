@@ -1,5 +1,5 @@
 <template>
-    <div class="defcon-wrapper" :title="`Danger Score: ${dangerScore}`">
+    <div class="defcon-wrapper" :data-noc-tooltip="`Danger Score: ${dangerScore}`">
         <!-- MODE: BAR -->
         <div v-if="mode === 'bar'" class="defcon-bar-container">
             <div class="defcon-bar-fill" :style="{ width: calculateDefconPercentage(level, dangerScore) + '%' }"

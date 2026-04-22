@@ -125,14 +125,14 @@
                       <!-- Origin Col -->
                         <div class="item-col item-col-origin">
                           <div class="indicator-group"
-                            :data-url-tooltip="`URI: ${item.request?.url || 'N/A'}\nDATE: ${formatDate(item.firstSeen)}`">
+                            :data-noc-tooltip="`URI: ${item.request?.url || 'N/A'}\nDATE: ${formatDate(item.firstSeen)}`">
                             <CountryFlag :countryCode="item.ipDetails?.ipinfo?.country"
                               :tooltip="item.ipDetails?.ipinfo ? `${item.ipDetails.ipinfo.country} - ${item.ipDetails.ipinfo.org || t('common.notAvailable')}` : t('common.notAvailable')" />
                             <DefconIndicator :level="item.dangerLevel" :dangerScore="item.dangerScore" mode="dot" />
                             <router-link 
                               :to="{ name: 'AttackDetail', params: { ip: item.request.ip } }" 
                               class="intel-det-btn"
-                              :title="t('common.detail')"
+                              :data-noc-tooltip="t('common.detail')"
                             >
                               DET
                             </router-link>
@@ -145,8 +145,8 @@
                         </div>
                         
                         <!-- Forensics Col -->
-                        <div class="item-col item-col-forensics" :title="t('attackDetail.timeWindow')">
-                          <div class="time-row">
+                        <div class="item-col item-col-forensics">
+                          <div class="time-row" :data-noc-tooltip="$t('attacks.table.firstSeen')">
                             <span class="date-part">{{ formatDateOnly(item.firstSeen) }}</span>
                             <span class="time-part">{{ formatTimeOnly(item.firstSeen) }}</span>
                           </div>
@@ -158,7 +158,7 @@
                         <!-- Metrics Col -->
                         <div class="item-col item-col-metrics">
                           <div class="activity-badge">
-                            <div class="badge-content" :class="{ 'high-interaction': (item.totaleLogs || 0) > 50 }" :title="$t('attacks.table.totalLogs')">
+                            <div class="badge-content" :class="{ 'high-interaction': (item.totaleLogs || 0) > 50 }" :data-noc-tooltip="$t('attacks.table.totalLogs')">
                               <span class="badge-icon">📋</span>
                               <span class="badge-value">{{ item.totaleLogs || 0 }}</span>
                             </div>
@@ -195,14 +195,14 @@
                         <!-- Origin Col -->
                         <div class="item-col item-col-origin">
                           <div class="indicator-group"
-                            :data-url-tooltip="`URI: ${item.request?.url || 'N/A'}\nDATE: ${formatDate(item.timestamp)}`">
+                            :data-noc-tooltip="`URI: ${item.request?.url || 'N/A'}\nDATE: ${formatDate(item.timestamp)}`">
                             <CountryFlag :countryCode="item.ipDetailsId?.ipinfo?.country"
                               :tooltip="item.ipDetailsId?.ipinfo ? `${item.ipDetailsId.ipinfo.country} - ${item.ipDetailsId.ipinfo.org || t('common.notAvailable')}` : t('common.notAvailable')" />
                             <router-link 
                               v-if="item.id || item._id"
                               :to="{ name: 'ThreatLog', params: { id: String(item.id || item._id) } }" 
                               class="intel-det-btn"
-                              :title="t('common.detail')"
+                              :data-noc-tooltip="t('common.detail')"
                             >
                               DET
                             </router-link>
@@ -225,7 +225,7 @@
                         <!-- Metrics Col -->
                         <div class="item-col item-col-metrics">
                           <div class="activity-badge">
-                            <div class="badge-content" :title="$t('threatLog.method')">
+                            <div class="badge-content" :data-noc-tooltip="$t('threatLog.method')">
                               <span class="badge-icon">🌐</span>
                               <span class="badge-value">{{ item.request.method }}</span>
                             </div>
@@ -262,14 +262,14 @@
                         <!-- Origin Col -->
                         <div class="item-col item-col-origin">
                           <div class="indicator-group"
-                            :data-url-tooltip="`PROTOCOL: ${item.protocol || 'N/A'}\nDATE: ${formatDate(item.starttime)}`">
+                            :data-noc-tooltip="`PROTOCOL: ${item.protocol || 'N/A'}\nDATE: ${formatDate(item.starttime)}`">
                             <CountryFlag :countryCode="item.ipDetailsId?.ipinfo?.country"
                               :tooltip="item.ipDetailsId?.ipinfo ? `${item.ipDetailsId.ipinfo.country} - ${item.ipDetailsId.ipinfo.org || t('common.notAvailable')}` : t('common.notAvailable')" />
                             <router-link 
                               v-if="item.session || item.id || item._id"
                               :to="{ name: 'CowrieAttackDetail', params: { id: String(item.session || item.id || item._id) } }" 
                               class="intel-det-btn"
-                              :title="t('common.detail')"
+                              :data-noc-tooltip="t('common.detail')"
                             >
                               DET
                             </router-link>
@@ -282,8 +282,8 @@
                         </div>
                         
                         <!-- Forensics Col -->
-                        <div class="item-col item-col-forensics" :title="t('cowrie.attackDetail.timeWindow')">
-                          <div class="time-row">
+                        <div class="item-col item-col-forensics">
+                          <div class="time-row" :data-noc-tooltip="$t('attacks.table.firstSeen')">
                             <span class="date-part">{{ formatDateOnly(item.starttime) }}</span>
                             <span class="time-part">{{ formatTimeOnly(item.starttime) }}</span>
                           </div>
@@ -296,12 +296,12 @@
                         <div class="item-col item-col-metrics">
                           <div class="activity-badge">
                             <!-- Aggregated Scanner occurrences -->
-                            <div v-if="item.isAggregated" class="badge-content occurrence" :title="$t('cowrie.sessions.table.occurrences')">
+                            <div v-if="item.isAggregated" class="badge-content occurrence" :data-noc-tooltip="$t('cowrie.sessions.table.occurrences')">
                               <span class="badge-icon">🔢</span>
                               <span class="badge-value">{{ item.occurrenceCount }}</span>
                             </div>
                             <!-- Standard interaction events -->
-                            <div v-else class="badge-content" :class="{ 'high-interaction': (item.eventCount || 0) > 10 }" :title="$t('sessionChart.activity')">
+                            <div v-else class="badge-content" :class="{ 'high-interaction': (item.eventCount || 0) > 10 }" :data-noc-tooltip="$t('sessionChart.activity')">
                               <span class="badge-icon">⚡</span>
                               <span class="badge-value">{{ item.eventCount || 0 }}</span>
                             </div>
@@ -323,7 +323,7 @@
                     <!-- Authenticated View -->
                     <ul v-if="authStore.isAuthenticated" class="scroll-list">
                       <li v-for="dossier in recentDossiers" :key="dossier._id" class="dossier-item">
-                        <div class="indicator-group" :data-url-tooltip="`Dossier: ${dossier.title}\nID: ${dossier._id}`">
+                        <div class="indicator-group" :data-noc-tooltip="`Dossier: ${dossier.title}\nID: ${dossier._id}`">
                             <span class="status-dot-mini" :class="dossier.status.toLowerCase()"></span>
                         </div>
                         <span class="dossier-title-link" @click="router.push(`/dossiers/${dossier._id}`)">{{ dossier.title }}</span>

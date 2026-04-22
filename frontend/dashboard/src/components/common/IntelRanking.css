@@ -710,3 +710,67 @@
   box-shadow: 0 0 10px rgba(30, 55, 153, 0.4) !important;
 }
 
+/* Global NOC Tooltip Engine */
+[data-noc-tooltip] {
+  position: relative;
+  /* Costringe l'elemento a stringersi attorno al proprio testo/icona, evitando spazi vuoti che allontanerebbero il tooltip */
+  width: max-content !important;
+}
+
+/* Nasconde il tooltip del padre se sto hoverando un figlio che ha anch'esso un tooltip */
+[data-noc-tooltip]:has([data-noc-tooltip]:hover)::after,
+[data-noc-tooltip]:has([data-noc-tooltip]:hover)::before {
+  display: none !important;
+}
+
+/* Default (Apertura verso DESTRA) per sfuggire al clipping verticale delle scroll-list */
+[data-noc-tooltip]:not([data-noc-tooltip=""]):hover::after,
+[data-noc-tooltip]:not([data-noc-tooltip=""]):active::after {
+  content: attr(data-noc-tooltip);
+  position: absolute;
+  top: 50%;
+  left: calc(100% + 8px);
+  bottom: auto;
+  transform: translateY(-50%);
+  background: rgba(15, 23, 42, 0.95);
+  color: #f1f5f9;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-family: 'JetBrains Mono', monospace;
+  white-space: pre;
+  z-index: 1000;
+  border: 1px solid rgba(136, 170, 255, 0.3);
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+  backdrop-filter: blur(4px);
+  opacity: 1;
+}
+
+[data-noc-tooltip]:not([data-noc-tooltip=""]):hover::before,
+[data-noc-tooltip]:not([data-noc-tooltip=""]):active::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 100%;
+  bottom: auto;
+  transform: translateY(-50%);
+  border-width: 6px;
+  border-style: solid;
+  border-color: transparent rgba(15, 23, 42, 0.95) transparent transparent;
+  z-index: 1000;
+  pointer-events: none;
+}
+
+/* Override Sinistro (per i contatori/metriche sulla destra, per non farli uscire dallo schermo) */
+.item-col-metrics [data-noc-tooltip]:not([data-noc-tooltip=""]):hover::after,
+.item-col-metrics [data-noc-tooltip]:not([data-noc-tooltip=""]):active::after {
+  left: auto;
+  right: calc(100% + 8px);
+}
+.item-col-metrics [data-noc-tooltip]:not([data-noc-tooltip=""]):hover::before,
+.item-col-metrics [data-noc-tooltip]:not([data-noc-tooltip=""]):active::before {
+  left: auto;
+  right: 100%;
+  border-color: transparent transparent transparent rgba(15, 23, 42, 0.95);
+}

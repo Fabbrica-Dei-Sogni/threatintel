@@ -1,5 +1,5 @@
 <template>
-    <div class="country-flag" :title="tooltip || (countryCode ? countryCode : 'Global/Unknown')">
+    <div class="country-flag" :data-noc-tooltip="tooltip || (countryCode ? countryCode : 'Global/Unknown')">
         <template v-if="countryCode && !hasError">
             <img :src="flagUrl" :alt="countryCode" class="flag-img" @error="hasError = true" />
         </template>

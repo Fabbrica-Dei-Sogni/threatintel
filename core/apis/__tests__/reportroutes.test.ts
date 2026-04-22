@@ -4,11 +4,19 @@ import express from 'express';
 import { container } from 'tsyringe';
 import { ReportController } from '../../controllers/ReportController';
 import { ReportService, ReportType } from '../../services/ReportService';
+import { AuthMiddleware } from '../../middlewares/AuthMiddleware';
 import reportRoutes from '../reportroutes';
 
 // Mock del ReportService
 const mockReportService = {
     generateDetailReport: jest.fn(),
+};
+
+// Mock AuthMiddleware
+const mockAuthMiddleware = {
+    isIdentified: jest.fn().mockReturnValue((req: any, res: any, next: any) => next()),
+    isAuthenticated: jest.fn().mockReturnValue((req: any, res: any, next: any) => next()),
+    hasRole: jest.fn().mockReturnValue((req: any, res: any, next: any) => next()),
 };
 
 // Mocking container per iniettare il servizio fittizio
@@ -19,7 +27,7 @@ const reportController = new ReportController(mockReportService as any);
 
 const app = express();
 app.use(express.json());
-app.use('/', reportRoutes(reportController));
+app.use('/', reportRoutes(reportController, mockAuthMiddleware as any));
 
 describe('ReportRoutes API', () => {
 

@@ -154,7 +154,7 @@ describe('ThreatLogService', () => {
             await ThreatLog.create({
                 id: '1',
                 request: { ip: '1.2.3.4', country: 'IT' },
-                fingerprint: { suspicious: true },
+                fingerprint: { suspicious: true, score: 50 },
                 timestamp: new Date()
             });
 
@@ -167,10 +167,11 @@ describe('ThreatLogService', () => {
 
     describe('getTopThreats', () => {
         it('should return top suspicious logs', async () => {
+            const now = Date.now();
             await ThreatLog.create([
-                { id: '1', fingerprint: { suspicious: true, score: 50 }, request: { ip: '1.1.1.1' }, timestamp: new Date() },
-                { id: '2', fingerprint: { suspicious: true, score: 90 }, request: { ip: '2.2.2.2' }, timestamp: new Date() },
-                { id: '3', fingerprint: { suspicious: false, score: 0 }, request: { ip: '3.3.3.3' }, timestamp: new Date() }
+                { id: '1', fingerprint: { suspicious: true, score: 50 }, request: { ip: '1.1.1.1' }, timestamp: new Date(now - 1000) },
+                { id: '2', fingerprint: { suspicious: true, score: 90 }, request: { ip: '2.2.2.2' }, timestamp: new Date(now) },
+                { id: '3', fingerprint: { suspicious: false, score: 0 }, request: { ip: '3.3.3.3' }, timestamp: new Date(now - 2000) }
             ]);
 
             const top = await service.getTopThreats(5);

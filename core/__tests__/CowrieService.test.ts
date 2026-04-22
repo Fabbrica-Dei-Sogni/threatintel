@@ -104,10 +104,22 @@ describe('CowrieService', () => {
     describe('getSessionDetails()', () => {
         it('should return session details by id', async () => {
             const mockSession = { session: 'xyz', src_ip: '1.1.1.1' };
-            const populateMock = jest.fn().mockReturnValue({
+            const leanMock = jest.fn().mockReturnValue({
                 exec: jest.fn().mockResolvedValue(mockSession)
             });
+            const populateMock = jest.fn().mockReturnValue({
+                lean: leanMock
+            });
             (CowrieSession.findOne as jest.Mock).mockReturnValue({ populate: populateMock });
+
+            // Mock per getSessionEvents (ritorniamo 1 evento per evitare il blocco scanner)
+            const eventLeanMock = jest.fn().mockReturnValue({
+                exec: jest.fn().mockResolvedValue([{ eventid: 'cowrie.session.connect' }])
+            });
+            (CowrieEvent.find as jest.Mock).mockReturnValue({ lean: eventLeanMock });
+            (CowrieAuth.find as jest.Mock).mockReturnValue({ lean: eventLeanMock });
+            (CowrieInput.find as jest.Mock).mockReturnValue({ lean: eventLeanMock });
+            (CowrieTtyLog.find as jest.Mock).mockReturnValue({ lean: eventLeanMock });
 
             const result = await cowrieService.getSessionDetails('xyz');
             expect(result).toEqual(mockSession);

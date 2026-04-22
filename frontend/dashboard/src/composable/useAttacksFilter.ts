@@ -19,11 +19,13 @@ export function useAttacksFilter(
     initialToValue: number,
     initialToUnit: string,
     initialSortFields: SortFields = null,
-    initialPageSize: number = 20
+    initialPageSize: number = 20,
+    initialDangerLevels: number[] = []
 ) {
     // Filtri specifici
     const filterIp = ref(initialIp);
     const filterProtocol = ref(initialProtocol);
+    const filterDangerLevels = ref<number[]>(initialDangerLevels);
     const minLogsForAttack = ref(initialMinLogsForAttack);
     const timeMode = ref(initialTimeMode);
     const agoValue = ref(initialAgoValue);
@@ -40,6 +42,7 @@ export function useAttacksFilter(
     const filterRefs = [
         filterIp,
         filterProtocol,
+        filterDangerLevels,
         minLogsForAttack,
         timeMode,
         agoValue,
@@ -81,6 +84,9 @@ export function useAttacksFilter(
         const filters: Record<string, string> = {};
         if (filterIp.value) filters['request.ip'] = filterIp.value;
         if (filterProtocol.value) filters['protocol'] = filterProtocol.value;
+        if (filterDangerLevels.value && filterDangerLevels.value.length > 0) {
+            filters['dangerLevel'] = filterDangerLevels.value.join(',');
+        }
 
         let timeConfig: TimeConfig = null;
         if (timeMode.value === 'ago') {
@@ -122,6 +128,7 @@ export function useAttacksFilter(
         attacks,
         filterIp,
         filterProtocol,
+        filterDangerLevels,
         sortFields,
         minLogsForAttack,
         page,

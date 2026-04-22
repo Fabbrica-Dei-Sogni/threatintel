@@ -157,6 +157,7 @@
         "filter_label": "TIMEFRAME",
         "filter_log_threshold_label": "SOGLIA LOG",
         "filter_score_label": "SOGLIA RISCHIO",
+        "filter_defcon_label": "LIVELLO DEFCON",
         "top_ranking": "CLASSIFICHE",
         "risk_level_info": "INFO (0+)",
         "risk_level_low": "BASSO (5+)",

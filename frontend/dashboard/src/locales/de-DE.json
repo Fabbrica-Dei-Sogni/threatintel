@@ -157,6 +157,7 @@
         "filter_label": "ZEITRAUM",
         "filter_log_threshold_label": "LOG-SCHWELLE",
         "filter_score_label": "RISIKOSCHWELLE",
+        "filter_defcon_label": "DEFCON-STUFE",
         "top_ranking": "RANGLISTEN",
         "risk_level_info": "INFO (0+)",
         "risk_level_low": "NIEDRIG (5+)",

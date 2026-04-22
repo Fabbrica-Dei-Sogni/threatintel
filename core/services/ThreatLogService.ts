@@ -188,7 +188,10 @@ export class ThreatLogService {
         sortFields = null
     }: any = {}) {
         const skip = (page - 1) * pageSize;
-        const mongoFilters = this.buildRegExpFilter(filters);
+        
+        // Estrai dangerLevel dai filtri prima di buildRegExpFilter per gestirlo manualmente post-aggregazione
+        const { dangerLevel, ...restFilters } = filters;
+        const mongoFilters = this.buildRegExpFilter(restFilters);
 
         // Costruisci sort dinamico
         const safeSort = sanitizeSortFields(sortFields, SortAllowedFields.attack, { lastSeen: -1 });
@@ -196,6 +199,28 @@ export class ThreatLogService {
 
         // Pipeline base costruita col nuovo Builder
         const basePipeline = await this.forensicPipelineService.buildStandardPipeline(mongoFilters, minLogsForAttack, timeConfig);
+
+        // Aggiungi filtro dangerLevel se presente (va fatto dopo ScoringStage che lo calcola)
+        if (dangerLevel) {
+            const levels = typeof dangerLevel === 'string' 
+                ? dangerLevel.split(',').map(l => parseInt(l.trim())).filter(l => !isNaN(l))
+                : [parseInt(dangerLevel)];
+            
+            if (levels.length > 0) {
+                basePipeline.push({ $match: { dangerLevel: { $in: levels } } });
+            }
+        }
+
+        // Aggiungi filtro dangerLevel se presente (va fatto dopo ScoringStage che lo calcola)
+        if (dangerLevel) {
+            const levels = typeof dangerLevel === 'string' 
+                ? dangerLevel.split(',').map(l => parseInt(l.trim())).filter(l => !isNaN(l))
+                : [parseInt(dangerLevel)];
+            
+            if (levels.length > 0) {
+                basePipeline.push({ $match: { dangerLevel: { $in: levels } } });
+            }
+        }
 
         // Unico aggregate con facet che restituisce dati e conteggio
         const pipeline = [

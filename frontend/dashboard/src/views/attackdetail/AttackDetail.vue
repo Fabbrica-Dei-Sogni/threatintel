@@ -201,12 +201,7 @@
                         <div v-for="log in paginatedLogs" :key="log._id || log.id" class="log-entry">
                             <div class="log-header" @click="toggleLog(log._id || log.id)">
                                 <div class="log-info-main">
-                                    <!-- <DefconIndicator 
-                                        :level="getDefconLevel(log.fingerprint.score)" 
-                                        :dangerScore="log.fingerprint.score" 
-                                        mode="dot" 
-                                        class="log-severity-indicator"
-                                    /> -->
+
                                     <span>{{ formatDateTime(log.timestamp) }}</span>
                                     <span class="log-method-url">
                                         <span class="method-badge">{{ log.request.method }}</span>
@@ -497,26 +492,7 @@ watch(
     }
 );
 
-// Helper for Defcon Level mapping
-/*
-function getDefconLevel(score) {
-    if (score == null) return 5;
-    if (score >= 9) return 1;
-    if (score >= 7) return 2;
-    if (score >= 4) return 3;
-    if (score >= 1) return 4;
-    return 5;
-}
 
-function getDefconClass(level) {
-    const numericLevel = parseInt(level, 10);
-    if (numericLevel <= 1) return 'defcon-critical';
-    if (numericLevel === 2) return 'defcon-high';
-    if (numericLevel === 3) return 'defcon-medium';
-    if (numericLevel === 4) return 'defcon-low';
-    return 'defcon-normal';
-}
-*/
 
 function setLogTab(id, tab) {
     activeLogTabs[id] = tab

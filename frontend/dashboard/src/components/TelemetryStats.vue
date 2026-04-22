@@ -143,7 +143,7 @@ import { computed, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useStats } from '../composable/useStats';
 import CountryFlag from './CountryFlag.vue';
-import DefconIndicator from './DefconIndicator.vue';
+
 import IntelRanking from './common/IntelRanking.vue';
 import './TelemetryStatsCyber.css';
 import './TelemetryStatsClassic.css';

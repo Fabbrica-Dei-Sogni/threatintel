@@ -646,6 +646,13 @@ li > a:last-child:hover {
   line-height: 1.5;
 }
 
+/* Defcon Filter Buttons */
+.defcon-btn-1.active { background: #ffffff !important; color: #b71c1c !important; box-shadow: 0 0 10px rgba(255, 255, 255, 0.5) !important; font-weight: 800; }
+.defcon-btn-2.active { background: #e53935 !important; color: #fff !important; box-shadow: 0 0 10px rgba(229, 57, 53, 0.5) !important; }
+.defcon-btn-3.active { background: #fdd835 !important; color: #000 !important; box-shadow: 0 0 10px rgba(253, 216, 53, 0.5) !important; }
+.defcon-btn-4.active { background: #43a047 !important; color: #fff !important; box-shadow: 0 0 10px rgba(67, 160, 71, 0.5) !important; }
+.defcon-btn-5.active { background: #1e88e5 !important; color: #fff !important; box-shadow: 0 0 10px rgba(30, 136, 229, 0.5) !important; }
+
 /* Responsive Unificato */
 @media (max-width: 1300px) {
   .primary-intel {

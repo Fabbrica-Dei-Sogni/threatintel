@@ -28,7 +28,8 @@ const DOSSIER_SORT_FIELDS = new Set([
  */
 const THREAT_LOG_FILTER_FIELDS = new Set([
     'request.ip', 'request.url', 'request.method', 'request.userAgent',
-    'fingerprint.suspicious', 'fingerprint.score', 'protocol', 'timestamp'
+    'fingerprint.suspicious', 'fingerprint.score', 'protocol', 'timestamp',
+    'dangerLevel'
 ]);
 
 const COWRIE_SESSION_FILTER_FIELDS = new Set([

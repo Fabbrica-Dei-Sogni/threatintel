@@ -157,6 +157,7 @@
         "filter_label": "TIMEFRAME",
         "filter_log_threshold_label": "LOG THRESHOLD",
         "filter_score_label": "RISK THRESHOLD",
+        "filter_defcon_label": "DEFCON LEVEL",
         "top_ranking": "RANKINGS",
         "risk_level_info": "INFO (0+)",
         "risk_level_low": "LOW (5+)",

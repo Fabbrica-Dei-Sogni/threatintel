@@ -157,6 +157,7 @@
         "filter_label": "OKRES CZASU",
         "filter_log_threshold_label": "PRÓG LOGÓW",
         "filter_score_label": "PRÓG RYZYKA",
+        "filter_defcon_label": "POZIOM DEFCON",
         "top_ranking": "RANKINGI",
         "risk_level_info": "INFO (0+)",
         "risk_level_low": "NISKI (5+)",

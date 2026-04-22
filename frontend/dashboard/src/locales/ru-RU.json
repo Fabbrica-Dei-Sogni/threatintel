@@ -157,6 +157,7 @@
         "filter_label": "ВРЕМЕННОЙ ИНТЕРВАЛ",
         "filter_log_threshold_label": "ПОРОГ ЛОГОВ",
         "filter_score_label": "ПОРОГ РИСКА",
+        "filter_defcon_label": "УРОВЕНЬ DEFCON",
         "top_ranking": "РЕЙТИНГИ",
         "risk_level_info": "ИНФО (0+)",
         "risk_level_low": "НИЗКИЙ (5+)",

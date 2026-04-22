@@ -96,6 +96,22 @@
                             </button>
                           </div>
                         </div>
+
+                        <!-- Defcon Level (Multi-select) -->
+                        <div class="filter-item">
+                          <span class="filter-label">{{ t('telemetry.filter_defcon_label') }}: <span class="active-val">{{ filterDangerLevels.length === 0 ? t('common.all').toUpperCase() : filterDangerLevels.sort().join(',') }}</span></span>
+                          <div class="tabs-row log-threshold-tabs">
+                            <button 
+                              v-for="lvl in [1, 2, 3, 4, 5]" 
+                              :key="lvl"
+                              class="tab-btn"
+                              :class="['defcon-btn-' + lvl, { active: filterDangerLevels.includes(lvl) }]"
+                              @click="toggleDefconLevel(lvl)"
+                            >
+                              {{ lvl }}
+                            </button>
+                          </div>
+                        </div>
                       </div>
                     </template>
 
@@ -442,6 +458,7 @@ const attackTimeUnit = ref('days');
 // Anomalie - chiamata base: ora include parametri dinamici per log e tempo
 const {
   attacks,
+  filterDangerLevels,
   loading: loadingAttacks,
   error: errorAttacks,
   page: attackPage,
@@ -449,6 +466,17 @@ const {
   total: attackTotal,
   fetchData: fetchAttacks
 } = useAttacksFilter('', selectedAttackProtocol, 1, attackMinLogs, 'ago', attackTimeValue, attackTimeUnit, null, 60, 'days', 0, 'days', { firstSeen: -1 }, 10)
+
+const toggleDefconLevel = (lvl) => {
+  const current = [...filterDangerLevels.value];
+  const index = current.indexOf(lvl);
+  if (index === -1) {
+    current.push(lvl);
+  } else {
+    current.splice(index, 1);
+  }
+  filterDangerLevels.value = current;
+};
 
 const recentAttacks = computed(() => attacks.value)
 

@@ -92,8 +92,8 @@
   transition: all 0.3s ease;
 }
 
-.extra-content-wrapper :deep(.map-container),
-.extra-content-wrapper :deep(.attack-map) {
+.extra-content-wrapper .map-container,
+.extra-content-wrapper .attack-map {
   height: 300px !important;
   width: 100% !important;
 }
@@ -110,7 +110,8 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  min-height: 0;
+  min-height: 120px;
+  position: relative;
 }
 
 .ranking-list {
@@ -273,11 +274,21 @@
 }
 
 .ranking-loading {
-  color: #3672ff;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(10, 14, 23, 0.75);
+  backdrop-filter: blur(4px);
+  z-index: 100;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
+  justify-content: center;
+  gap: 15px;
+  border-radius: 0 0 8px 8px;
+  color: #00ffff;
 }
 
 .loader-pulse {
@@ -385,7 +396,7 @@
 
 
 .filters-bar {
-  padding: 8px 20px;
+  padding: 12px 20px;
   background: rgba(0, 0, 0, 0.2);
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   margin-bottom: 8px;
@@ -412,20 +423,17 @@
 .filters-row {
   display: flex;
   align-items: center;
-  gap: 24px;
-  flex-wrap: nowrap;
-  overflow-x: auto; /* Allow horizontal scroll if many filters */
-  scrollbar-width: none; /* Hide scrollbar for cleaner look */
-}
-
-.filters-row::-webkit-scrollbar {
-  display: none;
+  gap: 20px;
+  flex-wrap: wrap;
+  padding-bottom: 5px;
 }
 
 .filter-item {
   display: flex;
   align-items: center;
   gap: 10px;
+  flex-shrink: 0;
+  margin-bottom: 10px;
 }
 
 .intel-ranking-widget .filter-label {

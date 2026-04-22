@@ -2,7 +2,7 @@
     <div class="defcon-wrapper" :title="`Danger Score: ${dangerScore}`">
         <!-- MODE: BAR -->
         <div v-if="mode === 'bar'" class="defcon-bar-container">
-            <div class="defcon-bar-fill" :style="{ width: calculateDefconPercentage(level) + '%' }"
+            <div class="defcon-bar-fill" :style="{ width: calculateDefconPercentage(level, dangerScore) + '%' }"
                 :class="getDefconClass(level)">
                 <span class="defcon-level-text">L{{ level }}</span>
             </div>
@@ -43,11 +43,19 @@ const props = defineProps({
     }
 });
 
-function calculateDefconPercentage(level) {
+function calculateDefconPercentage(level, score) {
+    // Se abbiamo il punteggio reale (0-100), usiamolo per la massima precisione
+    if (score !== undefined && score !== null) {
+        return Math.min(Math.max(parseFloat(score), 0), 100);
+    }
+
+    // Fallback sulla logica a scatti per livelli (1-5)
     const numericLevel = parseInt(level, 10);
     const minLevel = 1;
     const maxLevel = 5;
     if (isNaN(numericLevel) || numericLevel < minLevel || numericLevel > maxLevel) return 0;
+    
+    // Invertiamo: 1 è 100%, 5 è 0% (o molto basso)
     return ((maxLevel - numericLevel) / (maxLevel - minLevel)) * 100;
 }
 

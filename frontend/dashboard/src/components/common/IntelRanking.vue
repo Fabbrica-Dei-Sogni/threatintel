@@ -204,10 +204,7 @@ watch(internalLimit, (newLimit) => {
 </script>
 
 <style scoped src="./IntelRanking.css"></style>
-
-<style scoped src="./IntelRanking.css"></style>
-
-<style scoped src="./IntelRanking.css"></style>
+<style src="./IntelRanking.css"></style>
 
 <!-- Surgical fix for Slot Content (More info button) -->
 <style scoped>
@@ -264,4 +261,4 @@ watch(internalLimit, (newLimit) => {
 }
 </style>
 
-<style src="./IntelRanking.css"></style>
+

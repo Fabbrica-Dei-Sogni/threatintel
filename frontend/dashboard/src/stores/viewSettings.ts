@@ -10,13 +10,6 @@ export const useViewSettingsStore = defineStore('viewSettings', () => {
     const attacksShowMap = ref<boolean>(savedSettings.attacksShowMap ?? false);
     const attacksShowChart = ref<boolean>(savedSettings.attacksShowChart ?? true);
 
-    // Threat Logs View
-    const logsShowChart = ref<boolean>(savedSettings.logsShowChart ?? true);
-
-    // Cowrie Sessions View
-    const sessionsShowMap = ref<boolean>(savedSettings.sessionsShowMap ?? false);
-    const sessionsShowChart = ref<boolean>(savedSettings.sessionsShowChart ?? true);
-
     // Home Dashboard (Persistent Maps & Skin)
     const homeShowAttackMap = ref<boolean>(savedSettings.homeShowAttackMap ?? false);
     const homeShowSessionsMap = ref<boolean>(savedSettings.homeShowSessionsMap ?? false);
@@ -37,7 +30,7 @@ export const useViewSettingsStore = defineStore('viewSettings', () => {
     // Salvataggio automatico centralizzato
     watch(
         [
-            attacksShowMap, attacksShowChart, logsShowChart, sessionsShowMap, sessionsShowChart, 
+            attacksShowMap, attacksShowChart,
             homeShowAttackMap, homeShowSessionsMap, dashboardSkin, userLocale, activeWidgets,
             telemetryTimeframe, telemetryScore, telemetryLevel, telemetryTop, telemetryMinLogs
         ],
@@ -45,9 +38,6 @@ export const useViewSettingsStore = defineStore('viewSettings', () => {
             const settings = {
                 attacksShowMap: attacksShowMap.value,
                 attacksShowChart: attacksShowChart.value,
-                logsShowChart: logsShowChart.value,
-                sessionsShowMap: sessionsShowMap.value,
-                sessionsShowChart: sessionsShowChart.value,
                 homeShowAttackMap: homeShowAttackMap.value,
                 homeShowSessionsMap: homeShowSessionsMap.value,
                 dashboardSkin: dashboardSkin.value,
@@ -67,9 +57,6 @@ export const useViewSettingsStore = defineStore('viewSettings', () => {
     return {
         attacksShowMap,
         attacksShowChart,
-        logsShowChart,
-        sessionsShowMap,
-        sessionsShowChart,
         homeShowAttackMap,
         homeShowSessionsMap,
         dashboardSkin,
@@ -82,3 +69,4 @@ export const useViewSettingsStore = defineStore('viewSettings', () => {
         telemetryMinLogs
     };
 });
+

@@ -15,6 +15,13 @@
             <div class="view-controls">
                 <ViewToggle v-model="showMap" :label="$t('common.showMap')" theme="jade" />
                 <ViewToggle v-model="showChart" :label="$t('common.showChart')" theme="jade" />
+                <!-- Reset Button -->
+                <button class="reset-btn-mini reset-view-control" @click="handleReset" :title="$t('telemetry.reset_filters')">
+                    <div class="reset-ascii">
+                        <span></span>
+                        <span></span>
+                    </div>
+                </button>
             </div>
         </div>
 
@@ -204,7 +211,7 @@
 </template>
 
 <script setup>
-import { onMounted, watch, ref, computed, nextTick, onUnmounted } from 'vue';
+import { onMounted, watch, ref, computed, nextTick, onUnmounted, toRef } from 'vue';
 import { useRouter } from 'vue-router';
 import dayjs from 'dayjs';
 import { useI18n } from '../../composable/useI18n';
@@ -232,9 +239,15 @@ const { copyToClipboard, copyFormatted } = useClipboard();
 const router = useRouter();
 
 import { useViewSettingsStore } from '../../stores/viewSettings';
+import { useCowrieSessionsStore } from '../../stores/cowriesessions';
 import { storeToRefs } from 'pinia';
 const viewStore = useViewSettingsStore();
-const { dashboardSkin, sessionsShowMap: showMap, sessionsShowChart: showChart } = storeToRefs(viewStore);
+const cowrieStore = useCowrieSessionsStore();
+const { state: cowrieState } = cowrieStore;
+
+const { dashboardSkin } = storeToRefs(viewStore);
+const showMap = toRef(cowrieState.view, 'showMap');
+const showChart = toRef(cowrieState.view, 'showChart');
 const topScrollRef = ref(null);
 const tableScrollRef = ref(null);
 const tableRef = ref(null);
@@ -290,6 +303,15 @@ function toggleMap() {
     showMap.value = !showMap.value;
 }
 
+// Sincronizzazione Props -> Store (Priorità all'URL)
+onMounted(() => {
+  if (props.initialIp !== undefined) cowrieState.filters.ip = props.initialIp || '';
+  if (props.initialCategory !== undefined) cowrieState.filters.category = props.initialCategory || 'interaction';
+  if (props.initialPage !== undefined) cowrieState.pagination.page = props.initialPage || 1;
+  if (props.initialPageSize !== undefined) cowrieState.pagination.pageSize = props.initialPageSize || 20;
+  if (props.initialSortFields !== undefined) cowrieState.sort.fields = props.initialSortFields || { starttime: -1 };
+});
+
 const {
     sessions,
     page,
@@ -305,11 +327,11 @@ const {
     toggleSort,
     getSortDirection
 } = useCowrieSessions(
-    props.initialPage,
-    props.initialPageSize,
-    props.initialSortFields,
-    props.initialIp,
-    props.initialCategory
+    toRef(cowrieState.pagination, 'page'),
+    toRef(cowrieState.pagination, 'pageSize'),
+    toRef(cowrieState.sort, 'fields'),
+    toRef(cowrieState.filters, 'ip'),
+    toRef(cowrieState.filters, 'category')
 );
 
 
@@ -412,6 +434,13 @@ function goToInputPage() {
     changePage(targetPage);
 }
 
+const handleReset = () => {
+  cowrieStore.resetToDefaults();
+  nextTick(() => {
+    fetchData();
+  });
+};
+
 onMounted(() => {
     if (topScrollRef.value && tableScrollRef.value) {
         topScrollRef.value.addEventListener('scroll', handleTopScroll);
@@ -438,4 +467,79 @@ watch(() => sessions.value, () => {
 <style scoped src="./CowrieSessions.css"></style>
 <style scoped>
 @import "./CowrieSessionsCyber.css";
+
+/* Stunning Cyber-Red Reset Button with ASCII Lines */
+.reset-btn-mini {
+    background: transparent;
+    border: 1px solid rgba(255, 51, 102, 0.4);
+    color: #ff3366;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    clip-path: polygon(15% 0%, 100% 0, 100% 85%, 85% 100%, 0 100%, 0% 15%);
+    padding: 0;
+    overflow: hidden;
+}
+
+.reset-ascii {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+.reset-ascii span {
+    display: block;
+    width: 12px;
+    height: 2px;
+    background: #ff3366;
+    box-shadow: 0 0 5px rgba(255, 51, 102, 0.6);
+    transition: all 0.3s ease;
+}
+
+.reset-ascii span:nth-child(1) { transform: translateX(-3px); }
+.reset-ascii span:nth-child(2) { transform: translateX(3px); }
+
+.reset-btn-mini:hover {
+    background: rgba(255, 51, 102, 0.1);
+    border-color: #ff3366;
+    box-shadow: 0 0 15px rgba(255, 51, 102, 0.4);
+}
+
+.reset-btn-mini:hover .reset-ascii { transform: rotate(180deg); }
+
+.reset-btn-mini:hover .reset-ascii span {
+    transform: translateX(0);
+    background: #fff;
+    box-shadow: 0 0 10px #fff;
+    width: 14px;
+}
+
+.reset-btn-mini:active {
+    transform: scale(0.8);
+    background: #ff3366;
+}
+
+.view-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.reset-view-control {
+    margin-left: 15px;
+}
+
+/* Tooltip alignment for view controls */
+.reset-view-control[data-noc-tooltip]::after {
+    left: auto !important;
+    right: calc(100% + 10px) !important;
+}
 </style>
+

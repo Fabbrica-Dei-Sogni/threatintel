@@ -8,6 +8,8 @@ export enum StorageNamespace {
     SETTINGS = 'hp_settings',
     DASHBOARD = 'hp_dashboard',
     ATTACKS = 'hp_attacks',
+    THREAT_LOGS = 'hp_threatlogs',
+    COWRIE_SESSIONS = 'hp_cowrie_sessions',
     API = 'hp_api'
 }
 

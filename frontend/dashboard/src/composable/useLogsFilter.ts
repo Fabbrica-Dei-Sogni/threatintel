@@ -17,8 +17,8 @@ export function useLogsFilter(
     initialUrl: string | Ref<string> = '',
     initialProtocol: string | Ref<string> = 'http',
     initialPage: number | Ref<number> = 1,
-    initialSortFields: SortFields | null = null,
-    initialPageSize: number = 20
+    initialSortFields: SortFields | Ref<SortFields> | null = null,
+    initialPageSize: number | Ref<number> = 20
 ) {
     // Filtri specifici - Normalizzati come Ref
     const filterIp = toRef(initialIp);
@@ -43,7 +43,8 @@ export function useLogsFilter(
         initialPage,
         initialPageSize,
         initialSortFields: initialSortFields ?? { timestamp: -1 },
-        filterRefs: [filterIp, filterUrl, filterProtocol]
+        filterRefs: [filterIp, filterUrl, filterProtocol],
+        routeName: 'ThreatLogs'
     });
 
     async function fetchData(): Promise<void> {

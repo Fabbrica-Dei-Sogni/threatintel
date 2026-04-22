@@ -13,8 +13,8 @@ function toRef<T>(val: T | Ref<T>): Ref<T> {
 
 export function useCowrieSessions(
     initialPage: number | Ref<number> = 1,
-    initialPageSize: number = 20,
-    initialSortFields: any = {},
+    initialPageSize: number | Ref<number> = 20,
+    initialSortFields: any | Ref<any> = {},
     initialIp: string | Ref<string> = '',
     initialCategory: string | Ref<string> = 'interaction'
 ) {
@@ -40,7 +40,8 @@ export function useCowrieSessions(
         initialPage,
         initialPageSize,
         initialSortFields: initialSortFields || { starttime: -1 },
-        filterRefs: [filterIp, filterCategory]
+        filterRefs: [filterIp, filterCategory],
+        routeName: 'CowrieSessions'
     });
 
     async function fetchData(): Promise<void> {

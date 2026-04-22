@@ -19,6 +19,13 @@
       </div>
       <div class="view-controls">
         <ViewToggle v-model="showChart" :label="t('common.showChart')" theme="amber" />
+        <!-- Reset Button -->
+        <button class="reset-btn-mini reset-view-control" @click="handleReset" :title="t('telemetry.reset_filters')">
+          <div class="reset-ascii">
+            <span></span>
+            <span></span>
+          </div>
+        </button>
       </div>
     </div>
 
@@ -203,7 +210,7 @@
 </template>
 
 <script setup>
-import { computed, watch, ref, onMounted, onUnmounted, nextTick } from 'vue';
+import { computed, watch, ref, onMounted, onUnmounted, nextTick, toRef } from 'vue';
 import { useRouter } from 'vue-router';
 import { useLogsFilter } from '../../composable/useLogsFilter';
 import { useClipboard } from '../../composable/useClipboard';
@@ -231,6 +238,20 @@ const props = defineProps({
 });
 
 // State
+import { useThreatLogsStore } from '../../stores/threatlogs';
+
+const threatLogsStore = useThreatLogsStore();
+const { state: logsState } = threatLogsStore;
+
+// Sincronizzazione Props -> Store (Priorità all'URL)
+onMounted(() => {
+  if (props.initialIp !== undefined) logsState.filters.ip = props.initialIp || '';
+  if (props.initialUrl !== undefined) logsState.filters.url = props.initialUrl || '';
+  if (props.initialProtocol !== undefined) logsState.filters.protocol = props.initialProtocol || 'http';
+  if (props.initialPage !== undefined) logsState.pagination.page = props.initialPage || 1;
+  if (props.initialSortFields !== undefined) logsState.sort.fields = props.initialSortFields || { timestamp: -1 };
+});
+
 const {
   filterIp,
   filterUrl,
@@ -246,7 +267,14 @@ const {
   onFilterChanged,
   toggleSort,
   getSortDirection
-} = useLogsFilter(props.initialIp, props.initialUrl, props.initialProtocol, props.initialPage, props.initialSortFields);
+} = useLogsFilter(
+  toRef(logsState.filters, 'ip'),
+  toRef(logsState.filters, 'url'),
+  toRef(logsState.filters, 'protocol'),
+  toRef(logsState.pagination, 'page'),
+  toRef(logsState.sort, 'fields'),
+  toRef(logsState.pagination, 'pageSize')
+);
 
 const totalPages = computed(() => Math.ceil(total.value / pageSize.value) || 1);
 const previousPageBeforeIpFilter = ref(null);
@@ -254,7 +282,8 @@ const previousPageBeforeIpFilter = ref(null);
 import { useViewSettingsStore } from '../../stores/viewSettings';
 import { storeToRefs } from 'pinia';
 const viewStore = useViewSettingsStore();
-const { logsShowChart: showChart, dashboardSkin } = storeToRefs(viewStore);
+const { dashboardSkin } = storeToRefs(viewStore);
+const showChart = toRef(logsState.view, 'showChart');
 const inputPage = ref(page.value);
 
 // Dual Scrollbar Sync Support
@@ -394,10 +423,92 @@ function changePage(newPage) {
   }
 }
 
+const handleReset = () => {
+  threatLogsStore.resetToDefaults();
+  nextTick(() => {
+    fetchData();
+  });
+};
+
 // Fetch iniziale rimosso in favore del watcher immediato nel composable
 </script>
 
 <style scoped src="./ThreatLogs.css"></style>
 <style scoped>
 @import "./ThreatLogsCyber.css";
+
+/* Stunning Cyber-Red Reset Button with ASCII Lines */
+.reset-btn-mini {
+    background: transparent;
+    border: 1px solid rgba(255, 51, 102, 0.4);
+    color: #ff3366;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    clip-path: polygon(15% 0%, 100% 0, 100% 85%, 85% 100%, 0 100%, 0% 15%);
+    padding: 0;
+    overflow: hidden;
+}
+
+.reset-ascii {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+.reset-ascii span {
+    display: block;
+    width: 12px;
+    height: 2px;
+    background: #ff3366;
+    box-shadow: 0 0 5px rgba(255, 51, 102, 0.6);
+    transition: all 0.3s ease;
+}
+
+.reset-ascii span:nth-child(1) { transform: translateX(-3px); }
+.reset-ascii span:nth-child(2) { transform: translateX(3px); }
+
+.reset-btn-mini:hover {
+    background: rgba(255, 51, 102, 0.1);
+    border-color: #ff3366;
+    box-shadow: 0 0 15px rgba(255, 51, 102, 0.4);
+}
+
+.reset-btn-mini:hover .reset-ascii { transform: rotate(180deg); }
+
+.reset-btn-mini:hover .reset-ascii span {
+    transform: translateX(0);
+    background: #fff;
+    box-shadow: 0 0 10px #fff;
+    width: 14px;
+}
+
+.reset-btn-mini:active {
+    transform: scale(0.8);
+    background: #ff3366;
+}
+
+.view-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.reset-view-control {
+    margin-left: 15px;
+}
+
+/* Tooltip alignment for view controls */
+.reset-view-control[data-noc-tooltip]::after {
+    left: auto !important;
+    right: calc(100% + 10px) !important;
+}
 </style>
+

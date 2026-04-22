@@ -607,7 +607,7 @@ watch(() => attacks.value, () => {
 }
 
 .reset-view-control {
-    margin-left: 10px;
+    margin-left: 15px;
 }
 
 /* === FILTERS LAYOUT REFINEMENT === */

@@ -351,41 +351,65 @@
                 </div>
 
                 <!-- DOSSIERS -->
-                <div v-if="widget === 'dossiers'" class="primary-intel">
-                  <div class="list-side glass-card full-width-widget dossier-ranking">
-                    <div class="scanning-line"></div>
-                    <div class="widget-header">
-                      <div class="title-content">
-                        <h3>{{ $t('home.recentDossiers').toUpperCase() }}</h3>
-                        <div class="title-meta">
-                          <div class="ranking-header-actions">
-                            <button class="btn-ranking-action" @click="goToArchive">
-                              {{ t('common.more_info') }}
-                            </button>
+                <div v-if="widget === 'dossiers'" class="intel-ranking-container">
+                  <IntelRanking
+                    v-if="authStore.isAuthenticated"
+                    :title="$t('home.recentDossiers')"
+                    :items="recentDossiers"
+                    :loading="loadingDossiers"
+                    :error="errorDossiers"
+                    :pageSize="5"
+                    :showRank="false"
+                    itemStyle="dossier-ranking"
+                  >
+                    <template #title-meta>
+                      <div class="ranking-header-actions">
+                        <button class="btn-ranking-action" @click="goToArchive">
+                          {{ t('common.more_info') }}
+                        </button>
+                      </div>
+                    </template>
+
+                    <template #item="{ item }">
+                      <!-- Origin Col -->
+                      <div class="item-col item-col-origin">
+                        <div class="indicator-group" :data-noc-tooltip="`Status: ${item.status}\nID: ${item._id}`">
+                          <span class="status-dot-mini" :class="item.status.toLowerCase()"></span>
+                          <span class="badge-icon">📂</span>
+                        </div>
+                      </div>
+
+                      <!-- Subject Col -->
+                      <div class="item-col item-col-subject">
+                        <span class="subject-link" @click="router.push(`/dossiers/${item._id}`)">{{ item.title }}</span>
+                      </div>
+
+                      <!-- Forensics Col -->
+                      <div class="item-col item-col-forensics">
+                        <div class="time-row">
+                          <span class="date-part">{{ formatDateOnly(item.createdAt) }}</span>
+                          <span class="time-part">{{ formatTimeOnly(item.createdAt) }}</span>
+                        </div>
+                      </div>
+
+                      <!-- Metrics Col -->
+                      <div class="item-col item-col-metrics">
+                        <div class="activity-badge">
+                          <div class="badge-content" :data-noc-tooltip="t('common.sections')">
+                            <span class="badge-icon">📑</span>
+                            <span class="badge-value">{{ item.sections?.length || 0 }}</span>
                           </div>
                         </div>
                       </div>
+                    </template>
+                  </IntelRanking>
+
+                  <!-- Restricted View (Anonymous) -->
+                  <div v-else class="glass-card">
+                    <div class="widget-header">
+                      <h3>{{ $t('home.recentDossiers').toUpperCase() }}</h3>
                     </div>
-
-                    <!-- Authenticated View -->
-                    <ul v-if="authStore.isAuthenticated" class="scroll-list">
-                      <li v-for="dossier in recentDossiers" :key="dossier._id" class="dossier-item">
-                        <div class="indicator-group" :data-noc-tooltip="`Dossier: ${dossier.title}\nID: ${dossier._id}`">
-                            <span class="status-dot-mini" :class="dossier.status.toLowerCase()"></span>
-                        </div>
-                        <span class="dossier-title-link" @click="router.push(`/dossiers/${dossier._id}`)">{{ dossier.title }}</span>
-                        <div class="column-spacer"></div>
-                        <div class="dossier-info">
-                            <span class="badge-mini">{{ dossier.sections?.length || 0 }} {{ t('common.sections') }}</span>
-                            <span class="timestamp-mini">{{ formatDateTime(dossier.createdAt) }}</span>
-                        </div>
-                      </li>
-                    </ul>
-
-                    <!-- Restricted View (Anonymous) -->
-                    <RestrictedIntelligenceGate v-else />
-                    <div v-if="loadingDossiers" class="loading">{{ $t('home.loadingDossiers') }}</div>
-                    <div v-if="errorDossiers" class="error">{{ $t('home.errorLoadingDossiers') }}</div>
+                    <RestrictedIntelligenceGate />
                   </div>
                 </div>
               </div>
@@ -678,6 +702,32 @@ watch(() => dashboardState.rankings, (newRankings, oldRankings) => {
 }
 .reset-ascii span:nth-child(2) {
     transform: translateX(3px);
+}
+
+.status-dot-mini.archived {
+  background: #64748b;
+}
+
+.subject-link {
+  color: var(--theme-primary, #5FA5FF);
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: block;
+  width: 100%;
+}
+
+.subject-link:hover {
+  text-decoration: underline;
+  filter: brightness(1.2);
+}
+
+.skin-cyber .subject-link {
+  color: var(--neon-cyan);
+  text-shadow: 0 0 5px rgba(0, 255, 255, 0.3);
 }
 
 .reset-btn-mini:hover {

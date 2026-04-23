@@ -811,31 +811,6 @@ li > a:last-child:hover {
 }
 
 /* Forensic & Dossier Archive Styles */
-.full-width-widget {
-  flex: 1 !important;
-  max-width: 100%;
-}
-
-.dossier-item {
-  cursor: default;
-}
-
-.dossier-title-link {
-  color: #818cf8;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  flex: 0 0 300px !important;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.dossier-title-link:hover {
-  color: #c084fc;
-  text-decoration: underline;
-}
-
 .status-dot-mini {
   width: 8px;
   height: 8px;
@@ -854,42 +829,6 @@ li > a:last-child:hover {
 
 .status-dot-mini.archived {
   background: #64748b;
-}
-
-.dossier-info {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  flex: 0 0 250px !important;
-  justify-content: flex-end;
-}
-
-.badge-mini {
-  font-size: 0.7rem;
-  background: rgba(99, 102, 241, 0.15);
-  color: #a5b4fc;
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-weight: 700;
-  border: 1px solid rgba(99, 102, 241, 0.2);
-}
-
-.timestamp-mini {
-  font-size: 0.75rem;
-  color: #64748b;
-  font-family: 'JetBrains Mono', monospace;
-}
-
-@media (max-width: 1000px) {
-  .dossier-title-link {
-    flex: 1 !important;
-  }
-  .dossier-info {
-    flex: 0 0 auto !important;
-  }
-  .timestamp-mini {
-    display: none;
-  }
 }
 
 /* Mobile Fix for Header Overflow */

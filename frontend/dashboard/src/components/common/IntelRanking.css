@@ -311,6 +311,10 @@
   --ranking-highlight: var(--theme-accent, #ff3366);
 }
 
+.dossier-ranking {
+  --ranking-accent: #ffb300; /* Amber Spy Style */
+}
+
 .skin-cyber .title-content h3,
 .skin-classic .title-content h3 {
   color: var(--ranking-accent);

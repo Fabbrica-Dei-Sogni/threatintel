@@ -379,6 +379,7 @@ export class ThreatLogService {
             );
 
             const oldAnalysis = logEntry.fingerprint;
+            const newHash = this.patternAnalysisService.generateFingerprint(logEntry.request);
 
             return {
                 logId: logEntry._id,
@@ -387,16 +388,19 @@ export class ThreatLogService {
                 userAgent: logEntry.request.userAgent,
                 comparison: {
                     old: {
+                        hash: oldAnalysis.hash,
                         suspicious: oldAnalysis.suspicious,
                         score: oldAnalysis.score,
                         indicators: oldAnalysis.indicators
                     },
                     new: {
+                        hash: newHash,
                         suspicious: newAnalysis.suspicious,
                         score: newAnalysis.score,
                         indicators: newAnalysis.indicators
                     },
                     hasChanges:
+                        oldAnalysis.hash !== newHash ||
                         oldAnalysis.suspicious !== newAnalysis.suspicious ||
                         oldAnalysis.score !== newAnalysis.score ||
                         JSON.stringify(oldAnalysis.indicators) !== JSON.stringify(newAnalysis.indicators)
@@ -492,7 +496,10 @@ export class ThreatLogService {
 
                             // Confronta con l'analisi esistente per vedere se ci sono cambiamenti
                             const oldAnalysis = logEntry.fingerprint;
+                            const newHash = this.patternAnalysisService.generateFingerprint(logEntry.request);
+                            
                             const hasChanges =
+                                oldAnalysis.hash !== newHash ||
                                 oldAnalysis.suspicious !== newAnalysis.suspicious ||
                                 oldAnalysis.score !== newAnalysis.score ||
                                 JSON.stringify(oldAnalysis.indicators) !== JSON.stringify(newAnalysis.indicators);
@@ -502,6 +509,7 @@ export class ThreatLogService {
                             // Se ci sono cambiamenti e updateDatabase è true, aggiorna il database
                             if (hasChanges && updateDatabase) {
                                 await ThreatLog.findByIdAndUpdate(logEntry._id, {
+                                    'fingerprint.hash': newHash,
                                     'fingerprint.suspicious': newAnalysis.suspicious,
                                     'fingerprint.score': newAnalysis.score,
                                     'fingerprint.indicators': newAnalysis.indicators,
@@ -513,6 +521,8 @@ export class ThreatLogService {
                                     status: 'updated',
                                     id: logEntry._id,
                                     changes: {
+                                        oldHash: oldAnalysis.hash,
+                                        newHash: newHash,
                                         oldScore: oldAnalysis.score,
                                         newScore: newAnalysis.score,
                                         oldSuspicious: oldAnalysis.suspicious,

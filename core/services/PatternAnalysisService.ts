@@ -144,17 +144,30 @@ export class PatternAnalysisService {
         };
     }
 
-    generateFingerprint(req: Request, ip: string) {
-        const fingerprint = {
-            ip: ip,
-            userAgent: req.get('User-Agent'),
-            acceptLanguage: req.get('Accept-Language'),
-            acceptEncoding: req.get('Accept-Encoding')
+    generateFingerprint(req: any, ip?: string) {
+        // Compose the attack signature tokens
+        // We exclude the IP to allow correlation of distributed attacks
+        
+        // Support both Express Request (req.get) and plain log objects (req.headers/userAgent)
+        const getHeader = (name: string) => {
+            if (typeof req.get === 'function') return req.get(name);
+            if (req.headers) return req.headers[name.toLowerCase()];
+            return null;
+        };
+
+        const signatureTokens = {
+            method: (req.method || 'GET').toUpperCase(),
+            url: (req.originalUrl || req.url || '/'),
+            userAgent: (req.userAgent || getHeader('User-Agent') || 'none'),
+            acceptLanguage: getHeader('Accept-Language') || 'none',
+            // Normalize body to avoid hash changes on whitespace/order if possible
+            body: req.body && Object.keys(req.body).length > 0 ? JSON.stringify(req.body) : 'none',
+            contentType: getHeader('Content-Type') || 'none'
         };
 
         const hash = crypto
             .createHash('md5')
-            .update(JSON.stringify(fingerprint))
+            .update(JSON.stringify(signatureTokens))
             .digest('hex');
 
         return hash;

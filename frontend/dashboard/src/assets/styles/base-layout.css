@@ -225,3 +225,54 @@
 .cyber-table tr:hover td {
     background-color: var(--theme-border);
 }
+
+/* === ELEMENT PLUS MESSAGE (TOASTS) HUD STYLE === */
+.el-message {
+    background: rgba(10, 15, 25, 0.9) !important;
+    backdrop-filter: blur(12px) !important;
+    border: 1px solid var(--theme-border) !important;
+    border-radius: 4px !important;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.7), 0 0 10px rgba(var(--theme-primary-rgb), 0.1) !important;
+    min-width: 380px !important;
+    padding: 15px 25px !important;
+    z-index: 10000 !important;
+}
+
+.el-message--success {
+    border-left: 4px solid #00FF41 !important;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.7), 0 0 15px rgba(0, 255, 65, 0.15) !important;
+}
+
+.el-message--error {
+    border-left: 4px solid #ff3366 !important;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.7), 0 0 15px rgba(255, 51, 102, 0.15) !important;
+}
+
+.el-message--warning {
+    border-left: 4px solid #ffcc00 !important;
+}
+
+.el-message__content {
+    color: #fff !important;
+    font-family: 'JetBrains Mono', monospace !important;
+    font-weight: 700 !important;
+    letter-spacing: 1.2px !important;
+    text-transform: uppercase !important;
+    font-size: 0.8rem !important;
+}
+
+.el-message .el-message__icon {
+    font-size: 1.2rem !important;
+}
+
+.el-message--success .el-message__icon {
+    color: #00FF41 !important;
+}
+
+.el-message--error .el-message__icon {
+    color: #ff3366 !important;
+}
+
+.el-message--warning .el-message__icon {
+    color: #ffcc00 !important;
+}

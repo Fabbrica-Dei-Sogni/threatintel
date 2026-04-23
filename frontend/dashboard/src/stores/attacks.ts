@@ -65,6 +65,10 @@ export const useAttacksStore = defineStore('attacks', () => {
     const saved = storage.get<AttacksState>(StorageNamespace.ATTACKS);
     
     if (saved) {
+        // Migration: se il valore salvato è il vecchio default di 90 giorni, forzalo a 10
+        if (saved.filters && saved.filters.agoValue === 90) {
+            saved.filters.agoValue = 10;
+        }
         if (saved.filters) Object.assign(state.filters, saved.filters);
         if (saved.pagination) Object.assign(state.pagination, saved.pagination);
         if (saved.view) Object.assign(state.view, saved.view);

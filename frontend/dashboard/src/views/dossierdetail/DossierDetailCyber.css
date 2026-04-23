@@ -65,23 +65,28 @@
 }
 
 .skin-cyber.dossier-archive-view.detail-mode .header-top h1 {
-  font-family: 'JetBrains Mono', monospace !important;
+  font-family: 'Outfit', sans-serif !important;
   color: var(--cy-primary) !important;
   text-transform: uppercase;
-  letter-spacing: 4px;
-  text-shadow: 0 0 10px rgba(var(--cy-primary-rgb), 0.5);
+  font-weight: 900 !important;
+  font-size: clamp(1.2rem, 5vw, 2.2rem) !important;
+  letter-spacing: 1px;
+  text-shadow: 0 0 15px rgba(var(--cy-primary-rgb), 0.4);
   margin: 0;
+  line-height: 1.1;
+  word-break: break-word;
 }
 
 .skin-cyber.dossier-archive-view.detail-mode .header-subtitle {
-  margin-top: 8px;
+  margin-top: 10px;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
+  flex-wrap: wrap;
   font-family: 'JetBrains Mono', monospace;
-  font-size: 0.65rem;
-  letter-spacing: 2px;
-  opacity: 0.7;
+  font-size: 0.6rem;
+  letter-spacing: 1.5px;
+  opacity: 0.8;
 }
 
 .skin-cyber.dossier-archive-view.detail-mode .status-classified {
@@ -253,6 +258,53 @@
   box-shadow: 0 0 15px var(--cy-primary);
 }
 
+.skin-cyber.dossier-archive-view.detail-mode .timestamp {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--cy-primary);
+  background: rgba(0, 0, 0, 0.4);
+  padding: 3px 10px;
+  border: 1px solid var(--cy-border);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.skin-cyber.dossier-archive-view.detail-mode .section-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.skin-cyber.dossier-archive-view.detail-mode .action-icon-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  cursor: pointer;
+  background: rgba(var(--cy-primary-rgb), 0.05) !important;
+  border: 1px solid var(--cy-border) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.skin-cyber.dossier-archive-view.detail-mode .action-icon-btn.danger-text {
+  color: #f87171 !important;
+}
+
+.skin-cyber.dossier-archive-view.detail-mode .action-icon-btn.danger-text:hover {
+  background: #ef4444 !important;
+  border-color: #ef4444 !important;
+  color: white !important;
+  box-shadow: 0 0 10px #ef4444;
+}
+
+.skin-cyber.dossier-archive-view.detail-mode .action-icon-btn.active-expert {
+  background: var(--cy-primary) !important;
+  color: var(--cy-bg) !important;
+  box-shadow: 0 0 15px var(--cy-primary);
+}
+
 /* Explicit override for the report button wrapper */
 .skin-cyber.dossier-archive-view.detail-mode :deep(.report-btn) {
   background: transparent !important;
@@ -385,4 +437,61 @@
   border-color: var(--cy-primary) !important;
   box-shadow: 0 0 10px rgba(var(--cy-primary-rgb), 0.3) !important;
   outline: none;
+}
+
+/* === RESPONSIVE MODIFICATIONS (COBALT NOIR) === */
+@media (max-width: 768px) {
+  .skin-cyber.dossier-archive-view.detail-mode .header-top {
+    padding: 15px 20px !important;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .skin-cyber.dossier-archive-view.detail-mode .header-actions {
+    width: 100%;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+
+  .skin-cyber.dossier-archive-view.detail-mode .archive-header {
+    padding: 15px 20px;
+  }
+
+  .skin-cyber.dossier-archive-view.detail-mode .info-card {
+    margin: 20px !important;
+    padding: 20px !important;
+  }
+
+  .skin-cyber.dossier-archive-view.detail-mode .detail-container {
+    padding: 0 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .skin-cyber.dossier-archive-view.detail-mode .header-top h1 {
+    font-size: 1.3rem !important;
+  }
+
+  .skin-cyber.dossier-archive-view.detail-mode .header-subtitle {
+    gap: 5px;
+  }
+
+  .skin-cyber.dossier-archive-view.detail-mode .separator {
+    display: none;
+  }
+
+  .skin-cyber.dossier-archive-view.detail-mode .header-subtitle > span {
+    width: 100%;
+  }
+
+  .skin-cyber.dossier-archive-view.detail-mode .title-with-back {
+    flex-direction: column;
+    width: 100%;
+    gap: 10px;
+  }
+
+  .skin-cyber.dossier-archive-view.detail-mode .title-with-back .back-btn {
+    width: 100% !important;
+  }
 }

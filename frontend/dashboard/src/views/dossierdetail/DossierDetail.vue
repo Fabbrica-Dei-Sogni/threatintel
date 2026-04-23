@@ -102,7 +102,7 @@
                   <template v-else>
                     <button @click="handleSaveSection(index)" class="action-icon-btn success-text" :title="t('dossier.actions.saveSection')"
                       :disabled="isSaving">✓</button>
-                    <button @click="showRawEdit = !showRawEdit" class="action-icon-btn btn-expert"
+                    <button v-if="isExpertModeAllowed(section.templateKey)" @click="showRawEdit = !showRawEdit" class="action-icon-btn btn-expert"
                       :class="{ 'active-expert': showRawEdit }" :title="t('dossier.actions.expertMode')">{...}</button>
                     <button @click="cancelEditSection()" class="action-icon-btn" :title="t('dossier.actions.cancel')"
                       :disabled="isSaving">✗</button>
@@ -183,7 +183,8 @@ import DossierSectionEditor from '../../components/dossier/DossierSectionEditor.
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { useViewSettingsStore } from '../../stores/viewSettings';
 import SkinSwitcher from '../../components/SkinSwitcher.vue';
-import { formatFullDateTime } from '../../utils/dateUtils';
+import { formatDateTime, formatFullDateTime } from '../../utils/dateUtils';
+import dayjs from 'dayjs';
 import { DossierSectionType, type IDossierSection, type IHumanSectionData } from '../../models/DossierDTO';
 
 const props = defineProps<{
@@ -405,7 +406,18 @@ const init = async () => {
 onMounted(init);
 
 const goBack = () => router.push('/dossiers');
-const formatDate = (date) => formatFullDateTime(date);
+const formatDate = (date: any) => formatDateTime(date);
+
+const isExpertModeAllowed = (templateKey: string) => {
+  const knownKeys = [
+    'clipboard.ip', 'clipboard.ipDetails.geo', 'clipboard.ipDetails.net', 
+    'clipboard.ipDetails.abuse', 'clipboard.ipDetails.whois', 'clipboard.ipDetails.abuseLog',
+    'clipboard.attackDetail.summary', 'clipboard.attackDetail.log', 'clipboard.attackDetail.rateLimitEvent',
+    'clipboard.telnetDetail.summary', 'clipboard.telnetDetail.timelineRow', 'clipboard.telnetDetail.scannerAnalysis',
+    'clipboard.attackTechnique'
+  ];
+  return !knownKeys.includes(templateKey);
+};
 </script>
 
 <style scoped src="./DossierDetail.css"></style>

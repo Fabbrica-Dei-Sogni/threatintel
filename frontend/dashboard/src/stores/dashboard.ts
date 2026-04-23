@@ -48,6 +48,10 @@ export const useDashboardStore = defineStore('dashboard', () => {
     
     // Merge dei dati salvati sopra i default (Schema Migration)
     if (saved) {
+        // Migration: se il valore salvato è il vecchio default di 90 giorni, forzalo a 10
+        if (saved.rankings && saved.rankings.attackTimeValue === 90) {
+            saved.rankings.attackTimeValue = 10;
+        }
         if (saved.rankings) {
             Object.assign(state.rankings, saved.rankings);
         }

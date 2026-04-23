@@ -1,377 +1,388 @@
-/* DossierDetailCyber.css - NOIR INVESTIGATION EDITION */
+/* DossierDetailCyber.css - COBALT NOIR INVESTIGATION EDITION */
 
 .skin-cyber.dossier-archive-view.detail-mode {
-  --noir-bg: #050505;
-  --noir-surface: #0c0c0c;
-  --noir-border: #2a2a2a;
-  --noir-primary: #ffffff;
-  --noir-accent: #666666;
-  --noir-text: #d1d5db;
-  --noir-classified: #d97706;
-  --noir-danger: #ef4444;
+  --cy-primary: #0ea5e9;
+  --cy-primary-rgb: 14, 165, 233;
+  --cy-accent: #38bdf8;
+  --cy-bg: #05070a;
+  --cy-surface: rgba(10, 15, 25, 0.95);
+  --cy-border: rgba(14, 165, 233, 0.3);
+  --cy-text: #f8fafc;
+  --cy-text-muted: #94a3b8;
   
-  background-color: var(--noir-bg) !important;
-  color: var(--noir-text) !important;
-  font-family: 'Inter', sans-serif !important;
-}
-
-.skin-cyber.dossier-archive-view.detail-mode [class*="mono"],
-.skin-cyber.dossier-archive-view.detail-mode pre,
-.skin-cyber.dossier-archive-view.detail-mode code {
-  font-family: 'JetBrains Mono', 'Courier New', monospace !important;
-}
-
-/* === HEADER === */
-.header-top {
-  display: flex !important;
-  flex-wrap: wrap !important;
-  justify-content: space-between !important;
-  align-items: flex-end !important;
-  gap: 15px !important;
-  border-bottom: 1px solid var(--noir-border) !important;
-  padding: 20px 0 !important;
-  margin-bottom: 30px !important;
-}
-
-.header-content-left {
-  flex: 1 1 100% !important;
-}
-
-.header-content-right {
-  margin-left: auto !important;
-  display: flex !important;
-  gap: 15px !important;
-  align-items: center !important;
-}
-
-.skin-cyber.dossier-archive-view.detail-mode .archive-header {
-  margin-bottom: 60px !important;
-}
-
-.header-top h1 {
-  color: var(--noir-primary) !important;
-  font-weight: 900 !important;
-  letter-spacing: 0.2em !important;
-  text-transform: uppercase !important;
-  margin: 0 !important;
-  font-size: 1.8rem !important;
+  background-color: var(--cy-bg) !important;
+  background-image: 
+    radial-gradient(circle at 50% 0%, rgba(var(--cy-primary-rgb), 0.05) 0%, transparent 70%),
+    linear-gradient(rgba(14, 165, 233, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(14, 165, 233, 0.02) 1px, transparent 1px);
+  background-size: 100% 100%, 30px 30px, 30px 30px;
+  color: var(--cy-text) !important;
+  min-height: 100vh;
   position: relative;
-  display: inline-block;
+  overflow-x: hidden;
 }
 
-.header-top h1::after {
-  content: "TOP SECRET // NOFORN";
-  position: absolute;
-  top: -15px;
+/* HUD Scanning Elements */
+.skin-cyber.dossier-archive-view.detail-mode .scanning-line {
+  position: fixed;
+  top: 0;
   left: 0;
-  font-size: 0.6rem;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(to right, transparent, var(--cy-primary), transparent);
+  box-shadow: 0 0 15px var(--cy-primary);
+  animation: cobalt-scan 10s linear infinite;
+  z-index: 9999;
+  opacity: 0.1;
+  pointer-events: none;
+}
+
+@keyframes cobalt-scan {
+  0% { transform: translateY(-100vh); }
+  100% { transform: translateY(100vh); }
+}
+
+.skin-cyber.dossier-archive-view.detail-mode .vignette-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, transparent 40%, rgba(0, 0, 0, 0.7) 100%);
+  pointer-events: none;
+  z-index: 9998;
+}
+
+/* Header Refactoring */
+.skin-cyber.dossier-archive-view.detail-mode .header-top {
+  background: rgba(5, 7, 10, 0.9) !important;
+  border-bottom: 2px solid var(--cy-primary) !important;
+  padding: 20px 40px !important;
+  backdrop-filter: blur(10px);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.skin-cyber.dossier-archive-view.detail-mode .header-top h1 {
+  font-family: 'JetBrains Mono', monospace !important;
+  color: var(--cy-primary) !important;
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  text-shadow: 0 0 10px rgba(var(--cy-primary-rgb), 0.5);
+  margin: 0;
+}
+
+.skin-cyber.dossier-archive-view.detail-mode .header-subtitle {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
   letter-spacing: 2px;
-  color: var(--noir-classified);
+  opacity: 0.7;
+}
+
+.skin-cyber.dossier-archive-view.detail-mode .status-classified {
+  color: #f87171; /* Red for classified */
   font-weight: 800;
 }
 
-/* === SIDEBAR & INFO CARD === */
+.skin-cyber.dossier-archive-view.detail-mode .separator {
+  color: var(--cy-border);
+}
+
+.skin-cyber.dossier-archive-view.detail-mode .dossier-id-tag {
+  color: var(--cy-text-muted);
+}
+
+/* Counter & Back Nav */
+.skin-cyber.dossier-archive-view.detail-mode .header-nav-left {
+  display: flex;
+  align-items: center;
+  gap: 25px;
+}
+
+.skin-cyber.dossier-archive-view.detail-mode .header-counter-technical {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--cy-text-muted);
+  letter-spacing: 1.5px;
+  border-left: 1px solid var(--cy-border);
+  padding-left: 20px;
+}
+
+.skin-cyber.dossier-archive-view.detail-mode .counter-value {
+  color: var(--cy-primary);
+  font-weight: 800;
+}
+
+/* Info Sidebar Card */
 .skin-cyber.dossier-archive-view.detail-mode .info-card {
-  background: #000000 !important;
-  border: 1px solid var(--noir-border) !important;
-  border-left: 5px solid var(--noir-accent) !important;
-  padding: 25px !important;
+  background: var(--cy-surface) !important;
+  border: 1px solid var(--cy-border) !important;
+  border-left: 4px solid var(--cy-primary) !important;
   border-radius: 0 !important;
+  padding: 30px !important;
+  margin-bottom: 40px;
 }
 
-.skin-cyber.dossier-archive-view.detail-mode .info-header h3 {
-  background: var(--noir-accent) !important;
-  color: black !important;
-  padding: 2px 12px !important;
-  font-weight: 900 !important;
-  letter-spacing: 2px !important;
-  font-size: 0.75rem !important;
-  text-transform: uppercase !important;
-  display: inline-block !important;
-  margin-bottom: 20px !important;
-}
-
-.skin-cyber.dossier-archive-view.detail-mode .info-item label {
-  color: var(--noir-accent) !important;
-  font-weight: 900 !important;
-  font-size: 0.65rem !important;
-  text-transform: uppercase !important;
-  letter-spacing: 1px !important;
-  display: block !important;
-  margin-bottom: 5px !important;
-}
-
-.skin-cyber.dossier-archive-view.detail-mode .info-item p {
-  color: var(--noir-primary) !important;
-  font-family: 'JetBrains Mono', monospace !important;
-  font-size: 0.85rem !important;
-  line-height: 1.6 !important;
-  background: rgba(255, 255, 255, 0.02) !important;
-  padding: 10px !important;
-  border: 1px solid var(--noir-border) !important;
-}
-
-.skin-cyber.dossier-archive-view.detail-mode .meta-row {
-  border-top: 1px dashed var(--noir-border) !important;
-  margin-top: 20px !important;
-  padding-top: 20px !important;
-}
-
-.skin-cyber.dossier-archive-view.detail-mode .meta-label {
-  color: var(--noir-accent) !important;
-  font-weight: 800 !important;
-  font-size: 0.6rem !important;
-}
-
-.skin-cyber.dossier-archive-view.detail-mode .meta-value {
-  color: var(--noir-primary) !important;
-  font-family: 'JetBrains Mono', monospace !important;
-  font-size: 0.75rem !important;
-}
-
-/* === SECTIONS & TIMELINE === */
-.skin-cyber.dossier-archive-view.detail-mode .section-preview {
-  border-left: 1px solid var(--noir-border) !important;
-  margin-bottom: 40px !important;
-  position: relative;
-}
-
-.skin-cyber.dossier-archive-view.detail-mode .section-preview::before {
-  content: "";
-  position: absolute;
-  top: 0; left: -1px;
-  width: 1px; height: 30px;
-  background: var(--noir-classified);
-}
-
-.skin-cyber.dossier-archive-view.detail-mode .section-header {
-  border-bottom: 1px solid var(--noir-border) !important;
+.skin-cyber.dossier-archive-view.detail-mode .description {
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--cy-text) !important;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  border-bottom: 1px dashed var(--cy-border);
+  padding-bottom: 20px;
   margin-bottom: 20px;
 }
 
-.skin-cyber.dossier-archive-view.detail-mode .section-header .badge {
-  background: #1a1a1a !important;
-  color: var(--noir-text) !important;
-  border: 1px solid var(--noir-border) !important;
-  border-radius: 0 !important;
+.skin-cyber.dossier-archive-view.detail-mode .meta-item {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  margin-bottom: 8px;
 }
 
-/* === OBSERVATIONS === */
+.skin-cyber.dossier-archive-view.detail-mode .meta-label {
+  color: var(--cy-text-muted);
+  text-transform: uppercase;
+  margin-right: 10px;
+}
+
+.skin-cyber.dossier-archive-view.detail-mode .meta-value {
+  color: var(--cy-accent);
+}
+
+.skin-cyber.dossier-archive-view.detail-mode .status-value {
+  color: #10b981;
+  text-shadow: 0 0 5px rgba(16, 185, 129, 0.4);
+}
+
+/* Sections Timeline */
+.skin-cyber.dossier-archive-view.detail-mode .section-preview {
+  background: rgba(10, 15, 25, 0.4) !important;
+  border: 1px solid var(--cy-border) !important;
+  border-radius: 0 !important;
+  padding: 25px !important;
+  margin-bottom: 30px;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.skin-cyber.dossier-archive-view.detail-mode .section-preview:hover {
+  border-color: var(--cy-primary) !important;
+  box-shadow: 0 0 20px rgba(var(--cy-primary-rgb), 0.1);
+}
+
+.skin-cyber.dossier-archive-view.detail-mode .section-header {
+  border-bottom: 1px solid var(--cy-border);
+  padding-bottom: 15px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.skin-cyber.dossier-archive-view.detail-mode .badge {
+  background: rgba(var(--cy-primary-rgb), 0.1) !important;
+  border: 1px solid var(--cy-border) !important;
+  color: var(--cy-primary) !important;
+  border-radius: 0 !important;
+  font-family: 'JetBrains Mono', monospace;
+  padding: 4px 12px !important;
+  text-transform: uppercase;
+  font-size: 0.7rem !important;
+}
+
+.skin-cyber.dossier-archive-view.detail-mode .timestamp {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--cy-text-muted);
+}
+
+/* Observations Box */
 .skin-cyber.dossier-archive-view.detail-mode .observations-container {
-  background: #000000 !important;
-  border: 1px solid var(--noir-border) !important;
-  padding: 20px !important;
-  margin-top: 30px !important;
+  margin-top: 30px;
+  border-top: 1px solid var(--cy-border);
+  padding-top: 20px;
 }
 
 .skin-cyber.dossier-archive-view.detail-mode .obs-card {
-  background: #080808 !important;
-  border-left: 3px solid var(--noir-classified) !important;
-  margin-bottom: 10px !important;
+  background: rgba(0, 0, 0, 0.3) !important;
+  border: 1px solid var(--cy-border) !important;
+  border-left: 3px solid #10b981 !important;
   padding: 15px !important;
+  margin-bottom: 10px;
+}
+
+.skin-cyber.dossier-archive-view.detail-mode .obs-label {
+  color: #10b981;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 1px;
 }
 
 .skin-cyber.dossier-archive-view.detail-mode .obs-pre {
-  color: var(--noir-primary) !important;
+  color: var(--cy-text) !important;
   font-family: 'JetBrains Mono', monospace !important;
-  font-size: 0.8rem !important;
+  font-size: 0.85rem !important;
+  white-space: pre-wrap;
+  margin: 10px 0 0 0;
 }
 
-/* === INPUTS & FORMS === */
-.skin-cyber.dossier-archive-view.detail-mode .edit-title-input,
-.skin-cyber.dossier-archive-view.detail-mode .edit-desc-input,
-.skin-cyber.dossier-archive-view.detail-mode .obs-quick-input {
-  background: black !important;
-  border: 1px solid var(--noir-border) !important;
-  border-radius: 0 !important;
-  color: var(--noir-primary) !important;
-  font-family: inherit !important;
-}
-
-.skin-cyber.dossier-archive-view.detail-mode .edit-title-input:focus,
-.skin-cyber.dossier-archive-view.detail-mode .edit-desc-input:focus {
-  border-color: var(--noir-primary) !important;
-}
-
-/* === BUTTONS === */
+/* Buttons */
 .skin-cyber.dossier-archive-view.detail-mode .back-btn,
-.skin-cyber.dossier-archive-view.detail-mode .action-icon-btn {
+.skin-cyber.dossier-archive-view.detail-mode .action-icon-btn,
+.skin-cyber.dossier-archive-view.detail-mode .btn-archive {
   background: transparent !important;
-  border: 1px solid var(--noir-border) !important;
+  border: 1px solid var(--cy-primary) !important;
+  color: var(--cy-primary) !important;
   border-radius: 0 !important;
-  color: var(--noir-accent) !important;
-  box-shadow: none !important;
+  font-family: 'JetBrains Mono', monospace;
+  text-transform: uppercase;
+  font-weight: 800;
+  transition: all 0.2s ease;
 }
 
+.skin-cyber.dossier-archive-view.detail-mode .back-btn:hover,
 .skin-cyber.dossier-archive-view.detail-mode .action-icon-btn:hover,
-.title-with-back :deep(.back-btn:hover) {
-  background: var(--noir-primary) !important;
-  color: black !important;
-  border-color: var(--noir-primary) !important;
+.skin-cyber.dossier-archive-view.detail-mode :deep(.report-btn:hover) {
+  background: var(--cy-primary) !important;
+  color: var(--cy-bg) !important;
+  box-shadow: 0 0 15px var(--cy-primary);
 }
 
-.title-with-back :deep(.back-btn) {
+/* Explicit override for the report button wrapper */
+.skin-cyber.dossier-archive-view.detail-mode :deep(.report-btn) {
   background: transparent !important;
-  border: 1px solid var(--noir-border) !important;
-  border-radius: 0 !important;
-  color: var(--noir-accent) !important;
+  border: 1px solid var(--cy-primary) !important;
+  color: var(--cy-primary) !important;
   box-shadow: none !important;
-  height: 44px !important;
-  padding: 0 24px !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  font-family: inherit !important;
-  text-transform: uppercase !important;
-  letter-spacing: 1px !important;
-  font-weight: 700 !important;
-}
-
-.skin-cyber.dossier-archive-view.detail-mode .save-btn {
-  border-color: var(--noir-accent) !important;
-  color: var(--noir-primary) !important;
+  transform: none !important;
 }
 
 .skin-cyber.dossier-archive-view.detail-mode .add-btn-full {
+  width: 100%;
   border-style: dashed !important;
-  background: transparent !important;
+  padding: 15px !important;
+  margin-bottom: 30px;
 }
 
-.skin-cyber.dossier-archive-view.detail-mode :deep(.dossier-section) {
-  background: #000000 !important;
-  border: 1px solid var(--noir-border) !important;
-  border-top: 4px solid var(--noir-classified) !important;
-  padding: 30px !important;
-  margin-bottom: 60px !important;
-  position: relative;
-  overflow: hidden;
-}
-
-.skin-cyber.dossier-archive-view.detail-mode :deep(.dossier-section)::after {
-  content: "OFFICIAL RECORD";
+/* Loading Overlay (Shared with Archive) */
+.skin-cyber.dossier-archive-view.detail-mode .cyber-status-overlay {
   position: absolute;
-  top: 10px;
-  right: 10px;
-  font-size: 0.5rem;
-  color: var(--noir-accent);
-  opacity: 0.2;
-  letter-spacing: 2px;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 500;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(8px);
+  transition: all 0.3s ease;
+}
+
+.skin-cyber.dossier-archive-view.detail-mode .cyber-loading-overlay {
+  background: rgba(5, 7, 10, 0.8) !important;
+}
+
+.skin-cyber.dossier-archive-view.detail-mode .blur-context {
+  filter: blur(4px) grayscale(0.5);
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.skin-cyber.dossier-archive-view.detail-mode .cyber-hud-spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 25px;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 40px;
+  border: 1px solid var(--cy-border);
+  box-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
+}
+
+.skin-cyber.dossier-archive-view.detail-mode .spinner-circle {
+  width: 70px;
+  height: 70px;
+  border: 3px solid rgba(var(--cy-primary-rgb), 0.1);
+  border-top: 3px solid var(--cy-primary);
+  border-radius: 50%;
+  animation: cyber-spin 0.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  position: relative;
+}
+
+@keyframes cyber-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.skin-cyber.dossier-archive-view.detail-mode .spinner-text {
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--cy-primary);
+  font-size: 0.9rem;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  animation: cyber-glitch-pulse 2s infinite;
+}
+
+@keyframes cyber-glitch-pulse {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; text-shadow: 0 0 15px var(--cy-primary); }
+}
+
+/* === DEEP OVERRIDES FOR SECTIONS === */
+.skin-cyber.dossier-archive-view.detail-mode :deep(.dossier-section) {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
 }
 
 .skin-cyber.dossier-archive-view.detail-mode :deep(.section-title) {
-  border-bottom: 2px solid var(--noir-border) !important;
-  margin-bottom: 30px !important;
-  padding-bottom: 0 !important;
+  border-bottom: 1px dashed var(--cy-border) !important;
+  margin-bottom: 20px !important;
 }
 
 .skin-cyber.dossier-archive-view.detail-mode :deep(.section-title h3) {
-  background: var(--noir-classified) !important;
-  color: black !important;
-  padding: 4px 15px !important;
-  margin: 0 !important;
-  font-weight: 900 !important;
-  letter-spacing: 2px !important;
-  font-size: 0.8rem !important;
+  color: var(--cy-accent) !important;
+  font-family: 'JetBrains Mono', monospace !important;
+  font-weight: 800 !important;
+  font-size: 0.85rem !important;
 }
 
 .skin-cyber.dossier-archive-view.detail-mode :deep(.data-item label) {
-  color: var(--noir-accent) !important;
-  font-weight: 900 !important;
-  letter-spacing: 1.5px !important;
+  color: var(--cy-text-muted) !important;
+  font-family: 'JetBrains Mono', monospace !important;
   font-size: 0.65rem !important;
-  border-left: 2px solid var(--noir-accent);
-  padding-left: 8px;
-  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .skin-cyber.dossier-archive-view.detail-mode :deep(.data-item .value) {
-  color: var(--noir-primary) !important;
-  font-family: 'JetBrains Mono', monospace !important;
-  font-size: 0.9rem !important;
-  padding-left: 10px;
-}
-
-.skin-cyber.dossier-archive-view.detail-mode :deep(.rendered-content) {
-  color: var(--noir-text) !important;
+  color: var(--cy-text) !important;
   font-family: 'JetBrains Mono', monospace !important;
   font-size: 0.85rem !important;
-  line-height: 1.8 !important;
 }
 
-.skin-cyber.dossier-archive-view.detail-mode :deep(.cyan-text) { color: var(--noir-primary) !important; text-decoration: underline; }
-.skin-cyber.dossier-archive-view.detail-mode :deep(.amber-text) { color: var(--noir-classified) !important; }
-.skin-cyber.dossier-archive-view.detail-mode :deep(.emerald-text) { color: var(--noir-text) !important; font-weight: 900; }
-.skin-cyber.dossier-archive-view.detail-mode :deep(.rose-text) { color: var(--noir-danger) !important; }
+.skin-cyber.dossier-archive-view.detail-mode :deep(.coordinates) {
+  background: rgba(var(--cy-primary-rgb), 0.1) !important;
+  border: 1px solid var(--cy-border) !important;
+  color: var(--cy-primary) !important;
+}
 
-/* === EDITORS & INPUTS (DEEP) === */
-.skin-cyber.dossier-archive-view.detail-mode :deep(.edit-title-input),
-.skin-cyber.dossier-archive-view.detail-mode :deep(.edit-desc-input),
-.skin-cyber.dossier-archive-view.detail-mode :deep(.obs-quick-input),
-.skin-cyber.dossier-archive-view.detail-mode :deep(input),
-.skin-cyber.dossier-archive-view.detail-mode :deep(textarea),
-.skin-cyber.dossier-archive-view.detail-mode :deep(select) {
+.skin-cyber.dossier-archive-view.detail-mode :deep(.cyber-input) {
   background: #000000 !important;
-  border: 1px solid var(--noir-border) !important;
-  border-radius: 0 !important;
-  color: var(--noir-primary) !important;
+  border: 1px solid var(--cy-border) !important;
+  color: var(--cy-primary) !important;
   font-family: 'JetBrains Mono', monospace !important;
-  padding: 12px !important;
+  padding: 10px !important;
 }
 
-.skin-cyber.dossier-archive-view.detail-mode :deep(input:focus),
-.skin-cyber.dossier-archive-view.detail-mode :deep(textarea:focus) {
-  border-color: var(--noir-classified) !important;
-  outline: none !important;
-  box-shadow: 0 0 10px rgba(217, 119, 6, 0.1) !important;
-}
-
-.skin-cyber.dossier-archive-view.detail-mode :deep(.back-btn.save-btn) {
-  border-color: var(--noir-classified) !important;
-  color: var(--noir-classified) !important;
-}
-
-.skin-cyber.dossier-archive-view.detail-mode :deep(.back-btn.save-btn:hover) {
-  background: var(--noir-classified) !important;
-  color: black !important;
-}
-
-.skin-cyber.dossier-archive-view.detail-mode :deep(.human-section) {
-  border: 1px solid var(--noir-border) !important;
-  border-left: 10px solid var(--noir-classified) !important;
-  background: #050505 !important;
-  padding: 40px !important;
-}
-
-.skin-cyber.dossier-archive-view.detail-mode :deep(.human-section) h3 {
-  background: black !important;
-  color: var(--noir-classified) !important;
-  border: 2px solid var(--noir-classified) !important;
-  padding: 5px 20px !important;
-  transform: rotate(-1deg);
-  display: inline-block !important;
-}
-
-.skin-cyber.dossier-archive-view.detail-mode :deep(.text-content) {
-  color: #eeeeee !important;
-  font-family: 'JetBrains Mono', monospace !important;
-  font-size: 1rem !important;
-  line-height: 2 !important;
-  border-top: 1px dashed var(--noir-border);
-  margin-top: 20px;
-  padding-top: 20px;
-  opacity: 1 !important;
-}
-
-/* === NOIR OVERLAY === */
-.skin-cyber.dossier-archive-view.detail-mode::after {
-  content: " ";
-  display: block;
-  position: fixed;
-  top: 0; left: 0; bottom: 0; right: 0;
-  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.05) 50%),
-              linear-gradient(90deg, rgba(255, 255, 255, 0.01), rgba(0, 0, 0, 0.01), rgba(255, 255, 255, 0.01));
-  background-size: 100% 4px, 3px 100%;
-  pointer-events: none;
-  z-index: 100;
-  opacity: 0.4;
+.skin-cyber.dossier-archive-view.detail-mode :deep(.cyber-input:focus) {
+  border-color: var(--cy-primary) !important;
+  box-shadow: 0 0 10px rgba(var(--cy-primary-rgb), 0.3) !important;
+  outline: none;
 }

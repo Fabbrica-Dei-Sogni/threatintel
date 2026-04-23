@@ -1,4 +1,4 @@
-.dossier-section {
+.skin-classic .dossier-section {
   padding: 15px;
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.02);
@@ -6,12 +6,12 @@
   transition: all 0.2s ease;
 }
 
-.dossier-section:hover {
+.skin-classic .dossier-section:hover {
   background: rgba(255, 255, 255, 0.03);
   border-color: rgba(99, 102, 241, 0.2);
 }
 
-.section-title {
+.skin-classic .section-title {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -20,7 +20,7 @@
   padding-bottom: 8px;
 }
 
-.section-title h3 {
+.skin-classic .section-title h3 {
   margin: 0;
   font-size: 0.9rem;
   font-weight: 700;
@@ -45,14 +45,14 @@
   grid-column: 1 / -1;
 }
 
-.data-item label {
+.skin-classic .data-item label {
   font-size: 0.7rem;
   color: #64748b;
   text-transform: uppercase;
   font-weight: 700;
 }
 
-.data-item .value {
+.skin-classic .data-item .value {
   font-size: 0.85rem;
   color: #e2e8f0;
   word-break: break-all;

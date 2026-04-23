@@ -1,152 +1,168 @@
 <template>
   <div class="dossier-archive-view detail-mode" :class="'skin-' + dashboardSkin">
+    <!-- HUD Background Elements -->
+    <div class="scanning-line cobalt-pulse"></div>
+    <div class="vignette-overlay"></div>
+    
     <div class="header-top">
       <div class="header-content-left">
         <h1 v-if="dossier && !isEditing">{{ dossier.title }}</h1>
+        <div class="header-subtitle" v-if="dossier && !isEditing">
+          <span class="status-classified">[CLASSIFIED_FILE]</span>
+          <span class="separator">|</span>
+          <span class="dossier-id-tag">DOSSIER_ID: {{ dossier._id }}</span>
+        </div>
         <input v-else-if="dossier && isEditing" v-model="editForm.title" class="edit-title-input" />
       </div>
-      <div class="header-content-right">
+      <div class="header-actions">
         <SkinSwitcher />
         <LanguageSwitcher />
       </div>
     </div>
 
     <div class="archive-header">
-      <div class="title-with-back">
+      <div class="header-nav-left">
         <button @click="goBack" class="back-btn" :disabled="isSaving">{{ t('common.back').toUpperCase() }}</button>
+      </div>
+
+      <div class="title-with-back">
         <button v-if="dossier && !isEditing && canModify" @click="startEdit" class="back-btn edit-btn">✎ {{
           t('common.edit').toUpperCase() }}</button>
         
         <!-- Pulsante Genera Dossier allineato agli altri -->
-        <DossierReportActions v-if="dossier && !isEditing" :dossierId="dossier._id" customClass="back-btn report-btn" />
+        <DossierReportActions 
+          v-if="dossier && !isEditing" 
+          :dossierId="dossier._id" 
+          customClass="back-btn report-btn" 
+          accentColor="#0ea5e9"
+        />
 
         <template v-if="dossier && isEditing && canModify">
           <button @click="saveEdit" class="back-btn save-btn" :disabled="isSaving">✓ {{ t('common.save').toUpperCase()
           }}</button>
-          <button @click="handleAddHumanSection" class="back-btn add-btn" style="margin-left: 10px;">+ {{
-          t('dossier.addHumanSection').toUpperCase() }}</button>
+          <button @click="cancelEdit" class="back-btn add-btn" style="margin-left: 10px;">✗ {{
+          t('common.cancel').toUpperCase() }}</button>
         </template>
       </div>
     </div>
 
-    <div v-if="loading" class="loading-state">
-      <div class="spinner-large"></div>
-      <p>{{ t('common.loading') }}</p>
-    </div>
-
-    <div v-else-if="dossier" class="detail-container">
-      <!-- Info Sidebar -->
-      <div class="detail-content">
-        <div class="info-card glass-card">
-          <p class="description" v-if="!isEditing">{{ dossier.description || t('common.noDescription') }}</p>
-          <textarea v-else v-model="editForm.description" class="edit-desc-input" rows="3"></textarea>
-          <div class="dossier-meta">
-            <div class="meta-item"><strong>{{ t('common.id') }}:</strong> {{ dossier._id }}</div>
-            <div class="meta-item"><strong>{{ t('common.timestamp') }}:</strong> {{ formatDate(dossier.createdAt) }}
-            </div>
-            <div class="meta-item"><strong>{{ t('common.status') }}:</strong> {{ dossier.status }}</div>
-            <div class="meta-item" v-if="dossier.tags && dossier.tags.length">
-              <span class="tag-badge" v-for="tag in dossier.tags" :key="tag">{{ tag }}</span>
-            </div>
+    <!-- Grid & Overlays -->
+    <div class="detail-grid-container cyber-table-status-container">
+      <!-- Loading HUD Overlay -->
+      <transition name="fade">
+        <div v-if="loading || isSaving" class="cyber-status-overlay cyber-loading-overlay">
+          <div class="cyber-hud-spinner">
+            <div class="spinner-circle"></div>
+            <div class="spinner-text">{{ isSaving ? 'COMMIT_DATA_CHANGES...' : 'ACCESSING_CLASSIFIED_RECORD...' }}</div>
           </div>
         </div>
+      </transition>
 
-        <!-- Rendered Sections -->
-        <div class="sections-timeline">
-          <!-- New Section Button at the TOP -->
-          <div class="add-section-action top-action"
-            v-if="!isSaving && dossier && !isEditing && editingSectionIndex === -1 && canModify">
-            <button @click="handleAddHumanSection" class="back-btn add-btn-full">
-              + {{ t('common.add').toUpperCase() }}
-            </button>
-          </div>
-
-          <div v-for="(section, index) in dossier.sections" :key="index" class="section-preview glass-card">
-            <div class="section-header">
-              <div>
-                <span class="badge" :class="section.type">
-                  {{ t('dossier.sections.' + section.type).toUpperCase() }}
-                </span>
-              </div>
-              <div style="display: flex; align-items: center; gap: 10px;">
-                <span class="timestamp">{{ formatDate(section.timestamp) }}</span>
-                <template v-if="editingSectionIndex !== index">
-                  <button v-if="canModify" @click="startEditSection(index, section)" class="action-icon-btn"
-                    :title="t('dossier.actions.editSection')">✎</button>
-                  <button v-if="canModify" @click="handleDeleteSection(index)" class="action-icon-btn danger-text"
-                    :title="t('dossier.actions.deleteSection')">🗑</button>
-                </template>
-                <template v-else>
-                  <button @click="handleSaveSection(index)" class="action-icon-btn success-text" :title="t('dossier.actions.saveSection')"
-                    :disabled="isSaving">✓</button>
-                  <button @click="showRawEdit = !showRawEdit" class="action-icon-btn btn-expert"
-                    :class="{ 'active-expert': showRawEdit }" :title="t('dossier.actions.expertMode')">{...}</button>
-                  <button @click="cancelEditSection()" class="action-icon-btn" :title="t('dossier.actions.cancel')"
-                    :disabled="isSaving">✗</button>
-                </template>
+      <div v-if="dossier" class="detail-container" :class="{ 'blur-context': loading || isSaving }">
+        <!-- Info Sidebar -->
+        <div class="detail-content">
+          <div class="info-card cyber-card">
+            <p class="description" v-if="!isEditing">{{ dossier.description || t('common.noDescription') }}</p>
+            <textarea v-else v-model="editForm.description" class="edit-desc-input" rows="3"></textarea>
+            <div class="dossier-meta">
+              <div class="meta-item"><span class="meta-label">{{ t('common.id') }}:</span> <span class="meta-value">{{ dossier._id }}</span></div>
+              <div class="meta-item"><span class="meta-label">{{ t('common.timestamp') }}:</span> <span class="meta-value">{{ formatDate(dossier.createdAt) }}</span></div>
+              <div class="meta-item"><span class="meta-label">{{ t('common.status') }}:</span> <span class="meta-value status-value">{{ dossier.status }}</span></div>
+              <div class="meta-item" v-if="dossier.tags && dossier.tags.length">
+                <span class="tag-badge" v-for="tag in dossier.tags" :key="tag">{{ tag }}</span>
               </div>
             </div>
-            <div class="section-body">
-              <template v-if="editingSectionIndex !== index">
-                <!-- Nuovo sistema di rendering dinamico basato su DTO -->
-                <DossierSectionRenderer :section="section" />
+          </div>
 
-                <!-- Observations Container -->
-                <div class="observations-container" v-if="(section.observations && section.observations.length) || (!isSaving && editingSectionIndex === -1)">
-                  <div v-for="(obs, obsIdx) in section.observations" :key="obsIdx" class="obs-item-wrapper">
-                    <div class="obs-card">
-                      <div class="obs-header-tags">
-                        <span class="obs-label">OSS-{{ obsIdx + 1 }} / {{ t('dossier.analystNote').toUpperCase() }}</span>
-                        <div class="obs-actions" v-if="!isSaving && canModify">
-                          <button @click="startEditObs(index, obsIdx, obs)" class="mini-icon-btn">✎</button>
-                          <button @click="handleRemoveObs(index, obsIdx)" class="mini-icon-btn danger">🗑</button>
+          <!-- Rendered Sections -->
+          <div class="sections-timeline">
+            <!-- New Section Button at the TOP -->
+            <div class="add-section-action top-action"
+              v-if="!isSaving && dossier && !isEditing && editingSectionIndex === -1 && canModify">
+              <button @click="handleAddHumanSection" class="back-btn add-btn-full">
+                + {{ t('common.add').toUpperCase() }}
+              </button>
+            </div>
+
+            <div v-for="(section, index) in dossier.sections" :key="index" class="section-preview cyber-card">
+              <div class="section-header">
+                <div class="badge-wrapper">
+                  <span class="badge" :class="section.type">
+                    {{ t('dossier.sections.' + section.type).toUpperCase() }}
+                  </span>
+                </div>
+                <div class="section-actions">
+                  <span class="timestamp">{{ formatDate(section.timestamp) }}</span>
+                  <template v-if="editingSectionIndex !== index">
+                    <button v-if="canModify" @click="startEditSection(index, section)" class="action-icon-btn"
+                      :title="t('dossier.actions.editSection')">✎</button>
+                    <button v-if="canModify" @click="handleDeleteSection(index)" class="action-icon-btn danger-text"
+                      :title="t('dossier.actions.deleteSection')">🗑</button>
+                  </template>
+                  <template v-else>
+                    <button @click="handleSaveSection(index)" class="action-icon-btn success-text" :title="t('dossier.actions.saveSection')"
+                      :disabled="isSaving">✓</button>
+                    <button @click="showRawEdit = !showRawEdit" class="action-icon-btn btn-expert"
+                      :class="{ 'active-expert': showRawEdit }" :title="t('dossier.actions.expertMode')">{...}</button>
+                    <button @click="cancelEditSection()" class="action-icon-btn" :title="t('dossier.actions.cancel')"
+                      :disabled="isSaving">✗</button>
+                  </template>
+                </div>
+              </div>
+              <div class="section-body">
+                <template v-if="editingSectionIndex !== index">
+                  <!-- Dynamic Section Renderer -->
+                  <DossierSectionRenderer :section="section" />
+
+                  <!-- Observations Container -->
+                  <div class="observations-container" v-if="(section.observations && section.observations.length) || (!isSaving && editingSectionIndex === -1)">
+                    <div v-for="(obs, obsIdx) in section.observations" :key="obsIdx" class="obs-item-wrapper">
+                      <div class="obs-card cyber-card mini">
+                        <div class="obs-header-tags">
+                          <span class="obs-label">OSS-{{ obsIdx + 1 }} / {{ t('dossier.analystNote').toUpperCase() }}</span>
+                          <div class="obs-actions" v-if="!isSaving && canModify">
+                            <button @click="startEditObs(index, obsIdx, obs)" class="mini-icon-btn">✎</button>
+                            <button @click="handleRemoveObs(index, obsIdx)" class="mini-icon-btn danger">🗑</button>
+                          </div>
                         </div>
-                      </div>
-                      <div class="obs-text-content">
-                        <pre v-if="editingObsIndex !== `${index}-${obsIdx}`" class="obs-pre">{{ obs }}</pre>
-                        <div v-else class="obs-edit-box">
-                          <textarea v-model="obsEditBuffer" class="obs-edit-area" rows="2"></textarea>
-                          <div class="obs-edit-footer">
-                            <button @click="handleSaveObs(index, obsIdx)" class="btn-confirm-mini">✓</button>
-                            <button @click="cancelObsEdit" class="btn-cancel-mini">✗</button>
+                        <div class="obs-text-content">
+                          <pre v-if="editingObsIndex !== `${index}-${obsIdx}`" class="obs-pre">{{ obs }}</pre>
+                          <div v-else class="obs-edit-box">
+                            <textarea v-model="obsEditBuffer" class="obs-edit-area" rows="2"></textarea>
+                            <div class="obs-edit-footer">
+                              <button @click="handleSaveObs(index, obsIdx)" class="btn-confirm-mini">✓</button>
+                              <button @click="cancelObsEdit" class="btn-cancel-mini">✗</button>
+                            </div>
                           </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                  
-                  <!-- Add Observation Quick Input -->
-                  <div class="add-obs-box" v-if="!isSaving && editingSectionIndex === -1 && canModify">
-                    <div class="obs-input-wrapper">
-                      <input 
-                        v-model="newObsBuffers[index]" 
-                        type="text" 
-                        class="obs-quick-input" 
-                        :placeholder="t('dossier.addObservationPlaceholder') || 'Aggiungi nota investigativa...'"
-                        @keyup.enter="handleAddObs(index)"
-                      />
-                      <button @click="handleAddObs(index)" class="obs-quick-add" :disabled="!newObsBuffers[index] || !newObsBuffers[index].trim()">+</button>
+                    
+                    <!-- Add Observation Quick Input -->
+                    <div class="add-obs-box" v-if="!isSaving && editingSectionIndex === -1 && canModify">
+                      <div class="obs-input-wrapper">
+                        <input 
+                          v-model="newObsBuffers[index]" 
+                          type="text" 
+                          class="obs-quick-input cyber-input" 
+                          :placeholder="t('dossier.addObservationPlaceholder') || 'Aggiungi nota investigativa...'"
+                          @keyup.enter="handleAddObs(index)"
+                        />
+                        <button @click="handleAddObs(index)" class="obs-quick-add" :disabled="!newObsBuffers[index] || !newObsBuffers[index].trim()">+</button>
+                      </div>
                     </div>
                   </div>
-                </div>
-
-                <!-- Expandable Data Toggle (for forensic review) -->
-                <div class="data-dump" v-if="showRaw">
-                  <pre>{{ JSON.stringify(section.data, null, 2) }}</pre>
-                </div>
-              </template>
-              <template v-else>
-                <div v-if="!showRawEdit" class="typed-editor-container">
-                  <DossierSectionEditor :templateKey="section.templateKey" v-model="sectionEditForm.data" />
-                </div>
-                <div v-else class="expert-editor-container">
-                  <label
-                    style="font-size: 0.8rem; color: #fbbf24; font-weight: bold; margin-bottom: 5px; display: block;">EXPERT
-                    MODE: RAW JSON DATA</label>
-                  <textarea v-model="sectionEditForm.dataString" class="edit-desc-input expert-json" rows="18"
-                    style="font-family: monospace;"></textarea>
-                </div>
-              </template>
+                </template>
+                <template v-else>
+                  <div v-if="!showRawEdit" class="typed-editor-container">
+                    <DossierSectionEditor :templateKey="section.templateKey" v-model="sectionEditForm.data" />
+                  </div>
+                  <div v-else class="expert-editor-container">
+                    <label class="expert-label">EXPERT MODE: RAW JSON DATA</label>
+                    <textarea v-model="sectionEditForm.dataString" class="edit-desc-input expert-json cyber-input" rows="18"></textarea>
+                  </div>
+                </template>
+              </div>
             </div>
           </div>
         </div>
@@ -168,7 +184,6 @@ import { ElMessage, ElMessageBox } from 'element-plus';
 import { useViewSettingsStore } from '../../stores/viewSettings';
 import SkinSwitcher from '../../components/SkinSwitcher.vue';
 import { formatFullDateTime } from '../../utils/dateUtils';
-import dayjs from 'dayjs';
 import { DossierSectionType, type IDossierSection, type IHumanSectionData } from '../../models/DossierDTO';
 
 const props = defineProps<{

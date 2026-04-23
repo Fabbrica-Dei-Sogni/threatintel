@@ -92,8 +92,9 @@
         "dossierFormatA4": "FORMAT: A4 (ISO 216)",
         "dossierZoom": "ZOOM",
         "logout": "Logout",
-        "auth_required_title": "SECURITY CLEARANCE REQUIRED",
-        "auth_required_desc": "Forensic investigation dossiers and reports are restricted to identified operators."
+        "auth_required_title": "RESTRICTED ACCESS",
+        "auth_required_desc": "Investigative dossiers and forensic reports are only accessible to identified analysts.",
+        "reset_layout": "RESET LAYOUT"
     },
     "skin": {
         "classic": "Classic",

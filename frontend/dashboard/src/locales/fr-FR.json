@@ -93,7 +93,8 @@
         "dossierZoom": "ZOOM",
         "logout": "Déconnexion",
         "auth_required_title": "ACCÈS RÉSERVÉ",
-        "auth_required_desc": "Les dossiers d'investigation et les rapports médico-légaux sont réservés aux analystes identifiés."
+        "auth_required_desc": "Les dossiers d'investigation et les rapports médico-légaux sont réservés aux analystes identifiés.",
+        "reset_layout": "RÉINITIALISER LA MISE EN PAGE"
     },
     "skin": {
         "classic": "Classique",

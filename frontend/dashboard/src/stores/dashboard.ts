@@ -35,7 +35,7 @@ const DEFAULT_STATE: DashboardState = {
         logPage: 1,
         sessionPage: 1
     },
-    activeWidgets: ['telemetries', 'attacks', 'logs'],
+    activeWidgets: [],
     showTicker: true
 };
 

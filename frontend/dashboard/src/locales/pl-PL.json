@@ -91,8 +91,9 @@
         "dossierFormatA4": "FORMAT: A4 (ISO 216)",
         "dossierZoom": "POWIĘKSZENIE (ZOOM)",
         "logout": "Wyloguj",
-        "auth_required_title": "WYMAGANE UPRAWNIENIA",
-        "auth_required_desc": "Akta dochodzeniowe i raporty kryminalistyczne są dostępne wyłącznie dla zidentyfikowanych operatorów."
+        "auth_required_title": "DOSTĘP ZASTRZEŻONY",
+        "auth_required_desc": "Akta dochodzeniowe i raporty kryminalistyczne są dostępne wyłącznie dla zidentyfikowanych analityków.",
+        "reset_layout": "RESETUJ UKŁAD"
     },
     "skin": {
         "classic": "Klasyczny",

@@ -37,7 +37,7 @@ const DEFAULT_STATE: AttacksState = {
         protocol: 'http',
         minLogs: 10,
         timeMode: 'ago',
-        agoValue: 90,
+        agoValue: 10,
         agoUnit: 'days',
         dateRange: [null, null],
         fromValue: 60,

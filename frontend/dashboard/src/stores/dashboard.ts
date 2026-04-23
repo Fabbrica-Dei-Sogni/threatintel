@@ -28,7 +28,7 @@ const DEFAULT_STATE: DashboardState = {
         logProtocol: 'http',
         sessionCategory: 'interaction',
         attackMinLogs: 10,
-        attackTimeValue: 90,
+        attackTimeValue: 10,
         attackTimeUnit: 'days',
         dangerLevels: [3],
         attackPage: 1,

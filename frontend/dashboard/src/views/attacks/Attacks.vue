@@ -392,7 +392,7 @@ onMounted(() => {
     if (props.initialPage !== undefined) attacksState.pagination.page = props.initialPage || 1;
     if (props.initialMinLogsForAttack !== undefined) attacksState.filters.minLogs = props.initialMinLogsForAttack || 10;
     if (props.initTimeMode !== undefined) attacksState.filters.timeMode = props.initTimeMode || 'ago';
-    if (props.initAgoValue !== undefined) attacksState.filters.agoValue = props.initAgoValue || 90;
+    if (props.initAgoValue !== undefined) attacksState.filters.agoValue = props.initAgoValue || 10;
     if (props.initAgoUnit !== undefined) attacksState.filters.agoUnit = props.initAgoUnit || 'days';
     if (props.initDateRange !== undefined) attacksState.filters.dateRange = props.initDateRange || [null, null];
     if (props.initialSortFields !== undefined) attacksState.sort.fields = props.initialSortFields || { firstSeen: -1 };
@@ -458,7 +458,7 @@ watch(
                 page: nPage > 1 ? nPage : undefined,
                 minLogsForAttack: nmin !== 10 ? nmin : undefined,
                 timeMode: ntMode !== 'ago' ? ntMode : undefined,
-                agoValue: nAgoVal !== 90 ? nAgoVal : undefined,
+                agoValue: nAgoVal !== 10 ? nAgoVal : undefined,
                 agoUnit: nAgoUnit !== 'days' ? nAgoUnit : undefined,
                 dateRange: ndRange && (ndRange[0] || ndRange[1]) ? JSON.stringify(ndRange) : undefined,
                 dangerLevels: nDanger && nDanger.length > 0 ? nDanger.join(',') : undefined,

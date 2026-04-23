@@ -41,10 +41,26 @@ apiClient.interceptors.request.use((config) => {
     return Promise.reject(error);
 });
 
-// Interceptor per gestire errori di autenticazione (401/403)
+// Interceptor per gestire errori di autenticazione (401/403) e fallback su errori di rete
 apiClient.interceptors.response.use((response) => {
     return response;
 }, (error) => {
+    // 1. Gestione Errore di Rete / Timeout (Nessuna risposta dal server)
+    // Se il server non risponde, è probabile che il profilo attivo (indirizzo IP/Porta) sia errato o offline.
+    if (!error.response || error.code === 'ECONNABORTED' || error.message === 'Network Error') {
+        try {
+            const profileStore = useProfileStore();
+            if (profileStore.activeProfileId) {
+                console.warn(`[apiClient] Errore di rete rilevato su profilo "${profileStore.activeProfileId}". Ripristino profilo di default...`);
+                profileStore.setActiveProfile(null);
+            }
+        } catch (e) {
+            // Silenziamo se Pinia non è pronto, ma logghiamo l'errore originale
+            console.error('[apiClient] Errore di rete critico:', error.message);
+        }
+    }
+
+    // 2. Gestione errori di autorizzazione
     if (error.response && [401, 403].includes(error.response.status)) {
         const currentPath = window.location.pathname;
         if (!currentPath.includes('/auth/login') && !currentPath.includes('/auth/register')) {

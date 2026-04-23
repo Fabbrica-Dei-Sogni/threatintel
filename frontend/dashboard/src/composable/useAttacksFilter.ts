@@ -67,12 +67,7 @@ export function useAttacksFilter(
         let timeConfig: TimeConfig = null;
 
         if (timeMode.value === 'ago') {
-            const unit = agoUnit.value === 'minutes' ? 'm' :
-                         agoUnit.value === 'hours' ? 'h' :
-                         agoUnit.value === 'days' ? 'd' :
-                         agoUnit.value === 'months' ? 'M' :
-                         agoUnit.value === 'years' ? 'y' : 'd';
-            timeConfig = { [unit]: agoValue.value ?? 0 };
+            timeConfig = { [agoUnit.value]: agoValue.value ?? 0 };
         } else {
             timeConfig = {
                 from: { [fromUnit.value]: fromValue.value },

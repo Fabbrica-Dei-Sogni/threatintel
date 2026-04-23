@@ -32,6 +32,11 @@ const THREAT_LOG_FILTER_FIELDS = new Set([
     'dangerLevel', 'fingerprint.hash'
 ]);
 
+const ATTACK_FILTER_FIELDS = new Set([
+    'request.ip', 'request.url', 'request.method', 'protocol', 'timestamp',
+    'dangerLevel', 'fingerprint.hash', 'totaleLogs', 'dangerScore', 'averageScore'
+]);
+
 const COWRIE_SESSION_FILTER_FIELDS = new Set([
     'src_ip', 'session', 'sensor', 'protocol', 'timestamp', 'sessionCategory'
 ]);
@@ -138,5 +143,6 @@ export const SortAllowedFields = {
 
 export const FilterAllowedFields = {
     threatLog: THREAT_LOG_FILTER_FIELDS,
+    attack: ATTACK_FILTER_FIELDS,
     cowrieSession: COWRIE_SESSION_FILTER_FIELDS,
 };

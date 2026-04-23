@@ -193,7 +193,7 @@ export class ThreatLogService {
 
         // Estrai dangerLevel dai filtri prima di buildRegExpFilter per gestirlo manualmente post-aggregazione
         const { dangerLevel, ...restFilters } = filters;
-        const mongoFilters = this.buildRegExpFilter(restFilters);
+        const mongoFilters = this.buildRegExpFilter(restFilters, FilterAllowedFields.attack);
 
         // Costruisci sort dinamico
         const safeSort = sanitizeSortFields(sortFields, SortAllowedFields.attack, { lastSeen: -1 });
@@ -306,9 +306,9 @@ export class ThreatLogService {
         return attack || null;
     }
 
-    buildRegExpFilter(filters: any) {
+    buildRegExpFilter(filters: any, allowedFields: Set<string> = FilterAllowedFields.threatLog) {
         const mongoFilters: any = {};
-        const safeFilters = sanitizeFilters(filters, FilterAllowedFields.threatLog);
+        const safeFilters = sanitizeFilters(filters, allowedFields);
 
         for (const [key, value] of Object.entries(safeFilters)) {
             if (key === 'protocol') {

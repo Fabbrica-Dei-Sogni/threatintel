@@ -38,40 +38,62 @@ export class TimeFilterStage implements PipelineStage {
             }
         } else {
             // Caso 1: Solo periodo finale (timeAgo) - dal passato ad ora
-            if (this.timeConfig.minutes || this.timeConfig.hours || this.timeConfig.days || this.timeConfig.months || this.timeConfig.years) {
-                if (this.timeConfig.minutes) {
-                    timeAgo = new Date(now.getTime() - (this.timeConfig.minutes * 60 * 1000));
-                } else if (this.timeConfig.hours) {
-                    timeAgo = new Date(now.getTime() - (this.timeConfig.hours * 60 * 60 * 1000));
-                } else if (this.timeConfig.days) {
-                    timeAgo = new Date(now.getTime() - (this.timeConfig.days * 24 * 60 * 60 * 1000));
-                } else if (this.timeConfig.months) {
-                    timeAgo = new Date(now.getTime() - (this.timeConfig.months * 30 * 24 * 60 * 60 * 1000));
-                } else if (this.timeConfig.years) {
-                    timeAgo = new Date(now.getTime() - (this.timeConfig.years * 365 * 24 * 60 * 60 * 1000));
+            const minutes = this.timeConfig.minutes || this.timeConfig.m;
+            const hours = this.timeConfig.hours || this.timeConfig.h;
+            const days = this.timeConfig.days || this.timeConfig.d;
+            const months = this.timeConfig.months || this.timeConfig.M;
+            const years = this.timeConfig.years || this.timeConfig.y;
+
+            if (minutes || hours || days || months || years) {
+                if (minutes) {
+                    timeAgo = new Date(now.getTime() - (minutes * 60 * 1000));
+                } else if (hours) {
+                    timeAgo = new Date(now.getTime() - (hours * 60 * 60 * 1000));
+                } else if (days) {
+                    timeAgo = new Date(now.getTime() - (days * 24 * 60 * 60 * 1000));
+                } else if (months) {
+                    timeAgo = new Date(now.getTime() - (months * 30 * 24 * 60 * 60 * 1000));
+                } else if (years) {
+                    timeAgo = new Date(now.getTime() - (years * 365 * 24 * 60 * 60 * 1000));
                 }
             }
             // Caso 2: Finestra temporale precisa con 'from' e 'to'
             else if (this.timeConfig.from && this.timeConfig.to) {
-                if (this.timeConfig.from.minutes) timeAgo = new Date(now.getTime() - (this.timeConfig.from.minutes * 60 * 1000));
-                else if (this.timeConfig.from.hours) timeAgo = new Date(now.getTime() - (this.timeConfig.from.hours * 60 * 60 * 1000));
-                else if (this.timeConfig.from.days) timeAgo = new Date(now.getTime() - (this.timeConfig.from.days * 24 * 60 * 60 * 1000));
+                const fMin = this.timeConfig.from.minutes || this.timeConfig.from.m;
+                const fHour = this.timeConfig.from.hours || this.timeConfig.from.h;
+                const fDay = this.timeConfig.from.days || this.timeConfig.from.d;
 
-                if (this.timeConfig.to.minutes) timeToStart = new Date(now.getTime() - (this.timeConfig.to.minutes * 60 * 1000));
-                else if (this.timeConfig.to.hours) timeToStart = new Date(now.getTime() - (this.timeConfig.to.hours * 60 * 60 * 1000));
-                else if (this.timeConfig.to.days) timeToStart = new Date(now.getTime() - (this.timeConfig.to.days * 24 * 60 * 60 * 1000));
+                if (fMin) timeAgo = new Date(now.getTime() - (fMin * 60 * 1000));
+                else if (fHour) timeAgo = new Date(now.getTime() - (fHour * 60 * 60 * 1000));
+                else if (fDay) timeAgo = new Date(now.getTime() - (fDay * 24 * 60 * 60 * 1000));
+
+                const tMin = this.timeConfig.to.minutes || this.timeConfig.to.m;
+                const tHour = this.timeConfig.to.hours || this.timeConfig.to.h;
+                const tDay = this.timeConfig.to.days || this.timeConfig.to.d;
+
+                if (tMin) timeToStart = new Date(now.getTime() - (tMin * 60 * 1000));
+                else if (tHour) timeToStart = new Date(now.getTime() - (tHour * 60 * 60 * 1000));
+                else if (tDay) timeToStart = new Date(now.getTime() - (tDay * 24 * 60 * 60 * 1000));
             }
             // Caso 3: Solo 'from'
             else if (this.timeConfig.from) {
-                if (this.timeConfig.from.minutes) timeAgo = new Date(now.getTime() - (this.timeConfig.from.minutes * 60 * 1000));
-                else if (this.timeConfig.from.hours) timeAgo = new Date(now.getTime() - (this.timeConfig.from.hours * 60 * 60 * 1000));
-                else if (this.timeConfig.from.days) timeAgo = new Date(now.getTime() - (this.timeConfig.from.days * 24 * 60 * 60 * 1000));
+                const fMin = this.timeConfig.from.minutes || this.timeConfig.from.m;
+                const fHour = this.timeConfig.from.hours || this.timeConfig.from.h;
+                const fDay = this.timeConfig.from.days || this.timeConfig.from.d;
+
+                if (fMin) timeAgo = new Date(now.getTime() - (fMin * 60 * 1000));
+                else if (fHour) timeAgo = new Date(now.getTime() - (fHour * 60 * 60 * 1000));
+                else if (fDay) timeAgo = new Date(now.getTime() - (fDay * 24 * 60 * 60 * 1000));
             }
             // Caso 4: Solo 'to'
             else if (this.timeConfig.to) {
-                if (this.timeConfig.to.minutes) timeToStart = new Date(now.getTime() - (this.timeConfig.to.minutes * 60 * 1000));
-                else if (this.timeConfig.to.hours) timeToStart = new Date(now.getTime() - (this.timeConfig.to.hours * 60 * 60 * 1000));
-                else if (this.timeConfig.to.days) timeToStart = new Date(now.getTime() - (this.timeConfig.to.days * 24 * 60 * 60 * 1000));
+                const tMin = this.timeConfig.to.minutes || this.timeConfig.to.m;
+                const tHour = this.timeConfig.to.hours || this.timeConfig.to.h;
+                const tDay = this.timeConfig.to.days || this.timeConfig.to.d;
+
+                if (tMin) timeToStart = new Date(now.getTime() - (tMin * 60 * 1000));
+                else if (tHour) timeToStart = new Date(now.getTime() - (tHour * 60 * 60 * 1000));
+                else if (tDay) timeToStart = new Date(now.getTime() - (tDay * 24 * 60 * 60 * 1000));
             }
         }
 

@@ -1,9 +1,14 @@
 <template>
-  <div class="dossier-archive-view detail-mode">
+  <div class="dossier-archive-view detail-mode" :class="'skin-' + dashboardSkin">
     <div class="header-top">
-      <h1 v-if="dossier && !isEditing">{{ dossier.title }}</h1>
-      <input v-else-if="dossier && isEditing" v-model="editForm.title" class="edit-title-input" />
-      <LanguageSwitcher />
+      <div class="header-content-left">
+        <h1 v-if="dossier && !isEditing">{{ dossier.title }}</h1>
+        <input v-else-if="dossier && isEditing" v-model="editForm.title" class="edit-title-input" />
+      </div>
+      <div class="header-content-right">
+        <SkinSwitcher />
+        <LanguageSwitcher />
+      </div>
     </div>
 
     <div class="archive-header" style="flex-wrap: wrap; gap: 15px;">
@@ -11,15 +16,16 @@
         <button @click="goBack" class="back-btn" :disabled="isSaving">{{ t('common.back').toUpperCase() }}</button>
         <button v-if="dossier && !isEditing && canModify" @click="startEdit" class="back-btn edit-btn">✎ {{
           t('common.edit').toUpperCase() }}</button>
+        
+        <!-- Pulsante Genera Dossier allineato agli altri -->
+        <DossierReportActions v-if="dossier && !isEditing" :dossierId="dossier._id" customClass="back-btn report-btn" />
+
         <template v-if="dossier && isEditing && canModify">
           <button @click="saveEdit" class="back-btn save-btn" :disabled="isSaving">✓ {{ t('common.save').toUpperCase()
           }}</button>
           <button @click="handleAddHumanSection" class="back-btn add-btn" style="margin-left: 10px;">+ {{
           t('dossier.addHumanSection').toUpperCase() }}</button>
         </template>
-      </div>
-      <div class="header-actions" v-if="dossier">
-        <DossierReportActions :dossierId="dossier._id" />
       </div>
     </div>
 
@@ -150,7 +156,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { computed, ref, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { useDossierDetail } from '../../composable/useDossierDetail';
@@ -159,6 +165,8 @@ import DossierReportActions from '../../components/DossierReportActions.vue';
 import DossierSectionRenderer from '../../components/dossier/DossierSectionRenderer.vue';
 import DossierSectionEditor from '../../components/dossier/DossierSectionEditor.vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
+import { useViewSettingsStore } from '../../stores/viewSettings';
+import SkinSwitcher from '../../components/SkinSwitcher.vue';
 import { formatFullDateTime } from '../../utils/dateUtils';
 import dayjs from 'dayjs';
 import { DossierSectionType, type IDossierSection, type IHumanSectionData } from '../../models/DossierDTO';
@@ -169,6 +177,8 @@ const props = defineProps<{
 
 const router = useRouter();
 const { t } = useI18n();
+const viewSettings = useViewSettingsStore();
+const dashboardSkin = computed(() => viewSettings.dashboardSkin);
 
 const {
   dossier,
@@ -281,6 +291,11 @@ const startEditSection = (index: number, section: IDossierSection) => {
 };
 
 const cancelEditSection = () => {
+  const index = editingSectionIndex.value;
+  if (index !== -1 && dossier.value && (dossier.value.sections[index] as any)._isNew) {
+    // Se è una nuova sezione mai salvata, la rimuoviamo dalla lista locale
+    dossier.value.sections.splice(index, 1);
+  }
   editingSectionIndex.value = -1;
 };
 
@@ -317,6 +332,12 @@ const handleSaveSection = async (index: number) => {
   }
 
   try {
+    // Rimuoviamo il flag tecnico prima del salvataggio
+    if ((sectionUpdate as any)._isNew) delete (sectionUpdate as any)._isNew;
+    if (dossier.value && (dossier.value.sections[index] as any)._isNew) {
+       delete (dossier.value.sections[index] as any)._isNew;
+    }
+
     await updateSection(props.id, index, sectionUpdate);
     editingSectionIndex.value = -1;
     ElMessage.success(t('common.save') + ' OK');
@@ -342,14 +363,14 @@ const handleDeleteSection = async (index: number) => {
   }
 };
 
-const handleAddHumanSection = async () => {
+const handleAddHumanSection = () => {
   try {
-    await addHumanSection(props.id);
+    addHumanSection(props.id);
     // L'aggiunta in testa rende la nuova sezione all'indice 0
     if (dossier.value) {
       startEditSection(0, dossier.value.sections[0]);
     }
-    ElMessage.success(t('common.add') + ' OK');
+    // Nessun messaggio di OK qui, lo daremo al salvataggio effettivo
   } catch (err) {
     ElMessage.error(t('common.error'));
   }
@@ -371,433 +392,5 @@ const goBack = () => router.push('/dossiers');
 const formatDate = (date) => formatFullDateTime(date);
 </script>
 
-<style scoped src="./Dossiers.css"></style>
-<style scoped>
-.title-with-back {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-}
-
-.btn-back {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: white;
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-
-.btn-back:hover {
-  background: #6366f1;
-  transform: translateX(-4px);
-}
-
-.detail-container {
-  max-width: 1000px;
-  margin: 0 auto;
-}
-
-.info-card {
-  padding: 30px;
-  margin-bottom: 40px;
-}
-
-.sections-timeline {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.section-preview {
-  padding: 20px;
-  border-left: 4px solid #6366f1;
-}
-
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 15px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  padding-bottom: 10px;
-}
-
-.section-header .badge {
-  background: rgba(99, 102, 241, 0.2);
-  color: #a5b4fc;
-  padding: 4px 12px;
-  border-radius: 6px;
-  font-size: 0.7rem;
-  font-weight: 800;
-}
-
-.section-header .timestamp {
-  color: #64748b;
-  font-size: 0.75rem;
-}
-
-.rendered-content {
-  font-family: inherit;
-  font-size: 0.9rem;
-  line-height: 1.6;
-}
-
-/* OSSERVAZIONI STYLES */
-.observations-container {
-  margin-top: 25px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 15px;
-  background: rgba(245, 158, 11, 0.03);
-  border: 1px solid rgba(245, 158, 11, 0.15);
-  border-radius: 8px;
-}
-
-.obs-card {
-  background: rgba(0, 0, 0, 0.2);
-  border-left: 3px solid #f59e0b;
-  padding: 12px;
-  border-radius: 0 4px 4px 0;
-}
-
-.obs-header-tags {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-}
-
-.obs-label {
-  font-size: 0.65rem;
-  font-weight: 900;
-  color: #f59e0b;
-  letter-spacing: 1px;
-}
-
-.obs-actions {
-  display: flex;
-  gap: 8px;
-}
-
-.mini-icon-btn {
-  background: transparent;
-  border: none;
-  color: #94a3b8;
-  cursor: pointer;
-  font-size: 0.8rem;
-  padding: 2px;
-  transition: all 0.2s;
-}
-
-.mini-icon-btn:hover {
-  color: #f59e0b;
-}
-
-.mini-icon-btn.danger:hover {
-  color: #ef4444;
-}
-
-.obs-pre {
-  margin: 0;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.85rem;
-  color: #fde68a;
-  white-space: pre-wrap;
-  word-break: break-all;
-}
-
-.obs-edit-area {
-  width: 100%;
-  background: #000;
-  border: 1px solid #f59e0b;
-  color: #fde68a;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.85rem;
-  padding: 8px;
-  border-radius: 4px;
-  outline: none;
-}
-
-.obs-edit-footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-top: 5px;
-}
-
-.btn-confirm-mini {
-  background: #f59e0b;
-  color: black;
-  border: none;
-  border-radius: 4px;
-  padding: 2px 8px;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-.btn-cancel-mini {
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
-  border: none;
-  border-radius: 4px;
-  padding: 2px 8px;
-  cursor: pointer;
-}
-
-.add-obs-box {
-  margin-top: 5px;
-}
-
-.obs-input-wrapper {
-  display: flex;
-  gap: 10px;
-}
-
-.obs-quick-input {
-  flex: 1;
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px dashed rgba(245, 158, 11, 0.4);
-  color: #fde68a;
-  padding: 8px 12px;
-  font-size: 0.85rem;
-  border-radius: 4px;
-  outline: none;
-}
-
-.obs-quick-input:focus {
-  border-color: #f59e0b;
-  border-style: solid;
-}
-
-.obs-quick-add {
-  background: #f59e0b;
-  color: black;
-  border: none;
-  width: 32px;
-  height: 32px;
-  border-radius: 4px;
-  font-weight: 900;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.obs-quick-add:hover:not(:disabled) {
-  transform: scale(1.05);
-  box-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
-}
-
-.obs-quick-add:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-/* Override per uniformare i contenuti EJS iniettati */
-:deep(.rendered-content) h2,
-:deep(.rendered-content) h3 {
-  color: #6366f1;
-  font-size: 1rem;
-  margin-top: 15px;
-}
-
-:deep(.rendered-content) table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 10px;
-}
-
-:deep(.rendered-content) td {
-  padding: 8px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  font-size: 0.85rem;
-}
-
-.data-dump {
-  margin-top: 20px;
-  background: #000;
-  padding: 15px;
-  border-radius: 8px;
-  overflow: auto;
-  font-size: 0.75rem;
-}
-
-.style-selector.ghost select {
-  background: transparent;
-  color: #818cf8;
-  border: 1px solid rgba(99, 102, 241, 0.3);
-  padding: 8px 12px;
-}
-
-.indigo-pulse {
-  background: rgba(99, 102, 241, 0.2);
-  color: #a5b4fc;
-  border: 1px solid rgba(99, 102, 241, 0.3);
-  padding: 6px 14px;
-  border-radius: 20px;
-  font-weight: 800;
-  font-size: 0.8rem;
-  letter-spacing: 1px;
-}
-
-/* Standard Header & Back Button */
-.header-top {
-  margin-bottom: 25px;
-}
-
-.back-btn {
-  background: rgba(99, 102, 241, 0.1);
-  color: #818cf8;
-  border: 1px solid rgba(99, 102, 241, 0.3);
-  font-weight: 700;
-  padding: 10px 24px;
-  box-shadow: 0 0 15px rgba(99, 102, 241, 0.15);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.back-btn:hover {
-  background: #6366f1;
-  color: white;
-  box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
-  transform: translateY(-2px);
-  border-color: #6366f1;
-}
-
-.save-btn {
-  border-color: #10b981;
-  color: #10b981;
-}
-
-.save-btn:hover {
-  background: #10b981;
-  border-color: #10b981;
-}
-
-.cancel-btn {
-  border-color: #ef4444;
-  color: #ef4444;
-}
-
-.cancel-btn:hover {
-  background: #ef4444;
-  border-color: #ef4444;
-}
-
-.edit-title-input {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(99, 102, 241, 0.5);
-  color: white;
-  font-size: 2rem;
-  font-weight: 800;
-  padding: 10px 15px;
-  border-radius: 8px;
-  width: 100%;
-  max-width: 600px;
-  outline: none;
-}
-
-.edit-title-input:focus {
-  border-color: #6366f1;
-  background: rgba(0, 0, 0, 0.2);
-}
-
-.edit-desc-input {
-  background: rgba(0, 0, 0, 0.2);
-  border: 1px dashed rgba(99, 102, 241, 0.5);
-  color: #a5b4fc;
-  font-size: 1rem;
-  padding: 15px;
-  border-radius: 8px;
-  width: 100%;
-  resize: vertical;
-  margin-bottom: 20px;
-  outline: none;
-  font-family: inherit;
-}
-
-.edit-desc-input:focus {
-  border-color: #6366f1;
-}
-
-.action-icon-btn {
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #818cf8;
-  font-size: 1.1rem;
-  cursor: pointer;
-  padding: 4px;
-  width: 32px;
-  height: 32px;
-  border-radius: 6px;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.action-icon-btn:hover {
-  background: rgba(99, 102, 241, 0.2);
-  transform: scale(1.05);
-  border-color: rgba(99, 102, 241, 0.5);
-}
-
-.active-expert {
-  background: #fbbf24 !important;
-  color: black !important;
-  border-color: #fbbf24 !important;
-  box-shadow: 0 0 10px rgba(251, 191, 36, 0.3) !important;
-}
-
-.btn-expert {
-  font-size: 0.7rem !important;
-  font-weight: 800;
-  font-family: monospace;
-}
-
-.expert-json {
-  border-color: #fbbf24 !important;
-  color: #fbbf24 !important;
-}
-
-.expert-json:focus {
-  box-shadow: none !important;
-}
-
-.action-icon-btn.success-text:hover {
-  background: rgba(16, 185, 129, 0.2);
-  border-color: rgba(16, 185, 129, 0.5);
-}
-
-.action-icon-btn.danger-text:hover {
-  background: rgba(239, 68, 68, 0.2);
-  border-color: rgba(239, 68, 68, 0.5);
-}
-
-.add-section-action {
-  margin-top: 30px;
-  display: flex;
-  justify-content: center;
-  padding-bottom: 50px;
-}
-
-.add-btn-full {
-  width: 100%;
-  max-width: 400px;
-  border-style: dashed;
-  background: rgba(99, 102, 241, 0.05);
-  height: 50px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.9rem;
-  letter-spacing: 2px;
-}
-
-.add-btn-full:hover {
-  border-style: solid;
-  background: rgba(99, 102, 241, 0.15);
-}
-</style>
+<style scoped src="./DossierDetail.css"></style>
+<style scoped src="./DossierDetailCyber.css"></style>

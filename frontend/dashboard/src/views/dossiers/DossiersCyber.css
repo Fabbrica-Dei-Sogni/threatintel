@@ -1,0 +1,165 @@
+/* DossiersCyber.css - NOIR INVESTIGATION EDITION */
+
+.skin-cyber.dossier-archive-view {
+  --noir-bg: #050505;
+  --noir-surface: #0a0a0a;
+  --noir-border: #222222;
+  --noir-primary: #ffffff;
+  --noir-accent: #888888;
+  --noir-text: #e0e0e0;
+  --noir-text-muted: #666666;
+  
+  background-color: var(--noir-bg) !important;
+  color: var(--noir-text) !important;
+  font-family: 'JetBrains Mono', monospace !important;
+}
+
+/* === HEADER & SWITCHER ALIGNMENT === */
+.skin-cyber.dossier-archive-view .header-top {
+  border-bottom: 1px solid var(--noir-border) !important;
+  padding: 20px 0 !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  background: transparent !important;
+}
+
+.skin-cyber.dossier-archive-view .header-content-right {
+  display: flex !important;
+  gap: 15px !important;
+  align-items: center !important;
+}
+
+.skin-cyber.dossier-archive-view h1 {
+  background: none !important;
+  -webkit-text-fill-color: initial !important;
+  color: var(--noir-primary) !important;
+  font-weight: 200 !important;
+  letter-spacing: 4px !important;
+  text-transform: uppercase !important;
+}
+
+/* === CONTROLS === */
+.skin-cyber.dossier-archive-view .archive-controls {
+  background: var(--noir-surface) !important;
+  border: 1px solid var(--noir-border) !important;
+  border-radius: 0 !important;
+  padding: 20px !important;
+  box-shadow: none !important;
+}
+
+.skin-cyber.dossier-archive-view .search-input,
+.skin-cyber.dossier-archive-view .filter-select {
+  background: black !important;
+  border: 1px solid var(--noir-border) !important;
+  border-radius: 0 !important;
+  color: var(--noir-text) !important;
+  font-family: inherit !important;
+}
+
+.skin-cyber.dossier-archive-view .search-input:focus {
+  border-color: var(--noir-primary) !important;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.1) !important;
+}
+
+/* === GRID & CARDS === */
+.skin-cyber.dossier-archive-view .dossier-card {
+  background: var(--noir-surface) !important;
+  border: 1px solid var(--noir-border) !important;
+  border-radius: 0 !important;
+  transition: all 0.3s ease !important;
+}
+
+.skin-cyber.dossier-archive-view .dossier-card::before {
+  background: var(--noir-primary) !important;
+  width: 2px !important;
+}
+
+.skin-cyber.dossier-archive-view .dossier-card:hover {
+  transform: none !important;
+  border-color: var(--noir-primary) !important;
+  background: #0f0f0f !important;
+}
+
+.skin-cyber.dossier-archive-view .dossier-card h3 {
+  color: var(--noir-primary) !important;
+  font-weight: 400 !important;
+  letter-spacing: 1px !important;
+}
+
+.skin-cyber.dossier-archive-view .description {
+  color: var(--noir-accent) !important;
+}
+
+.skin-cyber.dossier-archive-view .tag-badge {
+  background: #1a1a1a !important;
+  color: var(--noir-text) !important;
+  border: 1px solid var(--noir-border) !important;
+  border-radius: 0 !important;
+}
+
+/* === BUTTONS === */
+.skin-cyber.dossier-archive-view .btn-archive {
+  background: transparent !important;
+  border: 1px solid var(--noir-border) !important;
+  border-radius: 0 !important;
+  color: var(--noir-accent) !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1px !important;
+}
+
+.skin-cyber.dossier-archive-view .btn-archive:hover:not(.delete) {
+  background: var(--noir-primary) !important;
+  color: black !important;
+  border-color: var(--noir-primary) !important;
+}
+
+.skin-cyber.dossier-archive-view .btn-archive.primary {
+  border-color: var(--noir-accent) !important;
+}
+
+.skin-cyber.dossier-archive-view .btn-archive.delete:hover {
+  background: #330000 !important;
+  color: #ff0000 !important;
+  border-color: #ff0000 !important;
+}
+
+.skin-cyber.dossier-archive-view .back-btn {
+  background: transparent !important;
+  border: 1px solid var(--noir-border) !important;
+  color: var(--noir-accent) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+.skin-cyber.dossier-archive-view .back-btn:hover {
+  border-color: var(--noir-primary) !important;
+  color: var(--noir-primary) !important;
+}
+
+/* === NOIR SCANLINES EFFECT === */
+.skin-cyber.dossier-archive-view::after {
+  content: " ";
+  display: block;
+  position: fixed;
+  top: 0; left: 0; bottom: 0; right: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%),
+              linear-gradient(90deg, rgba(255, 255, 255, 0.02), rgba(0, 0, 0, 0.02), rgba(255, 255, 255, 0.02));
+  background-size: 100% 4px, 3px 100%;
+  pointer-events: none;
+  z-index: 100;
+  opacity: 0.3;
+}
+
+@keyframes noir-grain {
+  0%, 100% { transform:translate(0, 0) }
+  10% { transform:translate(-5%, -10%) }
+  20% { transform:translate(-15%, 5%) }
+  30% { transform:translate(7%, -25%) }
+  40% { transform:translate(-5%, 25%) }
+  50% { transform:translate(-15%, 10%) }
+  60% { transform:translate(15%, 0) }
+  70% { transform:translate(0, 15%) }
+  80% { transform:translate(3%, 35%) }
+  90% { transform:translate(-10%, 10%) }
+}

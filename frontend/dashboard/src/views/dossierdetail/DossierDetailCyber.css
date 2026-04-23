@@ -1,0 +1,160 @@
+/* DossierDetailCyber.css - NOIR INVESTIGATION EDITION */
+
+.skin-cyber.dossier-archive-view.detail-mode {
+  --noir-bg: #050505;
+  --noir-surface: #0a0a0a;
+  --noir-border: #222222;
+  --noir-primary: #ffffff;
+  --noir-accent: #888888;
+  --noir-text: #e0e0e0;
+  
+  background-color: var(--noir-bg) !important;
+  color: var(--noir-text) !important;
+  font-family: 'JetBrains Mono', monospace !important;
+}
+
+/* === HEADER === */
+.header-top {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  justify-content: space-between !important;
+  align-items: flex-end !important;
+  gap: 15px !important;
+  border-bottom: 1px solid var(--noir-border) !important;
+  padding: 20px 0 !important;
+  margin-bottom: 30px !important;
+}
+
+.header-content-left {
+  flex: 1 1 100% !important;
+}
+
+.header-content-right {
+  margin-left: auto !important;
+  display: flex !important;
+  gap: 15px !important;
+  align-items: center !important;
+}
+
+.skin-cyber.dossier-archive-view.detail-mode h1 {
+  color: var(--noir-primary) !important;
+  font-weight: 200 !important;
+  letter-spacing: 3px !important;
+  text-transform: uppercase !important;
+  margin: 0 !important;
+}
+
+/* === CARDS & SECTIONS === */
+.skin-cyber.dossier-archive-view.detail-mode .glass-card,
+.skin-cyber.dossier-archive-view.detail-mode .info-card {
+  background: var(--noir-surface) !important;
+  border: 1px solid var(--noir-border) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+.skin-cyber.dossier-archive-view.detail-mode .section-preview {
+  border-left: 2px solid var(--noir-primary) !important;
+  margin-bottom: 25px !important;
+}
+
+.skin-cyber.dossier-archive-view.detail-mode .section-header {
+  border-bottom: 1px solid var(--noir-border) !important;
+}
+
+.skin-cyber.dossier-archive-view.detail-mode .section-header .badge {
+  background: #1a1a1a !important;
+  color: var(--noir-text) !important;
+  border: 1px solid var(--noir-border) !important;
+  border-radius: 0 !important;
+}
+
+/* === OBSERVATIONS === */
+.skin-cyber.dossier-archive-view.detail-mode .observations-container {
+  background: #080808 !important;
+  border: 1px solid var(--noir-border) !important;
+  border-radius: 0 !important;
+}
+
+.skin-cyber.dossier-archive-view.detail-mode .obs-card {
+  background: transparent !important;
+  border-left: 2px solid var(--noir-accent) !important;
+}
+
+.skin-cyber.dossier-archive-view.detail-mode .obs-pre {
+  color: var(--noir-text) !important;
+}
+
+/* === INPUTS & FORMS === */
+.skin-cyber.dossier-archive-view.detail-mode .edit-title-input,
+.skin-cyber.dossier-archive-view.detail-mode .edit-desc-input,
+.skin-cyber.dossier-archive-view.detail-mode .obs-quick-input {
+  background: black !important;
+  border: 1px solid var(--noir-border) !important;
+  border-radius: 0 !important;
+  color: var(--noir-primary) !important;
+  font-family: inherit !important;
+}
+
+.skin-cyber.dossier-archive-view.detail-mode .edit-title-input:focus,
+.skin-cyber.dossier-archive-view.detail-mode .edit-desc-input:focus {
+  border-color: var(--noir-primary) !important;
+}
+
+/* === BUTTONS === */
+.skin-cyber.dossier-archive-view.detail-mode .back-btn,
+.skin-cyber.dossier-archive-view.detail-mode .action-icon-btn {
+  background: transparent !important;
+  border: 1px solid var(--noir-border) !important;
+  border-radius: 0 !important;
+  color: var(--noir-accent) !important;
+  box-shadow: none !important;
+}
+
+.skin-cyber.dossier-archive-view.detail-mode .action-icon-btn:hover,
+.title-with-back :deep(.back-btn:hover) {
+  background: var(--noir-primary) !important;
+  color: black !important;
+  border-color: var(--noir-primary) !important;
+}
+
+.title-with-back :deep(.back-btn) {
+  background: transparent !important;
+  border: 1px solid var(--noir-border) !important;
+  border-radius: 0 !important;
+  color: var(--noir-accent) !important;
+  box-shadow: none !important;
+  height: 44px !important;
+  padding: 0 24px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-family: inherit !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1px !important;
+  font-weight: 700 !important;
+}
+
+.skin-cyber.dossier-archive-view.detail-mode .save-btn {
+  border-color: var(--noir-accent) !important;
+  color: var(--noir-primary) !important;
+}
+
+.skin-cyber.dossier-archive-view.detail-mode .add-btn-full {
+  border-style: dashed !important;
+  background: transparent !important;
+}
+
+/* === NOIR OVERLAY === */
+.skin-cyber.dossier-archive-view.detail-mode::after {
+  content: " ";
+  display: block;
+  position: fixed;
+  top: 0; left: 0; bottom: 0; right: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%),
+              linear-gradient(90deg, rgba(255, 255, 255, 0.02), rgba(0, 0, 0, 0.02), rgba(255, 255, 255, 0.02));
+  background-size: 100% 4px, 3px 100%;
+  pointer-events: none;
+  z-index: 100;
+  opacity: 0.3;
+}

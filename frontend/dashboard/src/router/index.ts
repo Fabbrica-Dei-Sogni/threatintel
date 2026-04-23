@@ -109,7 +109,7 @@ const routes: RouteRecordRaw[] = [
     { 
         path: '/dossiers/:id', 
         name: 'DossierDetail', 
-        component: () => import('../views/dossiers/DossierDetail.vue'),
+        component: () => import('../views/dossierdetail/DossierDetail.vue'),
         props: true
     },
     {

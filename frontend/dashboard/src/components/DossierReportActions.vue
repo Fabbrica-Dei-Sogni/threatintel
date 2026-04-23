@@ -1,6 +1,6 @@
 <template>
   <div class="report-actions-wrapper">
-    <Teleport to="body" :disabled="mode !== 'sticky'">
+    <Teleport to="body" :disabled="!teleport">
       <BaseDossierHUD
         v-if="authStore.isAuthenticated"
         mode="button"
@@ -16,10 +16,9 @@
       >
         <template #trigger="{ toggle, isOpen }">
           <div class="button-report-container">
-            <button @click="toggle" class="cyber-report-btn" :class="{ 'is-active': isOpen }">
+            <button @click="toggle" :class="[customClass || 'cyber-report-btn', { 'is-active': isOpen }]">
               <span v-if="loadingPdf || loadingHtml" class="spinner-small"></span>
               <span v-else class="btn-content">
-                <span class="icon">📊</span>
                 {{ t('common.generateReport').toUpperCase() }}
               </span>
             </button>
@@ -66,7 +65,9 @@ const showGate = ref(false);
 
 const props = defineProps({
   dossierId: { type: String, required: true },
-  accentColor: { type: String, default: '#6366f1' }
+  accentColor: { type: String, default: '#6366f1' },
+  teleport: { type: Boolean, default: false },
+  customClass: { type: String, default: '' }
 });
 
 const showPreview = ref(false);

@@ -1,8 +1,13 @@
 <template>
-  <div class="dossier-archive-view">
+  <div class="dossier-archive-view" :class="'skin-' + dashboardSkin">
     <div class="header-top">
-      <h1>🗃️ {{ t('nav.archive').toUpperCase() }}</h1>
-      <LanguageSwitcher />
+      <div class="header-content-left">
+        <h1>🗃️ {{ t('nav.archive').toUpperCase() }}</h1>
+      </div>
+      <div class="header-content-right">
+        <SkinSwitcher />
+        <LanguageSwitcher />
+      </div>
     </div>
 
     <div class="archive-header">
@@ -109,6 +114,8 @@ import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
 import { ElMessageBox, ElMessage } from 'element-plus';
 import { useDossierStore } from '../../stores/dossier';
 import { useAuthStore } from '../../stores/auth';
+import { useViewSettingsStore } from '../../stores/viewSettings';
+import SkinSwitcher from '../../components/SkinSwitcher.vue';
 import { useDossiersFilter } from '../../composable/useDossiersFilter';
 import { formatDateTime, formatFullDateTime } from '../../utils/dateUtils';
 import dayjs from 'dayjs';
@@ -117,6 +124,8 @@ const { t } = useI18n();
 const router = useRouter();
 const dossierStore = useDossierStore();
 const authStore = useAuthStore();
+const viewSettings = useViewSettingsStore();
+const dashboardSkin = computed(() => viewSettings.dashboardSkin);
 
 const props = defineProps({
   initialSearch: { type: String, default: '' },
@@ -232,6 +241,7 @@ onMounted(() => {
 </script>
 
 <style scoped src="./Dossiers.css"></style>
+<style scoped src="./DossiersCyber.css"></style>
 <style scoped>
 /* Additional specific utility classes for the view */
 .indigo-pulse {

@@ -73,29 +73,21 @@ export function useDossierDetail() {
         }
     };
 
-    const addHumanSection = async (id: string) => {
+    const addHumanSection = (id: string) => {
         if (!id || !dossier.value) return;
-        isSaving.value = true;
-        try {
-            const newSection: IDossierSection = {
-                type: DossierSectionType.HUMAN,
-                templateKey: 'sectionHuman',
-                data: { text: '' },
-                timestamp: new Date().toISOString(),
-                order: 0
-            };
-            
-            const updatedSections = sortSections([newSection, ...dossier.value.sections]);
-            await updateDossier(id, { sections: updatedSections });
-            dossier.value.sections = updatedSections;
-            dossierStore.notifySaved();
-            return updatedSections;
-        } catch (err) {
-            console.error('[useDossierDetail] Errore aggiunta sezione:', err);
-            throw err;
-        } finally {
-            isSaving.value = false;
-        }
+        
+        const newSection: any = {
+            type: DossierSectionType.HUMAN,
+            templateKey: 'sectionHuman',
+            data: { text: '' },
+            timestamp: new Date().toISOString(),
+            order: 0,
+            _isNew: true // Flag per gestione UI
+        };
+        
+        const updatedSections = sortSections([newSection, ...dossier.value.sections]);
+        dossier.value.sections = updatedSections;
+        return updatedSections;
     };
 
     const updateSection = async (id: string, index: number, sectionData: Partial<IDossierSection>) => {

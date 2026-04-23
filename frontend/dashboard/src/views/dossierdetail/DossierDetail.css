@@ -7,17 +7,53 @@
     color: #e2e8f0;
 }
 
-.title-with-back {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-}
-
 .archive-header {
   display: flex;
-  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
   gap: 15px;
   margin-bottom: 40px;
+  width: 100%;
+}
+
+.header-nav-left, .header-nav-right {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.edit-btn-compact, .cancel-btn-compact {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #818cf8;
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.edit-btn-compact:hover {
+  background: #6366f1;
+  color: white;
+  box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
+  transform: translateY(-2px);
+}
+
+.cancel-btn-compact {
+  color: #ef4444;
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.cancel-btn-compact:hover {
+  background: #ef4444;
+  color: white;
+  border-color: #ef4444;
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
 }
 
 .btn-back {

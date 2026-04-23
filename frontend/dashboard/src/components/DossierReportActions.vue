@@ -16,7 +16,18 @@
       >
         <template #trigger="{ toggle, isOpen }">
           <div class="button-report-container">
-            <button @click="toggle" :class="[customClass || 'cyber-report-btn', { 'is-active': isOpen }]">
+            <el-tooltip
+              v-if="mode === 'compact'"
+              :content="t('common.generateReport')"
+              placement="top"
+              effect="dark"
+            >
+              <button @click="toggle" :class="[customClass || 'cyber-report-btn', 'compact', { 'is-active': isOpen }]">
+                <span v-if="loadingPdf || loadingHtml" class="spinner-small"></span>
+                <span v-else class="btn-content">📄</span>
+              </button>
+            </el-tooltip>
+            <button v-else @click="toggle" :class="[customClass || 'cyber-report-btn', { 'is-active': isOpen }]">
               <span v-if="loadingPdf || loadingHtml" class="spinner-small"></span>
               <span v-else class="btn-content">
                 {{ t('common.generateReport').toUpperCase() }}
@@ -67,7 +78,8 @@ const props = defineProps({
   dossierId: { type: String, required: true },
   accentColor: { type: String, default: '#6366f1' },
   teleport: { type: Boolean, default: false },
-  customClass: { type: String, default: '' }
+  customClass: { type: String, default: '' },
+  mode: { type: String, default: 'normal' } // 'normal' | 'compact'
 });
 
 const showPreview = ref(false);
@@ -152,6 +164,26 @@ const handleDownload = async (style) => {
   background: var(--theme-color);
   color: white;
   border-color: var(--theme-color);
+}
+
+.cyber-report-btn.compact {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #818cf8;
+}
+
+.cyber-report-btn.compact:hover {
+  background: #6366f1;
+  color: white;
+  box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
+  transform: translateY(-2px);
 }
 
 .spinner-small {

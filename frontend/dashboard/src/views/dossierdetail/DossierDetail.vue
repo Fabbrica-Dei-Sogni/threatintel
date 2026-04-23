@@ -25,23 +25,41 @@
         <button @click="goBack" class="back-btn" :disabled="isSaving">{{ t('common.back').toUpperCase() }}</button>
       </div>
 
-      <div class="title-with-back">
-        <button v-if="dossier && !isEditing && canModify" @click="startEdit" class="back-btn edit-btn">✎ {{
-          t('common.edit').toUpperCase() }}</button>
-        
+      <div class="header-nav-right">
         <!-- Pulsante Genera Dossier allineato agli altri -->
         <DossierReportActions 
           v-if="dossier && !isEditing" 
           :dossierId="dossier._id" 
           customClass="back-btn report-btn" 
           :accentColor="reportAccentColor"
+          mode="compact"
         />
 
+        <el-tooltip
+          v-if="dossier && !isEditing && canModify"
+          :content="t('common.edit')"
+          placement="top"
+          effect="dark"
+        >
+          <button @click="startEdit" class="edit-btn-compact">
+            ✎
+          </button>
+        </el-tooltip>
+
         <template v-if="dossier && isEditing && canModify">
-          <button @click="saveEdit" class="back-btn save-btn" :disabled="isSaving">✓ {{ t('common.save').toUpperCase()
-          }}</button>
-          <button @click="cancelEdit" class="back-btn add-btn" style="margin-left: 10px;">✗ {{
-          t('common.cancel').toUpperCase() }}</button>
+          <button @click="saveEdit" class="back-btn save-btn" :disabled="isSaving">
+            ✓ {{ t('common.save').toUpperCase() }}
+          </button>
+          
+          <el-tooltip
+            :content="t('common.cancel')"
+            placement="top"
+            effect="dark"
+          >
+            <button @click="cancelEdit" class="back-btn cancel-btn-compact">
+              ✗
+            </button>
+          </el-tooltip>
         </template>
       </div>
     </div>

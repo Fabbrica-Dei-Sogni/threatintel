@@ -103,10 +103,46 @@
 }
 
 /* Counter & Back Nav */
-.skin-cyber.dossier-archive-view.detail-mode .header-nav-left {
+.skin-cyber.dossier-archive-view.detail-mode .header-nav-left,
+.skin-cyber.dossier-archive-view.detail-mode .header-nav-right {
   display: flex;
   align-items: center;
-  gap: 25px;
+  gap: 15px;
+}
+
+.skin-cyber.dossier-archive-view.detail-mode .edit-btn-compact,
+.skin-cyber.dossier-archive-view.detail-mode .cancel-btn-compact {
+  background: transparent !important;
+  border: 1px solid var(--cy-primary) !important;
+  color: var(--cy-primary) !important;
+  border-radius: 0 !important;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 800;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.skin-cyber.dossier-archive-view.detail-mode .edit-btn-compact:hover {
+  background: var(--cy-primary) !important;
+  color: var(--cy-bg) !important;
+  box-shadow: 0 0 15px var(--cy-primary);
+}
+
+.skin-cyber.dossier-archive-view.detail-mode .cancel-btn-compact {
+  border-color: #f87171 !important;
+  color: #f87171 !important;
+}
+
+.skin-cyber.dossier-archive-view.detail-mode .cancel-btn-compact:hover {
+  background: #ef4444 !important;
+  color: white !important;
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 15px #ef4444;
 }
 
 .skin-cyber.dossier-archive-view.detail-mode .header-counter-technical {
@@ -312,6 +348,22 @@
   color: var(--cy-primary) !important;
   box-shadow: none !important;
   transform: none !important;
+}
+
+.skin-cyber.dossier-archive-view.detail-mode :deep(.report-btn.compact) {
+  width: 44px !important;
+  height: 44px !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.skin-cyber.dossier-archive-view.detail-mode :deep(.report-btn.compact:hover) {
+  background: var(--cy-primary) !important;
+  color: var(--cy-bg) !important;
+  box-shadow: 0 0 15px var(--cy-primary) !important;
 }
 
 .skin-cyber.dossier-archive-view.detail-mode .add-btn-full {

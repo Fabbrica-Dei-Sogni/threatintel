@@ -23,7 +23,7 @@
         <span class="value amber-text fw-800">{{ data.method }}</span>
       </div>
       <div class="data-item full-width">
-        <label>{{ t('dossierSections.url') }} (PATH)</label>
+        <label>{{ t('dossierSections.url') }} {{ t('dossierSections.pathSuffix') }}</label>
         <span class="value emerald-text url-text">{{ data.path }}</span>
       </div>
       <div class="data-item full-width">

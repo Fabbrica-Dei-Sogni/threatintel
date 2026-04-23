@@ -723,6 +723,10 @@
         "saveError": "Errore durante il salvataggio."
     },
     "dossierSections": {
+        "logDetailSuffix": "(LOG DETTAGLIO)",
+        "telnetSessionSuffix": "(SESSIONE TELNET)",
+        "attackSummarySuffix": "(SINTESI ATTACCO)",
+        "pathSuffix": "(PATH)",
         "ip": "Indirizzo IP",
         "country": "Nazione/Origine",
         "city": "Città / Regione",
@@ -785,6 +789,14 @@
             "human": "NOTA MANUALE",
             "scanner_analysis": "ANALISI SCANNER"
         },
-        "addObservationPlaceholder": "Aggiungi nota investigativa..."
+        "addObservationPlaceholder": "Aggiungi nota investigativa...",
+        "analystNote": "Nota dell'Analista",
+        "actions": {
+            "editSection": "Modifica Sezione",
+            "deleteSection": "Elimina Sezione",
+            "saveSection": "Salva Sezione",
+            "expertMode": "Expert Mode (JSON)",
+            "cancel": "Annulla"
+        }
     }
 }

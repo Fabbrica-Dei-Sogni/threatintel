@@ -11,7 +11,7 @@
       </div>
     </div>
 
-    <div class="archive-header" style="flex-wrap: wrap; gap: 15px;">
+    <div class="archive-header">
       <div class="title-with-back">
         <button @click="goBack" class="back-btn" :disabled="isSaving">{{ t('common.back').toUpperCase() }}</button>
         <button v-if="dossier && !isEditing && canModify" @click="startEdit" class="back-btn edit-btn">✎ {{
@@ -72,16 +72,16 @@
                 <span class="timestamp">{{ formatDate(section.timestamp) }}</span>
                 <template v-if="editingSectionIndex !== index">
                   <button v-if="canModify" @click="startEditSection(index, section)" class="action-icon-btn"
-                    title="Modifica Sezione">✎</button>
+                    :title="t('dossier.actions.editSection')">✎</button>
                   <button v-if="canModify" @click="handleDeleteSection(index)" class="action-icon-btn danger-text"
-                    title="Elimina Sezione">🗑</button>
+                    :title="t('dossier.actions.deleteSection')">🗑</button>
                 </template>
                 <template v-else>
-                  <button @click="handleSaveSection(index)" class="action-icon-btn success-text" title="Salva Sezione"
+                  <button @click="handleSaveSection(index)" class="action-icon-btn success-text" :title="t('dossier.actions.saveSection')"
                     :disabled="isSaving">✓</button>
                   <button @click="showRawEdit = !showRawEdit" class="action-icon-btn btn-expert"
-                    :class="{ 'active-expert': showRawEdit }" title="Expert Mode (JSON)">{...}</button>
-                  <button @click="cancelEditSection()" class="action-icon-btn" title="Annulla"
+                    :class="{ 'active-expert': showRawEdit }" :title="t('dossier.actions.expertMode')">{...}</button>
+                  <button @click="cancelEditSection()" class="action-icon-btn" :title="t('dossier.actions.cancel')"
                     :disabled="isSaving">✗</button>
                 </template>
               </div>
@@ -96,7 +96,7 @@
                   <div v-for="(obs, obsIdx) in section.observations" :key="obsIdx" class="obs-item-wrapper">
                     <div class="obs-card">
                       <div class="obs-header-tags">
-                        <span class="obs-label">OSS-{{ obsIdx + 1 }} / {{ t('reports.common.analystNote').toUpperCase() }}</span>
+                        <span class="obs-label">OSS-{{ obsIdx + 1 }} / {{ t('dossier.analystNote').toUpperCase() }}</span>
                         <div class="obs-actions" v-if="!isSaving && canModify">
                           <button @click="startEditObs(index, obsIdx, obs)" class="mini-icon-btn">✎</button>
                           <button @click="handleRemoveObs(index, obsIdx)" class="mini-icon-btn danger">🗑</button>

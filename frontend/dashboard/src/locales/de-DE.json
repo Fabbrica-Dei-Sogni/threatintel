@@ -724,6 +724,10 @@
         "saveError": "Fehler beim Speichern."
     },
     "dossierSections": {
+        "logDetailSuffix": "(LOG DETAIL)",
+        "telnetSessionSuffix": "(TELNET SITZUNG)",
+        "attackSummarySuffix": "(ANGRIFFS-ZUSAMMENFASSUNG)",
+        "pathSuffix": "(PFAD)",
         "ip": "IP-Adresse",
         "country": "Land/Herkunft",
         "city": "Stadt / Region",
@@ -786,6 +790,14 @@
             "human": "MANUELLE NOTIZ",
             "scanner_analysis": "SCANNER-ANALYSE"
         },
-        "addObservationPlaceholder": "Investigative Notiz hinzufügen..."
+        "addObservationPlaceholder": "Investigative Notiz hinzufügen...",
+        "analystNote": "Analystennotiz",
+        "actions": {
+            "editSection": "Abschnitt bearbeiten",
+            "deleteSection": "Abschnitt löschen",
+            "saveSection": "Abschnitt speichern",
+            "expertMode": "Expertenmodus (JSON)",
+            "cancel": "Abbrechen"
+        }
     }
 }

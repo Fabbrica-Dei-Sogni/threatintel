@@ -2,7 +2,7 @@
   <div class="dossier-section telnet-summary-section">
     <div class="section-title">
       <span class="icon">🖥️</span>
-      <h3>{{ t('dossierSections.abuseInfo') }} (SESSIONE TELNET)</h3>
+      <h3>{{ t('dossierSections.abuseInfo') }} {{ t('dossierSections.telnetSessionSuffix') }}</h3>
     </div>
     
     <div class="data-grid">

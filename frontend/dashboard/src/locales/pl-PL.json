@@ -724,6 +724,10 @@
         "saveError": "Błąd podczas zapisywania."
     },
     "dossierSections": {
+        "logDetailSuffix": "(LOG SZCZEGÓŁOWY)",
+        "telnetSessionSuffix": "(SESJA TELNET)",
+        "attackSummarySuffix": "(PODSUMOWANIE ATAKU)",
+        "pathSuffix": "(ŚCIEŻKA)",
         "ip": "Adres IP",
         "country": "Kraj/Pochodzenie",
         "city": "Miasto / Region",
@@ -786,6 +790,14 @@
             "human": "NOTATKA RĘCZNA",
             "scanner_analysis": "ANALIZA SKANERA"
         },
-        "addObservationPlaceholder": "Dodaj notatkę śledczą..."
+        "addObservationPlaceholder": "Dodaj notatkę śledczą...",
+        "analystNote": "Notatka Analityka",
+        "actions": {
+            "editSection": "Edytuj sekcję",
+            "deleteSection": "Usuń sekcję",
+            "saveSection": "Zapisz sekcję",
+            "expertMode": "Tryb eksperta (JSON)",
+            "cancel": "Anuluj"
+        }
     }
 }

@@ -724,6 +724,10 @@
         "saveError": "Ошибка при сохранении."
     },
     "dossierSections": {
+        "logDetailSuffix": "(ПОДРОБНЫЙ ЛОГ)",
+        "telnetSessionSuffix": "(СЕССИЯ TELNET)",
+        "attackSummarySuffix": "(СВОДКА АТАКИ)",
+        "pathSuffix": "(ПУТЬ)",
         "ip": "IP-адрес",
         "country": "Страна/Происхождение",
         "city": "Город / Регион",
@@ -786,6 +790,14 @@
             "human": "РУЧНАЯ ЗАМЕТКА",
             "scanner_analysis": "АНАЛИЗ СКАНЕРА"
         },
-        "addObservationPlaceholder": "Добавить следственную заметку..."
+        "addObservationPlaceholder": "Добавить следственную заметку...",
+        "analystNote": "Заметка аналитика",
+        "actions": {
+            "editSection": "Изменить раздел",
+            "deleteSection": "Удалить раздел",
+            "saveSection": "Сохранить раздел",
+            "expertMode": "Режим эксперта (JSON)",
+            "cancel": "Отмена"
+        }
     }
 }

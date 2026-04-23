@@ -2,7 +2,7 @@
   <div class="dossier-section ip-abuse-log-section">
     <div class="section-title">
       <span class="icon">🚩</span>
-      <h3>{{ t('dossierSections.abuseInfo') }} (LOG DETTAGLIO)</h3>
+      <h3>{{ t('dossierSections.abuseInfo') }} {{ t('dossierSections.logDetailSuffix') }}</h3>
     </div>
     
     <div class="data-grid">

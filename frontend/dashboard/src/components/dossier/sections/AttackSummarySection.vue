@@ -2,7 +2,7 @@
   <div class="dossier-section attack-summary-section">
     <div class="section-title">
       <span class="icon">⚔️</span>
-      <h3>{{ t('dossierSections.abuseInfo') }} (SINTESI ATTACCO)</h3>
+      <h3>{{ t('dossierSections.abuseInfo') }} {{ t('dossierSections.attackSummarySuffix') }}</h3>
       <span v-if="data.defcon" class="badge-defcon" :class="`defcon-${data.defcon}`">DEFCON {{ data.defcon }}</span>
     </div>
     

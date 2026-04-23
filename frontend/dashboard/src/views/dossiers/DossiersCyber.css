@@ -2,16 +2,17 @@
 
 .skin-cyber.dossier-archive-view {
   --noir-bg: #050505;
-  --noir-surface: #0a0a0a;
-  --noir-border: #222222;
+  --noir-surface: #0c0c0c;
+  --noir-border: #1f1f1f;
   --noir-primary: #ffffff;
-  --noir-accent: #888888;
-  --noir-text: #e0e0e0;
-  --noir-text-muted: #666666;
+  --noir-accent: #555555;
+  --noir-text: #a0a0a0;
+  --noir-data: #d1d5db;
+  --noir-classified: #d97706;
   
   background-color: var(--noir-bg) !important;
   color: var(--noir-text) !important;
-  font-family: 'JetBrains Mono', monospace !important;
+  font-family: 'Inter', sans-serif !important;
 }
 
 /* === HEADER & SWITCHER ALIGNMENT === */
@@ -34,9 +35,22 @@
   background: none !important;
   -webkit-text-fill-color: initial !important;
   color: var(--noir-primary) !important;
-  font-weight: 200 !important;
-  letter-spacing: 4px !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.3em !important;
   text-transform: uppercase !important;
+  font-size: 1.5rem !important;
+  position: relative;
+}
+
+.skin-cyber.dossier-archive-view h1::after {
+  content: "ARCHIVE // ACCESS RESTRICTED";
+  position: absolute;
+  top: -15px;
+  left: 0;
+  font-size: 0.5rem;
+  letter-spacing: 2px;
+  color: var(--noir-classified);
+  font-weight: 800;
 }
 
 /* === CONTROLS === */
@@ -77,18 +91,34 @@
 
 .skin-cyber.dossier-archive-view .dossier-card:hover {
   transform: none !important;
-  border-color: var(--noir-primary) !important;
-  background: #0f0f0f !important;
+  border-color: var(--noir-classified) !important;
+  background: #080808 !important;
+}
+
+.skin-cyber.dossier-archive-view .dossier-card::after {
+  content: "CLASSIFIED";
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  font-size: 0.5rem;
+  color: var(--noir-accent);
+  opacity: 0.3;
+  letter-spacing: 2px;
 }
 
 .skin-cyber.dossier-archive-view .dossier-card h3 {
   color: var(--noir-primary) !important;
-  font-weight: 400 !important;
+  font-weight: 900 !important;
   letter-spacing: 1px !important;
+  text-transform: uppercase !important;
+  border-bottom: 1px solid var(--noir-border);
+  padding-bottom: 10px;
 }
 
 .skin-cyber.dossier-archive-view .description {
-  color: var(--noir-accent) !important;
+  color: var(--noir-text) !important;
+  font-size: 0.8rem !important;
+  line-height: 1.4 !important;
 }
 
 .skin-cyber.dossier-archive-view .tag-badge {

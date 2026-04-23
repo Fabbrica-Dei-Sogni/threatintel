@@ -357,6 +357,13 @@
                     <div class="widget-header">
                       <div class="title-content">
                         <h3>{{ $t('home.recentDossiers').toUpperCase() }}</h3>
+                        <div class="title-meta">
+                          <div class="ranking-header-actions">
+                            <button class="btn-ranking-action" @click="goToArchive">
+                              {{ t('common.more_info') }}
+                            </button>
+                          </div>
+                        </div>
                       </div>
                     </div>
 

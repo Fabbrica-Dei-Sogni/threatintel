@@ -6,7 +6,7 @@
  */
 const THREAT_LOG_SORT_FIELDS = new Set([
     'timestamp', 'request.ip', 'request.url', 'request.method',
-    'fingerprint.score', 'fingerprint.suspicious', 'protocol'
+    'fingerprint.score', 'fingerprint.suspicious', 'protocol', 'fingerprint.hash'
 ]);
 
 const ATTACK_SORT_FIELDS = new Set([
@@ -29,7 +29,7 @@ const DOSSIER_SORT_FIELDS = new Set([
 const THREAT_LOG_FILTER_FIELDS = new Set([
     'request.ip', 'request.url', 'request.method', 'request.userAgent',
     'fingerprint.suspicious', 'fingerprint.score', 'protocol', 'timestamp',
-    'dangerLevel'
+    'dangerLevel', 'fingerprint.hash'
 ]);
 
 const COWRIE_SESSION_FILTER_FIELDS = new Set([

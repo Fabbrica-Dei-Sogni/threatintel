@@ -2,10 +2,15 @@ import express from 'express';
 import { ThreatController } from '../controllers/ThreatController';
 import { AuthMiddleware } from '../middlewares/AuthMiddleware';
 
-export default (threatController: ThreatController, authMiddleware: AuthMiddleware) => {
+export default (
+    threatController: ThreatController, 
+    authMiddleware: AuthMiddleware
+) => {
     const router = express.Router();
 
+
     /**
+
      * @openapi
      * /stats:
      *   get:
@@ -180,17 +185,6 @@ export default (threatController: ThreatController, authMiddleware: AuthMiddlewa
      */
     router.get('/api/analyze-preview', (req, res) => threatController.analyzePreview(req, res));
     
-    /**
-     * @openapi
-     * /attack/distributed-discovery:
-     *   get:
-     *     tags: [Forensic Analysis]
-     *     summary: Scopre pattern di attacco (hash) condivisi da più IP
-     *     responses:
-     *       200:
-     *         description: Elenco pattern distribuiti trovati.
-     */
-    router.get('/api/attack/distributed-discovery', (req, res) => threatController.getDistributedCampaigns(req, res));
-
     return router;
 };
+

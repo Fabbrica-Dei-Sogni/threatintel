@@ -13,7 +13,6 @@ export class ThreatController {
     constructor(
         private threatLogService: ThreatLogService,
         private ipDetailsService: IpDetailsService,
-        private sshLogService: SshLogService,
         @inject(LOGGER_TOKEN) private logger: Logger
     ) { }
 
@@ -300,20 +299,5 @@ export class ThreatController {
         }
     }
 
-    // GET /api/attack/distributed-discovery
-    async getDistributedCampaigns(req: Request, res: Response): Promise<void> {
-        this.logger.info('[ThreatController] Starting distributed discovery');
-        try {
-            const { startTime, endTime, minIps = 2 } = req.query as any;
-            const timeConfig = { startTime, endTime };
-            const minIpsNum = parseInt(minIps) || 2;
-
-            const campaigns = await this.threatLogService.getDistributedCampaigns({ timeConfig, minIps: minIpsNum });
-
-            res.json({ campaigns, count: campaigns.length });
-        } catch (err: any) {
-            this.logger.error('[ThreatController] Error in distributed discovery:', err);
-            res.status(500).json({ error: 'Errore durante la scoperta degli attacchi distribuiti' });
-        }
-    }
 }
+

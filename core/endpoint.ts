@@ -5,6 +5,8 @@ dotenv.config();
 import { logger } from '../logger';
 import ratelimitroutes from './apis/ratelimitroutes';
 import threatroutes from './apis/threatroutes';
+import campaignroutes from './apis/campaignroutes';
+
 import routes from './apis/routes';
 import managelimitroutes from './apis/managelimitroutes';
 import configroutes from './apis/configroutes';
@@ -13,6 +15,8 @@ import { getComponent } from './di/container';
 import { ThreatLogger } from "./threatLogger";
 import { CowrieController } from "./controllers/CowrieController";
 import { ThreatController } from "./controllers/ThreatController";
+import { CampaignController } from "./controllers/CampaignController";
+
 import { ConfigController } from "./controllers/ConfigController";
 import { RateLimitController } from "./controllers/RateLimitController";
 import { ManageLimitController } from "./controllers/ManageLimitController";
@@ -26,6 +30,8 @@ import dossierroutes from './apis/dossierroutes';
 
 // Instantiate controllers via DI container
 const threatController = getComponent(ThreatController);
+const campaignController = getComponent(CampaignController);
+
 const configController = getComponent(ConfigController);
 const rateLimitController = getComponent(RateLimitController);
 const manageLimitController = getComponent(ManageLimitController);
@@ -111,6 +117,11 @@ router.use('/api', authMiddleware.isAuthenticated());
 
 // API Dashboards e statistiche
 router.use('/', threatroutes(threatController, authMiddleware));
+
+// API Campagne (Distributed Threat Analytics)
+router.use('/', campaignroutes(campaignController));
+
+
 
 // API Reports
 router.use('/', reportroutes(reportController, authMiddleware));

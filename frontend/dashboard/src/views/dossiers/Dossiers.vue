@@ -302,30 +302,6 @@ onMounted(() => {
   margin-bottom: 15px;
 }
 
-.archive-header {
-    margin-bottom: 40px;
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-}
-
-.header-nav-left {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-}
-
-.header-counter-technical {
-    font-size: 0.85rem;
-    color: #94a3b8;
-    font-weight: 600;
-}
-
-.counter-value {
-    color: #818cf8;
-    margin-left: 5px;
-}
-
 .btn-refresh {
   background: transparent;
   border: none;
@@ -345,10 +321,6 @@ onMounted(() => {
   border-radius: 10px;
   outline: none;
   cursor: pointer;
-}
-
-.btn-refresh:hover {
-  transform: scale(1.1);
 }
 
 .rotating {

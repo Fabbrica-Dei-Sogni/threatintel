@@ -107,6 +107,32 @@
   box-shadow: 0 0 15px var(--cy-primary);
 }
 
+.skin-cyber.dossier-archive-view .header-nav-left {
+  display: flex;
+  align-items: center;
+  gap: 25px;
+}
+
+.skin-cyber.dossier-archive-view .header-counter-technical {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--cy-text-muted);
+  letter-spacing: 1.5px;
+  border-left: 1px solid var(--cy-border);
+  padding-left: 20px;
+}
+
+.skin-cyber.dossier-archive-view .counter-label {
+  opacity: 0.6;
+  margin-right: 8px;
+}
+
+.skin-cyber.dossier-archive-view .counter-value {
+  color: var(--cy-primary);
+  font-weight: 800;
+  text-shadow: 0 0 5px rgba(var(--cy-primary-rgb), 0.5);
+}
+
 /* Controls Area */
 .skin-cyber.dossier-archive-view .archive-controls {
   margin: 30px 40px;

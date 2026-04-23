@@ -73,13 +73,13 @@ export class ThreatLogService {
         const skip = (safePage - 1) * safePageSize;
 
         const mongoFilters = this.buildRegExpFilter(filters);
-        
+
         const results = await ThreatLog.find(mongoFilters)
             .sort(safeSort)
             .skip(skip)
             .populate('ipDetailsId')
             .limit(safePageSize);
-            
+
         return results;
     }
 
@@ -187,11 +187,10 @@ export class ThreatLogService {
         filters = {},
         minLogsForAttack = 10,
         timeConfig = {},
-        sortFields = null,
-        groupBy = 'request.ip'
+        sortFields = null
     }: any = {}) {
         const skip = (page - 1) * pageSize;
-        
+
         // Estrai dangerLevel dai filtri prima di buildRegExpFilter per gestirlo manualmente post-aggregazione
         const { dangerLevel, ...restFilters } = filters;
         const mongoFilters = this.buildRegExpFilter(restFilters);
@@ -201,14 +200,14 @@ export class ThreatLogService {
         const sortStage = { $sort: safeSort };
 
         // Pipeline base costruita col nuovo Builder
-        const basePipeline = await this.forensicPipelineService.buildStandardPipeline(mongoFilters, minLogsForAttack, timeConfig, groupBy);
+        const basePipeline = await this.forensicPipelineService.buildStandardPipeline(mongoFilters, minLogsForAttack, timeConfig);
 
         // Aggiungi filtro dangerLevel se presente (va fatto dopo ScoringStage che lo calcola)
         if (dangerLevel) {
-            const levels = typeof dangerLevel === 'string' 
+            const levels = typeof dangerLevel === 'string'
                 ? dangerLevel.split(',').map(l => parseInt(l.trim())).filter(l => !isNaN(l))
                 : [parseInt(dangerLevel)];
-            
+
             if (levels.length > 0) {
                 basePipeline.push({ $match: { dangerLevel: { $in: levels } } });
             }
@@ -500,7 +499,7 @@ export class ThreatLogService {
                             // Confronta con l'analisi esistente per vedere se ci sono cambiamenti
                             const oldAnalysis = logEntry.fingerprint;
                             const newHash = this.patternAnalysisService.generateFingerprint(logEntry.request);
-                            
+
                             const hasChanges =
                                 oldAnalysis.hash !== newHash ||
                                 oldAnalysis.suspicious !== newAnalysis.suspicious ||
@@ -621,7 +620,7 @@ export class ThreatLogService {
 
     async getStats(timeframe = '24h', minScore = 15, limit = 10) {
         let timeframeMatch: any = {};
-        
+
         if (timeframe !== 'all') {
             const hours = this.getTimeframeHours(timeframe);
             const since = new Date(Date.now() - hours * 60 * 60 * 1000);
@@ -687,11 +686,11 @@ export class ThreatLogService {
 
         const facet = results[0];
         const stats = facet.mainStats[0] || { totalRequests: 0, suspiciousRequests: 0 };
-        
+
         // Formattazione per il frontend: convertiamo gli array di _id/count in mappe Record<string, number>
         const countriesMap: Record<string, number> = {};
         facet.topCountries.forEach((c: any) => { countriesMap[c._id] = c.count; });
-        
+
         const indicatorsMap: Record<string, number> = {};
         facet.topIndicators.forEach((i: any) => { indicatorsMap[i._id] = i.count; });
 
@@ -712,7 +711,7 @@ export class ThreatLogService {
      */
     async getDistributedCampaigns({ timeConfig = {}, minIps = 2 }: { timeConfig?: any, minIps?: number } = {}) {
         const mongoFilters = this.buildRegExpFilter({});
-        
+
         // Applichiamo il filtro temporale se presente
         if (timeConfig && (timeConfig.startTime || timeConfig.endTime)) {
             const timeFilter: any = {};
@@ -754,7 +753,7 @@ export class ThreatLogService {
 
     async getTopThreats(limit = 10, timeframe = '24h', minScore = 15) {
         let query: any = { 'fingerprint.suspicious': true };
-        
+
         if (timeframe !== 'all') {
             const hours = this.getTimeframeHours(timeframe);
             const since = new Date(Date.now() - hours * 60 * 60 * 1000);

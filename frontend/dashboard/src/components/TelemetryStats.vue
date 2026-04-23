@@ -95,6 +95,7 @@
         :error="error"
         :collapsible="false"
         itemStyle="telemetry-ranking"
+        enableMedals
       >
         <template #item="{ item }">
           <div class="item-col item-col-origin">
@@ -118,6 +119,7 @@
         :error="error"
         :collapsible="false"
         itemStyle="telemetry-ranking"
+        enableMedals
       >
         <template #item="{ item }">
           <div class="item-col item-col-subject">

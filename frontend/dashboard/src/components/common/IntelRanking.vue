@@ -126,7 +126,8 @@ const props = defineProps({
   showLimitSelector: { type: Boolean, default: true },
   page: { type: Number, default: 1 },
   total: { type: Number, default: 0 },
-  pageSize: { type: Number, default: 20 }
+  pageSize: { type: Number, default: 20 },
+  enableMedals: { type: Boolean, default: false }
 });
 
 const emit = defineEmits(['update:limit', 'update:page', 'row-click']);
@@ -180,6 +181,8 @@ const getItemKey = (item, index) => {
 };
 
 const getRankClass = (index) => {
+  if (!props.enableMedals) return 'standard';
+  
   const cardinalIndex = (props.page - 1) * parseInt(internalLimit.value) + index;
   if (cardinalIndex === 0) return 'gold';
   if (cardinalIndex === 1) return 'silver';

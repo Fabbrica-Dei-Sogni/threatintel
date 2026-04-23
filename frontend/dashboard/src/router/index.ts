@@ -125,11 +125,17 @@ const routes: RouteRecordRaw[] = [
     {
         path: '/settings',
         name: 'Settings',
-        component: SettingsHub,
-        children: [
-            { path: '', name: 'SettingsHome', component: Settings },
-            { path: 'config', name: 'ConfigPage', component: ConfigPage }
-        ]
+        component: SettingsHub
+    },
+    {
+        path: '/settings/profiles',
+        name: 'SettingsProfiles',
+        component: Settings
+    },
+    {
+        path: '/settings/algorithms',
+        name: 'ConfigPage',
+        component: ConfigPage
     },
     {
         path: '/telnet-sessions',

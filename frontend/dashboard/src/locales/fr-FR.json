@@ -45,7 +45,6 @@
         "clearFilter": "Effacer le filtre",
         "syncFilters": "Synchroniser les filtres avec la recherche",
         "more_info": "Plus d'informations...",
-
         "back": "Retour",
         "id": "ID",
         "timestamp": "Horodatage",
@@ -782,6 +781,7 @@
     },
     "dossier": {
         "sections": {
+            "generic": "INFORMATION GÉNÉRALE",
             "ip": "IP",
             "attack": "ANOMALIE",
             "telnet": "TELNET",

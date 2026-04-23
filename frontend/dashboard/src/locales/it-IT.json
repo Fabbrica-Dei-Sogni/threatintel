@@ -780,6 +780,7 @@
     },
     "dossier": {
         "sections": {
+            "generic": "INFORMAZIONE GENERICA",
             "ip": "IP",
             "attack": "ANOMALIA",
             "telnet": "TELNET",

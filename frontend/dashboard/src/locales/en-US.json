@@ -45,7 +45,6 @@
         "clearFilter": "Clear filter",
         "syncFilters": "Sync filters with search",
         "more_info": "More information...",
-
         "back": "Back",
         "id": "ID",
         "timestamp": "Timestamp",
@@ -782,6 +781,7 @@
     },
     "dossier": {
         "sections": {
+            "generic": "GENERAL INFORMATION",
             "ip": "IP",
             "attack": "ANOMALY",
             "telnet": "TELNET",

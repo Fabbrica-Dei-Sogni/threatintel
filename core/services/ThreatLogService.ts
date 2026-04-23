@@ -427,15 +427,10 @@ export class ThreatLogService {
 
         await this.patternAnalysisService.loadConfigFromDB();
 
-        // Filtro per recuperare solo log HTTP (o quelli senza protocollo specificato, legacy)
+        // Filtro per recuperare solo log HTTP
         // Escludendo quindi SSH o altri flussi futuri
         const httpFilter = {
-            $or: [
-                { protocol: 'http' },
-                { protocol: 'https' },
-                { protocol: { $exists: false } },
-                { protocol: null }
-            ]
+            protocol: { $in: ['http', 'https'] }
         };
 
         // Conta totale log da processare

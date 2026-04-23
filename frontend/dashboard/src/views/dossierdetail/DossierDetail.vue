@@ -295,13 +295,14 @@ const saveEdit = async () => {
 
 // === GESTIONE EDIT SEZIONI ===
 const editingSectionIndex = ref(-1);
-const sectionEditForm = ref({ type: '', data: {}, dataString: '' });
+const sectionEditForm = ref({ type: '', templateKey: '', data: {}, dataString: '' });
 
 const startEditSection = (index: number, section: IDossierSection) => {
   editingSectionIndex.value = index;
   showRawEdit.value = false;
   sectionEditForm.value = {
     type: section.type,
+    templateKey: section.templateKey || '',
     data: JSON.parse(JSON.stringify(section.data || {})), // Deep copy reattivo
     dataString: section.data ? JSON.stringify(section.data, null, 2) : '{}'
   };
@@ -345,7 +346,8 @@ const handleSaveSection = async (index: number) => {
     // Inseriamo renderedText anche in data affinché il ReportService possa usarlo per il Telex
     sectionUpdate.data.renderedText = formatted;
   } else {
-    sectionUpdate.templateKey = '';
+    // PRESERVIAMO il templateKey originale per evitare la corruzione dei dati
+    sectionUpdate.templateKey = sectionEditForm.value.templateKey;
   }
 
   try {

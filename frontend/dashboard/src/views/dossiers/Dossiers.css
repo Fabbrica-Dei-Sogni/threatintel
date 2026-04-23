@@ -48,8 +48,11 @@
 
 .dossier-archive-view {
     padding: 30px;
-    background: radial-gradient(circle at top left, #0f172a, #020617);
     min-height: 100vh;
+}
+
+.skin-classic.dossier-archive-view {
+    background: radial-gradient(circle at top left, #0f172a, #020617);
     color: #e2e8f0;
 }
 
@@ -71,7 +74,7 @@
 }
 
 /* Search & Filter Bar */
-.archive-controls {
+.skin-classic .archive-controls {
     display: flex;
     gap: 15px;
     margin-bottom: 30px;
@@ -145,7 +148,7 @@
     gap: 25px;
 }
 
-.dossier-card {
+.skin-classic .dossier-card {
     background: rgba(30, 41, 59, 0.4);
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.05);

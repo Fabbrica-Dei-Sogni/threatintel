@@ -1,91 +1,117 @@
 <template>
-  <div class="dossier-archive-view" :class="'skin-' + dashboardSkin">
+  <div class="dossier-archive-view cyber-view dossier-noir-context" :class="'skin-' + dashboardSkin">
+    <!-- HUD Background Elements -->
+    <div class="scanning-line cobalt-pulse"></div>
+    <div class="vignette-overlay"></div>
+    
     <div class="header-top">
       <div class="header-content-left">
         <h1>🗃️ {{ t('nav.archive').toUpperCase() }}</h1>
       </div>
-      <div class="header-content-right">
+      <div class="header-actions">
         <SkinSwitcher />
         <LanguageSwitcher />
       </div>
     </div>
 
     <div class="archive-header">
-      <button @click="goBack" class="back-btn">{{ t('home.dashboard').toUpperCase() }}</button>
-      <div class="header-stats">
-        <span class="badge indigo-pulse">{{ total }} {{ t('common.investigations') }}</span>
+      <div class="header-nav-left">
+        <button @click="goBack" class="back-btn">{{ t('home.dashboard').toUpperCase() }}</button>
+        <span class="header-counter-technical">
+          <span class="counter-label">RECORDS_FOUND:</span>
+          <span class="counter-value">{{ total }}</span>
+        </span>
       </div>
     </div>
 
     <!-- Controls -->
-    <div class="archive-controls glass-morphism">
-      <div class="search-box">
-        <span class="search-icon">🔍</span>
-        <input v-model="filterSearch" type="text" class="search-input" :placeholder="t('common.searchByTitleOrIp')"
-          @input="handleSearchInput" />
-      </div>
-      <div class="filter-group">
-        <select v-model="filterStatus" class="filter-select">
-          <option value="">{{ t('common.allStatus') }}</option>
-          <option value="draft">DRAFT</option>
-          <option value="finalized">FINALIZED</option>
-          <option value="archived">ARCHIVED</option>
-        </select>
-      </div>
-      <div class="filter-group">
-        <select @change="handleSortChange" class="filter-select">
-          <option value="createdAt:-1">{{ t('sorting.sortTimestamp') }} (Newest)</option>
-          <option value="createdAt:1">{{ t('sorting.sortTimestamp') }} (Oldest)</option>
-          <option value="title:1">{{ t('sorting.sortUrl') }} (A-Z)</option>
-          <!-- Using sortUrl because it's available and similar to Title -->
-          <option value="status:1">{{ t('common.status') }}</option>
-        </select>
-      </div>
-      <button @click="fetchData" class="btn-refresh" :class="{ rotating: loading }">🔄</button>
-    </div>
-
-    <!-- Grid -->
-    <div v-if="loading && dossiers.length === 0" class="loading-state">
-      <div class="spinner-large"></div>
-      <p>{{ t('common.loading') }}</p>
-    </div>
-
-    <div v-else-if="dossiers.length === 0" class="empty-state">
-      <span class="empty-icon">📁</span>
-      <h3>{{ t('common.noDossiersFound') }}</h3>
-    </div>
-
-    <div v-else class="dossier-grid">
-      <div v-for="dossier in dossiers" :key="dossier._id" class="dossier-card">
-        <div class="card-header">
-          <h3>{{ dossier.title }}</h3>
-          <span class="status-dot" :class="dossier.status.toLowerCase()"></span>
+    <div class="archive-controls glass-morphism cyber-controls-area">
+      <div class="controls-row main-search-row">
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input v-model="filterSearch" type="text" class="search-input cyber-input" :placeholder="t('common.searchByTitleOrIp')"
+            @input="handleSearchInput" />
         </div>
-
-        <p class="description">{{ dossier.description || t('common.noDescription') }}</p>
-
-        <div class="dossier-meta">
-          <div class="meta-item">
-            <span class="icon">📅</span> {{ formatDateTime(dossier.createdAt) }}
+      </div>
+      
+      <div class="controls-row filters-row">
+        <div class="filter-group">
+          <select v-model="filterStatus" class="filter-select cyber-input">
+            <option value="">{{ t('common.allStatus') }}</option>
+            <option value="draft">DRAFT</option>
+            <option value="finalized">FINALIZED</option>
+            <option value="archived">ARCHIVED</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <select @change="handleSortChange" class="filter-select cyber-input">
+            <option value="createdAt:-1">{{ t('sorting.sortTimestamp') }} (Newest)</option>
+            <option value="createdAt:1">{{ t('sorting.sortTimestamp') }} (Oldest)</option>
+            <option value="title:1">{{ t('sorting.sortUrl') }} (A-Z)</option>
+            <!-- Using sortUrl because it's available and similar to Title -->
+            <option value="status:1">{{ t('common.status') }}</option>
+          </select>
+        </div>
+        <button @click="fetchData" class="btn-cyber-refresh" :class="{ rotating: loading }" :title="t('common.refresh')">
+          <div class="refresh-icon-technical">
+            <span></span>
           </div>
-          <div class="meta-item">
-            <span class="icon">🧩</span> {{ dossier.sections.length }} {{ t('common.sections') }}
-          </div>
-          <div class="meta-item" v-if="dossier.tags && dossier.tags.length">
-            <span class="tag-badge" v-for="tag in dossier.tags" :key="tag">{{ tag }}</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Grid & Overlays -->
+    <div class="dossier-grid-container cyber-table-status-container">
+      <!-- Loading HUD Overlay -->
+      <transition name="fade">
+        <div v-if="loading" class="cyber-status-overlay cyber-loading-overlay">
+          <div class="cyber-hud-spinner">
+            <div class="spinner-circle"></div>
+            <div class="spinner-text">INITIALIZING_QUERY...</div>
           </div>
         </div>
+      </transition>
 
-        <div class="card-actions">
-          <button @click="viewDetail(dossier._id)" class="btn-archive primary">
-            👁️ {{ t('common.view') }}
-          </button>
-          <button @click="exportDossierPdf(dossier._id)" class="btn-archive">
-            📄 PDF
-          </button>
-          <button v-if="canDeleteDossier(dossier)" @click="confirmDelete(dossier._id)" class="btn-archive delete" :title="t('common.delete')">
-            🗑️
-          </button>
+      <div v-if="!loading && dossiers.length === 0" class="empty-state">
+        <span class="empty-icon">📁</span>
+        <h3>{{ t('common.noDossiersFound') }}</h3>
+      </div>
+
+      <div v-else class="dossier-grid cyber-grid cyber-scrollbar" :class="{ 'blur-context': loading }">
+        <div v-for="dossier in dossiers" :key="dossier._id" class="dossier-card cyber-card">
+          <!-- Local HUD Scan Line -->
+          <div class="card-hud-scan"></div>
+          
+          <div class="card-header">
+            <h3>{{ dossier.title }}</h3>
+            <span class="status-dot" :class="dossier.status.toLowerCase()"></span>
+          </div>
+
+          <p class="description">{{ dossier.description || t('common.noDescription') }}</p>
+
+          <div class="dossier-meta">
+            <div class="meta-item">
+              <span class="icon">📅</span> <span class="meta-value">{{ formatDateTime(dossier.createdAt) }}</span>
+            </div>
+            <div class="meta-item">
+              <span class="icon">🧩</span> <span class="meta-value">{{ dossier.sections.length }} {{ t('common.sections') }}</span>
+            </div>
+            <div class="meta-item" v-if="dossier.tags && dossier.tags.length">
+              <span class="tag-badge" v-for="tag in dossier.tags" :key="tag">{{ tag }}</span>
+            </div>
+          </div>
+
+          <div class="card-actions">
+            <button @click="viewDetail(dossier._id)" class="btn-archive primary btn-cyber-action">
+              👁️ {{ t('common.view') }}
+            </button>
+            <button @click="exportDossierPdf(dossier._id)" class="btn-archive btn-cyber-action">
+              📄 PDF
+            </button>
+            <button v-if="canDeleteDossier(dossier)" @click="confirmDelete(dossier._id)" class="btn-archive delete btn-cyber-action" :title="t('common.delete')">
+              🗑️
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -243,18 +269,7 @@ onMounted(() => {
 <style scoped src="./Dossiers.css"></style>
 <style scoped src="./DossiersCyber.css"></style>
 <style scoped>
-/* Additional specific utility classes for the view */
-.indigo-pulse {
-  background: rgba(99, 102, 241, 0.2);
-  color: #a5b4fc;
-  border: 1px solid rgba(99, 102, 241, 0.3);
-  padding: 6px 14px;
-  border-radius: 20px;
-  font-weight: 800;
-  font-size: 0.8rem;
-  letter-spacing: 1px;
-}
-
+/* Additional specific styles for the view */
 .status-dot {
   width: 10px;
   height: 10px;
@@ -287,6 +302,41 @@ onMounted(() => {
   margin-bottom: 15px;
 }
 
+.archive-header {
+    margin-bottom: 40px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.header-nav-left {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.header-counter-technical {
+    font-size: 0.85rem;
+    color: #94a3b8;
+    font-weight: 600;
+}
+
+.counter-value {
+    color: #818cf8;
+    margin-left: 5px;
+}
+
+.btn-refresh {
+  background: transparent;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.btn-refresh:hover {
+  transform: scale(1.1);
+}
+
 .filter-select {
   background: rgba(0, 0, 0, 0.2);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -295,14 +345,6 @@ onMounted(() => {
   border-radius: 10px;
   outline: none;
   cursor: pointer;
-}
-
-.btn-refresh {
-  background: transparent;
-  border: none;
-  font-size: 1.2rem;
-  cursor: pointer;
-  transition: all 0.3s;
 }
 
 .btn-refresh:hover {

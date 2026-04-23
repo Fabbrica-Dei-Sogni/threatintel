@@ -34,7 +34,7 @@
           v-if="dossier && !isEditing" 
           :dossierId="dossier._id" 
           customClass="back-btn report-btn" 
-          accentColor="#0ea5e9"
+          :accentColor="reportAccentColor"
         />
 
         <template v-if="dossier && isEditing && canModify">
@@ -194,6 +194,7 @@ const router = useRouter();
 const { t } = useI18n();
 const viewSettings = useViewSettingsStore();
 const dashboardSkin = computed(() => viewSettings.dashboardSkin);
+const reportAccentColor = computed(() => dashboardSkin.value === 'cyber' ? '#0ea5e9' : '#6366f1');
 
 const {
   dossier,

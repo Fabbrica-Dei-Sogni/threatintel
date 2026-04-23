@@ -11,6 +11,7 @@
           class="action-menu glass-morphism" 
           :class="[
             `mode-${mode}`, 
+            'skin-' + viewSettings.dashboardSkin,
             { 'is-mobile-menu': isMobile, 'popover-menu': mode === 'button' }
           ]"
         >
@@ -66,7 +67,7 @@
     <Teleport to="body">
       <transition name="modal-fade">
         <div v-if="showPreview" class="preview-modal-overlay" @click.self="closePreview">
-          <div class="preview-modal-content glass-morphism-dark">
+          <div class="preview-modal-content glass-morphism-dark" :class="'skin-' + viewSettings.dashboardSkin">
             <div class="modal-header">
               <div class="header-title">
                 <span class="header-icon">🔎</span>
@@ -112,8 +113,10 @@
 <script setup>
 import { ref, onUnmounted, computed, nextTick, onMounted, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useViewSettingsStore } from '../stores/viewSettings';
 
 const { t } = useI18n();
+const viewSettings = useViewSettingsStore();
 
 const props = defineProps({
   mode: { type: String, default: 'button' },
@@ -573,5 +576,92 @@ defineExpose({ updateScale });
   .modal-header { padding: 15px 20px; }
   .modal-body { padding: 20px 5px; }
   .preview-modal-content { border-radius: 0; width: 100vw; height: 100vh; height: 100dvh; }
+}
+
+/* CYBER SKIN OVERRIDES (Cobalt Noir) */
+.skin-cyber.action-menu {
+  background: #05070a !important;
+  border: 1px solid #0ea5e9 !important;
+  border-radius: 0 !important;
+  box-shadow: 0 0 30px rgba(14, 165, 233, 0.2) !important;
+}
+
+.skin-cyber .menu-header {
+  border-bottom: 1px solid rgba(14, 165, 233, 0.3) !important;
+}
+
+.skin-cyber .menu-header strong {
+  color: #0ea5e9 !important;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.skin-cyber .style-name {
+  color: #0ea5e9 !important;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.skin-cyber .style-desc {
+  color: #38bdf8 !important;
+  opacity: 0.7;
+}
+
+.skin-cyber .action-btn, 
+.skin-cyber .action-btn-mini {
+  background: transparent !important;
+  border: 1px solid #0ea5e9 !important;
+  color: #0ea5e9 !important;
+  border-radius: 0 !important;
+}
+
+.skin-cyber .action-btn:hover,
+.skin-cyber .action-btn-mini:hover {
+  background: #0ea5e9 !important;
+  color: #05070a !important;
+  box-shadow: 0 0 10px #0ea5e9 !important;
+}
+
+.skin-cyber.preview-modal-content {
+  background: #020617 !important;
+  border: 1px solid #0ea5e9 !important;
+  border-radius: 0 !important;
+}
+
+.skin-cyber .modal-header {
+  border-bottom: 1px solid #0ea5e9 !important;
+}
+
+.skin-cyber .modal-header h3 {
+  color: #0ea5e9 !important;
+  font-family: 'JetBrains Mono', monospace !important;
+}
+
+.skin-cyber .download-mini-btn {
+  background: transparent !important;
+  border: 1px solid #0ea5e9 !important;
+  color: #0ea5e9 !important;
+  border-radius: 0 !important;
+}
+
+.skin-cyber .download-mini-btn:hover {
+  background: #0ea5e9 !important;
+  color: #020617 !important;
+}
+
+.skin-cyber .close-btn {
+  background: transparent !important;
+  border: 1px solid rgba(14, 165, 233, 0.3) !important;
+  border-radius: 0 !important;
+  color: #0ea5e9 !important;
+}
+
+.skin-cyber .modal-body {
+  background: #05070a !important;
+}
+
+.skin-cyber .modal-info-bar {
+  background: #020617 !important;
+  border-top: 1px solid #0ea5e9 !important;
+  color: #0ea5e9 !important;
+  font-family: 'JetBrains Mono', monospace;
 }
 </style>

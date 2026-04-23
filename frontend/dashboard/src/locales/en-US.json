@@ -792,6 +792,7 @@
             "scanner_analysis": "SCANNER ANALYSIS"
         },
         "addObservationPlaceholder": "Add investigative note...",
+        "addHumanSection": "Add Manual Note",
         "analystNote": "Analyst Note",
         "actions": {
             "editSection": "Edit Section",

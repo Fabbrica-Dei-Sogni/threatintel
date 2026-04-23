@@ -791,6 +791,7 @@
             "scanner_analysis": "ANALIZA SKANERA"
         },
         "addObservationPlaceholder": "Dodaj notatkę śledczą...",
+        "addHumanSection": "Dodaj Notatkę Ręczną",
         "analystNote": "Notatka Analityka",
         "actions": {
             "editSection": "Edytuj sekcję",

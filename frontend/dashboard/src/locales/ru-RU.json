@@ -791,6 +791,7 @@
             "scanner_analysis": "АНАЛИЗ СКАНЕРА"
         },
         "addObservationPlaceholder": "Добавить следственную заметку...",
+        "addHumanSection": "Добавить ручную заметку",
         "analystNote": "Заметка аналитика",
         "actions": {
             "editSection": "Изменить раздел",

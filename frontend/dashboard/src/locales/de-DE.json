@@ -791,6 +791,7 @@
             "scanner_analysis": "SCANNER-ANALYSE"
         },
         "addObservationPlaceholder": "Investigative Notiz hinzufügen...",
+        "addHumanSection": "Manuelle Notiz hinzufügen",
         "analystNote": "Analystennotiz",
         "actions": {
             "editSection": "Abschnitt bearbeiten",

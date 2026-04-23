@@ -790,6 +790,7 @@
             "scanner_analysis": "ANALISI SCANNER"
         },
         "addObservationPlaceholder": "Aggiungi nota investigativa...",
+        "addHumanSection": "Aggiungi Nota Manuale",
         "analystNote": "Nota dell'Analista",
         "actions": {
             "editSection": "Modifica Sezione",

@@ -1,6 +1,5 @@
 <template>
   <div class="dashboard" :class="'skin-' + currentSkin">
-    <ConfigMenuButton />
     <div class="header-top">
       <div class="header-main-title">
         <h1>
@@ -415,7 +414,6 @@ import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
 import CountryFlag from '../../components/CountryFlag.vue';
 import BreakingNews from '../../components/BreakingNews.vue';
 import SkinSwitcher from '../../components/SkinSwitcher.vue';
-import ConfigMenuButton from '../../components/ConfigMenuButton.vue';
 import ProtocolSelector from '../../components/common/ProtocolSelector.vue';
 import DefconIndicator from '../../components/DefconIndicator.vue';
 import TelemetryStats from '../../components/TelemetryStats.vue';

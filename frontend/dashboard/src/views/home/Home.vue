@@ -9,6 +9,13 @@
       </div>
 
       <div class="header-actions">
+        <button @click="dashboardStore.resetToDefaults" class="reset-btn-mini global-reset"
+          :title="t('common.reset_layout')">
+          <div class="reset-ascii">
+            <span></span>
+            <span></span>
+          </div>
+        </button>
         <SkinSwitcher />
         <LanguageSwitcher />
       </div>
@@ -36,14 +43,6 @@
         <button @click="dashboardStore.toggleWidget('dossiers')"
           :class="{ active: dashboardStore.isWidgetActive('dossiers') }" class="btn-action">📁 {{
             t('home.archive').toUpperCase() }}</button>
-
-        <button @click="dashboardStore.resetToDefaults" class="reset-btn-mini global-reset"
-          :title="t('common.reset_layout')">
-          <div class="reset-ascii">
-            <span></span>
-            <span></span>
-          </div>
-        </button>
       </section>
 
       <transition-group name="widget-dynamic" tag="div" class="widgets-container">
@@ -654,7 +653,7 @@ watch(() => dashboardState.rankings, (newRankings, oldRankings) => {
 }
 
 .global-reset {
-  margin-left: auto;
+  margin: 0 !important;
 }
 
 .reset-ascii {

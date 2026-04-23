@@ -261,12 +261,13 @@
 
 /* === LIST ELEMENTS === */
 
-.skin-cyber .indicator-group { 
-  flex: 0 0 60px !important; 
+.skin-cyber .indicator-group {
+  flex: 0 0 130px !important;
   display: flex;
   gap: 8px;
   align-items: center;
   position: relative;
+  flex-shrink: 0;
 }
 
 .skin-cyber .ip-link { 

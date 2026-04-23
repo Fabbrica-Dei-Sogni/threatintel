@@ -135,8 +135,7 @@
               <template #item="{ item }">
                 <!-- Origin Col -->
                 <div class="item-col item-col-origin">
-                  <div class="indicator-group"
-                    :data-noc-tooltip="`URI: ${item.request?.url || 'N/A'}\nDATE: ${formatDate(item.firstSeen)}`">
+                  <div class="indicator-group">
                     <CountryFlag :countryCode="item.ipDetails?.ipinfo?.country"
                       :tooltip="item.ipDetails?.ipinfo ? `${item.ipDetails.ipinfo.country} - ${item.ipDetails.ipinfo.org || t('common.notAvailable')}` : t('common.notAvailable')" />
                     <DefconIndicator :level="item.dangerLevel" :dangerScore="item.dangerScore" mode="dot" />
@@ -152,9 +151,13 @@
                     }" class="intel-det-btn" :data-noc-tooltip="t('common.detail')">
                       DET
                     </router-link>
-                    <button class="intel-det-btn sync-btn-mini" @click="syncSingleAttackToSearch(item)"
+                    <button class="sync-btn-mini" @click="syncSingleAttackToSearch(item)"
                       :data-noc-tooltip="t('common.syncFilters')">
-                      🔍
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                      </svg>
                     </button>
                   </div>
                 </div>
@@ -791,20 +794,19 @@ watch(() => dashboardState.rankings, (newRankings, oldRankings) => {
 
 /* Sync Button Styles */
 .sync-btn-mini {
-  margin-left: 6px;
   border: 1px solid rgba(255, 51, 102, 0.4);
-  background: transparent;
-  color: var(--theme-primary, #ff3366);
-  width: 28px;
-  height: 28px;
+  background: rgba(255, 51, 102, 0.05);
+  color: var(--neon-pink, #ff3366);
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   border-radius: 4px;
-  font-size: 0.8rem;
   padding: 0;
+  flex-shrink: 0;
 }
 
 .sync-btn-mini:hover {

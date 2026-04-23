@@ -431,7 +431,7 @@ li > a:last-child {
 }
 
 .item-col-origin {
-  flex: 0 0 100px !important;
+  flex: 0 0 130px !important;
 }
 
 .indicator-group {
@@ -441,7 +441,12 @@ li > a:last-child {
   gap: 8px;
   justify-content: flex-start;
   position: relative;
-  cursor: help;
+  flex-shrink: 0;
+}
+
+.indicator-group .country-flag,
+.indicator-group .defcon-wrapper {
+  cursor: help !important;
 }
 
 /* Custom Tooltip - Posizionato lateralmente a destra per non essere mai tagliato dai bordi sopra/sotto */
@@ -724,7 +729,7 @@ li > a:last-child:hover {
   }
 
   .item-col-origin {
-    flex: 0 0 90px !important;
+    flex: 0 0 120px !important;
   }
 
   .indicator-group {

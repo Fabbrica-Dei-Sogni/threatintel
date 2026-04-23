@@ -187,7 +187,8 @@ export class ThreatLogService {
         filters = {},
         minLogsForAttack = 10,
         timeConfig = {},
-        sortFields = null
+        sortFields = null,
+        groupBy = 'request.ip'
     }: any = {}) {
         const skip = (page - 1) * pageSize;
         
@@ -200,7 +201,7 @@ export class ThreatLogService {
         const sortStage = { $sort: safeSort };
 
         // Pipeline base costruita col nuovo Builder
-        const basePipeline = await this.forensicPipelineService.buildStandardPipeline(mongoFilters, minLogsForAttack, timeConfig);
+        const basePipeline = await this.forensicPipelineService.buildStandardPipeline(mongoFilters, minLogsForAttack, timeConfig, groupBy);
 
         // Aggiungi filtro dangerLevel se presente (va fatto dopo ScoringStage che lo calcola)
         if (dangerLevel) {
@@ -704,6 +705,52 @@ export class ThreatLogService {
         };
     }
 
+
+    /**
+     * Scopre pattern di attacco (hash) condivisi da più IP diversi.
+     * Implementa il cuore della Distributed Anomaly Analysis.
+     */
+    async getDistributedCampaigns({ timeConfig = {}, minIps = 2 }: { timeConfig?: any, minIps?: number } = {}) {
+        const mongoFilters = this.buildRegExpFilter({});
+        
+        // Applichiamo il filtro temporale se presente
+        if (timeConfig && (timeConfig.startTime || timeConfig.endTime)) {
+            const timeFilter: any = {};
+            if (timeConfig.startTime) timeFilter.$gte = new Date(timeConfig.startTime);
+            if (timeConfig.endTime) timeFilter.$lte = new Date(timeConfig.endTime);
+            mongoFilters.timestamp = timeFilter;
+        }
+
+        const pipeline = [
+            { $match: mongoFilters },
+            {
+                $group: {
+                    _id: '$fingerprint.hash',
+                    ips: { $addToSet: '$request.ip' },
+                    totalLogs: { $sum: 1 },
+                    firstSeen: { $min: '$timestamp' },
+                    lastSeen: { $max: '$timestamp' },
+                    sampleUrl: { $first: '$request.url' }
+                }
+            },
+            {
+                $project: {
+                    hash: '$_id',
+                    ips: 1,
+                    ipCount: { $size: '$ips' },
+                    totalLogs: 1,
+                    firstSeen: 1,
+                    lastSeen: 1,
+                    sampleUrl: 1
+                }
+            },
+            // Filtriamo solo pattern usati da almeno N IP (default 2)
+            { $match: { ipCount: { $gte: minIps }, hash: { $ne: null } } },
+            { $sort: { ipCount: -1 as const, totalLogs: -1 as const } }
+        ];
+
+        return await ThreatLog.aggregate(pipeline);
+    }
 
     async getTopThreats(limit = 10, timeframe = '24h', minScore = 15) {
         let query: any = { 'fingerprint.suspicious': true };

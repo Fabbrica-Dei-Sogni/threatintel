@@ -1,14 +1,17 @@
 import { PipelineStage } from '../PipelineStage';
 
 export class GroupingStage implements PipelineStage {
-    constructor(private readonly minLogsForAttack: number) { }
+    constructor(
+        private readonly minLogsForAttack: number,
+        private readonly groupByField: string = 'request.ip'
+    ) { }
 
     generate(): any[] {
         return [
-            // Stage 2: Raggruppa per IP
+            // Stage 2: Raggruppa per il campo specificato (IP o Hash)
             {
                 $group: {
-                    _id: '$request.ip',
+                    _id: `$${this.groupByField}`,
                     // Mantieni la struttura del primo log come "rappresentante" del gruppo
                     representative: { $first: '$$ROOT' },
                     // Aggiungi i 3 campi richiesti
@@ -72,6 +75,7 @@ export class GroupingStage implements PipelineStage {
                         $mergeObjects: [
                             '$representative', // Mantiene tutti i campi originali del log
                             {
+                                _id: '$_id', // RIPRISTINA L'ID DEL GRUPPO (IP o HASH)
                                 // Aggiungi i campi calcolati
                                 logsRaggruppati: '$logsRaggruppati',
                                 totaleLogs: '$totaleLogs',

@@ -93,14 +93,15 @@ export class ForensicPipelineService {
     async buildStandardPipeline(
         mongoFilters: any,
         minLogsForAttack: number,
-        timeConfig: any = null
+        timeConfig: any = null,
+        groupBy: string = 'request.ip'
     ): Promise<any[]> {
         await this.initialized;
 
         return this.createBuilder()
             .addStage(new TimeFilterStage(timeConfig))
             .addStage(new MatchFilterStage(mongoFilters))
-            .addStage(new GroupingStage(minLogsForAttack))
+            .addStage(new GroupingStage(minLogsForAttack, groupBy))
             .addStage(new AttackStatsStage(this.tolleranceWeights))
             // Advanced Analysis Stages (Added for behavioral analysis)
             .addStage(new SequenceAnalysisStage())

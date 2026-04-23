@@ -179,6 +179,18 @@ export default (threatController: ThreatController, authMiddleware: AuthMiddlewa
      *         description: Anteprima generata.
      */
     router.get('/api/analyze-preview', (req, res) => threatController.analyzePreview(req, res));
+    
+    /**
+     * @openapi
+     * /attack/distributed-discovery:
+     *   get:
+     *     tags: [Forensic Analysis]
+     *     summary: Scopre pattern di attacco (hash) condivisi da più IP
+     *     responses:
+     *       200:
+     *         description: Elenco pattern distribuiti trovati.
+     */
+    router.get('/api/attack/distributed-discovery', (req, res) => threatController.getDistributedCampaigns(req, res));
 
     return router;
 };

@@ -94,8 +94,10 @@ export function sanitizeFilters(
             safe[key] = escapeRegex(value.trim());
         } else if (typeof value === 'boolean' || typeof value === 'number') {
             safe[key] = value;
+        } else if (value && typeof value === 'object' && '$in' in value && Array.isArray((value as any).$in)) {
+            // Supporto per operatore $in (es. lista di IP per analisi distribuita)
+            safe[key] = { $in: (value as any).$in };
         }
-        // Oggetti/array non primitivi vengono ignorati
     }
 
     return safe;

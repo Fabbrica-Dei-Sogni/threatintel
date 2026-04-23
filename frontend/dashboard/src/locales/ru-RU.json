@@ -770,7 +770,9 @@
         "rateBreachTitle": "ДЕТАЛИ НАРУШЕНИЯ RATE LIMIT",
         "limitType": "Тип Лимита",
         "honeypotId": "ID Honeypot",
-        "humanObservationTitle": "Судебно-медицинское наблюдение"
+        "humanObservationTitle": "Криминалистическое наблюдение",
+        "scannerAnalysisTitle": "Анализ активности сканера",
+        "scannerOccurrences": "Появления сканера"
     },
     "dossier": {
         "sections": {
@@ -781,7 +783,8 @@
             "abuse": "ЗЛОУПОТРЕБЛЕНИЕ",
             "technique": "ТЕХНИКА",
             "firewall": "БРАНДМАУЭР",
-            "human": "РУЧНАЯ ЗАМЕТКА"
+            "human": "РУЧНАЯ ЗАМЕТКА",
+            "scanner_analysis": "АНАЛИЗ СКАНЕРА"
         },
         "addObservationPlaceholder": "Добавить следственную заметку..."
     }

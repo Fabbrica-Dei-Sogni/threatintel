@@ -29,6 +29,7 @@ const componentsMap: Record<string, any> = {
   'clipboard.attackDetail.rateLimitEvent': defineAsyncComponent(() => import('./sections/RateBreachSection.vue')),
   'clipboard.telnetDetail.summary': defineAsyncComponent(() => import('./sections/TelnetSummarySection.vue')),
   'clipboard.telnetDetail.timelineRow': defineAsyncComponent(() => import('./sections/TelnetTimelineRowSection.vue')),
+  'clipboard.telnetDetail.scannerAnalysis': defineAsyncComponent(() => import('./sections/ScannerAnalysisSection.vue')),
   'clipboard.attackTechnique': defineAsyncComponent(() => import('./sections/AttackTechniqueSection.vue')),
   'clipboard.generic': defineAsyncComponent(() => import('./sections/GenericSection.vue')),
 };

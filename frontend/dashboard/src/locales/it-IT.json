@@ -769,7 +769,9 @@
         "rateBreachTitle": "DETTAGLIO VIOLAZIONE RATE LIMIT",
         "limitType": "Tipo di Limite",
         "honeypotId": "ID Honeypot",
-        "humanObservationTitle": "Osservazione Forense"
+        "humanObservationTitle": "Osservazione Forense",
+        "scannerAnalysisTitle": "Analisi Attività Scanner",
+        "scannerOccurrences": "Occorrenze Scanner"
     },
     "dossier": {
         "sections": {
@@ -780,7 +782,8 @@
             "abuse": "ABUSO",
             "technique": "TECNICA",
             "firewall": "FIREWALL",
-            "human": "NOTA MANUALE"
+            "human": "NOTA MANUALE",
+            "scanner_analysis": "ANALISI SCANNER"
         },
         "addObservationPlaceholder": "Aggiungi nota investigativa..."
     }

@@ -30,6 +30,7 @@ const editorsMap: Record<string, any> = {
   'clipboard.attackDetail.rateLimitEvent': defineAsyncComponent(() => import('./editors/RateBreachEditor.vue')),
   'clipboard.telnetDetail.summary': defineAsyncComponent(() => import('./editors/TelnetSummaryEditor.vue')),
   'clipboard.telnetDetail.timelineRow': defineAsyncComponent(() => import('./editors/TelnetTimelineRowEditor.vue')),
+  'clipboard.telnetDetail.scannerAnalysis': defineAsyncComponent(() => import('./editors/ScannerAnalysisEditor.vue')),
   'clipboard.attackTechnique': defineAsyncComponent(() => import('./editors/AttackTechniqueEditor.vue')),
   'clipboard.generic': defineAsyncComponent(() => import('./editors/GenericEditor.vue')),
 };

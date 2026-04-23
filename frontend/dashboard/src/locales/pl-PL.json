@@ -770,7 +770,9 @@
         "rateBreachTitle": "SZCZEGÓŁY NARUSZENIA RATE LIMIT",
         "limitType": "Typ Limitu",
         "honeypotId": "ID Honeypota",
-        "humanObservationTitle": "Obserwacja śledcza"
+        "humanObservationTitle": "Obserwacja Kryminalistyczna",
+        "scannerAnalysisTitle": "Analiza aktywności skanera",
+        "scannerOccurrences": "Wystąpienia skanera"
     },
     "dossier": {
         "sections": {
@@ -781,7 +783,8 @@
             "abuse": "NADUŻYCIE",
             "technique": "TECHNIKA",
             "firewall": "ZAPORA",
-            "human": "NOTATKA MANUALNA"
+            "human": "NOTATKA RĘCZNA",
+            "scanner_analysis": "ANALIZA SKANERA"
         },
         "addObservationPlaceholder": "Dodaj notatkę śledczą..."
     }

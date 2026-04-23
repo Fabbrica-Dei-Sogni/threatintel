@@ -85,6 +85,14 @@ export interface ITelnetTimelineRowData extends IBaseSectionData {
   details: string;
 }
 
+export interface IScannerAnalysisSectionData extends IBaseSectionData {
+  src_ip: string;
+  totalOccurrences: number | string;
+  firstSeen: string;
+  lastSeen: string;
+  duration: string;
+}
+
 export enum DossierSectionType {
   IP = 'ip',
   ATTACK = 'attack',
@@ -93,7 +101,8 @@ export enum DossierSectionType {
   ABUSE = 'abuse',
   TECHNIQUE = 'technique',
   FIREWALL = 'firewall',
-  HUMAN = 'human'
+  HUMAN = 'human',
+  SCANNER_ANALYSIS = 'scanner_analysis'
 }
 
 export interface IHumanSectionData extends IBaseSectionData {

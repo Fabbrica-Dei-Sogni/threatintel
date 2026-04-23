@@ -770,7 +770,9 @@
         "rateBreachTitle": "RATE-LIMIT-VERLETZUNGSDETAIL",
         "limitType": "Limit-Typ",
         "honeypotId": "Honeypot-ID",
-        "humanObservationTitle": "Forensische Beobachtung"
+        "humanObservationTitle": "Forensische Beobachtung",
+        "scannerAnalysisTitle": "Scanner-Aktivitätsanalyse",
+        "scannerOccurrences": "Scanner-Vorkommen"
     },
     "dossier": {
         "sections": {
@@ -781,7 +783,8 @@
             "abuse": "MISSBRAUCH",
             "technique": "TECHNIK",
             "firewall": "FIREWALL",
-            "human": "MANUELLE NOTIZ"
+            "human": "MANUELLE NOTIZ",
+            "scanner_analysis": "SCANNER-ANALYSE"
         },
         "addObservationPlaceholder": "Investigative Notiz hinzufügen..."
     }

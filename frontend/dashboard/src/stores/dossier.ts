@@ -8,7 +8,7 @@ export interface DossierSection {
     templateKey: string;
     data: any;
     renderedText: string;
-    type: 'ip' | 'attack' | 'telnet' | 'rate_breach' | 'generic';
+    type: 'ip' | 'attack' | 'telnet' | 'rate_breach' | 'scanner_analysis' | 'generic';
     timestamp: string;
 }
 
@@ -68,6 +68,7 @@ export const useDossierStore = defineStore('dossier', () => {
         if (templateKey.includes('ipDetails')) type = 'ip';
         else if (templateKey.includes('attackDetail.rateLimitEvent')) type = 'rate_breach';
         else if (templateKey.includes('attackDetail')) type = 'attack';
+        else if (templateKey.includes('telnetDetail.scannerAnalysis')) type = 'scanner_analysis';
         else if (templateKey.includes('telnetDetail')) type = 'telnet';
 
         const newSection: DossierSection = {

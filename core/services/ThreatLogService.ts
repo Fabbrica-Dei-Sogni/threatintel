@@ -73,12 +73,14 @@ export class ThreatLogService {
         const skip = (safePage - 1) * safePageSize;
 
         const mongoFilters = this.buildRegExpFilter(filters);
-
-        return await ThreatLog.find(mongoFilters)
+        
+        const results = await ThreatLog.find(mongoFilters)
             .sort(safeSort)
             .skip(skip)
             .populate('ipDetailsId')
             .limit(safePageSize);
+            
+        return results;
     }
 
     // Conteggio totale log filtrati (per paginazione frontend)

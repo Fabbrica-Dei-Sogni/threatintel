@@ -10,6 +10,9 @@ import PatternAnalysisService from '../PatternAnalysisService';
 import { LOGGER_TOKEN } from '../../di/tokens';
 
 describe('ThreatLogService', () => {
+    console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+    console.log('!!! RUNNING TEST: ThreatLogService.test.ts    !!!');
+    console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
     let service: ThreatLogService;
     let mockLogger: any;
     let mockForensicService: any;
@@ -58,6 +61,8 @@ describe('ThreatLogService', () => {
                 indicators: [],
                 isBot: false
             }),
+            generateFingerprint: jest.fn().mockReturnValue('mock-hash'),
+            calculateHash: jest.fn().mockReturnValue('mock-hash'),
             loadConfigFromDB: jest.fn().mockResolvedValue(null)
         };
 
@@ -282,6 +287,33 @@ describe('ThreatLogService', () => {
             
             const total = await service.countLogs({ 'request.ip': '1.2.3.4' });
             expect(total).toBe(2);
+        });
+    });
+
+    describe('getLogs (with Hash filter)', () => {
+        it('should return logs matching a specific fingerprint hash', async () => {
+            await ThreatLog.create([
+                { id: 'h1', fingerprint: { hash: 'HASH-A' }, request: { ip: '1.1.1.1' }, timestamp: new Date() },
+                { id: 'h2', fingerprint: { hash: 'HASH-B' }, request: { ip: '2.2.2.2' }, timestamp: new Date() },
+                { id: 'h3', fingerprint: { hash: 'HASH-A' }, request: { ip: '3.3.3.3' }, timestamp: new Date() }
+            ]);
+
+            const logs = await service.getLogs({ filters: { 'fingerprint.hash': 'HASH-A' } });
+            expect(logs).toHaveLength(2);
+            expect(logs.every(l => l.fingerprint.hash === 'HASH-A')).toBe(true);
+        });
+
+        it('should return logs sorted by hash', async () => {
+            await ThreatLog.create([
+                { id: 's1', fingerprint: { hash: 'CCC' }, request: { ip: '1.1.1.1' }, timestamp: new Date() },
+                { id: 's2', fingerprint: { hash: 'AAA' }, request: { ip: '2.2.2.2' }, timestamp: new Date() },
+                { id: 's3', fingerprint: { hash: 'BBB' }, request: { ip: '3.3.3.3' }, timestamp: new Date() }
+            ]);
+
+            const logs = await service.getLogs({ sortFields: { 'fingerprint.hash': 1 } });
+            expect(logs[0].fingerprint.hash).toBe('AAA');
+            expect(logs[1].fingerprint.hash).toBe('BBB');
+            expect(logs[2].fingerprint.hash).toBe('CCC');
         });
     });
 });

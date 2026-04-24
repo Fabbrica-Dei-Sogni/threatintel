@@ -15,8 +15,21 @@ export class CampaignService {
      * Scopre pattern di attacco (hash) condivisi da più IP diversi.
      * Implementa il cuore della Distributed Anomaly Analysis.
      */
-    async getCampaigns({ timeConfig = {}, minIps = 2 }: { timeConfig?: any, minIps?: number } = {}) {
-        this.logger.info(`[CampaignService] Discovering campaigns with minIps: ${minIps}`);
+    async getCampaigns({ 
+        timeConfig = {}, 
+        minIps = 2, 
+        minScore = 0,
+        page = 1,
+        pageSize = 10
+    }: { 
+        timeConfig?: any, 
+        minIps?: number, 
+        minScore?: number,
+        page?: number,
+        pageSize?: number 
+    } = {}) {
+        const startTimeProc = Date.now();
+        this.logger.info(`[CampaignService] Discovery START - Params: page=${page}, size=${pageSize}, minIps=${minIps}, minScore=${minScore}`);
         
         const mongoFilters: any = {};
 
@@ -27,6 +40,9 @@ export class CampaignService {
             if (timeConfig.endTime) timeFilter.$lte = new Date(timeConfig.endTime);
             mongoFilters.timestamp = timeFilter;
         }
+
+        // Filtro di severità (rumore di fondo) - di default esclude score 0 o mancanti
+        mongoFilters['fingerprint.score'] = { $gt: minScore };
 
         const pipeline = [
             { $match: mongoFilters },
@@ -53,10 +69,36 @@ export class CampaignService {
             },
             // Filtriamo solo pattern usati da almeno N IP (default 2)
             { $match: { ipCount: { $gte: minIps }, hash: { $ne: null } } },
-            { $sort: { ipCount: -1 as const, totalLogs: -1 as const } }
+            { $sort: { ipCount: -1 as const, totalLogs: -1 as const } },
+            // Paginazione server-side tramite $facet
+            {
+                $facet: {
+                    metadata: [{ $count: "total" }],
+                    data: [
+                        { $skip: (page - 1) * pageSize },
+                        { $limit: pageSize }
+                    ]
+                }
+            }
         ];
 
-        return await ThreatLog.aggregate(pipeline);
+        try {
+            const [result] = await ThreatLog.aggregate(pipeline);
+            const duration = Date.now() - startTimeProc;
+            
+            const total = result.metadata[0]?.total || 0;
+            const campaigns = result.data || [];
+            
+            this.logger.info(`[CampaignService] Discovery COMPLETED in ${duration}ms - Page ${page}: ${campaigns.length}/${total} campaigns`);
+            
+            return {
+                campaigns,
+                total
+            };
+        } catch (err) {
+            this.logger.error(`[CampaignService] Discovery FAILED after ${Date.now() - startTimeProc}ms:`, err);
+            throw err;
+        }
     }
 
     /**
@@ -66,18 +108,25 @@ export class CampaignService {
         ips,
         hash,
         minLogsForAttack = 1,
+        minScore = 0,
         timeConfig = {}
     }: {
         ips?: string[];
         hash: string;
         minLogsForAttack?: number;
+        minScore?: number;
         timeConfig?: any;
     }) {
-        this.logger.info(`[CampaignService] Fetching details for campaign hash: ${hash}`);
+        const startTimeProc = Date.now();
+        this.logger.info(`[CampaignService] Detail Fetch START - Hash: ${hash}, minLogsForAttack: ${minLogsForAttack}, minScore: ${minScore}`);
         
         const mongoFilters: any = { 
             'fingerprint.hash': hash
         };
+
+        if (minScore > 0) {
+            mongoFilters['fingerprint.score'] = { $gt: minScore };
+        }
         
         if (ips && ips.length > 0) {
             mongoFilters['request.ip'] = { $in: ips };
@@ -127,7 +176,14 @@ export class CampaignService {
             }
         ];
 
-        const [campaign] = await ThreatLog.aggregate(pipeline).allowDiskUse(true);
-        return campaign || null;
+        try {
+            const [campaign] = await ThreatLog.aggregate(pipeline).allowDiskUse(true);
+            const duration = Date.now() - startTimeProc;
+            this.logger.info(`[CampaignService] Detail Fetch COMPLETED in ${duration}ms for hash ${hash}`);
+            return campaign || null;
+        } catch (err) {
+            this.logger.error(`[CampaignService] Detail Fetch FAILED after ${Date.now() - startTimeProc}ms for hash ${hash}:`, err);
+            throw err;
+        }
     }
 }

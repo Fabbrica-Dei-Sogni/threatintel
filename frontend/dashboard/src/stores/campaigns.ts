@@ -4,6 +4,7 @@ import { storage, StorageNamespace } from '../utils/storage';
 
 export interface CampaignsFilters {
     minIps: number;
+    minScore: number;
     timeMode: 'ago' | 'range';
     agoValue: number;
     agoUnit: 'minutes' | 'hours' | 'days' | 'months' | 'years';
@@ -26,6 +27,7 @@ export interface CampaignsState {
 const DEFAULT_STATE: CampaignsState = {
     filters: {
         minIps: 2,
+        minScore: 0,
         timeMode: 'ago',
         agoValue: 30,
         agoUnit: 'days',
@@ -34,7 +36,7 @@ const DEFAULT_STATE: CampaignsState = {
     },
     pagination: {
         page: 1,
-        pageSize: 20
+        pageSize: 10
     },
     sorting: {
         field: 'ipCount',

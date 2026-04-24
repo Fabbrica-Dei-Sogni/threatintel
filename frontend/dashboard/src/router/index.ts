@@ -182,7 +182,8 @@ const routes: RouteRecordRaw[] = [
             minLogsForAttack: route.query.minLogs ? parseInt(route.query.minLogs as string) : 1,
             timeMode: route.query.timeMode || 'ago',
             agoValue: route.query.agoValue ? parseInt(route.query.agoValue as string) : 30,
-            agoUnit: route.query.agoUnit || 'days'
+            agoUnit: route.query.agoUnit || 'days',
+            minScore: route.query.minScore ? parseInt(route.query.minScore as string) : 0
         })
     }
 ];

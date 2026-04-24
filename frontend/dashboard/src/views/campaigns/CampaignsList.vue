@@ -46,6 +46,17 @@
         </div>
 
         <div class="filter-group">
+          <label class="cyber-label">{{ t('telemetry.filter_score_label') }}</label>
+          <div class="tabs-row">
+            <button v-for="val in [0, 5, 10, 15, 20, 30]" :key="val" class="tab-btn"
+              :class="{ active: campaignsStore.state.filters.minScore === val }"
+              @click="campaignsStore.state.filters.minScore = val">
+              {{ val === 0 ? 'INFO' : val }}
+            </button>
+          </div>
+        </div>
+
+        <div class="filter-group">
           <label class="cyber-label">{{ t('telemetry.filter_label') }}</label>
           <div class="tabs-row">
             <button v-for="opt in [
@@ -62,6 +73,38 @@
           </div>
         </div>
       </section>
+
+      <!-- Top Pagination -->
+      <div v-if="total > 0" class="pagination cyber-pagination top-pagination">
+        <div class="pagination-main">
+          <button :disabled="page === 1" @click="page--" class="nav-btn">◄ {{ t('common.prev') }}</button>
+          <span class="pagination-info cyber-pagination-info">
+            {{ t('common.page') }} {{ page }} {{ t('common.of') }} {{ Math.ceil(total / pageSize) }}
+          </span>
+          <button :disabled="page >= Math.ceil(total / pageSize)" @click="page++" class="nav-btn">{{ t('common.next') }} ►</button>
+        </div>
+
+        <div class="pagination-tools">
+          <div class="page-size-selector">
+            <span class="selector-label">{{ t('common.show') }}:</span>
+            <div class="size-options">
+              <button v-for="size in [10, 20, 50, 100]" :key="size" 
+                      :class="{ active: pageSize === size }"
+                      @click="pageSize = size; page = 1"
+                      class="size-btn">
+                {{ size }}
+              </button>
+            </div>
+          </div>
+
+          <div class="cyber-page-input-container">
+            <label for="pageInputTop">{{ t('common.goToPage') }}</label>
+            <input class="cyber-pagination-input" id="pageInputTop" type="number" 
+                   v-model.number="inputPage" :min="1" :max="Math.ceil(total / pageSize)" 
+                   @keyup.enter="goToPage" />
+          </div>
+        </div>
+      </div>
 
       <!-- Grid -->
       <transition-group name="widget-dynamic" tag="div" class="campaigns-grid">
@@ -83,11 +126,11 @@
           @click="goToDetail(campaign.hash)">
           <div class="card-header">
             <div class="hash-badge">
-              DNA: {{ campaign.hash.substring(0, 8) }}
+              {{ t('campaigns.table.hash') }}: {{ campaign.hash.substring(0, 8) }}
             </div>
             <div class="cluster-size">
               <span class="size-val">{{ campaign.ipCount }}</span>
-              <span class="size-label">IP NODES</span>
+              <span class="size-label">{{ t('campaigns.ipsInvolved').toUpperCase() }}</span>
             </div>
           </div>
 
@@ -97,7 +140,7 @@
               <span class="metric-value">{{ campaign.totalLogs }}</span>
             </div>
             <div class="metric-item">
-              <span class="metric-label">SAMPLE URL</span>
+              <span class="metric-label">{{ t('common.sample_url').toUpperCase() }}</span>
               <span class="metric-value" :title="campaign.sampleUrl">{{ campaign.sampleUrl || '/' }}</span>
             </div>
           </div>
@@ -106,7 +149,7 @@
             <div class="timeline-info">
               <div>{{ t('campaigns.firstSeen') }}: {{ formatDate(campaign.firstSeen) }}</div>
               <div v-if="campaign.lastSeen !== campaign.firstSeen">
-                DURATA: {{ computeDuration(campaign.firstSeen, campaign.lastSeen) }}
+                {{ t('common.duration_label').toUpperCase() }}: {{ computeDuration(campaign.firstSeen, campaign.lastSeen) }}
               </div>
             </div>
             <div class="go-btn">
@@ -116,22 +159,43 @@
         </div>
       </transition-group>
 
-      <!-- Pagination -->
-      <div v-if="total > pageSize" class="pagination cyber-pagination">
-        <button :disabled="page === 1" @click="page--">◄ {{ t('common.prev') }}</button>
-        <span class="pagination-info cyber-pagination-info">
-          {{ t('common.page') }} {{ page }} {{ t('common.of') }} {{ Math.ceil(total / pageSize) }}
-        </span>
-        <button :disabled="page >= Math.ceil(total / pageSize)" @click="page++">
-          {{ t('common.next') }} ►
-        </button>
+      <!-- Bottom Pagination -->
+      <div v-if="total > 0" class="pagination cyber-pagination">
+        <div class="pagination-main">
+          <button :disabled="page === 1" @click="page--" class="nav-btn">◄ {{ t('common.prev') }}</button>
+          <span class="pagination-info cyber-pagination-info">
+            {{ t('common.page') }} {{ page }} {{ t('common.of') }} {{ Math.ceil(total / pageSize) }}
+          </span>
+          <button :disabled="page >= Math.ceil(total / pageSize)" @click="page++" class="nav-btn">{{ t('common.next') }} ►</button>
+        </div>
+
+        <div class="pagination-tools">
+          <div class="page-size-selector">
+            <span class="selector-label">{{ t('common.show') }}:</span>
+            <div class="size-options">
+              <button v-for="size in [10, 20, 50, 100]" :key="size" 
+                      :class="{ active: pageSize === size }"
+                      @click="pageSize = size; page = 1"
+                      class="size-btn">
+                {{ size }}
+              </button>
+            </div>
+          </div>
+
+          <div class="cyber-page-input-container">
+            <label for="pageInputBottom">{{ t('common.goToPage') }}</label>
+            <input class="cyber-pagination-input" id="pageInputBottom" type="number" 
+                   v-model.number="inputPage" :min="1" :max="Math.ceil(total / pageSize)" 
+                   @keyup.enter="goToPage" />
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { computed, toRef, onMounted } from 'vue';
+import { computed, toRef, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { storeToRefs } from 'pinia';
@@ -160,13 +224,30 @@ const {
 } = useCampaignsDiscovery(
   toRef(campaignsStore.state.pagination, 'page'),
   toRef(campaignsStore.state.filters, 'minIps'),
+  toRef(campaignsStore.state.filters, 'minScore'),
   toRef(campaignsStore.state.filters, 'timeMode'),
   toRef(campaignsStore.state.filters, 'agoValue'),
   toRef(campaignsStore.state.filters, 'agoUnit'),
   toRef(campaignsStore.state.pagination, 'pageSize')
 );
 
-onMounted(fetchData);
+// Logica paginazione standard
+const inputPage = ref(page.value);
+watch(page, (newVal) => {
+  inputPage.value = newVal;
+});
+
+function goToPage() {
+  const p = parseInt(inputPage.value);
+  if (isNaN(p)) {
+    inputPage.value = page.value;
+    return;
+  }
+  const max = Math.ceil(total.value / pageSize.value);
+  if (p < 1) page.value = 1;
+  else if (p > max) page.value = max;
+  else page.value = p;
+}
 
 function formatDate(ts) {
   return formatFullDateTime(ts);
@@ -185,7 +266,8 @@ function goToDetail(hash) {
     query: {
       timeMode: campaignsStore.state.filters.timeMode,
       agoValue: campaignsStore.state.filters.agoValue,
-      agoUnit: campaignsStore.state.filters.agoUnit
+      agoUnit: campaignsStore.state.filters.agoUnit,
+      minScore: campaignsStore.state.filters.minScore
     }
   });
 }

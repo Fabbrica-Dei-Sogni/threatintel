@@ -41,6 +41,14 @@ const COWRIE_SESSION_FILTER_FIELDS = new Set([
     'src_ip', 'session', 'sensor', 'protocol', 'timestamp', 'sessionCategory'
 ]);
 
+const CAMPAIGN_FILTER_FIELDS = new Set([
+    'minIps', 'minScore', 'startTime', 'endTime', 'page', 'pageSize'
+]);
+
+const CAMPAIGN_SORT_FIELDS = new Set([
+    'ipCount', 'totalLogs', 'firstSeen', 'lastSeen'
+]);
+
 /**
  * Escapa i caratteri speciali regex in una stringa.
  * Previene ReDoS su input utente.
@@ -139,10 +147,12 @@ export const SortAllowedFields = {
     attack: ATTACK_SORT_FIELDS,
     cowrieSession: COWRIE_SESSION_SORT_FIELDS,
     dossier: DOSSIER_SORT_FIELDS,
+    campaign: CAMPAIGN_SORT_FIELDS,
 };
 
 export const FilterAllowedFields = {
     threatLog: THREAT_LOG_FILTER_FIELDS,
     attack: ATTACK_FILTER_FIELDS,
     cowrieSession: COWRIE_SESSION_FILTER_FIELDS,
+    campaign: CAMPAIGN_FILTER_FIELDS,
 };

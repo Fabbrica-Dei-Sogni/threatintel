@@ -3,6 +3,7 @@ import { inject, singleton } from 'tsyringe';
 import { CampaignService } from '../services/CampaignService';
 import { LOGGER_TOKEN } from '../di/tokens';
 import { Logger } from 'winston';
+import { sanitizeFilters, sanitizePage, sanitizePageSize, FilterAllowedFields } from '../utils/queryGuard';
 
 @singleton()
 export class CampaignController {
@@ -18,13 +19,33 @@ export class CampaignController {
     async getCampaigns(req: Request, res: Response): Promise<void> {
         this.logger.info('[CampaignController] Requesting distributed campaigns discovery');
         try {
-            const { startTime, endTime, minIps = 2 } = req.query as any;
-            const timeConfig = { startTime, endTime };
-            const minIpsNum = parseInt(minIps) || 2;
+            // Sanificazione tramite whitelist centralizzata
+            const cleanQuery = sanitizeFilters(req.query, FilterAllowedFields.campaign);
+            
+            const pageNum = sanitizePage(cleanQuery.page);
+            const pageSizeNum = sanitizePageSize(cleanQuery.pageSize, 100, 10);
+            
+            // Parametri specifici convertiti in numero
+            const minIpsNum = parseInt(cleanQuery.minIps as string) || 2;
+            const minScoreNum = parseInt(cleanQuery.minScore as string) || 0;
+            
+            const timeConfig = { 
+                startTime: cleanQuery.startTime as string, 
+                endTime: cleanQuery.endTime as string 
+            };
 
-            const campaigns = await this.campaignService.getCampaigns({ timeConfig, minIps: minIpsNum });
+            const result = await this.campaignService.getCampaigns({ 
+                timeConfig, 
+                minIps: minIpsNum,
+                minScore: minScoreNum,
+                page: pageNum,
+                pageSize: pageSizeNum
+            });
 
-            res.json({ campaigns, count: campaigns.length });
+            res.json({ 
+                campaigns: result.campaigns, 
+                count: result.total 
+            });
         } catch (err: any) {
             this.logger.error('[CampaignController] Error in campaigns discovery:', err);
             res.status(500).json({ error: 'Errore durante la scoperta delle campagne' });
@@ -38,7 +59,7 @@ export class CampaignController {
     async getCampaignDetail(req: Request, res: Response): Promise<void> {
         this.logger.info(`[CampaignController] Requesting campaign details for hash ${req.body.hash}`);
         try {
-            const { ips, hash, minLogsForAttack = 1, timeConfig = {} } = req.body;
+            const { ips, hash, minLogsForAttack = 1, minScore = 0, timeConfig = {} } = req.body;
             if (!hash) {
                 res.status(400).json({ error: 'Hash mancante' });
                 return;
@@ -48,6 +69,7 @@ export class CampaignController {
                 ips,
                 hash,
                 minLogsForAttack: parseInt(minLogsForAttack),
+                minScore: parseInt(minScore),
                 timeConfig
             });
 

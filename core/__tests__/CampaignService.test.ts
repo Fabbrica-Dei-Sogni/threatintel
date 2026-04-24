@@ -47,13 +47,14 @@ describe('CampaignService', () => {
 
             // Create logs from 3 different IPs with the same hash
             await ThreatLog.create([
-                { id: '1', request: { ip: '1.1.1.1', url: '/attack' }, fingerprint: { hash }, timestamp: new Date() },
-                { id: '2', request: { ip: '2.2.2.2', url: '/attack' }, fingerprint: { hash }, timestamp: new Date() },
-                { id: '3', request: { ip: '3.3.3.3', url: '/attack' }, fingerprint: { hash }, timestamp: new Date() },
-                { id: '4', request: { ip: '4.4.4.4', url: '/other' }, fingerprint: { hash: 'UNIQUE' }, timestamp: new Date() }
+                { id: '1', request: { ip: '1.1.1.1', url: '/attack' }, fingerprint: { hash, score: 10 }, timestamp: new Date() },
+                { id: '2', request: { ip: '2.2.2.2', url: '/attack' }, fingerprint: { hash, score: 10 }, timestamp: new Date() },
+                { id: '3', request: { ip: '3.3.3.3', url: '/attack' }, fingerprint: { hash, score: 10 }, timestamp: new Date() },
+                { id: '4', request: { ip: '4.4.4.4', url: '/other' }, fingerprint: { hash: 'UNIQUE', score: 10 }, timestamp: new Date() }
             ]);
 
-            const campaigns = await service.getCampaigns({ minIps: 2 });
+            const result = await service.getCampaigns({ minIps: 2 });
+            const campaigns = result.campaigns;
 
             expect(campaigns).toHaveLength(1);
             expect(campaigns[0].hash).toBe(hash);

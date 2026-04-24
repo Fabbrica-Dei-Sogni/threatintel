@@ -101,6 +101,7 @@ import { formatFullDateTime } from '../../utils/dateUtils';
 const props = defineProps({
   hash: { type: String, required: true },
   minLogsForAttack: { type: Number, default: 1 },
+  minScore: { type: Number, default: 0 },
   timeMode: { type: String, default: 'ago' },
   agoValue: { type: Number, default: 30 },
   agoUnit: { type: String, default: 'days' }
@@ -125,6 +126,7 @@ async function loadCampaign() {
     const data = await fetchCampaignDetail({
       hash: props.hash,
       minLogsForAttack: props.minLogsForAttack,
+      minScore: props.minScore,
       timeConfig
     });
     campaign.value = data;

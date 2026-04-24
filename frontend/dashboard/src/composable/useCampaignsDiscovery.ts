@@ -12,12 +12,14 @@ function toRef<T>(val: T | Ref<T>): Ref<T> {
 export function useCampaignsDiscovery(
     initialPage: number | Ref<number>,
     initialMinIps: number | Ref<number>,
+    initialMinScore: number | Ref<number>,
     initialTimeMode: ('ago' | 'range') | Ref<'ago' | 'range'>,
     initialAgoValue: (number | null) | Ref<number | null>,
     initialAgoUnit: (string | null) | Ref<string | null>,
-    initialPageSize: number | Ref<number> = 20
+    initialPageSize: number | Ref<number> = 10
 ) {
     const minIps = toRef(initialMinIps);
+    const minScore = toRef(initialMinScore);
     const timeMode = toRef(initialTimeMode);
     const agoValue = toRef(initialAgoValue);
     const agoUnit = toRef(initialAgoUnit);
@@ -26,6 +28,7 @@ export function useCampaignsDiscovery(
 
     const filterRefs = [
         minIps,
+        minScore,
         timeMode,
         agoValue,
         agoUnit
@@ -57,7 +60,10 @@ export function useCampaignsDiscovery(
             const response = await fetchCampaigns({
                 startTime,
                 endTime,
-                minIps: minIps.value
+                minIps: minIps.value,
+                minScore: minScore.value,
+                page: page.value,
+                pageSize: pageSize.value
             });
             campaigns.value = response.campaigns || [];
             total.value = response.count || campaigns.value.length;

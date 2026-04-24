@@ -2,6 +2,15 @@
 @import './styles/base-layout.css';
 @import './styles/cyber-theme.css';
 
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
 body {
   background-color: #0B111B !important;
   margin: 0;

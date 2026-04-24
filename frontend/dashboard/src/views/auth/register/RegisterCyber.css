@@ -1,6 +1,12 @@
 /* RegisterCyber.css - CYBER SKIN OVERRIDES */
 
 .skin-cyber.auth-page {
+    --theme-primary: #00D4FF;
+    --theme-primary-rgb: 0, 212, 255;
+    --theme-accent: #007AFF;
+    --theme-border: rgba(0, 212, 255, 0.2);
+    --theme-surface: rgba(16, 24, 48, 0.45);
+    
     background-color: #080C14 !important;
 }
 

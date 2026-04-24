@@ -1,13 +1,10 @@
 <template>
   <div class="dashboard" :class="'skin-' + currentSkin">
-    <div class="header-top">
-      <div class="header-main-title">
-        <h1>
-          {{ t('home.title').toUpperCase() }}
-        </h1>
-      </div>
+    <GlobalHeader context="home" extraClass="header-top" />
 
-      <div class="header-actions">
+    <div class="dashboard-hero">
+      <div class="hero-container">
+        <h1>{{ t('home.title').toUpperCase() }}</h1>
         <button @click="dashboardStore.resetToDefaults" class="reset-btn-mini global-reset"
           :title="t('common.reset_layout')">
           <div class="reset-ascii">
@@ -15,8 +12,6 @@
             <span></span>
           </div>
         </button>
-        <SkinSwitcher />
-        <LanguageSwitcher />
       </div>
     </div>
 
@@ -413,10 +408,9 @@ import { fetchDossiers } from '../../api';
 import { useDossierStore } from '../../stores/dossier';
 import { useAuthStore } from '../../stores/auth';
 import dayjs from 'dayjs';
-import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
 import CountryFlag from '../../components/CountryFlag.vue';
 import BreakingNews from '../../components/BreakingNews.vue';
-import SkinSwitcher from '../../components/SkinSwitcher.vue';
+import GlobalHeader from '../../components/GlobalHeader.vue';
 import ProtocolSelector from '../../components/common/ProtocolSelector.vue';
 import DefconIndicator from '../../components/DefconIndicator.vue';
 import TelemetryStats from '../../components/TelemetryStats.vue';

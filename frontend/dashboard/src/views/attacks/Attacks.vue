@@ -1,12 +1,10 @@
 <template>
     <div class="attacchi cyber-view" :class="'skin-' + dashboardSkin">
-        <div class="header-top cyber-sticky-area cyber-sticky-top-0">
-            <h1><span class="animated-icon pulse-magma">📡</span> {{ t('attacks.title') }}</h1>
-            <div class="header-actions">
-                <SkinSwitcher />
-                <LanguageSwitcher />
-            </div>
-        </div>
+        <GlobalHeader context="attacks" extraClass="cyber-sticky-area cyber-sticky-top-0">
+            <template #title>
+                <h1><span class="animated-icon pulse-magma">📡</span> {{ t('attacks.title') }}</h1>
+            </template>
+        </GlobalHeader>
         <!-- Pulsanti per tornare alla Home principale e View Controls -->
         <div class="actions cyber-sticky-area cyber-sticky-top-1">
             <div class="nav-actions">
@@ -364,8 +362,7 @@ import DefconIndicator from '../../components/DefconIndicator.vue';
 import CountryFlag from '../../components/CountryFlag.vue';
 import AttackChart from '../../components/AttackChart.vue';
 import AttackMap from '../../components/AttackMap.vue';
-import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
-import SkinSwitcher from '../../components/SkinSwitcher.vue';
+import GlobalHeader from '../../components/GlobalHeader.vue';
 
 const props = defineProps({
     initialIp: String,

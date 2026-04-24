@@ -233,7 +233,8 @@
     border: 1px solid var(--theme-border) !important;
     border-radius: 4px !important;
     box-shadow: 0 0 30px rgba(0, 0, 0, 0.7), 0 0 10px rgba(var(--theme-primary-rgb), 0.1) !important;
-    min-width: 380px !important;
+    min-width: 300px !important;
+    max-width: 90vw !important;
     padding: 15px 25px !important;
     z-index: 10000 !important;
 }

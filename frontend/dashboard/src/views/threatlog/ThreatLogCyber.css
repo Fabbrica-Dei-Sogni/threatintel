@@ -39,34 +39,20 @@
   transition: all 0.3s ease;
 }
 
-/* === HEADER & SWITCHER ALIGNMENT (PERFECT) === */
-.skin-cyber.threatlog-details .header-top {
-  background: rgba(15, 12, 5, 0.95) !important;
-  border-bottom: 2px solid var(--cy-primary) !important;
-  padding: 12px 24px 15px 24px !important;
-  display: flex !important;
-  justify-content: space-between !important;
-  align-items: center !important;
-  flex-wrap: wrap !important;
-  gap: 15px !important;
-  margin-bottom: 30px !important;
-}
-
-.skin-cyber.threatlog-details .header-actions {
-  display: flex !important;
-  flex-direction: row !important;
-  align-items: center !important;
-  gap: 15px !important;
-}
-
-.skin-cyber.threatlog-details h1 {
+/* === GLOBAL HEADER OVERRIDES === */
+.skin-cyber.threatlog-details :deep(.header-title-area h1) {
+  margin: 0 !important;
   color: var(--cy-primary) !important;
   text-shadow: 0 0 15px rgba(var(--cy-primary-rgb), 0.6) !important;
   font-family: var(--font-cyber-mono) !important;
   letter-spacing: 2px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  white-space: nowrap;
 }
 
-.skin-cyber.threatlog-details h1::after {
+.skin-cyber.threatlog-details :deep(.header-title-area h1)::after {
   content: '_';
   animation: amber-blink-hud-v8 1s step-end infinite;
 }
@@ -194,6 +180,20 @@
   border: 1px solid var(--theme-border) !important;
 }
 
+.skin-cyber.threatlog-details .back-navigation {
+  padding: 15px 30px 10px 30px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+@media (max-width: 768px) {
+  .skin-cyber.threatlog-details .back-navigation {
+    padding: 10px 15px;
+  }
+}
+
 /* === BUTTONS === */
 .skin-cyber.threatlog-details .back-btn {
   background: var(--theme-btn-bg) !important;
@@ -202,11 +202,34 @@
   border-radius: var(--theme-radius) !important;
   font-weight: 800;
   text-transform: uppercase;
+  padding: 10px 20px !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  flex-shrink: 0;
   box-shadow: none !important;
+  height: fit-content;
 }
 
 .skin-cyber.threatlog-details .back-btn:hover {
   background: var(--theme-primary) !important;
   color: #000 !important;
   box-shadow: 0 0 20px var(--theme-btn-shadow) !important;
+}
+
+@media (max-width: 768px) {
+  .skin-cyber.threatlog-details {
+    padding-top: 10px;
+  }
+  
+  .skin-cyber.threatlog-details .back-btn {
+    padding: 6px 12px !important;
+    font-size: 0.7rem !important;
+  }
+
+  .skin-cyber.threatlog-details :deep(.header-title-area h1) {
+    font-size: 0.85rem !important;
+    gap: 8px;
+  }
 }

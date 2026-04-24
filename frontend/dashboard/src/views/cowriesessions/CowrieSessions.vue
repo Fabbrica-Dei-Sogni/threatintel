@@ -1,12 +1,10 @@
 <template>
     <div class="cowrie-sessions attacchi cyber-view" :class="'skin-' + dashboardSkin">
-        <div class="header-top cyber-sticky-area cyber-sticky-top-0">
-            <h1><span class="animated-icon pulse-jade">📟</span> {{ $t('cowrie.sessions.title') }}</h1>
-            <div class="header-actions">
-                <SkinSwitcher />
-                <LanguageSwitcher />
-            </div>
-        </div>
+        <GlobalHeader context="cowrie-sessions" extraClass="cyber-sticky-area cyber-sticky-top-0">
+            <template #title>
+                <h1><span class="animated-icon pulse-jade">📟</span> {{ $t('cowrie.sessions.title') }}</h1>
+            </template>
+        </GlobalHeader>
         <div class="actions cyber-sticky-area cyber-sticky-top-1">
             <div class="nav-actions">
                 <button @click="$router.push('/')" class="btn-action">{{ $t('cowrie.sessions.backToDashboard')
@@ -228,8 +226,7 @@ import { useI18n } from '../../composable/useI18n';
 import { useCowrieSessions } from '../../composable/useCowrieSessions';
 import { useClipboard } from '../../composable/useClipboard';
 import CountryFlag from '../../components/CountryFlag.vue';
-import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
-import SkinSwitcher from '../../components/SkinSwitcher.vue';
+import GlobalHeader from '../../components/GlobalHeader.vue';
 import SessionChart from '../../components/SessionChart.vue';
 import AttackMap from '../../components/AttackMap.vue';
 import CowrieCategorySelector from '../../components/common/CowrieCategorySelector.vue';

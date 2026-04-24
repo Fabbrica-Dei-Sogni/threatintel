@@ -1,17 +1,6 @@
 <template>
     <div class="auth-page cyber-view" :class="'skin-' + dashboardSkin">
-        <div class="header-top">
-            <div class="header-left">
-                <div class="brand-logo">
-                    <span class="logo-icon">🛰️</span>
-                    <span class="logo-text">THREAT<span class="highlight">INTEL</span></span>
-                </div>
-            </div>
-            <div class="header-actions">
-                <SkinSwitcher />
-                <LanguageSwitcher />
-            </div>
-        </div>
+        <GlobalHeader context="auth" />
 
         <div class="auth-container">
             <button @click="router.push('/')" class="back-btn-integrated">
@@ -67,8 +56,7 @@ import { useRouter } from 'vue-router';
 import { login } from '../../../api/index';
 import { useI18n } from 'vue-i18n';
 import { useAuthStore } from '../../../stores/auth';
-import LanguageSwitcher from '../../../components/LanguageSwitcher.vue';
-import SkinSwitcher from '../../../components/SkinSwitcher.vue';
+import GlobalHeader from '../../../components/GlobalHeader.vue';
 import { useViewSettingsStore } from '../../../stores/viewSettings';
 import { storeToRefs } from 'pinia';
 

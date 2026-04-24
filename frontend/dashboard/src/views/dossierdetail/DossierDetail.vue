@@ -4,63 +4,57 @@
     <div class="scanning-line cobalt-pulse"></div>
     <div class="vignette-overlay"></div>
     
-    <div class="header-top">
-      <div class="header-content-left">
-        <h1 v-if="dossier && !isEditing">{{ dossier.title }}</h1>
-        <div class="header-subtitle" v-if="dossier && !isEditing">
+    <GlobalHeader context="dossier-archive-view detail-mode">
+      <template #actions>
+        <div class="header-nav-right">
+          <button @click="goBack" class="back-btn" :disabled="isSaving">{{ t('common.back').toUpperCase() }}</button>
+        </div>
+      </template>
+    </GlobalHeader>
+
+    <!-- Dossier Hero Header (Relocated from GlobalHeader for better space) -->
+    <div class="dossier-hero-header" v-if="dossier">
+      <div class="hero-content">
+        <h1 v-if="!isEditing">{{ dossier.title }}</h1>
+        <input v-else v-model="editForm.title" class="edit-title-input hero-input" />
+        
+        <div class="header-subtitle" v-if="!isEditing">
           <span class="status-classified">[CLASSIFIED_FILE]</span>
           <span class="separator">|</span>
           <span class="dossier-id-tag">DOSSIER_ID: {{ dossier._id }}</span>
         </div>
-        <input v-else-if="dossier && isEditing" v-model="editForm.title" class="edit-title-input" />
-      </div>
-      <div class="header-actions">
-        <SkinSwitcher />
-        <LanguageSwitcher />
-      </div>
-    </div>
 
-    <div class="archive-header">
-      <div class="header-nav-left">
-        <button @click="goBack" class="back-btn" :disabled="isSaving">{{ t('common.back').toUpperCase() }}</button>
-      </div>
+        <div class="dossier-actions-row">
+           <!-- Pulsante Genera Dossier -->
+           <DossierReportActions 
+            v-if="dossier && !isEditing" 
+            :dossierId="dossier._id" 
+            customClass="back-btn report-btn" 
+            :accentColor="reportAccentColor"
+            mode="compact"
+          />
 
-      <div class="header-nav-right">
-        <!-- Pulsante Genera Dossier allineato agli altri -->
-        <DossierReportActions 
-          v-if="dossier && !isEditing" 
-          :dossierId="dossier._id" 
-          customClass="back-btn report-btn" 
-          :accentColor="reportAccentColor"
-          mode="compact"
-        />
-
-        <el-tooltip
-          v-if="dossier && !isEditing && canModify"
-          :content="t('common.edit')"
-          placement="top"
-          effect="dark"
-        >
-          <button @click="startEdit" class="edit-btn-compact">
-            ✎
-          </button>
-        </el-tooltip>
-
-        <template v-if="dossier && isEditing && canModify">
-          <button @click="saveEdit" class="back-btn save-btn" :disabled="isSaving">
-            ✓ {{ t('common.save').toUpperCase() }}
-          </button>
-          
           <el-tooltip
-            :content="t('common.cancel')"
+            v-if="dossier && !isEditing && canModify"
+            :content="t('common.edit')"
             placement="top"
             effect="dark"
           >
-            <button @click="cancelEdit" class="back-btn cancel-btn-compact">
-              ✗
+            <button @click="startEdit" class="edit-btn-compact">
+              ✎ {{ t('common.edit').toUpperCase() }}
             </button>
           </el-tooltip>
-        </template>
+
+          <template v-if="dossier && isEditing && canModify">
+            <button @click="saveEdit" class="back-btn save-btn" :disabled="isSaving">
+              ✓ {{ t('common.save').toUpperCase() }}
+            </button>
+            
+            <button @click="cancelEdit" class="back-btn cancel-btn">
+              ✗ {{ t('common.cancel').toUpperCase() }}
+            </button>
+          </template>
+        </div>
       </div>
     </div>
 
@@ -194,13 +188,12 @@ import { computed, ref, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { useDossierDetail } from '../../composable/useDossierDetail';
-import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
-import DossierReportActions from '../../components/DossierReportActions.vue';
 import DossierSectionRenderer from '../../components/dossier/DossierSectionRenderer.vue';
 import DossierSectionEditor from '../../components/dossier/DossierSectionEditor.vue';
+import DossierReportActions from '../../components/DossierReportActions.vue';
+import GlobalHeader from '../../components/GlobalHeader.vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { useViewSettingsStore } from '../../stores/viewSettings';
-import SkinSwitcher from '../../components/SkinSwitcher.vue';
 import { formatDateTime, formatFullDateTime } from '../../utils/dateUtils';
 import dayjs from 'dayjs';
 import { DossierSectionType, type IDossierSection, type IHumanSectionData } from '../../models/DossierDTO';

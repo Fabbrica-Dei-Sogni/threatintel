@@ -10,14 +10,22 @@
 /* === HEADER TOP & BACK BUTTON === */
 
 .header-top {
-    display: flex !important;
-    justify-content: space-between !important;
-    align-items: center !important;
-    flex-wrap: wrap !important;
-    gap: 20px !important;
-    margin-bottom: 24px !important;
-    padding: 12px 24px 15px 24px !important;
-    border-bottom: 1px solid var(--theme-border, rgba(230, 33, 23, 0.2));
+    display: none !important; /* Managed by GlobalHeader component */
+}
+
+.back-navigation {
+    padding: clamp(10px, 2vw, 15px) 0;
+    margin-bottom: clamp(10px, 3vw, 20px);
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+@media (max-width: 768px) {
+    .back-navigation {
+        padding: 8px 0;
+    }
 }
 
 .header-content-left, .header-content-right {

@@ -9,6 +9,17 @@
   --cy-border: rgba(14, 165, 233, 0.3);
   --cy-text: #f8fafc;
   --cy-text-muted: #94a3b8;
+
+  --theme-primary: var(--cy-primary);
+  --theme-primary-rgb: var(--cy-primary-rgb);
+  --theme-accent: var(--cy-accent);
+  --theme-bg: var(--cy-bg);
+  --theme-surface: var(--cy-surface);
+  --theme-border: var(--cy-border);
+  --theme-text: var(--cy-text);
+  --theme-text-muted: var(--cy-text-muted);
+  --theme-radius: 0px;
+  --theme-blur: blur(10px);
   
   background-color: var(--cy-bg) !important;
   background-image: 
@@ -53,45 +64,85 @@
   z-index: 9998;
 }
 
-/* Header Refactoring */
-.skin-cyber.dossier-archive-view.detail-mode .header-top {
-  background: rgba(5, 7, 10, 0.9) !important;
-  border-bottom: 2px solid var(--cy-primary) !important;
-  padding: 20px 40px !important;
-  backdrop-filter: blur(10px);
-  position: sticky;
-  top: 0;
-  z-index: 100;
+/* === GLOBAL HEADER OVERRIDES (SLIM) === */
+/* Redundant title overrides removed */
+
+/* === DOSSIER HERO HEADER (RELOCATED) === */
+.skin-cyber.dossier-archive-view.detail-mode .dossier-hero-header {
+  padding: 30px 40px 10px 40px;
+  background: linear-gradient(to bottom, rgba(var(--cy-primary-rgb), 0.05), transparent);
+  border-bottom: 1px solid rgba(var(--cy-primary-rgb), 0.1);
+  margin-bottom: 20px;
 }
 
-.skin-cyber.dossier-archive-view.detail-mode .header-top h1 {
+.skin-cyber.dossier-archive-view.detail-mode .dossier-hero-header h1 {
   font-family: 'Outfit', sans-serif !important;
   color: var(--cy-primary) !important;
   text-transform: uppercase;
   font-weight: 900 !important;
-  font-size: clamp(1.2rem, 5vw, 2.2rem) !important;
-  letter-spacing: 1px;
-  text-shadow: 0 0 15px rgba(var(--cy-primary-rgb), 0.4);
+  font-size: clamp(1.2rem, 4vw, 2.2rem) !important; /* Reduced for better proportion */
+  letter-spacing: 0.5px;
+  text-shadow: 0 0 20px rgba(var(--cy-primary-rgb), 0.3);
   margin: 0;
   line-height: 1.1;
   word-break: break-word;
 }
 
+.skin-cyber.dossier-archive-view.detail-mode .dossier-hero-header h1::after {
+  content: '_';
+  animation: cobalt-blink-hud-v8 1s step-end infinite;
+}
+
+@keyframes cobalt-blink-hud-v8 {
+  50% { opacity: 0; }
+}
+
 .skin-cyber.dossier-archive-view.detail-mode .header-subtitle {
-  margin-top: 10px;
+  margin-top: 15px;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 15px;
   flex-wrap: wrap;
   font-family: 'JetBrains Mono', monospace;
-  font-size: 0.6rem;
-  letter-spacing: 1.5px;
-  opacity: 0.8;
+  font-size: 0.75rem;
+  letter-spacing: 2px;
+  opacity: 0.9;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 5px 15px;
+  border-left: 3px solid var(--cy-primary);
+  width: fit-content;
+}
+
+@media (max-width: 768px) {
+  .skin-cyber.dossier-archive-view.detail-mode .dossier-hero-header {
+    padding: 15px 20px 5px 20px;
+    margin-bottom: 15px;
+  }
+
+  .skin-cyber.dossier-archive-view.detail-mode .dossier-hero-header h1 {
+    font-size: 1.1rem !important;
+    letter-spacing: 0;
+  }
+
+  .skin-cyber.dossier-archive-view.detail-mode .header-subtitle {
+    margin-top: 10px;
+    font-size: 0.6rem;
+    gap: 8px;
+    padding: 4px 10px;
+  }
 }
 
 .skin-cyber.dossier-archive-view.detail-mode .status-classified {
   color: #f87171; /* Red for classified */
   font-weight: 800;
+}
+
+.skin-cyber.dossier-archive-view.detail-mode .dossier-actions-row {
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
 }
 
 .skin-cyber.dossier-archive-view.detail-mode .separator {
@@ -116,15 +167,17 @@
   border: 1px solid var(--cy-primary) !important;
   color: var(--cy-primary) !important;
   border-radius: 0 !important;
-  width: 44px;
-  height: 44px;
+  padding: 0 16px !important;
+  height: 38px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: 'JetBrains Mono', monospace;
   font-weight: 800;
+  font-size: 0.75rem;
   transition: all 0.2s ease;
   cursor: pointer;
+  white-space: nowrap;
 }
 
 .skin-cyber.dossier-archive-view.detail-mode .edit-btn-compact:hover {
@@ -283,7 +336,15 @@
   font-family: 'JetBrains Mono', monospace;
   text-transform: uppercase;
   font-weight: 800;
+  padding: 8px 16px !important;
+  font-size: 0.8rem;
   transition: all 0.2s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: fit-content;
 }
 
 .skin-cyber.dossier-archive-view.detail-mode .back-btn:hover,
@@ -351,8 +412,8 @@
 }
 
 .skin-cyber.dossier-archive-view.detail-mode :deep(.report-btn.compact) {
-  width: 44px !important;
-  height: 44px !important;
+  width: 38px !important;
+  height: 38px !important;
   padding: 0 !important;
   border-radius: 0 !important;
   display: flex !important;

@@ -1,8 +1,6 @@
 .ip-details {
   color: #E0E6ED;
   background-color: #18181B;
-  /* Tinged Charcoal */
-  padding: 24px 28px;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -10,48 +8,89 @@
 
 @media (max-width: 768px) {
   .ip-details {
-    padding: 15px 10px;
-    /* Reduced mobile padding */
+    padding: 0 5px 10px 5px;
     white-space: normal;
-    /* Restore wrapping for mobile flow */
-  }
-
-  .ip-details h1 {
-    font-size: clamp(20px, 5vw, 28px);
-    white-space: normal;
-    /* Allow title to wrap */
   }
 }
 
-.ip-details>* {
-  white-space: normal;
+.back-navigation {
+    padding: clamp(10px, 2vw, 15px) 40px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap; /* Prevent overflow */
+    gap: clamp(8px, 2vw, 15px);
 }
 
-.back-btn {
+@media (max-width: 768px) {
+    .back-navigation {
+        padding: 10px 15px;
+        gap: 10px;
+    }
+}
+
+.back-btn, .refresh-btn {
   background: rgba(0, 122, 255, 0.1);
   color: #00D4FF;
   border: 1px solid rgba(0, 212, 255, 0.3);
   font-weight: 700;
-  padding: 10px 24px;
+  padding: 8px 16px;
   box-shadow: 0 0 15px rgba(0, 212, 255, 0.15);
   transition: all 0.3s ease;
   border-radius: 4px;
   cursor: pointer;
+  font-size: clamp(0.7rem, 2vw, 0.85rem);
+  height: auto;
+  white-space: normal; /* Allow text to wrap if very narrow */
+  text-align: center;
 }
 
-.refresh-btn {
-  background: rgba(0, 122, 255, 0.1);
-  color: #00D4FF;
-  border: 1px solid rgba(0, 212, 255, 0.3);
-  border-radius: 4px;
-  padding: 10px 24px;
-  font-weight: 700;
-  cursor: pointer;
-  box-shadow: 0 0 15px rgba(0, 212, 255, 0.15);
-  transition: all 0.3s ease;
+@media (max-width: 480px) {
+    .back-btn, .refresh-btn {
+        flex: 1 1 100%; /* Full width on very small screens if they stack */
+        padding: 10px 12px;
+    }
+}
+
+.ip-hero-header {
+  padding: 20px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 25px;
+}
+
+.hero-content-wrapper {
   display: flex;
-  gap: 8px;
+  justify-content: space-between;
   align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.ip-hero-header h1 {
+  font-size: clamp(1.4rem, 4vw, 2rem);
+  font-weight: 900;
+  color: #00D4FF;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.ip-hero-header .title-text {
+  opacity: 0.7;
+  font-size: 0.8em;
+}
+
+.ip-hero-header .ip-value {
+  color: #fff;
+}
+
+@media (max-width: 768px) {
+  .ip-hero-header {
+    padding: 15px 0 5px 0;
+    margin-bottom: 20px;
+  }
+
+  .ip-hero-header h1 {
+    font-size: 1.2rem;
+  }
 }
 
 .back-btn:hover,

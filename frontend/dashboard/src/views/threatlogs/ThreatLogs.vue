@@ -1,12 +1,10 @@
 <template>
   <div class="threatlogs cyber-view" :class="'skin-' + dashboardSkin">
-    <div class="header-top cyber-sticky-area cyber-sticky-top-0">
-      <h1><span class="animated-icon pulse-log">🗄️</span> {{ t('threatLogs.title') }}</h1>
-      <div class="header-actions">
-        <SkinSwitcher />
-        <LanguageSwitcher />
-      </div>
-    </div>
+    <GlobalHeader context="threatlogs" extraClass="cyber-sticky-area cyber-sticky-top-0">
+      <template #title>
+        <h1><span class="animated-icon pulse-log">🗄️</span> {{ t('threatLogs.title') }}</h1>
+      </template>
+    </GlobalHeader>
     <!-- Pulsante per navigare alla Home -->
     <div class="actions cyber-sticky-area cyber-sticky-top-1">
       <div class="nav-actions">
@@ -235,8 +233,7 @@ import ViewToggle from '../../components/common/ViewToggle.vue';
 import dayjs from 'dayjs';
 import CountryFlag from '../../components/CountryFlag.vue';
 import ThreadLogChart from '../../components/ThreadLogChart.vue';
-import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
-import SkinSwitcher from '../../components/SkinSwitcher.vue';
+import GlobalHeader from '../../components/GlobalHeader.vue';
 import { formatDateTime, formatFullDateTime } from '../../utils/dateUtils';
 
 const { t } = useI18n();

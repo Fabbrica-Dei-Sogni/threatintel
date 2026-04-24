@@ -1,25 +1,34 @@
 <template>
-  <div class="ip-details">
-    <div class="header-top">
+  <div class="ip-details" :class="'skin-' + dashboardSkin">
+    <GlobalHeader context="ip-details" />
+
+    <div class="back-navigation">
       <button @click="goBack" class="back-btn">← {{ t('ipDetails.backToAttacks').toUpperCase() }}</button>
       <button v-if="authStore.isAuthenticated" @click="forzaArricchimento" :disabled="loadingEnrich"
         class="refresh-btn">
         <span v-if="loadingEnrich" class="spinner"></span>
         {{ (loadingEnrich ? t('common.loading') : t('ipDetails.forceRefresh')).toUpperCase() }}
       </button>
-      <LanguageSwitcher />
     </div>
 
-    <div class="header-main">
-      <h1>
-        <span class="animated-icon pulse-cobalt">🔍</span> {{ t('ipDetails.title').toUpperCase() }}: {{ ip }}
-        <button class="action-btn copy-ip-btn" @click="copyMainIp(ip)" :title="t('common.copyToClipboard')">
-          <span v-if="!copiedIp">📋</span>
-          <span v-else>✅</span>
-        </button>
-      </h1>
-      <ReportActions type="ip" :ip="ip" filename="dossier_ip" mode="sticky" accentColor="#00D4FF" />
+    <!-- IP Hero Header -->
+    <div class="ip-hero-header" v-if="ip">
+      <div class="hero-content-wrapper">
+        <div class="hero-main">
+          <h1>
+            <span class="animated-icon pulse-cobalt">🔍</span> 
+            <span class="title-text">{{ t('ipDetails.title').toUpperCase() }}:</span> 
+            <span class="ip-value">{{ ip }}</span>
+            <button class="action-btn copy-ip-btn" @click="copyMainIp(ip)" :title="t('common.copyToClipboard')">
+              <span v-if="!copiedIp">📋</span>
+              <span v-else>✅</span>
+            </button>
+          </h1>
+        </div>
+      </div>
     </div>
+
+    <ReportActions type="ip" :ip="ip" filename="dossier_ip" mode="sticky" accentColor="#00D4FF" />
 
     <div v-if="ipInfo" class="briefing-wrapper">
       <!-- BLOCK 1: GEOGRAPHIC INTELLIGENCE -->
@@ -357,13 +366,18 @@ import { formatDateTime, formatFullDateTime } from '../../utils/dateUtils';
 import dayjs from 'dayjs'
 import { fetchIpDetails, fetchRateLimitSearch, enrichReports, enrichReputationScore } from '../../api/index'
 import { useI18n } from 'vue-i18n'
-import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
 import CountryFlag from '../../components/CountryFlag.vue';
 import ReportActions from '../../components/ReportActions.vue';
 import RestrictedIntelligenceGate from '../../components/common/RestrictedIntelligenceGate.vue';
 import { ElMessage } from 'element-plus';
 import { useClipboard } from '../../composable/useClipboard';
 import { useAuthStore } from '../../stores/auth';
+import { useViewSettingsStore } from '../../stores/viewSettings';
+import { storeToRefs } from 'pinia';
+import GlobalHeader from '../../components/GlobalHeader.vue';
+
+const viewStore = useViewSettingsStore();
+const { dashboardSkin } = storeToRefs(viewStore);
 
 const props = defineProps({
   ip: { type: String, required: true },
@@ -663,3 +677,6 @@ onMounted(() => {
 </script>
 
 <style scoped src="./IpDetails.css"></style>
+<style scoped>
+@import "./IpDetailsCyber.css";
+</style>

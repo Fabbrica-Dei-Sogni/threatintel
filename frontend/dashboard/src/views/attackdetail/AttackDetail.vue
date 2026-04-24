@@ -1,23 +1,21 @@
 <template>
     <div class="attack-detail cyber-view" :class="'skin-' + dashboardSkin">
-        <div class="header-top cyber-sticky-area cyber-sticky-top-0">
-            <div class="header-content-left">
-                <button @click="goBack" class="back-btn">← {{ t('attackDetail.backToAttacks') }}</button>
-                <button @click="syncFiltersToSearch" class="sync-filters-btn" :title="t('common.syncFilters')">
-                    <span class="animated-icon">🔍</span>
-                </button>
+        <GlobalHeader context="attack-detail" extraClass="cyber-sticky-area cyber-sticky-top-0">
+            <template #actions>
+                <div class="header-content-right">
+                    <ReportActions type="attack" :ip="props.ip" filename="dossier_attack" mode="sticky" accentColor="#ff4d4d" />
+                </div>
+            </template>
+            <template #title>
                 <div class="briefing-info-main">
                     <span class="animated-icon pulse-magma">🛰️</span>
                     <h1>{{ t('attackDetail.title') }}</h1>
                 </div>
-            </div>
-            <div class="header-content-right">
-                <ReportActions type="attack" :ip="props.ip" filename="dossier_attack" mode="sticky" accentColor="#ff4d4d" />
-                <div class="header-actions">
-                    <SkinSwitcher />
-                    <LanguageSwitcher />
-                </div>
-            </div>
+            </template>
+        </GlobalHeader>
+
+        <div class="back-navigation">
+            <button @click="goBack" class="back-btn">← {{ t('attackDetail.backToAttacks') }}</button>
         </div>
 
         <!-- Attacker Highlight Card -->
@@ -378,9 +376,8 @@ import DefconIndicator from '../../components/DefconIndicator.vue';
 import AttackProfileRadar from '../../components/AttackProfileRadar.vue';
 import HexViewer from '../../components/HexViewer.vue';
 import AttackMap from '../../components/AttackMap.vue';
-import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
-import SkinSwitcher from '../../components/SkinSwitcher.vue';
 import ReportActions from '../../components/ReportActions.vue';
+import GlobalHeader from '../../components/GlobalHeader.vue';
 import { Search } from '@element-plus/icons-vue';
 import { fetchAttackDetail } from '../../api';
 
@@ -574,22 +571,7 @@ function goBack() {
     router.back()
 }
 
-function syncFiltersToSearch() {
-    if (!attack.value) return;
-    
-    // Sincronizzazione filtri verso AttacksStore
-    attacksStore.state.filters.ip = attack.value.request?.ip || '';
-    attacksStore.state.filters.timeMode = props.timeMode;
-    attacksStore.state.filters.agoValue = props.agoValue;
-    attacksStore.state.filters.agoUnit = props.agoUnit;
-    attacksStore.state.filters.dateRange = props.dateRange;
-    attacksStore.state.filters.minLogs = props.minLogsForAttack;
-    
-    // Opzionale: se vogliamo resettare la pagina
-    attacksStore.state.pagination.page = 1;
 
-    router.push({ name: 'Attacks' });
-}
 
 const loadAttackData = async () => {
     loading.value = true

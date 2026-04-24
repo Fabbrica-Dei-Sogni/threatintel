@@ -1,0 +1,179 @@
+/* IpDetailsCyber.css - COBALT EDITION */
+
+.skin-cyber.ip-details {
+    --cy-primary: #00d4ff;
+    --cy-primary-rgb: 0, 212, 255;
+    --cy-accent: #007aff;
+    --cy-bg: #0a0e14;
+    --cy-surface: rgba(15, 23, 42, 0.9);
+    --cy-border: rgba(0, 212, 255, 0.2);
+    --cy-input-bg: rgba(0, 0, 0, 0.7);
+
+    --theme-primary: var(--cy-primary);
+    --theme-primary-rgb: var(--cy-primary-rgb);
+    --theme-accent: var(--cy-accent);
+    --theme-bg: var(--cy-bg);
+    --theme-surface: var(--cy-surface);
+    --theme-border: var(--cy-border);
+    --theme-text: #e2e8f0;
+    --theme-text-muted: rgba(226, 232, 240, 0.6);
+    --theme-radius: 4px;
+    --theme-blur: blur(12px);
+
+    background-color: var(--theme-bg) !important;
+    color: var(--theme-text) !important;
+}
+
+/* Specific overrides for IpDetails in Cyber Skin */
+/* === GLOBAL HEADER OVERRIDES (SLIM) === */
+.skin-cyber.ip-details :deep(.header-title-area) {
+  display: none; /* No title in header as requested */
+}
+
+.skin-cyber.ip-details .back-navigation {
+    padding: clamp(10px, 3vw, 15px) 40px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+@media (max-width: 768px) {
+    .skin-cyber.ip-details .back-navigation {
+        padding: 10px 20px;
+        gap: 10px;
+    }
+}
+
+/* === IP HERO HEADER (RELOCATED) === */
+.skin-cyber.ip-details .ip-hero-header {
+  padding: 20px 40px;
+  background: linear-gradient(to bottom, rgba(var(--cy-primary-rgb), 0.05), transparent);
+  border-bottom: 1px solid rgba(var(--cy-primary-rgb), 0.1);
+  margin-bottom: 20px;
+}
+
+.skin-cyber.ip-details .hero-content-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.skin-cyber.ip-details .ip-hero-header h1 {
+  margin: 0 !important;
+  color: var(--cy-primary) !important;
+  text-shadow: 0 0 20px rgba(var(--cy-primary-rgb), 0.4) !important;
+  font-family: 'JetBrains Mono', monospace !important;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  font-size: clamp(1.2rem, 4vw, 2.2rem) !important;
+  line-height: 1.2;
+}
+
+.skin-cyber.ip-details .ip-hero-header .title-text {
+  opacity: 0.7;
+  font-size: 0.7em;
+}
+
+.skin-cyber.ip-details .ip-hero-header .ip-value {
+  color: #fff;
+  font-weight: 900;
+}
+
+@media (max-width: 768px) {
+  .skin-cyber.ip-details .ip-hero-header {
+    padding: 15px 20px 5px 20px;
+    margin-bottom: 15px;
+  }
+
+  .skin-cyber.ip-details .ip-hero-header h1 {
+    font-size: 1.1rem !important;
+    gap: 10px;
+  }
+}
+
+.skin-cyber.ip-details .forensic-briefing {
+    background: var(--theme-surface) !important;
+    border: 1px solid var(--theme-border) !important;
+    backdrop-filter: var(--theme-blur) !important;
+}
+
+.skin-cyber.ip-details .briefing-header,
+.skin-cyber.ip-details .section-header {
+    background: rgba(var(--theme-primary-rgb), 0.1) !important;
+    border-bottom: 1px solid var(--theme-border) !important;
+    color: var(--theme-primary) !important;
+}
+
+.skin-cyber.ip-details .back-btn,
+.skin-cyber.ip-details .refresh-btn {
+    background: rgba(var(--theme-primary-rgb), 0.1) !important;
+    border: 1px solid var(--cy-primary) !important;
+    color: var(--cy-primary) !important;
+    border-radius: 0 !important;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 800;
+    padding: clamp(6px, 1.5vw, 10px) clamp(12px, 2vw, 20px) !important;
+    font-size: clamp(0.65rem, 1.5vw, 0.75rem);
+    height: auto;
+    white-space: normal;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+@media (max-width: 480px) {
+    .skin-cyber.ip-details .back-btn,
+    .skin-cyber.ip-details .refresh-btn {
+        flex: 1 1 100%;
+        padding: 10px 12px !important;
+    }
+}
+
+.skin-cyber.ip-details .back-btn:hover,
+.skin-cyber.ip-details .refresh-btn:hover:not(:disabled) {
+    background: var(--cy-primary) !important;
+    color: #000 !important;
+    box-shadow: 0 0 20px rgba(var(--cy-primary-rgb), 0.6) !important;
+}
+
+@media (max-width: 768px) {
+    .skin-cyber.ip-details :deep(.header-title-area .title-text) {
+        display: none;
+    }
+    
+    .skin-cyber.ip-details :deep(.header-title-area h1) {
+        font-size: 0.85rem !important;
+    }
+    
+    .skin-cyber.ip-details .back-btn,
+    .skin-cyber.ip-details .refresh-btn {
+        padding: 6px 12px !important;
+        font-size: 0.7rem;
+    }
+}
+
+.skin-cyber.ip-details .section {
+    background: rgba(var(--theme-primary-rgb), 0.05) !important;
+    border: 1px solid var(--theme-border) !important;
+}
+
+.skin-cyber.ip-details .t-hour {
+    color: var(--theme-primary) !important;
+}
+
+.skin-cyber.ip-details .cat-badge {
+    background: rgba(var(--theme-primary-rgb), 0.15) !important;
+    color: var(--theme-primary) !important;
+    border: 1px solid var(--theme-border) !important;
+}
+
+/* Restricted View specific to Cyber */
+.skin-cyber.ip-details .update-btn.locked {
+    border: 1px dashed var(--theme-primary) !important;
+    color: var(--theme-primary) !important;
+    opacity: 0.8 !important;
+}

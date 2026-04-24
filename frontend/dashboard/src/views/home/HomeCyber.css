@@ -59,6 +59,17 @@
   letter-spacing: 3px;
   position: relative;
   display: inline-block;
+  font-size: clamp(1.2rem, 4vw, 2.2rem);
+}
+
+.skin-cyber .dashboard-hero {
+  padding: 20px 30px 10px 30px;
+}
+
+.skin-cyber .hero-container {
+  display: flex;
+  align-items: center;
+  gap: 20px;
 }
 
 .skin-cyber h1::after {

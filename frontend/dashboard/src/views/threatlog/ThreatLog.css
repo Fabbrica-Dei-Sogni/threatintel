@@ -26,37 +26,46 @@
 }
 
 .threatlog-details {
-  padding: 24px 28px;
+  padding: 0 28px 24px 28px;
   background-color: var(--theme-bg);
   color: var(--theme-text);
   min-height: 100vh;
 }
 
-.header-top {
-  display: flex !important;
-  justify-content: space-between !important;
-  align-items: center !important;
-  flex-wrap: wrap !important;
-  gap: 15px !important;
-  margin-bottom: 24px !important;
+.back-navigation {
+  padding: 15px 0 10px 0;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
 }
 
-.header-actions {
-  display: flex !important;
-  align-items: center !important;
-  gap: 15px !important;
+@media (max-width: 768px) {
+  .threatlog-details {
+    padding: 0 12px 15px 12px;
+  }
+  .back-navigation {
+    padding: 10px 0;
+  }
 }
+
+/* Redundant styles removed in favor of GlobalHeader */
 
 /* Pulsante indietro */
 .back-btn {
   background: var(--theme-btn-bg);
   color: var(--theme-btn-text);
   border: none;
-  padding: 8px 16px;
+  padding: 10px 20px;
   border-radius: var(--theme-radius);
   cursor: pointer;
   box-shadow: 0 4px 12px var(--theme-btn-shadow);
   transition: all 0.3s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .back-btn:hover {
@@ -66,9 +75,13 @@
 }
 
 /* Titolo */
-h1 {
-  margin-bottom: 24px;
+.threatlog-details :deep(.header-title-area h1) {
+  margin: 0 !important;
   color: var(--theme-primary);
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  white-space: nowrap;
 }
 
 /* Container sezioni */

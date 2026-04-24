@@ -1,13 +1,14 @@
 <template>
     <div class="threatlog-details" :class="'skin-' + dashboardSkin">
-        <div class="header-top">
+        <GlobalHeader context="threatlog-details">
+            <template #title>
+                <h1><span class="animated-icon pulse-amber">🗄️</span> {{ t('threatLog.title') }}</h1>
+            </template>
+        </GlobalHeader>
+
+        <div class="back-navigation">
             <button @click="goBack" class="back-btn">← {{ t('threatLog.backToLogs') }}</button>
-            <div class="header-actions">
-                <SkinSwitcher />
-                <LanguageSwitcher />
-            </div>
         </div>
-        <h1><span class="animated-icon pulse-amber">🗄️</span> {{ t('threatLog.title') }}</h1>
 
         <section v-if="loading" class="loading">{{ t('common.loading') }}</section>
         <section v-if="error" class="error">{{ t('common.error') }}</section>
@@ -212,8 +213,7 @@ import { fetchLogById } from '../../api/index'
 import { useI18n } from 'vue-i18n'
 import HexViewer from '../../components/HexViewer.vue';
 import { useClipboard } from '../../composable/useClipboard';
-import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
-import SkinSwitcher from '../../components/SkinSwitcher.vue';
+import GlobalHeader from '../../components/GlobalHeader.vue';
 import CountryFlag from '../../components/CountryFlag.vue';
 import { formatFullDateTime } from '../../utils/dateUtils';
 

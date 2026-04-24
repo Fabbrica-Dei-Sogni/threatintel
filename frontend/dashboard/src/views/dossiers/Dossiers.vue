@@ -4,19 +4,18 @@
     <div class="scanning-line cobalt-pulse"></div>
     <div class="vignette-overlay"></div>
     
-    <div class="header-top">
-      <div class="header-content-left">
+    <GlobalHeader context="dossier-archive-view">
+      <template #actions>
+        <!-- Actions are empty now as Dashboard button moved below -->
+      </template>
+      <template #title>
         <h1>🗃️ {{ t('nav.archive').toUpperCase() }}</h1>
-      </div>
-      <div class="header-actions">
-        <SkinSwitcher />
-        <LanguageSwitcher />
-      </div>
-    </div>
+      </template>
+    </GlobalHeader>
 
     <div class="archive-header">
       <div class="header-nav-left">
-        <button @click="goBack" class="back-btn">{{ t('home.dashboard').toUpperCase() }}</button>
+        <button @click="goBack" class="back-btn dashboard-back-btn">{{ t('home.dashboard').toUpperCase() }}</button>
         <span class="header-counter-technical">
           <span class="counter-label">RECORDS_FOUND:</span>
           <span class="counter-value">{{ total }}</span>
@@ -136,12 +135,10 @@ import { computed, watch, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { deleteDossier, exportDossier } from '../../api';
-import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
-import { ElMessageBox, ElMessage } from 'element-plus';
-import { useDossierStore } from '../../stores/dossier';
 import { useAuthStore } from '../../stores/auth';
+import { useDossierStore } from '../../stores/dossier';
 import { useViewSettingsStore } from '../../stores/viewSettings';
-import SkinSwitcher from '../../components/SkinSwitcher.vue';
+import GlobalHeader from '../../components/GlobalHeader.vue';
 import { useDossiersFilter } from '../../composable/useDossiersFilter';
 import { formatDateTime, formatFullDateTime } from '../../utils/dateUtils';
 import dayjs from 'dayjs';

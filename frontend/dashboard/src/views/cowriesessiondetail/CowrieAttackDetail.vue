@@ -1,15 +1,18 @@
 <template>
     <div class="cowrie-detail attacchi" :class="'skin-' + dashboardSkin">
-        <div class="header-top">
-            <h1><span class="animated-icon pulse-jade">👾</span> {{ $t('cowrie.attackDetail.title') }}</h1>
-            <div class="header-actions">
-                <SkinSwitcher />
-                <LanguageSwitcher />
-            </div>
-        </div>
-        <div class="actions">
+        <GlobalHeader context="cowrie-detail">
+            <template #actions>
+                <div class="header-actions-group">
+                    <ReportActions type="telnet" :sessionId="sessionId" filename="dossier_telnet" mode="sticky" accentColor="var(--theme-primary)" />
+                </div>
+            </template>
+            <template #title>
+                <h1><span class="animated-icon pulse-jade">👾</span> {{ $t('cowrie.attackDetail.title') }}</h1>
+            </template>
+        </GlobalHeader>
+
+        <div class="back-navigation">
             <button @click="$router.back()" class="btn-action">{{ $t('cowrie.attackDetail.backToSessions') }}</button>
-            <ReportActions type="telnet" :sessionId="sessionId" filename="dossier_telnet" mode="sticky" accentColor="var(--theme-primary)" />
         </div>
         <p class="subtitle">{{ $t('cowrie.attackDetail.subtitle') }}: <span class="hash">{{ sessionId }}</span> ({{ $t('cowrie.attackDetail.rawEvents') }}: {{ events.length }})</p>
 
@@ -173,9 +176,8 @@ import { useDossierStore } from '../../stores/dossier';
 import { fetchCowrieSessionDetails, fetchCowrieSessionEvents } from '../../api';
 import { ElMessage } from 'element-plus';
 import AttackMap from '../../components/AttackMap.vue';
-import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
-import SkinSwitcher from '../../components/SkinSwitcher.vue';
 import ReportActions from '../../components/ReportActions.vue';
+import GlobalHeader from '../../components/GlobalHeader.vue';
 
 const props = defineProps({
     id: { type: String, required: true }

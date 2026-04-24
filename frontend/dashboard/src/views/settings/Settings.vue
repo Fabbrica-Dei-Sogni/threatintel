@@ -1,7 +1,7 @@
 <template>
-  <div class="settings-container" v-if="authStore.isAdmin">
-    <div class="header-top">
-      <div class="header-left">
+  <div class="settings-container" :class="'skin-' + dashboardSkin" v-if="authStore.isAdmin">
+    <GlobalHeader context="settings">
+      <template #actions>
         <button class="back-btn" @click="goBack" :title="t('common.back')">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -9,10 +9,11 @@
             <polyline points="12 19 5 12 12 5"></polyline>
           </svg>
         </button>
+      </template>
+      <template #title>
         <h1 class="page-title">{{ t('nav.settings') }}</h1>
-      </div>
-      <LanguageSwitcher />
-    </div>
+      </template>
+    </GlobalHeader>
     <div class="settings-layout">
       <!-- Profiles Section (Sidebar on Desktop, Top-scroll on Mobile) -->
       <aside class="profiles-navigator">
@@ -193,7 +194,9 @@ import 'leaflet/dist/leaflet.css';
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
-import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
+import GlobalHeader from '../../components/GlobalHeader.vue';
+import { useViewSettingsStore } from '../../stores/viewSettings';
+import { storeToRefs } from 'pinia';
 
 // Override default icon configuration
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -206,6 +209,8 @@ L.Icon.Default.mergeOptions({
 const router = useRouter();
 const profileStore = useProfileStore();
 const authStore = useAuthStore();
+const viewStore = useViewSettingsStore();
+const { dashboardSkin } = storeToRefs(viewStore);
 const { t } = useI18n();
 
 const successMessage = ref('');

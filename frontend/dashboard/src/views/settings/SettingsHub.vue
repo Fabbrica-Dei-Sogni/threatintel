@@ -1,7 +1,7 @@
 <template>
-  <div class="settings-hub-container" v-if="authStore.isAdmin">
-    <header class="header-top">
-      <div class="header-left">
+  <div class="settings-hub-container" :class="'skin-' + dashboardSkin" v-if="authStore.isAdmin">
+    <GlobalHeader context="settings-hub">
+      <template #actions>
         <button class="back-btn" @click="goHome" :title="t('common.back')">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -9,10 +9,11 @@
             <polyline points="12 19 5 12 12 5"></polyline>
           </svg>
         </button>
+      </template>
+      <template #title>
         <h1 class="page-title">{{ t('nav.configuration').toUpperCase() }}</h1>
-      </div>
-      <LanguageSwitcher />
-    </header>
+      </template>
+    </GlobalHeader>
 
     <div class="hub-content">
       <div class="hub-grid">
@@ -58,11 +59,15 @@
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useAuthStore } from '../../stores/auth';
-import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
+import { useViewSettingsStore } from '../../stores/viewSettings';
+import { storeToRefs } from 'pinia';
+import GlobalHeader from '../../components/GlobalHeader.vue';
 
 const { t } = useI18n();
 const router = useRouter();
 const authStore = useAuthStore();
+const viewStore = useViewSettingsStore();
+const { dashboardSkin } = storeToRefs(viewStore);
 
 const goHome = () => router.push('/');
 const goToProfiles = () => router.push('/settings/profiles');

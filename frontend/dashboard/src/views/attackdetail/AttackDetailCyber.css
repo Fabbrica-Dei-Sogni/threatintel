@@ -17,15 +17,20 @@
 
 /* === HEADER & SWITCHER ALIGNMENT (PERFECT) === */
 .skin-cyber.attack-detail .header-top {
-  background: rgba(15, 5, 5, 0.95) !important;
-  border-bottom: 2px solid var(--cy-primary) !important;
-  padding: 12px 24px 15px 24px !important;
-  margin-bottom: 30px !important;
-  display: flex !important;
-  justify-content: space-between !important;
-  align-items: center !important;
-  flex-wrap: wrap !important;
-  gap: 20px !important;
+  display: none !important; /* Managed by GlobalHeader component now */
+}
+
+.skin-cyber.attack-detail .back-navigation {
+  padding: 15px 30px 10px 30px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+@media (max-width: 768px) {
+  .skin-cyber.attack-detail .back-navigation {
+    padding: 10px 15px;
+  }
 }
 
 .skin-cyber.attack-detail .header-content-left, 

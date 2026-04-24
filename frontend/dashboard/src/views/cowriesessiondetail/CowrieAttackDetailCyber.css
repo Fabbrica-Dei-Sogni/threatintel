@@ -41,29 +41,24 @@
   transition: all 0.3s ease;
 }
 
-/* === HEADER & SWITCHER ALIGNMENT === */
-.skin-cyber.cowrie-detail.attacchi .header-top {
-  background: rgba(var(--theme-primary-rgb), 0.05) !important;
-  border-bottom: 2px solid var(--theme-primary) !important;
-  padding: 12px 24px 15px 24px !important;
-  display: flex !important;
-  justify-content: space-between !important;
-  align-items: center !important;
-  flex-wrap: wrap !important;
-  gap: 15px !important;
-  margin-bottom: 30px !important;
-}
-
-.skin-cyber.cowrie-detail.attacchi .header-actions {
-  display: flex !important;
-  flex-direction: row !important;
-  align-items: center !important;
-  gap: 15px !important;
-}
-
-.skin-cyber.cowrie-detail.attacchi h1 {
+/* === GLOBAL HEADER OVERRIDES === */
+.skin-cyber.cowrie-detail.attacchi :deep(.header-title-area h1) {
   color: var(--theme-primary) !important;
   text-shadow: 0 0 15px rgba(var(--theme-primary-rgb), 0.6) !important;
+  margin: 0 !important;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  white-space: nowrap;
+}
+
+.skin-cyber.cowrie-detail.attacchi :deep(.header-title-area h1)::after {
+  content: '_';
+  animation: jade-blink-hud-v8 1s step-end infinite;
+}
+
+@keyframes jade-blink-hud-v8 {
+  50% { opacity: 0; }
 }
 
 /* === HUD SCANLINES overlays === */
@@ -147,6 +142,20 @@
   text-shadow: 0 0 10px rgba(255, 170, 0, 0.5) !important;
 }
 
+.skin-cyber.cowrie-detail.attacchi .back-navigation {
+  padding: 15px 30px 10px 30px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+@media (max-width: 768px) {
+  .skin-cyber.cowrie-detail.attacchi .back-navigation {
+    padding: 10px 15px;
+  }
+}
+
 /* === BUTTONS === */
 .skin-cyber.cowrie-detail.attacchi .btn-action {
   background: var(--theme-btn-bg) !important;
@@ -156,6 +165,14 @@
   box-shadow: none !important;
   text-transform: uppercase;
   font-weight: 800;
+  padding: 8px 16px !important;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  flex-shrink: 0;
+  height: fit-content;
 }
 
 .skin-cyber.cowrie-detail.attacchi .btn-action:hover {
@@ -163,4 +180,25 @@
   color: #050d0b !important;
   box-shadow: 0 0 30px rgba(var(--theme-primary-rgb), 0.6) !important;
   font-weight: 900 !important;
+}
+
+@media (max-width: 768px) {
+  .skin-cyber.cowrie-detail.attacchi {
+    padding-top: 10px;
+  }
+  
+  .skin-cyber.cowrie-detail.attacchi .btn-action {
+    padding: 6px 12px !important;
+    font-size: 0.7rem !important;
+  }
+
+  .skin-cyber.cowrie-detail.attacchi :deep(.header-title-area h1) {
+    font-size: 0.85rem !important;
+    gap: 8px;
+  }
+
+  .skin-cyber.cowrie-detail.attacchi .subtitle {
+    font-size: 0.7rem;
+    padding: 10px 15px;
+  }
 }

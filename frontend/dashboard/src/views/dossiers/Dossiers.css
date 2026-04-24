@@ -26,19 +26,24 @@
     }
 }
 
-.back-btn {
+.dashboard-back-btn {
     background: rgba(99, 102, 241, 0.1);
     color: #818cf8;
     border: 1px solid rgba(99, 102, 241, 0.3);
     font-weight: 700;
-    padding: 10px 24px;
+    padding: 8px 16px;
     box-shadow: 0 0 15px rgba(99, 102, 241, 0.15);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     border-radius: 4px;
     cursor: pointer;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
 }
 
-.back-btn:hover {
+.dashboard-back-btn:hover {
     background: #6366f1;
     color: white;
     box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);

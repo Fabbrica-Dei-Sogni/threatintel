@@ -1,18 +1,19 @@
 <template>
-    <div class="config-page-view" v-if="authStore.isAdmin">
+    <div class="config-page-view" :class="'skin-' + dashboardSkin" v-if="authStore.isAdmin">
         <!-- Dashboard Header -->
-        <header class="hub-header-top">
-            <div class="header-left-hub">
+        <GlobalHeader context="config-page">
+            <template #actions>
                 <button class="back-accent-btn" @click="goBack">
                     <span class="btn-icon-back">←</span>
                 </button>
+            </template>
+            <template #title>
                 <div class="hub-title-group">
                     <h1 class="hub-page-title">{{ t('config.title').toUpperCase() }}</h1>
                     <span class="system-status-indicator">● ALGORITHM ENGINE ACTIVE</span>
                 </div>
-            </div>
-            <LanguageSwitcher />
-        </header>
+            </template>
+        </GlobalHeader>
 
         <!-- Tactical Toolbar -->
         <div class="forensic-toolbar glass-morphism">
@@ -100,13 +101,17 @@ import { useI18n } from 'vue-i18n';
 import { useConfig } from '../../composable/useConfig';
 import { useProfileStore } from '../../stores/profiles';
 import { useAuthStore } from '../../stores/auth';
+import { useViewSettingsStore } from '../../stores/viewSettings';
+import { storeToRefs } from 'pinia';
 import ConfigEditor from '../../components/ConfigEditor.vue';
-import LanguageSwitcher from '../../components/LanguageSwitcher.vue';
+import GlobalHeader from '../../components/GlobalHeader.vue';
 
 const { t } = useI18n();
 const router = useRouter();
 const profileStore = useProfileStore();
 const authStore = useAuthStore();
+const viewStore = useViewSettingsStore();
+const { dashboardSkin } = storeToRefs(viewStore);
 
 // Composable per la gestione delle configurazioni
 const {

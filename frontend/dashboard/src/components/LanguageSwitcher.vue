@@ -45,25 +45,26 @@ const handleChange = () => {
     backdrop-filter: var(--theme-blur, blur(10px));
     -webkit-backdrop-filter: var(--theme-blur, blur(10px));
     border: 1px solid var(--theme-border, rgba(255, 255, 255, 0.1));
-    border-radius: var(--theme-radius, 10px);
-    padding: 6px 12px;
+    border-radius: var(--theme-radius, 4px);
+    padding: 0;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
 }
 
 .select-wrapper:hover {
-    background: var(--theme-surface);
-    filter: brightness(1.2);
+    background: rgba(var(--theme-primary-rgb, 76, 175, 80), 0.1);
     border-color: var(--theme-primary, #4CAF50);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3), 0 0 0 1px var(--theme-primary, rgba(76, 175, 80, 0.2));
     transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3), 0 0 10px rgba(var(--theme-primary-rgb, 76, 175, 80), 0.2);
 }
 
 .globe-icon {
+    position: absolute;
+    left: 10px;
     font-size: 14px;
-    margin-right: 8px;
-    user-select: none;
-    opacity: 0.8;
+    pointer-events: none;
+    z-index: 1;
 }
 
 .lang-select {
@@ -72,18 +73,23 @@ const handleChange = () => {
     border: none;
     color: var(--theme-text, #f0e6d2);
     cursor: pointer;
-    padding-right: 20px;
+    padding: 6px 30px 6px 32px;
     outline: none;
-    min-width: 120px;
+    min-width: 140px;
+    font-size: 0.8rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    position: relative;
+    z-index: 2;
     color-scheme: dark;
-    accent-color: var(--theme-primary, #4CAF50);
 }
 
 .lang-select option {
-    background-color: var(--theme-bg, #1e1b1a) !important;
-    /* Mantiene coerenza con il colore di sfondo shell */
-    color: var(--theme-text, #f0e6d2) !important;
+    background-color: #1e1b1a !important;
+    color: #f0e6d2 !important;
     padding: 12px;
+    text-transform: none;
 }
 
 .lang-select option:hover,
@@ -99,19 +105,31 @@ const handleChange = () => {
     color: var(--theme-text, #f0e6d2);
     opacity: 0.5;
     font-size: 8px;
-    transition: all 0.2s ease;
-}
-
-.select-wrapper:hover .arrow-icon {
-    opacity: 1;
-    color: var(--theme-primary, #4CAF50);
-    transform: translateY(1px);
+    z-index: 1;
 }
 
 /* Firefox fix for dropdown arrow */
 @-moz-document url-prefix() {
     .lang-select {
-        padding-right: 20px;
+        padding-right: 30px;
+    }
+}
+@media (max-width: 768px) {
+    .lang-select {
+        min-width: unset;
+        width: 36px;
+        color: transparent;
+        padding: 6px;
+    }
+    
+    .globe-icon {
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 16px;
+    }
+
+    .arrow-icon {
+        display: none;
     }
 }
 </style>

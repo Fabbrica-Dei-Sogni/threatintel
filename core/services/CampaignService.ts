@@ -83,30 +83,12 @@ export class CampaignService {
             mongoFilters['request.ip'] = { $in: ips };
         }
 
-        // Pipeline configurata per raggruppare per HASH (il pattern della campagna)
-        const basePipeline = await this.forensicPipelineService.buildStandardPipeline(
+        // Pipeline specifica per raggruppare per HASH (il pattern della campagna)
+        const pipeline = await this.forensicPipelineService.buildCampaignPipeline(
             mongoFilters, 
             minLogsForAttack, 
-            timeConfig, 
-            'fingerprint.hash'
+            timeConfig
         );
-
-        const pipeline = [
-            ...basePipeline,
-            {
-                $lookup: {
-                    from: 'ipdetails',
-                    localField: 'ipDetailsId',
-                    foreignField: '_id',
-                    as: 'ipDetails'
-                }
-            },
-            {
-                $addFields: {
-                    ipDetails: { $arrayElemAt: ['$ipDetails', 0] }
-                }
-            }
-        ];
 
         const [campaign] = await ThreatLog.aggregate(pipeline).allowDiskUse(true);
         return campaign || null;

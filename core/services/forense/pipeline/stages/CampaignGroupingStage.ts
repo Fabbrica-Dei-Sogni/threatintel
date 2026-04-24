@@ -1,17 +1,19 @@
 import { PipelineStage } from '../PipelineStage';
 
-export class GroupingStage implements PipelineStage {
+export class CampaignGroupingStage implements PipelineStage {
     constructor(private readonly minLogsForAttack: number) { }
 
     generate(): any[] {
         return [
-            // Stage 2: Raggruppa per IP (Analisi Forense Standard)
+            // Stage 2: Raggruppa per Hash (Discovery delle Campagne)
             {
                 $group: {
-                    _id: '$request.ip',
-                    // Mantieni la struttura del primo log come "rappresentante" del gruppo
+                    _id: '$fingerprint.hash',
+                    // Rappresentante della campagna
                     representative: { $first: '$$ROOT' },
-                    // Aggiungi i log raggruppati per l'analisi comportamentale
+                    // Tracking IP coinvolti
+                    ipsInvolved: { $addToSet: '$request.ip' },
+                    // Log aggregati
                     logsRaggruppati: {
                         $push: {
                             _id: '$_id',
@@ -35,50 +37,28 @@ export class GroupingStage implements PipelineStage {
                     sumScore: { $sum: '$fingerprint.score' }
                 }
             },
-            // Stage per il recupero dei ratelimit events (specifico per IP)
-            {
-                $lookup: {
-                    from: 'ratelimitevents',
-                    let: { ip_agg: '$_id', start_time: '$firstSeen', end_time: '$lastSeen' },
-                    pipeline: [
-                        {
-                            $match: {
-                                $expr: {
-                                    $and: [
-                                        { $eq: ['$ip', '$$ip_agg'] },
-                                        { $gte: ['$timestamp', '$$start_time'] },
-                                        { $lte: ['$timestamp', '$$end_time'] }
-                                    ]
-                                }
-                            }
-                        }
-                    ],
-                    as: 'rateLimitEvents'
-                }
-            },
-            // Stage 3: Filtra gruppi significativi (min logs)
+            // Stage 3: Filtra per minimi logs (se richiesto)
             {
                 $match: {
                     totaleLogs: { $gte: this.minLogsForAttack },
-                    firstSeen: { $exists: true, $ne: null },
-                    lastSeen: { $exists: true, $ne: null }
+                    _id: { $ne: null }
                 }
             },
-            // Stage 4: Ricrea la struttura come un normale ThreatLog + i campi extra
+            // Stage 4: Struttura finale per Campagna
             {
                 $replaceRoot: {
                     newRoot: {
                         $mergeObjects: [
                             '$representative',
                             {
-                                _id: '$_id', // L'IP attaccante
+                                hash: '$_id',
+                                ips: '$ipsInvolved',
+                                ipCount: { $size: '$ipsInvolved' },
                                 logsRaggruppati: '$logsRaggruppati',
                                 totaleLogs: '$totaleLogs',
                                 firstSeen: '$firstSeen',
                                 lastSeen: '$lastSeen',
-                                sumScore: '$sumScore',
-                                countRateLimit: { $size: '$rateLimitEvents' },
-                                rateLimitList: '$rateLimitEvents'
+                                sumScore: '$sumScore'
                             },
                         ]
                     }

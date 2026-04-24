@@ -63,7 +63,10 @@ apiClient.interceptors.response.use((response) => {
     // 2. Gestione errori di autorizzazione
     if (error.response && [401, 403].includes(error.response.status)) {
         const currentPath = window.location.pathname;
-        if (!currentPath.includes('/auth/login') && !currentPath.includes('/auth/register')) {
+        const isAuthPage = currentPath.endsWith('/login') || currentPath.endsWith('/register') || 
+                          currentPath.includes('/auth/login') || currentPath.includes('/auth/register');
+        
+        if (!isAuthPage) {
             console.warn('[apiClient] Sessione scaduta o permessi insufficienti. Reindirizzamento...');
             
             // Pulizia storage (sempre per 401, per 403 solo se non siamo già in login/register)

@@ -116,7 +116,14 @@
         "backToConsole": "POWRÓT DO PULPITU",
         "usernamePlaceholder": "Wprowadź nazwę użytkownika",
         "passwordPlaceholder": "Wprowadź hasło",
-        "emailPlaceholder": "Wprowadź adres e-mail"
+        "emailPlaceholder": "Wprowadź adres e-mail",
+        "welcomeTitle": "DOSTĘP AUTORYZOWANY",
+        "identityVerified": "TOŻSAMOŚĆ ZWERYFIKOWANA",
+        "welcomeMessage": "Twoje konto zostało pomyślnie aktywowane w naszych systemach bezpieczeństwa. Możesz teraz uzyskać dostęp do konsoli wywiadowczej.",
+        "proceedToLogin": "PRZEJDŹ DO LOGOWANIA",
+        "activationErrorTitle": "BŁĄD AKTYWACJI",
+        "activationErrorMessage": "Link aktywacyjny jest nieważny lub wygasł. Prosimy spróbować ponownie zarejestrować się lub skontaktować się z administratorem.",
+        "backToRegister": "POWRÓT DO REJESTRACJI"
     },
     "home": {
         "title": "Konsola Operacyjna Forensic",

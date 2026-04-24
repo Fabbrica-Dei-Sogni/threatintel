@@ -116,7 +116,14 @@
         "backToConsole": "ZURÜCK ZUM DASHBOARD",
         "usernamePlaceholder": "Geben Sie Ihren Benutzernamen ein",
         "passwordPlaceholder": "Geben Sie Ihr Passwort ein",
-        "emailPlaceholder": "Geben Sie Ihre E-Mail-Adresse ein"
+        "emailPlaceholder": "Geben Sie Ihre E-Mail-Adresse ein",
+        "welcomeTitle": "ZUGRIFF AUTORISIERT",
+        "identityVerified": "IDENTITÄT VERIFIZIERT",
+        "welcomeMessage": "Ihr Konto wurde erfolgreich in unseren Sicherheitssystemen aktiviert. Sie können nun auf die Intelligence-Konsole zugreifen.",
+        "proceedToLogin": "WEITER ZUM LOGIN",
+        "activationErrorTitle": "AKTIVIERUNGSFEHLER",
+        "activationErrorMessage": "Der Aktivierungslink ist ungültig oder abgelaufen. Bitte versuchen Sie die Registrierung erneut oder kontaktieren Sie den Administrator.",
+        "backToRegister": "ZURÜCK ZUR REGISTRIERUNG"
     },
     "home": {
         "title": "Forensische Ops-Konsole",

@@ -116,7 +116,14 @@
         "backToConsole": "BACK TO DASHBOARD",
         "usernamePlaceholder": "Enter your username",
         "passwordPlaceholder": "Enter your password",
-        "emailPlaceholder": "Enter your email address"
+        "emailPlaceholder": "Enter your email address",
+        "welcomeTitle": "ACCESS AUTHORIZED",
+        "identityVerified": "IDENTITY VERIFIED",
+        "welcomeMessage": "Your account has been successfully activated in our security systems. You can now access the intelligence console.",
+        "proceedToLogin": "PROCEED TO LOGIN",
+        "activationErrorTitle": "ACTIVATION ERROR",
+        "activationErrorMessage": "The activation link is invalid or has expired. Please try registering again or contact the administrator.",
+        "backToRegister": "BACK TO REGISTRATION"
     },
     "home": {
         "title": "FORENSIC OPS CONSOLE",

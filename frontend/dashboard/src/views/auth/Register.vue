@@ -21,37 +21,18 @@
                 <form @submit.prevent="onSubmit" class="auth-form">
                     <div class="form-group">
                         <label for="username" class="cyber-label-muted">{{ t('auth.username').toUpperCase() }}</label>
-                        <input 
-                            v-model="username" 
-                            id="username" 
-                            type="text"
-                            class="cyber-input-text" 
-                            :placeholder="t('auth.usernamePlaceholder')"
-                            required 
-                        />
+                        <input v-model="username" id="username" type="text" class="cyber-input-text"
+                            :placeholder="t('auth.usernamePlaceholder')" required />
                     </div>
                     <div class="form-group">
                         <label for="email" class="cyber-label-muted">{{ t('auth.email').toUpperCase() }}</label>
-                        <input 
-                            v-model="email" 
-                            id="email" 
-                            type="email" 
-                            class="cyber-input-text" 
-                            :placeholder="t('auth.emailPlaceholder')"
-                            required 
-                        />
+                        <input v-model="email" id="email" type="email" class="cyber-input-text"
+                            :placeholder="t('auth.emailPlaceholder')" required />
                     </div>
                     <div class="form-group">
                         <label for="password" class="cyber-label-muted">{{ t('auth.password').toUpperCase() }}</label>
-                        <input 
-                            v-model="password" 
-                            id="password" 
-                            type="password" 
-                            class="cyber-input-text" 
-                            :placeholder="t('auth.passwordPlaceholder')"
-                            required
-                            minlength="6" 
-                        />
+                        <input v-model="password" id="password" type="password" class="cyber-input-text"
+                            :placeholder="t('auth.passwordPlaceholder')" required minlength="6" />
                     </div>
 
                     <button type="submit" class="btn-action-primary" :disabled="loading">
@@ -99,7 +80,12 @@ async function onSubmit() {
     error.value = false;
     loading.value = true;
     try {
-        await register({ username: username.value, email: email.value, password: password.value });
+        await register({
+            username: username.value,
+            email: email.value,
+            password: password.value,
+            redirectUrl: window.location.origin + '/honeypot/welcome'
+        });
         router.push('/login');
     } catch (err) {
         error.value = true;
@@ -293,9 +279,20 @@ async function onSubmit() {
 }
 
 @keyframes pulse-cobalt {
-    0% { transform: scale(1); filter: drop-shadow(0 0 2px #007AFF); }
-    50% { transform: scale(1.1); filter: drop-shadow(0 0 10px #00D4FF); }
-    100% { transform: scale(1); filter: drop-shadow(0 0 2px #007AFF); }
+    0% {
+        transform: scale(1);
+        filter: drop-shadow(0 0 2px #007AFF);
+    }
+
+    50% {
+        transform: scale(1.1);
+        filter: drop-shadow(0 0 10px #00D4FF);
+    }
+
+    100% {
+        transform: scale(1);
+        filter: drop-shadow(0 0 2px #007AFF);
+    }
 }
 
 .spinner-small {
@@ -308,7 +305,9 @@ async function onSubmit() {
 }
 
 @keyframes spin {
-    to { transform: rotate(360deg); }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 .scanline {
@@ -317,15 +316,11 @@ async function onSubmit() {
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(
-        rgba(18, 16, 16, 0) 50%,
-        rgba(0, 0, 0, 0.1) 50%
-    ), linear-gradient(
-        90deg,
-        rgba(255, 0, 0, 0.03),
-        rgba(0, 255, 0, 0.01),
-        rgba(0, 0, 255, 0.03)
-    );
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%,
+            rgba(0, 0, 0, 0.1) 50%), linear-gradient(90deg,
+            rgba(255, 0, 0, 0.03),
+            rgba(0, 255, 0, 0.01),
+            rgba(0, 0, 255, 0.03));
     background-size: 100% 4px, 3px 100%;
     pointer-events: none;
     z-index: 100;
@@ -338,7 +333,7 @@ async function onSubmit() {
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: 
+    background-image:
         linear-gradient(rgba(0, 212, 255, 0.05) 1px, transparent 1px),
         linear-gradient(90deg, rgba(0, 212, 255, 0.05) 1px, transparent 1px);
     background-size: 50px 50px;
@@ -350,6 +345,7 @@ async function onSubmit() {
     .auth-header {
         padding: 15px 20px;
     }
+
     .back-btn {
         padding: 8px 16px;
         font-size: 0.75rem;

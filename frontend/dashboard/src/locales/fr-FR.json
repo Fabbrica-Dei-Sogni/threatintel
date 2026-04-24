@@ -116,7 +116,14 @@
         "backToConsole": "RETOUR AU TABLEAU DE BORD",
         "usernamePlaceholder": "Entrez votre nom d'utilisateur",
         "passwordPlaceholder": "Entrez votre mot de passe",
-        "emailPlaceholder": "Entrez votre adresse email"
+        "emailPlaceholder": "Entrez votre adresse email",
+        "welcomeTitle": "ACCÈS AUTORISÉ",
+        "identityVerified": "IDENTITÉ VÉRIFIÉE",
+        "welcomeMessage": "Votre compte a été activé avec succès dans nos systèmes de sécurité. Vous pouvez maintenant accéder à la console de renseignement.",
+        "proceedToLogin": "PROCÉDER AU LOGIN",
+        "activationErrorTitle": "ERREUR D'ACTIVATION",
+        "activationErrorMessage": "Le lien d'activation est invalide ou a expiré. Veuillez réessayer l'inscription ou contacter l'administrateur.",
+        "backToRegister": "RETOUR À L'INSCRIPTION"
     },
     "home": {
         "title": "Console Ops Forensic",

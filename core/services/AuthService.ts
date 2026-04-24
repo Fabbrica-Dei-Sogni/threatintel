@@ -13,11 +13,11 @@ export class AuthService {
             rejectUnauthorized: process.env.AUTH_STRICT_SSL !== 'false'
         })
     });
-    
+
     // Identificativo univoco di questa istanza dell'applicativo
     public readonly appId = process.env.APP_ID || process.env.HONEYPOT_INSTANCE_ID || 'threat-intel-01';
 
-    constructor(@inject(LOGGER_TOKEN) private logger: Logger) {}
+    constructor(@inject(LOGGER_TOKEN) private logger: Logger) { }
 
     private getUri() {
         return process.env.URI_DIGITAL_AUTH || defaultDigitalAuthUri;
@@ -67,6 +67,12 @@ export class AuthService {
         this.logger.info(`[AuthService] Proxy register verso ${this.getUri()}/register con appId ${this.appId}`);
         try {
             data.appId = this.appId;
+
+            // Se il frontend NON ha inviato un redirectUrl, usiamo quello di default del Core
+            if (!data.redirectUrl && process.env.FRONTEND_URL) {
+                data.redirectUrl = `${process.env.FRONTEND_URL}/welcome`;
+            }
+
             const response = await this.instance.post(`${this.getUri()}/register`, data);
             return response.data;
         } catch (error: any) {

@@ -116,7 +116,14 @@
         "backToConsole": "TORNA AL CRUSCOTTO",
         "usernamePlaceholder": "Inserisci il tuo nome utente",
         "passwordPlaceholder": "Inserisci la tua password",
-        "emailPlaceholder": "Inserisci il tuo indirizzo email"
+        "emailPlaceholder": "Inserisci il tuo indirizzo email",
+        "welcomeTitle": "ACCESSO AUTORIZZATO",
+        "identityVerified": "IDENTITÀ VERIFICATA",
+        "welcomeMessage": "Il tuo account è stato attivato con successo nei nostri sistemi di sicurezza. Ora puoi accedere alla console di intelligence.",
+        "proceedToLogin": "PROCEDI AL LOGIN",
+        "activationErrorTitle": "ERRORE DI ATTIVAZIONE",
+        "activationErrorMessage": "Il link di attivazione non è valido o è scaduto. Ti preghiamo di riprovare la registrazione o contattare l'amministratore.",
+        "backToRegister": "TORNA ALLA REGISTRAZIONE"
     },
     "home": {
         "title": "FORENSIC OPS CONSOLE",

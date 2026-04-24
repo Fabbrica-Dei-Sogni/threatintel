@@ -115,6 +115,12 @@ const routes: RouteRecordRaw[] = [
         props: true
     },
     {
+        path: '/welcome',
+        name: 'Welcome',
+        component: () => import('../views/auth/Welcome.vue'),
+        meta: { requiresAuth: false }
+    },
+    {
         path: '/login',
         name: 'Login',
         component: Login

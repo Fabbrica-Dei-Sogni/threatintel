@@ -16,5 +16,17 @@ export default (manageLimitController: ManageLimitController) => {
      */
     router.post('/api/blacklist-ip', (req, res) => manageLimitController.blacklistIP(req, res));
 
+    /**
+     * @openapi
+     * /unblacklist-ip:
+     *   post:
+     *     tags: [System & Security]
+     *     summary: Rimuove manualmente un IP dalla blacklist
+     *     responses:
+     *       200:
+     *         description: IP rimosso dalla blacklist.
+     */
+    router.post('/api/unblacklist-ip', (req, res) => manageLimitController.unblacklistIP(req, res));
+
     return router;
 };

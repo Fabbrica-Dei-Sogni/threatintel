@@ -36,4 +36,29 @@ export class ManageLimitController {
             res.status(500).json({ error: 'Errore interno durante la blacklist dell\'IP' });
         }
     }
+
+    // POST /api/unblacklist-ip
+    async unblacklistIP(req: Request, res: Response): Promise<void> {
+        const { ip } = req.body;
+
+        if (!ip || typeof ip !== 'string') {
+            res.status(400).json({ error: 'IP mancante nel corpo della richiesta' });
+            return;
+        }
+
+        const trimmedIp = ip.trim();
+
+        if (!isValidIp(trimmedIp)) {
+            res.status(400).json({ error: `Formato IP non valido: ${trimmedIp}` });
+            return;
+        }
+
+        try {
+            await this.rateLimitMiddleware.removeIPFromBlacklist(trimmedIp);
+            res.status(200).json({ message: `IP ${trimmedIp} rimosso con successo dalla blacklist.` });
+        } catch (error: any) {
+            this.logger.error(`[ManageLimitController] Errore durante rimozione IP ${trimmedIp}: ${error.message}`);
+            res.status(500).json({ error: 'Errore interno durante la rimozione dalla blacklist dell\'IP' });
+        }
+    }
 }

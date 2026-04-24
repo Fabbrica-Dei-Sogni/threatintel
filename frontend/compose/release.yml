@@ -1,4 +1,4 @@
-name: "threat-intel-frontend"
+name: "threat-intel-frontend-release"
 
 services:
   dashboard-honeypot:

@@ -14,6 +14,9 @@
         <button @click="goToAttacks" class="btn-action">
           {{ t('threatLogs.attacks') }}
         </button>
+        <button @click="goToCampaigns" class="btn-action">
+          {{ t('campaigns.title').toUpperCase() }}
+        </button>
       </div>
       <div class="view-controls">
         <ViewToggle v-model="showChart" :label="t('common.showChart')" theme="amber" />
@@ -388,6 +391,10 @@ function goToHome() {
 
 function goToAttacks() {
   router.push('/attacks');
+}
+
+function goToCampaigns() {
+  router.push('/campaigns');
 }
 
 function goToIpDetails(ip) {

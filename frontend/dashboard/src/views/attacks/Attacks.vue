@@ -14,6 +14,9 @@
                 <button @click="goToLogs" class="btn-action">
                     {{ t('attacks.logRequests') }}
                 </button>
+                <button @click="goToCampaigns" class="btn-action">
+                    {{ t('campaigns.title').toUpperCase() }}
+                </button>
             </div>
             <div class="view-controls">
                 <ViewToggle v-model="attacksState.view.showMap" :label="t('common.showMap')" theme="magma" />
@@ -497,6 +500,7 @@ function setIpFilter(ip) {
 }
 
 function goToLogs() { router.push('/threatlogs'); }
+function goToCampaigns() { router.push('/campaigns'); }
 function goToHome() { router.push('/'); }
 
 function changePage(newPage) {

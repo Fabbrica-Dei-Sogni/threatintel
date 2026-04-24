@@ -10,6 +10,7 @@ export enum StorageNamespace {
     ATTACKS = 'hp_attacks',
     THREAT_LOGS = 'hp_threatlogs',
     COWRIE_SESSIONS = 'hp_cowrie_sessions',
+    CAMPAIGNS = 'hp_campaigns',
     API = 'hp_api'
 }
 

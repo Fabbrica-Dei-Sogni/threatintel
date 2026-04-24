@@ -267,6 +267,38 @@
         "radarTitle": "Радарный анализ",
         "searchUrlPlaceholder": "Фильтровать по URL..."
     },
+    "campaigns": {
+        "title": "Кампании",
+        "homeButton": "Кампания",
+        "noCampaignsFound": "Распределенных кампаний не обнаружено",
+        "minIpsLabel": "Мин. количество задействованных IP:",
+        "ipsInvolved": "Задействовано IP: {count}",
+        "totalLogs": "Общий объем логов",
+        "firstSeen": "Начало Кампании",
+        "lastSeen": "Последняя Активность",
+        "patternHash": "Хэш Паттерна",
+        "discovery": "Обнаружение Кампаний",
+        "searchLabel": "Поиск в списке:",
+        "searchPlaceholder": "IP, Хэш, Техника...",
+        "table": {
+            "ips": "Задействовано IP",
+            "logs": "Всего Логов",
+            "firstSeen": "Начало",
+            "lastSeen": "Конец",
+            "hash": "DNA Паттерн"
+        }
+    },
+    "campaignDetail": {
+        "title": "Детали Кампании",
+        "summary": "Сводка Расследования Кампании",
+        "backToCampaigns": "Назад к Кампаниям",
+        "involvedIps": "Задействованные Узлы-Источники",
+        "commonTechniques": "Обнаруженные Общие Техники",
+        "avgIntensity": "Средняя Интенсивность Кластера",
+        "distributedTimeline": "Распределенная Хронология",
+        "ipList": "Список Узлов Кластера",
+        "reputationScore": "Репутационный Скоринг"
+    },
     "attackChart": {
         "title": "Анализ атак во времени",
         "frequency": "Частота",

@@ -4,6 +4,7 @@
 
     <div class="back-navigation">
       <button @click="goBack" class="back-btn">← {{ t('ipDetails.backToAttacks').toUpperCase() }}</button>
+      <button @click="goToCampaigns" class="back-btn">🧬 {{ t('campaigns.title').toUpperCase() }}</button>
       <button v-if="authStore.isAuthenticated" @click="forzaArricchimento" :disabled="loadingEnrich"
         class="refresh-btn">
         <span v-if="loadingEnrich" class="spinner"></span>
@@ -612,6 +613,10 @@ function handlePageSizeChange(newSize) {
 
 function goBack() {
   router.back()
+}
+
+function goToCampaigns() {
+  router.push('/campaigns')
 }
 
 const copyGeoInfo = () => {

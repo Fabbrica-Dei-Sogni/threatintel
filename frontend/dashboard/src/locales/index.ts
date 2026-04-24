@@ -77,7 +77,7 @@ function getInitialLocale(): string {
 const i18n = createI18n({
     legacy: false,
     locale: getInitialLocale(),
-    fallbackLocale: 'en-US',
+    fallbackLocale: 'it-IT',
     messages: {
         'it-IT': itIT,
         'en-US': enUS,

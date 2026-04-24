@@ -93,6 +93,25 @@ export class CampaignService {
 
         const pipeline = [
             ...basePipeline,
+            // Aggiungiamo estrazione IP unici e conteggio per il dettaglio campagna
+            {
+                $addFields: {
+                    ips: {
+                        $reduce: {
+                            input: "$logsRaggruppati",
+                            initialValue: [],
+                            in: { $setUnion: ["$$value", ["$$this.request.ip"]] }
+                        }
+                    }
+                }
+            },
+            {
+                $addFields: {
+                    ipCount: { $size: "$ips" },
+                    // Allineamento nomi per il frontend (attackPatterns -> techniques)
+                    techniques: "$attackPatterns"
+                }
+            },
             {
                 $lookup: {
                     from: 'ipdetails',

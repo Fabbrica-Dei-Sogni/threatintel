@@ -1,0 +1,294 @@
+/* CampaignDetail.css */
+.campaign-detail-page {
+    background-color: var(--theme-bg, #0b0f19);
+    color: var(--theme-text, #f0e6d2);
+    min-height: 100vh;
+}
+
+.campaign-detail-container {
+    padding: 1.5rem;
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+/* Actions Bar (Sticky) */
+.actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  background: var(--theme-surface, rgba(0, 0, 0, 0.2));
+  padding: 12px 24px;
+  border-bottom: 1px solid var(--theme-border);
+}
+
+.nav-actions {
+    display: flex;
+    gap: 16px;
+}
+
+.detail-header {
+    margin-bottom: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    border-bottom: 1px solid var(--theme-border, rgba(0, 255, 65, 0.2));
+    padding-bottom: 1rem;
+}
+
+.hash-title {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--theme-primary, #00FF41);
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+    display: block;
+    opacity: 0.8;
+}
+
+h1 {
+    font-size: 2rem;
+    letter-spacing: 2px;
+    margin: 0;
+    color: var(--theme-text);
+    text-shadow: 0 0 10px rgba(var(--theme-primary-rgb), 0.3);
+}
+
+.btn-action {
+    background: transparent;
+    border: 1px solid var(--theme-primary);
+    color: var(--theme-primary);
+    padding: 0.5rem 1.2rem;
+    font-family: 'JetBrains Mono', monospace;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.btn-action:hover {
+    background: var(--theme-primary);
+    color: #000;
+    box-shadow: 0 0 15px var(--theme-primary);
+}
+
+/* Forensic Cards Grid */
+.forensic-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.forensic-card {
+    background: var(--theme-surface, rgba(0, 30, 0, 0.3));
+    border: 1px solid var(--theme-border, rgba(0, 255, 65, 0.2));
+    border-radius: 4px;
+    padding: 1.2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.card-title {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    color: var(--theme-primary);
+    margin-bottom: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    opacity: 0.9;
+}
+
+.metric-big {
+    font-size: 2.2rem;
+    font-weight: 900;
+    font-family: 'JetBrains Mono', monospace;
+    color: #fff;
+    text-shadow: 0 0 5px rgba(255,255,255,0.2);
+}
+
+/* Cluster Section */
+.cluster-section {
+    background: rgba(0,0,0,0.2);
+    border: 1px solid var(--theme-border);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    border-radius: 4px;
+}
+
+.cluster-nodes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.node-card {
+    background: rgba(0, 20, 0, 0.4);
+    border: 1px solid rgba(0, 255, 65, 0.1);
+    padding: 0.8rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.2s;
+    border-left: 3px solid transparent;
+}
+
+.node-card:hover {
+    border-color: var(--theme-primary);
+    background: rgba(0, 255, 65, 0.05);
+    border-left-color: var(--theme-primary);
+}
+
+.node-ip {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: bold;
+    color: var(--theme-text);
+    cursor: pointer;
+}
+
+.node-meta {
+    font-size: 0.65rem;
+    color: var(--theme-primary);
+    opacity: 0.5;
+    margin-top: 0.2rem;
+}
+
+.sync-btn-mini {
+    background: transparent;
+    border: 1px solid rgba(0,255,65,0.3);
+    color: var(--theme-primary);
+    padding: 0.2rem 0.5rem;
+    cursor: pointer;
+    border-radius: 3px;
+}
+
+.sync-btn-mini:hover {
+    background: var(--theme-primary);
+    color: #000;
+}
+
+/* Timeline Visualization Placeholder */
+.timeline-visualization {
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(0,255,65,0.1);
+    min-height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+}
+
+/* Cyber Skin Details */
+.skin-cyber .forensic-card {
+    border-left: 2px solid var(--theme-primary);
+    box-shadow: inset 0 0 20px rgba(var(--theme-primary-rgb), 0.05);
+}
+
+.skin-cyber .forensic-card::after {
+    content: 'FORENSIC_NODE';
+    position: absolute;
+    bottom: 5px;
+    right: 8px;
+    font-size: 0.5rem;
+    opacity: 0.3;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+/* Loading Overlay Styles */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--theme-bg, #0A0605);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    backdrop-filter: blur(20px);
+}
+
+.ascii-loader {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--theme-primary);
+    font-size: 1.2rem;
+    letter-spacing: 4px;
+    text-shadow: 0 0 15px var(--theme-primary);
+    animation: pulse-glow 2s infinite ease-in-out;
+}
+
+@keyframes pulse-glow {
+    0%, 100% { opacity: 0.6; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.05); }
+}
+
+/* Scrollbar Styling for Dark Theme */
+.campaign-detail-page::-webkit-scrollbar {
+    width: 8px;
+}
+.campaign-detail-page::-webkit-scrollbar-track {
+    background: var(--theme-bg);
+}
+.campaign-detail-page::-webkit-scrollbar-thumb {
+    background: var(--theme-surface);
+    border-radius: 4px;
+}
+.campaign-detail-page::-webkit-scrollbar-thumb:hover {
+    background: var(--theme-primary);
+}
+
+/* Techniques & Tags */
+.techniques-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.tech-tag {
+    background: rgba(var(--theme-primary-rgb, 0, 255, 65), 0.1);
+    border: 1px solid var(--theme-border);
+    color: var(--theme-primary);
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-family: 'JetBrains Mono', monospace;
+    transition: all 0.3s;
+}
+
+.tech-tag:hover {
+    background: rgba(var(--theme-primary-rgb), 0.2);
+    box-shadow: 0 0 10px rgba(var(--theme-primary-rgb), 0.2);
+}
+
+.full-width {
+    grid-column: 1 / -1;
+}
+
+.placeholder-msg {
+    text-align: center;
+    padding: 3rem;
+    border: 1px dashed var(--theme-border);
+    opacity: 0.5;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--theme-text);
+}
+
+.no-campaigns-detail {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 5rem;
+    text-align: center;
+    color: var(--theme-primary);
+    background: var(--theme-bg);
+}
+
+.no-campaigns-detail .ascii-art {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}

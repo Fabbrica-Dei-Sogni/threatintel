@@ -34,6 +34,9 @@
         <button @click="dashboardStore.toggleWidget('sessions')"
           :class="{ active: dashboardStore.isWidgetActive('sessions') }" class="btn-action">📟 {{
             t('home.telnet').toUpperCase() }}</button>
+        <button @click="dashboardStore.toggleWidget('campaigns')"
+          :class="{ active: dashboardStore.isWidgetActive('campaigns') }" class="btn-action">🧬 {{
+            t('campaigns.homeButton').toUpperCase() }}</button>
         <button @click="dashboardStore.toggleWidget('dossiers')"
           :class="{ active: dashboardStore.isWidgetActive('dossiers') }" class="btn-action">📁 {{
             t('home.archive').toUpperCase() }}</button>
@@ -382,6 +385,83 @@
               <RestrictedIntelligenceGate />
             </div>
           </div>
+
+          <!-- CAMPAIGNS -->
+          <div v-if="widget === 'campaigns'" class="intel-ranking-container">
+            <IntelRanking :title="t('campaigns.discovery')" :items="recentCampaigns" :loading="loadingCampaigns"
+              :error="errorCampaigns" v-model:page="dashboardState.rankings.campaignPage" :pageSize="10"
+              :total="campaignTotal" itemStyle="campaigns-ranking">
+              
+              <template #header-actions>
+                 <button class="reset-btn-mini" @click="dashboardStore.resetCampaigns"
+                  :title="t('telemetry.reset_filters')">
+                  <div class="reset-ascii">
+                    <span></span>
+                    <span></span>
+                  </div>
+                </button>
+              </template>
+
+              <template #title-meta>
+                <div class="ranking-header-actions">
+                  <button class="btn-ranking-action" @click="router.push('/campaigns')">
+                    {{ t('common.more_info') }}
+                  </button>
+                </div>
+              </template>
+
+              <template #item="{ item }">
+                <!-- Origin Col (using Pattern DNA as title) -->
+                <div class="item-col item-col-origin">
+                  <div class="indicator-group">
+                    <span class="badge-icon">🧬</span>
+                    <router-link :to="{
+                      name: 'CampaignDetail',
+                      params: { hash: item.hash },
+                      query: {
+                        minLogs: dashboardState.rankings.attackMinLogs,
+                        timeMode: 'ago',
+                        agoValue: dashboardState.rankings.attackTimeValue,
+                        agoUnit: dashboardState.rankings.attackTimeUnit
+                      }
+                    }" class="intel-det-btn" :data-noc-tooltip="t('common.detail')">
+                      DET
+                    </router-link>
+                  </div>
+                </div>
+
+                <!-- Subject Col -->
+                <div class="item-col item-col-subject">
+                  <span class="hash-link">{{ item.hash.substring(0, 16) }}...</span>
+                </div>
+
+                <!-- Forensics Col -->
+                <div class="item-col item-col-forensics">
+                   <div class="time-row" :data-noc-tooltip="$t('campaigns.firstSeen')">
+                    <span class="date-part">{{ formatDateOnly(item.firstSeen) }}</span>
+                    <span class="time-part">{{ formatTimeOnly(item.firstSeen) }}</span>
+                  </div>
+                  <span class="duration-badge" v-if="item.lastSeen && item.lastSeen !== item.firstSeen">
+                    ({{ computeDuration(item.firstSeen, item.lastSeen) }})
+                  </span>
+                </div>
+
+                <!-- Metrics Col -->
+                <div class="item-col item-col-metrics">
+                   <div class="activity-badge">
+                    <div class="badge-content occurrence" :data-noc-tooltip="$t('campaigns.ipsInvolved', { count: item.ipCount })">
+                      <span class="badge-icon">👤</span>
+                      <span class="badge-value">{{ item.ipCount }}</span>
+                    </div>
+                    <div class="badge-content" :data-noc-tooltip="$t('campaigns.totalLogs')">
+                      <span class="badge-icon">📋</span>
+                      <span class="badge-value">{{ item.totalLogs }}</span>
+                    </div>
+                  </div>
+                </div>
+              </template>
+            </IntelRanking>
+          </div>
         </div>
       </transition-group>
 
@@ -401,6 +481,7 @@
 import { useLogsFilter } from '../../composable/useLogsFilter';
 import { useAttacksFilter } from '../../composable/useAttacksFilter';
 import { useCowrieSessions } from '../../composable/useCowrieSessions';
+import { useCampaignsDiscovery } from '../../composable/useCampaignsDiscovery';
 import { useRouter } from 'vue-router'
 import { computed, onMounted, watch, ref, toRef } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -570,6 +651,24 @@ const {
 
 const recentSessions = computed(() => sessions.value)
 
+// Campagne
+const {
+  campaigns,
+  loading: loadingCampaigns,
+  error: errorCampaigns,
+  total: campaignTotal,
+  fetchData: fetchCampaigns
+} = useCampaignsDiscovery(
+  toRef(dashboardState.rankings, 'campaignPage'),
+  toRef(dashboardState.rankings, 'attackMinLogs'), // Riutilizziamo minIps o mettiamo un default
+  'ago',
+  toRef(dashboardState.rankings, 'attackTimeValue'),
+  toRef(dashboardState.rankings, 'attackTimeUnit'),
+  10
+);
+
+const recentCampaigns = computed(() => campaigns.value)
+
 // Dossier - ultimi 5
 const recentDossiers = ref([]);
 const loadingDossiers = ref(false);
@@ -605,6 +704,7 @@ const loadAll = () => {
   fetchAttacks();
   fetchLogs();
   fetchSessions();
+  fetchCampaigns();
   fetchRecentDossiers();
 };
 
@@ -620,6 +720,7 @@ watch(() => dashboardState.rankings, (newRankings, oldRankings) => {
   // Idem per log e sessioni
   fetchLogs();
   fetchSessions();
+  fetchCampaigns();
 }, { deep: true });
 
 </script>

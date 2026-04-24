@@ -267,6 +267,38 @@
         "radarTitle": "Analiza Radarowa",
         "searchUrlPlaceholder": "Filtruj według adresu URL..."
     },
+    "campaigns": {
+        "title": "Kampanie",
+        "homeButton": "Kampania",
+        "noCampaignsFound": "Nie wykryto żadnych rozproszonych kampanii",
+        "minIpsLabel": "Minimalna liczba zaangażowanych IP:",
+        "ipsInvolved": "{count} zaangażowanych IP",
+        "totalLogs": "Całkowita objętość logów",
+        "firstSeen": "Początek Kampanii",
+        "lastSeen": "Ostatnia Aktywność",
+        "patternHash": "Hash Wzorca",
+        "discovery": "Odkrywanie Kampanii",
+        "searchLabel": "Szukaj na liście:",
+        "searchPlaceholder": "IP, Hash, Technika...",
+        "table": {
+            "ips": "Zaangażowane IP",
+            "logs": "Suma Logów",
+            "firstSeen": "Początek",
+            "lastSeen": "Koniec",
+            "hash": "Wzorzec DNA"
+        }
+    },
+    "campaignDetail": {
+        "title": "Szczegóły Kampanii",
+        "summary": "Podsumowanie Śledcze Kampanii",
+        "backToCampaigns": "Powrót do Kampanii",
+        "involvedIps": "Zaangażowane Węzły Źródłowe",
+        "commonTechniques": "Wykryte Wspólne Techniki",
+        "avgIntensity": "Średnia Intensywność Klastra",
+        "distributedTimeline": "Rozproszona Oś Czasu",
+        "ipList": "Lista Węzłów Klastra",
+        "reputationScore": "Wynik Reputacji"
+    },
     "attackChart": {
         "title": "Analiza anomaliaów w czasie",
         "frequency": "Częstotliwość",

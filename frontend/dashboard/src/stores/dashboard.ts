@@ -13,6 +13,7 @@ export interface DashboardRankingsState {
     attackPage: number;
     logPage: number;
     sessionPage: number;
+    campaignPage: number;
 }
 
 export interface DashboardState {
@@ -33,7 +34,8 @@ const DEFAULT_STATE: DashboardState = {
         dangerLevels: [3],
         attackPage: 1,
         logPage: 1,
-        sessionPage: 1
+        sessionPage: 1,
+        campaignPage: 1
     },
     activeWidgets: [],
     showTicker: true
@@ -119,6 +121,10 @@ export const useDashboardStore = defineStore('dashboard', () => {
         state.rankings.sessionPage = 1;
     }
 
+    function resetCampaigns() {
+        state.rankings.campaignPage = 1;
+    }
+
     return {
         state,
         resetToDefaults,
@@ -127,6 +133,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
         resetSessions,
         toggleWidget,
         isWidgetActive,
-        toggleDefconLevel
+        toggleDefconLevel,
+        resetCampaigns
     };
 });

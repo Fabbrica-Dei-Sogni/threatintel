@@ -510,3 +510,53 @@ export async function exportDossier(id: string, format: string = 'pdf', style: s
         throw error;
     }
 }
+
+// ==========================
+// CAMPAIGNS (DISTRIBUTED ANALYTICS)
+// ==========================
+
+export async function fetchCampaigns({
+    startTime,
+    endTime,
+    minIps = 2
+}: {
+    startTime?: string;
+    endTime?: string;
+    minIps?: number;
+} = {}): Promise<any> {
+    try {
+        const response = await apiClient.get('/campaigns', {
+            params: { startTime, endTime, minIps }
+        });
+        return response.data;
+    } catch (error) {
+        console.error('[fetchCampaigns] Error:', error);
+        throw error;
+    }
+}
+
+export async function fetchCampaignDetail({
+    hash,
+    ips = [],
+    minLogsForAttack = 1,
+    timeConfig = {}
+}: {
+    hash: string;
+    ips?: string[];
+    minLogsForAttack?: number;
+    timeConfig?: any;
+}): Promise<any> {
+    try {
+        const response = await apiClient.post('/campaign/details', {
+            hash,
+            ips,
+            minLogsForAttack,
+            timeConfig
+        });
+        return response.data;
+    } catch (error) {
+        console.error('[fetchCampaignDetail] Error:', error);
+        throw error;
+    }
+}
+

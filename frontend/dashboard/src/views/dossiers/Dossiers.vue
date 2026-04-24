@@ -16,6 +16,7 @@
     <div class="archive-header">
       <div class="header-nav-left">
         <button @click="goBack" class="back-btn dashboard-back-btn">{{ t('home.dashboard').toUpperCase() }}</button>
+        <button @click="goToCampaigns" class="back-btn dashboard-back-btn">{{ t('campaigns.title').toUpperCase() }}</button>
         <span class="header-counter-technical">
           <span class="counter-label">RECORDS_FOUND:</span>
           <span class="counter-value">{{ total }}</span>
@@ -233,6 +234,10 @@ const viewDetail = (id) => {
 
 const goBack = () => {
   router.push('/');
+};
+
+const goToCampaigns = () => {
+  router.push('/campaigns');
 };
 
 const exportDossierPdf = async (id) => {

@@ -267,6 +267,38 @@
         "radarTitle": "Radar Analysis",
         "searchUrlPlaceholder": "Filter by URL..."
     },
+    "campaigns": {
+        "title": "Campaigns",
+        "homeButton": "Campaign",
+        "noCampaignsFound": "No distributed campaigns detected",
+        "minIpsLabel": "Minimum number of involved IPs:",
+        "ipsInvolved": "{count} involved IPs",
+        "totalLogs": "Total log volume",
+        "firstSeen": "Campaign Start",
+        "lastSeen": "Last Activity",
+        "patternHash": "Pattern Hash",
+        "discovery": "Campaign Discovery",
+        "searchLabel": "Search in list:",
+        "searchPlaceholder": "IP, Hash, Technique...",
+        "table": {
+            "ips": "Involved IPs",
+            "logs": "Total Logs",
+            "firstSeen": "Start",
+            "lastSeen": "End",
+            "hash": "DNA Pattern"
+        }
+    },
+    "campaignDetail": {
+        "title": "Campaign Detail",
+        "summary": "Campaign Investigative Summary",
+        "backToCampaigns": "Back to Campaigns",
+        "involvedIps": "Involved Source Nodes",
+        "commonTechniques": "Common Detected Techniques",
+        "avgIntensity": "Average Cluster Intensity",
+        "distributedTimeline": "Distributed Timeline",
+        "ipList": "Cluster Nodes List",
+        "reputationScore": "Reputation Score"
+    },
     "attackChart": {
         "title": "Anomalies Analysis Over Time",
         "frequency": "Frequency",

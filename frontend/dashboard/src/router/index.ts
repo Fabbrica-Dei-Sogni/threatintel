@@ -160,6 +160,30 @@ const routes: RouteRecordRaw[] = [
         name: 'CowrieAttackDetail',
         component: CowrieAttackDetail,
         props: true
+    },
+    {
+        path: '/campaigns',
+        name: 'Campaigns',
+        component: () => import('../views/campaigns/CampaignsList.vue'),
+        props: (route: RouteLocationNormalized) => ({
+            initialPage: route.query.page ? parseInt(route.query.page as string) : undefined,
+            initialMinIps: route.query.minIps ? parseInt(route.query.minIps as string) : undefined,
+            initTimeMode: route.query.timeMode,
+            initAgoValue: route.query.agoValue ? parseInt(route.query.agoValue as string) : undefined,
+            initAgoUnit: route.query.agoUnit,
+        })
+    },
+    {
+        path: '/campaign-detail/:hash',
+        name: 'CampaignDetail',
+        component: () => import('../views/campaigns/CampaignDetail.vue'),
+        props: (route: RouteLocationNormalized) => ({
+            hash: route.params.hash,
+            minLogsForAttack: route.query.minLogs ? parseInt(route.query.minLogs as string) : 1,
+            timeMode: route.query.timeMode || 'ago',
+            agoValue: route.query.agoValue ? parseInt(route.query.agoValue as string) : 30,
+            agoUnit: route.query.agoUnit || 'days'
+        })
     }
 ];
 

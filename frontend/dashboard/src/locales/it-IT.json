@@ -267,6 +267,38 @@
         "radarTitle": "Analisi Radar",
         "searchUrlPlaceholder": "Filtra per URL..."
     },
+    "campaigns": {
+        "title": "Campagne",
+        "homeButton": "Campagna",
+        "noCampaignsFound": "Nessuna campagna distribuita rilevata",
+        "minIpsLabel": "Numero minimo di IP coinvolti:",
+        "ipsInvolved": "{count} IP coinvolti",
+        "totalLogs": "Volume totale log",
+        "firstSeen": "Inizio Campagna",
+        "lastSeen": "Ultima Attività",
+        "patternHash": "Hash Pattern",
+        "discovery": "Scoperta Campagne",
+        "searchLabel": "Cerca nella lista:",
+        "searchPlaceholder": "IP, Hash, Technica...",
+        "table": {
+            "ips": "IP coinvolti",
+            "logs": "Log Totali",
+            "firstSeen": "Inizio",
+            "lastSeen": "Fine",
+            "hash": "Pattern DNA"
+        }
+    },
+    "campaignDetail": {
+        "title": "Dettaglio Campagna",
+        "summary": "Sintesi Investigativa Campagna",
+        "backToCampaigns": "Torna alle Campagne",
+        "involvedIps": "Nodi Sorgente Coinvolti",
+        "commonTechniques": "Tecniche Comuni Rilevate",
+        "avgIntensity": "Intensità Media Cluster",
+        "distributedTimeline": "Timeline Distribuita",
+        "ipList": "Elenco Nodi Cluster",
+        "reputationScore": "Score Reputazione"
+    },
     "attackChart": {
         "title": "Analisi Anomalie Temporale",
         "frequency": "Frequenza",

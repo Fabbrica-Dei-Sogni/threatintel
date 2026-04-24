@@ -114,5 +114,154 @@ describe('API index', () => {
     const result = await exportDossier('123', 'pdf');
     expect(result).toBeNull();
     expect(window.URL.createObjectURL).toHaveBeenCalled();
+
+    // HTML version
+    mock.onGet('/dossiers/123/export').reply(200, '<html></html>');
+    const htmlResult = await exportDossier('123', 'html');
+    expect(htmlResult).toBe('<html></html>');
+  });
+
+  it('should fallback to env variable in getApiUrl', () => {
+    vi.mocked(useProfileStore).mockImplementation(() => { throw new Error('No Pinia'); });
+    storage.remove(StorageNamespace.API);
+    // VITE_APP_API_URL is handled by vitest env or mock
+    expect(getApiUrl()).toBeDefined();
+  });
+
+  it('should handle request interceptor without token', async () => {
+    storage.remove(StorageNamespace.AUTH);
+    mock.onGet('/test').reply(200);
+    await apiClient.get('/test');
+    expect(mock.history.get[0].headers?.Authorization).toBeUndefined();
+  });
+
+  it('should handle login without token in response', async () => {
+    mock.onPost('/auth/login').reply(200, { user: {} });
+    const result = await login({});
+    expect(result.token).toBeUndefined();
+  });
+
+  it('should not redirect if already on auth page', async () => {
+    // Mock window.location
+    const originalLocation = window.location;
+    delete (window as any).location;
+    (window as any).location = { pathname: '/login', href: '' };
+
+    mock.onGet('/test-401').reply(401);
+    try {
+        await apiClient.get('/test-401');
+    } catch (e) {}
+    
+    expect((window.location as any).href).toBe(''); // No redirect
+    
+    (window as any).location = originalLocation;
+  });
+
+  it('should fetch attack search', async () => {
+    const mockData = { attacks: [], total: 0 };
+    mock.onPost('/attack/search').reply(200, mockData);
+    const result = await fetchAttackSearch({ page: 1, pageSize: 20 } as any);
+    expect(result).toEqual(mockData);
+  });
+
+  it('should fetch attack detail', async () => {
+    const mockData = { ip: '1.2.3.4', details: {} };
+    mock.onPost('/attack/details').reply(200, mockData);
+    const result = await fetchAttackDetail({ ip: '1.2.3.4', minLogsForAttack: 5, timeConfig: {} });
+    expect(result).toEqual(mockData);
+  });
+
+  it('should fetch rate limit search', async () => {
+    const mockData = { bobjs: [], total: 0 };
+    mock.onPost('/ratelimit/search').reply(200, mockData);
+    const result = await fetchRateLimitSearch({ page: 1, pageSize: 20 });
+    expect(result).toEqual(mockData);
+  });
+
+  it('should enrich reports', async () => {
+    const mockData = { success: true };
+    mock.onPost('/enrichreports/1.2.3.4').reply(200, mockData);
+    const result = await enrichReports('1.2.3.4');
+    expect(result).toEqual(mockData);
+  });
+
+  it('should enrich reputation score', async () => {
+    const mockData = { score: 100 };
+    mock.onPost('/enrich/1.2.3.4').reply(200, mockData);
+    const result = await enrichReputationScore('1.2.3.4');
+    expect(result).toEqual(mockData);
+  });
+
+  it('should fetch cowrie sessions', async () => {
+    const mockData = { sessions: [] };
+    mock.onPost('/cowrie/search').reply(200, mockData);
+    const result = await fetchCowrieSessions();
+    expect(result).toEqual(mockData);
+  });
+
+  it('should fetch cowrie session details and events', async () => {
+    mock.onGet('/cowrie/sessions/s1').reply(200, { id: 's1' });
+    mock.onGet('/cowrie/sessions/s1/events').reply(200, []);
+    
+    expect(await fetchCowrieSessionDetails('s1')).toEqual({ id: 's1' });
+    expect(await fetchCowrieSessionEvents('s1')).toEqual([]);
+  });
+
+  it('should fetch report as blob', async () => {
+    const mockBlob = new Blob(['test']);
+    mock.onGet('/reports/dettaglio').reply(200, mockBlob);
+    const result = await fetchReport({ type: 'ip', ip: '1.2.3.4' });
+    expect(result).toBeInstanceOf(Blob);
+  });
+
+  it('should fetch custom report', async () => {
+    // HTML version
+    mock.onPost('/reports/custom').reply(200, '<html></html>');
+    const htmlResult = await fetchCustomReport({}, 'html');
+    expect(htmlResult).toBe('<html></html>');
+
+    // PDF version
+    window.URL.createObjectURL = vi.fn().mockReturnValue('url');
+    mock.onPost('/reports/custom').reply(200, new Blob());
+    const pdfResult = await fetchCustomReport({}, 'pdf');
+    expect(pdfResult).toBeNull();
+  });
+
+  it('should manage dossiers', async () => {
+    mock.onGet('/dossiers').reply(200, []);
+    mock.onGet('/dossiers/1').reply(200, { id: '1' });
+    mock.onPost('/dossiers').reply(201, { id: '2' });
+    mock.onPatch('/dossiers/2').reply(200, { id: '2', title: 'new' });
+    mock.onDelete('/dossiers/2').reply(200, { success: true });
+
+    expect(await fetchDossiers()).toEqual([]);
+    expect(await fetchDossierById('1')).toEqual({ id: '1' });
+    expect(await saveDossier({ title: 'T' })).toEqual({ id: '2' });
+    expect(await updateDossier('2', { title: 'new' })).toEqual({ id: '2', title: 'new' });
+    expect(await deleteDossier('2')).toEqual({ success: true });
+  });
+
+  it('should handle error cases for various functions', async () => {
+    mock.onPost('/auth/login').reply(500);
+    await expect(login({})).rejects.toThrow();
+
+    mock.onPost('/auth/register').reply(500);
+    await expect(register({})).rejects.toThrow();
+
+    mock.onGet('/logs/1').reply(500);
+    await expect(fetchLogById('1')).rejects.toThrow();
+
+    mock.onPost('/search').reply(500);
+    await expect(fetchSearch({} as any)).rejects.toThrow();
+
+    mock.onPost('/attack/search').reply(500);
+    await expect(fetchAttackSearch({} as any)).rejects.toThrow();
+  });
+
+  it('should handle empty IDs gracefully', async () => {
+    expect(await fetchLogById('')).toEqual({ data: null });
+    expect(await fetchIpDetails(' ')).toEqual({ data: null });
+    expect(await enrichReports('')).toBeNull();
+    expect(await enrichReputationScore(undefined as any)).toBeNull();
   });
 });

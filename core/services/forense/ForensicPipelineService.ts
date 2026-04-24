@@ -8,6 +8,7 @@ import { ForensicPipelineBuilder } from './pipeline/ForensicPipelineBuilder';
 import { TimeFilterStage } from './pipeline/stages/TimeFilterStage';
 import { MatchFilterStage } from './pipeline/stages/MatchFilterStage';
 import { GroupingStage } from './pipeline/stages/GroupingStage';
+import { CampaignGroupingStage } from './pipeline/stages/CampaignGroupingStage';
 import { AttackStatsStage } from './pipeline/stages/AttackStatsStage';
 import { ScoringStage } from './pipeline/stages/ScoringStage';
 import { SequenceAnalysisStage } from './pipeline/stages/SequenceAnalysisStage';
@@ -89,21 +90,44 @@ export class ForensicPipelineService {
 
     /**
      * Costruisce la pipeline standard per l'analisi (equivalente a buildAttackGroupsBasePipeline nel legacy service).
+     * Raggruppamento per IP (GroupingStage).
      */
     async buildStandardPipeline(
         mongoFilters: any,
         minLogsForAttack: number,
-        timeConfig: any = null,
-        groupBy: string = 'request.ip'
+        timeConfig: any = null
     ): Promise<any[]> {
         await this.initialized;
 
         return this.createBuilder()
             .addStage(new TimeFilterStage(timeConfig))
             .addStage(new MatchFilterStage(mongoFilters))
-            .addStage(new GroupingStage(minLogsForAttack, groupBy))
+            .addStage(new GroupingStage(minLogsForAttack))
             .addStage(new AttackStatsStage(this.tolleranceWeights))
             // Advanced Analysis Stages (Added for behavioral analysis)
+            .addStage(new SequenceAnalysisStage())
+            .addStage(new PayloadAnalysisStage(this.suspiciousPatterns))
+            .addStage(new FingerprintAnalysisStage(this.suspiciousReferers))
+            .addStage(new ScoringStage(this.dangerWeights, this.tolleranceWeights))
+            .build();
+    }
+
+    /**
+     * Costruisce la pipeline specifica per l'analisi delle Campagne distribuite.
+     * Raggruppamento per Hash (CampaignGroupingStage).
+     */
+    async buildCampaignPipeline(
+        mongoFilters: any,
+        minLogsForAttack: number,
+        timeConfig: any = null
+    ): Promise<any[]> {
+        await this.initialized;
+
+        return this.createBuilder()
+            .addStage(new TimeFilterStage(timeConfig))
+            .addStage(new MatchFilterStage(mongoFilters))
+            .addStage(new CampaignGroupingStage(minLogsForAttack))
+            .addStage(new AttackStatsStage(this.tolleranceWeights))
             .addStage(new SequenceAnalysisStage())
             .addStage(new PayloadAnalysisStage(this.suspiciousPatterns))
             .addStage(new FingerprintAnalysisStage(this.suspiciousReferers))

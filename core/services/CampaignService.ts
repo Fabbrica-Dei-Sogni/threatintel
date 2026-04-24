@@ -117,7 +117,6 @@ export class CampaignService {
         minScore?: number;
         timeConfig?: any;
     }) {
-        const startTimeProc = Date.now();
         this.logger.info(`[CampaignService] Detail Fetch START - Hash: ${hash}, minLogsForAttack: ${minLogsForAttack}, minScore: ${minScore}`);
         
         const mongoFilters: any = { 
@@ -132,58 +131,14 @@ export class CampaignService {
             mongoFilters['request.ip'] = { $in: ips };
         }
 
-        // Pipeline configurata per raggruppare per HASH (il pattern della campagna)
-        const basePipeline = await this.forensicPipelineService.buildStandardPipeline(
+        // Pipeline specifica per raggruppare per HASH (il pattern della campagna)
+        const pipeline = await this.forensicPipelineService.buildCampaignPipeline(
             mongoFilters, 
             minLogsForAttack, 
-            timeConfig, 
-            'fingerprint.hash'
+            timeConfig
         );
 
-        const pipeline = [
-            ...basePipeline,
-            // Aggiungiamo estrazione IP unici e conteggio per il dettaglio campagna
-            {
-                $addFields: {
-                    ips: {
-                        $reduce: {
-                            input: "$logsRaggruppati",
-                            initialValue: [],
-                            in: { $setUnion: ["$$value", ["$$this.request.ip"]] }
-                        }
-                    }
-                }
-            },
-            {
-                $addFields: {
-                    ipCount: { $size: "$ips" },
-                    // Allineamento nomi per il frontend (attackPatterns -> techniques)
-                    techniques: "$attackPatterns"
-                }
-            },
-            {
-                $lookup: {
-                    from: 'ipdetails',
-                    localField: 'ipDetailsId',
-                    foreignField: '_id',
-                    as: 'ipDetails'
-                }
-            },
-            {
-                $addFields: {
-                    ipDetails: { $arrayElemAt: ['$ipDetails', 0] }
-                }
-            }
-        ];
-
-        try {
-            const [campaign] = await ThreatLog.aggregate(pipeline).allowDiskUse(true);
-            const duration = Date.now() - startTimeProc;
-            this.logger.info(`[CampaignService] Detail Fetch COMPLETED in ${duration}ms for hash ${hash}`);
-            return campaign || null;
-        } catch (err) {
-            this.logger.error(`[CampaignService] Detail Fetch FAILED after ${Date.now() - startTimeProc}ms for hash ${hash}:`, err);
-            throw err;
-        }
+        const [campaign] = await ThreatLog.aggregate(pipeline).allowDiskUse(true);
+        return campaign || null;
     }
 }

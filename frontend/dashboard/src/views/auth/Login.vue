@@ -67,7 +67,7 @@
     </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { login } from '../../api/index';
@@ -95,8 +95,14 @@ async function onSubmit() {
             authStore.setAuth(res.token, res.user);
         }
 
-        router.push('/');
-    } catch (err) {
+        // Recupera il redirect dalla query string, se presente, altrimenti vai in home
+        const redirectPath = router.currentRoute.value.query.redirect as string;
+        if (redirectPath) {
+            router.push(redirectPath);
+        } else {
+            router.push('/');
+        }
+    } catch (err: any) {
         error.value = true;
         errorMessage.value = err.response?.data?.message || t('auth.errorLogin');
     } finally {

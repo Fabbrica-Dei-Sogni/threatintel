@@ -100,6 +100,7 @@ const routes: RouteRecordRaw[] = [
         path: '/dossiers', 
         name: 'Dossiers', 
         component: () => import('../views/dossiers/Dossiers.vue'),
+        meta: { requiresAuth: true },
         props: (route: RouteLocationNormalized) => ({
             initialPage: route.query.page ? parseInt(route.query.page as string) : 1,
             initialSearch: route.query.q || '',
@@ -110,6 +111,7 @@ const routes: RouteRecordRaw[] = [
         path: '/dossiers/:id', 
         name: 'DossierDetail', 
         component: () => import('../views/dossierdetail/DossierDetail.vue'),
+        meta: { requiresAuth: true },
         props: true
     },
     {

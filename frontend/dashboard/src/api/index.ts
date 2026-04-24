@@ -65,9 +65,12 @@ apiClient.interceptors.response.use((response) => {
         const currentPath = window.location.pathname;
         if (!currentPath.includes('/auth/login') && !currentPath.includes('/auth/register')) {
             console.warn('[apiClient] Sessione scaduta o permessi insufficienti. Reindirizzamento...');
-            if (error.response.status === 401) {
-                storage.remove(StorageNamespace.AUTH);
-            }
+            
+            // Pulizia storage (sempre per 401, per 403 solo se non siamo già in login/register)
+            storage.remove(StorageNamespace.AUTH);
+            
+            // Reindirizzamento forzato
+            window.location.href = '/login?redirect=' + encodeURIComponent(currentPath);
         }
     }
     return Promise.reject(error);

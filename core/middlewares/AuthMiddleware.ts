@@ -62,11 +62,10 @@ export class AuthMiddleware {
                 (req as any).user = user; // Popola request
                 next();
             } catch (error: any) {
-                if (allowAnonymous) {
-                    this.logger.warn(`[AuthMiddleware] Fallback su anonimo a causa di errore auth: ${error.message || 'Errore sconosciuto'}`);
-                    return setAnonymousUser();
-                }
-
+                // Se il token è presente ma non valido, NON facciamo fallback su anonimo
+                // Questo perché l'utente ha espresso la volontà di essere autenticato.
+                // Fallback su anonimo solo se il token è assente (gestito sopra).
+                
                 const locale = this.getLocale(req);
                 const defaultMsg = this.i18n.t('errors.auth.tokenInvalid', locale);
                 const message = error.message || defaultMsg;

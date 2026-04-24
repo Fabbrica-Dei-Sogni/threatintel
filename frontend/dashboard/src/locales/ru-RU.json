@@ -177,6 +177,7 @@
         "reset_filters": "СБРОСИТЬ ФИЛЬТРЫ",
         "filter_label": "ВРЕМЕННОЙ ИНТЕРВАЛ",
         "filter_log_threshold_label": "ПОРОГ ЛОГОВ",
+        "filter_ip_threshold_label": "ПОРОГ IP",
         "filter_score_label": "ПОРОГ РИСКА",
         "filter_defcon_label": "УРОВЕНЬ DEFCON",
         "top_ranking": "РЕЙТИНГИ",

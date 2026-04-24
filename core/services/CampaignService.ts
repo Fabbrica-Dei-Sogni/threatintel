@@ -43,7 +43,9 @@ export class CampaignService {
                     firstSeen: { $min: '$timestamp' },
                     lastSeen: { $max: '$timestamp' },
                     sampleUrl: { $first: '$request.url' },
-                    sumScore: { $sum: '$fingerprint.score' }
+                    sumScore: { $sum: '$fingerprint.score' },
+                    // Raccogliamo tutti gli indicatori unici di minaccia rilevati in tutto il cluster
+                    allIndicators: { $push: '$fingerprint.indicators' }
                 }
             },
             {
@@ -55,6 +57,14 @@ export class CampaignService {
                     firstSeen: 1,
                     lastSeen: 1,
                     sampleUrl: 1,
+                    // Appiattiamo l'array di array e teniamo solo i valori unici
+                    attackPatterns: {
+                        $reduce: {
+                            input: '$allIndicators',
+                            initialValue: [],
+                            in: { $setUnion: ['$$value', '$$this'] }
+                        }
+                    },
                     averageScore: { $divide: ['$sumScore', '$totaleLogs'] }
                 }
             },

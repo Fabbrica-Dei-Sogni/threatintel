@@ -383,38 +383,47 @@
 .card-header {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 1.2rem;
+    align-items: center; /* Allineamento centrato per bilanciare i pesi */
+    margin-bottom: 1.5rem;
 }
 
 .hash-badge {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 0.75rem;
+    font-size: 0.6rem;
     color: var(--theme-primary);
-    background: rgba(0, 255, 65, 0.05);
-    padding: 0.3rem 0.6rem;
-    border-radius: 3px;
-    border: 1px solid rgba(0, 255, 65, 0.1);
+    background: rgba(var(--theme-primary-rgb, 0, 255, 65), 0.03);
+    padding: 0.15rem 0.5rem;
+    border-radius: 2px;
+    border: 1px solid rgba(var(--theme-primary-rgb, 0, 255, 65), 0.15);
+    opacity: 0.7;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
 }
 
 .cluster-size {
     display: flex;
-    flex-direction: column;
-    align-items: flex-end;
+    align-items: baseline; /* Allinea il numero alla base del testo */
+    gap: 8px;
+    background: rgba(var(--theme-primary-rgb), 0.03);
+    padding: 4px 12px;
+    border-radius: 40px; /* Effetto pillola per differenziarlo dall'hash */
+    border: 1px solid rgba(var(--theme-primary-rgb), 0.1);
 }
 
 .size-val {
-    font-size: 1.8rem;
+    font-size: 1.4rem;
     font-weight: 900;
-    line-height: 1;
     color: #fff;
+    font-family: 'JetBrains Mono', monospace;
 }
 
 .size-label {
-    font-size: 0.6rem;
+    font-size: 0.55rem;
+    color: var(--theme-primary);
     text-transform: uppercase;
-    opacity: 0.5;
+    font-weight: 800;
     letter-spacing: 1px;
+    opacity: 0.8;
 }
 
 .card-metrics {
@@ -441,6 +450,33 @@
     font-weight: 700;
     font-size: 0.9rem;
     font-family: 'JetBrains Mono', monospace;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.card-techniques {
+    margin-bottom: 1.2rem;
+    padding-top: 0.5rem;
+    border-top: 1px dashed rgba(var(--theme-primary-rgb), 0.1);
+}
+
+.tech-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+
+.tech-tag {
+    font-size: 0.6rem;
+    padding: 2px 6px;
+    background: rgba(var(--theme-primary-rgb, 0, 255, 65), 0.05);
+    border: 1px solid rgba(var(--theme-primary-rgb, 0, 255, 65), 0.2);
+    color: var(--theme-primary);
+    border-radius: 10px;
+    text-transform: uppercase;
+    font-weight: 800;
+    letter-spacing: 0.4px;
 }
 
 .card-footer {

@@ -402,6 +402,58 @@
                 </button>
               </template>
 
+              <template #filters>
+                <div class="filters-row">
+                  <!-- Time Range -->
+                  <div class="filter-item">
+                    <span class="filter-label">{{ t('telemetry.filter_label') }}: <span class="active-val">{{
+                      dashboardState.rankings.attackTimeValue === null ? t('common.all').toUpperCase() :
+                        (dashboardState.rankings.attackTimeValue + (dashboardState.rankings.attackTimeUnit === 'days' ?
+                        'D' : 'H')) }}</span></span>
+                    <div class="tabs-row log-threshold-tabs">
+                      <button v-for="opt in [
+                        { v: 10, u: 'days', l: '10D' },
+                        { v: 30, u: 'days', l: '1M' },
+                        { v: 90, u: 'days', l: '3M' },
+                        { v: 180, u: 'days', l: '6M' },
+                        { v: 365, u: 'days', l: '1Y' },
+                        { v: null, u: null, l: 'ALL' }
+                      ]" :key="opt.l" class="tab-btn"
+                        :class="{ active: dashboardState.rankings.attackTimeValue === opt.v && (opt.v === null || dashboardState.rankings.attackTimeUnit === opt.u) }"
+                        @click="dashboardState.rankings.attackTimeValue = opt.v; dashboardState.rankings.attackTimeUnit = opt.u">
+                        {{ opt.v === null ? t('common.all').toUpperCase() : opt.l }}
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Min IPs -->
+                  <div class="filter-item">
+                    <span class="filter-label">{{ t('telemetry.filter_ip_threshold_label') }}: <span
+                        class="active-val">{{ dashboardState.rankings.campaignMinIps }}</span></span>
+                    <div class="tabs-row log-threshold-tabs">
+                      <button v-for="val in [2, 5, 10, 20, 50, 100]" :key="val" class="tab-btn"
+                        :class="{ active: dashboardState.rankings.campaignMinIps === val }"
+                        @click="dashboardState.rankings.campaignMinIps = val">
+                        {{ val }}
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Min Score -->
+                  <div class="filter-item">
+                    <span class="filter-label">{{ t('telemetry.filter_score_label') }}: <span
+                        class="active-val">{{ dashboardState.rankings.campaignMinScore }}</span></span>
+                    <div class="tabs-row log-threshold-tabs">
+                      <button v-for="val in [0, 5, 10, 15, 20, 30, 40]" :key="val" class="tab-btn"
+                        :class="{ active: dashboardState.rankings.campaignMinScore === val }"
+                        @click="dashboardState.rankings.campaignMinScore = val">
+                        {{ val }}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </template>
+
               <template #title-meta>
                 <div class="ranking-header-actions">
                   <button class="btn-ranking-action" @click="router.push('/campaigns')">
@@ -414,12 +466,13 @@
                 <!-- Origin Col (using Pattern DNA as title) -->
                 <div class="item-col item-col-origin">
                   <div class="indicator-group">
-                    <span class="badge-icon">🧬</span>
+                    <span class="badge-icon" :title="'Avg Score: ' + item.averageScore?.toFixed(1)">🧬</span>
                     <router-link :to="{
                       name: 'CampaignDetail',
                       params: { hash: item.hash },
                       query: {
                         minLogs: dashboardState.rankings.attackMinLogs,
+                        minScore: dashboardState.rankings.campaignMinScore,
                         timeMode: 'ago',
                         agoValue: dashboardState.rankings.attackTimeValue,
                         agoUnit: dashboardState.rankings.attackTimeUnit
@@ -431,8 +484,13 @@
                 </div>
 
                 <!-- Subject Col -->
-                <div class="item-col item-col-subject">
-                  <span class="hash-link">{{ item.hash.substring(0, 16) }}...</span>
+                <div class="item-col item-col-subject" :data-noc-tooltip="'PATTERN_DNA: ' + item.hash">
+                  <span class="hash-link url-target">{{ item.sampleUrl || '/' }}</span>
+                  <div class="campaign-tech-list">
+                    <span v-for="tech in (item.attackPatterns || [])" :key="tech" class="tech-mini-tag">
+                      {{ tech }}
+                    </span>
+                  </div>
                 </div>
 
                 <!-- Forensics Col -->
@@ -455,7 +513,7 @@
                     </div>
                     <div class="badge-content" :data-noc-tooltip="$t('campaigns.totalLogs')">
                       <span class="badge-icon">📋</span>
-                      <span class="badge-value">{{ item.totalLogs }}</span>
+                      <span class="badge-value">{{ item.totaleLogs }}</span>
                     </div>
                   </div>
                 </div>
@@ -660,8 +718,9 @@ const {
   fetchData: fetchCampaigns
 } = useCampaignsDiscovery(
   toRef(dashboardState.rankings, 'campaignPage'),
-  toRef(dashboardState.rankings, 'attackMinLogs'), // Riutilizziamo minIps o mettiamo un default
-  'ago',
+  toRef(dashboardState.rankings, 'campaignMinIps'),
+  toRef(dashboardState.rankings, 'campaignMinScore'),
+  'ago', // initialTimeMode
   toRef(dashboardState.rankings, 'attackTimeValue'),
   toRef(dashboardState.rankings, 'attackTimeUnit'),
   10
@@ -780,6 +839,82 @@ watch(() => dashboardState.rankings, (newRankings, oldRankings) => {
 
 .status-dot-mini.archived {
   background: #64748b;
+}
+
+.item-col-subject {
+  flex: 1 !important;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start; /* Allineamento a sinistra */
+  gap: 8px; /* Spazio netto tra URI e Tags */
+  min-width: 0;
+  text-align: left;
+}
+
+.url-target {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 0.8rem;
+  color: #fff;
+  text-transform: none;
+  letter-spacing: -0.2px;
+  max-width: 240px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: block;
+  text-shadow: 0 0 10px rgba(255,255,255,0.1);
+  line-height: 1.2;
+}
+
+.campaign-tech-list {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+  padding-left: 2px;
+  margin-top: 2px;
+}
+
+@media (max-width: 768px) {
+  .url-target {
+    max-width: 140px; /* Ridotto leggermente per far spazio alle icone */
+    font-size: 0.75rem;
+  }
+  
+  .item-col-subject {
+    gap: 4px;
+    flex: 1 1 auto !important; /* Permette alla colonna di espandersi */
+  }
+  
+  /* Nascondiamo la colonna Forensics (date) su mobile per le campagne 
+     per dare spazio vitale all'URI e ai Tags tecnici */
+  .campaigns-ranking :deep(.item-col-forensics) {
+    display: none !important;
+  }
+
+  /* Ridimensioniamo l'origine per guadagnare spazio */
+  .campaigns-ranking :deep(.item-col-origin) {
+    flex: 0 0 90px !important;
+  }
+
+  .tech-mini-tag {
+    font-size: 0.5rem;
+    padding: 0px 4px;
+    line-height: 1.4;
+  }
+}
+
+.tech-mini-tag {
+  font-size: 0.55rem;
+  padding: 1px 6px;
+  background: rgba(var(--theme-primary-rgb, 0, 255, 65), 0.05);
+  border: 1px solid rgba(var(--theme-primary-rgb, 0, 255, 65), 0.3);
+  color: var(--theme-primary);
+  border-radius: 10px;
+  text-transform: uppercase;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+  opacity: 0.8;
 }
 
 .subject-link {

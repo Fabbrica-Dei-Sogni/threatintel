@@ -177,6 +177,7 @@
         "reset_filters": "RESET FILTERS",
         "filter_label": "TIMEFRAME",
         "filter_log_threshold_label": "LOG THRESHOLD",
+        "filter_ip_threshold_label": "IP THRESHOLD",
         "filter_score_label": "RISK THRESHOLD",
         "filter_defcon_label": "DEFCON LEVEL",
         "top_ranking": "RANKINGS",

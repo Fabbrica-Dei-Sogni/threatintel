@@ -177,6 +177,7 @@
         "reset_filters": "FILTER ZURÜCKSETZEN",
         "filter_label": "ZEITRAUM",
         "filter_log_threshold_label": "LOG-SCHWELLE",
+        "filter_ip_threshold_label": "IP-SCHWELLE",
         "filter_score_label": "RISIKOSCHWELLE",
         "filter_defcon_label": "DEFCON-STUFE",
         "top_ranking": "RANGLISTEN",

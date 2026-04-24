@@ -1,6 +1,12 @@
 <template>
   <div class="campaign-detail-page" :class="'skin-' + currentSkin">
-    <GlobalHeader context="campaign_detail" extraClass="cyber-sticky-area cyber-sticky-top-0" />
+    <GlobalHeader context="campaign_detail" extraClass="cyber-sticky-area cyber-sticky-top-0">
+      <template #title>
+        <h1 class="header-main-title">
+          {{ t('campaignDetail.title').toUpperCase() }}<span class="blinking-cursor">_</span>
+        </h1>
+      </template>
+    </GlobalHeader>
     <div class="actions cyber-sticky-area cyber-sticky-top-1">
       <div class="nav-actions">
         <button @click="router.back()" class="btn-action">
@@ -17,7 +23,10 @@
       <header class="detail-header">
         <div class="title-section">
           <span class="hash-title">{{ t('campaigns.patternHash') }}: {{ hash }}</span>
-          <h1>{{ t('campaignDetail.title').toUpperCase() }}</h1>
+          <div class="target-uri-container" v-if="campaign.request?.url">
+             <span class="target-label">{{ t('common.sample_url').toUpperCase() }}:</span>
+             <span class="target-value">{{ campaign.request.url }}</span>
+          </div>
         </div>
       </header>
 
@@ -52,18 +61,23 @@
         </div>
       </section>
 
-      <!-- Distributed Timeline Placeholder -->
-      <section class="forensic-card">
-        <div class="card-title">{{ t('campaignDetail.distributedTimeline') }}</div>
-        <div class="timeline-visualization">
-            <!-- Qui andrà il componente grafico della timeline distribuita -->
-            <div class="placeholder-msg">
-                [ TIMELINE AGGREGATA: {{ formatDate(campaign.firstSeen) }} -> {{ formatDate(campaign.lastSeen) }} ]
-            </div>
+      <!-- Campaign Timeline Summary -->
+      <section class="forensic-grid">
+        <div class="forensic-card">
+          <div class="card-title">{{ t('campaigns.firstSeen') }}</div>
+          <div class="metric-med">{{ formatDate(campaign.firstSeen) }}</div>
+        </div>
+        <div class="forensic-card">
+          <div class="card-title">{{ t('campaigns.lastSeen') }}</div>
+          <div class="metric-med">{{ formatDate(campaign.lastSeen) }}</div>
+        </div>
+        <div class="forensic-card" v-if="campaign.lastSeen && campaign.firstSeen && campaign.lastSeen !== campaign.firstSeen">
+          <div class="card-title">{{ t('common.duration_label') }}</div>
+          <div class="metric-med duration-highlight">{{ computeDuration(campaign.firstSeen, campaign.lastSeen) }}</div>
         </div>
       </section>
 
-      <!-- Cluster Nodes Map (Moved to Bottom) -->
+      <!-- Cluster Nodes Map -->
       <section class="cluster-section">
         <div class="card-title">{{ t('campaignDetail.ipList') }}</div>
         <div class="cluster-nodes-grid">
@@ -96,7 +110,8 @@ import { storeToRefs } from 'pinia';
 import { useViewSettingsStore } from '../../stores/viewSettings';
 import { fetchCampaignDetail } from '../../api';
 import GlobalHeader from '../../components/GlobalHeader.vue';
-import { formatFullDateTime } from '../../utils/dateUtils';
+import { formatFullDateTime, formatHumanDuration } from '../../utils/dateUtils';
+import dayjs from 'dayjs';
 
 const props = defineProps({
   hash: { type: String, required: true },
@@ -145,6 +160,12 @@ onMounted(loadCampaign);
 
 function formatDate(ts) {
   return formatFullDateTime(ts);
+}
+
+function computeDuration(start, end) {
+  if (!start || !end) return '-';
+  const diff = dayjs(end).diff(dayjs(start), 'second');
+  return formatHumanDuration(diff, t);
 }
 
 function goToIp(ip) {

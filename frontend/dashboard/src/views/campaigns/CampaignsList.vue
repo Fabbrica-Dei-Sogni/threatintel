@@ -145,6 +145,14 @@
             </div>
           </div>
 
+          <div class="card-techniques" v-if="campaign.attackPatterns?.length">
+             <div class="tech-tags">
+                <span v-for="tech in campaign.attackPatterns" :key="tech" class="tech-tag">
+                   {{ tech }}
+                </span>
+             </div>
+          </div>
+
           <div class="card-footer">
             <div class="timeline-info">
               <div>{{ t('campaigns.firstSeen') }}: {{ formatDate(campaign.firstSeen) }}</div>

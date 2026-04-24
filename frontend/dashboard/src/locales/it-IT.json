@@ -177,6 +177,7 @@
         "reset_filters": "RIPRISTINA FILTRI",
         "filter_label": "TIMEFRAME",
         "filter_log_threshold_label": "SOGLIA LOG",
+        "filter_ip_threshold_label": "SOGLIA IP",
         "filter_score_label": "SOGLIA RISCHIO",
         "filter_defcon_label": "LIVELLO DEFCON",
         "top_ranking": "CLASSIFICHE",

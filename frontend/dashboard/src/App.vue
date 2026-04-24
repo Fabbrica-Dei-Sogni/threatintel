@@ -43,6 +43,9 @@
     </div>
 
     <GlobalNavMenu />
+    
+    <!-- App Version Display -->
+    <div class="app-version">v{{ appVersion }}</div>
   </div>
 </template>
 
@@ -61,6 +64,7 @@ const route = useRoute();
 const dossierStore = useDossierStore();
 const authStore = useAuthStore();
 
+const appVersion = import.meta.env.VITE_APP_VERSION || '1.0.0';
 const isAuthPage = computed(() => route.path === '/login' || route.path === '/register');
 
 onMounted(() => {
@@ -241,5 +245,17 @@ onMounted(() => {
   .floating-auth-group.has-settings.recorder-active .floating-logout {
     bottom: 160px;
   }
+}
+
+.app-version {
+  position: fixed;
+  bottom: 8px;
+  left: 12px;
+  font-size: 0.65rem;
+  color: rgba(255, 255, 255, 0.2);
+  font-family: 'Courier New', Courier, monospace;
+  pointer-events: none;
+  z-index: 10;
+  letter-spacing: 1px;
 }
 </style>

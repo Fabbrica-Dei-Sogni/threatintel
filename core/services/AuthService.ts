@@ -68,10 +68,8 @@ export class AuthService {
         try {
             data.appId = this.appId;
 
-            // Se il frontend NON ha inviato un redirectUrl, usiamo quello di default del Core
-            if (!data.redirectUrl && process.env.FRONTEND_URL) {
-                data.redirectUrl = `${process.env.FRONTEND_URL}/welcome`;
-            }
+            // Il redirectUrl viene ora gestito interamente dal frontend
+            // Il backend non deve più assumere il controllo di questa logica via .env
 
             const response = await this.instance.post(`${this.getUri()}/register`, data);
             return response.data;

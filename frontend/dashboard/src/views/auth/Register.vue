@@ -84,7 +84,7 @@ async function onSubmit() {
             username: username.value,
             email: email.value,
             password: password.value,
-            redirectUrl: window.location.origin + '/honeypot/welcome'
+            redirectUrl: window.location.origin + import.meta.env.VITE_WELCOME_PATH
         });
         router.push('/login');
     } catch (err) {

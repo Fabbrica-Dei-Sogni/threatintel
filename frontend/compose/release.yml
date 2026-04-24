@@ -1,0 +1,32 @@
+name: "threat-intel-frontend"
+
+services:
+  dashboard-honeypot:
+    image: dashboard-honeypot:${IMG_VERSION:-latest}
+    container_name: dashboard-honeypot
+    restart: unless-stopped
+    build:
+      context: ../
+      dockerfile: ./Dockerfile.release
+      args:
+        NPM_VERSION: ${NPM_VERSION_FRONTEND:-0.1.1}
+        NPM_REGISTRY_URI: ${NPM_REGISTRY_URI:-http://alessandromodica.com:8081/repository/npm-cloud-pubblico/}
+        # Variabili Vite iniettate al build time
+        VITE_APP_TITLE: ${VITE_APP_TITLE:-"Threat Intel Dashboard"}
+        VITE_APP_VERSION: ${VITE_APP_VERSION:-"0.1.1"}
+        VITE_APP_API_URL: ${VITE_APP_API_URL:-"/honeypot/api"}
+        VITE_WELCOME_PATH: ${VITE_WELCOME_PATH:-"/honeypot/welcome"}
+        VITE_API_TIMEOUT: ${VITE_API_TIMEOUT:-"30000"}
+        VITE_HONEYPOT_LOCATION_LAT: ${VITE_HONEYPOT_LOCATION_LAT:-"48.8566"}
+        VITE_HONEYPOT_LOCATION_LON: ${VITE_HONEYPOT_LOCATION_LON:-"2.3522"}
+        VITE_HONEYPOT_NAME: ${VITE_HONEYPOT_NAME:-"Honeypot (Paris)"}
+    ports:
+      - "127.0.0.1:8180:80"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - network-threat-intel
+
+networks:
+  network-threat-intel:
+    driver: bridge

@@ -152,12 +152,12 @@ export class RateLimitMiddleware {
 
     // Helper per verificare se un IP è escluso (whitelist)
     private isExcluded(req: any): boolean {
-        // Logica specifica richiesta dall'utente: skip se naviga alla location dominio/honeypot
-        const pathStr = req.originalUrl || req.path || '';
-        const isHoneypotPath = pathStr.toLowerCase().includes('honeypot');
-
-        if (isHoneypotPath) {
-            this.logger.debug(`[WHITELIST-BYPASS] IP ${req.ip} allowed for honeypot path: ${pathStr}`);
+        // Logica specifica richiesta dall'utente: skip se naviga alla location della dashboard configurata
+        const dashboardPath = (process.env.HONEYPOT_DASHBOARD_PATH || '/honeypot').toLowerCase();
+        const pathStr = (req.originalUrl || req.path || '').toLowerCase();
+        
+        if (pathStr.includes(dashboardPath) || pathStr.startsWith('/api/')) {
+            this.logger.debug(`[WHITELIST-BYPASS] IP ${req.ip} allowed for path: ${pathStr}`);
             return true;
         }
 
@@ -271,14 +271,14 @@ export class RateLimitMiddleware {
         return async (req: any, res: any, next: any) => {
             const ip = req.ip;
 
-            // 1. PRIORITÀ ASSOLUTA: Bypass per navigazione protetta /honeypot e chiamate API legittime
+            // 1. PRIORITÀ ASSOLUTA: Bypass per navigazione protetta (Dashboard e API)
+            const dashboardPath = (process.env.HONEYPOT_DASHBOARD_PATH || '/honeypot').toLowerCase();
             const pathStr = (req.originalUrl || req.path || req.url || '').toLowerCase();
             
-            // Bypass se l'URL contiene 'honeypot' O se è una chiamata API (le API sono protette da AuthMiddleware dopo)
-            if (pathStr.includes('honeypot') || pathStr.startsWith('/api/')) {
-                // Log solo per honeypot per non intasare i log
-                if (pathStr.includes('honeypot')) {
-                    console.log(`[DEBUG-BYPASS] IP ${ip} sta accedendo a: ${pathStr} - BYPASS ATTIVATO`);
+            if (pathStr.includes(dashboardPath) || pathStr.startsWith('/api/')) {
+                // Log solo per dashboard per non intasare i log
+                if (pathStr.includes(dashboardPath)) {
+                    console.log(`[DEBUG-BYPASS] IP ${ip} sta accedendo a dashboard configurata: ${pathStr} - BYPASS ATTIVATO`);
                 }
                 return next();
             }
@@ -315,9 +315,10 @@ export class RateLimitMiddleware {
             const self = this;
             res.send = function (data: any) {
                 if (res.statusCode === 429 && redisClient) {
-                    // Verifica se il path è escluso dal tracking delle violazioni (es. navigazione sicura)
-                    const whitelistPaths = (process.env.WHITELIST_PATHS_FROM_BLACKLIST || '/,/favicon.ico,/login').split(',').map(p => p.trim());
-                    const isWhitelistedPath = req.method === 'GET' && whitelistPaths.includes(req.path);
+                    // Verifica se il path è escluso dal tracking delle violazioni
+                    // Escludiamo solo la dashboard configurata e le chiamate API
+                    const isWhitelistedPath = (pathStr.includes(dashboardPath) || 
+                                              pathStr.startsWith('/api/'));
 
                     if (!isWhitelistedPath) {
                         // Traccia violazione per blacklist automatica

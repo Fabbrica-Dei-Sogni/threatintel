@@ -1,4 +1,4 @@
-name: "threat-intel-frontend-legacy"
+name: "threat-intel-frontend-collaudo"
 
 services:
   dashboard-honeypot:

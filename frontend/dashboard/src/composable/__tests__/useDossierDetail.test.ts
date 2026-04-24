@@ -56,17 +56,17 @@ describe('useDossierDetail', () => {
     expect(dossier.value!.title).toBe('New');
   });
 
-  it('should add a human section', async () => {
+  it('should add a human section locally', async () => {
     const mockDossier = { _id: '123', sections: [] };
     vi.mocked(api.fetchDossierById).mockResolvedValue(mockDossier as any);
-    vi.mocked(api.updateDossier).mockResolvedValue({ ...mockDossier, sections: [{ type: DossierSectionType.HUMAN, templateKey: 'h', order: 0, timestamp: new Date(), data: {} }] } as any);
 
     const { loadDossier, addHumanSection, dossier } = useDossierDetail();
     await loadDossier('123');
-    await addHumanSection('123');
+    addHumanSection('123');
 
-    expect(api.updateDossier).toHaveBeenCalled();
+    expect(api.updateDossier).not.toHaveBeenCalled();
     expect(dossier.value!.sections[0].type).toBe(DossierSectionType.HUMAN);
+    expect((dossier.value!.sections[0] as any)._isNew).toBe(true);
   });
 
   it('should update a section', async () => {

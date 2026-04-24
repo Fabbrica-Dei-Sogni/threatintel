@@ -41,7 +41,7 @@ describe('useAttacksFilter', () => {
     await filter.fetchData();
 
     expect(api.fetchAttackSearch).toHaveBeenCalledWith(expect.objectContaining({
-      timeConfig: { h: 1 }
+      timeConfig: { hours: 1 }
     }));
   });
 

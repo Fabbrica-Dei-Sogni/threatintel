@@ -1,0 +1,91 @@
+/* WelcomeCyber.css - CYBER SKIN OVERRIDES */
+
+.skin-cyber.auth-page {
+    background-color: #080C14 !important;
+}
+
+.skin-cyber.auth-page .logo-text .highlight {
+    color: #00D4FF !important;
+    text-shadow: 0 0 10px rgba(0, 212, 255, 0.5) !important;
+}
+
+.skin-cyber.auth-page .auth-card {
+    background: rgba(16, 24, 48, 0.45) !important;
+    border: 1px solid rgba(0, 212, 255, 0.2) !important;
+    backdrop-filter: blur(12px) !important;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5) !important;
+}
+
+.skin-cyber.auth-page .status-circle {
+    background: rgba(0, 212, 255, 0.1) !important;
+    border-color: #00D4FF !important;
+}
+
+.skin-cyber.auth-page .welcome-title {
+    color: #fff !important;
+    text-shadow: 0 0 15px rgba(0, 212, 255, 0.4) !important;
+}
+
+.skin-cyber.auth-page .user-id-badge {
+    border-left: 3px solid #00D4FF !important;
+}
+
+.skin-cyber.auth-page .user-id-badge .label {
+    color: #4B6584 !important;
+}
+
+.skin-cyber.auth-page .user-id-badge .value {
+    color: #00D4FF !important;
+}
+
+.skin-cyber.auth-page .highlight-cyan {
+    color: #00D4FF !important;
+    text-shadow: 0 0 8px rgba(0, 212, 255, 0.5) !important;
+}
+
+.skin-cyber.auth-page .btn-action-primary {
+    background: linear-gradient(135deg, #007AFF, #00D4FF) !important;
+    box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3) !important;
+}
+
+.skin-cyber.auth-page .btn-action-primary:hover {
+    box-shadow: 0 6px 20px rgba(0, 212, 255, 0.5) !important;
+}
+
+.skin-cyber.auth-page .back-btn-integrated {
+    background: rgba(0, 122, 255, 0.1) !important;
+    color: #00D4FF !important;
+    border: 1px solid rgba(0, 212, 255, 0.3) !important;
+    box-shadow: 0 0 15px rgba(0, 212, 255, 0.15) !important;
+    backdrop-filter: blur(8px) !important;
+}
+
+.skin-cyber.auth-page .back-btn-integrated:hover {
+    background: rgba(0, 122, 255, 0.2) !important;
+    box-shadow: 0 0 20px rgba(0, 212, 255, 0.4) !important;
+    border-color: rgba(0, 212, 255, 0.6) !important;
+}
+
+/* Animations */
+.skin-cyber.auth-page .pulse-cyan {
+    animation: pulse-cyan 2s infinite ease-in-out;
+}
+
+@keyframes pulse-cyan {
+    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 212, 255, 0.4); }
+    70% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(0, 212, 255, 0); }
+    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 212, 255, 0); }
+}
+
+.skin-cyber.auth-page .scanline {
+    display: block !important;
+}
+
+.skin-cyber.auth-page .grid-overlay {
+    display: block !important;
+}
+
+.auth-page:not(.skin-cyber) .scanline,
+.auth-page:not(.skin-cyber) .grid-overlay {
+    display: none;
+}

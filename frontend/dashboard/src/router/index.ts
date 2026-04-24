@@ -5,8 +5,8 @@ import type { RouteRecordRaw, RouteLocationNormalized } from 'vue-router';
 import Home from '../views/home/Home.vue';
 import ThreatLogs from '../views/threatlogs/ThreatLogs.vue';
 import IpDetails from '../views/ipdetails/IpDetails.vue';
-import Login from '../views/auth/Login.vue';
-import Register from '../views/auth/Register.vue';
+import Login from '../views/auth/login/Login.vue';
+import Register from '../views/auth/register/Register.vue';
 import ThreatLog from '../views/threatlog/ThreatLog.vue';
 import Attacks from '../views/attacks/Attacks.vue';
 import AttackDetail from '../views/attackdetail/AttackDetail.vue';
@@ -117,7 +117,7 @@ const routes: RouteRecordRaw[] = [
     {
         path: '/welcome',
         name: 'Welcome',
-        component: () => import('../views/auth/Welcome.vue'),
+        component: () => import('../views/auth/welcome/Welcome.vue'),
         meta: { requiresAuth: false }
     },
     {

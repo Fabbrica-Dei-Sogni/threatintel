@@ -42,7 +42,7 @@ const COWRIE_SESSION_FILTER_FIELDS = new Set([
 ]);
 
 const CAMPAIGN_FILTER_FIELDS = new Set([
-    'minIps', 'minScore', 'startTime', 'endTime', 'page', 'pageSize'
+    'minIps', 'minScore', 'startTime', 'endTime', 'page', 'pageSize', 'timeMode', 'agoValue', 'agoUnit'
 ]);
 
 const CAMPAIGN_SORT_FIELDS = new Set([
@@ -87,6 +87,7 @@ export function sanitizeSortFields(
 /**
  * Sanitizza i filtri controllando la whitelist delle chiavi
  * ed escapando i valori stringa per prevenire ReDoS.
+ * Esclude dall'escaping i campi di tipo data.
  */
 export function sanitizeFilters(
     filters: any,
@@ -96,19 +97,25 @@ export function sanitizeFilters(
         return {};
     }
 
+    const DATE_FIELDS = new Set(['startTime', 'endTime', 'timestamp', 'fromDate', 'toDate', 'firstSeen', 'lastSeen']);
+
     const safe: Record<string, any> = {};
     for (const [key, value] of Object.entries(filters)) {
         if (!allowedFields.has(key)) continue;
 
         if (typeof value === 'string') {
-            // Stringa vuota = ignora il filtro
-            if (value.trim() === '') continue;
-            // Escaping prima di usare come regex
-            safe[key] = escapeRegex(value.trim());
+            const trimmed = value.trim();
+            if (trimmed === '') continue;
+
+            // Se è un campo data, non applichiamo escapeRegex per non corrompere il formato ISO
+            if (DATE_FIELDS.has(key)) {
+                safe[key] = trimmed;
+            } else {
+                safe[key] = escapeRegex(trimmed);
+            }
         } else if (typeof value === 'boolean' || typeof value === 'number') {
             safe[key] = value;
         } else if (value && typeof value === 'object' && '$in' in value && Array.isArray((value as any).$in)) {
-            // Supporto per operatore $in (es. lista di IP per analisi distribuita)
             safe[key] = { $in: (value as any).$in };
         }
     }

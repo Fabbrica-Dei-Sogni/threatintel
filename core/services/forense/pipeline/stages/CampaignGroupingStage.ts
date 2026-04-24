@@ -51,6 +51,7 @@ export class CampaignGroupingStage implements PipelineStage {
                         $mergeObjects: [
                             '$representative',
                             {
+                                _id: '$_id',
                                 hash: '$_id',
                                 ips: '$ipsInvolved',
                                 ipCount: { $size: '$ipsInvolved' },

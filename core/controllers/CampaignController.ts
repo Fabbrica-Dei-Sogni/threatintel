@@ -29,13 +29,14 @@ export class CampaignController {
             const minIpsNum = parseInt(cleanQuery.minIps as string) || 2;
             const minScoreNum = parseInt(cleanQuery.minScore as string) || 0;
             
-            const timeConfig = { 
-                startTime: cleanQuery.startTime as string, 
-                endTime: cleanQuery.endTime as string 
-            };
-
             const result = await this.campaignService.getCampaigns({ 
-                timeConfig, 
+                timeConfig: {
+                    startTime: cleanQuery.startTime as string, 
+                    endTime: cleanQuery.endTime as string,
+                    timeMode: cleanQuery.timeMode as string,
+                    agoValue: cleanQuery.agoValue ? parseInt(cleanQuery.agoValue as string) : undefined,
+                    agoUnit: cleanQuery.agoUnit as string
+                }, 
                 minIps: minIpsNum,
                 minScore: minScoreNum,
                 page: pageNum,
@@ -44,7 +45,7 @@ export class CampaignController {
 
             res.json({ 
                 campaigns: result.campaigns, 
-                count: result.total 
+                count: result.count 
             });
         } catch (err: any) {
             this.logger.error('[CampaignController] Error in campaigns discovery:', err);

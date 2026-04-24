@@ -137,7 +137,7 @@
           <div class="card-metrics">
             <div class="metric-item">
               <span class="metric-label">{{ t('campaigns.totalLogs') }}</span>
-              <span class="metric-value">{{ campaign.totalLogs }}</span>
+              <span class="metric-value">{{ campaign.totaleLogs }}</span>
             </div>
             <div class="metric-item">
               <span class="metric-label">{{ t('common.sample_url').toUpperCase() }}</span>
@@ -228,7 +228,9 @@ const {
   toRef(campaignsStore.state.filters, 'timeMode'),
   toRef(campaignsStore.state.filters, 'agoValue'),
   toRef(campaignsStore.state.filters, 'agoUnit'),
-  toRef(campaignsStore.state.pagination, 'pageSize')
+  toRef(campaignsStore.state.pagination, 'pageSize'),
+  toRef(campaignsStore.state.filters, 'startDate'),
+  toRef(campaignsStore.state.filters, 'endDate')
 );
 
 // Logica paginazione standard
@@ -260,15 +262,20 @@ function computeDuration(start, end) {
 }
 
 function goToDetail(hash) {
+  const query = {
+    timeMode: campaignsStore.state.filters.timeMode,
+    agoValue: campaignsStore.state.filters.agoValue,
+    agoUnit: campaignsStore.state.filters.agoUnit,
+    minScore: campaignsStore.state.filters.minScore
+  };
+
+  if (campaignsStore.state.filters.startDate) query.customStartTime = campaignsStore.state.filters.startDate;
+  if (campaignsStore.state.filters.endDate) query.customEndTime = campaignsStore.state.filters.endDate;
+
   router.push({
     name: 'CampaignDetail',
     params: { hash },
-    query: {
-      timeMode: campaignsStore.state.filters.timeMode,
-      agoValue: campaignsStore.state.filters.agoValue,
-      agoUnit: campaignsStore.state.filters.agoUnit,
-      minScore: campaignsStore.state.filters.minScore
-    }
+    query
   });
 }
 

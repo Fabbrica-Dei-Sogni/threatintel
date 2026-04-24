@@ -3,6 +3,7 @@ import { Logger } from 'winston';
 import { LOGGER_TOKEN } from '../di/tokens';
 import ThreatLog from '../models/ThreatLogSchema';
 import { ForensicPipelineService } from './forense/ForensicPipelineService';
+import { TimeFilterStage } from './forense/pipeline/stages/TimeFilterStage';
 
 @injectable()
 export class CampaignService {
@@ -12,48 +13,37 @@ export class CampaignService {
     ) {}
 
     /**
-     * Scopre pattern di attacco (hash) condivisi da più IP diversi.
-     * Implementa il cuore della Distributed Anomaly Analysis.
+     * Discovery (Lista): Ricerca dei cluster.
+     * Centralizza la logica del tempo usando il TimeFilterStage per coerenza globale.
      */
-    async getCampaigns({ 
-        timeConfig = {}, 
-        minIps = 2, 
-        minScore = 0,
-        page = 1,
-        pageSize = 10
-    }: { 
-        timeConfig?: any, 
-        minIps?: number, 
-        minScore?: number,
-        page?: number,
-        pageSize?: number 
-    } = {}) {
-        const startTimeProc = Date.now();
-        this.logger.info(`[CampaignService] Discovery START - Params: page=${page}, size=${pageSize}, minIps=${minIps}, minScore=${minScore}`);
-        
-        const mongoFilters: any = {};
+    async getCampaigns(params: any) {
+        const { minIps = 2, minScore = 0, page = 1, pageSize = 10, timeConfig = {} } = params;
 
-        // Applichiamo il filtro temporale se presente
-        if (timeConfig && (timeConfig.startTime || timeConfig.endTime)) {
-            const timeFilter: any = {};
-            if (timeConfig.startTime) timeFilter.$gte = new Date(timeConfig.startTime);
-            if (timeConfig.endTime) timeFilter.$lte = new Date(timeConfig.endTime);
-            mongoFilters.timestamp = timeFilter;
+        // 1. Filtro Score (applicato subito alla base log)
+        const baseFilters: any = {};
+        const score = Number(minScore || 0);
+        if (score > 0) baseFilters['fingerprint.score'] = { $gt: score };
+
+        // 2. Generazione automatica dello stage temporale (gestisce ago e range in modo solido)
+        // Mappiamo agoValue/agoUnit sui nomi attesi dal TimeFilterStage (minutes, hours, days, etc.)
+        const timeParams = { ...timeConfig };
+        if (timeConfig.timeMode === 'ago' && timeConfig.agoUnit && timeConfig.agoValue) {
+            timeParams[timeConfig.agoUnit] = timeConfig.agoValue;
         }
-
-        // Filtro di severità (rumore di fondo) - di default esclude score 0 o mancanti
-        mongoFilters['fingerprint.score'] = { $gt: minScore };
+        const timeStage = new TimeFilterStage(timeParams).generate();
 
         const pipeline = [
-            { $match: mongoFilters },
+            ...timeStage, // Lo stage temporale è il primo per performance
+            { $match: baseFilters },
             {
                 $group: {
                     _id: '$fingerprint.hash',
                     ips: { $addToSet: '$request.ip' },
-                    totalLogs: { $sum: 1 },
+                    totaleLogs: { $sum: 1 },
                     firstSeen: { $min: '$timestamp' },
                     lastSeen: { $max: '$timestamp' },
-                    sampleUrl: { $first: '$request.url' }
+                    sampleUrl: { $first: '$request.url' },
+                    sumScore: { $sum: '$fingerprint.score' }
                 }
             },
             {
@@ -61,84 +51,63 @@ export class CampaignService {
                     hash: '$_id',
                     ips: 1,
                     ipCount: { $size: '$ips' },
-                    totalLogs: 1,
+                    totaleLogs: 1,
                     firstSeen: 1,
                     lastSeen: 1,
-                    sampleUrl: 1
+                    sampleUrl: 1,
+                    averageScore: { $divide: ['$sumScore', '$totaleLogs'] }
                 }
             },
-            // Filtriamo solo pattern usati da almeno N IP (default 2)
-            { $match: { ipCount: { $gte: minIps }, hash: { $ne: null } } },
-            { $sort: { ipCount: -1 as const, totalLogs: -1 as const } },
-            // Paginazione server-side tramite $facet
+            { $match: { ipCount: { $gte: Number(minIps) }, hash: { $ne: null } } },
+            { $sort: { ipCount: -1 as const, totaleLogs: -1 as const } },
             {
                 $facet: {
                     metadata: [{ $count: "total" }],
-                    data: [
-                        { $skip: (page - 1) * pageSize },
-                        { $limit: pageSize }
-                    ]
+                    data: [{ $skip: (page - 1) * pageSize }, { $limit: pageSize }]
                 }
             }
         ];
 
         try {
-            const [result] = await ThreatLog.aggregate(pipeline);
-            const duration = Date.now() - startTimeProc;
-            
-            const total = result.metadata[0]?.total || 0;
-            const campaigns = result.data || [];
-            
-            this.logger.info(`[CampaignService] Discovery COMPLETED in ${duration}ms - Page ${page}: ${campaigns.length}/${total} campaigns`);
-            
-            return {
-                campaigns,
-                total
+            const [result] = await ThreatLog.aggregate(pipeline).allowDiskUse(true);
+            return { 
+                campaigns: result?.data || [], 
+                count: result?.metadata[0]?.total || 0 
             };
-        } catch (err) {
-            this.logger.error(`[CampaignService] Discovery FAILED after ${Date.now() - startTimeProc}ms:`, err);
+        } catch (err: any) {
+            this.logger.error(`[CampaignService] Discovery Error: ${err.message}`);
             throw err;
         }
     }
 
     /**
-     * Analisi forense aggregata per una campagna distribuita.
+     * Dettaglio (Forensics): Analisi profonda dello stesso cluster.
      */
-    async getCampaignDetail({
-        ips,
-        hash,
-        minLogsForAttack = 1,
-        minScore = 0,
-        timeConfig = {}
-    }: {
-        ips?: string[];
-        hash: string;
-        minLogsForAttack?: number;
-        minScore?: number;
-        timeConfig?: any;
-    }) {
-        this.logger.info(`[CampaignService] Detail Fetch START - Hash: ${hash}, minLogsForAttack: ${minLogsForAttack}, minScore: ${minScore}`);
-        
-        const mongoFilters: any = { 
-            'fingerprint.hash': hash
-        };
+    async getCampaignDetail(params: any) {
+        const { hash, minScore = 0, timeConfig = {}, minLogsForAttack = 1 } = params;
 
-        if (minScore > 0) {
-            mongoFilters['fingerprint.score'] = { $gt: minScore };
-        }
-        
-        if (ips && ips.length > 0) {
-            mongoFilters['request.ip'] = { $in: ips };
+        const baseFilters: any = { 'fingerprint.hash': hash };
+        const score = Number(minScore || 0);
+        if (score > 0) baseFilters['fingerprint.score'] = { $gt: score };
+
+        // Normalizzazione parametri tempo per la pipeline forense
+        const timeParams = { ...timeConfig };
+        if (timeConfig.timeMode === 'ago' && timeConfig.agoUnit && timeConfig.agoValue) {
+            timeParams[timeConfig.agoUnit] = timeConfig.agoValue;
         }
 
-        // Pipeline specifica per raggruppare per HASH (il pattern della campagna)
         const pipeline = await this.forensicPipelineService.buildCampaignPipeline(
-            mongoFilters, 
+            baseFilters, 
             minLogsForAttack, 
-            timeConfig
+            timeParams
         );
 
-        const [campaign] = await ThreatLog.aggregate(pipeline).allowDiskUse(true);
-        return campaign || null;
+        try {
+            const [campaign] = await ThreatLog.aggregate(pipeline).allowDiskUse(true);
+            return campaign || null;
+        } catch (err: any) {
+            this.logger.error(`[CampaignService] Detail Error: ${err.message}`);
+            throw err;
+        }
     }
 }

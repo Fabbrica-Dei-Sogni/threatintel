@@ -19,22 +19,21 @@ export class TimeFilterStage implements PipelineStage {
             return null;
         };
 
-        // Gestione intervallo da fromDate e toDate (prioritaria se presenti)
-        if (this.timeConfig.fromDate && this.timeConfig.toDate) {
-            timeAgo = parseDate(this.timeConfig.fromDate);
-            const toDateParsed = parseDate(this.timeConfig.toDate);
-            if (toDateParsed) {
-                // End of day for toDate if it came from date picker string
-                toDateParsed.setHours(23, 59, 59, 999);
-                timeToStart = toDateParsed;
-            }
-        } else if (this.timeConfig.fromDate) {
-            timeAgo = parseDate(this.timeConfig.fromDate);
-        } else if (this.timeConfig.toDate) {
-            const toDateParsed = parseDate(this.timeConfig.toDate);
-            if (toDateParsed) {
-                toDateParsed.setHours(23, 59, 59, 999);
-                timeToStart = toDateParsed;
+        const fromStr = this.timeConfig.fromDate || this.timeConfig.startTime || this.timeConfig.start;
+        const toStr = this.timeConfig.toDate || this.timeConfig.endTime || this.timeConfig.end;
+
+        // Gestione intervallo da date assolute (prioritaria se presenti)
+        if (fromStr || toStr) {
+            if (fromStr) timeAgo = parseDate(fromStr);
+            if (toStr) {
+                const toDateParsed = parseDate(toStr);
+                if (toDateParsed) {
+                    // Se la data è solo YYYY-MM-DD, impostiamo alla fine del giorno
+                    if (typeof toStr === 'string' && toStr.length <= 10) {
+                        toDateParsed.setHours(23, 59, 59, 999);
+                    }
+                    timeToStart = toDateParsed;
+                }
             }
         } else {
             // Caso 1: Solo periodo finale (timeAgo) - dal passato ad ora

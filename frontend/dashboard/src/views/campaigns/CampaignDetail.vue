@@ -42,10 +42,10 @@
         <div class="forensic-card full-width">
           <div class="card-title">{{ t('campaignDetail.commonTechniques') }}</div>
           <div class="techniques-list">
-             <div v-for="tech in (campaign.techniques || [])" :key="tech" class="tech-tag">
+             <div v-for="tech in (campaign.attackPatterns || [])" :key="tech" class="tech-tag">
                 {{ tech }}
              </div>
-             <div v-if="(!campaign.techniques || campaign.techniques.length === 0)" class="no-tech">
+             <div v-if="(!campaign.attackPatterns || campaign.attackPatterns.length === 0)" class="no-tech">
                 {{ t('common.noDataFound') }}
              </div>
           </div>
@@ -119,16 +119,20 @@ const loading = ref(true);
 async function loadCampaign() {
   loading.value = true;
   try {
-    const timeConfig = props.timeMode === 'ago' 
-      ? { [props.agoUnit]: props.agoValue } 
-      : {};
-
     const data = await fetchCampaignDetail({
       hash: props.hash,
+      ips: [], 
       minLogsForAttack: props.minLogsForAttack,
       minScore: props.minScore,
-      timeConfig
+      timeConfig: {
+        startTime: route.query.customStartTime,
+        endTime: route.query.customEndTime,
+        timeMode: props.timeMode,
+        agoValue: props.agoValue,
+        agoUnit: props.agoUnit
+      }
     });
+    
     campaign.value = data;
   } catch (err) {
     console.error('[CampaignDetail] Error loading campaign:', err);

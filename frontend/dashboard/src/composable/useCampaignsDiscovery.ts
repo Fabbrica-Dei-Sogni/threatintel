@@ -1,4 +1,4 @@
-import { ref, isRef, computed, type Ref } from 'vue';
+import { ref, isRef, type Ref } from 'vue';
 import { fetchCampaigns } from '../api/index.js';
 import { useSearchBase } from './useSearchBase';
 
@@ -16,57 +16,50 @@ export function useCampaignsDiscovery(
     initialTimeMode: ('ago' | 'range') | Ref<'ago' | 'range'>,
     initialAgoValue: (number | null) | Ref<number | null>,
     initialAgoUnit: (string | null) | Ref<string | null>,
-    initialPageSize: number | Ref<number> = 10
+    initialPageSize: number | Ref<number> = 10,
+    initialStartDate: (string | null) | Ref<string | null> = null,
+    initialEndDate: (string | null) | Ref<string | null> = null
 ) {
     const minIps = toRef(initialMinIps);
     const minScore = toRef(initialMinScore);
     const timeMode = toRef(initialTimeMode);
     const agoValue = toRef(initialAgoValue);
     const agoUnit = toRef(initialAgoUnit);
+    const startDate = toRef(initialStartDate);
+    const endDate = toRef(initialEndDate);
     
     const campaigns = ref<any[]>([]);
-
+    
     const filterRefs = [
         minIps,
         minScore,
         timeMode,
         agoValue,
-        agoUnit
+        agoUnit,
+        startDate,
+        endDate
     ];
 
     async function fetchData() {
         loading.value = true;
         error.value = null;
 
-        let startTime: string | undefined;
-        let endTime: string | undefined;
-
-        if (timeMode.value === 'ago' && agoValue.value) {
-            const now = new Date();
-            const start = new Date();
-            const unit = agoUnit.value || 'days';
-            const val = agoValue.value || 0;
-
-            if (unit === 'minutes') start.setMinutes(now.getMinutes() - val);
-            else if (unit === 'hours') start.setHours(now.getHours() - val);
-            else if (unit === 'days') start.setDate(now.getDate() - val);
-            else if (unit === 'months') start.setMonth(now.getMonth() - val);
-            else if (unit === 'years') start.setFullYear(now.getFullYear() - val);
-
-            startTime = start.toISOString();
-        }
-
         try {
             const response = await fetchCampaigns({
-                startTime,
-                endTime,
+                timeMode: timeMode.value,
+                agoValue: agoValue.value,
+                agoUnit: agoUnit.value,
+                startTime: startDate.value,
+                endTime: endDate.value,
                 minIps: minIps.value,
                 minScore: minScore.value,
                 page: page.value,
                 pageSize: pageSize.value
             });
+            
             campaigns.value = response.campaigns || [];
             total.value = response.count || campaigns.value.length;
+            
         } catch (err) {
             console.error('[useCampaignsDiscovery] Error:', err);
             error.value = true;

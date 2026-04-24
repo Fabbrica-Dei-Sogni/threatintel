@@ -518,13 +518,19 @@ export async function exportDossier(id: string, format: string = 'pdf', style: s
 export async function fetchCampaigns({
     startTime,
     endTime,
+    timeMode,
+    agoValue,
+    agoUnit,
     minIps = 2,
     minScore = 0,
     page = 1,
     pageSize = 10
 }: {
-    startTime?: string;
-    endTime?: string;
+    startTime?: string | null;
+    endTime?: string | null;
+    timeMode?: string;
+    agoValue?: number | null;
+    agoUnit?: string | null;
     minIps?: number;
     minScore?: number;
     page?: number;
@@ -532,7 +538,7 @@ export async function fetchCampaigns({
 } = {}): Promise<any> {
     try {
         const response = await apiClient.get('/campaigns', {
-            params: { startTime, endTime, minIps, minScore, page, pageSize }
+            params: { startTime, endTime, timeMode, agoValue, agoUnit, minIps, minScore, page, pageSize }
         });
         return response.data;
     } catch (error) {

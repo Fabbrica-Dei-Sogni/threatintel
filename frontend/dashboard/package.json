@@ -1,7 +1,9 @@
 {
     "name": "honeypot-dashboard",
     "version": "0.1.1",
-    "private": true,
+    "publishConfig": {
+        "registry": "http://alessandromodica.com:8081/repository/npm-cloud-pubblico/"
+    },
     "scripts": {
         "dev": "vite --config vite.config.ts --host",
         "build": "vue-tsc -p tsconfig.app.json --noEmit && vite build --config vite.config.ts",
@@ -10,7 +12,9 @@
         "type-check": "vue-tsc -p tsconfig.app.json --noEmit",
         "type-check:all": "vue-tsc --noEmit",
         "test": "vitest",
-        "test:coverage": "vitest run --coverage"
+        "test:coverage": "vitest run --coverage",
+        "release": "npm version $npm_config_versione -m 'Rilasciata una nuova release frontend' && git push",
+        "patch": "npm version patch -m 'Rilasciata una nuova patch frontend' && git push"
     },
 
     "dependencies": {

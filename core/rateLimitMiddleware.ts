@@ -46,6 +46,33 @@ export class RateLimitMiddleware {
         private readonly rateLimitService: RateLimitService
     ) {}
 
+    public async removeIPFromBlacklist(ip: string) {
+        if (!redisClient) {
+            throw new Error('Redis non disponibile');
+        }
+
+        // Rimozione ip da blacklist redis
+        await redisClient.srem('blacklisted-ips', ip);
+        await redisClient.del(`blacklist:${ip}`);
+        await redisClient.del(`violations:${ip}`);
+        
+        // Pulizia contatori rate limit (pattern matching semplificato o chiavi note)
+        const keysToDel = [
+            `ddos:${ip}`,
+            `app:${ip}`,
+            `trap:${ip}`
+        ];
+        
+        for (const key of keysToDel) {
+            await redisClient.del(key);
+        }
+
+        // Le chiavi 'critical' includono il path, potremmo averne diverse. 
+        // Cerchiamole via pattern se necessario, ma intanto puliamo le principali.
+
+        this.logger.info(`[BLACKLIST-REMOVE] IP ${ip} rimosso dalla blacklist e contatori resettati.`);
+    }
+
     public async manualBlacklistIP(ip: string) {
         if (!redisClient) {
             throw new Error('Redis non disponibile');
@@ -123,6 +150,61 @@ export class RateLimitMiddleware {
         };
     }
 
+    // Helper per verificare se un IP è escluso (whitelist)
+    private isExcluded(req: any): boolean {
+        // Logica specifica richiesta dall'utente: skip se naviga alla location dominio/honeypot
+        const pathStr = req.originalUrl || req.path || '';
+        const isHoneypotPath = pathStr.toLowerCase().includes('honeypot');
+
+        if (isHoneypotPath) {
+            this.logger.debug(`[WHITELIST-BYPASS] IP ${req.ip} allowed for honeypot path: ${pathStr}`);
+            return true;
+        }
+
+        const excludedIPs = (process.env.EXCLUDED_IPS || '').split(',').map((ip) => ip.trim()).filter(Boolean);
+        const clientIp = req.ip || 'unknown';
+
+        if (excludedIPs.includes(clientIp)) {
+            this.logger.debug(`[WHITELIST-BYPASS] IP ${clientIp} allowed by EXCLUDED_IPS`);
+            return true;
+        }
+
+        // Supporto per CIDR semplificato (es. 192.168.1.0/24)
+        for (const range of excludedIPs) {
+            if (range.includes('/')) {
+                try {
+                    const [rangeIp, prefix] = range.split('/');
+                    const mask = parseInt(prefix, 10);
+                    if (this.ipInSubnet(clientIp, rangeIp, mask)) return true;
+                } catch (e) {
+                    continue;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private ipInSubnet(ip: string, subnet: string, mask: number): boolean {
+        // Implementazione semplificata per IPv4
+        const ipToLong = (addr: string) => {
+            const parts = addr.split('.');
+            if (parts.length !== 4) return null;
+            return parts.reduce((acc, octet) => (acc << 8) + parseInt(octet, 10), 0) >>> 0;
+        };
+
+        try {
+            const ipLong = ipToLong(ip);
+            const subnetLong = ipToLong(subnet);
+            if (ipLong === null || subnetLong === null) return false;
+
+            const maskLong = (0xFFFFFFFF << (32 - mask)) >>> 0;
+            return (ipLong & maskLong) === (subnetLong & maskLong);
+        } catch (e) {
+            return false;
+        }
+    }
+
     // 1. Protezione DDoS generale (applicata a tutte le richieste)
     public ddosProtectionLimiter() {
         return rateLimit({
@@ -134,10 +216,7 @@ export class RateLimitMiddleware {
             legacyHeaders: false,
             handler: this.createRateLimitHandler('ddos-protection'),
             keyGenerator: (req, res) => `ddos:${ipKeyGenerator(req.ip || 'unknown')}`,
-            skip: (req: any) => {
-                const excludedIPs = (process.env.EXCLUDED_IPS || '').split(',').map((ip) => ip.trim()).filter(Boolean);
-                return excludedIPs.includes(req.ip);
-            }
+            skip: (req) => this.isExcluded(req)
         });
     }
 
@@ -152,7 +231,8 @@ export class RateLimitMiddleware {
             legacyHeaders: false,
             handler: this.createRateLimitHandler('critical-endpoints'),
             keyGenerator: (req, res) => `critical:${ipKeyGenerator(req.ip || 'unknown')}:${req.path}`,
-            skipSuccessfulRequests: false // Conta anche richieste "riuscite" per honeypot
+            skipSuccessfulRequests: false, // Conta anche richieste "riuscite" per honeypot
+            skip: (req) => this.isExcluded(req)
         });
     }
 
@@ -167,6 +247,7 @@ export class RateLimitMiddleware {
             legacyHeaders: false,
             handler: this.createRateLimitHandler('trap-endpoints'),
             keyGenerator: (req, res) => `trap:${ipKeyGenerator(req.ip || 'unknown')}`,
+            skip: (req) => this.isExcluded(req)
         });
     }
 
@@ -180,7 +261,8 @@ export class RateLimitMiddleware {
             standardHeaders: true,
             legacyHeaders: false,
             handler: this.createRateLimitHandler('application'),
-            keyGenerator: (req, res) => `app:${ipKeyGenerator(req.ip || 'unknown')}`
+            keyGenerator: (req, res) => `app:${ipKeyGenerator(req.ip || 'unknown')}`,
+            skip: (req) => this.isExcluded(req)
         });
     }
 
@@ -189,20 +271,38 @@ export class RateLimitMiddleware {
         return async (req: any, res: any, next: any) => {
             const ip = req.ip;
 
-            // Controlla blacklist dinamica
+            // 1. PRIORITÀ ASSOLUTA: Bypass per navigazione protetta /honeypot e chiamate API legittime
+            const pathStr = (req.originalUrl || req.path || req.url || '').toLowerCase();
+            
+            // Bypass se l'URL contiene 'honeypot' O se è una chiamata API (le API sono protette da AuthMiddleware dopo)
+            if (pathStr.includes('honeypot') || pathStr.startsWith('/api/')) {
+                // Log solo per honeypot per non intasare i log
+                if (pathStr.includes('honeypot')) {
+                    console.log(`[DEBUG-BYPASS] IP ${ip} sta accedendo a: ${pathStr} - BYPASS ATTIVATO`);
+                }
+                return next();
+            }
+
+            // 2. Salta se l'IP è in whitelist (EXCLUDED_IPS)
+            if (this.isExcluded(req)) {
+                return next();
+            }
+
+            // 3. Controlla blacklist dinamica
             if (redisClient) {
                 try {
                     const isBlacklisted = await redisClient.sismember('blacklisted-ips', ip);
                     if (isBlacklisted) {
                         const blacklistTTL = await redisClient.ttl(`blacklist:${ip}`);
 
-                        this.logger.warn(`[BLACKLISTED] IP ${ip} attempted access while blacklisted`);
+                        this.logger.warn(`[BLACKLISTED] IP ${ip} attempted access to ${pathStr} while blacklisted`);
 
                         return res.status(403).json({
                             error: 'IP temporarily blacklisted',
                             reason: 'Repeated rate limit violations',
                             unblockIn: blacklistTTL > 0 ? `${blacklistTTL} seconds` : 'soon',
-                            honeypotId: process.env.HONEYPOT_INSTANCE_ID
+                            honeypotId: process.env.HONEYPOT_INSTANCE_ID,
+                            debugPath: pathStr // Ti aggiungo questo per capire cosa vede il server
                         });
                     }
                 } catch (error: any) {
@@ -215,29 +315,37 @@ export class RateLimitMiddleware {
             const self = this;
             res.send = function (data: any) {
                 if (res.statusCode === 429 && redisClient) {
-                    // Traccia violazione per blacklist automatica
-                    (async () => {
-                        try {
-                            const violationKey = `violations:${ip}`;
-                            const violations = await redisClient.incr(violationKey);
+                    // Verifica se il path è escluso dal tracking delle violazioni (es. navigazione sicura)
+                    const whitelistPaths = (process.env.WHITELIST_PATHS_FROM_BLACKLIST || '/,/favicon.ico,/login').split(',').map(p => p.trim());
+                    const isWhitelistedPath = req.method === 'GET' && whitelistPaths.includes(req.path);
 
-                            if (violations === 1) {
-                                await redisClient.expire(violationKey, 3600); // 1 ora window
+                    if (!isWhitelistedPath) {
+                        // Traccia violazione per blacklist automatica
+                        (async () => {
+                            try {
+                                const violationKey = `violations:${ip}`;
+                                const violations = await redisClient.incr(violationKey);
+
+                                if (violations === 1) {
+                                    await redisClient.expire(violationKey, 3600); // 1 ora window
+                                }
+
+                                const maxViolations = parseInt(process.env.MAX_VIOLATIONS || '5', 10);
+                                if (violations >= maxViolations) {
+                                    // Blacklist temporanea
+                                    const blacklistDuration = parseInt(process.env.BLACKLIST_DURATION || '7200', 10);
+                                    await redisClient.sadd('blacklisted-ips', ip);
+                                    await redisClient.setex(`blacklist:${ip}`, blacklistDuration, 'auto-blacklisted');
+
+                                    self.logger.error(`[AUTO-BLACKLIST] IP ${ip} blacklisted for ${violations} violations on ${req.path}`);
+                                }
+                            } catch (error: any) {
+                                self.logger.error('[VIOLATION-TRACK] Redis error:', error.message);
                             }
-
-                            const maxViolations = parseInt(process.env.MAX_VIOLATIONS || '5', 10);
-                            if (violations >= maxViolations) {
-                                // Blacklist temporanea
-                                const blacklistDuration = parseInt(process.env.BLACKLIST_DURATION || '7200', 10);
-                                await redisClient.sadd('blacklisted-ips', ip);
-                                await redisClient.setex(`blacklist:${ip}`, blacklistDuration, 'auto-blacklisted');
-
-                                self.logger.error(`[AUTO-BLACKLIST] IP ${ip} blacklisted for ${violations} violations`);
-                            }
-                        } catch (error: any) {
-                            self.logger.error('[VIOLATION-TRACK] Redis error:', error.message);
-                        }
-                    })();
+                        })();
+                    } else {
+                        self.logger.info(`[VIOLATION-SKIP] Skipping violation track for ${ip} on whitelisted path: ${req.path}`);
+                    }
                 }
                 return originalSend.call(this, data);
             };

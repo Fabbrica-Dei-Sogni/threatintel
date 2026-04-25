@@ -95,36 +95,9 @@
         </div>
       </section>
 
-      <!-- Top Pagination -->
-      <div v-if="total > 0" class="pagination cyber-pagination top-pagination">
-        <div class="pagination-main">
-          <button :disabled="page === 1" @click="page--" class="nav-btn">◄ {{ t('common.prev') }}</button>
-          <span class="pagination-info cyber-pagination-info">
-            {{ t('common.page') }} {{ page }} {{ t('common.of') }} {{ Math.ceil(total / pageSize) }}
-          </span>
-          <button :disabled="page >= Math.ceil(total / pageSize)" @click="page++" class="nav-btn">{{ t('common.next') }} ►</button>
-        </div>
-
-        <div class="pagination-tools">
-          <div class="page-size-selector">
-            <span class="selector-label">{{ t('common.show') }}:</span>
-            <div class="size-options">
-              <button v-for="size in [10, 20, 50, 100]" :key="size" 
-                      :class="{ active: pageSize === size }"
-                      @click="pageSize = size; page = 1"
-                      class="size-btn">
-                {{ size }}
-              </button>
-            </div>
-          </div>
-
-          <div class="cyber-page-input-container">
-            <label for="pageInputTop">{{ t('common.goToPage') }}</label>
-            <input class="cyber-pagination-input" id="pageInputTop" type="number" 
-                   v-model.number="inputPage" :min="1" :max="Math.ceil(total / pageSize)" 
-                   @keyup.enter="goToPage" />
-          </div>
-        </div>
+      <!-- Top Pager -->
+      <div v-if="total > 0" class="pager-container top-pager">
+        <CyberPager v-model:page="page" v-model:pageSize="pageSize" :total="total" />
       </div>
 
       <!-- Grid -->
@@ -145,25 +118,25 @@
 
         <div v-for="campaign in campaigns" :key="campaign.hash" class="campaign-card"
           @click="goToDetail(campaign.hash)">
-          <div class="card-header">
-            <div class="hash-badge">
-              {{ t('campaigns.table.hash') }}: {{ campaign.hash.substring(0, 8) }}
+          
+          <div class="card-metrics-grid">
+            <div class="metric-box">
+              <span class="box-label">{{ t('campaigns.table.ips').toUpperCase() }}</span>
+              <span class="box-value">{{ campaign.ipCount }}</span>
             </div>
-            <div class="cluster-size">
-              <span class="size-val">{{ campaign.ipCount }}</span>
-              <span class="size-label">{{ t('campaigns.ipsInvolved').toUpperCase() }}</span>
+            <div class="metric-box">
+              <span class="box-label">{{ t('campaigns.table.logs').toUpperCase() }}</span>
+              <span class="box-value">{{ campaign.totaleLogs }}</span>
+            </div>
+            <div class="metric-box" :class="getScoreClass(campaign.averageScore)">
+              <span class="box-label">{{ t('attackDetail.avgScore').toUpperCase() }}</span>
+              <span class="box-value">{{ campaign.averageScore?.toFixed(1) || '0.0' }}</span>
             </div>
           </div>
 
-          <div class="card-metrics">
-            <div class="metric-item">
-              <span class="metric-label">{{ t('campaigns.totalLogs') }}</span>
-              <span class="metric-value">{{ campaign.totaleLogs }}</span>
-            </div>
-            <div class="metric-item">
-              <span class="metric-label">{{ t('common.sample_url').toUpperCase() }}</span>
-              <span class="metric-value" :title="campaign.sampleUrl">{{ campaign.sampleUrl || '/' }}</span>
-            </div>
+          <div class="card-target">
+             <span class="target-label">{{ t('common.sample_url').toUpperCase() }}</span>
+             <span class="target-value" :title="campaign.sampleUrl">{{ campaign.sampleUrl || '/' }}</span>
           </div>
 
           <div class="card-techniques" v-if="campaign.attackPatterns?.length">
@@ -188,43 +161,16 @@
         </div>
       </transition-group>
 
-      <!-- Bottom Pagination -->
-      <div v-if="total > 0" class="pagination cyber-pagination">
-        <div class="pagination-main">
-          <button :disabled="page === 1" @click="page--" class="nav-btn">◄ {{ t('common.prev') }}</button>
-          <span class="pagination-info cyber-pagination-info">
-            {{ t('common.page') }} {{ page }} {{ t('common.of') }} {{ Math.ceil(total / pageSize) }}
-          </span>
-          <button :disabled="page >= Math.ceil(total / pageSize)" @click="page++" class="nav-btn">{{ t('common.next') }} ►</button>
-        </div>
-
-        <div class="pagination-tools">
-          <div class="page-size-selector">
-            <span class="selector-label">{{ t('common.show') }}:</span>
-            <div class="size-options">
-              <button v-for="size in [10, 20, 50, 100]" :key="size" 
-                      :class="{ active: pageSize === size }"
-                      @click="pageSize = size; page = 1"
-                      class="size-btn">
-                {{ size }}
-              </button>
-            </div>
-          </div>
-
-          <div class="cyber-page-input-container">
-            <label for="pageInputBottom">{{ t('common.goToPage') }}</label>
-            <input class="cyber-pagination-input" id="pageInputBottom" type="number" 
-                   v-model.number="inputPage" :min="1" :max="Math.ceil(total / pageSize)" 
-                   @keyup.enter="goToPage" />
-          </div>
-        </div>
+      <!-- Bottom Pager -->
+      <div v-if="total > 0" class="pager-container bottom-pager">
+        <CyberPager v-model:page="page" v-model:pageSize="pageSize" :total="total" />
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { computed, toRef, ref, watch } from 'vue';
+import { computed, toRef } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { storeToRefs } from 'pinia';
@@ -233,6 +179,7 @@ import { useCampaignsStore } from '../../../stores/campaigns';
 import { useCampaignsDiscovery } from '../../../composable/useCampaignsDiscovery';
 import GlobalHeader from '../../../components/GlobalHeader.vue';
 import ProtocolSelector from '../../../components/common/ProtocolSelector.vue';
+import CyberPager from '../../../components/common/CyberPager.vue';
 import { formatFullDateTime, formatHumanDuration } from '../../../utils/dateUtils';
 import { generateSmartScale, generateScoreScale, generateTimeScale } from '../../../utils/filterUtils';
 import dayjs from 'dayjs';
@@ -287,24 +234,6 @@ const dynamicLogsPerIpScale = computed(() => {
   return generateSmartScale(minLogsPerIp, maxLogsPerIp);
 });
 
-// Logica paginazione standard
-const inputPage = ref(page.value);
-watch(page, (newVal) => {
-  inputPage.value = newVal;
-});
-
-function goToPage() {
-  const p = parseInt(inputPage.value);
-  if (isNaN(p)) {
-    inputPage.value = page.value;
-    return;
-  }
-  const max = Math.ceil(total.value / pageSize.value);
-  if (p < 1) page.value = 1;
-  else if (p > max) page.value = max;
-  else page.value = p;
-}
-
 function formatDate(ts) {
   return formatFullDateTime(ts);
 }
@@ -315,12 +244,20 @@ function computeDuration(start, end) {
   return formatHumanDuration(diff, t);
 }
 
+function getScoreClass(score) {
+  if (score >= 80) return 'danger-high';
+  if (score >= 50) return 'danger-medium';
+  if (score >= 20) return 'danger-low';
+  return 'danger-info';
+}
+
 function goToDetail(hash) {
   const query = {
     timeMode: campaignsStore.state.filters.timeMode,
     agoValue: campaignsStore.state.filters.agoValue,
     agoUnit: campaignsStore.state.filters.agoUnit,
     minScore: campaignsStore.state.filters.minScore,
+    minLogsPerIp: campaignsStore.state.filters.minLogsPerIp,
     protocol: campaignsStore.state.filters.protocol
   };
 
@@ -350,4 +287,10 @@ function goToLogs() {
 <style scoped src="./CampaignsList.css"></style>
 <style scoped>
 @import "./CampaignsListCyber.css";
+
+.pager-container {
+  margin: 20px 0;
+  display: flex;
+  justify-content: center;
+}
 </style>

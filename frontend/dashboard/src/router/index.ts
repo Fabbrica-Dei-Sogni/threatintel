@@ -179,11 +179,12 @@ const routes: RouteRecordRaw[] = [
         component: () => import('../views/campaigns/campaign-detail/CampaignDetail.vue'),
         props: (route: RouteLocationNormalized) => ({
             hash: route.params.hash,
-            minLogsForAttack: route.query.minLogs ? parseInt(route.query.minLogs as string) : 1,
+            minLogsPerIp: route.query.minLogsPerIp ? parseInt(route.query.minLogsPerIp as string) : 1,
             timeMode: route.query.timeMode || 'ago',
-            agoValue: route.query.agoValue ? parseInt(route.query.agoValue as string) : 30,
-            agoUnit: route.query.agoUnit || 'days',
-            minScore: route.query.minScore ? parseInt(route.query.minScore as string) : 0
+            agoValue: route.query.agoValue ? (route.query.agoValue === 'null' ? null : parseInt(route.query.agoValue as string)) : null,
+            agoUnit: route.query.agoUnit || null,
+            minScore: route.query.minScore ? parseInt(route.query.minScore as string) : 0,
+            protocol: route.query.protocol || null
         })
     }
 ];

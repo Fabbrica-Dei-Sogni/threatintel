@@ -74,11 +74,21 @@
   box-shadow: 0 0 15px var(--cy-primary) !important;
 }
 
-.skin-cyber.campaigns-page .size-val {
-  color: var(--cy-primary) !important;
-  text-shadow: 0 0 10px var(--cy-primary);
+.skin-cyber.campaigns-page .metric-box {
+  background: rgba(0, 0, 0, 0.4) !important;
+  border-color: var(--cy-border) !important;
 }
 
-.skin-cyber.campaigns-page .stat-item .label {
+.skin-cyber.campaigns-page .metric-box:hover {
+  border-color: var(--cy-primary) !important;
+  background: rgba(var(--cy-primary-rgb), 0.1) !important;
+}
+
+.skin-cyber.campaigns-page .box-value {
+  color: #fff;
+}
+
+.skin-cyber.campaigns-page .metric-box.danger-info .box-value {
   color: var(--cy-primary) !important;
+  text-shadow: 0 0 10px var(--cy-primary);
 }

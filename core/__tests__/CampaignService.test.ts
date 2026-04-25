@@ -53,20 +53,17 @@ describe('CampaignService', () => {
                 { id: '4', request: { ip: '4.4.4.4', url: '/other' }, fingerprint: { hash: 'UNIQUE', score: 10 }, timestamp: new Date() }
             ]);
 
-            const result = await service.getCampaigns({ minIps: 2 });
+            const result = await service.getCampaigns({ minIps: 2, minLogsPerIp: 1 });
             const campaigns = result.campaigns;
 
             expect(campaigns).toHaveLength(1);
             expect(campaigns[0].hash).toBe(hash);
             expect(campaigns[0].ipCount).toBe(3);
-            expect(campaigns[0].ips).toContain('1.1.1.1');
-            expect(campaigns[0].ips).toContain('2.2.2.2');
-            expect(campaigns[0].ips).toContain('3.3.3.3');
         });
     });
 
     describe('getCampaignDetail (Forensics)', () => {
-        it('should aggregate logs from multiple IPs into a single campaign object', async () => {
+        it('should aggregate nodes from multiple IPs into a campaign detail object', async () => {
             const hash = 'CAMPAIGN-HASH';
 
             await ThreatLog.create([
@@ -77,16 +74,19 @@ describe('CampaignService', () => {
 
             const campaign = await service.getCampaignDetail({
                 hash,
-                ips: ['10.0.0.1', '10.0.0.2'],
-                minLogsForAttack: 1
+                minLogsPerIp: 1
             });
 
             expect(campaign).toBeDefined();
-            expect(campaign._id).toBe(hash);
+            expect(campaign.hash).toBe(hash);
             expect(campaign.totaleLogs).toBe(2);
-            // Verify it used the Forensic Pipeline (check some fields added by stages)
-            expect(campaign.logsRaggruppati).toBeDefined();
-            expect(campaign.logsRaggruppati).toHaveLength(2);
+            expect(campaign.ipCount).toBe(2);
+            
+            // Verify enriched nodes
+            expect(campaign.nodes).toBeDefined();
+            expect(campaign.nodes).toHaveLength(2);
+            expect(campaign.nodes[0].ip).toBeDefined();
+            expect(campaign.nodes[0].totaleLogs).toBe(1);
         });
     });
 });

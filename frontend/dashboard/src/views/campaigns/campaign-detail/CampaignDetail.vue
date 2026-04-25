@@ -23,9 +23,9 @@
       <header class="detail-header">
         <div class="title-section">
           <span class="hash-title">{{ t('campaigns.patternHash') }}: {{ hash }}</span>
-          <div class="target-uri-container" v-if="campaign.request?.url">
+          <div class="target-uri-container" v-if="campaign.sampleUrl">
              <span class="target-label">{{ t('common.sample_url').toUpperCase() }}:</span>
-             <span class="target-value">{{ campaign.request.url }}</span>
+             <span class="target-value">{{ campaign.sampleUrl }}</span>
           </div>
         </div>
       </header>
@@ -46,21 +46,6 @@
         </div>
       </section>
 
-      <!-- Common Techniques / Indicators -->
-      <section class="forensic-grid">
-        <div class="forensic-card full-width">
-          <div class="card-title">{{ t('campaignDetail.commonTechniques') }}</div>
-          <div class="techniques-list">
-             <div v-for="tech in (campaign.attackPatterns || [])" :key="tech" class="tech-tag">
-                {{ tech }}
-             </div>
-             <div v-if="(!campaign.attackPatterns || campaign.attackPatterns.length === 0)" class="no-tech">
-                {{ t('common.noDataFound') }}
-             </div>
-          </div>
-        </div>
-      </section>
-
       <!-- Campaign Timeline Summary -->
       <section class="forensic-grid">
         <div class="forensic-card">
@@ -77,19 +62,64 @@
         </div>
       </section>
 
-      <!-- Cluster Nodes Map -->
+      <!-- Enriched Cluster Nodes List -->
       <section class="cluster-section">
-        <div class="card-title">{{ t('campaignDetail.ipList') }}</div>
-        <div class="cluster-nodes-grid">
-          <div v-for="node in (campaign.ips || [])" :key="node" class="node-card">
-            <div class="node-info">
-              <div class="node-ip" @click="goToIp(node)">{{ node }}</div>
-              <div class="node-meta">NODE_PARTICIPANT_ID: {{ node.split('.').pop() }}</div>
+        <div class="section-header">
+           <h2 class="card-title">{{ t('campaignDetail.ipList') }}</h2>
+           <div class="pager-mini-wrapper" v-if="campaign.ipCount > pageSize">
+             <CyberPager v-model:page="nodesPage" :pageSize="pageSize" :total="campaign.ipCount" simple size="mini" @change="loadCampaign" />
+           </div>
+        </div>
+
+        <div class="nodes-list">
+          <div v-for="node in campaign.nodes" :key="node.ip" class="enriched-node-card">
+            <div class="node-header">
+              <div class="ip-info">
+                <CountryFlag :countryCode="node.geoInfo?.ipinfo?.country" 
+                             :tooltip="node.geoInfo?.ipinfo ? `${node.geoInfo.ipinfo.country} - ${node.geoInfo.ipinfo.org}` : 'N/A'" />
+                <span class="ip-val" @click="goToIp(node.ip)">{{ node.ip }}</span>
+              </div>
+              <div class="score-badge" :class="getScoreClass(node.averageScore)">
+                SCORE: {{ node.averageScore?.toFixed(1) }}
+              </div>
             </div>
-            <div class="node-action">
-              <button class="sync-btn-mini" @click="goToIp(node)">👁️</button>
+
+            <div class="node-stats-row">
+              <div class="stat">
+                <span class="stat-label">LOGS:</span>
+                <span class="stat-value">{{ node.totaleLogs }}</span>
+              </div>
+              <div class="stat">
+                <span class="stat-label">DURATA:</span>
+                <span class="stat-value">{{ computeDuration(node.firstSeen, node.lastSeen) }}</span>
+              </div>
+            </div>
+
+            <div class="node-techniques" v-if="node.attackPatterns?.length">
+              <div class="tech-mini-tags">
+                <span v-for="tech in node.attackPatterns" :key="tech" class="tech-mini-tag">{{ tech }}</span>
+              </div>
+            </div>
+
+            <div class="node-timeline">
+              <div class="time-point">
+                <span class="point-label">FIRST:</span> {{ formatTimePoint(node.firstSeen) }}
+              </div>
+              <div class="time-point">
+                <span class="point-label">LAST:</span> {{ formatTimePoint(node.lastSeen) }}
+              </div>
+            </div>
+            
+            <div class="node-footer-actions">
+              <button class="intel-det-btn-mini" @click="goToIp(node.ip)">
+                ANALISI IP 👉
+              </button>
             </div>
           </div>
+        </div>
+
+        <div class="pager-footer-wrapper" v-if="campaign.ipCount > pageSize">
+          <CyberPager v-model:page="nodesPage" v-model:pageSize="pageSize" :total="campaign.ipCount" @change="loadCampaign" />
         </div>
       </section>
     </div>
@@ -110,16 +140,19 @@ import { storeToRefs } from 'pinia';
 import { useViewSettingsStore } from '../../../stores/viewSettings';
 import { fetchCampaignDetail } from '../../../api';
 import GlobalHeader from '../../../components/GlobalHeader.vue';
-import { formatFullDateTime, formatHumanDuration } from '../../../utils/dateUtils';
+import CyberPager from '../../../components/common/CyberPager.vue';
+import CountryFlag from '../../../components/CountryFlag.vue';
+import { formatFullDateTime, formatHumanDuration, formatDateTime } from '../../../utils/dateUtils';
 import dayjs from 'dayjs';
 
 const props = defineProps({
   hash: { type: String, required: true },
-  minLogsForAttack: { type: Number, default: 1 },
+  minLogsPerIp: { type: Number, default: 1 },
   minScore: { type: Number, default: 0 },
+  protocol: { type: String, default: null },
   timeMode: { type: String, default: 'ago' },
-  agoValue: { type: Number, default: 30 },
-  agoUnit: { type: String, default: 'days' }
+  agoValue: { type: [Number, null], default: null },
+  agoUnit: { type: [String, null], default: null }
 });
 
 const { t } = useI18n();
@@ -130,15 +163,19 @@ const { dashboardSkin: currentSkin } = storeToRefs(viewStore);
 
 const campaign = ref(null);
 const loading = ref(true);
+const nodesPage = ref(1);
+const pageSize = ref(10);
 
 async function loadCampaign() {
   loading.value = true;
   try {
     const data = await fetchCampaignDetail({
       hash: props.hash,
-      ips: [], 
-      minLogsForAttack: props.minLogsForAttack,
+      minLogsPerIp: props.minLogsPerIp,
       minScore: props.minScore,
+      protocol: props.protocol,
+      page: nodesPage.value,
+      pageSize: pageSize.value,
       timeConfig: {
         startTime: route.query.customStartTime,
         endTime: route.query.customEndTime,
@@ -162,10 +199,22 @@ function formatDate(ts) {
   return formatFullDateTime(ts);
 }
 
+function formatTimePoint(ts) {
+  return formatDateTime(ts);
+}
+
 function computeDuration(start, end) {
   if (!start || !end) return '-';
   const diff = dayjs(end).diff(dayjs(start), 'second');
+  if (diff < 1) return '< 1s';
   return formatHumanDuration(diff, t);
+}
+
+function getScoreClass(score) {
+  if (score >= 80) return 'danger-high';
+  if (score >= 50) return 'danger-medium';
+  if (score >= 20) return 'danger-low';
+  return 'danger-info';
 }
 
 function goToIp(ip) {
@@ -176,4 +225,180 @@ function goToIp(ip) {
 <style scoped src="./CampaignDetail.css"></style>
 <style scoped>
 @import "./CampaignDetailCyber.css";
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.nodes-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.enriched-node-card {
+  background: rgba(var(--cy-primary-rgb, 0, 255, 65), 0.05);
+  border: 1px solid var(--cy-border, rgba(0, 255, 65, 0.2));
+  border-left: 3px solid var(--cy-primary, #00FF41);
+  padding: 18px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.enriched-node-card::after {
+  content: 'PARTICIPANT_NODE';
+  position: absolute;
+  bottom: 6px;
+  right: 15px;
+  font-size: 0.5rem;
+  opacity: 0.3;
+  color: var(--cy-primary, #00FF41);
+  letter-spacing: 1px;
+}
+
+.enriched-node-card:hover {
+  background: rgba(var(--cy-primary-rgb, 0, 255, 65), 0.12);
+  border-color: var(--cy-primary, #00FF41);
+  box-shadow: 0 0 25px rgba(var(--cy-primary-rgb, 0, 255, 65), 0.15);
+  transform: translateY(-3px);
+}
+
+.node-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  border-bottom: 1px solid rgba(var(--cy-primary-rgb, 0, 255, 65), 0.15);
+  padding-bottom: 10px;
+}
+
+.ip-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ip-val {
+  font-weight: 900;
+  color: #fff;
+  cursor: pointer;
+  font-size: 1.05rem;
+  letter-spacing: -0.5px;
+}
+
+.ip-val:hover {
+  color: var(--cy-primary, #00FF41);
+  text-shadow: 0 0 10px var(--cy-primary, #00FF41);
+}
+
+.score-badge {
+  font-size: 0.65rem;
+  padding: 3px 8px;
+  border-radius: 0;
+  border: 1px solid currentColor;
+  font-weight: 800;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.danger-high { color: #ff3366; border-color: #ff3366; }
+.danger-medium { color: #f39c12; border-color: #f39c12; }
+.danger-low { color: #3498db; border-color: #3498db; }
+.danger-info { color: var(--cy-primary, #00FF41); border-color: var(--cy-primary, #00FF41); }
+
+.node-stats-row {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.stat-label {
+  font-size: 0.55rem;
+  opacity: 0.5;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.stat-value {
+  font-weight: 800;
+  font-size: 0.95rem;
+  color: var(--cy-primary, #00FF41);
+}
+
+.tech-mini-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 18px;
+  min-height: 20px;
+}
+
+.tech-mini-tag {
+  font-size: 0.5rem;
+  padding: 1px 6px;
+  background: rgba(var(--cy-primary-rgb, 0, 255, 65), 0.08);
+  border: 1px solid rgba(var(--cy-primary-rgb, 0, 255, 65), 0.3);
+  color: #fff;
+  border-radius: 10px;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+.node-timeline {
+  font-size: 0.65rem;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 8px 10px;
+  border-radius: 2px;
+  margin-bottom: 15px;
+}
+
+.time-point {
+  margin-bottom: 4px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.time-point:last-child { margin-bottom: 0; }
+
+.point-label {
+  opacity: 0.5;
+  font-weight: normal;
+}
+
+.node-footer-actions {
+  display: flex;
+  justify-content: stretch;
+}
+
+.intel-det-btn-mini {
+  width: 100%;
+  background: transparent;
+  border: 1px solid var(--cy-primary, #00FF41);
+  color: var(--cy-primary, #00FF41);
+  font-size: 0.65rem;
+  padding: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: bold;
+  letter-spacing: 1px;
+  clip-path: polygon(5px 0, 100% 0, 100% 100%, 0 100%, 0 5px);
+}
+
+.intel-det-btn-mini:hover {
+  background: var(--cy-primary, #00FF41);
+  color: #000;
+  box-shadow: 0 0 15px rgba(var(--cy-primary-rgb, 0, 255, 65), 0.4);
+}
 </style>

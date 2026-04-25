@@ -64,7 +64,7 @@ export class CampaignController {
     async getCampaignDetail(req: Request, res: Response): Promise<void> {
         this.logger.info(`[CampaignController] Requesting campaign details for hash ${req.body.hash}`);
         try {
-            const { ips, hash, minLogsForAttack = 1, minScore = 0, protocol = null, timeConfig = {} } = req.body;
+            const { ips, hash, minLogsPerIp = 1, minScore = 0, protocol = null, timeConfig = {} } = req.body;
             if (!hash) {
                 res.status(400).json({ error: 'Hash mancante' });
                 return;
@@ -73,8 +73,8 @@ export class CampaignController {
             const campaign = await this.campaignService.getCampaignDetail({
                 ips,
                 hash,
-                minLogsForAttack: parseInt(minLogsForAttack),
-                minScore: parseInt(minScore),
+                minLogsPerIp: parseInt(minLogsPerIp as any),
+                minScore: parseInt(minScore as any),
                 protocol,
                 timeConfig
             });

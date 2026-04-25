@@ -554,26 +554,32 @@ export async function fetchCampaigns({
 export async function fetchCampaignDetail({
     hash,
     ips = [],
-    minLogsForAttack = 1,
+    minLogsPerIp = 1,
     minScore = 0,
     protocol = null,
-    timeConfig = {}
+    timeConfig = {},
+    page = 1,
+    pageSize = 10
 }: {
     hash: string;
     ips?: string[];
-    minLogsForAttack?: number;
+    minLogsPerIp?: number;
     minScore?: number;
     protocol?: string | null;
     timeConfig?: any;
+    page?: number;
+    pageSize?: number;
 }): Promise<any> {
     try {
         const response = await apiClient.post('/campaign/details', {
             hash,
             ips,
-            minLogsForAttack,
+            minLogsPerIp,
             minScore,
             protocol,
-            timeConfig
+            timeConfig,
+            page,
+            pageSize
         });
         return response.data;
     } catch (error) {

@@ -150,8 +150,15 @@ export class PatternAnalysisService {
         
         // Support both Express Request (req.get) and plain log objects (req.headers/userAgent)
         const getHeader = (name: string) => {
-            if (typeof req.get === 'function') return req.get(name);
-            if (req.headers) return req.headers[name.toLowerCase()];
+            if (!req) return null;
+            const lowerName = name.toLowerCase();
+            if (req.headers) {
+                // Find case-insensitive match in headers object
+                const key = Object.keys(req.headers).find(k => k.toLowerCase() === lowerName);
+                if (key) return req.headers[key];
+            }
+            // Fallback for Express Request object (using 'header' alias to avoid Mongoose 'get' clash)
+            if (typeof req.header === 'function') return req.header(name);
             return null;
         };
 
@@ -160,6 +167,7 @@ export class PatternAnalysisService {
             url: (req.originalUrl || req.url || '/'),
             userAgent: (req.userAgent || getHeader('User-Agent') || 'none'),
             acceptLanguage: getHeader('Accept-Language') || 'none',
+            serverPort: getHeader('X-Server-Port') || getHeader('X-Forwarded-Port') || 'standard',
             // Normalize body to avoid hash changes on whitespace/order if possible
             body: req.body && Object.keys(req.body).length > 0 ? JSON.stringify(req.body) : 'none',
             contentType: getHeader('Content-Type') || 'none'

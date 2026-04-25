@@ -50,13 +50,7 @@
           <div class="filter-group">
             <label class="cyber-label">{{ t('telemetry.filter_label') }}</label>
             <div class="tabs-row">
-              <button v-for="opt in [
-                { v: 1, u: 'hours', l: '1H' },
-                { v: 24, u: 'hours', l: '24H' },
-                { v: 7, u: 'days', l: '7D' },
-                { v: 30, u: 'days', l: '1M' },
-                { v: 90, u: 'days', l: '3M' }
-              ]" :key="opt.l" class="tab-btn"
+              <button v-for="opt in dynamicTimeScale" :key="opt.l" class="tab-btn"
                 :class="{ active: campaignsStore.state.filters.agoValue === opt.v && campaignsStore.state.filters.agoUnit === opt.u }"
                 @click="campaignsStore.state.filters.agoValue = opt.v; campaignsStore.state.filters.agoUnit = opt.u">
                 {{ opt.l }}
@@ -229,7 +223,7 @@ import { useCampaignsDiscovery } from '../../../composable/useCampaignsDiscovery
 import GlobalHeader from '../../../components/GlobalHeader.vue';
 import ProtocolSelector from '../../../components/common/ProtocolSelector.vue';
 import { formatFullDateTime, formatHumanDuration } from '../../../utils/dateUtils';
-import { generateSmartScale, generateScoreScale } from '../../../utils/filterUtils';
+import { generateSmartScale, generateScoreScale, generateTimeScale } from '../../../utils/filterUtils';
 import dayjs from 'dayjs';
 
 const { t } = useI18n();
@@ -269,6 +263,11 @@ const dynamicIpScale = computed(() => {
 const dynamicScoreScale = computed(() => {
   const { minScore, maxScore } = campaignsStore.state.metadata;
   return generateScoreScale(Math.floor(minScore), Math.ceil(maxScore));
+});
+
+const dynamicTimeScale = computed(() => {
+  const { minDate, maxDate, globalMinDate, globalMaxDate } = campaignsStore.state.metadata;
+  return generateTimeScale(minDate, maxDate, globalMinDate, globalMaxDate);
 });
 
 // Logica paginazione standard

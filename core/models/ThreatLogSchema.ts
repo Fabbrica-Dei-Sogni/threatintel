@@ -114,6 +114,14 @@ const ThreatLogSchema: Schema = new Schema({
     protocol: { type: String, default: 'http' }
 });
 
+// Indici per ottimizzazione performance
+ThreatLogSchema.index({ protocol: 1, timestamp: 1 });
+ThreatLogSchema.index({ timestamp: -1 });
+ThreatLogSchema.index({ 'request.ip': 1 });
+ThreatLogSchema.index({ 'fingerprint.hash': 1 });
+ThreatLogSchema.index({ 'fingerprint.score': 1 });
+ThreatLogSchema.index({ 'fingerprint.suspicious': 1 });
+
 const ThreatLog: Model<IThreatLog> = mongoose.model<IThreatLog>('ThreatLog', ThreatLogSchema);
 
 export default ThreatLog;

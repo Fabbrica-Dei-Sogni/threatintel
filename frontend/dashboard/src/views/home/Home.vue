@@ -75,14 +75,7 @@
                         (dashboardState.rankings.attackTimeValue + (dashboardState.rankings.attackTimeUnit === 'days' ?
                         'D' : 'H')) }}</span></span>
                     <div class="tabs-row log-threshold-tabs">
-                      <button v-for="opt in [
-                        { v: 10, u: 'days', l: '10D' },
-                        { v: 30, u: 'days', l: '1M' },
-                        { v: 90, u: 'days', l: '3M' },
-                        { v: 180, u: 'days', l: '6M' },
-                        { v: 365, u: 'days', l: '1Y' },
-                        { v: null, u: null, l: 'ALL' }
-                      ]" :key="opt.l" class="tab-btn"
+                      <button v-for="opt in dynamicTimeScaleHome" :key="opt.l" class="tab-btn"
                         :class="{ active: dashboardState.rankings.attackTimeValue === opt.v && (opt.v === null || dashboardState.rankings.attackTimeUnit === opt.u) }"
                         @click="dashboardState.rankings.attackTimeValue = opt.v; dashboardState.rankings.attackTimeUnit = opt.u">
                         {{ opt.v === null ? t('common.all').toUpperCase() : opt.l }}
@@ -410,20 +403,13 @@
                     <!-- Time Range -->
                     <div class="filter-item">
                       <span class="filter-label">{{ t('telemetry.filter_label') }}: <span class="active-val">{{
-                        dashboardState.rankings.attackTimeValue === null ? t('common.all').toUpperCase() :
-                          (dashboardState.rankings.attackTimeValue + (dashboardState.rankings.attackTimeUnit === 'days' ?
+                        dashboardState.rankings.campaignTimeValue === null ? t('common.all').toUpperCase() :
+                          (dashboardState.rankings.campaignTimeValue + (dashboardState.rankings.campaignTimeUnit === 'days' ?
                           'D' : 'H')) }}</span></span>
                       <div class="tabs-row log-threshold-tabs">
-                        <button v-for="opt in [
-                          { v: 10, u: 'days', l: '10D' },
-                          { v: 30, u: 'days', l: '1M' },
-                          { v: 90, u: 'days', l: '3M' },
-                          { v: 180, u: 'days', l: '6M' },
-                          { v: 365, u: 'days', l: '1Y' },
-                          { v: null, u: null, l: 'ALL' }
-                        ]" :key="opt.l" class="tab-btn"
-                          :class="{ active: dashboardState.rankings.attackTimeValue === opt.v && (opt.v === null || dashboardState.rankings.attackTimeUnit === opt.u) }"
-                          @click="dashboardState.rankings.attackTimeValue = opt.v; dashboardState.rankings.attackTimeUnit = opt.u">
+                        <button v-for="opt in dynamicTimeScaleHome" :key="opt.l" class="tab-btn"
+                          :class="{ active: dashboardState.rankings.campaignTimeValue === opt.v && (opt.v === null || dashboardState.rankings.campaignTimeUnit === opt.u) }"
+                          @click="dashboardState.rankings.campaignTimeValue = opt.v; dashboardState.rankings.campaignTimeUnit = opt.u">
                           {{ opt.v === null ? t('common.all').toUpperCase() : opt.l }}
                         </button>
                       </div>
@@ -547,7 +533,7 @@ import { useAttacksFilter } from '../../composable/useAttacksFilter';
 import { useCowrieSessions } from '../../composable/useCowrieSessions';
 import { useCampaignsDiscovery } from '../../composable/useCampaignsDiscovery';
 import { useCampaignsStore } from '../../stores/campaigns';
-import { generateSmartScale, generateScoreScale } from '../../utils/filterUtils';
+import { generateSmartScale, generateScoreScale, generateTimeScale } from '../../utils/filterUtils';
 import { useRouter } from 'vue-router'
 import { computed, onMounted, watch, ref, toRef } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -683,7 +669,7 @@ const {
   'ago',
   toRef(dashboardState.rankings, 'attackTimeValue'),
   toRef(dashboardState.rankings, 'attackTimeUnit'),
-  null, 60, 'days', 0, 'days', { firstSeen: -1 }, 10,
+  null, null, null, null, null, { firstSeen: -1 }, 10,
   toRef(dashboardState.rankings, 'dangerLevels')
 )
 
@@ -731,8 +717,8 @@ const {
   toRef(dashboardState.rankings, 'campaignMinScore'),
   toRef(dashboardState.rankings, 'campaignProtocol'),
   'ago', // initialTimeMode
-  toRef(dashboardState.rankings, 'attackTimeValue'),
-  toRef(dashboardState.rankings, 'attackTimeUnit'),
+  toRef(dashboardState.rankings, 'campaignTimeValue'),
+  toRef(dashboardState.rankings, 'campaignTimeUnit'),
   10
 );
 
@@ -747,6 +733,11 @@ const dynamicIpScaleHome = computed(() => {
 const dynamicScoreScaleHome = computed(() => {
   const { minScore, maxScore } = campaignsStore.state.metadata;
   return generateScoreScale(Math.floor(minScore), Math.ceil(maxScore));
+});
+
+const dynamicTimeScaleHome = computed(() => {
+  const { minDate, maxDate, globalMinDate, globalMaxDate } = campaignsStore.state.metadata;
+  return generateTimeScale(minDate, maxDate, globalMinDate, globalMaxDate);
 });
 
 // Dossier - ultimi 5

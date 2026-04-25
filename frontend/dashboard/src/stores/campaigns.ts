@@ -28,16 +28,20 @@ export interface CampaignsState {
         maxIpCount: number;
         minScore: number;
         maxScore: number;
+        minDate: string | null;
+        maxDate: string | null;
+        globalMinDate: string | null;
+        globalMaxDate: string | null;
     };
 }
 
 const DEFAULT_STATE: CampaignsState = {
     filters: {
-        minIps: 2,
+        minIps: 3,
         minScore: 0,
         protocol: 'http',
         timeMode: 'ago',
-        agoValue: 30,
+        agoValue: 7,
         agoUnit: 'days',
         startDate: null,
         endDate: null
@@ -54,7 +58,11 @@ const DEFAULT_STATE: CampaignsState = {
         minIpCount: 2,
         maxIpCount: 10,
         minScore: 0,
-        maxScore: 100
+        maxScore: 100,
+        minDate: null,
+        maxDate: null,
+        globalMinDate: null,
+        globalMaxDate: null
     }
 };
 

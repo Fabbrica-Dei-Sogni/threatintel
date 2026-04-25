@@ -32,6 +32,12 @@ export class CampaignService {
                 baseFilters.protocol = protocol;
             }
         }
+
+        // Global time bounds for the current baseFilters (protocol)
+        const [oldestLog] = await ThreatLog.find(baseFilters).sort({ timestamp: 1 }).limit(1).select('timestamp').lean();
+        const [newestLog] = await ThreatLog.find(baseFilters).sort({ timestamp: -1 }).limit(1).select('timestamp').lean();
+        const globalMinDate = oldestLog?.timestamp || null;
+        const globalMaxDate = newestLog?.timestamp || null;
  
         // 2. Generazione stage temporale
         const timeParams = { ...timeConfig };
@@ -130,7 +136,9 @@ export class CampaignService {
                     minIpCount: bIps.minIpCount || 0,
                     maxIpCount: bIps.maxIpCount || 0,
                     minScore: bScore.minScore || 0,
-                    maxScore: bScore.maxScore || 0
+                    maxScore: bScore.maxScore || 0,
+                    minDate: globalMinDate,
+                    maxDate: globalMaxDate
                 }
             };
         } catch (err: any) {

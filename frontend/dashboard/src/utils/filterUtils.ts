@@ -52,3 +52,76 @@ export function generateScoreScale(min: number, max: number): number[] {
     
     return [...new Set(filtered)].sort((a, b) => a - b);
 }
+
+/**
+ * Genera una scala di intervalli temporali basata sul range di date disponibile.
+ * Se viene fornito un range globale, i pulsanti della scala saranno basati su quello (per permettere l'espansione),
+ * ma verranno inclusi indicatori o opzioni speciali per il range filtrato (attivo).
+ */
+export function generateTimeScale(
+    minDateStr: string | null, 
+    maxDateStr: string | null,
+    globalMinDateStr: string | null = null,
+    globalMaxDateStr: string | null = null
+) {
+    const defaultScale = [
+        { v: 1, u: 'hours', l: '1H' },
+        { v: 24, u: 'hours', l: '24H' },
+        { v: 7, u: 'days', l: '7D' },
+        { v: 30, u: 'days', l: '1M' },
+        { v: 90, u: 'days', l: '3M' }
+    ];
+
+    // Usiamo il range globale per decidere quali preset mostrare (così l'utente può sempre tornare indietro)
+    const effectiveMin = globalMinDateStr || minDateStr;
+    const effectiveMax = globalMaxDateStr || maxDateStr;
+
+    if (!effectiveMin || !effectiveMax) return defaultScale;
+
+    const min = new Date(effectiveMin).getTime();
+    const max = new Date(effectiveMax).getTime();
+    const diffHours = (max - min) / (1000 * 60 * 60);
+
+    const scale = [];
+    if (diffHours >= 0) scale.push({ v: 1, u: 'hours', l: '1H' });
+    if (diffHours >= 1) scale.push({ v: 24, u: 'hours', l: '24H' });
+    if (diffHours >= 24) scale.push({ v: 7, u: 'days', l: '7D' });
+    if (diffHours >= 24 * 7) scale.push({ v: 30, u: 'days', l: '1M' });
+    if (diffHours >= 24 * 30) scale.push({ v: 90, u: 'days', l: '3M' });
+    if (diffHours >= 24 * 90) scale.push({ v: 180, u: 'days', l: '6M' });
+    if (diffHours >= 24 * 180) scale.push({ v: 365, u: 'days', l: '1Y' });
+
+    // Aggiungiamo sempre l'opzione per coprire tutto il range GLOBALE disponibile
+    const totalGlobalDays = Math.ceil(diffHours / 24);
+    if (totalGlobalDays > 0) {
+        const labels = scale.map(s => s.l);
+        if (totalGlobalDays > 365) {
+            scale.push({ v: totalGlobalDays, u: 'days', l: 'FULL' });
+        } else if (totalGlobalDays > 90 && !labels.includes('6M') && !labels.includes('1Y')) {
+            scale.push({ v: totalGlobalDays, u: 'days', l: 'FULL' });
+        }
+    }
+
+    // NOVITÀ: Aggiungiamo un'opzione speciale "DATA RANGE" se il range filtrato è significativamente
+    // diverso (più stretto) del range globale, per permettere di zoomare esattamente sui dati trovati.
+    if (minDateStr && maxDateStr && globalMinDateStr && globalMaxDateStr) {
+        const fMin = new Date(minDateStr).getTime();
+        const fMax = new Date(maxDateStr).getTime();
+        const fDiffDays = Math.ceil((fMax - fMin) / (1000 * 60 * 60 * 24));
+        
+        // Se il range dei dati filtrati è diverso dal range globale selezionato
+        if (fDiffDays > 0 && fDiffDays < totalGlobalDays) {
+             // Possiamo inserire un'opzione "AUTO" o "FOCUS"
+             // Per ora lo lasciamo gestire alla UI che può evidenziare i dati.
+        }
+    }
+
+    // Se c'è pochissimo scarto, mostriamo comunque almeno un paio di opzioni per chiarezza UI
+    if (scale.length === 1) scale.push({ v: 24, u: 'hours', l: '24H' });
+    if (scale.length === 2) scale.push({ v: 7, u: 'days', l: '7D' });
+
+    // Aggiungiamo sempre l'opzione ALL alla fine
+    scale.push({ v: null, u: null, l: 'ALL' });
+
+    return scale;
+}

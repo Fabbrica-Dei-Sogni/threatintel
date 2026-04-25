@@ -71,6 +71,10 @@ export function useCampaignsDiscovery(
                 campaignsStore.state.metadata.maxIpCount = response.metadata.maxIpCount || 0;
                 campaignsStore.state.metadata.minScore = response.metadata.minScore || 0;
                 campaignsStore.state.metadata.maxScore = response.metadata.maxScore || 0;
+                campaignsStore.state.metadata.minDate = response.metadata.minDate || null;
+                campaignsStore.state.metadata.maxDate = response.metadata.maxDate || null;
+                campaignsStore.state.metadata.globalMinDate = response.metadata.globalMinDate || null;
+                campaignsStore.state.metadata.globalMaxDate = response.metadata.globalMaxDate || null;
 
                 // Auto-reset filters if they fall out of the new dynamic range
                 if (minIps.value > campaignsStore.state.metadata.maxIpCount && campaignsStore.state.metadata.maxIpCount > 0) {

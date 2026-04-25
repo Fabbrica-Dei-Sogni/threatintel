@@ -17,6 +17,8 @@ export interface DashboardRankingsState {
     campaignMinIps: number;
     campaignMinScore: number;
     campaignProtocol: string;
+    campaignTimeValue: number | null;
+    campaignTimeUnit: string | null;
 }
 
 export interface DashboardState {
@@ -39,9 +41,11 @@ const DEFAULT_STATE: DashboardState = {
         logPage: 1,
         sessionPage: 1,
         campaignPage: 1,
-        campaignMinIps: 5,
+        campaignMinIps: 3,
         campaignMinScore: 15,
-        campaignProtocol: 'http'
+        campaignProtocol: 'http',
+        campaignTimeValue: 7,
+        campaignTimeUnit: 'days'
     },
     activeWidgets: [],
     showTicker: true
@@ -59,6 +63,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
         // Migration: se il valore salvato è il vecchio default di 90 giorni, forzalo a 10
         if (saved.rankings && saved.rankings.attackTimeValue === 90) {
             saved.rankings.attackTimeValue = 10;
+            saved.rankings.attackTimeUnit = 'days';
         }
         if (saved.rankings) {
             Object.assign(state.rankings, saved.rankings);
@@ -131,6 +136,8 @@ export const useDashboardStore = defineStore('dashboard', () => {
         state.rankings.campaignMinIps = DEFAULT_STATE.rankings.campaignMinIps;
         state.rankings.campaignMinScore = DEFAULT_STATE.rankings.campaignMinScore;
         state.rankings.campaignProtocol = DEFAULT_STATE.rankings.campaignProtocol;
+        state.rankings.campaignTimeValue = DEFAULT_STATE.rankings.campaignTimeValue;
+        state.rankings.campaignTimeUnit = DEFAULT_STATE.rankings.campaignTimeUnit;
         state.rankings.campaignPage = 1;
     }
 

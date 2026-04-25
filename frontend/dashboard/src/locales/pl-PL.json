@@ -97,7 +97,9 @@
         "logout": "Wyloguj",
         "auth_required_title": "DOSTĘP ZASTRZEŻONY",
         "auth_required_desc": "Akta dochodzeniowe i raporty kryminalistyczne są dostępne wyłącznie dla zidentyfikowanych analityków.",
-        "reset_layout": "RESETUJ UKŁAD"
+        "reset_layout": "RESETUJ UKŁAD",
+        "view_list": "Widok Listy",
+        "view_grid": "Widok Siatki"
     },
     "skin": {
         "classic": "Klasyczny",

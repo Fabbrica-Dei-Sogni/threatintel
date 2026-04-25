@@ -97,7 +97,9 @@
         "logout": "Logout",
         "auth_required_title": "RESTRICTED ACCESS",
         "auth_required_desc": "Investigative dossiers and forensic reports are only accessible to identified analysts.",
-        "reset_layout": "RESET LAYOUT"
+        "reset_layout": "RESET LAYOUT",
+        "view_list": "List View",
+        "view_grid": "Grid View"
     },
     "skin": {
         "classic": "Classic",

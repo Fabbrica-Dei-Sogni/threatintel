@@ -97,7 +97,9 @@
         "logout": "Déconnexion",
         "auth_required_title": "ACCÈS RÉSERVÉ",
         "auth_required_desc": "Les dossiers d'investigation et les rapports médico-légaux sont réservés aux analystes identifiés.",
-        "reset_layout": "RÉINITIALISER LA MISE EN PAGE"
+        "reset_layout": "RÉINITIALISER LA MISE EN PAGE",
+        "view_list": "Vue Liste",
+        "view_grid": "Vue Grille"
     },
     "skin": {
         "classic": "Classique",

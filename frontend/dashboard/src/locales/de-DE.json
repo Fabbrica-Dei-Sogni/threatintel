@@ -97,7 +97,9 @@
         "logout": "Logout",
         "auth_required_title": "ZUGRIFF EINGESCHRÄNKT",
         "auth_required_desc": "Investigative Dossiers und forensische Berichte sind nur für identifizierte Analysten zugänglich.",
-        "reset_layout": "LAYOUT ZURÜCKSETZEN"
+        "reset_layout": "LAYOUT ZURÜCKSETZEN",
+        "view_list": "Listenansicht",
+        "view_grid": "Rasteransicht"
     },
     "skin": {
         "classic": "Klassisch",

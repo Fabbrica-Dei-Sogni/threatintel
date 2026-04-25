@@ -28,6 +28,7 @@ export interface AttacksState {
     view: {
         showMap: boolean;
         showChart: boolean;
+        viewMode: 'table' | 'grid';
     };
 }
 
@@ -55,7 +56,8 @@ const DEFAULT_STATE: AttacksState = {
     },
     view: {
         showMap: false,
-        showChart: false
+        showChart: false,
+        viewMode: 'table'
     }
 };
 

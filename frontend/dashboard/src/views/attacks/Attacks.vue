@@ -4,6 +4,15 @@
             <template #title>
                 <h1><span class="animated-icon pulse-magma">📡</span> {{ t('attacks.title') }}</h1>
             </template>
+            <template #actions>
+                <!-- Reset Button moved to Header -->
+                <button class="reset-btn-mini reset-view-control" @click="handleReset" :title="t('telemetry.reset_filters')">
+                    <div class="reset-ascii">
+                        <span></span>
+                        <span></span>
+                    </div>
+                </button>
+            </template>
         </GlobalHeader>
         <!-- Pulsanti per tornare alla Home principale e View Controls -->
         <div class="actions cyber-sticky-area cyber-sticky-top-1">
@@ -21,13 +30,25 @@
             <div class="view-controls">
                 <ViewToggle v-model="attacksState.view.showMap" :label="t('common.showMap')" theme="magma" />
                 <ViewToggle v-model="attacksState.view.showChart" :label="t('common.showChart')" theme="magma" />
-                <!-- Reset Button -->
-                <button class="reset-btn-mini reset-view-control" @click="handleReset" :title="t('telemetry.reset_filters')">
-                    <div class="reset-ascii">
-                        <span></span>
-                        <span></span>
-                    </div>
-                </button>
+                <!-- Grid/Table Toggle -->
+                <div class="view-mode-pill">
+                    <button 
+                        class="mode-btn" 
+                        :class="{ active: attacksState.view.viewMode === 'table' }"
+                        @click="attacksState.view.viewMode = 'table'"
+                        :title="t('common.view_list')"
+                    >
+                        ☰
+                    </button>
+                    <button 
+                        class="mode-btn" 
+                        :class="{ active: attacksState.view.viewMode === 'grid' }"
+                        @click="attacksState.view.viewMode = 'grid'"
+                        :title="t('common.view_grid')"
+                    >
+                        ▤
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -136,198 +157,274 @@
             <!-- Scanning Line -->
             <div class="scanning-line"></div>
 
-            <!-- Top Scrollbar Sync Wrapper -->
-            <div class="top-scrollbar-wrapper cyber-scrollbar" ref="topScrollRef">
-                <div class="top-scrollbar-content" :style="{ width: tableWidth + 'px' }"></div>
-            </div>
+            <!-- Switchable Content: Table vs Grid -->
+            <template v-if="attacksState.view.viewMode === 'table'">
+                <!-- Top Scrollbar Sync Wrapper -->
+                <div class="top-scrollbar-wrapper cyber-scrollbar" ref="topScrollRef">
+                    <div class="top-scrollbar-content" :style="{ width: tableWidth + 'px' }"></div>
+                </div>
 
-            <section class="log-table cyber-scrollbar cyber-table-container" ref="tableScrollRef">
+                <section class="log-table cyber-scrollbar cyber-table-container" ref="tableScrollRef">
+                    <table ref="tableRef" class="cyber-table">
+                        <thead>
+                            <tr>
+                                <th :data-attacks-tooltip="t('attacks.table.countryOrg')">
+                                    <span class="label">{{ t('attacks.table.short.origin') }}</span>
+                                </th>
+                                <th class="sortable-th" :data-attacks-tooltip="t('attacks.table.defcon')">
+                                    <div class="sort-control">
+                                        <span class="label">{{ t('attacks.table.short.defcon') }}</span>
+                                        <button @click="toggleSort('dangerScore')" :aria-label="t('sorting.sortDanger')"
+                                            class="sort-button">
+                                            <span v-if="getSortDirection('dangerScore') === 1">▲</span>
+                                            <span v-else-if="getSortDirection('dangerScore') === -1">▼</span>
+                                            <span v-else>⇵</span>
+                                        </button>
+                                    </div>
+                                </th>
+                                <th :data-attacks-tooltip="t('attacks.table.details')">
+                                    {{ t('attacks.table.short.info') }}
+                                </th>
+                                <th :data-attacks-tooltip="t('attacks.table.techniques')">
+                                    {{ t('attacks.table.short.tech') }}
+                                </th>
+                                <th :data-attacks-tooltip="t('attacks.table.attacker')">
+                                    <div class="sort-control">
+                                        <span class="label">{{ t('attacks.table.short.attacker') }}</span>
+                                        <button @click="toggleSort('request.ip')" aria-label="Ordina IP"
+                                            class="sort-button">
+                                            <span v-if="getSortDirection('request.ip') === 1">▲</span>
+                                            <span v-else-if="getSortDirection('request.ip') === -1">▼</span>
+                                            <span v-else>⇵</span>
+                                        </button>
+                                    </div>
+                                </th>
+                                <th class="sortable-th" :data-attacks-tooltip="t('attacks.table.avgScore')">
+                                    <div class="sort-control">
+                                        <span class="label">{{ t('attacks.table.short.avg') }}</span>
+                                        <button @click="toggleSort('averageScore')" :aria-label="t('sorting.sortAvgScore')"
+                                            class="sort-button">
+                                            <span v-if="getSortDirection('averageScore') === 1">▲</span>
+                                            <span v-else-if="getSortDirection('averageScore') === -1">▼</span>
+                                            <span v-else>⇵</span>
+                                        </button>
+                                    </div>
+                                </th>
+                                <th class="sortable-th" :data-attacks-tooltip="t('attacks.table.rateBreach')">
+                                    <div class="sort-control">
+                                        <span class="label">{{ t('attacks.table.short.breach') }}</span>
+                                        <button @click="toggleSort('countRateLimit')"
+                                            :aria-label="t('sorting.sortRateBreach')" class="sort-button">
+                                            <span v-if="getSortDirection('countRateLimit') === 1">▲</span>
+                                            <span v-else-if="getSortDirection('countRateLimit') === -1">▼</span>
+                                            <span v-else>⇵</span>
+                                        </button>
+                                    </div>
+                                </th>
+                                <th class="sortable-th" :data-attacks-tooltip="t('attacks.table.rps')">
+                                    <div class="sort-control">
+                                        <span class="label">{{ t('attacks.table.short.rps') }}</span>
+                                        <button @click="toggleSort('rps')" :aria-label="t('sorting.sortRPS')"
+                                            class="sort-button">
+                                            <span v-if="getSortDirection('rps') === 1">▲</span>
+                                            <span v-else-if="getSortDirection('rps') === -1">▼</span>
+                                            <span v-else>⇵</span>
+                                        </button>
+                                    </div>
+                                </th>
+                                <th class="sortable-th" :data-attacks-tooltip="t('attacks.table.totalLogs')">
+                                    <div class="sort-control">
+                                        <span class="label">{{ t('attacks.table.short.logs') }}</span>
+                                        <button @click="toggleSort('totaleLogs')" :aria-label="t('sorting.sortTotalLogs')"
+                                            class="sort-button">
+                                            <span v-if="getSortDirection('totaleLogs') === 1">▲</span>
+                                            <span v-else-if="getSortDirection('totaleLogs') === -1">▼</span>
+                                            <span v-else>⇵</span>
+                                        </button>
+                                    </div>
+                                </th>
+                                <th class="sortable-th" :data-attacks-tooltip="t('attacks.table.attackDuration')">
+                                    <div class="sort-control">
+                                        <span class="label">{{ t('attacks.table.short.dur') }}</span>
+                                        <button @click="toggleSort('durataAttacco.ms')"
+                                            :aria-label="t('sorting.sortDuration')" class="sort-button">
+                                            <span v-if="getSortDirection('durataAttacco.ms') === 1">▲</span>
+                                            <span v-else-if="getSortDirection('durataAttacco.ms') === -1">▼</span>
+                                            <span v-else>⇵</span>
+                                        </button>
+                                    </div>
+                                </th>
+                                <th class="sortable-th" :data-attacks-tooltip="t('attacks.table.firstSeen')">
+                                    <div class="sort-control">
+                                        <span class="label">{{ t('attacks.table.short.first') }}</span>
+                                        <button @click="toggleSort('firstSeen')" :aria-label="t('sorting.sortFirstSeen')"
+                                            class="sort-button">
+                                            <span v-if="getSortDirection('firstSeen') === 1">▲</span>
+                                            <span v-else-if="getSortDirection('firstSeen') === -1">▼</span>
+                                            <span v-else>⇵</span>
+                                        </button>
+                                    </div>
+                                </th>
+                                <th class="sortable-th" :data-attacks-tooltip="t('attacks.table.lastSeen')">
+                                    <div class="sort-control">
+                                        <span class="label">{{ t('attacks.table.short.last') }}</span>
+                                        <button @click="toggleSort('lastSeen')" :aria-label="t('sorting.sortLastSeen')"
+                                            class="sort-button">
+                                            <span v-if="getSortDirection('lastSeen') === 1">▲</span>
+                                            <span v-else-if="getSortDirection('lastSeen') === -1">▼</span>
+                                            <span v-else>⇵</span>
+                                        </button>
+                                    </div>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="attack in attacks" :key="attack.id">
+                                <td>
+                                    <div style="display: flex; align-items: center; justify-content: center;">
+                                        <CountryFlag :countryCode="attack.ipDetails?.ipinfo?.country"
+                                            :tooltip="attack.ipDetails?.ipinfo ? `${attack.ipDetails.ipinfo.country} - ${attack.ipDetails.ipinfo.org || t('common.notAvailable')}` : t('common.notAvailable')" />
+                                    </div>
+                                </td>
 
-                <table ref="tableRef" class="cyber-table">
-                    <thead>
-                        <tr>
-                            <th :data-attacks-tooltip="t('attacks.table.countryOrg')">
-                                <span class="label">{{ t('attacks.table.short.origin') }}</span>
-                            </th>
-                            <th class="sortable-th" :data-attacks-tooltip="t('attacks.table.defcon')">
-                                <div class="sort-control">
-                                    <span class="label">{{ t('attacks.table.short.defcon') }}</span>
-                                    <button @click="toggleSort('dangerScore')" :aria-label="t('sorting.sortDanger')"
-                                        class="sort-button">
-                                        <span v-if="getSortDirection('dangerScore') === 1">▲</span>
-                                        <span v-else-if="getSortDirection('dangerScore') === -1">▼</span>
-                                        <span v-else>⇵</span>
-                                    </button>
-                                </div>
-                            </th>
-                            <th :data-attacks-tooltip="t('attacks.table.details')">
-                                {{ t('attacks.table.short.info') }}
-                            </th>
-                            <th :data-attacks-tooltip="t('attacks.table.techniques')">
-                                {{ t('attacks.table.short.tech') }}
-                            </th>
-                            <th :data-attacks-tooltip="t('attacks.table.attacker')">
-                                <div class="sort-control">
-                                    <span class="label">{{ t('attacks.table.short.attacker') }}</span>
-                                    <button @click="toggleSort('request.ip')" aria-label="Ordina IP"
-                                        class="sort-button">
-                                        <span v-if="getSortDirection('request.ip') === 1">▲</span>
-                                        <span v-else-if="getSortDirection('request.ip') === -1">▼</span>
-                                        <span v-else>⇵</span>
-                                    </button>
-                                </div>
-                            </th>
-                            <th class="sortable-th" :data-attacks-tooltip="t('attacks.table.avgScore')">
-                                <div class="sort-control">
-                                    <span class="label">{{ t('attacks.table.short.avg') }}</span>
-                                    <button @click="toggleSort('averageScore')" :aria-label="t('sorting.sortAvgScore')"
-                                        class="sort-button">
-                                        <span v-if="getSortDirection('averageScore') === 1">▲</span>
-                                        <span v-else-if="getSortDirection('averageScore') === -1">▼</span>
-                                        <span v-else>⇵</span>
-                                    </button>
-                                </div>
-                            </th>
-                            <th class="sortable-th" :data-attacks-tooltip="t('attacks.table.rateBreach')">
-                                <div class="sort-control">
-                                    <span class="label">{{ t('attacks.table.short.breach') }}</span>
-                                    <button @click="toggleSort('countRateLimit')"
-                                        :aria-label="t('sorting.sortRateBreach')" class="sort-button">
-                                        <span v-if="getSortDirection('countRateLimit') === 1">▲</span>
-                                        <span v-else-if="getSortDirection('countRateLimit') === -1">▼</span>
-                                        <span v-else>⇵</span>
-                                    </button>
-                                </div>
-                            </th>
-                            <th class="sortable-th" :data-attacks-tooltip="t('attacks.table.rps')">
-                                <div class="sort-control">
-                                    <span class="label">{{ t('attacks.table.short.rps') }}</span>
-                                    <button @click="toggleSort('rps')" :aria-label="t('sorting.sortRPS')"
-                                        class="sort-button">
-                                        <span v-if="getSortDirection('rps') === 1">▲</span>
-                                        <span v-else-if="getSortDirection('rps') === -1">▼</span>
-                                        <span v-else>⇵</span>
-                                    </button>
-                                </div>
-                            </th>
-                            <th class="sortable-th" :data-attacks-tooltip="t('attacks.table.totalLogs')">
-                                <div class="sort-control">
+                                <td class="defcon-cell" :title="attack.dangerScore">
+                                    <DefconIndicator :level="attack.dangerLevel" :dangerScore="attack.dangerScore"
+                                        mode="dot" />
+                                </td>
+                                <td>
+                                    <router-link :to="{
+                                        name: 'AttackDetail',
+                                        params: { ip: attack.request.ip },
+                                        query: {
+                                            timeMode: attacksState.filters.timeMode,
+                                            agoValue: attacksState.filters.agoValue,
+                                            agoUnit: attacksState.filters.agoUnit,
+                                            minLogsForAttack: attacksState.filters.minLogs,
+                                            dateRange: attacksState.filters.dateRange && (attacksState.filters.dateRange[0] || attacksState.filters.dateRange[1]) ? JSON.stringify(attacksState.filters.dateRange) : undefined
+                                        }
+                                    }" class="detail-link">
+                                        {{ t('common.detail') }}
+                                    </router-link>
+                                </td>
+                                <td class="tecniche-cell">
+                                    <div class="tech-wrapper">
+                                        <span v-for="tech in attack.attackPatterns" :key="tech" class="tech-chip">
+                                            <span class="tech-name">{{ tech }}</span>
+                                            <button @click.stop="copyFormatted('clipboard.attackTechnique', { tech: tech })"
+                                                class="btn-copy-mini-tech" :title="t('common.copyToClipboard')">📋</button>
+                                        </span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span style="display:inline-flex;align-items:center;">
+                                        <span class="detail-link" @click="goToIpDetails(attack.request.ip)"
+                                            style="cursor:pointer;" :title="t('common.infoIp')">{{ attack.request.ip
+                                            }}</span>
+                                        <button @click.stop="copyFormatted('clipboard.ip', { ip: attack.request.ip })"
+                                            class="btn-copy-ip" :title="t('common.copyToClipboard')">📋</button>
+                                        <button @click.stop="setIpFilter(attack.request.ip)" class="btn-copy-ip"
+                                            :title="t('common.copyToFilter')">⬇️</button>
+                                    </span>
+                                </td>
+                                <td>{{ attack.averageScore }}</td>
+                                <td>{{ attack.countRateLimit }}</td>
+                                <td>{{ attack.rps }}</td>
+                                <td>{{ attack.totaleLogs }}</td>
+                                <td>{{ getHumanDuration(attack.durataAttacco.ms / 1000) }}</td>
+                                <td>
+                                    <div class="time-display">
+                                        <span class="time-hour">{{ formatDateTime(attack.firstSeen) }}</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="time-display">
+                                        <span class="time-hour">{{ formatDateTime(attack.lastSeen) }}</span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr v-if="attacks.length === 0 && !loading">
+                                <td colspan="12" style="text-align:center;">
+                                    {{ t('attacks.noAttacksFound') }}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+            </template>
+
+            <!-- Grid View -->
+            <template v-else>
+                <section class="attacks-grid-view cyber-scrollbar">
+                    <div v-for="attack in attacks" :key="attack.id" class="attack-card glass-card">
+                        <div class="card-header">
+                            <div class="origin-info">
+                                <CountryFlag :countryCode="attack.ipDetails?.ipinfo?.country" size="small" />
+                                <span class="ip-address" @click="goToIpDetails(attack.request.ip)">{{ attack.request.ip }}</span>
+                            </div>
+                            <DefconIndicator :level="attack.dangerLevel" :dangerScore="attack.dangerScore" mode="dot" />
+                        </div>
+
+                        <div class="card-body">
+                            <div class="metrics-row">
+                                <div class="metric">
                                     <span class="label">{{ t('attacks.table.short.logs') }}</span>
-                                    <button @click="toggleSort('totaleLogs')" :aria-label="t('sorting.sortTotalLogs')"
-                                        class="sort-button">
-                                        <span v-if="getSortDirection('totaleLogs') === 1">▲</span>
-                                        <span v-else-if="getSortDirection('totaleLogs') === -1">▼</span>
-                                        <span v-else>⇵</span>
-                                    </button>
+                                    <span class="value">{{ attack.totaleLogs }}</span>
                                 </div>
-                            </th>
-                            <th class="sortable-th" :data-attacks-tooltip="t('attacks.table.attackDuration')">
-                                <div class="sort-control">
-                                    <span class="label">{{ t('attacks.table.short.dur') }}</span>
-                                    <button @click="toggleSort('durataAttacco.ms')"
-                                        :aria-label="t('sorting.sortDuration')" class="sort-button">
-                                        <span v-if="getSortDirection('durataAttacco.ms') === 1">▲</span>
-                                        <span v-else-if="getSortDirection('durataAttacco.ms') === -1">▼</span>
-                                        <span v-else>⇵</span>
-                                    </button>
+                                <div class="metric">
+                                    <span class="label">{{ t('attacks.table.short.avg') }}</span>
+                                    <span class="value">{{ attack.averageScore }}</span>
                                 </div>
-                            </th>
-                            <th class="sortable-th" :data-attacks-tooltip="t('attacks.table.firstSeen')">
-                                <div class="sort-control">
-                                    <span class="label">{{ t('attacks.table.short.first') }}</span>
-                                    <button @click="toggleSort('firstSeen')" :aria-label="t('sorting.sortFirstSeen')"
-                                        class="sort-button">
-                                        <span v-if="getSortDirection('firstSeen') === 1">▲</span>
-                                        <span v-else-if="getSortDirection('firstSeen') === -1">▼</span>
-                                        <span v-else>⇵</span>
-                                    </button>
+                                <div class="metric">
+                                    <span class="label">{{ t('attacks.table.short.rps') }}</span>
+                                    <span class="value">{{ attack.rps }}</span>
                                 </div>
-                            </th>
-                            <th class="sortable-th" :data-attacks-tooltip="t('attacks.table.lastSeen')">
-                                <div class="sort-control">
-                                    <span class="label">{{ t('attacks.table.short.last') }}</span>
-                                    <button @click="toggleSort('lastSeen')" :aria-label="t('sorting.sortLastSeen')"
-                                        class="sort-button">
-                                        <span v-if="getSortDirection('lastSeen') === 1">▲</span>
-                                        <span v-else-if="getSortDirection('lastSeen') === -1">▼</span>
-                                        <span v-else>⇵</span>
-                                    </button>
-                                </div>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="attack in attacks" :key="attack.id">
-                            <td>
-                                <div style="display: flex; align-items: center; justify-content: center;">
-                                    <CountryFlag :countryCode="attack.ipDetails?.ipinfo?.country"
-                                        :tooltip="attack.ipDetails?.ipinfo ? `${attack.ipDetails.ipinfo.country} - ${attack.ipDetails.ipinfo.org || t('common.notAvailable')}` : t('common.notAvailable')" />
-                                </div>
-                            </td>
+                            </div>
 
-                            <td class="defcon-cell" :title="attack.dangerScore">
-                                <DefconIndicator :level="attack.dangerLevel" :dangerScore="attack.dangerScore"
-                                    mode="dot" />
-                            </td>
-                            <td>
-                                <router-link :to="{
-                                    name: 'AttackDetail',
-                                    params: { ip: attack.request.ip },
-                                    query: {
-                                        timeMode: attacksState.filters.timeMode,
-                                        agoValue: attacksState.filters.agoValue,
-                                        agoUnit: attacksState.filters.agoUnit,
-                                        minLogsForAttack: attacksState.filters.minLogs,
-                                        dateRange: attacksState.filters.dateRange && (attacksState.filters.dateRange[0] || attacksState.filters.dateRange[1]) ? JSON.stringify(attacksState.filters.dateRange) : undefined
-                                    }
-                                }" class="detail-link">
-                                    {{ t('common.detail') }}
-                                </router-link>
-                            </td>
-                            <td class="tecniche-cell">
-                                <div class="tech-wrapper">
-                                    <span v-for="tech in attack.attackPatterns" :key="tech" class="tech-chip">
-                                        <span class="tech-name">{{ tech }}</span>
-                                        <button @click.stop="copyFormatted('clipboard.attackTechnique', { tech: tech })"
-                                            class="btn-copy-mini-tech" :title="t('common.copyToClipboard')">📋</button>
+                            <div class="techniques-area" v-if="attack.attackPatterns?.length">
+                                <div class="tech-tags">
+                                    <span v-for="tech in attack.attackPatterns" :key="tech" class="tech-tag">
+                                        {{ tech }}
                                     </span>
                                 </div>
-                            </td>
-                            <td>
-                                <span style="display:inline-flex;align-items:center;">
-                                    <span class="detail-link" @click="goToIpDetails(attack.request.ip)"
-                                        style="cursor:pointer;" :title="t('common.infoIp')">{{ attack.request.ip
-                                        }}</span>
-                                    <button @click.stop="copyFormatted('clipboard.ip', { ip: attack.request.ip })"
-                                        class="btn-copy-ip" :title="t('common.copyToClipboard')">📋</button>
-                                    <button @click.stop="setIpFilter(attack.request.ip)" class="btn-copy-ip"
-                                        :title="t('common.copyToFilter')">⬇️</button>
-                                </span>
-                            </td>
-                            <td>{{ attack.averageScore }}</td>
-                            <td>{{ attack.countRateLimit }}</td>
-                            <td>{{ attack.rps }}</td>
-                            <td>{{ attack.totaleLogs }}</td>
-                            <td>{{ getHumanDuration(attack.durataAttacco.ms / 1000) }}</td>
-                            <td>
-                                <div class="time-display">
-                                    <span class="time-hour">{{ formatDateTime(attack.firstSeen) }}</span>
+                            </div>
+
+                            <div class="timeline-area">
+                                <div class="time-item">
+                                    <span class="label">{{ t('attacks.table.short.first') }}:</span>
+                                    <span class="value">{{ formatDateTime(attack.firstSeen) }}</span>
                                 </div>
-                            </td>
-                            <td>
-                                <div class="time-display">
-                                    <span class="time-hour">{{ formatDateTime(attack.lastSeen) }}</span>
+                                <div class="time-item">
+                                    <span class="label">{{ t('attacks.table.short.dur') }}:</span>
+                                    <span class="value">{{ getHumanDuration(attack.durataAttacco.ms / 1000) }}</span>
                                 </div>
-                            </td>
-                        </tr>
-                        <tr v-if="attacks.length === 0 && !loading">
-                            <td colspan="6" style="text-align:center;">
-                                {{ t('attacks.noAttacksFound') }}
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </section>
+                            </div>
+                        </div>
+
+                        <div class="card-actions">
+                            <router-link :to="{
+                                name: 'AttackDetail',
+                                params: { ip: attack.request.ip },
+                                query: {
+                                    timeMode: attacksState.filters.timeMode,
+                                    agoValue: attacksState.filters.agoValue,
+                                    agoUnit: attacksState.filters.agoUnit,
+                                    minLogsForAttack: attacksState.filters.minLogs,
+                                    dateRange: attacksState.filters.dateRange && (attacksState.filters.dateRange[0] || attacksState.filters.dateRange[1]) ? JSON.stringify(attacksState.filters.dateRange) : undefined
+                                }
+                            }" class="btn-detail">
+                                {{ t('common.detail').toUpperCase() }}
+                            </router-link>
+                            <div class="mini-tools">
+                                <button @click.stop="copyFormatted('clipboard.ip', { ip: attack.request.ip })" :title="t('common.copyToClipboard')">📋</button>
+                                <button @click.stop="setIpFilter(attack.request.ip)" :title="t('common.copyToFilter')">⬇️</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div v-if="attacks.length === 0 && !loading" class="no-results-grid">
+                        {{ t('attacks.noAttacksFound') }}
+                    </div>
+                </section>
+            </template>
         </div>
         <div class="pagination cyber-pagination" v-if="total > pageSize">
             <button :disabled="page === 1" @click="changePage(page - 1)">◄ {{ t('common.prev') }}</button>

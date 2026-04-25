@@ -121,3 +121,76 @@
   background: rgba(var(--theme-primary-rgb), 0.15) !important;
   color: var(--theme-accent);
 }
+
+/* === GRID VIEW - MAGMA EDITION === */
+.skin-cyber.attacchi .attack-card {
+    background: var(--cy-surface) !important;
+    border: 1px solid var(--cy-border) !important;
+    border-bottom: 4px solid var(--cy-primary) !important;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.8) !important;
+    clip-path: polygon(0 0, 100% 0, 100% 90%, 90% 100%, 0 100%);
+}
+
+.skin-cyber.attacchi .attack-card:hover {
+    border-color: var(--cy-primary) !important;
+    box-shadow: 0 0 25px rgba(var(--cy-primary-rgb), 0.3) !important;
+}
+
+.skin-cyber.attacchi .ip-address {
+    color: var(--cy-primary) !important;
+    text-shadow: 0 0 10px rgba(var(--cy-primary-rgb), 0.4);
+}
+
+.skin-cyber.attacchi .metric {
+    background: rgba(0, 0, 0, 0.6) !important;
+    border: 1px solid rgba(var(--cy-primary-rgb), 0.2) !important;
+}
+
+.skin-cyber.attacchi .metric .label {
+    color: var(--cy-primary);
+}
+
+.skin-cyber.attacchi .tech-tag {
+    background: rgba(var(--cy-primary-rgb), 0.1) !important;
+    border: 1px solid var(--cy-primary) !important;
+    color: var(--cy-primary) !important;
+}
+
+.skin-cyber.attacchi .btn-detail {
+    background: var(--cy-primary) !important;
+    color: var(--cy-bg) !important;
+    clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%);
+    letter-spacing: 1px;
+}
+
+.skin-cyber.attacchi .view-mode-pill {
+    background: rgba(0, 0, 0, 0.6) !important;
+    border: 1px solid var(--cy-primary) !important;
+    border-radius: 0 !important;
+}
+
+.skin-cyber.attacchi .mode-btn.active {
+    background: var(--cy-primary) !important;
+    color: var(--cy-bg) !important;
+    border-radius: 0 !important;
+}
+
+.skin-cyber.attacchi .mini-tools button:hover {
+    border-color: var(--cy-primary) !important;
+    color: var(--cy-primary) !important;
+}
+
+.skin-cyber.attacchi .reset-btn-mini {
+    border: 1px solid var(--cy-primary) !important;
+    background: rgba(var(--cy-primary-rgb), 0.1) !important;
+    border-radius: 0 !important;
+}
+
+.skin-cyber.attacchi .reset-btn-mini:hover {
+    background: var(--cy-primary) !important;
+    box-shadow: 0 0 15px var(--cy-primary) !important;
+}
+
+.skin-cyber.attacchi .reset-btn-mini:hover .reset-ascii span {
+    background: var(--cy-bg) !important;
+}

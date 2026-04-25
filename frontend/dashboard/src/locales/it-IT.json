@@ -97,7 +97,9 @@
         "logout": "Logout",
         "auth_required_title": "ACCESSO RISERVATO",
         "auth_required_desc": "I dossier investigativi e i report forensi sono accessibili solo ad analisti identificati.",
-        "reset_layout": "RIPRISTINA LAYOUT"
+        "reset_layout": "RIPRISTINA LAYOUT",
+        "view_list": "Vista Lista",
+        "view_grid": "Vista Griglia"
     },
     "skin": {
         "classic": "Classic",

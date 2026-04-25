@@ -458,12 +458,12 @@ export class ThreatLogService {
             try {
                 this.logger.info(`Processando batch ${batchNumber}...`);
 
-                // Recupera batch di log dal database
-                const logs = await this.getLogs({
-                    page: batchNumber,
-                    pageSize: batchSize,
-                    filters: httpFilter
-                });
+                // Recupera batch di log dal database direttamente per bypassare i limiti di UI (sanitizePageSize)
+                const logs = await ThreatLog.find(httpFilter)
+                    .sort({ timestamp: -1 })
+                    .skip(skip)
+                    .limit(batchSize)
+                    .lean();
 
                 const batchResults = await Promise.allSettled(
                     logs.map(async (logEntry: any) => {

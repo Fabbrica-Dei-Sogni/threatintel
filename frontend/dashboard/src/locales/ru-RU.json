@@ -304,7 +304,9 @@
         "avgIntensity": "Средняя Интенсивность Кластера",
         "distributedTimeline": "Распределенная Хронология",
         "ipList": "Список Узлов Кластера",
-        "reputationScore": "Репутационный Скоринг"
+        "reputationScore": "Репутационный Скоринг",
+        "viewProfile": "ПРОФИЛЬ",
+        "investigate": "ИССЛЕДОВАТЬ 👉"
     },
     "attackChart": {
         "title": "Анализ атак во времени",

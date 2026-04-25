@@ -304,7 +304,9 @@
         "avgIntensity": "Durchschnittliche Clusterintensität",
         "distributedTimeline": "Verteilte Zeitachse",
         "ipList": "Cluster-Knotenliste",
-        "reputationScore": "Reputations-Score"
+        "reputationScore": "Reputations-Score",
+        "viewProfile": "PROFIL",
+        "investigate": "UNTERSUCHEN 👉"
     },
     "attackChart": {
         "title": "Zeitliche Anomaliesanalyse",

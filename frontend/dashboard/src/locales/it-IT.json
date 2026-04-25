@@ -304,7 +304,9 @@
         "avgIntensity": "Intensità Media Cluster",
         "distributedTimeline": "Timeline Distribuita",
         "ipList": "Elenco Nodi Cluster",
-        "reputationScore": "Score Reputazione"
+        "reputationScore": "Score Reputazione",
+        "viewProfile": "PROFILO",
+        "investigate": "INVESTIGA 👉"
     },
     "attackChart": {
         "title": "Analisi Anomalie Temporale",

@@ -40,10 +40,10 @@ export interface CampaignsState {
 
 const DEFAULT_STATE: CampaignsState = {
     filters: {
-        minIps: 3,
+        minIps: 1,
         minScore: 0,
         minLogsPerIp: 1,
-        protocol: 'http',
+        protocol: '',
         timeMode: 'ago',
         agoValue: 7,
         agoUnit: 'days',

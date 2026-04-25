@@ -32,6 +32,11 @@
             <label class="cyber-label">PROT</label>
             <div class="protocol-reset-group">
               <div class="tabs-row">
+                <button class="tab-btn"
+                  :class="{ active: !campaignsStore.state.filters.protocol }"
+                  @click="campaignsStore.state.filters.protocol = ''">
+                  ALL
+                </button>
                 <button v-for="opt in ['http', 'https', 'ssh']" :key="opt" class="tab-btn"
                   :class="{ active: campaignsStore.state.filters.protocol === opt }"
                   @click="campaignsStore.state.filters.protocol = opt">
@@ -65,7 +70,7 @@
             <div class="tabs-row">
               <button v-for="val in dynamicIpScale" :key="val" class="tab-btn"
                 :class="{ active: campaignsStore.state.filters.minIps === val }"
-                @click="campaignsStore.state.filters.minIps = (campaignsStore.state.filters.minIps === val ? 3 : val)">
+                @click="campaignsStore.state.filters.minIps = (campaignsStore.state.filters.minIps === val ? 1 : val)">
                 {{ val }}
               </button>
             </div>

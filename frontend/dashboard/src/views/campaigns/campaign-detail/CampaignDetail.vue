@@ -111,8 +111,11 @@
             </div>
             
             <div class="node-footer-actions">
-              <button class="intel-det-btn-mini" @click="goToIp(node.ip)">
-                ANALISI IP 👉
+              <button class="intel-det-btn-mini btn-profile" @click="goToIp(node.ip)">
+                {{ t('campaignDetail.viewProfile') }}
+              </button>
+              <button class="intel-det-btn-mini btn-investigate" @click="investigateIp(node.ip)">
+                {{ t('campaignDetail.investigate') }}
               </button>
             </div>
           </div>
@@ -215,6 +218,29 @@ function getScoreClass(score) {
   if (score >= 50) return 'danger-medium';
   if (score >= 20) return 'danger-low';
   return 'danger-info';
+}
+
+function investigateIp(ip) {
+  const query = {
+    timeMode: props.timeMode,
+    agoValue: props.agoValue,
+    agoUnit: props.agoUnit,
+    minLogsForAttack: props.minLogsPerIp || 1
+  };
+  
+  // Gestione date custom per coerenza con AttackDetail
+  if (route.query.customStartTime || route.query.customEndTime) {
+    query.dateRange = JSON.stringify([
+      route.query.customStartTime || null,
+      route.query.customEndTime || null
+    ]);
+  }
+
+  router.push({
+    name: 'AttackDetail',
+    params: { ip },
+    query
+  });
 }
 
 function goToIp(ip) {
@@ -379,16 +405,17 @@ function goToIp(ip) {
 
 .node-footer-actions {
   display: flex;
-  justify-content: stretch;
+  justify-content: space-between;
+  gap: 10px;
 }
 
 .intel-det-btn-mini {
-  width: 100%;
+  flex: 1;
   background: transparent;
   border: 1px solid var(--cy-primary, #00FF41);
   color: var(--cy-primary, #00FF41);
-  font-size: 0.65rem;
-  padding: 6px;
+  font-size: 0.6rem;
+  padding: 6px 4px;
   cursor: pointer;
   transition: all 0.2s;
   font-weight: bold;
@@ -396,9 +423,19 @@ function goToIp(ip) {
   clip-path: polygon(5px 0, 100% 0, 100% 100%, 0 100%, 0 5px);
 }
 
+.btn-profile {
+  opacity: 0.8;
+  border-color: rgba(var(--cy-primary-rgb, 0, 255, 65), 0.5);
+}
+
+.btn-investigate {
+  background: rgba(var(--cy-primary-rgb, 0, 255, 65), 0.1);
+}
+
 .intel-det-btn-mini:hover {
   background: var(--cy-primary, #00FF41);
   color: #000;
+  opacity: 1;
   box-shadow: 0 0 15px rgba(var(--cy-primary-rgb, 0, 255, 65), 0.4);
 }
 </style>

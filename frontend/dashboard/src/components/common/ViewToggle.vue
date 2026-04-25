@@ -1,12 +1,15 @@
 <template>
-  <div class="view-toggle-wrapper" :class="[`theme-${theme}`, { 'is-active': modelValue }]" @click="toggle" :title="label">
-    <div class="toggle-container">
+  <div class="view-toggle-wrapper" :class="[`theme-${theme}`, { 'is-active': modelValue, 'compact': compact }]" @click="toggle" :title="label">
+    <div class="toggle-container" :class="{ 'compact': compact }">
       <div class="toggle-track">
         <div class="toggle-handle">
           <div class="led"></div>
         </div>
       </div>
-      <span class="toggle-label">{{ label }}</span>
+      <div class="label-group" v-if="label">
+        <span class="icon" v-if="icon">{{ icon }}</span>
+        <span class="toggle-label" :class="{ 'mini': compact }">{{ label }}</span>
+      </div>
     </div>
   </div>
 </template>
@@ -24,6 +27,14 @@ const props = defineProps({
   theme: {
     type: String,
     default: 'magma' // magma, amber, jade
+  },
+  compact: {
+    type: Boolean,
+    default: false
+  },
+  icon: {
+    type: String,
+    default: ''
   }
 });
 
@@ -48,10 +59,28 @@ const toggle = () => {
   backdrop-filter: blur(4px);
 }
 
+.view-toggle-wrapper.compact {
+  padding: 6px;
+}
+
+.view-toggle-wrapper.compact {
+  padding: 4px 8px;
+}
+
 .toggle-container {
   display: flex;
   align-items: center;
   gap: 10px;
+}
+
+.toggle-container.compact {
+  gap: 6px;
+}
+
+.label-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .toggle-track {
@@ -89,7 +118,20 @@ const toggle = () => {
 
 .toggle-label {
   color: #666;
+  font-size: 0.9rem;
+  font-weight: 600;
   transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.toggle-label.mini {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.icon {
+  font-size: 0.9rem;
 }
 
 /* Active State Styles */

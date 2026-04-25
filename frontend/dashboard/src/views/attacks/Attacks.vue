@@ -4,15 +4,6 @@
             <template #title>
                 <h1><span class="animated-icon pulse-magma">📡</span> {{ t('attacks.title') }}</h1>
             </template>
-            <template #actions>
-                <!-- Reset Button moved to Header -->
-                <button class="reset-btn-mini reset-view-control" @click="handleReset" :title="t('telemetry.reset_filters')">
-                    <div class="reset-ascii">
-                        <span></span>
-                        <span></span>
-                    </div>
-                </button>
-            </template>
         </GlobalHeader>
         <!-- Pulsanti per tornare alla Home principale e View Controls -->
         <div class="actions cyber-sticky-area cyber-sticky-top-1">
@@ -28,26 +19,19 @@
                 </button>
             </div>
             <div class="view-controls">
-                <ViewToggle v-model="attacksState.view.showMap" :label="t('common.showMap')" theme="magma" />
-                <ViewToggle v-model="attacksState.view.showChart" :label="t('common.showChart')" theme="magma" />
-                <!-- Grid/Table Toggle -->
-                <div class="view-mode-pill">
-                    <button 
-                        class="mode-btn" 
-                        :class="{ active: attacksState.view.viewMode === 'table' }"
-                        @click="attacksState.view.viewMode = 'table'"
-                        :title="t('common.view_list')"
-                    >
-                        ☰
-                    </button>
-                    <button 
-                        class="mode-btn" 
-                        :class="{ active: attacksState.view.viewMode === 'grid' }"
-                        @click="attacksState.view.viewMode = 'grid'"
-                        :title="t('common.view_grid')"
-                    >
-                        ▤
-                    </button>
+                <div class="toggle-group-vertical">
+                    <ViewToggle 
+                        v-model="attacksState.view.showMap" 
+                        :label="t('common.showMap')" 
+                        theme="magma" 
+                        compact 
+                    />
+                    <ViewToggle 
+                        v-model="attacksState.view.showChart" 
+                        :label="t('common.showChart')" 
+                        theme="magma" 
+                        compact 
+                    />
                 </div>
             </div>
         </div>
@@ -57,7 +41,15 @@
             <div class="filter-row main-filters">
                 <div class="filter-item">
                     <span class="cyber-label">PROT</span>
-                    <ProtocolSelector v-model="attacksState.filters.protocol" :options="['http', 'https', 'ssh']" theme="magma" />
+                    <div class="protocol-reset-group">
+                        <ProtocolSelector v-model="attacksState.filters.protocol" :options="['http', 'https', 'ssh']" theme="magma" />
+                        <button class="reset-btn-mini filter-reset-btn" @click="handleReset" :title="t('telemetry.reset_filters')">
+                            <div class="reset-ascii">
+                                <span></span>
+                                <span></span>
+                            </div>
+                        </button>
+                    </div>
                 </div>
 
                 <div class="filter-item min-logs">
@@ -114,6 +106,31 @@
                             @click="attacksStore.toggleDangerLevel(lvl)"
                         >
                             {{ lvl }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- View Mode Toggle Row -->
+            <div class="filter-row view-mode-row">
+                <div class="filter-item">
+                    <span class="cyber-label">{{ t('common.view').toUpperCase() }}</span>
+                    <div class="view-mode-pill">
+                        <button 
+                            class="mode-btn" 
+                            :class="{ active: attacksState.view.viewMode === 'table' }"
+                            @click="attacksState.view.viewMode = 'table'"
+                            :title="t('common.view_list')"
+                        >
+                            ☰
+                        </button>
+                        <button 
+                            class="mode-btn" 
+                            :class="{ active: attacksState.view.viewMode === 'grid' }"
+                            @click="attacksState.view.viewMode = 'grid'"
+                            :title="t('common.view_grid')"
+                        >
+                            ▤
                         </button>
                     </div>
                 </div>

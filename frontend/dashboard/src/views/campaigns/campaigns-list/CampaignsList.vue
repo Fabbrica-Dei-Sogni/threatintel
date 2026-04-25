@@ -20,13 +20,6 @@
         </button>
       </div>
       <div class="view-controls">
-        <!-- Reset Button -->
-        <button class="reset-btn-mini reset-view-control" @click="campaignsStore.resetFilters" :title="t('telemetry.reset_filters')">
-          <div class="reset-ascii">
-            <span></span>
-            <span></span>
-          </div>
-        </button>
       </div>
     </div>
 
@@ -36,11 +29,19 @@
       <section class="campaigns-filters">
         <div class="filter-group">
           <label class="cyber-label">PROT</label>
-          <div class="tabs-row">
-            <button v-for="opt in ['http', 'https', 'ssh']" :key="opt" class="tab-btn"
-              :class="{ active: campaignsStore.state.filters.protocol === opt }"
-              @click="campaignsStore.state.filters.protocol = opt">
-              {{ opt.toUpperCase() }}
+          <div class="protocol-reset-group">
+            <div class="tabs-row">
+              <button v-for="opt in ['http', 'https', 'ssh']" :key="opt" class="tab-btn"
+                :class="{ active: campaignsStore.state.filters.protocol === opt }"
+                @click="campaignsStore.state.filters.protocol = opt">
+                {{ opt.toUpperCase() }}
+              </button>
+            </div>
+            <button class="reset-btn-mini filter-reset-btn" @click="campaignsStore.resetFilters" :title="t('telemetry.reset_filters')">
+              <div class="reset-ascii">
+                <span></span>
+                <span></span>
+              </div>
             </button>
           </div>
         </div>
@@ -310,7 +311,7 @@ function goToAttacks() {
 }
 
 function goToLogs() {
-  router.push('/logs');
+  router.push('/threatlogs');
 }
 </script>
 

@@ -144,14 +144,11 @@
 
 .actions {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
   flex-wrap: wrap;
   gap: 16px;
   margin-bottom: 25px;
-  background: rgba(0, 0, 0, 0.2);
-  padding: 12px 16px;
-  border-radius: 8px;
   border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
@@ -160,10 +157,24 @@
     gap: 16px;
 }
 
-.view-controls {
+.protocol-reset-group {
     display: flex;
-    gap: 12px;
     align-items: center;
+    gap: 8px;
+}
+
+.filter-reset-btn {
+    margin-left: 4px;
+}
+
+.toggle-group-vertical {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 4px;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .btn-action {
@@ -559,8 +570,14 @@
   }
 
   .view-controls {
-    justify-content: space-between;
-    width: 100%;
+    justify-content: flex-start;
+    width: auto;
+    gap: 8px;
+  }
+
+  .toggle-group-vertical {
+    padding: 2px;
+    gap: 2px;
   }
 }
 

@@ -19,14 +19,7 @@
         </button>
       </div>
       <div class="view-controls">
-        <ViewToggle v-model="showChart" :label="t('common.showChart')" theme="amber" />
-        <!-- Reset Button -->
-        <button class="reset-btn-mini reset-view-control" @click="handleReset" :title="t('telemetry.reset_filters')">
-          <div class="reset-ascii">
-            <span></span>
-            <span></span>
-          </div>
-        </button>
+        <ViewToggle v-model="showChart" :label="t('common.showChart')" theme="amber" compact />
       </div>
     </div>
 
@@ -34,7 +27,15 @@
       <div class="filter-row main-filters">
         <div class="filter-item">
           <span class="cyber-label">PROT</span>
-          <ProtocolSelector v-model="filterProtocol" :options="['http', 'https', 'ssh']" theme="amber" />
+          <div class="protocol-reset-group">
+            <ProtocolSelector v-model="filterProtocol" :options="['http', 'https', 'ssh']" theme="amber" />
+            <button class="reset-btn-mini filter-reset-btn" @click="handleReset" :title="t('telemetry.reset_filters')">
+              <div class="reset-ascii">
+                <span></span>
+                <span></span>
+              </div>
+            </button>
+          </div>
         </div>
 
         <div class="filter-item search-box">
@@ -522,6 +523,16 @@ const handleReset = () => {
 
 .reset-view-control {
     margin-left: 15px;
+}
+
+.protocol-reset-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.filter-reset-btn {
+    margin-left: 4px;
 }
 
 /* Tooltip alignment for view controls */

@@ -11,15 +11,8 @@
                 }}</button>
             </div>
             <div class="view-controls">
-                <ViewToggle v-model="showMap" :label="$t('common.showMap')" theme="jade" />
-                <ViewToggle v-model="showChart" :label="$t('common.showChart')" theme="jade" />
-                <!-- Reset Button -->
-                <button class="reset-btn-mini reset-view-control" @click="handleReset" :title="$t('telemetry.reset_filters')">
-                    <div class="reset-ascii">
-                        <span></span>
-                        <span></span>
-                    </div>
-                </button>
+                <ViewToggle v-model="showMap" :label="$t('common.showMap')" theme="jade" compact />
+                <ViewToggle v-model="showChart" :label="$t('common.showChart')" theme="jade" compact />
             </div>
         </div>
 
@@ -27,7 +20,15 @@
             <div class="filter-row main-filters">
                 <div class="filter-item">
                     <span class="cyber-label">CATEGORY</span>
-                    <CowrieCategorySelector v-model="filterCategory" />
+                    <div class="category-reset-group">
+                        <CowrieCategorySelector v-model="filterCategory" />
+                        <button class="reset-btn-mini filter-reset-btn" @click="handleReset" :title="$t('telemetry.reset_filters')">
+                            <div class="reset-ascii">
+                                <span></span>
+                                <span></span>
+                            </div>
+                        </button>
+                    </div>
                 </div>
                 
                 <div class="filter-item search-box">
@@ -541,6 +542,16 @@ watch(() => sessions.value, () => {
 
 .reset-view-control {
     margin-left: 15px;
+}
+
+.category-reset-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.filter-reset-btn {
+    margin-left: 4px;
 }
 
 /* Tooltip alignment for view controls */

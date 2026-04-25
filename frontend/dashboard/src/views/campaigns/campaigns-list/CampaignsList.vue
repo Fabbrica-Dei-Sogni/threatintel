@@ -36,7 +36,13 @@
       <section class="campaigns-filters">
         <div class="filter-group">
           <label class="cyber-label">PROT</label>
-          <ProtocolSelector v-model="campaignsStore.state.filters.protocol" :options="['http', 'https', 'ssh']" />
+          <div class="tabs-row">
+            <button v-for="opt in ['http', 'https', 'ssh']" :key="opt" class="tab-btn"
+              :class="{ active: campaignsStore.state.filters.protocol === opt }"
+              @click="campaignsStore.state.filters.protocol = opt">
+              {{ opt.toUpperCase() }}
+            </button>
+          </div>
         </div>
 
         <div class="filter-group">
@@ -212,12 +218,12 @@ import { computed, toRef, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { storeToRefs } from 'pinia';
-import { useViewSettingsStore } from '../../stores/viewSettings';
-import { useCampaignsStore } from '../../stores/campaigns';
-import { useCampaignsDiscovery } from '../../composable/useCampaignsDiscovery';
-import GlobalHeader from '../../components/GlobalHeader.vue';
-import ProtocolSelector from '../../components/common/ProtocolSelector.vue';
-import { formatFullDateTime, formatHumanDuration } from '../../utils/dateUtils';
+import { useViewSettingsStore } from '../../../stores/viewSettings';
+import { useCampaignsStore } from '../../../stores/campaigns';
+import { useCampaignsDiscovery } from '../../../composable/useCampaignsDiscovery';
+import GlobalHeader from '../../../components/GlobalHeader.vue';
+import ProtocolSelector from '../../../components/common/ProtocolSelector.vue';
+import { formatFullDateTime, formatHumanDuration } from '../../../utils/dateUtils';
 import dayjs from 'dayjs';
 
 const { t } = useI18n();
@@ -309,3 +315,6 @@ function goToLogs() {
 </script>
 
 <style scoped src="./CampaignsList.css"></style>
+<style scoped>
+@import "./CampaignsListCyber.css";
+</style>

@@ -1,0 +1,84 @@
+/* CampaignsListCyber.css - PHOSPHORUS EDITION */
+
+.skin-cyber.campaigns-page {
+  --cy-primary: #00FF41;
+  --cy-primary-rgb: 0, 255, 65;
+  --cy-accent: #008020;
+  --cy-bg: #050a06;
+  --cy-surface: rgba(10, 25, 12, 0.9);
+  --cy-border: rgba(0, 255, 65, 0.25);
+  --cy-input-bg: rgba(0, 0, 0, 0.7);
+  
+  background-color: var(--cy-bg) !important;
+  color: #fff;
+  transition: all 0.3s ease;
+}
+
+/* === HUD SCANLINES overlays === */
+.skin-cyber.campaigns-page::before {
+  content: "";
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  background: linear-gradient(rgba(10, 15, 12, 0) 50%, rgba(0, 0, 0, 0.1) 50%),
+              linear-gradient(90deg, rgba(0, 255, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+  background-size: 100% 4px, 3px 100%;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.2;
+}
+
+/* === SEMANTIC THEME MAPPING === */
+.skin-cyber.campaigns-page {
+  --theme-primary: var(--cy-primary);
+  --theme-primary-rgb: var(--cy-primary-rgb);
+  --theme-accent: var(--cy-accent);
+  --theme-bg: var(--cy-bg);
+  --theme-surface: var(--cy-surface);
+  --theme-border: var(--cy-border);
+  --theme-text: #fff;
+  --theme-text-muted: rgba(255, 255, 255, 0.6);
+  --theme-radius: 0;
+  --theme-blur: blur(15px);
+
+  /* Button specific for Cyber Green */
+  --theme-btn-bg: linear-gradient(135deg, #00FF41, #008020);
+  --theme-btn-text: #000;
+  --theme-btn-shadow: rgba(0, 255, 65, 0.4);
+}
+
+/* === CYBER SPECIFIC OVERRIDES === */
+.skin-cyber.campaigns-page .campaign-card {
+  border-left: 3px solid var(--cy-primary) !important;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%);
+  background: rgba(var(--cy-primary-rgb), 0.05) !important;
+  border: 1px solid var(--cy-border) !important;
+}
+
+.skin-cyber.campaigns-page .campaign-card:hover {
+  background: rgba(var(--cy-primary-rgb), 0.12) !important;
+  box-shadow: 0 0 30px rgba(var(--cy-primary-rgb), 0.2) !important;
+  border-color: var(--cy-primary) !important;
+}
+
+.skin-cyber.campaigns-page .header-main-title {
+  color: var(--cy-primary) !important;
+  text-shadow: 0 0 20px rgba(var(--cy-primary-rgb), 0.6) !important;
+}
+
+.skin-cyber.campaigns-page .cyber-label {
+  color: var(--cy-primary) !important;
+  text-shadow: 0 0 5px rgba(var(--cy-primary-rgb), 0.3);
+}
+
+.skin-cyber.campaigns-page .tab-btn.active {
+  box-shadow: 0 0 15px var(--cy-primary) !important;
+}
+
+.skin-cyber.campaigns-page .size-val {
+  color: var(--cy-primary) !important;
+  text-shadow: 0 0 10px var(--cy-primary);
+}
+
+.skin-cyber.campaigns-page .stat-item .label {
+  color: var(--cy-primary) !important;
+}

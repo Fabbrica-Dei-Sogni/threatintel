@@ -1,0 +1,88 @@
+/* CampaignDetailCyber.css - PHOSPHORUS EDITION */
+
+.skin-cyber.campaign-detail-page {
+  --cy-primary: #00FF41;
+  --cy-primary-rgb: 0, 255, 65;
+  --cy-accent: #008020;
+  --cy-bg: #050a06;
+  --cy-surface: rgba(10, 25, 12, 0.9);
+  --cy-border: rgba(0, 255, 65, 0.25);
+  --cy-input-bg: rgba(0, 0, 0, 0.7);
+  
+  background-color: var(--cy-bg) !important;
+  color: #fff;
+  transition: all 0.3s ease;
+}
+
+/* === HUD SCANLINES overlays === */
+.skin-cyber.campaign-detail-page::before {
+  content: "";
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  background: linear-gradient(rgba(10, 15, 12, 0) 50%, rgba(0, 0, 0, 0.1) 50%),
+              linear-gradient(90deg, rgba(0, 255, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+  background-size: 100% 4px, 3px 100%;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.2;
+}
+
+/* === SEMANTIC THEME MAPPING === */
+.skin-cyber.campaign-detail-page {
+  --theme-primary: var(--cy-primary);
+  --theme-primary-rgb: var(--cy-primary-rgb);
+  --theme-accent: var(--cy-accent);
+  --theme-bg: var(--cy-bg);
+  --theme-surface: var(--cy-surface);
+  --theme-border: var(--cy-border);
+  --theme-text: #fff;
+  --theme-text-muted: rgba(255, 255, 255, 0.6);
+  --theme-radius: 0;
+  --theme-blur: blur(15px);
+
+  /* Button specific for Cyber Green */
+  --theme-btn-bg: linear-gradient(135deg, #00FF41, #008020);
+  --theme-btn-text: #000;
+  --theme-btn-shadow: rgba(0, 255, 65, 0.4);
+}
+
+.skin-cyber.campaign-detail-page h1,
+.skin-cyber.campaign-detail-page .header-main-title {
+  color: var(--cy-primary) !important;
+  text-shadow: 0 0 20px rgba(var(--cy-primary-rgb), 0.6) !important;
+  font-family: 'JetBrains Mono', monospace !important;
+}
+
+.skin-cyber.campaign-detail-page .forensic-card {
+  border-left: 3px solid var(--cy-primary) !important;
+  background: rgba(var(--cy-primary-rgb), 0.05) !important;
+  border: 1px solid var(--cy-border) !important;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%);
+}
+
+.skin-cyber.campaign-detail-page .forensic-card::after {
+  content: 'ANALYSIS_NODE';
+  position: absolute;
+  bottom: 8px;
+  right: 12px;
+  font-size: 0.55rem;
+  opacity: 0.4;
+  color: var(--cy-primary);
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 1px;
+}
+
+.skin-cyber.campaign-detail-page .metric-big {
+  color: var(--cy-primary) !important;
+  text-shadow: 0 0 10px rgba(var(--cy-primary-rgb), 0.4);
+}
+
+.skin-cyber.campaign-detail-page .node-card:hover {
+  background: rgba(var(--cy-primary-rgb), 0.1) !important;
+  box-shadow: inset 0 0 15px rgba(var(--cy-primary-rgb), 0.1);
+}
+
+.skin-cyber.campaign-detail-page .ascii-loader {
+  color: var(--cy-primary) !important;
+  text-shadow: 0 0 20px var(--cy-primary);
+}

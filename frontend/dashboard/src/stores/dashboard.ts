@@ -16,6 +16,7 @@ export interface DashboardRankingsState {
     campaignPage: number;
     campaignMinIps: number;
     campaignMinScore: number;
+    campaignProtocol: string;
 }
 
 export interface DashboardState {
@@ -39,7 +40,8 @@ const DEFAULT_STATE: DashboardState = {
         sessionPage: 1,
         campaignPage: 1,
         campaignMinIps: 5,
-        campaignMinScore: 15
+        campaignMinScore: 15,
+        campaignProtocol: 'http'
     },
     activeWidgets: [],
     showTicker: true
@@ -128,6 +130,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
     function resetCampaigns() {
         state.rankings.campaignMinIps = DEFAULT_STATE.rankings.campaignMinIps;
         state.rankings.campaignMinScore = DEFAULT_STATE.rankings.campaignMinScore;
+        state.rankings.campaignProtocol = DEFAULT_STATE.rankings.campaignProtocol;
         state.rankings.campaignPage = 1;
     }
 

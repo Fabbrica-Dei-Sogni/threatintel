@@ -164,7 +164,7 @@ const routes: RouteRecordRaw[] = [
     {
         path: '/campaigns',
         name: 'Campaigns',
-        component: () => import('../views/campaigns/CampaignsList.vue'),
+        component: () => import('../views/campaigns/campaigns-list/CampaignsList.vue'),
         props: (route: RouteLocationNormalized) => ({
             initialPage: route.query.page ? parseInt(route.query.page as string) : undefined,
             initialMinIps: route.query.minIps ? parseInt(route.query.minIps as string) : undefined,
@@ -176,7 +176,7 @@ const routes: RouteRecordRaw[] = [
     {
         path: '/campaign-detail/:hash',
         name: 'CampaignDetail',
-        component: () => import('../views/campaigns/CampaignDetail.vue'),
+        component: () => import('../views/campaigns/campaign-detail/CampaignDetail.vue'),
         props: (route: RouteLocationNormalized) => ({
             hash: route.params.hash,
             minLogsForAttack: route.query.minLogs ? parseInt(route.query.minLogs as string) : 1,

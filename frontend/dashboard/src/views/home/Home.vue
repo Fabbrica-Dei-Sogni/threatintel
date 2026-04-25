@@ -392,15 +392,17 @@
               :error="errorCampaigns" v-model:page="dashboardState.rankings.campaignPage" :pageSize="10"
               :total="campaignTotal" itemStyle="campaigns-ranking">
               
-              <template #header-actions>
-                 <button class="reset-btn-mini" @click="dashboardStore.resetCampaigns"
-                  :title="t('telemetry.reset_filters')">
+               <template #header-actions>
+                  <ProtocolSelector v-model="dashboardState.rankings.campaignProtocol" :options="['http', 'https', 'ssh']"
+                    theme="dark" />
+                  <button class="reset-btn-mini" @click="dashboardStore.resetCampaigns"
+                   :title="t('telemetry.reset_filters')">
                   <div class="reset-ascii">
                     <span></span>
                     <span></span>
                   </div>
                 </button>
-              </template>
+               </template>
 
               <template #filters>
                 <div class="filters-row">
@@ -720,6 +722,7 @@ const {
   toRef(dashboardState.rankings, 'campaignPage'),
   toRef(dashboardState.rankings, 'campaignMinIps'),
   toRef(dashboardState.rankings, 'campaignMinScore'),
+  toRef(dashboardState.rankings, 'campaignProtocol'),
   'ago', // initialTimeMode
   toRef(dashboardState.rankings, 'attackTimeValue'),
   toRef(dashboardState.rankings, 'attackTimeUnit'),

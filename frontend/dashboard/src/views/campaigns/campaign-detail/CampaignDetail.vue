@@ -107,10 +107,10 @@ import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { storeToRefs } from 'pinia';
-import { useViewSettingsStore } from '../../stores/viewSettings';
-import { fetchCampaignDetail } from '../../api';
-import GlobalHeader from '../../components/GlobalHeader.vue';
-import { formatFullDateTime, formatHumanDuration } from '../../utils/dateUtils';
+import { useViewSettingsStore } from '../../../stores/viewSettings';
+import { fetchCampaignDetail } from '../../../api';
+import GlobalHeader from '../../../components/GlobalHeader.vue';
+import { formatFullDateTime, formatHumanDuration } from '../../../utils/dateUtils';
 import dayjs from 'dayjs';
 
 const props = defineProps({
@@ -174,3 +174,6 @@ function goToIp(ip) {
 </script>
 
 <style scoped src="./CampaignDetail.css"></style>
+<style scoped>
+@import "./CampaignDetailCyber.css";
+</style>

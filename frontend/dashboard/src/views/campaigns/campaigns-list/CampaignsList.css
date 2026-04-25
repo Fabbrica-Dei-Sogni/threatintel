@@ -1,8 +1,28 @@
-/* CampaignsList.css */
+/* CampaignsList.css - BASE & CLASSIC SKIN */
 .campaigns-page {
     background-color: var(--theme-bg, #0b0f19);
     color: var(--theme-text, #f0e6d2);
     min-height: 100vh;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* === SEMANTIC THEME MAPPING (CLASSIC - BLUE/SLATE) === */
+.skin-classic.campaigns-page {
+  --theme-primary: #3b82f6;
+  --theme-primary-rgb: 59, 130, 246;
+  --theme-accent: #60a5fa;
+  --theme-bg: #0f172a;
+  --theme-surface: rgba(30, 41, 59, 0.7);
+  --theme-border: rgba(59, 130, 246, 0.2);
+  --theme-text: #f1f5f9;
+  --theme-text-muted: #94a3b8;
+  --theme-radius: 8px;
+  --theme-blur: blur(10px);
+
+  /* Button specific for Classic Blue */
+  --theme-btn-bg: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  --theme-btn-text: #fff;
+  --theme-btn-shadow: rgba(59, 130, 246, 0.3);
 }
 
 .campaigns-container {
@@ -18,9 +38,10 @@
   align-items: center;
   flex-wrap: wrap;
   gap: 16px;
-  background: var(--theme-surface, rgba(0, 0, 0, 0.2));
+  background: var(--theme-surface);
   padding: 12px 24px;
   border-bottom: 1px solid var(--theme-border);
+  backdrop-filter: var(--theme-blur);
 }
 
 .nav-actions {

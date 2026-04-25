@@ -274,7 +274,7 @@
     },
     "campaigns": {
         "title": "Кампании",
-        "homeButton": "Кампания",
+        "homeButton": "Кампании",
         "noCampaignsFound": "Распределенных кампаний не обнаружено",
         "minIpsLabel": "Мин. количество задействованных IP:",
         "ipsInvolved": "Задействовано IP: {count}",

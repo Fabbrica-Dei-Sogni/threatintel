@@ -274,7 +274,7 @@
     },
     "campaigns": {
         "title": "Kampanie",
-        "homeButton": "Kampania",
+        "homeButton": "Kampanie",
         "noCampaignsFound": "Nie wykryto żadnych rozproszonych kampanii",
         "minIpsLabel": "Minimalna liczba zaangażowanych IP:",
         "ipsInvolved": "{count} zaangażowanych IP",

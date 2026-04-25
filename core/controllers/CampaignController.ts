@@ -46,7 +46,8 @@ export class CampaignController {
 
             res.json({ 
                 campaigns: result.campaigns, 
-                count: result.count 
+                count: result.count,
+                metadata: result.metadata
             });
         } catch (err: any) {
             this.logger.error('[CampaignController] Error in campaigns discovery:', err);

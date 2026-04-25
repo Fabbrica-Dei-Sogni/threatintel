@@ -405,52 +405,56 @@
                </template>
 
               <template #filters>
-                <div class="filters-row">
-                  <!-- Time Range -->
-                  <div class="filter-item">
-                    <span class="filter-label">{{ t('telemetry.filter_label') }}: <span class="active-val">{{
-                      dashboardState.rankings.attackTimeValue === null ? t('common.all').toUpperCase() :
-                        (dashboardState.rankings.attackTimeValue + (dashboardState.rankings.attackTimeUnit === 'days' ?
-                        'D' : 'H')) }}</span></span>
-                    <div class="tabs-row log-threshold-tabs">
-                      <button v-for="opt in [
-                        { v: 10, u: 'days', l: '10D' },
-                        { v: 30, u: 'days', l: '1M' },
-                        { v: 90, u: 'days', l: '3M' },
-                        { v: 180, u: 'days', l: '6M' },
-                        { v: 365, u: 'days', l: '1Y' },
-                        { v: null, u: null, l: 'ALL' }
-                      ]" :key="opt.l" class="tab-btn"
-                        :class="{ active: dashboardState.rankings.attackTimeValue === opt.v && (opt.v === null || dashboardState.rankings.attackTimeUnit === opt.u) }"
-                        @click="dashboardState.rankings.attackTimeValue = opt.v; dashboardState.rankings.attackTimeUnit = opt.u">
-                        {{ opt.v === null ? t('common.all').toUpperCase() : opt.l }}
-                      </button>
+                <div class="filters-column-layout">
+                  <div class="filters-row">
+                    <!-- Time Range -->
+                    <div class="filter-item">
+                      <span class="filter-label">{{ t('telemetry.filter_label') }}: <span class="active-val">{{
+                        dashboardState.rankings.attackTimeValue === null ? t('common.all').toUpperCase() :
+                          (dashboardState.rankings.attackTimeValue + (dashboardState.rankings.attackTimeUnit === 'days' ?
+                          'D' : 'H')) }}</span></span>
+                      <div class="tabs-row log-threshold-tabs">
+                        <button v-for="opt in [
+                          { v: 10, u: 'days', l: '10D' },
+                          { v: 30, u: 'days', l: '1M' },
+                          { v: 90, u: 'days', l: '3M' },
+                          { v: 180, u: 'days', l: '6M' },
+                          { v: 365, u: 'days', l: '1Y' },
+                          { v: null, u: null, l: 'ALL' }
+                        ]" :key="opt.l" class="tab-btn"
+                          :class="{ active: dashboardState.rankings.attackTimeValue === opt.v && (opt.v === null || dashboardState.rankings.attackTimeUnit === opt.u) }"
+                          @click="dashboardState.rankings.attackTimeValue = opt.v; dashboardState.rankings.attackTimeUnit = opt.u">
+                          {{ opt.v === null ? t('common.all').toUpperCase() : opt.l }}
+                        </button>
+                      </div>
                     </div>
                   </div>
 
-                  <!-- Min IPs -->
-                  <div class="filter-item">
-                    <span class="filter-label">{{ t('telemetry.filter_ip_threshold_label') }}: <span
-                        class="active-val">{{ dashboardState.rankings.campaignMinIps }}</span></span>
-                    <div class="tabs-row log-threshold-tabs">
-                      <button v-for="val in [2, 5, 10, 20, 50, 100]" :key="val" class="tab-btn"
-                        :class="{ active: dashboardState.rankings.campaignMinIps === val }"
-                        @click="dashboardState.rankings.campaignMinIps = val">
-                        {{ val }}
-                      </button>
+                  <div class="filters-row dynamic-row-separator" v-if="campaignsStore.state.metadata.maxIpCount > 0 || campaignsStore.state.metadata.maxScore > 0">
+                    <!-- Min IPs -->
+                    <div class="filter-item" v-if="dynamicIpScaleHome.length > 0 && campaignsStore.state.metadata.maxIpCount > 0">
+                      <span class="filter-label">{{ t('telemetry.filter_ip_threshold_label') }}: <span
+                          class="active-val">{{ dashboardState.rankings.campaignMinIps }}</span></span>
+                      <div class="tabs-row log-threshold-tabs">
+                        <button v-for="val in dynamicIpScaleHome" :key="val" class="tab-btn"
+                          :class="{ active: dashboardState.rankings.campaignMinIps === val }"
+                          @click="dashboardState.rankings.campaignMinIps = val">
+                          {{ val }}
+                        </button>
+                      </div>
                     </div>
-                  </div>
 
-                  <!-- Min Score -->
-                  <div class="filter-item">
-                    <span class="filter-label">{{ t('telemetry.filter_score_label') }}: <span
-                        class="active-val">{{ dashboardState.rankings.campaignMinScore }}</span></span>
-                    <div class="tabs-row log-threshold-tabs">
-                      <button v-for="val in [0, 5, 10, 15, 20, 30, 40]" :key="val" class="tab-btn"
-                        :class="{ active: dashboardState.rankings.campaignMinScore === val }"
-                        @click="dashboardState.rankings.campaignMinScore = val">
-                        {{ val }}
-                      </button>
+                    <!-- Min Score -->
+                    <div class="filter-item" v-if="dynamicScoreScaleHome.length > 0 && campaignsStore.state.metadata.maxScore > 0">
+                      <span class="filter-label">{{ t('telemetry.filter_score_label') }}: <span
+                          class="active-val">{{ dashboardState.rankings.campaignMinScore }}</span></span>
+                      <div class="tabs-row log-threshold-tabs">
+                        <button v-for="val in dynamicScoreScaleHome" :key="val" class="tab-btn"
+                          :class="{ active: dashboardState.rankings.campaignMinScore === val }"
+                          @click="dashboardState.rankings.campaignMinScore = val">
+                          {{ val === 0 ? 'INFO' : val }}
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -542,6 +546,8 @@ import { useLogsFilter } from '../../composable/useLogsFilter';
 import { useAttacksFilter } from '../../composable/useAttacksFilter';
 import { useCowrieSessions } from '../../composable/useCowrieSessions';
 import { useCampaignsDiscovery } from '../../composable/useCampaignsDiscovery';
+import { useCampaignsStore } from '../../stores/campaigns';
+import { generateSmartScale, generateScoreScale } from '../../utils/filterUtils';
 import { useRouter } from 'vue-router'
 import { computed, onMounted, watch, ref, toRef } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -572,6 +578,7 @@ import { useAttacksStore } from '../../stores/attacks';
 const attacksStore = useAttacksStore();
 const dashboardStore = useDashboardStore();
 const viewStore = useViewSettingsStore();
+const campaignsStore = useCampaignsStore();
 const { state: dashboardState } = dashboardStore;
 const { dashboardSkin: currentSkin } = storeToRefs(viewStore);
 
@@ -730,6 +737,17 @@ const {
 );
 
 const recentCampaigns = computed(() => campaigns.value)
+
+// Scale dinamiche Home basate sui metadati globali delle campagne
+const dynamicIpScaleHome = computed(() => {
+  const { minIpCount, maxIpCount } = campaignsStore.state.metadata;
+  return generateSmartScale(minIpCount, maxIpCount);
+});
+
+const dynamicScoreScaleHome = computed(() => {
+  const { minScore, maxScore } = campaignsStore.state.metadata;
+  return generateScoreScale(Math.floor(minScore), Math.ceil(maxScore));
+});
 
 // Dossier - ultimi 5
 const recentDossiers = ref([]);

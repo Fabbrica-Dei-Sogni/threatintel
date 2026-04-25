@@ -1,6 +1,7 @@
 import { ref, isRef, type Ref } from 'vue';
 import { fetchCampaigns } from '../api/index.js';
 import { useSearchBase } from './useSearchBase';
+import { useCampaignsStore } from '../stores/campaigns';
 
 /**
  * Helper per normalizzare un input che può essere un valore semplice o un Ref
@@ -22,6 +23,7 @@ export function useCampaignsDiscovery(
     initialEndDate: (string | null) | Ref<string | null> = null
 ) {
     const minIps = toRef(initialMinIps);
+    const campaignsStore = useCampaignsStore();
     const minScore = toRef(initialMinScore);
     const protocol = toRef(initialProtocol);
     const timeMode = toRef(initialTimeMode);
@@ -63,6 +65,21 @@ export function useCampaignsDiscovery(
             
             campaigns.value = response.campaigns || [];
             total.value = response.count || campaigns.value.length;
+            
+            if (response.metadata) {
+                campaignsStore.state.metadata.minIpCount = response.metadata.minIpCount || 0;
+                campaignsStore.state.metadata.maxIpCount = response.metadata.maxIpCount || 0;
+                campaignsStore.state.metadata.minScore = response.metadata.minScore || 0;
+                campaignsStore.state.metadata.maxScore = response.metadata.maxScore || 0;
+
+                // Auto-reset filters if they fall out of the new dynamic range
+                if (minIps.value > campaignsStore.state.metadata.maxIpCount && campaignsStore.state.metadata.maxIpCount > 0) {
+                    minIps.value = 2; // Default min
+                }
+                if (minScore.value > campaignsStore.state.metadata.maxScore && campaignsStore.state.metadata.maxScore > 0) {
+                    minScore.value = 0; // Default min
+                }
+            }
             
         } catch (err) {
             console.error('[useCampaignsDiscovery] Error:', err);

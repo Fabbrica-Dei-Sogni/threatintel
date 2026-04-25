@@ -27,61 +27,65 @@
 
       <!-- Filters -->
       <section class="campaigns-filters">
-        <div class="filter-group">
-          <label class="cyber-label">PROT</label>
-          <div class="protocol-reset-group">
-            <div class="tabs-row">
-              <button v-for="opt in ['http', 'https', 'ssh']" :key="opt" class="tab-btn"
-                :class="{ active: campaignsStore.state.filters.protocol === opt }"
-                @click="campaignsStore.state.filters.protocol = opt">
-                {{ opt.toUpperCase() }}
+        <div class="filter-row top-filters">
+          <div class="filter-group">
+            <label class="cyber-label">PROT</label>
+            <div class="protocol-reset-group">
+              <div class="tabs-row">
+                <button v-for="opt in ['http', 'https', 'ssh']" :key="opt" class="tab-btn"
+                  :class="{ active: campaignsStore.state.filters.protocol === opt }"
+                  @click="campaignsStore.state.filters.protocol = opt">
+                  {{ opt.toUpperCase() }}
+                </button>
+              </div>
+              <button class="reset-btn-mini filter-reset-btn" @click="campaignsStore.resetFilters" :title="t('telemetry.reset_filters')">
+                <div class="reset-ascii">
+                  <span></span>
+                  <span></span>
+                </div>
               </button>
             </div>
-            <button class="reset-btn-mini filter-reset-btn" @click="campaignsStore.resetFilters" :title="t('telemetry.reset_filters')">
-              <div class="reset-ascii">
-                <span></span>
-                <span></span>
-              </div>
-            </button>
+          </div>
+
+          <div class="filter-group">
+            <label class="cyber-label">{{ t('telemetry.filter_label') }}</label>
+            <div class="tabs-row">
+              <button v-for="opt in [
+                { v: 1, u: 'hours', l: '1H' },
+                { v: 24, u: 'hours', l: '24H' },
+                { v: 7, u: 'days', l: '7D' },
+                { v: 30, u: 'days', l: '1M' },
+                { v: 90, u: 'days', l: '3M' }
+              ]" :key="opt.l" class="tab-btn"
+                :class="{ active: campaignsStore.state.filters.agoValue === opt.v && campaignsStore.state.filters.agoUnit === opt.u }"
+                @click="campaignsStore.state.filters.agoValue = opt.v; campaignsStore.state.filters.agoUnit = opt.u">
+                {{ opt.l }}
+              </button>
+            </div>
           </div>
         </div>
 
-        <div class="filter-group">
-          <label class="cyber-label">{{ t('campaigns.minIpsLabel') }}</label>
-          <div class="tabs-row">
-            <button v-for="val in [2, 3, 5, 10, 20]" :key="val" class="tab-btn"
-              :class="{ active: campaignsStore.state.filters.minIps === val }"
-              @click="campaignsStore.state.filters.minIps = val">
-              {{ val }}
-            </button>
+        <div class="filter-row dynamic-filters" v-if="campaignsStore.state.metadata.maxIpCount > 0 || campaignsStore.state.metadata.maxScore > 0">
+          <div class="filter-group" v-if="dynamicIpScale.length > 0 && campaignsStore.state.metadata.maxIpCount > 0">
+            <label class="cyber-label">{{ t('campaigns.minIpsLabel') }}</label>
+            <div class="tabs-row">
+              <button v-for="val in dynamicIpScale" :key="val" class="tab-btn"
+                :class="{ active: campaignsStore.state.filters.minIps === val }"
+                @click="campaignsStore.state.filters.minIps = val">
+                {{ val }}
+              </button>
+            </div>
           </div>
-        </div>
 
-        <div class="filter-group">
-          <label class="cyber-label">{{ t('telemetry.filter_score_label') }}</label>
-          <div class="tabs-row">
-            <button v-for="val in [0, 5, 10, 15, 20, 30]" :key="val" class="tab-btn"
-              :class="{ active: campaignsStore.state.filters.minScore === val }"
-              @click="campaignsStore.state.filters.minScore = val">
-              {{ val === 0 ? 'INFO' : val }}
-            </button>
-          </div>
-        </div>
-
-        <div class="filter-group">
-          <label class="cyber-label">{{ t('telemetry.filter_label') }}</label>
-          <div class="tabs-row">
-            <button v-for="opt in [
-              { v: 1, u: 'hours', l: '1H' },
-              { v: 24, u: 'hours', l: '24H' },
-              { v: 7, u: 'days', l: '7D' },
-              { v: 30, u: 'days', l: '1M' },
-              { v: 90, u: 'days', l: '3M' }
-            ]" :key="opt.l" class="tab-btn"
-              :class="{ active: campaignsStore.state.filters.agoValue === opt.v && campaignsStore.state.filters.agoUnit === opt.u }"
-              @click="campaignsStore.state.filters.agoValue = opt.v; campaignsStore.state.filters.agoUnit = opt.u">
-              {{ opt.l }}
-            </button>
+          <div class="filter-group" v-if="dynamicScoreScale.length > 0 && campaignsStore.state.metadata.maxScore > 0">
+            <label class="cyber-label">{{ t('telemetry.filter_score_label') }}</label>
+            <div class="tabs-row">
+              <button v-for="val in dynamicScoreScale" :key="val" class="tab-btn"
+                :class="{ active: campaignsStore.state.filters.minScore === val }"
+                @click="campaignsStore.state.filters.minScore = val">
+                {{ val === 0 ? 'INFO' : val }}
+              </button>
+            </div>
           </div>
         </div>
       </section>
@@ -225,6 +229,7 @@ import { useCampaignsDiscovery } from '../../../composable/useCampaignsDiscovery
 import GlobalHeader from '../../../components/GlobalHeader.vue';
 import ProtocolSelector from '../../../components/common/ProtocolSelector.vue';
 import { formatFullDateTime, formatHumanDuration } from '../../../utils/dateUtils';
+import { generateSmartScale, generateScoreScale } from '../../../utils/filterUtils';
 import dayjs from 'dayjs';
 
 const { t } = useI18n();
@@ -254,6 +259,17 @@ const {
   toRef(campaignsStore.state.filters, 'startDate'),
   toRef(campaignsStore.state.filters, 'endDate')
 );
+
+// Scale dinamiche calcolate dai metadati del backend
+const dynamicIpScale = computed(() => {
+  const { minIpCount, maxIpCount } = campaignsStore.state.metadata;
+  return generateSmartScale(minIpCount, maxIpCount);
+});
+
+const dynamicScoreScale = computed(() => {
+  const { minScore, maxScore } = campaignsStore.state.metadata;
+  return generateScoreScale(Math.floor(minScore), Math.ceil(maxScore));
+});
 
 // Logica paginazione standard
 const inputPage = ref(page.value);

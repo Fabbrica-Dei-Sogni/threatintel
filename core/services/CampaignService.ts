@@ -19,11 +19,8 @@ export class CampaignService {
     async getCampaigns(params: any) {
         const { minIps = 2, minScore = 0, protocol = 'http', page = 1, pageSize = 10, timeConfig = {} } = params;
 
-        // 1. Filtro Score e Protocollo (applicato subito alla base log)
+        // 1. Filtro Protocollo (applicato subito alla base log)
         const baseFilters: any = {};
-        const score = Number(minScore || 0);
-        if (score > 0) baseFilters['fingerprint.score'] = { $gte: score };
-
         if (protocol) {
             if (protocol === 'http') {
                 baseFilters.$or = [
@@ -35,17 +32,16 @@ export class CampaignService {
                 baseFilters.protocol = protocol;
             }
         }
-
-        // 2. Generazione automatica dello stage temporale (gestisce ago e range in modo solido)
-        // Mappiamo agoValue/agoUnit sui nomi attesi dal TimeFilterStage (minutes, hours, days, etc.)
+ 
+        // 2. Generazione stage temporale
         const timeParams = { ...timeConfig };
         if (timeConfig.timeMode === 'ago' && timeConfig.agoUnit && timeConfig.agoValue) {
             timeParams[timeConfig.agoUnit] = timeConfig.agoValue;
         }
         const timeStage = new TimeFilterStage(timeParams).generate();
-
+ 
         const pipeline = [
-            ...timeStage, // Lo stage temporale è il primo per performance
+            ...timeStage,
             { $match: baseFilters },
             {
                 $group: {
@@ -56,7 +52,6 @@ export class CampaignService {
                     lastSeen: { $max: '$timestamp' },
                     sampleUrl: { $first: '$request.url' },
                     sumScore: { $sum: '$fingerprint.score' },
-                    // Raccogliamo tutti gli indicatori unici di minaccia rilevati in tutto il cluster
                     allIndicators: { $push: '$fingerprint.indicators' }
                 }
             },
@@ -69,7 +64,6 @@ export class CampaignService {
                     firstSeen: 1,
                     lastSeen: 1,
                     sampleUrl: 1,
-                    // Appiattiamo l'array di array e teniamo solo i valori unici
                     attackPatterns: {
                         $reduce: {
                             input: '$allIndicators',
@@ -80,21 +74,64 @@ export class CampaignService {
                     averageScore: { $divide: ['$sumScore', '$totaleLogs'] }
                 }
             },
-            { $match: { ipCount: { $gte: Number(minIps) }, hash: { $ne: null } } },
-            { $sort: { ipCount: -1 as const, totaleLogs: -1 as const } },
+            { $match: { hash: { $ne: null } } }, // Filtro base per avere solo cluster validi
             {
                 $facet: {
-                    metadata: [{ $count: "total" }],
-                    data: [{ $skip: (page - 1) * pageSize }, { $limit: pageSize }]
+                    // 1. Limiti IP filtrati dalla soglia di rischio corrente
+                    boundsIps: [
+                        { $match: { averageScore: { $gte: Number(minScore) } } },
+                        {
+                            $group: {
+                                _id: null,
+                                minIpCount: { $min: "$ipCount" },
+                                maxIpCount: { $max: "$ipCount" }
+                            }
+                        }
+                    ],
+                    // 2. Limiti SCORE filtrati dal numero minimo di IP corrente
+                    boundsScore: [
+                        { $match: { ipCount: { $gte: Number(minIps) } } },
+                        {
+                            $group: {
+                                _id: null,
+                                minScore: { $min: "$averageScore" },
+                                maxScore: { $max: "$averageScore" }
+                            }
+                        }
+                    ],
+                    // 3. Conteggio totale (filtrato da entrambi)
+                    totalFiltered: [
+                        { $match: { ipCount: { $gte: Number(minIps) }, averageScore: { $gte: Number(minScore) } } },
+                        { $count: "total" }
+                    ],
+                    // 4. Dati paginati
+                    pagedData: [
+                        { $match: { ipCount: { $gte: Number(minIps) }, averageScore: { $gte: Number(minScore) } } },
+                        { $sort: { ipCount: -1 as const, totaleLogs: -1 as const } },
+                        { $skip: (page - 1) * pageSize },
+                        { $limit: pageSize }
+                    ]
                 }
             }
         ];
-
+ 
         try {
             const [result] = await ThreatLog.aggregate(pipeline).allowDiskUse(true);
+            const bIps = result?.boundsIps[0] || { minIpCount: 0, maxIpCount: 0 };
+            const bScore = result?.boundsScore[0] || { minScore: 0, maxScore: 0 };
+            
+            const totalCount = result?.totalFiltered[0]?.total || 0;
+            const data = result?.pagedData || [];
+            
             return { 
-                campaigns: result?.data || [], 
-                count: result?.metadata[0]?.total || 0 
+                campaigns: data, 
+                count: totalCount,
+                metadata: {
+                    minIpCount: bIps.minIpCount || 0,
+                    maxIpCount: bIps.maxIpCount || 0,
+                    minScore: bScore.minScore || 0,
+                    maxScore: bScore.maxScore || 0
+                }
             };
         } catch (err: any) {
             this.logger.error(`[CampaignService] Discovery Error: ${err.message}`);

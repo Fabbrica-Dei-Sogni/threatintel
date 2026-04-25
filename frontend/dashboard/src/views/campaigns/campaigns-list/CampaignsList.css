@@ -200,13 +200,24 @@
     backdrop-filter: blur(15px);
     border: 1px solid var(--theme-border);
     border-radius: 4px;
-    padding: 1.5rem;
+    padding: 1.2rem 1.5rem;
     margin-bottom: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+}
+
+.filter-row {
     display: flex;
     flex-wrap: wrap;
     gap: 2.5rem;
     align-items: flex-end;
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+}
+
+.dynamic-filters {
+    padding-top: 1.2rem;
+    border-top: 1px solid rgba(var(--theme-primary-rgb), 0.1);
 }
 
 .filter-group {

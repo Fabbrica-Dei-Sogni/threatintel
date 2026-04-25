@@ -615,3 +615,24 @@
 .skin-cyber .lock-icon {
   filter: drop-shadow(0 0 12px var(--neon-cyan));
 }
+
+/* Campaigns Multi-row Filters Stability */
+.skin-cyber .filters-column-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.skin-cyber .filters-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  align-items: flex-end;
+}
+
+.skin-cyber .dynamic-row-separator {
+  padding-top: 12px;
+  border-top: 1px solid rgba(0, 255, 255, 0.1);
+  margin-top: 4px;
+}

@@ -23,6 +23,12 @@ export interface CampaignsState {
         field: string;
         order: number;
     };
+    metadata: {
+        minIpCount: number;
+        maxIpCount: number;
+        minScore: number;
+        maxScore: number;
+    };
 }
 
 const DEFAULT_STATE: CampaignsState = {
@@ -43,6 +49,12 @@ const DEFAULT_STATE: CampaignsState = {
     sorting: {
         field: 'ipCount',
         order: -1
+    },
+    metadata: {
+        minIpCount: 2,
+        maxIpCount: 10,
+        minScore: 0,
+        maxScore: 100
     }
 };
 

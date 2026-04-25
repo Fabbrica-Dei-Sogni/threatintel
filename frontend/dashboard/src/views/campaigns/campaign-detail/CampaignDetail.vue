@@ -257,13 +257,28 @@ function goToIp(ip) {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
 
 .nodes-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 20px;
   margin-bottom: 30px;
+}
+
+@media (max-width: 480px) {
+  .nodes-list {
+    grid-template-columns: 1fr;
+  }
 }
 
 .enriched-node-card {
@@ -275,6 +290,7 @@ function goToIp(ip) {
   position: relative;
   clip-path: polygon(0 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%);
   font-family: 'JetBrains Mono', monospace;
+  overflow: hidden;
 }
 
 .enriched-node-card::after {
@@ -302,12 +318,22 @@ function goToIp(ip) {
   margin-bottom: 15px;
   border-bottom: 1px solid rgba(var(--cy-primary-rgb, 0, 255, 65), 0.15);
   padding-bottom: 10px;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 480px) {
+  .node-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
 
 .ip-info {
   display: flex;
   align-items: center;
   gap: 12px;
+  max-width: 100%;
 }
 
 .ip-val {
@@ -316,6 +342,7 @@ function goToIp(ip) {
   cursor: pointer;
   font-size: 1.05rem;
   letter-spacing: -0.5px;
+  word-break: break-all;
 }
 
 .ip-val:hover {
@@ -330,6 +357,7 @@ function goToIp(ip) {
   border: 1px solid currentColor;
   font-weight: 800;
   background: rgba(0, 0, 0, 0.3);
+  white-space: nowrap;
 }
 
 .danger-high { color: #ff3366; border-color: #ff3366; }
@@ -342,6 +370,13 @@ function goToIp(ip) {
   grid-template-columns: 1fr 1.5fr;
   gap: 15px;
   margin-bottom: 15px;
+}
+
+@media (max-width: 400px) {
+  .node-stats-row {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
 }
 
 .stat {
@@ -394,6 +429,7 @@ function goToIp(ip) {
   margin-bottom: 4px;
   display: flex;
   justify-content: space-between;
+  gap: 10px;
 }
 
 .time-point:last-child { margin-bottom: 0; }
@@ -401,12 +437,14 @@ function goToIp(ip) {
 .point-label {
   opacity: 0.5;
   font-weight: normal;
+  white-space: nowrap;
 }
 
 .node-footer-actions {
   display: flex;
   justify-content: space-between;
   gap: 10px;
+  flex-wrap: wrap;
 }
 
 .intel-det-btn-mini {
@@ -415,12 +453,13 @@ function goToIp(ip) {
   border: 1px solid var(--cy-primary, #00FF41);
   color: var(--cy-primary, #00FF41);
   font-size: 0.6rem;
-  padding: 6px 4px;
+  padding: 8px 4px;
   cursor: pointer;
   transition: all 0.2s;
   font-weight: bold;
   letter-spacing: 1px;
   clip-path: polygon(5px 0, 100% 0, 100% 100%, 0 100%, 0 5px);
+  min-width: 100px;
 }
 
 .btn-profile {

@@ -13,6 +13,7 @@ export function useCampaignsDiscovery(
     initialPage: number | Ref<number>,
     initialMinIps: number | Ref<number>,
     initialMinScore: number | Ref<number>,
+    initialProtocol: string | Ref<string>,
     initialTimeMode: ('ago' | 'range') | Ref<'ago' | 'range'>,
     initialAgoValue: (number | null) | Ref<number | null>,
     initialAgoUnit: (string | null) | Ref<string | null>,
@@ -22,6 +23,7 @@ export function useCampaignsDiscovery(
 ) {
     const minIps = toRef(initialMinIps);
     const minScore = toRef(initialMinScore);
+    const protocol = toRef(initialProtocol);
     const timeMode = toRef(initialTimeMode);
     const agoValue = toRef(initialAgoValue);
     const agoUnit = toRef(initialAgoUnit);
@@ -33,6 +35,7 @@ export function useCampaignsDiscovery(
     const filterRefs = [
         minIps,
         minScore,
+        protocol,
         timeMode,
         agoValue,
         agoUnit,
@@ -53,6 +56,7 @@ export function useCampaignsDiscovery(
                 endTime: endDate.value,
                 minIps: minIps.value,
                 minScore: minScore.value,
+                protocol: protocol.value,
                 page: page.value,
                 pageSize: pageSize.value
             });
@@ -86,6 +90,8 @@ export function useCampaignsDiscovery(
     return {
         campaigns,
         minIps,
+        minScore,
+        protocol,
         timeMode,
         agoValue,
         agoUnit,

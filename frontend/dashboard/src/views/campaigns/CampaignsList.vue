@@ -35,6 +35,11 @@
       <!-- Filters -->
       <section class="campaigns-filters">
         <div class="filter-group">
+          <label class="cyber-label">PROT</label>
+          <ProtocolSelector v-model="campaignsStore.state.filters.protocol" :options="['http', 'https', 'ssh']" />
+        </div>
+
+        <div class="filter-group">
           <label class="cyber-label">{{ t('campaigns.minIpsLabel') }}</label>
           <div class="tabs-row">
             <button v-for="val in [2, 3, 5, 10, 20]" :key="val" class="tab-btn"
@@ -211,6 +216,7 @@ import { useViewSettingsStore } from '../../stores/viewSettings';
 import { useCampaignsStore } from '../../stores/campaigns';
 import { useCampaignsDiscovery } from '../../composable/useCampaignsDiscovery';
 import GlobalHeader from '../../components/GlobalHeader.vue';
+import ProtocolSelector from '../../components/common/ProtocolSelector.vue';
 import { formatFullDateTime, formatHumanDuration } from '../../utils/dateUtils';
 import dayjs from 'dayjs';
 
@@ -233,6 +239,7 @@ const {
   toRef(campaignsStore.state.pagination, 'page'),
   toRef(campaignsStore.state.filters, 'minIps'),
   toRef(campaignsStore.state.filters, 'minScore'),
+  toRef(campaignsStore.state.filters, 'protocol'),
   toRef(campaignsStore.state.filters, 'timeMode'),
   toRef(campaignsStore.state.filters, 'agoValue'),
   toRef(campaignsStore.state.filters, 'agoUnit'),
@@ -274,7 +281,8 @@ function goToDetail(hash) {
     timeMode: campaignsStore.state.filters.timeMode,
     agoValue: campaignsStore.state.filters.agoValue,
     agoUnit: campaignsStore.state.filters.agoUnit,
-    minScore: campaignsStore.state.filters.minScore
+    minScore: campaignsStore.state.filters.minScore,
+    protocol: campaignsStore.state.filters.protocol
   };
 
   if (campaignsStore.state.filters.startDate) query.customStartTime = campaignsStore.state.filters.startDate;

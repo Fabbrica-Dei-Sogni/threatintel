@@ -523,6 +523,7 @@ export async function fetchCampaigns({
     agoUnit,
     minIps = 2,
     minScore = 0,
+    protocol = 'http',
     page = 1,
     pageSize = 10
 }: {
@@ -533,12 +534,13 @@ export async function fetchCampaigns({
     agoUnit?: string | null;
     minIps?: number;
     minScore?: number;
+    protocol?: string;
     page?: number;
     pageSize?: number;
 } = {}): Promise<any> {
     try {
         const response = await apiClient.get('/campaigns', {
-            params: { startTime, endTime, timeMode, agoValue, agoUnit, minIps, minScore, page, pageSize }
+            params: { startTime, endTime, timeMode, agoValue, agoUnit, minIps, minScore, protocol, page, pageSize }
         });
         return response.data;
     } catch (error) {
@@ -552,12 +554,14 @@ export async function fetchCampaignDetail({
     ips = [],
     minLogsForAttack = 1,
     minScore = 0,
+    protocol = null,
     timeConfig = {}
 }: {
     hash: string;
     ips?: string[];
     minLogsForAttack?: number;
     minScore?: number;
+    protocol?: string | null;
     timeConfig?: any;
 }): Promise<any> {
     try {
@@ -566,6 +570,7 @@ export async function fetchCampaignDetail({
             ips,
             minLogsForAttack,
             minScore,
+            protocol,
             timeConfig
         });
         return response.data;

@@ -17,12 +17,24 @@ export class CampaignService {
      * Centralizza la logica del tempo usando il TimeFilterStage per coerenza globale.
      */
     async getCampaigns(params: any) {
-        const { minIps = 2, minScore = 0, page = 1, pageSize = 10, timeConfig = {} } = params;
+        const { minIps = 2, minScore = 0, protocol = 'http', page = 1, pageSize = 10, timeConfig = {} } = params;
 
-        // 1. Filtro Score (applicato subito alla base log)
+        // 1. Filtro Score e Protocollo (applicato subito alla base log)
         const baseFilters: any = {};
         const score = Number(minScore || 0);
-        if (score > 0) baseFilters['fingerprint.score'] = { $gt: score };
+        if (score > 0) baseFilters['fingerprint.score'] = { $gte: score };
+
+        if (protocol) {
+            if (protocol === 'http') {
+                baseFilters.$or = [
+                    { protocol: 'http' },
+                    { protocol: { $exists: false } },
+                    { protocol: null }
+                ];
+            } else {
+                baseFilters.protocol = protocol;
+            }
+        }
 
         // 2. Generazione automatica dello stage temporale (gestisce ago e range in modo solido)
         // Mappiamo agoValue/agoUnit sui nomi attesi dal TimeFilterStage (minutes, hours, days, etc.)
@@ -94,11 +106,23 @@ export class CampaignService {
      * Dettaglio (Forensics): Analisi profonda dello stesso cluster.
      */
     async getCampaignDetail(params: any) {
-        const { hash, minScore = 0, timeConfig = {}, minLogsForAttack = 1 } = params;
+        const { hash, minScore = 0, protocol = null, timeConfig = {}, minLogsForAttack = 1 } = params;
 
         const baseFilters: any = { 'fingerprint.hash': hash };
         const score = Number(minScore || 0);
-        if (score > 0) baseFilters['fingerprint.score'] = { $gt: score };
+        if (score > 0) baseFilters['fingerprint.score'] = { $gte: score };
+
+        if (protocol) {
+            if (protocol === 'http') {
+                baseFilters.$or = [
+                    { protocol: 'http' },
+                    { protocol: { $exists: false } },
+                    { protocol: null }
+                ];
+            } else {
+                baseFilters.protocol = protocol;
+            }
+        }
 
         // Normalizzazione parametri tempo per la pipeline forense
         const timeParams = { ...timeConfig };

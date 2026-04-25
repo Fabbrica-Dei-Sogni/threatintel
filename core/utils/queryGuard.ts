@@ -42,7 +42,7 @@ const COWRIE_SESSION_FILTER_FIELDS = new Set([
 ]);
 
 const CAMPAIGN_FILTER_FIELDS = new Set([
-    'minIps', 'minScore', 'startTime', 'endTime', 'page', 'pageSize', 'timeMode', 'agoValue', 'agoUnit'
+    'minIps', 'minScore', 'protocol', 'startTime', 'endTime', 'page', 'pageSize', 'timeMode', 'agoValue', 'agoUnit'
 ]);
 
 const CAMPAIGN_SORT_FIELDS = new Set([

@@ -39,6 +39,7 @@ export class CampaignController {
                 }, 
                 minIps: minIpsNum,
                 minScore: minScoreNum,
+                protocol: cleanQuery.protocol as string,
                 page: pageNum,
                 pageSize: pageSizeNum
             });
@@ -60,7 +61,7 @@ export class CampaignController {
     async getCampaignDetail(req: Request, res: Response): Promise<void> {
         this.logger.info(`[CampaignController] Requesting campaign details for hash ${req.body.hash}`);
         try {
-            const { ips, hash, minLogsForAttack = 1, minScore = 0, timeConfig = {} } = req.body;
+            const { ips, hash, minLogsForAttack = 1, minScore = 0, protocol = null, timeConfig = {} } = req.body;
             if (!hash) {
                 res.status(400).json({ error: 'Hash mancante' });
                 return;
@@ -71,6 +72,7 @@ export class CampaignController {
                 hash,
                 minLogsForAttack: parseInt(minLogsForAttack),
                 minScore: parseInt(minScore),
+                protocol,
                 timeConfig
             });
 

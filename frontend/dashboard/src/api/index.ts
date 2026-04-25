@@ -523,6 +523,7 @@ export async function fetchCampaigns({
     agoUnit,
     minIps = 2,
     minScore = 0,
+    minLogsPerIp = 1,
     protocol = 'http',
     page = 1,
     pageSize = 10
@@ -534,13 +535,14 @@ export async function fetchCampaigns({
     agoUnit?: string | null;
     minIps?: number;
     minScore?: number;
+    minLogsPerIp?: number;
     protocol?: string;
     page?: number;
     pageSize?: number;
 } = {}): Promise<any> {
     try {
         const response = await apiClient.get('/campaigns', {
-            params: { startTime, endTime, timeMode, agoValue, agoUnit, minIps, minScore, protocol, page, pageSize }
+            params: { startTime, endTime, timeMode, agoValue, agoUnit, minIps, minScore, minLogsPerIp, protocol, page, pageSize }
         });
         return response.data;
     } catch (error) {

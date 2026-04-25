@@ -5,6 +5,7 @@ import { storage, StorageNamespace } from '../utils/storage';
 export interface CampaignsFilters {
     minIps: number;
     minScore: number;
+    minLogsPerIp: number;
     protocol: string;
     timeMode: 'ago' | 'range';
     agoValue: number;
@@ -28,6 +29,8 @@ export interface CampaignsState {
         maxIpCount: number;
         minScore: number;
         maxScore: number;
+        minLogsPerIp: number;
+        maxLogsPerIp: number;
         minDate: string | null;
         maxDate: string | null;
         globalMinDate: string | null;
@@ -39,6 +42,7 @@ const DEFAULT_STATE: CampaignsState = {
     filters: {
         minIps: 3,
         minScore: 0,
+        minLogsPerIp: 1,
         protocol: 'http',
         timeMode: 'ago',
         agoValue: 7,
@@ -59,6 +63,8 @@ const DEFAULT_STATE: CampaignsState = {
         maxIpCount: 10,
         minScore: 0,
         maxScore: 100,
+        minLogsPerIp: 1,
+        maxLogsPerIp: 10,
         minDate: null,
         maxDate: null,
         globalMinDate: null,

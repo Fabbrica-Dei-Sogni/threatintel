@@ -28,6 +28,7 @@ export class CampaignController {
             // Parametri specifici convertiti in numero
             const minIpsNum = parseInt(cleanQuery.minIps as string) || 2;
             const minScoreNum = parseInt(cleanQuery.minScore as string) || 0;
+            const minLogsPerIpNum = parseInt(cleanQuery.minLogsPerIp as string) || 1;
             
             const result = await this.campaignService.getCampaigns({ 
                 timeConfig: {
@@ -39,6 +40,7 @@ export class CampaignController {
                 }, 
                 minIps: minIpsNum,
                 minScore: minScoreNum,
+                minLogsPerIp: minLogsPerIpNum,
                 protocol: cleanQuery.protocol as string,
                 page: pageNum,
                 pageSize: pageSizeNum

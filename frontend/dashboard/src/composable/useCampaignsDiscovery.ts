@@ -19,12 +19,14 @@ export function useCampaignsDiscovery(
     initialAgoValue: (number | null) | Ref<number | null>,
     initialAgoUnit: (string | null) | Ref<string | null>,
     initialPageSize: number | Ref<number> = 10,
+    initialMinLogsPerIp: number | Ref<number> = 1,
     initialStartDate: (string | null) | Ref<string | null> = null,
     initialEndDate: (string | null) | Ref<string | null> = null
 ) {
     const minIps = toRef(initialMinIps);
     const campaignsStore = useCampaignsStore();
     const minScore = toRef(initialMinScore);
+    const minLogsPerIp = toRef(initialMinLogsPerIp);
     const protocol = toRef(initialProtocol);
     const timeMode = toRef(initialTimeMode);
     const agoValue = toRef(initialAgoValue);
@@ -37,6 +39,7 @@ export function useCampaignsDiscovery(
     const filterRefs = [
         minIps,
         minScore,
+        minLogsPerIp,
         protocol,
         timeMode,
         agoValue,
@@ -58,6 +61,7 @@ export function useCampaignsDiscovery(
                 endTime: endDate.value,
                 minIps: minIps.value,
                 minScore: minScore.value,
+                minLogsPerIp: minLogsPerIp.value,
                 protocol: protocol.value,
                 page: page.value,
                 pageSize: pageSize.value
@@ -71,6 +75,8 @@ export function useCampaignsDiscovery(
                 campaignsStore.state.metadata.maxIpCount = response.metadata.maxIpCount || 0;
                 campaignsStore.state.metadata.minScore = response.metadata.minScore || 0;
                 campaignsStore.state.metadata.maxScore = response.metadata.maxScore || 0;
+                campaignsStore.state.metadata.minLogsPerIp = response.metadata.minLogsPerIp || 0;
+                campaignsStore.state.metadata.maxLogsPerIp = response.metadata.maxLogsPerIp || 0;
                 campaignsStore.state.metadata.minDate = response.metadata.minDate || null;
                 campaignsStore.state.metadata.maxDate = response.metadata.maxDate || null;
                 campaignsStore.state.metadata.globalMinDate = response.metadata.globalMinDate || null;
@@ -82,6 +88,9 @@ export function useCampaignsDiscovery(
                 }
                 if (minScore.value > campaignsStore.state.metadata.maxScore && campaignsStore.state.metadata.maxScore > 0) {
                     minScore.value = 0; // Default min
+                }
+                if (minLogsPerIp.value > campaignsStore.state.metadata.maxLogsPerIp && campaignsStore.state.metadata.maxLogsPerIp > 0) {
+                    minLogsPerIp.value = 1; // Default min quality
                 }
             }
             
@@ -112,6 +121,7 @@ export function useCampaignsDiscovery(
         campaigns,
         minIps,
         minScore,
+        minLogsPerIp,
         protocol,
         timeMode,
         agoValue,

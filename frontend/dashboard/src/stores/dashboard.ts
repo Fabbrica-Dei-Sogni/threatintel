@@ -19,6 +19,7 @@ export interface DashboardRankingsState {
     campaignProtocol: string;
     campaignTimeValue: number | null;
     campaignTimeUnit: string | null;
+    campaignMinLogsPerIp: number;
 }
 
 export interface DashboardState {
@@ -45,7 +46,8 @@ const DEFAULT_STATE: DashboardState = {
         campaignMinScore: 15,
         campaignProtocol: 'http',
         campaignTimeValue: 7,
-        campaignTimeUnit: 'days'
+        campaignTimeUnit: 'days',
+        campaignMinLogsPerIp: 1
     },
     activeWidgets: [],
     showTicker: true
@@ -138,6 +140,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
         state.rankings.campaignProtocol = DEFAULT_STATE.rankings.campaignProtocol;
         state.rankings.campaignTimeValue = DEFAULT_STATE.rankings.campaignTimeValue;
         state.rankings.campaignTimeUnit = DEFAULT_STATE.rankings.campaignTimeUnit;
+        state.rankings.campaignMinLogsPerIp = DEFAULT_STATE.rankings.campaignMinLogsPerIp;
         state.rankings.campaignPage = 1;
     }
 

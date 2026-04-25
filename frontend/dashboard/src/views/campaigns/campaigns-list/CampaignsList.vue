@@ -60,12 +60,12 @@
         </div>
 
         <div class="filter-row dynamic-filters" v-if="campaignsStore.state.metadata.maxIpCount > 0 || campaignsStore.state.metadata.maxScore > 0">
-          <div class="filter-group" v-if="dynamicIpScale.length > 0 && campaignsStore.state.metadata.maxIpCount > 0">
+          <div class="filter-group" v-if="campaignsStore.state.metadata.maxIpCount > 0">
             <label class="cyber-label">{{ t('campaigns.minIpsLabel') }}</label>
             <div class="tabs-row">
               <button v-for="val in dynamicIpScale" :key="val" class="tab-btn"
                 :class="{ active: campaignsStore.state.filters.minIps === val }"
-                @click="campaignsStore.state.filters.minIps = val">
+                @click="campaignsStore.state.filters.minIps = (campaignsStore.state.filters.minIps === val ? 3 : val)">
                 {{ val }}
               </button>
             </div>
@@ -76,8 +76,19 @@
             <div class="tabs-row">
               <button v-for="val in dynamicScoreScale" :key="val" class="tab-btn"
                 :class="{ active: campaignsStore.state.filters.minScore === val }"
-                @click="campaignsStore.state.filters.minScore = val">
+                @click="campaignsStore.state.filters.minScore = (campaignsStore.state.filters.minScore === val ? 0 : val)">
                 {{ val === 0 ? 'INFO' : val }}
+              </button>
+            </div>
+          </div>
+
+          <div class="filter-group" v-if="dynamicLogsPerIpScale.length > 0 && campaignsStore.state.metadata.maxLogsPerIp > 0">
+            <label class="cyber-label">LOGS/IP</label>
+            <div class="tabs-row">
+              <button v-for="val in dynamicLogsPerIpScale" :key="val" class="tab-btn"
+                :class="{ active: campaignsStore.state.filters.minLogsPerIp === val }"
+                @click="campaignsStore.state.filters.minLogsPerIp = (campaignsStore.state.filters.minLogsPerIp === val ? 1 : val)">
+                {{ val }}
               </button>
             </div>
           </div>
@@ -250,6 +261,7 @@ const {
   toRef(campaignsStore.state.filters, 'agoValue'),
   toRef(campaignsStore.state.filters, 'agoUnit'),
   toRef(campaignsStore.state.pagination, 'pageSize'),
+  toRef(campaignsStore.state.filters, 'minLogsPerIp'),
   toRef(campaignsStore.state.filters, 'startDate'),
   toRef(campaignsStore.state.filters, 'endDate')
 );
@@ -268,6 +280,11 @@ const dynamicScoreScale = computed(() => {
 const dynamicTimeScale = computed(() => {
   const { minDate, maxDate, globalMinDate, globalMaxDate } = campaignsStore.state.metadata;
   return generateTimeScale(minDate, maxDate, globalMinDate, globalMaxDate);
+});
+
+const dynamicLogsPerIpScale = computed(() => {
+  const { minLogsPerIp, maxLogsPerIp } = campaignsStore.state.metadata;
+  return generateSmartScale(minLogsPerIp, maxLogsPerIp);
 });
 
 // Logica paginazione standard

@@ -418,13 +418,13 @@
 
                   <div class="filters-row dynamic-row-separator" v-if="campaignsStore.state.metadata.maxIpCount > 0 || campaignsStore.state.metadata.maxScore > 0">
                     <!-- Min IPs -->
-                    <div class="filter-item" v-if="dynamicIpScaleHome.length > 0 && campaignsStore.state.metadata.maxIpCount > 0">
+                    <div class="filter-item" v-if="campaignsStore.state.metadata.maxIpCount > 0">
                       <span class="filter-label">{{ t('telemetry.filter_ip_threshold_label') }}: <span
                           class="active-val">{{ dashboardState.rankings.campaignMinIps }}</span></span>
                       <div class="tabs-row log-threshold-tabs">
                         <button v-for="val in dynamicIpScaleHome" :key="val" class="tab-btn"
                           :class="{ active: dashboardState.rankings.campaignMinIps === val }"
-                          @click="dashboardState.rankings.campaignMinIps = val">
+                          @click="dashboardState.rankings.campaignMinIps = (dashboardState.rankings.campaignMinIps === val ? 3 : val)">
                           {{ val }}
                         </button>
                       </div>
@@ -437,8 +437,21 @@
                       <div class="tabs-row log-threshold-tabs">
                         <button v-for="val in dynamicScoreScaleHome" :key="val" class="tab-btn"
                           :class="{ active: dashboardState.rankings.campaignMinScore === val }"
-                          @click="dashboardState.rankings.campaignMinScore = val">
+                          @click="dashboardState.rankings.campaignMinScore = (dashboardState.rankings.campaignMinScore === val ? 0 : val)">
                           {{ val === 0 ? 'INFO' : val }}
+                        </button>
+                      </div>
+                    </div>
+
+                    <!-- Logs per IP -->
+                    <div class="filter-item" v-if="dynamicLogsPerIpScaleHome.length > 0 && campaignsStore.state.metadata.maxLogsPerIp > 0">
+                      <span class="filter-label">LOGS/IP: <span
+                          class="active-val">{{ dashboardState.rankings.campaignMinLogsPerIp }}</span></span>
+                      <div class="tabs-row log-threshold-tabs">
+                        <button v-for="val in dynamicLogsPerIpScaleHome" :key="val" class="tab-btn"
+                          :class="{ active: dashboardState.rankings.campaignMinLogsPerIp === val }"
+                          @click="dashboardState.rankings.campaignMinLogsPerIp = (dashboardState.rankings.campaignMinLogsPerIp === val ? 1 : val)">
+                          {{ val }}
                         </button>
                       </div>
                     </div>
@@ -719,7 +732,8 @@ const {
   'ago', // initialTimeMode
   toRef(dashboardState.rankings, 'campaignTimeValue'),
   toRef(dashboardState.rankings, 'campaignTimeUnit'),
-  10
+  10,
+  toRef(dashboardState.rankings, 'campaignMinLogsPerIp')
 );
 
 const recentCampaigns = computed(() => campaigns.value)
@@ -738,6 +752,11 @@ const dynamicScoreScaleHome = computed(() => {
 const dynamicTimeScaleHome = computed(() => {
   const { minDate, maxDate, globalMinDate, globalMaxDate } = campaignsStore.state.metadata;
   return generateTimeScale(minDate, maxDate, globalMinDate, globalMaxDate);
+});
+
+const dynamicLogsPerIpScaleHome = computed(() => {
+  const { minLogsPerIp, maxLogsPerIp } = campaignsStore.state.metadata;
+  return generateSmartScale(minLogsPerIp, maxLogsPerIp);
 });
 
 // Dossier - ultimi 5

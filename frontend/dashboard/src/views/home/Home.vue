@@ -741,12 +741,12 @@ const recentCampaigns = computed(() => campaigns.value)
 // Scale dinamiche Home basate sui metadati globali delle campagne
 const dynamicIpScaleHome = computed(() => {
   const { minIpCount, maxIpCount } = campaignsStore.state.metadata;
-  return generateSmartScale(minIpCount, maxIpCount);
+  return generateSmartScale(minIpCount, maxIpCount, 6, dashboardState.rankings.campaignMinIps);
 });
 
 const dynamicScoreScaleHome = computed(() => {
   const { minScore, maxScore } = campaignsStore.state.metadata;
-  return generateScoreScale(Math.floor(minScore), Math.ceil(maxScore));
+  return generateScoreScale(Math.floor(minScore), Math.ceil(maxScore), dashboardState.rankings.campaignMinScore);
 });
 
 const dynamicTimeScaleHome = computed(() => {
@@ -756,7 +756,7 @@ const dynamicTimeScaleHome = computed(() => {
 
 const dynamicLogsPerIpScaleHome = computed(() => {
   const { minLogsPerIp, maxLogsPerIp } = campaignsStore.state.metadata;
-  return generateSmartScale(minLogsPerIp, maxLogsPerIp);
+  return generateSmartScale(minLogsPerIp, maxLogsPerIp, 6, dashboardState.rankings.campaignMinLogsPerIp);
 });
 
 // Dossier - ultimi 5

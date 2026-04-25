@@ -5,15 +5,25 @@
 /**
  * Genera una scala di valori "belli" (passi logici) tra un minimo e un massimo.
  * Esempio: min 2, max 500 -> [2, 5, 10, 25, 50, 100, 250, 500]
+ * Il parametro pivot permette di forzare l'inclusione di un valore (es. il filtro corrente).
  */
-export function generateSmartScale(min: number, max: number, maxSteps: number = 6): number[] {
-    if (max <= min) return [min];
+export function generateSmartScale(min: number, max: number, maxSteps: number = 6, pivot?: number | null): number[] {
+    if (max <= min) {
+        const res = [min];
+        if (pivot !== undefined && pivot !== null && pivot !== min) res.push(pivot);
+        return res.sort((a, b) => a - b);
+    }
     
     // Lista di "passi" preferiti (multipli comuni)
     const preferredSteps = [1, 2, 3, 5, 10, 15, 20, 25, 30, 40, 50, 75, 100, 150, 200, 250, 300, 400, 500, 750, 1000];
     
     // Filtriamo i passi che rientrano nel range [min, max]
     let possible = preferredSteps.filter(s => s >= min && s <= max);
+
+    // Se abbiamo un pivot, assicuriamoci che sia considerato tra i possibili se nel range o vicino
+    if (pivot !== undefined && pivot !== null && !possible.includes(pivot)) {
+        possible.push(pivot);
+    }
     
     // Se abbiamo troppi passi, li diradiamo
     if (possible.length > maxSteps) {
@@ -26,6 +36,11 @@ export function generateSmartScale(min: number, max: number, maxSteps: number = 
             if (possible[idx] > min && possible[idx] < max) {
                 result.push(possible[idx]);
             }
+        }
+
+        // Se abbiamo un pivot e non è finito nel campionamento, forziamolo
+        if (pivot !== undefined && pivot !== null && !result.includes(pivot)) {
+            result.push(pivot);
         }
         
         if (!result.includes(max)) result.push(max); // Sempre il massimo
@@ -42,10 +57,15 @@ export function generateSmartScale(min: number, max: number, maxSteps: number = 
 /**
  * Genera una scala specifica per il punteggio di rischio (0-100)
  */
-export function generateScoreScale(min: number, max: number): number[] {
+export function generateScoreScale(min: number, max: number, pivot?: number | null): number[] {
     // Per lo score usiamo passi di 5 o 10
     const baseScale = [0, 5, 10, 15, 20, 25, 30, 40, 50, 60, 75, 100];
     let filtered = baseScale.filter(s => s >= min && s <= max);
+
+    // Forza pivot se presente
+    if (pivot !== undefined && pivot !== null && !filtered.includes(pivot)) {
+        filtered.push(pivot);
+    }
     
     if (!filtered.includes(min)) filtered.unshift(min);
     if (!filtered.includes(max) && max > min) filtered.push(max);

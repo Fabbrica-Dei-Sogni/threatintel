@@ -221,12 +221,12 @@ const {
 // Scale dinamiche calcolate dai metadati del backend
 const dynamicIpScale = computed(() => {
   const { minIpCount, maxIpCount } = campaignsStore.state.metadata;
-  return generateSmartScale(minIpCount, maxIpCount);
+  return generateSmartScale(minIpCount, maxIpCount, 6, campaignsStore.state.filters.minIps);
 });
 
 const dynamicScoreScale = computed(() => {
   const { minScore, maxScore } = campaignsStore.state.metadata;
-  return generateScoreScale(Math.floor(minScore), Math.ceil(maxScore));
+  return generateScoreScale(Math.floor(minScore), Math.ceil(maxScore), campaignsStore.state.filters.minScore);
 });
 
 const dynamicTimeScale = computed(() => {
@@ -236,7 +236,7 @@ const dynamicTimeScale = computed(() => {
 
 const dynamicLogsPerIpScale = computed(() => {
   const { minLogsPerIp, maxLogsPerIp } = campaignsStore.state.metadata;
-  return generateSmartScale(minLogsPerIp, maxLogsPerIp);
+  return generateSmartScale(minLogsPerIp, maxLogsPerIp, 6, campaignsStore.state.filters.minLogsPerIp);
 });
 
 function formatDate(ts) {

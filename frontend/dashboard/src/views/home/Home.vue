@@ -29,14 +29,14 @@
         <button @click="dashboardStore.toggleWidget('attacks')"
           :class="{ active: dashboardStore.isWidgetActive('attacks') }" class="btn-action">🛰️ {{
             t('home.attacks').toUpperCase() }}</button>
+        <button @click="dashboardStore.toggleWidget('campaigns')"
+          :class="{ active: dashboardStore.isWidgetActive('campaigns') }" class="btn-action">🧬 {{
+            t('campaigns.homeButton').toUpperCase() }}</button>
         <button @click="dashboardStore.toggleWidget('logs')" :class="{ active: dashboardStore.isWidgetActive('logs') }"
           class="btn-action">🗄️ {{ t('home.logRequests').toUpperCase() }}</button>
         <button @click="dashboardStore.toggleWidget('sessions')"
           :class="{ active: dashboardStore.isWidgetActive('sessions') }" class="btn-action">📟 {{
             t('home.telnet').toUpperCase() }}</button>
-        <button @click="dashboardStore.toggleWidget('campaigns')"
-          :class="{ active: dashboardStore.isWidgetActive('campaigns') }" class="btn-action">🧬 {{
-            t('campaigns.homeButton').toUpperCase() }}</button>
         <button @click="dashboardStore.toggleWidget('dossiers')"
           :class="{ active: dashboardStore.isWidgetActive('dossiers') }" class="btn-action">📁 {{
             t('home.archive').toUpperCase() }}</button>

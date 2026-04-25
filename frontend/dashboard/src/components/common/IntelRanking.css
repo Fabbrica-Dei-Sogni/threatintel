@@ -125,15 +125,15 @@
 
 .ranking-item {
   display: flex !important;
-  align-items: center !important;
-  padding: 12px 16px !important;
+  align-items: var(--ranking-item-align, center) !important;
+  padding: var(--ranking-item-padding, 10px 16px) !important;
   margin-bottom: 6px;
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid rgba(255, 255, 255, 0.05) !important;
   border-radius: 8px;
-  gap: 15px !important;
+  gap: var(--ranking-item-gap, 15px) !important;
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  min-height: 54px;
+  min-height: var(--ranking-item-min-height, 48px);
   box-sizing: border-box;
 }
 
@@ -192,7 +192,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 20px;
+  gap: var(--ranking-content-gap, 20px);
 }
 
 /* Surgery Column Helpers */
@@ -213,6 +213,10 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  display: flex;
+  flex-direction: var(--col-subject-direction, row);
+  align-items: var(--col-subject-align, center);
+  gap: var(--col-subject-gap, 0);
 }
 
 .item-col-forensics {

@@ -252,23 +252,7 @@
   margin-top: 10px;
 }
 
-.skin-cyber li {
-  padding: 10px 15px;
-  font-size: 0.9em;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  gap: 20px !important;
-  width: 100% !important;
-  box-sizing: border-box !important;
-  transition: background 0.2s ease;
-  border-bottom: 1px solid rgba(0, 255, 255, 0.05);
-  font-family: var(--font-cyber);
-}
-
-.skin-cyber li:hover {
-  background: rgba(0, 255, 255, 0.03);
-}
+/* === LIST ELEMENTS === */
 
 /* === LIST ELEMENTS === */
 

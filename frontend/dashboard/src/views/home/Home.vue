@@ -846,13 +846,16 @@ watch(() => dashboardState.rankings, (newRankings, oldRankings) => {
 
 .item-col-subject {
   flex: 1 !important;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: flex-start; /* Allineamento a sinistra */
-  gap: 8px; /* Spazio netto tra URI e Tags */
   min-width: 0;
   text-align: left;
+}
+
+/* Campaign Specific Multi-line Layout */
+.campaigns-ranking {
+  --col-subject-direction: column;
+  --col-subject-align: flex-start;
+  --col-subject-gap: 8px;
+  --ranking-item-min-height: 72px; /* Diamo più spazio alle campagne */
 }
 
 .url-target {
@@ -885,8 +888,11 @@ watch(() => dashboardState.rankings, (newRankings, oldRankings) => {
   }
   
   .item-col-subject {
-    gap: 4px;
     flex: 1 1 auto !important; /* Permette alla colonna di espandersi */
+  }
+
+  .campaigns-ranking {
+    --col-subject-gap: 4px;
   }
   
   /* Nascondiamo la colonna Forensics (date) su mobile per le campagne 

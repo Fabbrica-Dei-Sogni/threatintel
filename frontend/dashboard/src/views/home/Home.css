@@ -324,22 +324,6 @@ ul {
   overflow-x: hidden; /* Protezione globale per scrollbar orizzontali */
 }
 
-li {
-  border-bottom: 1px solid rgba(136, 170, 255, 0.08);
-  padding: 10px 15px;
-  font-size: 0.9em;
-  color: #cbd5e1;
-  display: flex !important; /* Flexbox è più stabile della griglia per elementi pulsanti */
-  align-items: center !important;
-  justify-content: space-between !important;
-  gap: 20px !important;
-  width: 100% !important;
-  box-sizing: border-box !important;
-  transition: background 0.2s ease;
-  contain: layout;
-  transform: translateZ(0); /* Isola l'intera riga dalla ricomposizione globale */
-}
-
 /* Isolamento Dimensionale (Nulla può spostare queste colonne) */
 
 .ip-link { 

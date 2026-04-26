@@ -62,21 +62,37 @@ export class CampaignController {
      * Ottiene dettagli forensi aggregati per una campagna
      */
     async getCampaignDetail(req: Request, res: Response): Promise<void> {
-        this.logger.info(`[CampaignController] Requesting campaign details for hash ${req.body.hash}`);
+        const hash = req.body.hash;
+        this.logger.info(`[CampaignController] Requesting campaign details for hash ${hash}`);
         try {
-            const { ips, hash, minLogsPerIp = 1, minScore = 0, protocol = null, timeConfig = {} } = req.body;
+            const { 
+                ips, 
+                minLogsPerIp = 1, minScore = 0, 
+                protocol = null, timeConfig = {},
+                page = 1, pageSize = 10 
+            } = req.body;
+            
             if (!hash) {
                 res.status(400).json({ error: 'Hash mancante' });
                 return;
             }
 
+            const pageNum = Math.max(1, parseInt(page as any) || 1);
+            const pageSizeNum = Math.max(1, parseInt(pageSize as any) || 10);
+            const minLogsNum = parseInt(minLogsPerIp as any) || 1;
+            const minScoreNum = parseFloat(minScore as any) || 0;
+
+            this.logger.debug(`[CampaignController] Params: page=${pageNum}, size=${pageSizeNum}, minLogs=${minLogsNum}, score=${minScoreNum}`);
+
             const campaign = await this.campaignService.getCampaignDetail({
                 ips,
                 hash,
-                minLogsPerIp: parseInt(minLogsPerIp as any),
-                minScore: parseInt(minScore as any),
+                minLogsPerIp: minLogsNum,
+                minScore: minScoreNum,
                 protocol,
-                timeConfig
+                timeConfig,
+                page: pageNum,
+                pageSize: pageSizeNum
             });
 
             if (!campaign) {

@@ -106,7 +106,7 @@ export class CampaignService {
                 $facet: {
                     pagedData: [
                         { $match: { ipCount: { $gte: Number(minIps) }, averageScore: { $gte: Number(minScore) } } },
-                        { $sort: { ipCount: -1 as const, totaleLogs: -1 as const } },
+                        { $sort: { firstSeen: -1 as const, ipCount: -1 as const } },
                         { $skip: (page - 1) * pageSize },
                         { $limit: pageSize }
                     ],
@@ -245,9 +245,9 @@ export class CampaignService {
                         }
                     ],
                     nodes: [
-                        { $sort: { totaleLogs: -1, averageScore: -1 } },
-                        { $skip: (page - 1) * pageSize },
-                        { $limit: pageSize }
+                        { $sort: { firstSeen: -1, totaleLogs: -1 } },
+                        { $skip: (Number(page) - 1) * Number(pageSize) },
+                        { $limit: Number(pageSize) }
                     ]
                 }
             }

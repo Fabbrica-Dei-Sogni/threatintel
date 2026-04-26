@@ -299,8 +299,6 @@
 
 /* === TACTICAL HUD === */
 
-/* === TACTICAL HUD === */
-
 .hud-container {
     display: flex;
     flex-wrap: wrap;
@@ -308,7 +306,6 @@
     margin-bottom: 24px;
 }
 
-/* New Stats Row - Proportional & Responsive */
 .hud-stats-row {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -317,7 +314,6 @@
     width: 100%;
 }
 
-/* Sub-card Grid for profile metadata */
 .hud-sub-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -343,7 +339,7 @@
     border-radius: 4px;
     padding: 12px 16px;
     display: flex;
-    justify-content: center; /* Smart justification: center content in each cell */
+    justify-content: center;
     align-items: center;
     gap: 16px;
     overflow: hidden;
@@ -379,7 +375,6 @@
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4), 0 0 10px rgba(230, 33, 23, 0.1);
 }
 
-/* Glowing corners for HUD feel */
 .hud-stat-box::after {
     content: '';
     position: absolute;
@@ -420,13 +415,11 @@
     text-shadow: 0 0 15px rgba(255, 76, 76, 0.4);
 }
 
-/* Animations */
 @keyframes scan-line {
     0% { transform: translateY(-100%); }
     100% { transform: translateY(400%); }
 }
 
-/* Original HUD Item for Sub-cards */
 .hud-item {
     flex: 0 1 auto;
     width: auto;
@@ -534,7 +527,6 @@
     .hud-stat-box {
         padding: 8px 10px;
     }
-    /* Sub-card grid stack */
     .hud-sub-grid {
         grid-template-columns: 1fr;
         padding: 15px;
@@ -555,7 +547,7 @@
 .collapse-enter-active,
 .collapse-leave-active {
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    max-height: 5000px; /* High enough for long log lists */
+    max-height: 5000px;
     overflow: hidden;
 }
 
@@ -622,7 +614,6 @@
 
 /* === DATA SEARCH INPUT === */
 
-/* === SEMANTIC THEME MAPPING === */
 .skin-classic.attack-detail {
     --theme-primary: #ff4c4c;
     --theme-primary-rgb: 255, 76, 76;
@@ -634,8 +625,6 @@
     --theme-text-muted: #f2a1a1;
     --theme-radius: 6px;
     --theme-blur: blur(12px);
-
-    /* Button specific for Classic Attack Detail (Red) */
     --theme-btn-bg: linear-gradient(135deg, #E62117, #B71C1C);
     --theme-btn-text: #fff;
     --theme-btn-shadow: rgba(230, 33, 23, 0.4);
@@ -660,16 +649,15 @@
 .log-header, .event-header {
     display: flex;
     justify-content: space-between;
-    align-items: center; /* keep arrow centered vertically */
+    align-items: center;
     cursor: pointer;
     font-weight: 600;
     color: var(--theme-text);
     font-size: clamp(0.85rem, 2.5vw, 0.95rem);
     line-height: 1.5;
-    gap: 15px; /* Ensures space between content and arrow */
+    gap: 15px;
 }
 
-/* Rate Breach Styling Restyling */
 .event-header-content {
     display: flex;
     flex-wrap: wrap;
@@ -868,8 +856,6 @@
 .intensity-badge.medium { background: #f59e0b; color: #000; }
 .intensity-badge.low { background: #10b981; color: #fff; }
 
-/* === SUB-CARDS (MAP & RADAR) === */
-
 .sub-card {
     background: rgba(24, 24, 27, 0.4);
     border: 1px solid rgba(230, 33, 23, 0.1);
@@ -906,20 +892,14 @@
     padding: 0;
 }
 
-/* Adjusting attack-map-section to fit better in sub-card */
 .attack-map-section {
     margin: 0 !important;
     padding: 10px;
 }
 
-/* Ensure radar fits well */
 .sub-card .attack-profile {
     margin: 20px auto;
 }
-
-/* === LOG HEADER ENHANCEMENTS === */
-
-
 
 .log-severity-indicator {
     margin-right: 12px;
@@ -969,8 +949,6 @@
     color: #ff4c4c;
     font-weight: 800;
 }
-
-/* === LOG BODY TAB SYSTEM === */
 
 .log-details-meta {
     display: flex;
@@ -1065,12 +1043,9 @@
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* Layout adjustments to reduce vertical space */
 .log-body {
-    padding: clamp(10px, 2vw, 15px); /* Reduced from 20px */
+    padding: clamp(10px, 2vw, 15px);
 }
-
-/* === MOBILE ADAPTATIONS === */
 
 @media (max-width: 600px) {
     .header-briefing-top {
@@ -1097,5 +1072,109 @@
 
     .forensic-briefing {
         min-width: 100%;
+    }
+}
+
+/* === DISTRIBUTED ATTACK (CLUSTER) STYLES === */
+
+.cluster-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(230, 33, 23, 0.15);
+    border: 1px solid rgba(230, 33, 23, 0.4);
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 900;
+    color: #ff4c4c;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    margin-left: 10px;
+    letter-spacing: 1px;
+    text-shadow: 0 0 10px rgba(255, 76, 76, 0.3);
+}
+
+.cluster-badge:hover {
+    background: rgba(230, 33, 23, 0.25);
+    border-color: #ff4c4c;
+    box-shadow: 0 0 15px rgba(230, 33, 23, 0.2);
+}
+
+.arrow-mini {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-right: 1.5px solid currentColor;
+    border-bottom: 1.5px solid currentColor;
+    transform: rotate(45deg);
+    transition: transform 0.3s ease;
+    margin-bottom: 2px;
+}
+
+.arrow-mini.open {
+    transform: rotate(-135deg);
+}
+
+.ip-list-dropdown {
+    margin-top: 15px;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(230, 33, 23, 0.2);
+    border-radius: 6px;
+    padding: 12px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 8px;
+    animation: slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.ip-list-item {
+    font-size: 0.8rem;
+    color: #f0e6d2;
+    padding: 4px 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.ip-list-item:hover {
+    background: rgba(230, 33, 23, 0.15);
+    color: #ff4c4c;
+    transform: translateX(3px);
+}
+
+.ip-dot {
+    width: 6px;
+    height: 6px;
+    background: #ff4c4c;
+    border-radius: 50%;
+    display: inline-block;
+    box-shadow: 0 0 5px #ff4c4c;
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 600px) {
+    .ip-list-dropdown {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 400px) {
+    .ip-list-dropdown {
+        grid-template-columns: 1fr;
     }
 }

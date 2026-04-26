@@ -253,6 +253,8 @@
         "summary": "Сводка аномалии",
         "backToAttacks": "Вернуться",
         "attacker": "Атакующий",
+        "distributedAttacker": "Распределенный IP-кластер",
+        "investigateCluster": "Исследовать кластер",
         "country": "Страна",
         "organization": "Организация",
         "defconLevel": "Уровень Defcon",
@@ -306,7 +308,8 @@
         "ipList": "Список Узлов Кластера",
         "reputationScore": "Репутационный Скоринг",
         "viewProfile": "ПРОФИЛЬ",
-        "investigate": "ИССЛЕДОВАТЬ 👉"
+        "investigate": "ИССЛЕДОВАТЬ 👉",
+        "investigateCluster": "ИССЛЕДОВАТЬ КЛАСТЕР 🚀"
     },
     "attackChart": {
         "title": "Анализ атак во времени",

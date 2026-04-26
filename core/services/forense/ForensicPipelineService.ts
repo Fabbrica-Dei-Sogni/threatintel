@@ -9,6 +9,7 @@ import { TimeFilterStage } from './pipeline/stages/TimeFilterStage';
 import { MatchFilterStage } from './pipeline/stages/MatchFilterStage';
 import { GroupingStage } from './pipeline/stages/GroupingStage';
 import { CampaignGroupingStage } from './pipeline/stages/CampaignGroupingStage';
+import { DistributedGroupingStage } from './pipeline/stages/DistributedGroupingStage';
 import { AttackStatsStage } from './pipeline/stages/AttackStatsStage';
 import { ScoringStage } from './pipeline/stages/ScoringStage';
 import { SequenceAnalysisStage } from './pipeline/stages/SequenceAnalysisStage';
@@ -113,7 +114,7 @@ export class ForensicPipelineService {
     }
 
     /**
-     * Costruisce la pipeline specifica per l'analisi delle Campagne distribuite.
+     * Costruisce la pipeline specifica per l'analisi delle Campagne distribuite (Discovery).
      * Raggruppamento per Hash (CampaignGroupingStage).
      */
     async buildCampaignPipeline(
@@ -134,4 +135,36 @@ export class ForensicPipelineService {
             .addStage(new ScoringStage(this.dangerWeights, this.tolleranceWeights))
             .build();
     }
+
+    /**
+     * Costruisce la pipeline per l'analisi investigativa su una lista di IP (Attacco Distribuito).
+     * Raggruppa la lista di IP come un'unica entità virtuale per calcolarne la pericolosità globale.
+     */
+    async buildDistributedPipeline(
+        ipList: string[],
+        minLogsForAttack: number,
+        timeConfig: any = null
+    ): Promise<any[]> {
+        await this.initialized;
+
+        if (!ipList || ipList.length === 0) {
+            throw new Error("[ForensicPipelineService] ipList non può essere vuota");
+        }
+
+        return this.createBuilder()
+            .addStage(new TimeFilterStage(timeConfig))
+            // Filtra solo gli IP forniti dall'utente
+            .addStage(new MatchFilterStage({ 'request.ip': { $in: ipList } }))
+            // Raggruppa la lista di IP come un unico cluster (investigazione)
+            .addStage(new DistributedGroupingStage(ipList[0], minLogsForAttack))
+            // Calcola RPS e durata complessiva sul cluster
+            .addStage(new AttackStatsStage(this.tolleranceWeights))
+            // Analisi comportamentale e scoring (reuse standard)
+            .addStage(new SequenceAnalysisStage())
+            .addStage(new PayloadAnalysisStage(this.suspiciousPatterns))
+            .addStage(new FingerprintAnalysisStage(this.suspiciousReferers))
+            .addStage(new ScoringStage(this.dangerWeights, this.tolleranceWeights))
+            .build();
+    }
 }
+

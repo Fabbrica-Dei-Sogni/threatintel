@@ -253,6 +253,8 @@
         "summary": "Podsumowanie anomaliau",
         "backToAttacks": "Powrót",
         "attacker": "Anomaliaujący",
+        "distributedAttacker": "Rozproszony klaster IP",
+        "investigateCluster": "Zbadaj klaster",
         "country": "Kraj",
         "organization": "Organizacja",
         "defconLevel": "Poziom Defcon",
@@ -306,7 +308,8 @@
         "ipList": "Lista Węzłów Klastra",
         "reputationScore": "Wynik Reputacji",
         "viewProfile": "PROFIL",
-        "investigate": "BADAJ 👉"
+        "investigate": "BADAJ 👉",
+        "investigateCluster": "ZBADAJ KLASTER 🚀"
     },
     "attackChart": {
         "title": "Analiza anomaliaów w czasie",

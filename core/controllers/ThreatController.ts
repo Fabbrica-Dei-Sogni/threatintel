@@ -129,11 +129,41 @@ export class ThreatController {
             res.json(attack);
         } catch (err: any) {
             this.logger.error('[ThreatController] Error fetching attack details:', err);
-            res.status(500).json({ error: 'Errore durante il recupero del dettaglio attacco' });
+            res.status(500).json({ error: 'Errore durante il recupero dei dettagli dell\'attacco' });
         }
     }
 
-    // GET /api/logs/:id
+    // POST /api/attack/distributed
+    async getDistributedAttackDetails(req: Request, res: Response): Promise<void> {
+        this.logger.info(`[ThreatController] Requesting distributed attack details for ${req.body.ipList?.length || 0} IPs`);
+        try {
+            const { ipList, minLogsForAttack = 1, timeConfig = {} } = req.body;
+
+            if (!ipList || !Array.isArray(ipList) || ipList.length === 0) {
+                res.status(400).json({ error: 'Lista IP mancante o non valida' });
+                return;
+            }
+
+            const attack = await this.threatLogService.getDistributedAttackDetail({
+                ipList,
+                minLogsForAttack: parseInt(minLogsForAttack),
+                timeConfig
+            });
+
+            if (!attack) {
+                res.status(404).json({ error: 'Nessun dato trovato per il cluster di IP fornito' });
+                return;
+            }
+
+            res.json(attack);
+        } catch (err: any) {
+            this.logger.error('[ThreatController] Error fetching distributed attack details:', err);
+            res.status(500).json({ error: 'Errore durante l\'analisi investigativa distribuita' });
+        }
+    }
+
+    // POST /api/search
+
     async getLogById(req: Request, res: Response): Promise<void> {
         this.logger.info(`[ThreatController] Requesting log ${req.params.id}`);
         try {

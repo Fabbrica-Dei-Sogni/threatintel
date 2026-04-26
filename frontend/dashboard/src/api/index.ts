@@ -233,6 +233,31 @@ export async function fetchAttackDetail({
     }
 }
 
+export async function fetchDistributedAttackDetail({
+    ipList,
+    minLogsForAttack,
+    timeConfig = {},
+}: {
+    ipList: string[];
+    minLogsForAttack: number;
+    timeConfig: any;
+}): Promise<any> {
+    console.log('[fetchDistributedAttackDetail] Params:', { ipList, minLogsForAttack, timeConfig });
+    try {
+        const response = await apiClient.post<any>('/attack/distributed', {
+            ipList,
+            minLogsForAttack,
+            timeConfig,
+        });
+
+        console.log('[fetchDistributedAttackDetail] Response status:', response.status);
+        return response.data;
+    } catch (error) {
+        console.error('[fetchDistributedAttackDetail] Error:', error);
+        throw error;
+    }
+}
+
 export async function fetchRateLimitSearch({
     page = 1,
     pageSize = 20,

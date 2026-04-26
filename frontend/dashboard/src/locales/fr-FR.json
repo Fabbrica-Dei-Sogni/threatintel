@@ -253,6 +253,8 @@
         "summary": "Résumé de l'anomalie",
         "backToAttacks": "Retour",
         "attacker": "Attaquant",
+        "distributedAttacker": "Cluster d'IP distribué",
+        "investigateCluster": "Investiguer le cluster",
         "country": "Pays",
         "organization": "Organisation",
         "defconLevel": "Niveau Defcon",
@@ -306,7 +308,8 @@
         "ipList": "Liste des Nœuds du Cluster",
         "reputationScore": "Score de Réputation",
         "viewProfile": "PROFIL",
-        "investigate": "ENQUÊTER 👉"
+        "investigate": "ENQUÊTER 👉",
+        "investigateCluster": "INVESTIGUER LE CLUSTER 🚀"
     },
     "attackChart": {
         "title": "Analyse des anomalies dans le temps",

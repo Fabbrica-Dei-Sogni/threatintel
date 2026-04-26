@@ -21,12 +21,25 @@
         <!-- Attacker Highlight Card -->
         <div v-if="attack" class="attacker-card">
             <div class="attacker-info">
-                <span class="attacker-label">{{ t('attackDetail.attacker') }}</span>
+                <span class="attacker-label">{{ props.ipList?.length > 1 ? t('attackDetail.distributedAttacker') : t('attackDetail.attacker') }}</span>
                 <h2 class="attacker-ip">
                     <span class="animated-icon pulse-magma" style="font-size: 0.8em;">🎯</span>
                     {{ attack.request.ip }}
                     <span class="copy-btn" @click.stop="copyFormatted('clipboard.ip', { ip: attack.request.ip })" :title="t('common.copyIp')">📋</span>
+
+                    <span v-if="props.ipList?.length > 1" class="cluster-badge" @click="toggles.showIpList = !toggles.showIpList">
+                        CLUSTER ({{ props.ipList.length }} IPs)
+                        <span class="arrow-mini" :class="{ open: toggles.showIpList }"></span>
+                    </span>
                 </h2>
+
+                <transition name="collapse">
+                    <div v-if="toggles.showIpList" class="ip-list-dropdown cyber-scroll">
+                        <div v-for="ip in props.ipList" :key="ip" class="ip-list-item" @click="goToIpDetails(ip)">
+                            <span class="ip-dot"></span> {{ ip }}
+                        </div>
+                    </div>
+                </transition>
             </div>
             <button @click="goToIpDetails(attack.request.ip)" class="attacker-action-btn">
                 {{ t('common.analizeProfile') }} &rarr;
@@ -379,7 +392,7 @@ import AttackMap from '../../components/AttackMap.vue';
 import ReportActions from '../../components/ReportActions.vue';
 import GlobalHeader from '../../components/GlobalHeader.vue';
 import { Search } from '@element-plus/icons-vue';
-import { fetchAttackDetail } from '../../api';
+import { fetchAttackDetail, fetchDistributedAttackDetail } from '../../api';
 
 import { useViewSettingsStore } from '../../stores/viewSettings';
 import { useAttacksStore } from '../../stores/attacks';
@@ -397,7 +410,8 @@ const toggles = reactive({
     rateLimit: true,
     showProfile: true,
     showMap: false,
-    showRadar: false
+    showRadar: false,
+    showIpList: false
 })
 
 // Props
@@ -405,6 +419,10 @@ const props = defineProps({
     ip: {
         type: String,
         required: true
+    },
+    ipList: {
+        type: Array,
+        default: () => []
     },
     minLogsForAttack: {
         type: Number,
@@ -583,11 +601,21 @@ const loadAttackData = async () => {
             agoUnit: props.agoUnit,
             dateRange: props.dateRange
         }
-        const data = await fetchAttackDetail({
-            ip: props.ip,
-            minLogsForAttack: props.minLogsForAttack,
-            timeConfig
-        })
+        
+        let data;
+        if (props.ipList && props.ipList.length > 0) {
+            data = await fetchDistributedAttackDetail({
+                ipList: props.ipList,
+                minLogsForAttack: props.minLogsForAttack,
+                timeConfig
+            })
+        } else {
+            data = await fetchAttackDetail({
+                ip: props.ip,
+                minLogsForAttack: props.minLogsForAttack,
+                timeConfig
+            })
+        }
         attack.value = data
     } catch (err) {
         console.error('Error fetching attack detail:', err)

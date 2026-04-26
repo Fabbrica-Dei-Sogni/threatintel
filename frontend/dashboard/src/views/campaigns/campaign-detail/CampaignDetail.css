@@ -179,6 +179,27 @@ h1 {
     box-shadow: 0 0 15px var(--theme-primary);
 }
 
+.btn-investigate-cluster {
+    background: rgba(var(--theme-primary-rgb, 0, 255, 65), 0.1) !important;
+    border: 1px solid var(--theme-primary) !important;
+    color: var(--theme-primary) !important;
+    padding: 8px 20px !important;
+    font-family: 'JetBrains Mono', monospace !important;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    font-size: 0.85rem !important;
+    font-weight: 900 !important;
+    letter-spacing: 1px !important;
+    clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px) !important;
+}
+
+.btn-investigate-cluster:hover {
+    background: var(--theme-primary) !important;
+    color: #000 !important;
+    box-shadow: 0 0 20px var(--theme-primary) !important;
+    transform: translateY(-2px);
+}
+
 /* Forensic Cards Grid */
 .forensic-grid {
     display: grid;

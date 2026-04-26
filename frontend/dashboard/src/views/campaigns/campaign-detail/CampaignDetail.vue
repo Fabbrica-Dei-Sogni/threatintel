@@ -66,8 +66,15 @@
       <section class="cluster-section">
         <div class="section-header">
            <h2 class="card-title">{{ t('campaignDetail.ipList') }}</h2>
-           <div class="pager-mini-wrapper" v-if="campaign.ipCount > pageSize">
-             <CyberPager v-model:page="nodesPage" :pageSize="pageSize" :total="campaign.ipCount" simple size="mini" @change="loadCampaign" />
+           <div class="header-cluster-actions">
+              <button v-if="campaign && campaign.allIps?.length" 
+                      @click="investigateCluster" 
+                      class="btn-action btn-investigate-cluster">
+                🚀 {{ t('campaignDetail.investigateCluster').toUpperCase() }}
+              </button>
+              <div class="pager-mini-wrapper" v-if="campaign.ipCount > pageSize">
+                <CyberPager v-model:page="nodesPage" :pageSize="pageSize" :total="campaign.ipCount" simple size="mini" @change="loadCampaign" />
+              </div>
            </div>
         </div>
 
@@ -246,6 +253,31 @@ function investigateIp(ip) {
 function goToIp(ip) {
   router.push(`/ip/${ip}`);
 }
+
+function investigateCluster() {
+  if (!campaign.value || !campaign.value.allIps || campaign.value.allIps.length === 0) return;
+  
+  const query = {
+    timeMode: props.timeMode,
+    agoValue: props.agoValue,
+    agoUnit: props.agoUnit,
+    minLogsForAttack: props.minLogsPerIp || 1,
+    ipList: JSON.stringify(campaign.value.allIps)
+  };
+  
+  if (route.query.customStartTime || route.query.customEndTime) {
+    query.dateRange = JSON.stringify([
+      route.query.customStartTime || null,
+      route.query.customEndTime || null
+    ]);
+  }
+
+  router.push({
+    name: 'AttackDetail',
+    params: { ip: campaign.value.allIps[0] },
+    query
+  });
+}
 </script>
 
 <style scoped src="./CampaignDetail.css"></style>
@@ -261,10 +293,27 @@ function goToIp(ip) {
   flex-wrap: wrap;
 }
 
+.header-cluster-actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
 @media (max-width: 768px) {
   .section-header {
     flex-direction: column;
     align-items: flex-start;
+  }
+  
+  .header-cluster-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .btn-investigate-cluster {
+    flex: 1;
+    text-align: center;
   }
 }
 

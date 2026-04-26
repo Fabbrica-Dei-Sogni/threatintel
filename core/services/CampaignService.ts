@@ -240,7 +240,8 @@ export class CampaignService {
                                 clusterAvgScore: { $avg: '$averageScore' },
                                 clusterFirstSeen: { $min: '$firstSeen' },
                                 clusterLastSeen: { $max: '$lastSeen' },
-                                sampleUrl: { $first: '$sampleUrl' }
+                                sampleUrl: { $first: '$sampleUrl' },
+                                allIps: { $push: '$ip' }
                             }
                         }
                     ],
@@ -264,6 +265,7 @@ export class CampaignService {
                 firstSeen: meta.clusterFirstSeen,
                 lastSeen: meta.clusterLastSeen,
                 sampleUrl: meta.sampleUrl,
+                allIps: meta.allIps || [],
                 nodes: result?.nodes || [],
                 page, pageSize
             };

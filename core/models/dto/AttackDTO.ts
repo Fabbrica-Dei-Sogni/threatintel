@@ -21,6 +21,8 @@ export default class AttackDTO {
         indicators?: string[];
     } = {};
     geoInfo?: any;
+    ips?: string[];
+    isDistributed?: boolean;
     logsRaggruppati?: any[];
     totaleLogs?: number;
     firstSeen?: string;

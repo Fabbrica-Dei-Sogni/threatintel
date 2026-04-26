@@ -77,6 +77,18 @@ export default (
 
     /**
      * @openapi
+     * /attack/distributed:
+     *   post:
+     *     tags: [Dashboard API]
+     *     summary: Ottiene dettagli investigativi per un cluster di IP (Attacco Distribuito)
+     *     responses:
+     *       200:
+     *         description: Dettagli dell'attacco distribuito.
+     */
+    router.post('/api/attack/distributed', (req, res) => threatController.getDistributedAttackDetails(req, res));
+
+    /**
+     * @openapi
      * /logs/{id}:
      *   get:
      *     tags: [Dashboard API]

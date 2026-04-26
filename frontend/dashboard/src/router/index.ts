@@ -67,6 +67,7 @@ const routes: RouteRecordRaw[] = [
         component: AttackDetail,
         props: (route: RouteLocationNormalized) => ({
             ip: route.params.ip,
+            ipList: route.query.ipList ? JSON.parse(route.query.ipList as string) : undefined,
             minLogsForAttack: route.query.minLogsForAttack ? parseInt(route.query.minLogsForAttack as string) : 10,
             timeMode: route.query.timeMode || 'ago',
             agoValue: route.query.agoValue ? parseInt(route.query.agoValue as string) : 1,

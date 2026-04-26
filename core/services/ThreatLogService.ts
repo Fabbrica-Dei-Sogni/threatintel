@@ -306,6 +306,30 @@ export class ThreatLogService {
         return attack || null;
     }
 
+    async getDistributedAttackDetail({
+        ipList,
+        minLogsForAttack = 1,
+        timeConfig = {}
+    }: {
+        ipList: string[];
+        minLogsForAttack?: number;
+        timeConfig?: any;
+    }) {
+        // Costruisce la pipeline dedicata alla lista IP
+        const pipeline = await this.forensicPipelineService.buildDistributedPipeline(ipList, minLogsForAttack, timeConfig);
+
+        // Esegue l'aggregazione
+        const [attack] = await ThreatLog.aggregate(pipeline).allowDiskUse(true);
+
+        // Aggiunge metadati extra se necessario (lookup ipDetails per il "rappresentante")
+        if (attack) {
+            const result = await ThreatLog.populate(attack, { path: 'ipDetailsId', model: 'IpDetails' });
+            return result;
+        }
+
+        return null;
+    }
+
     buildRegExpFilter(filters: any, allowedFields: Set<string> = FilterAllowedFields.threatLog) {
         const mongoFilters: any = {};
         const safeFilters = sanitizeFilters(filters, allowedFields);

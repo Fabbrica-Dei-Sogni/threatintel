@@ -253,6 +253,8 @@
         "summary": "Riassunto Anomalia",
         "backToAttacks": "Torna indietro",
         "attacker": "Attaccante",
+        "distributedAttacker": "Cluster IP Distribuiti",
+        "investigateCluster": "Investiga Cluster",
         "country": "Paese",
         "organization": "Organizzazione",
         "defconLevel": "Livello Defcon",
@@ -306,7 +308,8 @@
         "ipList": "Elenco Nodi Cluster",
         "reputationScore": "Score Reputazione",
         "viewProfile": "PROFILO",
-        "investigate": "INVESTIGA 👉"
+        "investigate": "INVESTIGA 👉",
+        "investigateCluster": "INVESTIGA CLUSTER 🚀"
     },
     "attackChart": {
         "title": "Analisi Anomalie Temporale",

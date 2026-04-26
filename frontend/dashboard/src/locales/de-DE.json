@@ -253,6 +253,8 @@
         "summary": "Anomalieszusammenfassung",
         "backToAttacks": "Zurück",
         "attacker": "Angreifer",
+        "distributedAttacker": "Verteiltes IP-Cluster",
+        "investigateCluster": "Cluster untersuchen",
         "country": "Land",
         "organization": "Organisation",
         "defconLevel": "Defcon-Stufe",
@@ -306,7 +308,8 @@
         "ipList": "Cluster-Knotenliste",
         "reputationScore": "Reputations-Score",
         "viewProfile": "PROFIL",
-        "investigate": "UNTERSUCHEN 👉"
+        "investigate": "UNTERSUCHEN 👉",
+        "investigateCluster": "CLUSTER UNTERSUCHEN 🚀"
     },
     "attackChart": {
         "title": "Zeitliche Anomaliesanalyse",

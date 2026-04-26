@@ -253,6 +253,8 @@
         "summary": "Anomaly Summary",
         "backToAttacks": "Back",
         "attacker": "Attacker",
+        "distributedAttacker": "Distributed IP Cluster",
+        "investigateCluster": "Investigate Cluster",
         "country": "Country",
         "organization": "Organization",
         "defconLevel": "Defcon Level",
@@ -306,7 +308,8 @@
         "ipList": "Cluster Nodes List",
         "reputationScore": "Reputation Score",
         "viewProfile": "PROFILE",
-        "investigate": "INVESTIGATE 👉"
+        "investigate": "INVESTIGATE 👉",
+        "investigateCluster": "INVESTIGATE CLUSTER 🚀"
     },
     "attackChart": {
         "title": "Anomalies Analysis Over Time",

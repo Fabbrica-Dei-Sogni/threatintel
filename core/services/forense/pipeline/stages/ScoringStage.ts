@@ -20,12 +20,32 @@ export class ScoringStage implements PipelineStage {
             durNormPenalized: this.dangerWeights.DURNORM ? this.dangerWeights.DURNORM : (parseFloat(process.env.DANGER_WEIGHT_DURNORM || '0.12') || 0.12),
             scoreNorm: this.dangerWeights.SCORENORM ? this.dangerWeights.SCORENORM : (parseFloat(process.env.DANGER_WEIGHT_SCORENORM || '0.50') || 0.50),
             // BUG LEGACY: Il servizio originale usa DURNORM anche per uniqueTechNorm. Replicato per parity.
-            uniqueTechNorm: this.dangerWeights.DURNORM ? this.dangerWeights.DURNORM : (parseFloat(process.env.DANGER_WEIGHT_UNIQUETECHNORM || '0.20') || 0.20)
+            uniqueTechNorm: this.dangerWeights.DURNORM ? this.dangerWeights.DURNORM : (parseFloat(process.env.DANGER_WEIGHT_UNIQUETECHNORM || '0.20') || 0.20),
+            distributedNorm: parseFloat(process.env.DANGER_WEIGHT_DISTRIBUTED || '0.15') || 0.15
         };
 
         return [
             {
                 $addFields: {
+                    // Normalizzazione numero IP (Coordination Factor)
+                    // Cresce logaritmicamente fino a 50 IP, poi satura a 1.
+                    ipCountNorm: {
+                        $cond: [
+                            { $and: [{ $gt: ['$ipCount', 1] }, { $eq: ['$isDistributed', true] }] },
+                            {
+                                $min: [
+                                    {
+                                        $divide: [
+                                            { $ln: '$ipCount' },
+                                            { $ln: 50 }
+                                        ]
+                                    },
+                                    1
+                                ]
+                            },
+                            0
+                        ]
+                    },
                     // Label per esprimere uno stile di rps
                     rpsStyle: {
                         $switch: {
@@ -172,6 +192,8 @@ export class ScoringStage implements PipelineStage {
                                             { $multiply: ['$scoreNorm', dWeights.scoreNorm] },
                                             // peso sul numero di tecniche usate nell'attacco
                                             { $multiply: ['$uniqueTechNorm', dWeights.uniqueTechNorm] },
+                                            // peso sulla coordinazione distribuita (Cluster Factor)
+                                            { $multiply: ['$ipCountNorm', dWeights.distributedNorm] },
 
                                             // [NEW] Advanced Analysis Scores (Behavioral Boosting)
                                             // A differenza dei pesi precedenti che sono "pesati" (moltiplicati per un fattore < 1),

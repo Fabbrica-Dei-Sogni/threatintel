@@ -25,36 +25,33 @@
       <span class="preview-text-hud">{{ previewText }}</span>
     </div>
 
-    <!-- Details Section -->
-    <div v-if="isExpanded && !isEditing" class="module-details">
-      <!-- List View -->
-      <div v-if="valueType === 'list'" class="tactical-tags">
-        <span v-for="(tag, index) in tags" :key="index" class="tactical-tag">{{ tag }}</span>
-      </div>
-
-      <!-- Key-Value View -->
-      <div v-else-if="valueType === 'keyvalue'" class="tactical-kv-grid">
-        <div v-for="(item, index) in keyValuePairs" :key="index" class="kv-card-mini">
-          <span class="kv-label">{{ item.key }}</span>
-          <span class="kv-val">{{ item.value }}</span>
-        </div>
-      </div>
-
-      <!-- Simple Text View -->
-      <div v-else class="tactical-text-box">
-        <p class="raw-data">{{ modelValue }}</p>
-      </div>
-    </div>
-
-    <!-- Advanced Tactical Editor Modal -->
-    <div v-if="isEditing" class="tactical-modal-overlay" @click.self="cancelEdit">
-      <div class="tactical-modal-content card-glass">
-        <div class="modal-header-tactical">
-          <h3 class="modal-title-hud">{{ $t('config.editConfig').toUpperCase() }}</h3>
-          <span class="modal-subtitle">{{ configKey }}</span>
+    <!-- Details & Editor Section -->
+    <div v-if="isExpanded" class="module-content">
+      <!-- READ-ONLY VIEW -->
+      <template v-if="!isEditing">
+        <div v-if="valueType === 'list'" class="tactical-tags">
+          <span v-for="(tag, index) in tags" :key="index" class="tactical-tag">{{ tag }}</span>
         </div>
 
-        <div class="modal-body-tactical">
+        <div v-else-if="valueType === 'keyvalue'" class="tactical-kv-grid">
+          <div v-for="(item, index) in keyValuePairs" :key="index" class="kv-card-mini">
+            <span class="kv-label">{{ item.key }}</span>
+            <span class="kv-val">{{ item.value }}</span>
+          </div>
+        </div>
+
+        <div v-else class="tactical-text-box">
+          <p class="raw-data">{{ modelValue }}</p>
+        </div>
+      </template>
+
+      <!-- EDIT MODE (INLINE) -->
+      <template v-else>
+        <div class="inline-editor-hud">
+          <div class="editor-header-mini">
+            <span class="editor-label">{{ $t('config.editConfig').toUpperCase() }}</span>
+          </div>
+
           <!-- List Editor -->
           <div v-if="valueType === 'list'" class="editor-hub-list">
             <div class="tags-cluster">
@@ -64,7 +61,8 @@
               </div>
             </div>
             <div class="tactical-add-row">
-              <input type="text" v-model="newTag" :placeholder="$t('config.addTagPlaceholder')" @keyup.enter="addTag" />
+              <input type="text" v-model="newTag" :placeholder="$t('config.addTagPlaceholder')"
+                @keyup.enter="addTag" />
               <button class="btn btn-add-pulse" @click="addTag">+</button>
             </div>
           </div>
@@ -88,20 +86,22 @@
 
           <!-- Text Editor -->
           <div v-else class="editor-hub-text">
-            <textarea v-model="editText" :placeholder="$t('config.textPlaceholder')" rows="6" class="cyber-textarea"></textarea>
+            <textarea v-model="editText" :placeholder="$t('config.textPlaceholder')" rows="4"
+              class="cyber-textarea"></textarea>
+          </div>
+
+          <!-- Inline Actions -->
+          <div class="inline-actions">
+            <button class="btn btn-ghost-hud mini" @click="cancelEdit">{{ $t('common.cancel').toUpperCase() }}</button>
+            <button class="btn btn-primary-hud mini shadow-glow" @click="saveEdit" :disabled="saving">
+              {{ (saving ? $t('common.loading') : $t('common.save')).toUpperCase() }}
+            </button>
           </div>
         </div>
-
-        <div class="modal-actions-tactical">
-          <button class="btn btn-ghost-hud" @click="cancelEdit">{{ $t('common.cancel').toUpperCase() }}</button>
-          <button class="btn btn-primary-hud shadow-glow" @click="saveEdit" :disabled="saving">
-            {{ (saving ? $t('common.loading') : $t('common.save')).toUpperCase() }}
-          </button>
-        </div>
-      </div>
+      </template>
     </div>
 
-    <!-- Confirmation Dialog -->
+    <!-- Confirmation Dialog (Still Modal as it is a Critical Action) -->
     <div v-if="showDeleteConfirm" class="tactical-modal-overlay" @click.self="showDeleteConfirm = false">
       <div class="delete-dialog card-glass">
         <h3 class="error-accent">{{ $t('config.confirmDeleteTitle').toUpperCase() }}</h3>
@@ -384,9 +384,186 @@ function executeDelete() {
   font-size: 0.7rem;
 }
 
-/* Content Views */
+/* Inline Editor Hud */
+.module-content {
+  padding: 0 25px 25px 25px;
+  border-top: 1px solid rgba(255, 255, 255, 0.03);
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.inline-editor-hud {
+  padding-top: 20px;
+  animation: slide-down 0.3s ease-out;
+}
+
+@keyframes slide-down {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.editor-header-mini {
+  margin-bottom: 15px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding-bottom: 8px;
+}
+
+.editor-label {
+  font-size: 0.65rem;
+  font-weight: 900;
+  letter-spacing: 2px;
+  color: #6366f1;
+}
+
+.inline-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.btn.mini {
+  padding: 8px 18px;
+  font-size: 0.7rem;
+  letter-spacing: 1.5px;
+}
+
+/* Cluster Pills */
+.tags-cluster {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 12px;
+  border-radius: 12px;
+  margin-bottom: 15px;
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.cluster-pill {
+  background: rgba(30, 41, 59, 0.8);
+  padding: 6px 12px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.8rem;
+  font-family: 'Source Code Pro', monospace;
+  border: 1px solid rgba(99, 102, 241, 0.1);
+  transition: all 0.2s;
+}
+
+.cluster-pill:hover {
+  background: rgba(30, 41, 59, 1);
+  border-color: rgba(99, 102, 241, 0.4);
+}
+
+.pill-remove {
+  background: rgba(239, 68, 68, 0.1);
+  border: none;
+  color: #f87171;
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.6rem;
+  transition: all 0.2s;
+}
+
+.pill-remove:hover {
+  background: #ef4444;
+  color: #fff;
+}
+
+.tactical-add-row, .kv-add-tactical {
+  display: flex;
+  gap: 10px;
+}
+
+.tactical-add-row input, .kv-add-tactical input, .cyber-textarea, .kv-edit-row input {
+  flex: 1;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 10px 15px;
+  border-radius: 10px;
+  color: #fff;
+  font-size: 0.9rem;
+  transition: all 0.3s;
+}
+
+.tactical-add-row input:focus, .cyber-textarea:focus, .kv-edit-row input:focus {
+  border-color: #6366f1;
+  outline: none;
+  background: rgba(0, 0, 0, 0.6);
+  box-shadow: 0 0 15px rgba(99, 102, 241, 0.1);
+}
+
+.btn-add-pulse {
+  background: rgba(99, 102, 241, 0.2);
+  color: #818cf8;
+  border: 1px solid rgba(99, 102, 241, 0.4);
+  width: 40px;
+  border-radius: 10px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-add-pulse:hover {
+  background: #6366f1;
+  color: #fff;
+  transform: scale(1.05);
+}
+
+/* KV List Editing */
+.kv-scroll-list {
+  background: rgba(0, 0, 0, 0.2);
+  padding: 15px;
+  border-radius: 12px;
+  margin-bottom: 15px;
+  max-height: 250px;
+  overflow-y: auto;
+  border: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.kv-edit-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.kv-sep { opacity: 0.3; font-weight: 900; }
+
+.btn-remove-tactical {
+  background: rgba(239, 68, 68, 0.1);
+  border: none;
+  color: #f87171;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all 0.2s;
+}
+
+.btn-remove-tactical:hover {
+  background: #ef4444;
+  color: #fff;
+}
+
+/* Read-only Preview Section */
 .module-preview {
-  padding: 0 25px 18px 45px;
+  padding: 0 25px 18px 25px;
   opacity: 0.6;
 }
 
@@ -395,13 +572,6 @@ function executeDelete() {
   font-family: 'Source Code Pro', monospace;
   color: #94a3b8;
   display: block;
-}
-
-.module-details {
-  padding: 0 25px 25px 45px;
-  border-top: 1px solid rgba(255, 255, 255, 0.03);
-  padding-top: 15px;
-  background: rgba(0, 0, 0, 0.1);
 }
 
 .tactical-tags {
@@ -423,12 +593,12 @@ function executeDelete() {
 .tactical-kv-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 10px;
+  gap: 12px;
 }
 
 .kv-card-mini {
   background: rgba(255, 255, 255, 0.03);
-  padding: 8px 15px;
+  padding: 10px 15px;
   border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, 0.05);
 }
@@ -439,16 +609,17 @@ function executeDelete() {
   font-weight: 800;
   color: #64748b;
   text-transform: uppercase;
+  margin-bottom: 4px;
 }
 
 .kv-val {
   font-size: 0.85rem;
-  color: #fff;
+  color: #e2e8f0;
   font-family: 'Source Code Pro', monospace;
 }
 
 .tactical-text-box {
-  background: rgba(0, 0, 0, 0.3);
+  background: rgba(0, 0, 0, 0.2);
   padding: 15px;
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.05);
@@ -460,9 +631,10 @@ function executeDelete() {
   line-height: 1.6;
   white-space: pre-wrap;
   font-family: 'Source Code Pro', monospace;
+  color: #cbd5e1;
 }
 
-/* Specialized Editor Modals */
+/* Modals & Dialogs */
 .tactical-modal-overlay {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
@@ -475,132 +647,20 @@ function executeDelete() {
   padding: 20px;
 }
 
-.tactical-modal-content {
-  width: 100%;
-  max-width: 650px;
-  background: rgba(15, 23, 42, 0.95);
+.delete-dialog {
+  max-width: 450px;
+  padding: 40px;
+  text-align: center;
   border-radius: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
-  padding: 35px;
 }
 
-.modal-header-tactical {
-  margin-bottom: 25px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  padding-bottom: 20px;
-}
+.error-accent { color: #ef4444; margin: 0 0 15px 0; font-weight: 950; letter-spacing: 2px; }
+.dialog-msg { color: #94a3b8; margin-bottom: 30px; font-size: 0.9rem; line-height: 1.5; }
 
-.modal-title-hud {
-  font-size: 1.25rem;
-  font-weight: 900;
-  letter-spacing: 3px;
-  margin: 0;
-  color: #fff;
-}
-
-.modal-subtitle {
-  font-size: 0.8rem;
-  color: #6366f1;
-  font-family: 'Source Code Pro', monospace;
-}
-
-.modal-body-tactical { margin-bottom: 30px; }
-
-/* Cluster Pills */
-.tags-cluster {
+.dialog-actions-tactical {
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  background: rgba(0, 0, 0, 0.3);
-  padding: 15px;
-  border-radius: 12px;
-  margin-bottom: 15px;
-  max-height: 250px;
-  overflow-y: auto;
-}
-
-.cluster-pill {
-  background: #1e293b;
-  padding: 6px 12px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 0.85rem;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.pill-remove {
-  background: transparent;
-  border: none;
-  color: #ef4444;
-  cursor: pointer;
-  font-size: 0.7rem;
-}
-
-.tactical-add-row, .kv-add-tactical {
-  display: flex;
-  gap: 10px;
-}
-
-.tactical-add-row input, .kv-add-tactical input, .cyber-textarea, .kv-edit-row input {
-  flex: 1;
-  background: rgba(0, 0, 0, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 12px 15px;
-  border-radius: 10px;
-  color: #fff;
-  transition: all 0.3s;
-}
-
-.tactical-add-row input:focus, .cyber-textarea:focus {
-  border-color: #6366f1;
-  outline: none;
-  background: rgba(0, 0, 0, 0.6);
-}
-
-.btn-add-pulse {
-  background: #6366f1;
-  color: #fff;
-  border: none;
-  width: 45px;
-  border-radius: 10px;
-  font-size: 1.5rem;
-  cursor: pointer;
-}
-
-/* KV Scroll List */
-.kv-scroll-list {
-  background: rgba(0, 0, 0, 0.2);
-  padding: 15px;
-  border-radius: 12px;
-  margin-bottom: 15px;
-  max-height: 250px;
-  overflow-y: auto;
-}
-
-.kv-edit-row {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  margin-bottom: 10px;
-}
-
-.kv-sep { opacity: 0.3; }
-
-.btn-remove-tactical {
-  background: transparent;
-  border: none;
-  color: #ef4444;
-  cursor: pointer;
-  font-size: 1rem;
-}
-
-/* Actions */
-.modal-actions-tactical {
-  display: flex;
-  justify-content: flex-end;
+  justify-content: center;
   gap: 15px;
 }
 
@@ -636,36 +696,25 @@ function executeDelete() {
   cursor: pointer;
 }
 
-.delete-dialog {
-  max-width: 450px;
-  padding: 40px;
-  text-align: center;
-}
-
-.error-accent { color: #ef4444; margin: 0 0 15px 0; }
-.dialog-msg { color: #94a3b8; margin-bottom: 30px; }
-.dialog-actions-tactical {
-  display: flex;
-  justify-content: center;
-  gap: 15px;
-}
-
-/* Generic Glass */
 .glass-morphism {
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 }
 
 .card-glass {
-  background: rgba(15, 23, 42, 0.8);
+  background: rgba(15, 23, 42, 0.9);
   backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .shadow-glow {
-  box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+  box-shadow: 0 0 25px rgba(99, 102, 241, 0.4);
 }
 
 @media (max-width: 600px) {
-  .kv-edit-row { flex-direction: column; align-items: stretch; gap: 5px; }
+  .kv-edit-row { flex-direction: column; align-items: stretch; gap: 8px; }
+  .kv-sep { display: none; }
+  .module-header { padding: 15px; }
+  .module-content { padding: 0 15px 15px 15px; }
 }
 </style>

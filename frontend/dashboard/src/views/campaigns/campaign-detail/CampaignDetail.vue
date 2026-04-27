@@ -65,25 +65,42 @@
       <!-- Enriched Cluster Nodes List -->
       <section class="cluster-section">
         <div class="section-header">
-           <h2 class="card-title">{{ t('campaignDetail.ipList') }}</h2>
-           <div class="header-cluster-actions">
-              <button v-if="campaign && campaign.allIps?.length" 
-                      @click="investigateCluster" 
-                      class="btn-action btn-investigate-cluster">
-                🚀 {{ t('campaignDetail.investigateCluster').toUpperCase() }}
-              </button>
-              <div class="pager-mini-wrapper" v-if="campaign.ipCount > pageSize">
-                <CyberPager v-model:page="nodesPage" :pageSize="pageSize" :total="campaign.ipCount" simple size="mini" @change="loadCampaign" />
-              </div>
-           </div>
+          <h2 class="card-title">{{ t('campaignDetail.ipList') }}</h2>
+          <div class="header-cluster-actions">
+            <div v-if="selectedIps.length > 0" class="selection-indicator-group">
+              <span class="selection-badge animate-pulse">
+                {{ t('campaignDetail.nodesSelected', { count: selectedIps.length }) }}
+              </span>
+              <button class="btn-clear-selection-mini" @click="clearSelection" title="Clear selection">✕</button>
+            </div>
+            <button v-if="campaign && campaign.allIps?.length" @click="investigateCluster"
+              class="btn-action btn-investigate-cluster" :class="{ 'btn-targeted-mode': selectedIps.length > 0 }">
+              <span v-if="selectedIps.length === 0">🚀 {{ t('campaignDetail.investigateCluster').toUpperCase() }}</span>
+              <span v-else>🎯 {{ t('campaignDetail.investigateSelected').toUpperCase() }}</span>
+            </button>
+            <div class="pager-mini-wrapper" v-if="campaign.ipCount > pageSize">
+              <CyberPager v-model:page="nodesPage" :pageSize="pageSize" :total="campaign.ipCount" simple size="mini"
+                @change="loadCampaign" />
+            </div>
+          </div>
         </div>
 
         <div class="nodes-list">
-          <div v-for="node in campaign.nodes" :key="node.ip" class="enriched-node-card">
+          <div v-for="node in campaign.nodes" :key="node.ip" class="enriched-node-card"
+            :class="{ 'is-targeted': selectedIps.includes(node.ip) }">
             <div class="node-header">
               <div class="ip-info">
                 <CountryFlag :countryCode="node.geoInfo?.ipinfo?.country" 
                              :tooltip="node.geoInfo?.ipinfo ? `${node.geoInfo.ipinfo.country} - ${node.geoInfo.ipinfo.org}` : 'N/A'" />
+                
+                <!-- Integrated Tactical Selector -->
+                <button class="node-selector-mirino-integrated" 
+                        :class="{ 'active': selectedIps.includes(node.ip) }"
+                        @click="toggleIpSelection(node.ip)"
+                        :title="t('campaignDetail.toggleTarget')">
+                  🎯
+                </button>
+
                 <span class="ip-val" @click="goToIp(node.ip)">{{ node.ip }}</span>
               </div>
               <div class="score-badge" :class="getScoreClass(node.averageScore)">
@@ -143,11 +160,12 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { storeToRefs } from 'pinia';
 import { useViewSettingsStore } from '../../../stores/viewSettings';
+import { useCampaignsStore } from '../../../stores/campaigns';
 import { fetchCampaignDetail } from '../../../api';
 import GlobalHeader from '../../../components/GlobalHeader.vue';
 import CyberPager from '../../../components/common/CyberPager.vue';
@@ -169,12 +187,23 @@ const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
 const viewStore = useViewSettingsStore();
+const campaignsStore = useCampaignsStore();
 const { dashboardSkin: currentSkin } = storeToRefs(viewStore);
 
 const campaign = ref(null);
 const loading = ref(true);
 const nodesPage = ref(1);
 const pageSize = ref(10);
+
+const selectedIps = computed(() => campaignsStore.getTargetedIps(props.hash));
+
+function toggleIpSelection(ip) {
+  campaignsStore.toggleTargetedIp(props.hash, ip);
+}
+
+function clearSelection() {
+  campaignsStore.clearTargetedIps(props.hash);
+}
 
 async function loadCampaign() {
   loading.value = true;
@@ -257,12 +286,14 @@ function goToIp(ip) {
 function investigateCluster() {
   if (!campaign.value || !campaign.value.allIps || campaign.value.allIps.length === 0) return;
   
+  const ipsToInvestigate = selectedIps.value.length > 0 ? selectedIps.value : campaign.value.allIps;
+
   const query = {
     timeMode: props.timeMode,
     agoValue: props.agoValue,
     agoUnit: props.agoUnit,
     minLogsForAttack: props.minLogsPerIp || 1,
-    ipList: JSON.stringify(campaign.value.allIps)
+    ipList: JSON.stringify(ipsToInvestigate)
   };
   
   if (route.query.customStartTime || route.query.customEndTime) {
@@ -274,7 +305,7 @@ function investigateCluster() {
 
   router.push({
     name: 'AttackDetail',
-    params: { ip: campaign.value.allIps[0] },
+    params: { ip: ipsToInvestigate[0] },
     query
   });
 }
@@ -298,6 +329,121 @@ function investigateCluster() {
   align-items: center;
   gap: 20px;
   flex-wrap: wrap;
+}
+
+.btn-investigate-cluster {
+  min-width: 250px;
+  justify-content: center;
+}
+
+.btn-targeted-mode {
+  background: var(--cy-primary, #00FF41) !important;
+  color: #000 !important;
+  font-weight: 900;
+  border-color: var(--cy-primary, #00FF41) !important;
+  box-shadow: 0 0 15px rgba(var(--cy-primary-rgb, 0, 255, 65), 0.5), 
+              inset 0 0 10px rgba(255, 255, 255, 0.4);
+  text-shadow: none;
+  animation: pulse-targeted-btn 2s infinite;
+}
+
+@keyframes pulse-targeted-btn {
+  0% { box-shadow: 0 0 10px rgba(var(--cy-primary-rgb, 0, 255, 65), 0.4); }
+  50% { box-shadow: 0 0 25px rgba(var(--cy-primary-rgb, 0, 255, 65), 0.7); }
+  100% { box-shadow: 0 0 10px rgba(var(--cy-primary-rgb, 0, 255, 65), 0.4); }
+}
+
+.title-with-selection {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.selection-indicator-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.selection-badge {
+  background: var(--cy-primary, #00FF41);
+  color: #000;
+  font-size: 0.6rem;
+  font-weight: 900;
+  padding: 4px 10px;
+  border-radius: 20px;
+  letter-spacing: 1px;
+}
+
+.btn-clear-selection-mini {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #f87171;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all 0.2s;
+  padding: 0;
+  line-height: 1;
+}
+
+.btn-clear-selection-mini:hover {
+  background: #ef4444;
+  color: #fff;
+  border-color: #ef4444;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
+}
+
+.enriched-node-card.is-targeted {
+  background: rgba(var(--cy-primary-rgb, 0, 255, 65), 0.12);
+  border-color: var(--cy-primary, #00FF41);
+  box-shadow: inset 0 0 10px rgba(var(--cy-primary-rgb, 0, 255, 65), 0.15);
+  border-left-width: 6px;
+}
+
+.node-selector-mirino-integrated {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #64748b;
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+  padding: 0;
+  line-height: 1;
+}
+
+.node-selector-mirino-integrated:hover {
+  border-color: var(--cy-primary, #00FF41);
+  color: #fff;
+  transform: scale(1.1);
+}
+
+.node-selector-mirino-integrated.active {
+  background: var(--cy-primary, #00FF41);
+  color: #000;
+  border-color: var(--cy-primary, #00FF41);
+  box-shadow: 0 0 10px var(--cy-primary, #00FF41);
+}
+
+.animate-pulse {
+  animation: pulse-hud 2s infinite;
+}
+
+@keyframes pulse-hud {
+  0% { opacity: 1; }
+  50% { opacity: 0.7; }
+  100% { opacity: 1; }
 }
 
 @media (max-width: 768px) {

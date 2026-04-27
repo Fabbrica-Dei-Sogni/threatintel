@@ -305,8 +305,11 @@
         "commonTechniques": "Wykryte Wspólne Techniki",
         "avgIntensity": "Średnia Intensywność Klastra",
         "distributedTimeline": "Rozproszona Oś Czasu",
-        "ipList": "Lista Węzłów Klastra",
-        "reputationScore": "Wynik Reputacji",
+        "ipList": "Lista adresów IP klastra",
+        "nodesSelected": "Wybrano {count} węzłów",
+        "investigateSelected": "Zbadaj wybrane",
+        "toggleTarget": "Wybierz do analizy celowanej",
+        "reputationScore": "Wynik reputacji",
         "viewProfile": "PROFIL",
         "investigate": "BADAJ 👉",
         "investigateCluster": "ZBADAJ KLASTER 🚀"

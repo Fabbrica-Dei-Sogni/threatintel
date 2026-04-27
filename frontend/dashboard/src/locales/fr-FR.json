@@ -305,8 +305,11 @@
         "commonTechniques": "Techniques Communes Détectées",
         "avgIntensity": "Intensité Moyenne du Cluster",
         "distributedTimeline": "Timeline Distribuée",
-        "ipList": "Liste des Nœuds du Cluster",
-        "reputationScore": "Score de Réputation",
+        "ipList": "Liste des nœuds du cluster",
+        "nodesSelected": "{count} nœuds sélectionnés",
+        "investigateSelected": "Enquêter sur la sélection",
+        "toggleTarget": "Sélectionner pour analyse ciblée",
+        "reputationScore": "Score de réputation",
         "viewProfile": "PROFIL",
         "investigate": "ENQUÊTER 👉",
         "investigateCluster": "INVESTIGUER LE CLUSTER 🚀"

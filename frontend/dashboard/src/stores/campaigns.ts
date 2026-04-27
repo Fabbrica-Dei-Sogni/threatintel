@@ -36,6 +36,7 @@ export interface CampaignsState {
         globalMinDate: string | null;
         globalMaxDate: string | null;
     };
+    targetedIps: Record<string, string[]>;
 }
 
 const DEFAULT_STATE: CampaignsState = {
@@ -69,7 +70,8 @@ const DEFAULT_STATE: CampaignsState = {
         maxDate: null,
         globalMinDate: null,
         globalMaxDate: null
-    }
+    },
+    targetedIps: {}
 };
 
 export const useCampaignsStore = defineStore('campaigns', () => {
@@ -80,7 +82,7 @@ export const useCampaignsStore = defineStore('campaigns', () => {
     if (saved) {
         if (saved.filters) Object.assign(state.filters, saved.filters);
         if (saved.sorting) Object.assign(state.sorting, saved.sorting);
-        // La paginazione di solito non la persistiamo tra le sessioni per evitare confusione
+        if (saved.targetedIps) Object.assign(state.targetedIps, saved.targetedIps);
     }
 
     // Salvataggio automatico
@@ -93,8 +95,31 @@ export const useCampaignsStore = defineStore('campaigns', () => {
         state.pagination.page = 1;
     }
 
+    function toggleTargetedIp(hash: string, ip: string) {
+        if (!state.targetedIps[hash]) {
+            state.targetedIps[hash] = [];
+        }
+        const index = state.targetedIps[hash].indexOf(ip);
+        if (index === -1) {
+            state.targetedIps[hash].push(ip);
+        } else {
+            state.targetedIps[hash].splice(index, 1);
+        }
+    }
+
+    function clearTargetedIps(hash: string) {
+        state.targetedIps[hash] = [];
+    }
+
+    function getTargetedIps(hash: string): string[] {
+        return state.targetedIps[hash] || [];
+    }
+
     return {
         state,
-        resetFilters
+        resetFilters,
+        toggleTargetedIp,
+        clearTargetedIps,
+        getTargetedIps
     };
 });

@@ -90,12 +90,11 @@
         <div class="nodes-list">
           <div v-for="node in campaign.nodes" :key="node.ip" class="enriched-node-card"
             :class="{ 'is-targeted': selectedIps.includes(node.ip) }">
-            <div class="node-header">
+               <div class="node-header">
               <div class="ip-info">
                 <CountryFlag :countryCode="node.geoInfo?.ipinfo?.country" 
                              :tooltip="node.geoInfo?.ipinfo ? `${node.geoInfo.ipinfo.country} - ${node.geoInfo.ipinfo.org}` : 'N/A'" />
                 
-                <!-- Integrated Tactical Selector -->
                 <button class="node-selector-mirino-integrated" 
                         :class="{ 'active': selectedIps.includes(node.ip) }"
                         @click="toggleIpSelection(node.ip)"
@@ -105,11 +104,29 @@
 
                 <span class="ip-val" @click="goToIp(node.ip)">{{ node.ip }}</span>
               </div>
-              <div class="score-badge" :class="getScoreClass(node.averageScore)">
-                SCORE: {{ node.averageScore?.toFixed(1) }}
+              
+              <!-- Azione Profilo Rapida -->
+              <button class="btn-profile-compact" @click="goToIp(node.ip)" :title="t('campaignDetail.viewProfile')">
+                 <span>{{ t('campaignDetail.viewProfile').toUpperCase() }}</span> <span class="arrow">→</span>
+              </button>
+            </div>
+
+            <!-- 1. Score Evidente (Sopra le tecniche) -->
+            <div class="node-score-row">
+               <div class="score-badge-evident" :class="getScoreClass(node.averageScore)">
+                  <span class="score-lbl">SCORE:</span>
+                  <span class="score-val">{{ node.averageScore?.toFixed(1) }}</span>
+               </div>
+            </div>
+
+            <!-- 2. Tecniche -->
+            <div class="node-techniques" v-if="node.attackPatterns?.length">
+              <div class="tech-mini-tags">
+                <span v-for="tech in node.attackPatterns" :key="tech" class="tech-mini-tag">{{ tech }}</span>
               </div>
             </div>
 
+            <!-- 3. Logs e Durata -->
             <div class="node-stats-row">
               <div class="stat">
                 <span class="stat-label">LOGS:</span>
@@ -121,12 +138,7 @@
               </div>
             </div>
 
-            <div class="node-techniques" v-if="node.attackPatterns?.length">
-              <div class="tech-mini-tags">
-                <span v-for="tech in node.attackPatterns" :key="tech" class="tech-mini-tag">{{ tech }}</span>
-              </div>
-            </div>
-
+            <!-- 4. Timeline -->
             <div class="node-timeline">
               <div class="time-point">
                 <span class="point-label">FIRST:</span> {{ formatTimePoint(node.firstSeen) }}
@@ -137,12 +149,9 @@
             </div>
             
             <div class="node-footer-actions">
-              <button class="intel-det-btn-mini btn-profile" @click="goToIp(node.ip)">
-                {{ t('campaignDetail.viewProfile') }}
+              <button class="intel-det-btn-mini btn-investigate" @click="handleInvestigateIp(node.ip)">
+                {{ t('campaignDetail.investigate') }}
               </button>
-                      <button class="intel-det-btn-mini btn-investigate" @click="handleInvestigateIp(node.ip)">
-                        {{ t('campaignDetail.investigate') }}
-                      </button>
             </div>
           </div>
         </div>
@@ -626,10 +635,87 @@ function goToIp(ip) {
   box-shadow: 0 0 15px rgba(var(--cy-primary-rgb, 0, 255, 65), 0.4);
 }
 
+.node-score-row {
+  margin: 8px 0;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.score-badge-evident {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(var(--cy-primary-rgb, 0, 255, 65), 0.03);
+  padding: 4px 12px;
+  border: 1px solid rgba(var(--cy-primary-rgb, 0, 255, 65), 0.1);
+  border-left: 3px solid currentColor;
+  font-family: 'JetBrains Mono', monospace;
+  min-width: 140px;
+  justify-content: space-between;
+}
+
+.score-lbl {
+  font-size: 0.55rem;
+  opacity: 0.6;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.score-val {
+  font-size: 1.1rem;
+  font-weight: 900;
+  text-shadow: 0 0 10px currentColor;
+}
+
+/* Color classes for score */
+.score-badge-evident.low { color: #00FF41; }
+.score-badge-evident.mid { color: #ffcc00; }
+.score-badge-evident.high { color: #ff4d4d; }
+
 .btn-profile:hover {
   background: var(--cy-primary, #00FF41);
   color: #000;
   opacity: 1;
   box-shadow: 0 0 15px rgba(var(--cy-primary-rgb, 0, 255, 65), 0.4);
+}
+
+.node-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  padding-bottom: 4px;
+}
+
+.btn-profile-compact {
+  background: rgba(var(--cy-primary-rgb, 0, 255, 65), 0.05);
+  border: 1px solid rgba(var(--cy-primary-rgb, 0, 255, 65), 0.2);
+  color: var(--cy-primary, #00FF41);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.55rem;
+  font-weight: 800;
+  padding: 3px 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  letter-spacing: 1px;
+}
+
+.btn-profile-compact .arrow {
+  font-size: 0.8rem;
+  transition: transform 0.2s;
+}
+
+.btn-profile-compact:hover {
+  background: var(--cy-primary, #00FF41);
+  color: #000;
+  border-color: var(--cy-primary);
+  box-shadow: 0 0 10px rgba(var(--cy-primary-rgb), 0.3);
+}
+
+.btn-profile-compact:hover .arrow {
+  transform: translateX(3px);
 }
 </style>

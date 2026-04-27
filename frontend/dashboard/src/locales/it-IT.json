@@ -312,7 +312,8 @@
         "reputationScore": "Score Reputazione",
         "viewProfile": "PROFILO",
         "investigate": "INVESTIGA 👉",
-        "investigateCluster": "INVESTIGA CLUSTER 🚀"
+        "investigateCluster": "INVESTIGA CLUSTER 🚀",
+        "timelineAnalysis": "Analisi Coordinazione Temporale"
     },
     "attackChart": {
         "title": "Analisi Anomalie Temporale",

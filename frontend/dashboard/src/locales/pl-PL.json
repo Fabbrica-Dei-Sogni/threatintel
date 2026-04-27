@@ -312,7 +312,8 @@
         "reputationScore": "Wynik reputacji",
         "viewProfile": "PROFIL",
         "investigate": "BADAJ 👉",
-        "investigateCluster": "ZBADAJ KLASTER 🚀"
+        "investigateCluster": "ZBADAJ KLASTER 🚀",
+        "timelineAnalysis": "Analiza koordynacji czasowej"
     },
     "attackChart": {
         "title": "Analiza anomaliaów w czasie",

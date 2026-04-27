@@ -312,7 +312,8 @@
         "reputationScore": "Репутационный Скоринг",
         "viewProfile": "ПРОФИЛЬ",
         "investigate": "ИССЛЕДОВАТЬ 👉",
-        "investigateCluster": "ИССЛЕДОВАТЬ КЛАСТЕР 🚀"
+        "investigateCluster": "ИССЛЕДОВАТЬ КЛАСТЕР 🚀",
+        "timelineAnalysis": "Анализ временной координации"
     },
     "attackChart": {
         "title": "Анализ атак во времени",

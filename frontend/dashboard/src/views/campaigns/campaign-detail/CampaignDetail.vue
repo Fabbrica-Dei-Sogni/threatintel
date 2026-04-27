@@ -62,30 +62,49 @@
         </div>
       </section>
 
-      <!-- Enriched Cluster Nodes List -->
-      <section class="cluster-section">
-        <div class="section-header">
-          <h2 class="card-title">{{ t('campaignDetail.ipList') }}</h2>
-          <div class="header-cluster-actions">
-            <div v-if="selectedIps.length > 0" class="selection-indicator-group">
-              <span class="selection-badge animate-pulse">
-                {{ t('campaignDetail.nodesSelected', { count: selectedIps.length }) }}
-              </span>
-              <button class="btn-clear-selection-mini" @click="clearSelection" title="Clear selection">✕</button>
-            </div>
-            <button 
-                class="btn-cyber btn-investigate-cluster" 
-                :class="{ 'btn-targeted-mode': isTargetedMode }"
-                @click="handleInvestigateCluster"
-              >
+      <div class="campaign-detail-content">
+        
+        <!-- Pulsante Grafico (Nuova posizione: Sotto le card, a sinistra) -->
+        <div class="chart-controls-top">
+          <button class="btn-action" :class="{ 'active-glow': showChart }" @click="showChart = !showChart">
+              <span class="btn-icon">{{ showChart ? '📉' : '📊' }}</span>
+              <span>{{ (showChart ? t('common.hideChart') : t('common.showChart')).toUpperCase() }}</span>
+          </button>
+        </div>
+
+        <!-- SEZIONE GRAFICO (Collassabile) -->
+        <transition name="fade">
+          <div v-if="showChart" class="chart-analysis-section">
+            <CampaignNodesChart 
+              :nodes="campaign.nodes" 
+              :campaign-range="{ firstSeen: campaign.firstSeen, lastSeen: campaign.lastSeen }" 
+              :selected-ips="selectedIps"
+            />
+          </div>
+        </transition>
+
+        <!-- Enriched Cluster Nodes List -->
+        <section class="cluster-section">
+          <div class="section-header">
+            <h2 class="card-title">{{ t('campaignDetail.ipList') }}</h2>
+            <div class="header-cluster-actions">
+              <div v-if="selectedIps.length > 0" class="selection-indicator-group">
+                <span class="selection-badge animate-pulse">
+                  {{ t('campaignDetail.nodesSelected', { count: selectedIps.length }) }}
+                </span>
+                <button class="btn-clear-selection-mini" @click="clearSelection" title="Clear selection">✕</button>
+              </div>
+              <button class="btn-cyber btn-investigate-cluster" :class="{ 'btn-targeted-mode': isTargetedMode }"
+                @click="handleInvestigateCluster">
                 <span class="animated-icon">{{ isTargetedMode ? '🎯' : '🚀' }}</span>
-                {{ isTargetedMode ? t('campaignDetail.investigateSelected').toUpperCase() : t('campaignDetail.investigateCluster').toUpperCase() }}
+                {{ isTargetedMode ? t('campaignDetail.investigateSelected').toUpperCase() :
+                  t('campaignDetail.investigateCluster').toUpperCase() }}
               </button>
-            <div class="pager-mini-wrapper" v-if="campaign.ipCount > pageSize">
-              <CyberPager v-model:page="nodesPage" :pageSize="pageSize" :total="campaign.ipCount" simple size="mini" />
+              <div class="pager-mini-wrapper" v-if="campaign.ipCount > pageSize">
+                <CyberPager v-model:page="nodesPage" :pageSize="pageSize" :total="campaign.ipCount" simple size="mini" />
+              </div>
             </div>
           </div>
-        </div>
 
         <div class="nodes-list">
           <div v-for="node in campaign.nodes" :key="node.ip" class="enriched-node-card"
@@ -164,6 +183,7 @@
           <CyberPager v-model:page="nodesPage" v-model:pageSize="pageSize" :total="campaign.ipCount" />
         </div>
       </section>
+      </div>
     </div>
     
     <div v-else class="no-campaigns-detail">
@@ -184,6 +204,7 @@ import { useCampaignDetail } from '../../../composable/useCampaignDetail';
 import GlobalHeader from '../../../components/GlobalHeader.vue';
 import CyberPager from '../../../components/common/CyberPager.vue';
 import CountryFlag from '../../../components/CountryFlag.vue';
+import CampaignNodesChart from '../../../components/campaigns/CampaignNodesChart.vue';
 import { formatFullDateTime, formatHumanDuration, formatDateTime } from '../../../utils/dateUtils';
 import dayjs from 'dayjs';
 
@@ -202,6 +223,8 @@ const route = useRoute();
 const router = useRouter();
 const viewStore = useViewSettingsStore();
 const { dashboardSkin: currentSkin } = storeToRefs(viewStore);
+
+const showChart = ref(false);
 
 // Integrazione Composable
 const {
@@ -287,6 +310,16 @@ function goToIp(ip) {
 <style scoped src="./CampaignDetail.css"></style>
 <style scoped>
 @import "./CampaignDetailCyber.css";
+
+.chart-controls-top {
+  margin-bottom: 25px;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.chart-analysis-section {
+  margin-bottom: 30px;
+}
 
 .section-header {
   display: flex;

@@ -162,13 +162,12 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { storeToRefs } from 'pinia';
 import { useViewSettingsStore } from '../../../stores/viewSettings';
-import { useCampaignsStore } from '../../../stores/campaigns';
-import { fetchCampaignDetail } from '../../../api';
+import { useCampaignDetail } from '../../../composable/useCampaignDetail';
 import GlobalHeader from '../../../components/GlobalHeader.vue';
 import CyberPager from '../../../components/common/CyberPager.vue';
 import CountryFlag from '../../../components/CountryFlag.vue';

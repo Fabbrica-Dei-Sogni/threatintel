@@ -141,10 +141,14 @@
             <!-- 4. Timeline -->
             <div class="node-timeline">
               <div class="time-point">
-                <span class="point-label">FIRST:</span> {{ formatTimePoint(node.firstSeen) }}
+                <span class="point-label">FIRST:</span> 
+                <span class="date-val">{{ formatOnlyDate(node.firstSeen) }}</span>
+                <span class="time-val">{{ formatOnlyTime(node.firstSeen) }}</span>
               </div>
               <div class="time-point">
-                <span class="point-label">LAST:</span> {{ formatTimePoint(node.lastSeen) }}
+                <span class="point-label">LAST:</span> 
+                <span class="date-val">{{ formatOnlyDate(node.lastSeen) }}</span>
+                <span class="time-val">{{ formatOnlyTime(node.lastSeen) }}</span>
               </div>
             </div>
             
@@ -233,8 +237,14 @@ function formatDate(ts) {
   return formatFullDateTime(ts);
 }
 
-function formatTimePoint(ts) {
-  return formatDateTime(ts);
+function formatOnlyDate(ts) {
+  if (!ts) return '-';
+  return dayjs(ts).format('DD/MM/YYYY');
+}
+
+function formatOnlyTime(ts) {
+  if (!ts) return '';
+  return dayjs(ts).format('HH:mm:ss');
 }
 
 function computeDuration(start, end) {
@@ -592,10 +602,25 @@ function goToIp(ip) {
 
 .time-point:last-child { margin-bottom: 0; }
 
+.date-val {
+  color: #fff;
+  font-weight: 700;
+  margin-right: 8px;
+}
+
+.time-val {
+  color: var(--cy-primary, #00FF41);
+  opacity: 0.7;
+  font-size: 0.75rem;
+}
+
 .point-label {
+  display: inline-block;
+  min-width: 48px;
   opacity: 0.5;
   font-weight: normal;
   white-space: nowrap;
+  margin-right: 6px;
 }
 
 .node-footer-actions {

@@ -463,7 +463,18 @@ const loading = ref(true)
 const error = ref(null)
 
 const mapAttackData = computed(() => {
-    return attack.value ? [attack.value] : [];
+    if (!attack.value) return [];
+    
+    // Se è un attacco distribuito e abbiamo i dettagli di tutti gli IP, 
+    // espandiamo i dati per mostrare tutti i marker sulla mappa.
+    if (attack.value.isDistributed && attack.value.allIpDetails && attack.value.allIpDetails.length > 0) {
+        return attack.value.allIpDetails.map(details => ({
+            ...attack.value,
+            ipDetails: details
+        }));
+    }
+    
+    return [attack.value];
 });
 
 // Router

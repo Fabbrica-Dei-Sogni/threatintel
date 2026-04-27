@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
 // Import model
 import ThreatLog, { IThreatLog } from '../models/ThreatLogSchema';
+import IpDetails from '../models/IpDetailsSchema';
 import AttackDTO from '../models/dto/AttackDTO';
 import PatternAnalysisService from './PatternAnalysisService';
 import { ForensicService } from './forense/ForensicService';
@@ -324,6 +325,19 @@ export class ThreatLogService {
         // Aggiunge metadati extra se necessario (lookup ipDetails per il "rappresentante")
         if (attack) {
             const result = await ThreatLog.populate(attack, { path: 'ipDetailsId', model: 'IpDetails' });
+            // Sincronizza il campo ipDetails per retrocompatibilità con il frontend (che si aspetta ipDetails anziché ipDetailsId)
+            const resAny = result as any;
+            // Sincronizza il campo ipDetails per retrocompatibilità con il frontend (che si aspetta ipDetails anziché ipDetailsId)
+            if (resAny.ipDetailsId) {
+                resAny.ipDetails = resAny.ipDetailsId;
+            }
+
+            // Recupera ipDetails per TUTTI gli IP coinvolti per visualizzazione su mappa
+            if (resAny.ips && resAny.ips.length > 0) {
+                const allDetails = await IpDetails.find({ ip: { $in: resAny.ips } }).lean();
+                resAny.allIpDetails = allDetails;
+            }
+
             return result;
         }
 

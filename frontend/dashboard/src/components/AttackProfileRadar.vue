@@ -73,22 +73,24 @@ const chartData = computed(() => {
         1.0
     );
 
-    // Asse 2: Bassa Velocità/Stealth (Invertito)
+    // Asse 3: Bassa Velocità/Stealth (Invertito per mostrare il rischio stealth)
     const rpsInvertedNorm = 1.0 - (attack.rpsNorm || 0);
 
     // Calcolo e Trasformazione di TUTTI i dati
     const dataValues = [
         transformAndScale(attack.scoreNorm),         // 1. Rischio Tecnico
         transformAndScale(attack.uniqueTechNorm),    // 3. Complessità
-        transformAndScale(attack.rpsNorm),          // 2. Bassa Velocità (Invertito + Trasformato)
-        transformAndScale(attack.attackDurationMinutes),  // 4. Persistenza
+        transformAndScale(rpsInvertedNorm),          // 2. Bassa Velocità (Invertito per Stealth)
+        transformAndScale(attack.durNorm),           // 4. Persistenza (Normalizzata)
     ];
 
     return {
         labels: originalData.value.map(d => d.label),
         datasets: [
             {
-                label: `${t('components.radar.attackProfile')}: ${attack.request.ip}`,
+                label: attack.isDistributed 
+                    ? `${t('attackDetail.distributedAttacker')}`
+                    : `${t('components.radar.attackProfile')}: ${attack.request?.ip || 'N/A'}`,
                 data: dataValues,
                 // Colore Magma (Rosso Fuoco)
                 backgroundColor: 'rgba(230, 33, 23, 0.2)', 

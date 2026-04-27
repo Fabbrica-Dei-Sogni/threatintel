@@ -19,7 +19,10 @@ export class GroupingStage implements PipelineStage {
                             request: {
                                 method: '$request.method',
                                 url: '$request.url',
-                                ip: '$request.ip'
+                                ip: '$request.ip',
+                                headers: '$request.headers',
+                                body: '$request.body',
+                                query: '$request.query'
                             },
                             response: {
                                 statusCode: '$response.statusCode'

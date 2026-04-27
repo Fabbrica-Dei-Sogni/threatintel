@@ -261,7 +261,7 @@
         "dangerScore": "Wynik zagrożenia",
         "avgScore": "Średni wynik",
         "totalLogs": "Łączna liczba dzienników",
-        "logsRaggrupati": "Dzienniki zagregowane",
+        "logsRaggruppati": "Zgrupowane logi",
         "attackDuration": "Czas trwania anomaliau",
         "firstSeen": "Pierwsze wykrycie",
         "lastSeen": "Ostatnie wykrycie",

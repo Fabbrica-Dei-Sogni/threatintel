@@ -196,7 +196,7 @@
                 <div class="section-header logs-header-row clickable-header" @click="toggles.logs = !toggles.logs">
                     <div class="header-title-group">
                         <span class="animated-icon pulse-magma">📜</span>
-                        <h2>{{ t('attackDetail.logsRaggrupati').toUpperCase() }}</h2>
+                        <h2>{{ (attack.logsRaggruppati ? t('attackDetail.logsRaggruppati') : t('attackDetail.recentLogs')).toUpperCase() }}</h2>
                     </div>
                     <div class="header-actions" @click.stop>
                         <el-input 
@@ -419,10 +419,10 @@ const mapAttackData = computed(() => {
 
 // Computed for Logs
 const filteredLogs = computed(() => {
-    if (!props.attack?.logsRaggrupati) return [];
-    if (!searchUrl.value) return props.attack.logsRaggrupati;
+    const baseLogs = props.attack?.logsRaggruppati || props.attack?.logs || [];
+    if (!searchUrl.value) return baseLogs;
     const search = searchUrl.value.toLowerCase();
-    return props.attack.logsRaggrupati.filter(log => 
+    return baseLogs.filter(log => 
         log.request.url?.toLowerCase().includes(search)
     );
 });

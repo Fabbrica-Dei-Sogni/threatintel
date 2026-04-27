@@ -261,7 +261,7 @@
         "dangerScore": "Danger score",
         "avgScore": "Average score",
         "totalLogs": "Total logs",
-        "logsRaggrupati": "Aggregate logs",
+        "logsRaggruppati": "Grouped logs",
         "attackDuration": "Anomaly duration",
         "firstSeen": "First seen",
         "lastSeen": "Last seen",

@@ -261,7 +261,7 @@
         "dangerScore": "Punteggio di pericolo",
         "avgScore": "Punteggio medio",
         "totalLogs": "Totale log",
-        "logsRaggrupati": "Logs raggruppati",
+        "logsRaggruppati": "Logs raggruppati",
         "attackDuration": "Durata anomalia",
         "firstSeen": "Primo avvistamento",
         "lastSeen": "Ultimo avvistamento",

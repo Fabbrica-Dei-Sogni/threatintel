@@ -261,7 +261,7 @@
         "dangerScore": "Gefahrenwert",
         "avgScore": "Durchschnittliche Punktzahl",
         "totalLogs": "Gesamt Protokolle",
-        "logsRaggrupati": "Aggregierte Protokolle",
+        "logsRaggruppati": "Gruppierte Protokolle",
         "attackDuration": "Anomaliesdauer",
         "firstSeen": "Zuerst gesehen",
         "lastSeen": "Zuletzt gesehen",

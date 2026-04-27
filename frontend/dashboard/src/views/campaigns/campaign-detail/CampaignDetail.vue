@@ -140,7 +140,7 @@
               <button class="intel-det-btn-mini btn-profile" @click="goToIp(node.ip)">
                 {{ t('campaignDetail.viewProfile') }}
               </button>
-                      <button class="btn-cyber btn-mini" @click="handleInvestigateIp(node.ip)">
+                      <button class="intel-det-btn-mini btn-investigate" @click="handleInvestigateIp(node.ip)">
                         {{ t('campaignDetail.investigate') }}
                       </button>
             </div>
@@ -620,7 +620,13 @@ function goToIp(ip) {
   background: rgba(var(--cy-primary-rgb, 0, 255, 65), 0.1);
 }
 
-.intel-det-btn-mini:hover {
+.btn-investigate:hover {
+  background: var(--cy-primary, #00FF41);
+  color: #000;
+  box-shadow: 0 0 15px rgba(var(--cy-primary-rgb, 0, 255, 65), 0.4);
+}
+
+.btn-profile:hover {
   background: var(--cy-primary, #00FF41);
   color: #000;
   opacity: 1;

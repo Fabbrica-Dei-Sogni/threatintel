@@ -73,14 +73,16 @@
               </span>
               <button class="btn-clear-selection-mini" @click="clearSelection" title="Clear selection">✕</button>
             </div>
-            <button v-if="campaign && campaign.allIps?.length" @click="investigateCluster"
-              class="btn-action btn-investigate-cluster" :class="{ 'btn-targeted-mode': selectedIps.length > 0 }">
-              <span v-if="selectedIps.length === 0">🚀 {{ t('campaignDetail.investigateCluster').toUpperCase() }}</span>
-              <span v-else>🎯 {{ t('campaignDetail.investigateSelected').toUpperCase() }}</span>
-            </button>
+            <button 
+                class="btn-cyber btn-investigate-cluster" 
+                :class="{ 'btn-targeted-mode': isTargetedMode }"
+                @click="handleInvestigateCluster"
+              >
+                <span class="animated-icon">{{ isTargetedMode ? '🎯' : '🚀' }}</span>
+                {{ isTargetedMode ? t('campaignDetail.investigateSelected').toUpperCase() : t('campaignDetail.investigateCluster').toUpperCase() }}
+              </button>
             <div class="pager-mini-wrapper" v-if="campaign.ipCount > pageSize">
-              <CyberPager v-model:page="nodesPage" :pageSize="pageSize" :total="campaign.ipCount" simple size="mini"
-                @change="loadCampaign" />
+              <CyberPager v-model:page="nodesPage" :pageSize="pageSize" :total="campaign.ipCount" simple size="mini" />
             </div>
           </div>
         </div>
@@ -138,15 +140,15 @@
               <button class="intel-det-btn-mini btn-profile" @click="goToIp(node.ip)">
                 {{ t('campaignDetail.viewProfile') }}
               </button>
-              <button class="intel-det-btn-mini btn-investigate" @click="investigateIp(node.ip)">
-                {{ t('campaignDetail.investigate') }}
-              </button>
+                      <button class="btn-cyber btn-mini" @click="handleInvestigateIp(node.ip)">
+                        {{ t('campaignDetail.investigate') }}
+                      </button>
             </div>
           </div>
         </div>
 
         <div class="pager-footer-wrapper" v-if="campaign.ipCount > pageSize">
-          <CyberPager v-model:page="nodesPage" v-model:pageSize="pageSize" :total="campaign.ipCount" @change="loadCampaign" />
+          <CyberPager v-model:page="nodesPage" v-model:pageSize="pageSize" :total="campaign.ipCount" />
         </div>
       </section>
     </div>
@@ -187,52 +189,37 @@ const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
 const viewStore = useViewSettingsStore();
-const campaignsStore = useCampaignsStore();
 const { dashboardSkin: currentSkin } = storeToRefs(viewStore);
 
-const campaign = ref(null);
-const loading = ref(true);
-const nodesPage = ref(1);
-const pageSize = ref(10);
+// Integrazione Composable
+const {
+  campaign,
+  loading,
+  error,
+  nodesPage,
+  pageSize,
+  selectedIps,
+  isTargetedMode,
+  loadCampaign,
+  toggleIpSelection,
+  clearSelection,
+  investigate
+} = useCampaignDetail(props.hash);
 
-const selectedIps = computed(() => campaignsStore.getTargetedIps(props.hash));
+// Effettua il caricamento iniziale e reagisce al cambio pagina
+const triggerLoad = () => {
+  loadCampaign({
+    minLogsPerIp: props.minLogsPerIp,
+    minScore: props.minScore,
+    protocol: props.protocol,
+    timeMode: props.timeMode,
+    agoValue: props.agoValue,
+    agoUnit: props.agoUnit
+  });
+};
 
-function toggleIpSelection(ip) {
-  campaignsStore.toggleTargetedIp(props.hash, ip);
-}
-
-function clearSelection() {
-  campaignsStore.clearTargetedIps(props.hash);
-}
-
-async function loadCampaign() {
-  loading.value = true;
-  try {
-    const data = await fetchCampaignDetail({
-      hash: props.hash,
-      minLogsPerIp: props.minLogsPerIp,
-      minScore: props.minScore,
-      protocol: props.protocol,
-      page: nodesPage.value,
-      pageSize: pageSize.value,
-      timeConfig: {
-        startTime: route.query.customStartTime,
-        endTime: route.query.customEndTime,
-        timeMode: props.timeMode,
-        agoValue: props.agoValue,
-        agoUnit: props.agoUnit
-      }
-    });
-    
-    campaign.value = data;
-  } catch (err) {
-    console.error('[CampaignDetail] Error loading campaign:', err);
-  } finally {
-    loading.value = false;
-  }
-}
-
-onMounted(loadCampaign);
+onMounted(triggerLoad);
+watch(nodesPage, triggerLoad);
 
 function formatDate(ts) {
   return formatFullDateTime(ts);
@@ -256,58 +243,26 @@ function getScoreClass(score) {
   return 'danger-info';
 }
 
-function investigateIp(ip) {
-  const query = {
+function handleInvestigateIp(ip) {
+  investigate(ip, {
     timeMode: props.timeMode,
     agoValue: props.agoValue,
     agoUnit: props.agoUnit,
-    minLogsForAttack: props.minLogsPerIp || 1
-  };
-  
-  // Gestione date custom per coerenza con AttackDetail
-  if (route.query.customStartTime || route.query.customEndTime) {
-    query.dateRange = JSON.stringify([
-      route.query.customStartTime || null,
-      route.query.customEndTime || null
-    ]);
-  }
+    minLogsPerIp: props.minLogsPerIp
+  });
+}
 
-  router.push({
-    name: 'AttackDetail',
-    params: { ip },
-    query
+function handleInvestigateCluster() {
+  investigate(null, {
+    timeMode: props.timeMode,
+    agoValue: props.agoValue,
+    agoUnit: props.agoUnit,
+    minLogsPerIp: props.minLogsPerIp
   });
 }
 
 function goToIp(ip) {
   router.push(`/ip/${ip}`);
-}
-
-function investigateCluster() {
-  if (!campaign.value || !campaign.value.allIps || campaign.value.allIps.length === 0) return;
-  
-  const ipsToInvestigate = selectedIps.value.length > 0 ? selectedIps.value : campaign.value.allIps;
-
-  const query = {
-    timeMode: props.timeMode,
-    agoValue: props.agoValue,
-    agoUnit: props.agoUnit,
-    minLogsForAttack: props.minLogsPerIp || 1,
-    ipList: JSON.stringify(ipsToInvestigate)
-  };
-  
-  if (route.query.customStartTime || route.query.customEndTime) {
-    query.dateRange = JSON.stringify([
-      route.query.customStartTime || null,
-      route.query.customEndTime || null
-    ]);
-  }
-
-  router.push({
-    name: 'AttackDetail',
-    params: { ip: ipsToInvestigate[0] },
-    query
-  });
 }
 </script>
 

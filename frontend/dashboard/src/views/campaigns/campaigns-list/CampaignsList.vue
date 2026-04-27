@@ -80,8 +80,8 @@
             <label class="cyber-label">{{ t('telemetry.filter_score_label') }}</label>
             <div class="tabs-row">
               <button v-for="val in dynamicScoreScale" :key="val" class="tab-btn"
-                :class="{ active: campaignsStore.state.filters.minScore === val }"
-                @click="campaignsStore.state.filters.minScore = (campaignsStore.state.filters.minScore === val ? 0 : val)">
+                :class="{ active: minScore === val }"
+                @click="minScore = (minScore === val ? 0 : val)">
                 {{ val === 0 ? 'INFO' : val }}
               </button>
             </div>
@@ -91,8 +91,8 @@
             <label class="cyber-label">LOGS/IP</label>
             <div class="tabs-row">
               <button v-for="val in dynamicLogsPerIpScale" :key="val" class="tab-btn"
-                :class="{ active: campaignsStore.state.filters.minLogsPerIp === val }"
-                @click="campaignsStore.state.filters.minLogsPerIp = (campaignsStore.state.filters.minLogsPerIp === val ? 1 : val)">
+                :class="{ active: minLogsPerIp === val }"
+                @click="minLogsPerIp = (minLogsPerIp === val ? 1 : val)">
                 {{ val }}
               </button>
             </div>
@@ -203,6 +203,13 @@ const {
   total,
   page,
   pageSize,
+  minIps,
+  minScore,
+  minLogsPerIp,
+  protocol,
+  timeMode,
+  agoValue,
+  agoUnit,
   fetchData
 } = useCampaignsDiscovery(
   toRef(campaignsStore.state.pagination, 'page'),
@@ -221,12 +228,12 @@ const {
 // Scale dinamiche calcolate dai metadati del backend
 const dynamicIpScale = computed(() => {
   const { minIpCount, maxIpCount } = campaignsStore.state.metadata;
-  return generateSmartScale(minIpCount, maxIpCount, 6, campaignsStore.state.filters.minIps);
+  return generateSmartScale(minIpCount, maxIpCount, 6, minIps.value);
 });
 
 const dynamicScoreScale = computed(() => {
-  const { minScore, maxScore } = campaignsStore.state.metadata;
-  return generateScoreScale(Math.floor(minScore), Math.ceil(maxScore), campaignsStore.state.filters.minScore);
+  const { minScore: metaMin, maxScore: metaMax } = campaignsStore.state.metadata;
+  return generateScoreScale(Math.floor(metaMin), Math.ceil(metaMax), minScore.value);
 });
 
 const dynamicTimeScale = computed(() => {
@@ -235,8 +242,8 @@ const dynamicTimeScale = computed(() => {
 });
 
 const dynamicLogsPerIpScale = computed(() => {
-  const { minLogsPerIp, maxLogsPerIp } = campaignsStore.state.metadata;
-  return generateSmartScale(minLogsPerIp, maxLogsPerIp, 6, campaignsStore.state.filters.minLogsPerIp);
+  const { minLogsPerIp: metaMin, maxLogsPerIp: metaMax } = campaignsStore.state.metadata;
+  return generateSmartScale(metaMin, metaMax, 6, minLogsPerIp.value);
 });
 
 function formatDate(ts) {

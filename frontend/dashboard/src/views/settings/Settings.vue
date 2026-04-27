@@ -27,25 +27,18 @@
 
         <div class="profile-scroll-area">
           <ul class="profile-fan">
-            <li 
-              :class="{ active: isDefault }"
-              @click="profileStore.setActiveProfile(null)"
-              class="profile-card glass-morphism"
-            >
+            <li :class="{ active: isDefault }" @click="profileStore.setActiveProfile(null)"
+              class="profile-card glass-morphism">
               <div class="node-indicator"></div>
               <div class="profile-info">
                 <span class="label">{{ t('settings.defaultProfile').toUpperCase() }}</span>
                 <span class="status">PRIMARY</span>
               </div>
             </li>
-            
-            <li 
-              v-for="p in profileStore.profiles" 
-              :key="p.id" 
-              :class="{ active: profileStore.activeProfileId === p.id }"
-              @click="profileStore.setActiveProfile(p.id)"
-              class="profile-card glass-morphism"
-            >
+
+            <li v-for="p in profileStore.profiles" :key="p.id"
+              :class="{ active: profileStore.activeProfileId === p.id }" @click="profileStore.setActiveProfile(p.id)"
+              class="profile-card glass-morphism">
               <div class="node-indicator"></div>
               <div class="profile-info">
                 <span class="label">{{ p.name.toUpperCase() }}</span>
@@ -79,7 +72,7 @@
               <span class="hub-icon">📋</span>
               <h3 class="section-title">{{ t('settings.generalInfo').toUpperCase() }}</h3>
             </div>
-            
+
             <div class="grid-inputs">
               <div class="setting-item cyber-input-group">
                 <label for="name">{{ t('settings.honeypotName') }}</label>
@@ -666,7 +659,9 @@ function goBack() {
   margin-bottom: 25px;
 }
 
-.hub-icon { font-size: 1.2rem; }
+.hub-icon {
+  font-size: 1.2rem;
+}
 
 .section-title {
   font-size: 0.9rem;
@@ -724,7 +719,7 @@ function goBack() {
   transform: translateX(-50%);
 }
 
-.input-wrapper input:focus ~ .focus-border {
+.input-wrapper input:focus~.focus-border {
   width: 80%;
 }
 
@@ -785,7 +780,9 @@ function goBack() {
   margin-top: 25px;
 }
 
-.mini-input { flex: 1; }
+.mini-input {
+  flex: 1;
+}
 
 .mini-input label {
   font-size: 0.6rem;
@@ -876,7 +873,9 @@ function goBack() {
   gap: 15px;
 }
 
-.flex-spacer { flex: 1; }
+.flex-spacer {
+  flex: 1;
+}
 
 .btn-danger-minimal {
   background: transparent;
@@ -948,8 +947,15 @@ function goBack() {
 }
 
 @keyframes slide-in {
-  from { transform: translateX(100%); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
 
 /* Responsive */
@@ -957,7 +963,7 @@ function goBack() {
   .settings-layout {
     grid-template-columns: 1fr;
   }
-  
+
   .profiles-navigator {
     background: rgba(15, 23, 42, 0.4);
     padding: 20px;
@@ -968,13 +974,15 @@ function goBack() {
     gap: 20px;
   }
 
-  .nav-header { padding: 0; }
-  
-  .profile-scroll-area { 
+  .nav-header {
+    padding: 0;
+  }
+
+  .profile-scroll-area {
     width: 100%;
     overflow-x: visible;
   }
-  
+
   .profile-fan {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -982,7 +990,8 @@ function goBack() {
   }
 
   .profile-card {
-    min-width: 0; /* Allow shrinking */
+    min-width: 0;
+    /* Allow shrinking */
   }
 
   .btn-new-node {
@@ -1000,16 +1009,16 @@ function goBack() {
   .profile-fan {
     grid-template-columns: 1fr;
   }
-  
+
   .geo-panel {
     grid-template-columns: 1fr;
     padding: 15px;
   }
-  
+
   .grid-inputs {
     grid-template-columns: 1fr;
   }
-  
+
   .editor-actions {
     flex-direction: column-reverse;
     margin-top: 1rem;

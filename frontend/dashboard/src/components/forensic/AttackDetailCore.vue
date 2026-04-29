@@ -3,7 +3,7 @@
         <GlobalHeader context="attack-detail" extraClass="cyber-sticky-area cyber-sticky-top-0">
             <template #actions>
                 <div class="header-content-right">
-                    <ReportActions type="attack" :ip="ip" filename="dossier_attack" mode="sticky" accentColor="#ff4d4d" />
+                    <ReportActions type="attack" :ip="ip" :ip-list="ipList" filename="dossier_attack" mode="sticky" accentColor="#ff4d4d" />
                 </div>
             </template>
             <template #title>

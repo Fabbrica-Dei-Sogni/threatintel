@@ -90,6 +90,7 @@ const props = defineProps({
   type: String, // 'attack' | 'ip' | 'telnet'
   ip: String,
   sessionId: String,
+  ipList: { type: Array, default: null },
   filename: { type: String, default: 'dossier' },
   mode: { type: String, default: 'button' }, // 'sticky' | 'button'
   accentColor: { type: String, default: '#3b82f6' }
@@ -117,6 +118,7 @@ const handlePreview = async (style) => {
       type: props.type,
       ip: props.ip,
       sessionId: props.sessionId,
+      ipList: props.ipList ? JSON.stringify(props.ipList) : null,
       format: 'html',
       style: style || currentStyle.value,
       locale: locale.value
@@ -141,6 +143,7 @@ const handleDownload = async (style) => {
       type: props.type,
       ip: props.ip,
       sessionId: props.sessionId,
+      ipList: props.ipList ? JSON.stringify(props.ipList) : null,
       format: 'pdf',
       style: style || currentStyle.value,
       locale: locale.value

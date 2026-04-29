@@ -13,7 +13,7 @@ export class ReportController {
 
     async generateDetailReport(req: Request, res: Response) {
         try {
-            const { ip, sessionId, type, locale } = req.query;
+            const { ip, sessionId, type, locale, ipList } = req.query;
             const format = (req.query.format as 'html' | 'pdf') || 'pdf';
             const reportType = (type as ReportType) || 'attack';
             const lang = (locale as string) || 'it-IT';
@@ -21,14 +21,24 @@ export class ReportController {
 
             const id = (reportType === 'telnet' ? sessionId : ip) as string;
 
-            if (!id) {
+            // Se è un attacco e abbiamo ipList, la parsiamo
+            let parsedIpList: string[] | undefined;
+            if (reportType === 'attack' && ipList) {
+                try {
+                    parsedIpList = JSON.parse(ipList as string);
+                } catch (e) {
+                    console.error('[ReportController] Errore parsing ipList:', e);
+                }
+            }
+
+            if (!id && (!parsedIpList || parsedIpList.length === 0)) {
                 const errorMsg = lang.startsWith('it')
-                    ? `È necessario fornire un ID valido per il tipo ${reportType}`
-                    : `A valid ID is required for type ${reportType}`;
+                    ? `È necessario fornire un ID o una lista IP valida per il tipo ${reportType}`
+                    : `A valid ID or IP list is required for type ${reportType}`;
                 return res.status(400).json({ error: errorMsg });
             }
 
-            const result = await this.reportService.generateDetailReport(reportType, id, format, lang, style);
+            const result = await this.reportService.generateDetailReport(reportType, id, format, lang, style, parsedIpList);
 
             if (format === 'html') {
                 res.setHeader('Content-Type', 'text/html');

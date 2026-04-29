@@ -334,7 +334,9 @@ export class ThreatLogService {
 
             // Recupera ipDetails per TUTTI gli IP coinvolti per visualizzazione su mappa
             if (resAny.ips && resAny.ips.length > 0) {
-                const allDetails = await IpDetails.find({ ip: { $in: resAny.ips } }).lean();
+                const allDetails = await IpDetails.find({ ip: { $in: resAny.ips } })
+                    .populate('abuseipdbId')
+                    .lean();
                 resAny.allIpDetails = allDetails;
             }
 

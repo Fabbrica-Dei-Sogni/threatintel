@@ -91,6 +91,14 @@
             },
             "timelineNote": "Hinweis: Der Auszug zeigt die ersten 20 Ereignisse von insgesamt {count}."
         },
+        "distributedAttackDetail": {
+            "title": "Koordinierte Analyse verteilter Angriffe",
+            "clusterSummary": "1. Zusammenfassung des verteilten Clusters",
+            "involvedIps": "Beteiligte IP-Knoten",
+            "involvedNodes": "Analyse der Cluster-Knoten",
+            "aggregateIntensity": "Aggregierte Intensität",
+            "attackStatus": "Angriffsstatus"
+        },
         "ipDetail": {
             "title": "Intelligence Briefing: IP-forensische Untersuchung",
             "division": "Abteilung für Reputationsintelligenz",

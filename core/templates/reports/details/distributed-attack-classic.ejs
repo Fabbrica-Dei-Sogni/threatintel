@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="<%= locale.split('-')[0] %>">
+<head>
+    <meta charset="UTF-8">
+    <title><%= t('reports.common.agencyName') %> - <%= data.title %> - <%= data.ip %></title>
+    <style>
+        :root {
+            --bg-paper: #ffffff;
+            --text-main: #1a202c;
+            --text-muted: #4a5568;
+            --primary: #2c5282;
+            --danger: #c53030;
+            --warning: #b7791f;
+            --success: #2f855a;
+            --border: #e2e8f0;
+            --section-bg: #f7fafc;
+        }
+
+        @page {
+            margin: 15mm;
+            size: A4;
+        }
+
+        body {
+            font-family: 'Helvetica', 'Arial', sans-serif;
+            background-color: var(--bg-paper);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            line-height: 1.4;
+        }
+
+        .document-container {
+            max-width: 100%;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 2px solid var(--text-main);
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-box {
+            width: 50px;
+            height: 50px;
+            border: 1px solid var(--border);
+            padding: 2px;
+            background: #fff;
+        }
+
+        .logo-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .title-group h1 {
+            margin: 0;
+            font-size: 22px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 900;
+        }
+
+        .title-group p {
+            margin: 2px 0 0;
+            font-size: 10px;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+
+        .header-right {
+            text-align: right;
+        }
+
+        .security-stamp {
+            display: inline-block;
+            border: 2px solid var(--danger);
+            color: var(--danger);
+            font-weight: 900;
+            font-size: 12px;
+            padding: 4px 8px;
+            text-transform: uppercase;
+            transform: rotate(-2deg);
+            margin-bottom: 10px;
+        }
+
+        .dossier-id {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-family: monospace;
+        }
+
+        .meta-strip {
+            display: flex;
+            justify-content: space-between;
+            background: var(--section-bg);
+            padding: 10px 15px;
+            border: 1px solid var(--border);
+            font-size: 11px;
+            margin-bottom: 25px;
+        }
+
+        .section {
+            margin-bottom: 25px;
+        }
+
+        .section-header {
+            border-bottom: 1px solid var(--text-main);
+            margin-bottom: 12px;
+            padding-bottom: 4px;
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: var(--primary);
+        }
+
+        .summary-block {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1px;
+            background: var(--border);
+            border: 1px solid var(--border);
+            margin-bottom: 25px;
+        }
+
+        .summary-item {
+            background: #fff;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .summary-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            font-weight: 700;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .summary-value {
+            font-size: 18px;
+            font-weight: 800;
+        }
+
+        .danger-HIGH { color: var(--danger); }
+        .danger-MEDIUM { color: var(--warning); }
+        .danger-LOW { color: var(--success); }
+
+        .panel-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .detail-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+
+        .detail-table th {
+            text-align: left;
+            padding: 6px 0;
+            color: var(--text-muted);
+            width: 40%;
+            font-weight: 600;
+        }
+
+        .detail-table td {
+            text-align: right;
+            padding: 6px 0;
+            font-weight: 700;
+        }
+
+        .timeline-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 10px;
+            margin-top: 10px;
+        }
+
+        .timeline-table th {
+            background: var(--section-bg);
+            padding: 8px;
+            text-align: left;
+            border: 1px solid var(--border);
+            text-transform: uppercase;
+        }
+
+        .timeline-table td {
+            padding: 8px;
+            border: 1px solid var(--border);
+            word-break: break-all;
+        }
+
+        .badge-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-top: 8px;
+        }
+
+        .badge {
+            font-size: 9px;
+            padding: 2px 6px;
+            border-radius: 2px;
+            font-weight: 700;
+            border: 1px solid var(--border);
+            background: var(--section-bg);
+        }
+
+        .badge-danger { color: var(--danger); border-color: var(--danger); background: #fff5f5; }
+        .badge-warning { color: var(--warning); border-color: var(--warning); background: #fffaf0; }
+        .badge-primary { color: var(--primary); border-color: var(--primary); background: #ebf8ff; }
+
+        .footer {
+            margin-top: 50px;
+            border-top: 1px solid var(--border);
+            padding-top: 10px;
+            text-align: center;
+            font-size: 9px;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        .page-counter {
+            text-align: right;
+            font-size: 9px;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="document-container">
+        <header class="header">
+            <div class="header-left">
+                <div class="logo-box">
+                    <% if (typeof logoBase64 !== 'undefined' && logoBase64) { %>
+                        <img src="<%= logoBase64 %>" class="logo-img" alt="Seal">
+                    <% } else { %>
+                        <div style="font-size: 24px; font-weight: bold; color: #cbd5e0;">TI</div>
+                    <% } %>
+                </div>
+                <div class="title-group">
+                    <h1><%= t('reports.common.agencyName') %></h1>
+                    <p><%= t('reports.attackDetail.division') %> • <%= t('reports.common.executiveReport') %></p>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="dossier-id">REF: DIST-ATK-<%= data.ipCount %>-<%= Date.now().toString().slice(-6) %></div>
+            </div>
+        </header>
+
+        <div class="meta-strip">
+            <span><strong><%= t('reports.distributedAttackDetail.involvedIps') %>:</strong> <%= data.ipCount %></span>
+            <span><strong><%= t('reports.common.generatedAt') %>:</strong> <%= data.generatedAt %></span>
+            <span><strong><%= t('reports.common.protocol') %>:</strong> <%= t('reports.common.httpInvestigative') %> (DISTRIBUTED)</span>
+        </div>
+
+        <div class="section">
+            <div class="section-header">
+                <div class="section-title"><%= t('reports.distributedAttackDetail.clusterSummary') %></div>
+            </div>
+            <div class="summary-block">
+                <div class="summary-item">
+                    <span class="summary-label"><%= t('reports.attackDetail.criticality') %></span>
+                    <span class="summary-value danger-<%= data.summary.dangerLevel %>"><%= data.summary.dangerLevel %></span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label"><%= t('reports.attackDetail.dangerScore') %></span>
+                    <span class="summary-value"><%= data.summary.dangerScore.toFixed(2) %></span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label"><%= t('reports.attackDetail.eventVolume') %></span>
+                    <span class="summary-value"><%= data.summary.totalLogs %></span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label"><%= t('reports.distributedAttackDetail.aggregateIntensity') %></span>
+                    <span class="summary-value"><%= (data.attack?.rps || 0).toFixed(2) %></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel-grid">
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-title"><%= t('reports.attackDetail.operationalDetails') %></div>
+                </div>
+                <table class="detail-table">
+                    <tr>
+                        <th><%= t('reports.attackDetail.detectedIntensity') %></th>
+                        <td style="color: var(--warning);"><%= data.attack?.intensityAttack || t('reports.common.notAvailable') %></td>
+                    </tr>
+                    <tr>
+                        <th><%= t('reports.attackDetail.estimatedDuration') %></th>
+                        <td><%= data.summary.duration %></td>
+                    </tr>
+                    <tr>
+                        <th><%= t('reports.attackDetail.firstSeen') %></th>
+                        <td><%= data.attack?.firstSeen ? new Date(data.attack.firstSeen).toLocaleString(locale) : t('reports.common.notAvailable') %></td>
+                    </tr>
+                    <tr>
+                        <th><%= t('reports.attackDetail.lastSeen') %></th>
+                        <td><%= data.attack?.lastSeen ? new Date(data.attack.lastSeen).toLocaleString(locale) : t('reports.common.notAvailable') %></td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-title"><%= t('reports.attackDetail.forensicFingerprint') %></div>
+                </div>
+                <table class="detail-table">
+                    <tr>
+                        <th><%= t('reports.attackDetail.riskClass') %></th>
+                        <td style="color: var(--danger);"><%= data.attack?.fingerprint?.riskLevel || t('reports.common.notAvailable') %></td>
+                    </tr>
+                    <tr>
+                        <th><%= t('reports.attackDetail.fingerprintScore') %></th>
+                        <td><%= data.attack?.fingerprint?.score || 0 %> / 10</td>
+                    </tr>
+                    <tr>
+                        <th><%= t('reports.attackDetail.botDetection') %></th>
+                        <td><%= data.attack?.fingerprint?.isBot ? t('reports.attackDetail.isBot') : t('reports.attackDetail.notBot') %></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- NODES TABLE -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-title"><%= t('reports.distributedAttackDetail.involvedNodes') %></div>
+            </div>
+            <table class="timeline-table">
+                <thead>
+                    <tr>
+                        <th><%= t('reports.fragments.hud.ip') %></th>
+                        <th><%= t('reports.attackDetail.country') %></th>
+                        <th><%= t('reports.attackDetail.ispOrg') %></th>
+                        <th><%= t('reports.attackDetail.abuseConfidence') %></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% (data.allIpDetails || []).slice(0, 20).forEach(function(node) { %>
+                        <tr>
+                            <td><strong><%= node.ip %></strong></td>
+                            <td><%= node.country %> (<%= node.countryCode %>)</td>
+                            <td><%= node.isp %></td>
+                            <td style="text-align: center; font-weight: bold; color: <%= (node.abuseScore || 0) > 50 ? 'var(--danger)' : 'var(--success)' %>">
+                                <%= node.abuseScore || 0 %>%
+                            </td>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+            <% if (data.allIpDetails && data.allIpDetails.length > 20) { %>
+                <div style="font-size: 9px; color: var(--text-muted); margin-top: 5px; text-align: right;">
+                    ... AND <%= data.allIpDetails.length - 20 %> MORE NODES
+                </div>
+            <% } %>
+        </div>
+
+        <div class="section">
+            <div class="section-header">
+                <div class="section-title"><%= t('reports.attackDetail.timeline') %> (AGGREGATED)</div>
+            </div>
+            <table class="timeline-table">
+                <thead>
+                    <tr>
+                        <th width="15%"><%= t('reports.attackDetail.timelineHeaders.time') %></th>
+                        <th width="15%"><%= t('reports.fragments.hud.ip') %></th>
+                        <th width="10%"><%= t('reports.attackDetail.timelineHeaders.method') %></th>
+                        <th><%= t('reports.attackDetail.timelineHeaders.resource') %></th>
+                        <th width="12%"><%= t('reports.attackDetail.timelineHeaders.status') %></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% data.events.slice(0, 20).forEach(function(e) { %>
+                        <tr>
+                            <td><%= new Date(e.timestamp).toLocaleTimeString(locale) %></td>
+                            <td><strong><%= e.ip %></strong></td>
+                            <td><strong><%= e.method %></strong></td>
+                            <td style="font-family: monospace; font-size: 9px;"><%= e.url %></td>
+                            <td style="text-align: center; font-weight: bold; color: <%= e.statusCode < 400 ? 'var(--success)' : (e.statusCode < 500 ? 'var(--warning)' : 'var(--danger)') %>">
+                                <%= e.statusCode %>
+                            </td>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+            <% if (data.events.length > 20) { %>
+                <div style="font-size: 9px; color: var(--text-muted); margin-top: 5px; text-align: right;">
+                    <%= t('reports.attackDetail.timelineNote', { count: data.events.length }) %>
+                </div>
+            <% } %>
+        </div>
+
+        <footer class="footer">
+            <%= t('reports.common.footer') %>
+        </footer>
+        <div class="page-counter"><%= t('reports.common.page') %> 1 <%= t('reports.common.of') %> 1</div>
+    </div>
+</body>
+</html>

@@ -27,16 +27,23 @@ export class ReportService {
     /**
      * Entry point centralizzato per la generazione dei report
      */
-    async generateDetailReport(type: ReportType, id: string, format: 'html' | 'pdf' = 'pdf', locale: string = 'it-IT', style: 'classic' | 'hud' | 'telex' = 'classic'): Promise<Buffer | string> {
-        this.logger.info(`[ReportDetailService] Generazione report ${type} per ${id} in formato ${format} [${locale}] - Stile: ${style}`);
+    async generateDetailReport(
+        type: ReportType, 
+        id: string, 
+        format: 'html' | 'pdf' = 'pdf', 
+        locale: string = 'it-IT', 
+        style: 'classic' | 'hud' | 'telex' = 'classic',
+        ipList?: string[]
+    ): Promise<Buffer | string> {
+        this.logger.info(`[ReportDetailService] Generazione report ${type} per ${id || (ipList ? 'ipList['+ipList.length+']' : 'N/D')} in formato ${format} [${locale}] - Stile: ${style}`);
 
         let data: any;
         let templateBase: string;
 
         switch (type) {
             case 'attack':
-                data = await this.getAttackReportData(id, locale);
-                templateBase = 'attack';
+                data = await this.getAttackReportData(id, locale, ipList);
+                templateBase = data.isDistributed ? 'distributed-attack' : 'attack';
                 break;
             case 'telnet':
                 data = await this.getTelnetReportData(id, locale);
@@ -185,16 +192,35 @@ export class ReportService {
      * Recupera i dati per la generazione del report di attacco
      * @param ip 
      * @param locale 
+     * @param ipList Lista opzionale di IP per attacco distribuito
      * @returns 
      */
-    private async getAttackReportData(ip: string, locale: string) {
-        const attack = await this.threatLogService.getAttackDetail({ ip });
-        const logs = await this.threatLogService.getLogs({ filters: { 'request.ip': ip }, pageSize: 100 });
+    private async getAttackReportData(ip: string, locale: string, ipList?: string[]) {
+        let attack: any;
+        let logs: any[];
+        const isDistributed = ipList && ipList.length > 1;
 
-        return {
-            title: this.i18n.t('reports.attackDetail.title', locale),
+        if (isDistributed) {
+            attack = await this.threatLogService.getDistributedAttackDetail({ ipList: ipList! });
+            logs = await this.threatLogService.getLogs({ 
+                filters: { 'request.ip': { $in: ipList } }, 
+                pageSize: 100 
+            });
+        } else {
+            attack = await this.threatLogService.getAttackDetail({ ip });
+            logs = await this.threatLogService.getLogs({ 
+                filters: { 'request.ip': ip }, 
+                pageSize: 100 
+            });
+        }
+
+        const reportData: any = {
+            title: isDistributed 
+                ? this.i18n.t('reports.distributedAttackDetail.title', locale)
+                : this.i18n.t('reports.attackDetail.title', locale),
             generatedAt: new Date().toLocaleString(locale),
-            ip,
+            ip: isDistributed ? ipList![0] : ip,
+            isDistributed,
             attack, // Passa l'intero oggetto AttackDTO
             summary: {
                 dangerLevel: attack?.dangerLevel || 'LOW',
@@ -203,10 +229,9 @@ export class ReportService {
                 duration: attack?.durataAttacco?.human || this.i18n.t('reports.common.notAvailable', locale),
                 techniques: attack?.attackPatterns || []
             },
-            ipInfo: this.normalizeIpDetails(attack?.ipDetails, locale),
-            abuse: await this.prepareAbuseData(ip, locale),
             events: logs.map(l => ({
                 timestamp: l.timestamp,
+                ip: l.request?.ip,
                 method: l.request?.method || this.i18n.t('reports.common.notAvailable', locale),
                 url: l.request?.url || this.i18n.t('reports.common.notAvailable', locale),
                 userAgent: l.request?.userAgent || this.i18n.t('reports.common.notAvailable', locale),
@@ -216,6 +241,21 @@ export class ReportService {
                 body: l.request?.body
             }))
         };
+
+        if (isDistributed) {
+            reportData.ipList = ipList;
+            reportData.ipCount = attack?.ipCount || ipList!.length;
+            reportData.allIpDetails = (attack?.allIpDetails || []).map((node: any) => this.normalizeIpDetails(node, locale));
+            // Per il distribuito non ha senso un singolo geoInfo/abuse di un IP rappresentante come principale,
+            // ma lo manteniamo per compatibilità se i template lo usano (sarà quello del primo IP)
+            reportData.ipInfo = this.normalizeIpDetails(attack?.ipDetails, locale);
+            reportData.abuse = await this.prepareAbuseData(ipList![0], locale);
+        } else {
+            reportData.ipInfo = this.normalizeIpDetails(attack?.ipDetails, locale);
+            reportData.abuse = await this.prepareAbuseData(ip, locale);
+        }
+
+        return reportData;
     }
 
     /**
@@ -328,17 +368,19 @@ export class ReportService {
     private normalizeIpDetails(details: any, locale: string) {
         // Estraiamo i dati da ipinfo se presenti (lookups ipinfo.io) o dal root (AbuseIPDB)
         const info = details?.ipinfo || details || {};
+        const abuseDb = details?.abuseipdbId as any;
         const coordinates = info.loc || (details?.geo?.coordinates ? details.geo.coordinates.join(',') : this.i18n.t('reports.common.notAvailable', locale));
 
         return {
-            country: info.country || details?.country || this.i18n.t('reports.common.unknown', locale),
-            countryCode: info.countryCode || details?.countryCode || '??',
+            ip: details?.ip || info.ip || this.i18n.t('reports.common.notAvailable', locale),
+            country: info.country || details?.country || abuseDb?.countryCode || this.i18n.t('reports.common.unknown', locale),
+            countryCode: info.countryCode || details?.countryCode || abuseDb?.countryCode || '??',
             city: info.city || details?.city || this.i18n.t('reports.common.notAvailable', locale),
-            isp: info.isp || info.org || details?.isp || this.i18n.t('reports.common.notAvailable', locale),
-            abuseScore: details?.abuseScore || info.abuseScore || 0,
-            usageType: details?.usageType || info.usageType || this.i18n.t('reports.common.notAvailable', locale),
-            isTor: details?.isTor || info.isTor || false,
-            isWhitelisted: details?.isWhitelisted || info.isWhitelisted || false,
+            isp: info.isp || info.org || details?.isp || abuseDb?.isp || this.i18n.t('reports.common.notAvailable', locale),
+            abuseScore: details?.abuseScore || info.abuseScore || abuseDb?.abuseConfidenceScore || 0,
+            usageType: details?.usageType || info.usageType || abuseDb?.usageType || this.i18n.t('reports.common.notAvailable', locale),
+            isTor: details?.isTor || info.isTor || abuseDb?.isTor || false,
+            isWhitelisted: details?.isWhitelisted || info.isWhitelisted || abuseDb?.isWhitelisted || false,
             coordinates: coordinates
         };
     }

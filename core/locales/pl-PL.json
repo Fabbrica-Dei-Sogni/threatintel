@@ -91,6 +91,14 @@
             },
             "timelineNote": "Uwaga: Wyciąg pokazuje pierwsze 20 zdarzeń z {count} wszystkich."
         },
+        "distributedAttackDetail": {
+            "title": "Analiza skoordynowanego ataku rozproszonego",
+            "clusterSummary": "1. Podsumowanie klastra rozproszonego",
+            "involvedIps": "Zaangażowane węzły IP",
+            "involvedNodes": "Analiza węzłów klastra",
+            "aggregateIntensity": "Zagregowana intensywność",
+            "attackStatus": "Status ataku"
+        },
         "ipDetail": {
             "title": "Briefing Wywiadowczy: Śledztwo Informatyczne IP",
             "division": "Wydział Wywiadu Reputacyjnego",

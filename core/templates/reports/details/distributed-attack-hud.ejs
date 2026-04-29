@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="<%= locale.split('-')[0] %>">
+<head>
+    <meta charset="UTF-8">
+    <title><%= t('reports.common.agencyName') %> - DISTRIBUTED ATTACK REPORT</title>
+    <style>
+        :root {
+            --hud-bg: #0a0b0d;
+            --hud-surface: #15191c;
+            --hud-border: #232a2f;
+            --hud-accent: #00d4ff;
+            --hud-text-main: #e0e6ed;
+            --hud-text-dim: #94a3b8;
+            --hud-danger: #f43f5e;
+            --hud-warning: #fbbf24;
+            --hud-success: #10b981;
+            --hud-font: 'JetBrains Mono', 'Segoe UI Mono', monospace;
+        }
+
+        @page {
+            margin: 10mm;
+            size: A4;
+        }
+
+        body {
+            font-family: var(--hud-font);
+            background-color: var(--hud-bg);
+            color: var(--hud-text-main);
+            margin: 0;
+            padding: 0;
+            line-height: 1.2;
+            font-size: 11px;
+        }
+
+        .hud-container {
+            padding: 20px;
+        }
+
+        .hud-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--hud-accent);
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+
+        .hud-header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .hud-logo {
+            width: 45px;
+            height: 45px;
+            border: 1px solid var(--hud-accent);
+            padding: 5px;
+            background: rgba(0, 212, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .hud-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 0 2px var(--hud-accent));
+        }
+
+        .hud-title h1 {
+            margin: 0;
+            font-size: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--hud-accent);
+            text-shadow: 0 0 8px rgba(0, 212, 255, 0.3);
+        }
+
+        .hud-title p {
+            margin: 2px 0 0;
+            font-size: 9px;
+            color: var(--hud-text-dim);
+            text-transform: uppercase;
+        }
+
+        .hud-header-right {
+            text-align: right;
+        }
+
+        .hud-stamp {
+            border: 1px solid var(--hud-danger);
+            color: var(--hud-danger);
+            padding: 4px 10px;
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+            background: rgba(244, 63, 94, 0.1);
+        }
+
+        .hud-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .hud-block {
+            background: var(--hud-surface);
+            border: 1px solid var(--hud-border);
+            padding: 12px;
+            position: relative;
+        }
+
+        .hud-block::before {
+            content: "";
+            position: absolute;
+            top: -1px;
+            left: -1px;
+            width: 10px;
+            height: 10px;
+            border-top: 2px solid var(--hud-accent);
+            border-left: 2px solid var(--hud-accent);
+        }
+
+        .hud-block-title {
+            font-size: 10px;
+            color: var(--hud-accent);
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .hud-value-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+            border-bottom: 1px dashed var(--hud-border);
+            padding-bottom: 4px;
+        }
+
+        .hud-label { color: var(--hud-text-dim); }
+        .hud-value { font-weight: bold; color: var(--hud-text-main); }
+
+        .hud-badge {
+            padding: 2px 6px;
+            border-radius: 2px;
+            font-size: 9px;
+            text-transform: uppercase;
+        }
+
+        .badge-danger { background: rgba(244, 63, 94, 0.2); color: var(--hud-danger); border: 1px solid var(--hud-danger); }
+        .badge-warning { background: rgba(251, 191, 36, 0.2); color: var(--hud-warning); border: 1px solid var(--hud-warning); }
+        .badge-success { background: rgba(16, 185, 129, 0.2); color: var(--hud-success); border: 1px solid var(--hud-success); }
+
+        .hud-pattern-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .hud-pattern-tag {
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            color: var(--hud-accent);
+            padding: 2px 8px;
+            font-size: 9px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 9px;
+            margin-top: 10px;
+        }
+
+        th {
+            text-align: left;
+            background: rgba(0, 212, 255, 0.05);
+            color: var(--hud-accent);
+            padding: 6px;
+            border-bottom: 1px solid var(--hud-accent);
+            text-transform: uppercase;
+        }
+
+        td {
+            padding: 6px;
+            border-bottom: 1px solid var(--hud-border);
+            color: var(--hud-text-dim);
+        }
+
+        .hud-log-url { color: var(--hud-text-main); font-weight: bold; }
+        .hud-log-method { color: var(--hud-accent); }
+        .hud-log-ip { color: var(--hud-warning); font-family: monospace; }
+    </style>
+</head>
+<body>
+    <div class="hud-container">
+        <header class="hud-header">
+            <div class="hud-header-left">
+                <div class="hud-logo">
+                    <% if (typeof logoBase64 !== 'undefined' && logoBase64) { %>
+                        <img src="<%= logoBase64 %>" alt="Agency Logo">
+                    <% } else { %>
+                        <div style="font-size: 14px; font-weight: bold; color: var(--hud-accent);">TI</div>
+                    <% } %>
+                </div>
+                <div class="hud-title">
+                    <h1><%= data.title.toUpperCase() %></h1>
+                    <p><%= t('reports.common.agencyName') %> // <%= t('reports.common.generationEngine').toUpperCase() %></p>
+                </div>
+            </div>
+            <div class="hud-header-right">
+                <p style="font-size: 8px; color: var(--hud-text-dim); margin-top: 5px;"><%= t('reports.fragments.hud.timestamp').toUpperCase() %>: <%= data.generatedAt %></p>
+            </div>
+        </header>
+
+        <div class="hud-grid">
+            <!-- CLUSTER SUMMARY -->
+            <div class="hud-block">
+                <div class="hud-block-title">
+                    <span><%= t('reports.distributedAttackDetail.clusterSummary').toUpperCase() %></span>
+                    <span>[CLUSTER.STAT]</span>
+                </div>
+                <div class="hud-value-row">
+                    <span class="hud-label"><%= t('reports.distributedAttackDetail.involvedIps').toUpperCase() %>:</span>
+                    <span class="hud-value" style="color: var(--hud-accent);"><%= data.ipCount %></span>
+                </div>
+                <div class="hud-value-row">
+                    <span class="hud-label"><%= t('reports.attackDetail.criticality').toUpperCase() %>:</span>
+                    <span class="hud-badge <%= data.summary.dangerLevel === 'HIGH' || data.summary.dangerLevel === 'CRITICAL' ? 'badge-danger' : (data.summary.dangerLevel === 'MEDIUM' ? 'badge-warning' : 'badge-success') %>">
+                        <%= data.summary.dangerLevel %> (<%= data.summary.dangerScore.toFixed(2) %>%)
+                    </span>
+                </div>
+                <div class="hud-value-row">
+                    <span class="hud-label"><%= t('reports.attackDetail.eventVolume').toUpperCase() %>:</span>
+                    <span class="hud-value"><%= data.summary.totalLogs %></span>
+                </div>
+                <div class="hud-value-row">
+                    <span class="hud-label"><%= t('reports.distributedAttackDetail.aggregateIntensity').toUpperCase() %>:</span>
+                    <span class="hud-value"><%= (data.attack?.rps || 0).toFixed(2) %> RPS</span>
+                </div>
+            </div>
+
+            <!-- TIMELINE INFO -->
+            <div class="hud-block">
+                <div class="hud-block-title">
+                    <span><%= t('reports.attackDetail.operationalDetails').toUpperCase() %></span>
+                    <span>[SYS.TIME]</span>
+                </div>
+                <div class="hud-value-row">
+                    <span class="hud-label"><%= t('reports.attackDetail.firstSeen').toUpperCase() %>:</span>
+                    <span class="hud-value"><%= data.attack?.firstSeen ? new Date(data.attack.firstSeen).toLocaleString(locale) : t('reports.common.notAvailable') %></span>
+                </div>
+                <div class="hud-value-row">
+                    <span class="hud-label"><%= t('reports.attackDetail.lastSeen').toUpperCase() %>:</span>
+                    <span class="hud-value"><%= data.attack?.lastSeen ? new Date(data.attack.lastSeen).toLocaleString(locale) : t('reports.common.notAvailable') %></span>
+                </div>
+                <div class="hud-value-row">
+                    <span class="hud-label"><%= t('reports.attackDetail.estimatedDuration').toUpperCase() %>:</span>
+                    <span class="hud-value"><%= data.summary.duration %></span>
+                </div>
+                <div class="hud-value-row">
+                    <span class="hud-label"><%= t('reports.distributedAttackDetail.attackStatus').toUpperCase() %>:</span>
+                    <span class="hud-badge badge-danger"><%= data.attack?.intensityAttack || 'DETECTED' %></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- NODES TABLE -->
+        <div class="hud-block" style="margin-bottom: 20px;">
+            <div class="hud-block-title">
+                <span><%= t('reports.distributedAttackDetail.involvedNodes').toUpperCase() %></span>
+                <span>[NODE_INTEL]</span>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th width="20%"><%= t('reports.fragments.hud.ip').toUpperCase() %></th>
+                        <th><%= t('reports.attackDetail.country').toUpperCase() %></th>
+                        <th width="30%"><%= t('reports.attackDetail.ispOrg').toUpperCase() %></th>
+                        <th width="15%"><%= t('reports.attackDetail.abuseConfidence').toUpperCase() %></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% (data.allIpDetails || []).slice(0, 15).forEach(node => { %>
+                        <tr>
+                            <td class="hud-log-ip"><%= node.ip %></td>
+                            <td><%= node.country || 'N/A' %></td>
+                            <td><%= node.isp || 'N/A' %></td>
+                            <td style="text-align: center;">
+                                <span class="hud-badge <%= (node.abuseScore || 0) > 50 ? 'badge-danger' : 'badge-success' %>">
+                                    <%= node.abuseScore || 0 %>%
+                                </span>
+                            </td>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+            <% if (data.allIpDetails && data.allIpDetails.length > 15) { %>
+                <p style="font-size: 8px; color: var(--hud-text-dim); text-align: right; margin-top: 5px;">
+                    ... AND <%= data.allIpDetails.length - 15 %> MORE NODES
+                </p>
+            <% } %>
+        </div>
+
+        <!-- ATTACK PATTERNS -->
+        <div class="hud-block" style="margin-bottom: 20px;">
+            <div class="hud-block-title">
+                <span><%= t('reports.attackDetail.patterns').toUpperCase() %></span>
+                <span>[THREAT_IDENT]</span>
+            </div>
+            <div class="hud-pattern-list">
+                <% if (data.summary.techniques && data.summary.techniques.length > 0) { %>
+                    <% data.summary.techniques.forEach(tech => { %>
+                        <span class="hud-pattern-tag"><%= tech %></span>
+                    <% }); %>
+                <% } else { %>
+                    <span class="hud-text-dim"><%= t('reports.attackDetail.noPatterns').toUpperCase() %></span>
+                <% } %>
+            </div>
+        </div>
+
+        <!-- LOG ANALYSIS -->
+        <div class="hud-block">
+            <div class="hud-block-title">
+                <span><%= t('reports.attackDetail.timeline').toUpperCase() %> (AGGREGATED)</span>
+                <span>[SEQ_STREAM]</span>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th width="15%"><%= t('reports.attackDetail.timelineHeaders.time').toUpperCase() %></th>
+                        <th width="15%"><%= t('reports.fragments.hud.ip').toUpperCase() %></th>
+                        <th width="8%"><%= t('reports.attackDetail.timelineHeaders.method').toUpperCase() %></th>
+                        <th><%= t('reports.attackDetail.timelineHeaders.resource').toUpperCase() %></th>
+                        <th width="8%"><%= t('reports.attackDetail.timelineHeaders.status').toUpperCase() %></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% data.events.slice(0, 20).forEach(log => { %>
+                        <tr>
+                            <td><%= new Date(log.timestamp).toLocaleTimeString(locale) %></td>
+                            <td class="hud-log-ip"><%= log.ip %></td>
+                            <td class="hud-log-method"><%= log.method %></td>
+                            <td class="hud-log-url"><%= log.url %></td>
+                            <td><span class="hud-badge <%= log.statusCode >= 400 ? 'badge-danger' : (log.statusCode >= 300 ? 'badge-warning' : 'badge-success') %>"><%= log.statusCode %></span></td>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+            <% if (data.events.length > 20) { %>
+                <p style="font-size: 8px; color: var(--hud-text-dim); text-align: right; margin-top: 5px;">
+                    <%= t('reports.attackDetail.timelineNote', { count: data.events.length }) %>
+                </p>
+            <% } %>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="<%= locale.split('-')[0] %>">
+<head>
+    <meta charset="UTF-8">
+    <title>TELEX DISTRIBUTED - <%= data.ip %></title>
+    <style>
+        body {
+            background-color: #f4f4f4;
+            color: #1a1a1a;
+            font-family: 'Courier New', Courier, monospace;
+            padding: 40px;
+            line-height: 1.2;
+            font-size: 12px;
+        }
+        .telex-container {
+            max-width: 800px;
+            margin: 0 auto;
+            border: 1px solid #ccc;
+            padding: 20px;
+            background: #fff;
+            box-shadow: 2px 2px 0px #000;
+        }
+        .header {
+            border-bottom: 2px solid #000;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+        .section {
+            margin-bottom: 20px;
+        }
+        .section-title {
+            text-decoration: underline;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        pre {
+            white-space: pre-wrap;
+            margin: 0;
+        }
+        .footer {
+            margin-top: 30px;
+            border-top: 1px solid #000;
+            padding-top: 10px;
+            font-size: 10px;
+            text-align: right;
+        }
+        .node-row {
+            border-bottom: 1px dashed #ccc;
+            padding: 2px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="telex-container">
+        <div class="header">
+            TELEX-DISTRIBUTED-REPORT // <%= t('reports.common.agencyName') %> // NODES: <%= data.ipCount %>
+        </div>
+
+        <div class="section">
+            <div class="section-title"><%= t('reports.distributedAttackDetail.clusterSummary').toUpperCase() %></div>
+            <pre>
+<%= t('reports.distributedAttackDetail.involvedIps').toUpperCase() %>: <%= data.ipCount %>
+<%= t('reports.fragments.telex.dangerLevel').toUpperCase() %>: <%= data.summary.dangerLevel %>
+<%= t('reports.fragments.telex.dangerScore').toUpperCase() %>: <%= data.summary.dangerScore.toFixed(2) %>%
+<%= t('reports.fragments.telex.totalLogs').toUpperCase() %>: <%= data.summary.totalLogs %>
+<%= t('reports.distributedAttackDetail.aggregateIntensity').toUpperCase() %>: <%= (data.attack?.rps || 0).toFixed(2) %> RPS
+            </pre>
+        </div>
+
+        <div class="section">
+            <div class="section-title"><%= t('reports.distributedAttackDetail.involvedNodes').toUpperCase() %></div>
+            <pre>
+<% (data.allIpDetails || []).slice(0, 30).forEach(node => { %>
+[NODE] IP: <%= node.ip.padEnd(15) %> | COUNTRY: <%= (node.countryCode || '??').padEnd(3) %> | ABUSE: <%= (node.abuseScore || 0).toString().padStart(3) %>%
+<% }); %>
+<% if (data.allIpDetails && data.allIpDetails.length > 30) { %>
+... AND <%= data.allIpDetails.length - 30 %> MORE NODES
+<% } %>
+            </pre>
+        </div>
+
+        <div class="section">
+            <div class="section-title"><%= t('reports.fragments.telex.threatPatterns').toUpperCase() %></div>
+            <pre>
+<%= data.summary.techniques && data.summary.techniques.length > 0 ? data.summary.techniques.join(', ') : t('reports.fragments.telex.noneDetected').toUpperCase() %>
+            </pre>
+        </div>
+
+        <div class="section">
+            <div class="section-title"><%= t('reports.fragments.telex.operationalLogsExtract').toUpperCase() %> (AGGREGATED)</div>
+            <pre>
+<% data.events.slice(0, 50).forEach(log => { %>
+[<%= new Date(log.timestamp).toISOString() %>] IP: <%= log.ip.padEnd(15) %> | <%= log.method.padEnd(6) %> <%= log.url %> -> <%= log.statusCode %>
+<% }); %>
+            </pre>
+        </div>
+
+        <div class="footer">
+            <%= t('reports.fragments.telex.endOfTransmission').toUpperCase() %> // <%= t('reports.fragments.telex.date').toUpperCase() %>: <%= data.generatedAt %>
+        </div>
+    </div>
+</body>
+</html>

@@ -387,6 +387,7 @@ export async function fetchReport(params: {
     type: string;
     ip?: string;
     sessionId?: string;
+    ipList?: string | null;
     format?: string;
     style?: string;
     locale?: string;

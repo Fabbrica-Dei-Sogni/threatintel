@@ -91,6 +91,14 @@
             },
             "timelineNote": "Note: The extract shows the first 20 events of {count} total."
         },
+        "distributedAttackDetail": {
+            "title": "Coordinated Distributed Attack Analysis",
+            "clusterSummary": "1. Distributed Cluster Summary",
+            "involvedIps": "Involved IP Nodes",
+            "involvedNodes": "Cluster Nodes Analysis",
+            "aggregateIntensity": "Aggregate Intensity",
+            "attackStatus": "Attack Status"
+        },
         "ipDetail": {
             "title": "Intelligence Briefing: IP Forensic Investigation",
             "division": "Reputational Intelligence Division",

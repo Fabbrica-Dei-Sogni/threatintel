@@ -70,6 +70,14 @@
               <span class="btn-icon">{{ showChart ? '📉' : '📊' }}</span>
               <span>{{ (showChart ? t('common.hideChart') : t('common.showChart')).toUpperCase() }}</span>
           </button>
+          <button v-if="correlationHubs.length > 0" 
+                  class="btn-action btn-hub-toggle" 
+                  :class="{ 'active-hub': showHub }" 
+                  @click="showHub = !showHub">
+              <span class="btn-icon">{{ showHub ? '➖' : '🔍' }}</span>
+              <span>{{ t('campaignDetail.correlationHub').toUpperCase() }}</span>
+              <span class="hub-count-badge">{{ correlationHubs.length }}</span>
+          </button>
         </div>
 
         <!-- SEZIONE GRAFICO (Collassabile) -->
@@ -80,10 +88,50 @@
               :nodes="campaign.nodes" 
               :campaign-range="{ firstSeen: campaign.firstSeen, lastSeen: campaign.lastSeen }" 
               :selected-ips="selectedIps"
+              :correlation-hubs="correlationHubs"
               @investigate-ips="handleInvestigateIps"
               @apply-ips="handleApplyIps"
             />
           </div>
+        </transition>
+
+        <!-- HUB DI CORRELAZIONE (A scomparsa, Decoppiato) -->
+        <transition name="slide-fade">
+            <div v-if="showHub && correlationHubs.length > 0" class="correlation-hub-card">
+                <div class="hub-header">
+                    <div class="hub-title-group">
+                        <span class="hub-icon">📡</span>
+                        <h5 class="hub-title">{{ t('campaignDetail.correlationHub').toUpperCase() }}</h5>
+                    </div>
+                    <button class="btn-close-hub" @click="showHub = false">✕</button>
+                </div>
+                <div class="hub-list">
+                    <div v-for="(window, idx) in correlationHubs" :key="idx" class="hub-item">
+                        <div class="item-main">
+                            <div class="item-time">
+                                <span class="time-range">{{ dayjs(window.start).format('HH:mm:ss') }} - {{
+                                    dayjs(window.end).format('HH:mm:ss') }}</span>
+                                <span class="duration">{{ dayjs(window.end).diff(dayjs(window.start), 'minute') }} min</span>
+                            </div>
+                            <div class="item-ips">
+                                <span v-for="ip in window.ips" :key="ip" class="ip-tag">{{ ip }}</span>
+                            </div>
+                        </div>
+                        <div class="hub-actions">
+                            <button class="btn-hub-action btn-apply" 
+                                :class="{ active: isWindowFocused(window.ips) }"
+                                @click="handleApplyIps(window.ips)"
+                                :title="t('campaignDetail.toggleTarget')">
+                                🎯
+                            </button>
+                            <button class="btn-hub-action btn-investigate" @click="handleInvestigateIps(window.ips)"
+                                :title="t('campaignDetail.investigate')">
+                                🚀
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </transition>
 
         <!-- Enriched Cluster Nodes List -->
@@ -243,6 +291,7 @@ const {
   pageSize,
   showChart,
   showHub,
+  correlationHubs,
   selectedIps,
   isTargetedMode,
   loadCampaign,
@@ -251,6 +300,12 @@ const {
   setTargetedIps,
   investigate
 } = useCampaignDetail(props.hash);
+
+const isWindowFocused = (windowIps) => {
+    if (selectedIps.value.length === 0) return false;
+    return selectedIps.value.length === windowIps.length && 
+           windowIps.every(ip => selectedIps.value.includes(ip));
+};
 
 const handleInvestigateIps = (ips) => {
   // Impostiamo correttamente gli IP nello store tramite il metodo dedicato
@@ -361,6 +416,36 @@ async function copyNodeIp(text) {
   margin-bottom: 25px;
   display: flex;
   justify-content: flex-start;
+  gap: 15px;
+}
+
+.btn-hub-toggle {
+  background: rgba(124, 77, 255, 0.1);
+  border-color: rgba(124, 77, 255, 0.3);
+  color: #7C4DFF;
+}
+
+.btn-hub-toggle:hover {
+  background: rgba(124, 77, 255, 0.2);
+  border-color: #7C4DFF;
+  box-shadow: 0 0 15px rgba(124, 77, 255, 0.3);
+}
+
+.btn-hub-toggle.active-hub {
+  background: #7C4DFF;
+  color: #fff;
+  border-color: #7C4DFF;
+  box-shadow: 0 0 20px rgba(124, 77, 255, 0.5);
+}
+
+.hub-count-badge {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 0 6px;
+  border-radius: 10px;
+  font-size: 0.65rem;
+  font-weight: bold;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  margin-left: 8px;
 }
 
 .chart-analysis-section {
@@ -496,6 +581,204 @@ async function copyNodeIp(text) {
   0% { opacity: 1; }
   50% { opacity: 0.7; }
   100% { opacity: 1; }
+}
+
+/* DECOUPLED CORRELATION HUB STYLES */
+.correlation-hub-card {
+  background: rgba(124, 77, 255, 0.05);
+  border: 1px solid rgba(124, 77, 255, 0.2);
+  border-left: 4px solid #7C4DFF;
+  border-radius: 4px;
+  padding: 20px;
+  margin-bottom: 30px;
+  position: relative;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.hub-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  border-bottom: 1px solid rgba(124, 77, 255, 0.1);
+  padding-bottom: 10px;
+}
+
+.hub-title-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.hub-title {
+  margin: 0;
+  font-size: 0.8rem;
+  letter-spacing: 2px;
+  color: #7C4DFF;
+  font-weight: 900;
+}
+
+.btn-close-hub {
+  background: transparent;
+  border: none;
+  color: rgba(124, 77, 255, 0.5);
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.2s;
+}
+
+.btn-close-hub:hover {
+  color: #7C4DFF;
+  transform: scale(1.1);
+}
+
+.hub-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 300px;
+  overflow-y: auto;
+  padding-right: 10px;
+}
+
+.hub-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.hub-list::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.hub-list::-webkit-scrollbar-thumb {
+  background: rgba(124, 77, 255, 0.3);
+  border-radius: 2px;
+}
+
+.hub-item {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(124, 77, 255, 0.1);
+  padding: 12px 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.hub-item:hover {
+  background: rgba(124, 77, 255, 0.08);
+  border-color: rgba(124, 77, 255, 0.3);
+  transform: translateX(5px);
+}
+
+.item-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex: 1;
+  margin-right: 20px;
+}
+
+.hub-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-hub-action {
+  background: rgba(124, 77, 255, 0.15);
+  border: 1px solid rgba(124, 77, 255, 0.3);
+  color: #fff;
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+}
+
+.btn-hub-action:hover {
+  background: #7C4DFF;
+  box-shadow: 0 0 15px rgba(124, 77, 255, 0.5);
+  transform: translateY(-2px);
+}
+
+.btn-hub-action.btn-apply {
+  background: rgba(0, 255, 65, 0.05);
+  border-color: rgba(0, 255, 65, 0.2);
+}
+
+.btn-hub-action.btn-apply:hover {
+  background: #00FF41;
+  border-color: #00FF41;
+  color: #000;
+  box-shadow: 0 0 15px rgba(0, 255, 65, 0.5);
+}
+
+.btn-hub-action.btn-apply.active {
+  background: #00FF41;
+  border-color: #00FF41;
+  color: #000;
+  box-shadow: 0 0 20px rgba(0, 255, 65, 0.6);
+}
+
+.item-time {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.time-range {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.9rem;
+  color: #fff;
+  font-weight: 700;
+}
+
+.duration {
+  font-size: 0.7rem;
+  color: #888;
+  letter-spacing: 1px;
+}
+
+.item-ips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+  max-width: 60%;
+}
+
+.ip-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  background: rgba(124, 77, 255, 0.1);
+  padding: 3px 8px;
+  border-radius: 3px;
+  color: #a78bfa;
+  border: 1px solid rgba(124, 77, 255, 0.2);
+  transition: all 0.2s;
+}
+
+.ip-tag:hover {
+  background: rgba(124, 77, 255, 0.2);
+  border-color: #7C4DFF;
+  color: #fff;
+}
+
+/* Transitions */
+.slide-fade-enter-active {
+  transition: all 0.4s ease-out;
+}
+.slide-fade-leave-active {
+  transition: all 0.3s cubic-bezier(1, 0.5, 0.8, 1);
+}
+.slide-fade-enter-from,
+.slide-fade-leave-to {
+  transform: translateY(-20px);
+  opacity: 0;
 }
 
 @media (max-width: 768px) {

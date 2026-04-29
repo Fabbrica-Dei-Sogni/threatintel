@@ -1,6 +1,11 @@
 import axios from 'axios';
 import type { FetchSearchParams } from '../models/LogDTO';
 import type { FetchAttackSearchParams } from '../models/AttackDTO';
+import type { 
+    FetchCampaignsParams, 
+    FetchCampaignsResponse, 
+    CampaignDetailDTO 
+} from '../models/CampaignDTO';
 import { useProfileStore } from '../stores/profiles';
 
 import { storage, StorageNamespace } from '../utils/storage';
@@ -553,19 +558,7 @@ export async function fetchCampaigns({
     protocol = 'http',
     page = 1,
     pageSize = 10
-}: {
-    startTime?: string | null;
-    endTime?: string | null;
-    timeMode?: string;
-    agoValue?: number | null;
-    agoUnit?: string | null;
-    minIps?: number;
-    minScore?: number;
-    minLogsPerIp?: number;
-    protocol?: string;
-    page?: number;
-    pageSize?: number;
-} = {}): Promise<any> {
+}: FetchCampaignsParams = {}): Promise<FetchCampaignsResponse> {
     try {
         const response = await apiClient.get('/campaigns', {
             params: { startTime, endTime, timeMode, agoValue, agoUnit, minIps, minScore, minLogsPerIp, protocol, page, pageSize }
@@ -595,7 +588,7 @@ export async function fetchCampaignDetail({
     timeConfig?: any;
     page?: number;
     pageSize?: number;
-}): Promise<any> {
+}): Promise<CampaignDetailDTO> {
     try {
         const response = await apiClient.post('/campaign/details', {
             hash,

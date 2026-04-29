@@ -3,6 +3,8 @@ import { useRouter, useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { fetchCampaignDetail } from '../api';
 import { useCampaignsStore } from '../stores/campaigns';
+import { calculateCorrelationHubs } from '../utils/campaignUtils';
+import type { CampaignDetailDTO } from '../models/CampaignDTO';
 
 export function useCampaignDetail(hash: string) {
     const router = useRouter();
@@ -10,7 +12,7 @@ export function useCampaignDetail(hash: string) {
     const { t } = useI18n();
     const campaignsStore = useCampaignsStore();
 
-    const campaign = ref<any>(null);
+    const campaign = ref<CampaignDetailDTO | null>(null);
     const loading = ref(true);
     const error = ref<string | null>(null);
     const nodesPage = ref(1);
@@ -31,6 +33,12 @@ export function useCampaignDetail(hash: string) {
     const selectedIps = computed(() => campaignsStore.getTargetedIps(hash));
     
     const isTargetedMode = computed(() => selectedIps.value.length > 0);
+
+    // DTO delle correlazioni calcolato sui nodi correnti
+    const correlationHubs = computed(() => {
+        if (!campaign.value?.nodes) return [];
+        return calculateCorrelationHubs(campaign.value.nodes);
+    });
 
     async function loadCampaign(params: {
         minLogsPerIp: number;
@@ -133,6 +141,7 @@ export function useCampaignDetail(hash: string) {
         pageSize,
         showChart,
         showHub,
+        correlationHubs,
         selectedIps,
         isTargetedMode,
         loadCampaign,

@@ -44,7 +44,7 @@ const DEFAULT_STATE: CampaignsState = {
         minIps: 1,
         minScore: 0,
         minLogsPerIp: 1,
-        protocol: '',
+        protocol: 'http',
         timeMode: 'ago',
         agoValue: 7,
         agoUnit: 'days',

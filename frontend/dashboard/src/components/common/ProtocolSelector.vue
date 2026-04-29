@@ -25,7 +25,7 @@ const props = defineProps({
     theme: {
         type: String,
         default: "dark", // Default to dark for better general compatibility
-        validator: (value: string) => ["light", "dark", "magma", "amber"].includes(value),
+        validator: (value: string) => ["light", "dark", "magma", "amber", "phosphorus"].includes(value),
     },
 });
 
@@ -136,5 +136,14 @@ function selectProtocol(proto: string) {
     --proto-text: #cbb8a5;
     --proto-active-bg: #FF8F00;
     --proto-active-text: #0A0605;
+}
+
+/* Phosphorus Theme (Green/Cyber) */
+.options.theme-phosphorus {
+    --proto-bg: rgba(10, 25, 12, 0.6);
+    --proto-border: rgba(0, 255, 65, 0.3);
+    --proto-text: #b8cbb5;
+    --proto-active-bg: #00FF41;
+    --proto-active-text: #050a06;
 }
 </style>

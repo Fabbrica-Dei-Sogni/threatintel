@@ -31,18 +31,7 @@
           <div class="filter-group">
             <label class="cyber-label">PROT</label>
             <div class="protocol-reset-group">
-              <div class="tabs-row">
-                <button class="tab-btn"
-                  :class="{ active: !campaignsStore.state.filters.protocol }"
-                  @click="campaignsStore.state.filters.protocol = ''">
-                  ALL
-                </button>
-                <button v-for="opt in ['http', 'https', 'ssh']" :key="opt" class="tab-btn"
-                  :class="{ active: campaignsStore.state.filters.protocol === opt }"
-                  @click="campaignsStore.state.filters.protocol = opt">
-                  {{ opt.toUpperCase() }}
-                </button>
-              </div>
+              <ProtocolSelector v-model="campaignsStore.state.filters.protocol" theme="phosphorus" />
               <button class="reset-btn-mini filter-reset-btn" @click="campaignsStore.resetFilters" :title="t('telemetry.reset_filters')">
                 <div class="reset-ascii">
                   <span></span>

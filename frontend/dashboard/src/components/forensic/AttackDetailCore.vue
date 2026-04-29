@@ -35,8 +35,11 @@
 
                 <transition name="collapse">
                     <div v-if="toggles.showIpList" class="ip-list-dropdown cyber-scroll">
-                        <div v-for="ipItem in ipList" :key="ipItem" class="ip-list-item" @click="$emit('go-to-ip', ipItem)">
-                            <span class="ip-dot"></span> {{ ipItem }}
+                        <div v-for="ipItem in ipList" :key="ipItem" class="ip-list-item">
+                            <button class="copy-btn-mini-start" @click.stop="copyIpItem(ipItem)" :title="t('common.copyIp')">
+                                {{ copiedIpItem === ipItem ? '✅' : '📋' }}
+                            </button>
+                            <span class="ip-text-mini" @click="$emit('go-to-ip', ipItem)">{{ ipItem }}</span>
                         </div>
                     </div>
                 </transition>
@@ -404,6 +407,7 @@ const pageSize = ref(10);
 const expanded = reactive({});
 const expandedEvents = reactive({});
 const logTabs = reactive({});
+const copiedIpItem = ref(null);
 
 // Computed for Map
 const mapAttackData = computed(() => {
@@ -481,6 +485,15 @@ function copyAggregatedLog(log) {
 function copyRateBreachEvent(event) {
     copyFormatted('clipboard.generic', { text: JSON.stringify(event, null, 2) });
 }
+
+async function copyIpItem(text) {
+    if (!text) return;
+    await copyFormatted('clipboard.ip', { ip: text });
+    copiedIpItem.value = text;
+    setTimeout(() => {
+        if (copiedIpItem.value === text) copiedIpItem.value = null;
+    }, 2000);
+}
 </script>
 
 <style scoped src="../../views/attackdetail/AttackDetail.css"></style>
@@ -528,35 +541,69 @@ function copyRateBreachEvent(event) {
 }
 
 .ip-list-dropdown {
-    margin-top: 10px;
-    background: rgba(0, 0, 0, 0.8);
+    margin-top: 15px;
+    background: rgba(0, 0, 0, 0.9);
     border: 1px solid var(--cy-accent, #FF00FF);
     border-radius: 4px;
-    max-height: 200px;
+    max-height: 250px;
     overflow-y: auto;
-    padding: 5px;
+    padding: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 8px;
 }
 
 .ip-list-item {
-    padding: 8px 12px;
+    padding: 6px 10px;
     font-family: var(--cy-font-mono);
-    font-size: 0.9em;
-    cursor: pointer;
+    font-size: 0.85em;
+    cursor: default;
     transition: all 0.2s;
     display: flex;
     align-items: center;
     gap: 10px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 4px;
+    border: 1px solid rgba(255, 0, 255, 0.1);
+    min-width: 0;
 }
 
 .ip-list-item:hover {
-    background: rgba(255, 0, 255, 0.1);
-    color: var(--cy-accent, #FF00FF);
+    background: rgba(255, 0, 255, 0.08);
+    border-color: rgba(255, 0, 255, 0.3);
 }
 
-.ip-dot {
-    width: 6px;
-    height: 6px;
-    background: var(--cy-accent, #FF00FF);
-    border-radius: 50%;
+.ip-text-mini {
+    flex: 1;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #eee;
+}
+
+.ip-text-mini:hover {
+    color: var(--cy-accent, #FF00FF);
+    text-decoration: underline;
+}
+
+.copy-btn-mini-start {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 2px;
+    font-size: 0.9em;
+    opacity: 0.6;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.copy-btn-mini-start:hover {
+    opacity: 1;
+    transform: scale(1.1);
 }
 </style>

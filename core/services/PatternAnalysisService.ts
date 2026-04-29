@@ -64,19 +64,43 @@ export class PatternAnalysisService {
                 .split(',')
                 .map((p: string) => p.trim())
                 .filter(Boolean)
-                .map((pat: string) => new RegExp(pat, 'i'));
+                .map((pat: string) => {
+                    try {
+                        return new RegExp(pat, 'i');
+                    } catch (e) {
+                        this.logger.error(`[PatternAnalysisService] Invalid suspicious pattern regex: ${pat}`);
+                        return null;
+                    }
+                })
+                .filter((r): r is RegExp => r !== null);
 
             this.botPatterns = (botPatternsStr || '')
                 .split(',')
                 .map((p: string) => p.trim())
                 .filter(Boolean)
-                .map((pat: string) => new RegExp(pat, 'i'));
+                .map((pat: string) => {
+                    try {
+                        return new RegExp(pat, 'i');
+                    } catch (e) {
+                        this.logger.error(`[PatternAnalysisService] Invalid bot pattern regex: ${pat}`);
+                        return null;
+                    }
+                })
+                .filter((r): r is RegExp => r !== null);
 
             this.suspiciousReferers = (suspiciousReferersStr || '')
                 .split(',')
                 .map((p: string) => p.trim())
                 .filter(Boolean)
-                .map((pat: string) => new RegExp(pat, 'i'));
+                .map((pat: string) => {
+                    try {
+                        return new RegExp(pat, 'i');
+                    } catch (e) {
+                        this.logger.error(`[PatternAnalysisService] Invalid suspicious referer regex: ${pat}`);
+                        return null;
+                    }
+                })
+                .filter((r): r is RegExp => r !== null);
 
             // Parsing punteggi
             let scores: any = {};
@@ -211,12 +235,14 @@ export class PatternAnalysisService {
         let score = 0;
 
         // 0. analisi preliminare su controlli speciali di dogana
-        Object.keys(requestToAnalyze.headers).forEach(headerName => {
-            if (headerName.toLowerCase() === 'x-server-port') {
-                indicators.push(`${ThreatIndicator.ALT_PORT}:${requestToAnalyze.headers[headerName]}`);
-                score += this.suspiciousScores[ThreatIndicator.ALT_PORT];
-            }
-        });
+        if (requestToAnalyze && requestToAnalyze.headers) {
+            Object.keys(requestToAnalyze.headers).forEach(headerName => {
+                if (headerName.toLowerCase() === 'x-server-port') {
+                    indicators.push(`${ThreatIndicator.ALT_PORT}:${requestToAnalyze.headers[headerName]}`);
+                    score += this.suspiciousScores[ThreatIndicator.ALT_PORT];
+                }
+            });
+        }
 
         // 1. Pattern sospetti in URL
         this.suspiciousPatterns.forEach(pattern => {

@@ -151,20 +151,10 @@
             </div>
         </transition>
 
-        <div class="pagination cyber-pagination" v-if="total > pageSize">
-            <button :disabled="page === 1" @click="changePage(page - 1)">◄ {{ t('common.prev') }}</button>
-            <span class="pagination-info cyber-pagination-info">{{ t('common.page') }} {{ page }} {{ t('common.of') }}
-                {{ totalPages }}</span>
-            <button :disabled="page === totalPages" @click="changePage(page + 1)">{{ t('common.next') }} ►</button>
-
-            <!-- Input per inserire pagina manualmente -->
-            <div class="cyber-page-input-container">
-                <label for="pageInput">{{ t('common.goToPage') }}:</label>
-                <input class="cyber-pagination-input" id="pageInput" type="number" v-model.number="inputPage" :min="1"
-                    :max="totalPages" placeholder="1" />
-            </div>
-
+        <div class="pagination-wrapper" v-if="total > 0">
+            <CyberPager v-model:page="page" v-model:pageSize="pageSize" :total="total" @change="fetchData" />
         </div>
+        
         <div class="table-status-container cyber-table-status-container">
             <div v-if="loading" class="loading cyber-status-overlay cyber-loading-overlay">{{ t('common.loading') }}
             </div>
@@ -443,19 +433,8 @@
                 </section>
             </template>
         </div>
-        <div class="pagination cyber-pagination" v-if="total > pageSize">
-            <button :disabled="page === 1" @click="changePage(page - 1)">◄ {{ t('common.prev') }}</button>
-            <span class="pagination-info cyber-pagination-info">{{ t('common.page') }} {{ page }} {{ t('common.of') }}
-                {{ totalPages }}</span>
-            <button :disabled="page === totalPages" @click="changePage(page + 1)">{{ t('common.next') }} ►</button>
-
-            <!-- Input per inserire pagina manualmente -->
-            <div class="cyber-page-input-container">
-                <label for="pageInput">{{ t('common.goToPage') }}:</label>
-                <input class="cyber-pagination-input" id="pageInput" type="number" v-model.number="inputPage" :min="1"
-                    :max="totalPages" placeholder="1" />
-            </div>
-
+        <div class="pagination-wrapper" v-if="total > 0">
+            <CyberPager v-model:page="page" v-model:pageSize="pageSize" :total="total" @change="fetchData" />
         </div>
     </div>
 </template>
@@ -475,6 +454,7 @@ const { copyFormatted } = useClipboard();
 const { t } = useI18n();
 import ProtocolSelector from '../../components/common/ProtocolSelector.vue';
 import ViewToggle from '../../components/common/ViewToggle.vue';
+import CyberPager from '../../components/common/CyberPager.vue';
 import DefconIndicator from '../../components/DefconIndicator.vue';
 import CountryFlag from '../../components/CountryFlag.vue';
 import AttackChart from '../../components/AttackChart.vue';

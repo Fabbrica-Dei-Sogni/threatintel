@@ -286,13 +286,7 @@
                         </div>
 
                         <div class="pagination-container" v-if="filteredLogs.length > pageSize">
-                            <el-pagination background :layout="paginationLayout" :total="filteredLogs.length"
-                                :page-size="pageSize" :current-page="currentPage" :pager-count="isMobile ? 3 : 7"
-                                @current-change="page => currentPage = page" class="cyber-pagination magenta">
-                                <template #default v-if="isMobile">
-                                    <span class="mobile-pagination-info">{{ currentPage }} / {{ Math.ceil(filteredLogs.length / pageSize) }}</span>
-                                </template>
-                            </el-pagination>
+                            <CyberPager v-model:page="currentPage" :pageSize="pageSize" :total="filteredLogs.length" simple size="mini" />
                         </div>
                     </div>
                 </transition>
@@ -337,13 +331,7 @@
                         </div>
 
                         <div class="pagination-container" v-if="attack.countRateLimit > pageSize">
-                            <el-pagination background :layout="paginationLayout" :total="attack.countRateLimit"
-                                :page-size="pageSize" :current-page="currentPageEvents" :pager-count="isMobile ? 3 : 7"
-                                @current-change="page => currentPageEvents = page" class="cyber-pagination magenta">
-                                <template #default v-if="isMobile">
-                                    <span class="mobile-pagination-info">{{ currentPageEvents }} / {{ Math.ceil(attack.countRateLimit / pageSize) }}</span>
-                                </template>
-                            </el-pagination>
+                            <CyberPager v-model:page="currentPageEvents" :pageSize="pageSize" :total="attack.countRateLimit" simple size="mini" />
                         </div>
                     </div>
                 </transition>
@@ -364,6 +352,7 @@ import { Search } from '@element-plus/icons-vue';
 // Components
 import GlobalHeader from '../GlobalHeader.vue';
 import ReportActions from '../ReportActions.vue';
+import CyberPager from '../common/CyberPager.vue';
 import DefconIndicator from '../DefconIndicator.vue';
 import AttackProfileRadar from '../AttackProfileRadar.vue';
 import HexViewer from '../HexViewer.vue';

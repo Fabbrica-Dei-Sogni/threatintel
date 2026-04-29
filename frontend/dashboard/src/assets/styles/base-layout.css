@@ -130,6 +130,16 @@
     letter-spacing: 0.5px;
 }
 
+/* Pagination Wrapper for CyberPager integration */
+.pagination-wrapper {
+    width: 100%;
+    margin: 15px 0;
+}
+
+.pagination-wrapper > .cyber-pager {
+    width: 100%;
+}
+
 /* Pagination Page Input */
 .cyber-page-input-container {
     display: flex;

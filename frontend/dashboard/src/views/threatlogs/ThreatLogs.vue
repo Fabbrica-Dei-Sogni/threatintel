@@ -67,18 +67,8 @@
       </div>
     </transition>
 
-    <div class="pagination cyber-pagination" v-if="total > pageSize">
-      <button :disabled="page === 1" @click="changePage(page - 1)">◄ {{ t('common.prev') }}</button>
-      <span class="pagination-info cyber-pagination-info">{{ t('common.page') }} {{ page }} {{ t('common.of') }} {{
-        totalPages }}</span>
-      <button :disabled="page === totalPages" @click="changePage(page + 1)">{{ t('common.next') }} ►</button>
-
-      <div class="cyber-page-input-container">
-        <label for="pageInput">{{ t('common.goToPage') }}:</label>
-        <input class="cyber-pagination-input" id="pageInput" type="number" v-model.number="inputPage" :min="1"
-          :max="totalPages" placeholder="1" />
-      </div>
-
+    <div class="pagination-wrapper" v-if="total > 0">
+      <CyberPager v-model:page="page" v-model:pageSize="pageSize" :total="total" @change="fetchData" />
     </div>
 
     <div class="table-status-container cyber-table-status-container">
@@ -209,17 +199,8 @@
           </tbody>
         </table>
 
-        <div class="pagination cyber-pagination" v-if="total > pageSize">
-          <button :disabled="page === 1" @click="changePage(page - 1)">◄ {{ t('common.prev') }}</button>
-          <span class="pagination-info cyber-pagination-info">{{ t('common.page') }} {{ page }} {{ t('common.of') }} {{
-            totalPages }}</span>
-          <button :disabled="page === totalPages" @click="changePage(page + 1)">{{ t('common.next') }} ►</button>
-
-          <div class="cyber-page-input-container">
-            <label for="pageInput">{{ t('common.goToPage') }}:</label>
-            <input class="cyber-pagination-input" id="pageInput" type="number" v-model.number="inputPage" :min="1"
-              :max="totalPages" placeholder="1" />
-          </div>
+        <div class="pagination-wrapper" v-if="total > 0">
+          <CyberPager v-model:page="page" v-model:pageSize="pageSize" :total="total" @change="fetchData" />
         </div>
       </section>
     </div>
@@ -236,6 +217,7 @@ import ProtocolSelector from '../../components/common/ProtocolSelector.vue';
 import ViewToggle from '../../components/common/ViewToggle.vue';
 import dayjs from 'dayjs';
 import CountryFlag from '../../components/CountryFlag.vue';
+import CyberPager from '../../components/common/CyberPager.vue';
 import ThreadLogChart from '../../components/ThreadLogChart.vue';
 import GlobalHeader from '../../components/GlobalHeader.vue';
 import { formatDateTime, formatFullDateTime } from '../../utils/dateUtils';

@@ -90,7 +90,7 @@
       </section>
 
       <!-- Top Pager -->
-      <div v-if="total > 0" class="pager-container top-pager">
+      <div v-if="total > 0" class="pagination-wrapper top-pager">
         <CyberPager v-model:page="page" v-model:pageSize="pageSize" :total="total" />
       </div>
 
@@ -156,7 +156,7 @@
       </transition-group>
 
       <!-- Bottom Pager -->
-      <div v-if="total > 0" class="pager-container bottom-pager">
+      <div v-if="total > 0" class="pagination-wrapper bottom-pager">
         <CyberPager v-model:page="page" v-model:pageSize="pageSize" :total="total" />
       </div>
     </div>
@@ -338,9 +338,4 @@ function goToLogs() {
 <style scoped>
 @import "./CampaignsListCyber.css";
 
-.pager-container {
-  margin: 20px 0;
-  display: flex;
-  justify-content: center;
-}
 </style>

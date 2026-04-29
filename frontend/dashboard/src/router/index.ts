@@ -175,6 +175,7 @@ const routes: RouteRecordRaw[] = [
             initTimeMode: route.query.timeMode,
             initAgoValue: route.query.agoValue ? parseInt(route.query.agoValue as string) : undefined,
             initAgoUnit: route.query.agoUnit,
+            initialUris: route.query.uris,
         })
     },
     {

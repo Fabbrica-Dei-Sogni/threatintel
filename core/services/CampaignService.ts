@@ -23,7 +23,9 @@ export class CampaignService {
             protocol = 'http', 
             page = 1, 
             pageSize = 10, 
-            timeConfig = {} 
+            timeConfig = {},
+            selectedUris = [],
+            search = ''
         } = params;
 
         const baseFilters: any = {};
@@ -32,6 +34,28 @@ export class CampaignService {
                 baseFilters.$or = [{ protocol: 'http' }, { protocol: { $exists: false } }, { protocol: null }];
             } else {
                 baseFilters.protocol = protocol;
+            }
+        }
+
+        if (selectedUris.length > 0) {
+            baseFilters['request.url'] = { $in: selectedUris };
+        }
+
+        if (search) {
+            const cleanSearch = search.trim();
+            if (cleanSearch.length > 0) {
+                const searchFilter = {
+                    $or: [
+                        { 'request.ip': cleanSearch },
+                        { 'fingerprint.hash': cleanSearch }
+                    ]
+                };
+                if (baseFilters.$or) {
+                    baseFilters.$and = [{ $or: baseFilters.$or }, searchFilter];
+                    delete baseFilters.$or;
+                } else {
+                    baseFilters.$or = searchFilter.$or;
+                }
             }
         }
 
@@ -140,7 +164,7 @@ export class CampaignService {
             
             return { 
                 campaigns: data, 
-                count: totalCount,
+                total: totalCount,
                 metadata: {
                     minIpCount: bIps.min || 0,
                     maxIpCount: bIps.max || 0,
@@ -271,6 +295,148 @@ export class CampaignService {
             };
         } catch (err: any) {
             this.logger.error(`[CampaignService] Detail Error: ${err.message}`);
+            throw err;
+        }
+    }
+
+    /**
+     * Recupera gli URI unici (Target URLs) associati alle campagne scoperte.
+     */
+    async getUniqueSampleUrls(params: any) {
+        const {
+            protocol = 'http',
+            timeConfig = {},
+            minIps = 2,
+            minScore = 0,
+            search = '',
+            page = 1,
+            pageSize = 20,
+            sortBy = 'count',
+            order = -1
+        } = params;
+
+        const baseFilters: any = {};
+        if (protocol) {
+            if (protocol === 'http') {
+                baseFilters.$or = [{ protocol: 'http' }, { protocol: { $exists: false } }, { protocol: null }];
+            } else {
+                baseFilters.protocol = protocol;
+            }
+        }
+
+        if (search) {
+            const cleanSearch = search.trim();
+            if (cleanSearch.length > 0) {
+                const searchFilter = {
+                    $or: [
+                        { 'request.ip': cleanSearch },
+                        { 'fingerprint.hash': cleanSearch }
+                    ]
+                };
+                // Se abbiamo già un $or (per il protocollo http), usiamo $and
+                if (baseFilters.$or) {
+                    baseFilters.$and = [
+                        { $or: baseFilters.$or },
+                        searchFilter
+                    ];
+                    delete baseFilters.$or;
+                } else {
+                    baseFilters.$or = searchFilter.$or;
+                }
+            }
+        }
+
+        const timeParams = { ...timeConfig };
+        if (timeConfig.timeMode === 'ago' && timeConfig.agoUnit && timeConfig.agoValue) {
+            timeParams[timeConfig.agoUnit] = timeConfig.agoValue;
+        }
+        const timeStage = new TimeFilterStage(timeParams).generate();
+
+        const pipeline: any[] = [
+            ...timeStage,
+            { $match: baseFilters },
+            // Step 1: Raggruppiamo per Hash + IP per determinare i cluster (come in discovery)
+            {
+                $group: {
+                    _id: { hash: '$fingerprint.hash', ip: '$request.ip' },
+                    logsPerIp: { $sum: 1 },
+                    sumScorePerIp: { $sum: '$fingerprint.score' },
+                    sampleUrl: { $first: '$request.url' },
+                    lastSeen: { $max: '$timestamp' }
+                }
+            },
+            { $match: { '_id.hash': { $ne: null } } },
+            // Step 2: Raggruppiamo per Hash per avere le metriche della campagna
+            {
+                $group: {
+                    _id: '$_id.hash',
+                    ipCount: { $sum: 1 },
+                    totaleLogs: { $sum: '$logsPerIp' },
+                    sumScore: { $sum: '$sumScorePerIp' },
+                    sampleUrl: { $first: '$sampleUrl' },
+                    lastSeen: { $max: '$lastSeen' }
+                }
+            },
+            {
+                $project: {
+                    ipCount: 1,
+                    totaleLogs: 1,
+                    sampleUrl: 1,
+                    lastSeen: 1,
+                    averageScore: { $divide: ['$sumScore', '$totaleLogs'] }
+                }
+            },
+            // Step 3: Filtriamo le campagne che non passano i criteri di base
+            { $match: { ipCount: { $gte: Number(minIps) }, averageScore: { $gte: Number(minScore) } } },
+            // Step 4: Raggruppiamo per URI finale
+            {
+                $group: {
+                    _id: '$sampleUrl',
+                    campaignCount: { $sum: 1 },
+                    totaleLogs: { $sum: '$totaleLogs' },
+                    lastSeen: { $max: '$lastSeen' }
+                }
+            },
+            {
+                $project: {
+                    uri: { $ifNull: ['$_id', '/'] },
+                    campaignCount: 1,
+                    totaleLogs: 1,
+                    lastSeen: 1
+                }
+            }
+        ];
+
+        // Sorting dinamico
+        const sortStage: any = {};
+        if (sortBy === 'uri') sortStage.uri = order;
+        else if (sortBy === 'logs') sortStage.totaleLogs = order;
+        else sortStage.campaignCount = order;
+
+        const facetPipeline = [
+            ...pipeline,
+            {
+                $facet: {
+                    data: [
+                        { $sort: sortStage },
+                        { $skip: (page - 1) * pageSize },
+                        { $limit: pageSize }
+                    ],
+                    totalCount: [
+                        { $count: 'count' }
+                    ]
+                }
+            }
+        ];
+
+        try {
+            const [result] = await ThreatLog.aggregate(facetPipeline).allowDiskUse(true);
+            return {
+                uris: result?.data || [],
+                total: result?.totalCount[0]?.count || 0
+            };
+        } catch (err: any) {
+            this.logger.error(`[CampaignService] Unique URIs Error: ${err.message}`);
             throw err;
         }
     }

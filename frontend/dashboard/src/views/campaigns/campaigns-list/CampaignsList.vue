@@ -42,6 +42,24 @@
           </div>
 
           <div class="filter-group">
+            <UriFilterPicker 
+              :selected-uris="campaignsStore.state.filters.selectedUris"
+              :protocol="campaignsStore.state.filters.protocol"
+              :min-ips="campaignsStore.state.filters.minIps"
+              :min-score="campaignsStore.state.filters.minScore"
+              :time-config="{
+                timeMode: campaignsStore.state.filters.timeMode,
+                agoValue: campaignsStore.state.filters.agoValue,
+                agoUnit: campaignsStore.state.filters.agoUnit,
+                startTime: campaignsStore.state.filters.startDate,
+                endTime: campaignsStore.state.filters.endDate
+              }"
+              @toggle-uri="campaignsStore.toggleUri"
+              @clear-uris="campaignsStore.clearUris"
+            />
+          </div>
+
+          <div class="filter-group">
             <label class="cyber-label">{{ t('telemetry.filter_label') }}</label>
             <div class="tabs-row">
               <button v-for="opt in dynamicTimeScale" :key="opt.l" class="tab-btn"
@@ -174,6 +192,7 @@ import { useCampaignsDiscovery } from '../../../composable/useCampaignsDiscovery
 import GlobalHeader from '../../../components/GlobalHeader.vue';
 import ProtocolSelector from '../../../components/common/ProtocolSelector.vue';
 import CyberPager from '../../../components/common/CyberPager.vue';
+import UriFilterPicker from '../../../components/campaigns/UriFilterPicker.vue';
 import { formatFullDateTime, formatHumanDuration } from '../../../utils/dateUtils';
 import { generateSmartScale, generateScoreScale, generateTimeScale } from '../../../utils/filterUtils';
 import dayjs from 'dayjs';
@@ -186,7 +205,8 @@ const props = defineProps({
   initialProtocol: String,
   initTimeMode: String,
   initAgoValue: Number,
-  initAgoUnit: String
+  initAgoUnit: String,
+  initialUris: String // Comma separated string from query
 });
 
 const { t } = useI18n();
@@ -204,6 +224,7 @@ onMounted(() => {
   if (props.initTimeMode !== undefined) campaignsStore.state.filters.timeMode = props.initTimeMode;
   if (props.initAgoValue !== undefined) campaignsStore.state.filters.agoValue = props.initAgoValue;
   if (props.initAgoUnit !== undefined) campaignsStore.state.filters.agoUnit = props.initAgoUnit;
+  if (props.initialUris) campaignsStore.state.filters.selectedUris = props.initialUris.split(',');
 });
 
 watch(
@@ -215,9 +236,10 @@ watch(
     () => campaignsStore.state.filters.protocol,
     () => campaignsStore.state.filters.timeMode,
     () => campaignsStore.state.filters.agoValue,
-    () => campaignsStore.state.filters.agoUnit
+    () => campaignsStore.state.filters.agoUnit,
+    () => campaignsStore.state.filters.selectedUris
   ],
-  ([page, minIps, minScore, minLogsPerIp, protocol, timeMode, agoValue, agoUnit]) => {
+  ([page, minIps, minScore, minLogsPerIp, protocol, timeMode, agoValue, agoUnit, uris]) => {
     const query = {};
     if (page > 1) query.page = page;
     if (minIps > 1) query.minIps = minIps;
@@ -227,6 +249,7 @@ watch(
     if (timeMode && timeMode !== 'ago') query.timeMode = timeMode;
     if (agoValue && agoValue !== 7) query.agoValue = agoValue;
     if (agoUnit && agoUnit !== 'days') query.agoUnit = agoUnit;
+    if (uris && uris.length > 0) query.uris = uris.join(',');
 
     router.replace({ name: 'Campaigns', query }).catch(() => {});
   },
@@ -260,7 +283,8 @@ const {
   toRef(campaignsStore.state.pagination, 'pageSize'),
   toRef(campaignsStore.state.filters, 'minLogsPerIp'),
   toRef(campaignsStore.state.filters, 'startDate'),
-  toRef(campaignsStore.state.filters, 'endDate')
+  toRef(campaignsStore.state.filters, 'endDate'),
+  toRef(campaignsStore.state.filters, 'selectedUris')
 );
 
 // Scale dinamiche calcolate dai metadati del backend

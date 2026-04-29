@@ -21,7 +21,9 @@ export function useCampaignsDiscovery(
     initialPageSize: number | Ref<number> = 10,
     initialMinLogsPerIp: number | Ref<number> = 1,
     initialStartDate: (string | null) | Ref<string | null> = null,
-    initialEndDate: (string | null) | Ref<string | null> = null
+    initialEndDate: (string | null) | Ref<string | null> = null,
+    initialSelectedUris: string[] | Ref<string[]> = [],
+    initialSearch: string | Ref<string> = ''
 ) {
     const minIps = toRef(initialMinIps);
     const campaignsStore = useCampaignsStore();
@@ -33,6 +35,8 @@ export function useCampaignsDiscovery(
     const agoUnit = toRef(initialAgoUnit);
     const startDate = toRef(initialStartDate);
     const endDate = toRef(initialEndDate);
+    const selectedUris = toRef(initialSelectedUris);
+    const search = toRef(initialSearch);
     
     const campaigns = ref<any[]>([]);
     
@@ -45,7 +49,9 @@ export function useCampaignsDiscovery(
         agoValue,
         agoUnit,
         startDate,
-        endDate
+        endDate,
+        selectedUris,
+        search
     ];
 
     async function fetchData() {
@@ -64,11 +70,13 @@ export function useCampaignsDiscovery(
                 minLogsPerIp: minLogsPerIp.value,
                 protocol: protocol.value,
                 page: page.value,
-                pageSize: pageSize.value
+                pageSize: pageSize.value,
+                selectedUris: selectedUris.value,
+                search: search.value
             });
             
             campaigns.value = response.campaigns || [];
-            total.value = response.count || campaigns.value.length;
+            total.value = response.total || campaigns.value.length;
             
             if (response.metadata) {
                 campaignsStore.state.metadata.minIpCount = response.metadata.minIpCount || 0;
@@ -131,6 +139,7 @@ export function useCampaignsDiscovery(
         pageSize,
         total,
         page,
+        search,
         fetchData
     };
 }

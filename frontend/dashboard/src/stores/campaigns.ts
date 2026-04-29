@@ -12,6 +12,8 @@ export interface CampaignsFilters {
     agoUnit: 'minutes' | 'hours' | 'days' | 'months' | 'years';
     startDate: string | null;
     endDate: string | null;
+    selectedUris: string[];
+    search: string;
 }
 
 export interface CampaignsState {
@@ -41,6 +43,12 @@ export interface CampaignsState {
         showChart: boolean;
         showHub: boolean;
     }>;
+    uriBrowser: {
+        page: number;
+        pageSize: number;
+        sortBy: 'count' | 'uri' | 'logs';
+        order: -1 | 1;
+    };
 }
 
 const DEFAULT_STATE: CampaignsState = {
@@ -53,7 +61,9 @@ const DEFAULT_STATE: CampaignsState = {
         agoValue: 7,
         agoUnit: 'days',
         startDate: null,
-        endDate: null
+        endDate: null,
+        selectedUris: [],
+        search: ''
     },
     pagination: {
         page: 1,
@@ -76,7 +86,13 @@ const DEFAULT_STATE: CampaignsState = {
         globalMaxDate: null
     },
     targetedIps: {},
-    uiState: {}
+    uiState: {},
+    uriBrowser: {
+        page: 1,
+        pageSize: 10,
+        sortBy: 'count',
+        order: -1
+    }
 };
 
 export const useCampaignsStore = defineStore('campaigns', () => {
@@ -138,6 +154,25 @@ export const useCampaignsStore = defineStore('campaigns', () => {
         return state.targetedIps[hash] || [];
     }
 
+    function toggleUri(uri: string) {
+        const index = state.filters.selectedUris.indexOf(uri);
+        if (index === -1) {
+            state.filters.selectedUris.push(uri);
+        } else {
+            state.filters.selectedUris.splice(index, 1);
+        }
+        state.pagination.page = 1;
+    }
+
+    function clearUris() {
+        state.filters.selectedUris = [];
+        state.pagination.page = 1;
+    }
+
+    function updateUriBrowser(updates: Partial<CampaignsState['uriBrowser']>) {
+        Object.assign(state.uriBrowser, updates);
+    }
+
     return {
         state,
         resetFilters,
@@ -146,6 +181,9 @@ export const useCampaignsStore = defineStore('campaigns', () => {
         setTargetedIps,
         getUiState,
         updateUiState,
-        getTargetedIps
+        getTargetedIps,
+        toggleUri,
+        clearUris,
+        updateUriBrowser
     };
 });

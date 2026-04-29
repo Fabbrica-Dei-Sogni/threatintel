@@ -45,6 +45,18 @@ export interface CorrelationWindowDTO {
     ips: string[];
 }
 
+export interface UniqueUriDTO {
+    uri: string;
+    campaignCount: number;
+    totaleLogs: number;
+    lastSeen: string;
+}
+
+export interface FetchUrisResponse {
+    uris: UniqueUriDTO[];
+    total: number;
+}
+
 export interface FetchCampaignsParams {
     startTime?: string | null;
     endTime?: string | null;
@@ -57,6 +69,8 @@ export interface FetchCampaignsParams {
     protocol?: string | null;
     page?: number;
     pageSize?: number;
+    selectedUris?: string[];
+    search?: string;
 }
 
 export interface FetchCampaignsResponse {

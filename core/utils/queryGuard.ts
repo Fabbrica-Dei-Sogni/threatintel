@@ -42,7 +42,7 @@ const COWRIE_SESSION_FILTER_FIELDS = new Set([
 ]);
 
 const CAMPAIGN_FILTER_FIELDS = new Set([
-    'minIps', 'minScore', 'minLogsPerIp', 'protocol', 'startTime', 'endTime', 'page', 'pageSize', 'timeMode', 'agoValue', 'agoUnit'
+    'minIps', 'minScore', 'minLogsPerIp', 'protocol', 'startTime', 'endTime', 'page', 'pageSize', 'timeMode', 'agoValue', 'agoUnit', 'selectedUris', 'search'
 ]);
 
 const CAMPAIGN_SORT_FIELDS = new Set([
@@ -115,6 +115,12 @@ export function sanitizeFilters(
             }
         } else if (typeof value === 'boolean' || typeof value === 'number') {
             safe[key] = value;
+        } else if (Array.isArray(value)) {
+            // Supporto per array di stringhe (es. selectedUris)
+            safe[key] = value
+                .filter(v => typeof v === 'string')
+                .map(v => escapeRegex((v as string).trim()))
+                .filter(v => v !== '');
         } else if (value && typeof value === 'object' && '$in' in value && Array.isArray((value as any).$in)) {
             safe[key] = { $in: (value as any).$in };
         }

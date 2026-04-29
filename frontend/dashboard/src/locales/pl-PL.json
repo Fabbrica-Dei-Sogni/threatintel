@@ -289,6 +289,8 @@
         "discovery": "Odkrywanie Kampanii",
         "searchLabel": "Szukaj na liście:",
         "searchPlaceholder": "IP, Hash, Technika...",
+        "filterByUri": "Filtruj wg docelowego URI",
+        "browseUris": "Przeglądaj URI",
         "table": {
             "ips": "Zaangażowane IP",
             "logs": "Suma Logów",

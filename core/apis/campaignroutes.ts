@@ -28,5 +28,17 @@ export default (campaignController: CampaignController) => {
      */
     router.post('/api/campaign/details', (req, res) => campaignController.getCampaignDetail(req, res));
 
+    /**
+     * @openapi
+     * /campaigns/uris:
+     *   get:
+     *     tags: [Campaigns Analysis]
+     *     summary: Ottiene gli URI unici (Target URLs) coinvolti nelle campagne
+     *     responses:
+     *       200:
+     *         description: Elenco degli URI con conteggi.
+     */
+    router.get('/api/campaigns/uris', (req, res) => campaignController.getUniqueUris(req, res));
+
     return router;
 };

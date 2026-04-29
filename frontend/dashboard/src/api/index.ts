@@ -4,7 +4,8 @@ import type { FetchAttackSearchParams } from '../models/AttackDTO';
 import type { 
     FetchCampaignsParams, 
     FetchCampaignsResponse, 
-    CampaignDetailDTO 
+    CampaignDetailDTO,
+    FetchUrisResponse
 } from '../models/CampaignDTO';
 import { useProfileStore } from '../stores/profiles';
 
@@ -557,11 +558,13 @@ export async function fetchCampaigns({
     minLogsPerIp = 1,
     protocol = 'http',
     page = 1,
-    pageSize = 10
+    pageSize = 10,
+    selectedUris = [],
+    search = ''
 }: FetchCampaignsParams = {}): Promise<FetchCampaignsResponse> {
     try {
         const response = await apiClient.get('/campaigns', {
-            params: { startTime, endTime, timeMode, agoValue, agoUnit, minIps, minScore, minLogsPerIp, protocol, page, pageSize }
+            params: { startTime, endTime, timeMode, agoValue, agoUnit, minIps, minScore, minLogsPerIp, protocol, page, pageSize, selectedUris, search }
         });
         return response.data;
     } catch (error) {
@@ -603,6 +606,16 @@ export async function fetchCampaignDetail({
         return response.data;
     } catch (error) {
         console.error('[fetchCampaignDetail] Error:', error);
+        throw error;
+    }
+}
+
+export async function fetchUniqueUris(params: any = {}): Promise<FetchUrisResponse> {
+    try {
+        const response = await apiClient.get<FetchUrisResponse>('/campaigns/uris', { params });
+        return response.data;
+    } catch (error) {
+        console.error('[fetchUniqueUris] Error:', error);
         throw error;
     }
 }

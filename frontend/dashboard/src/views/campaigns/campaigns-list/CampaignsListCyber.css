@@ -5,9 +5,9 @@
   --cy-primary-rgb: 0, 255, 65;
   --cy-accent: #008020;
   --cy-bg: #050a06;
-  --cy-surface: rgba(10, 25, 12, 0.9);
+  --cy-surface: #0a190c;
   --cy-border: rgba(0, 255, 65, 0.25);
-  --cy-input-bg: rgba(0, 0, 0, 0.7);
+  --cy-input-bg: #000000;
   
   background-color: var(--cy-bg) !important;
   color: #fff;
@@ -91,4 +91,12 @@
 .skin-cyber.campaigns-page .metric-box.danger-info .box-value {
   color: var(--cy-primary) !important;
   text-shadow: 0 0 10px var(--cy-primary);
+}
+
+/* Fix trasparenza filtri desktop */
+.skin-cyber.campaigns-page .campaigns-filters {
+  background-color: var(--cy-surface) !important;
+  backdrop-filter: none !important;
+  border: 1px solid var(--cy-border) !important;
+  opacity: 1 !important;
 }

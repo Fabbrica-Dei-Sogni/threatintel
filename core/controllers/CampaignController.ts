@@ -43,12 +43,16 @@ export class CampaignController {
                 minLogsPerIp: minLogsPerIpNum,
                 protocol: cleanQuery.protocol as string,
                 page: pageNum,
-                pageSize: pageSizeNum
+                pageSize: pageSizeNum,
+                selectedUris: Array.isArray(cleanQuery.selectedUris) 
+                    ? cleanQuery.selectedUris 
+                    : (cleanQuery.selectedUris ? [cleanQuery.selectedUris as string] : []),
+                search: cleanQuery.search as string
             });
 
             res.json({ 
                 campaigns: result.campaigns, 
-                count: result.count,
+                total: result.total,
                 metadata: result.metadata
             });
         } catch (err: any) {
@@ -109,6 +113,42 @@ export class CampaignController {
         } catch (err: any) {
             this.logger.error('[CampaignController] Error fetching campaign details:', err);
             res.status(500).json({ error: 'Errore durante il recupero del dettaglio campagna' });
+        }
+    }
+
+    /**
+     * GET /api/campaigns/uris
+     * Ottiene la lista degli URI unici coinvolti nelle campagne
+     */
+    async getUniqueUris(req: Request, res: Response): Promise<void> {
+        this.logger.info('[CampaignController] Requesting unique URIs from campaigns');
+        try {
+            const cleanQuery = sanitizeFilters(req.query, FilterAllowedFields.campaign);
+            
+            const pageNum = sanitizePage(cleanQuery.page);
+            const pageSizeNum = sanitizePageSize(cleanQuery.pageSize, 100, 20);
+            
+            const result = await this.campaignService.getUniqueSampleUrls({
+                protocol: cleanQuery.protocol as string,
+                minIps: parseInt(cleanQuery.minIps as string) || 2,
+                minScore: parseInt(cleanQuery.minScore as string) || 0,
+                page: pageNum,
+                pageSize: pageSizeNum,
+                sortBy: cleanQuery.sortBy as string || 'count',
+                order: cleanQuery.order ? parseInt(cleanQuery.order as string) : -1,
+                timeConfig: {
+                    startTime: cleanQuery.startTime as string,
+                    endTime: cleanQuery.endTime as string,
+                    timeMode: cleanQuery.timeMode as string,
+                    agoValue: cleanQuery.agoValue ? parseInt(cleanQuery.agoValue as string) : undefined,
+                    agoUnit: cleanQuery.agoUnit as string
+                }
+            });
+
+            res.json(result);
+        } catch (err: any) {
+            this.logger.error('[CampaignController] Error fetching unique URIs:', err);
+            res.status(500).json({ error: 'Errore durante il recupero degli URI unici' });
         }
     }
 }

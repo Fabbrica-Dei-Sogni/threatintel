@@ -6,10 +6,17 @@
       </button>
       
       <div class="pager-info">
-        <span class="label">{{ $t('common.page') }}</span>
-        <span class="current-val">{{ page }}</span>
-        <span class="separator">/</span>
-        <span class="total-val">{{ totalPages }}</span>
+        <div class="info-group">
+          <span class="label">{{ $t('common.page') }}</span>
+          <span class="current-val">{{ page }}</span>
+          <span class="separator">/</span>
+          <span class="total-val">{{ totalPages }}</span>
+        </div>
+        
+        <div class="pager-total">
+          <span class="total-label">{{ $t('common.total') }}</span>
+          <span class="total-num">{{ total }}</span>
+        </div>
       </div>
 
       <button :disabled="page >= totalPages" @click="changePage(page + 1)" class="pager-nav-btn">
@@ -143,12 +150,39 @@ function jumpToPage() {
 .pager-info {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 15px;
   font-size: 0.9rem;
   color: #fff;
-  padding: 0 15px;
+  padding: 0 20px;
   border-left: 1px solid rgba(255, 255, 255, 0.1);
   border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.info-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pager-total {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-left: 15px;
+  border-left: 1px dashed rgba(255, 255, 255, 0.2);
+}
+
+.total-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  opacity: 0.5;
+  letter-spacing: 1px;
+}
+
+.total-num {
+  color: var(--theme-primary, #00FF41);
+  font-weight: 900;
+  text-shadow: 0 0 10px rgba(var(--theme-primary-rgb, 0, 255, 65), 0.4);
 }
 
 .current-val {
@@ -257,14 +291,100 @@ function jumpToPage() {
 
 .cyber-pager.mini .pager-info {
   font-size: 0.8rem;
+  gap: 10px;
+  padding: 0 10px;
 }
 
-@media (max-width: 992px) {
+.cyber-pager.mini .pager-total {
+  padding-left: 10px;
+  gap: 5px;
+}
+
+.cyber-pager.mini .total-label {
+  font-size: 0.55rem;
+}
+
+/* Responsive layout */
+@media (max-width: 1100px) {
+  .cyber-pager {
+    gap: 15px;
+    padding: 10px 15px;
+  }
+  
+  .pager-tools {
+    gap: 20px;
+  }
+}
+
+@media (max-width: 850px) {
   .cyber-pager {
     flex-direction: column;
-    gap: 15px;
+    align-items: center;
     clip-path: none;
     border-radius: 4px;
+    gap: 20px;
+  }
+
+  .pager-main {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .pager-tools {
+    width: 100%;
+    justify-content: center;
+    padding-top: 15px;
+    border-top: 1px dashed rgba(255, 255, 255, 0.1);
+  }
+}
+
+@media (max-width: 550px) {
+  .pager-main {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .pager-info {
+    order: -1;
+    width: 100%;
+    justify-content: center;
+    border: none;
+    padding: 5px 0;
+    margin-bottom: 5px;
+  }
+
+  .pager-nav-btn {
+    flex: 1;
+    min-width: 120px;
+    justify-content: center;
+  }
+
+  .pager-tools {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .page-size-selector {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .size-options {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 380px) {
+  .pager-info {
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .pager-total {
+    border-left: none;
+    padding-left: 0;
+    margin-left: 0;
   }
 }
 </style>

@@ -38,7 +38,14 @@ export class CampaignService {
         }
 
         if (selectedUris.length > 0) {
-            baseFilters['request.url'] = { $in: selectedUris };
+            if (selectedUris.length === 1) {
+                // Se c'è un solo URI, usiamo regex per massima robustezza contro punti e case-sensitivity
+                const escapedUri = selectedUris[0].replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                baseFilters['request.url'] = { $regex: `^${escapedUri}$`, $options: 'i' };
+            } else {
+                // Se sono più di uno, usiamo $in (match esatto letterale)
+                baseFilters['request.url'] = { $in: selectedUris };
+            }
         }
 
         if (search) {

@@ -111,7 +111,12 @@ export function sanitizeFilters(
             if (DATE_FIELDS.has(key)) {
                 safe[key] = trimmed;
             } else {
-                safe[key] = escapeRegex(trimmed);
+                /**
+                 * NOTA: L'escapeRegex automatico è stato rimosso per permettere il match letterale (es. URI con punti o IP).
+                 * IMPORTANTE: Se un Service decide di usare questo valore in un operatore $regex, 
+                 * DEVE applicare escapeRegex() manualmente nel Service stesso per prevenire ReDoS.
+                 */
+                safe[key] = trimmed;
             }
         } else if (typeof value === 'boolean' || typeof value === 'number') {
             safe[key] = value;
@@ -119,7 +124,7 @@ export function sanitizeFilters(
             // Supporto per array di stringhe (es. selectedUris)
             safe[key] = value
                 .filter(v => typeof v === 'string')
-                .map(v => escapeRegex((v as string).trim()))
+                .map(v => (v as string).trim())
                 .filter(v => v !== '');
         } else if (value && typeof value === 'object' && '$in' in value && Array.isArray((value as any).$in)) {
             safe[key] = { $in: (value as any).$in };

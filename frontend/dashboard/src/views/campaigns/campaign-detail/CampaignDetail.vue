@@ -122,12 +122,12 @@
                 </button>
 
                 <span class="ip-val" @click="goToIp(node.ip)">{{ node.ip }}</span>
+                
+                <button class="copy-ip-btn-mini" @click.stop="copyNodeIp(node.ip)" :title="t('common.copyToClipboard')">
+                  <span v-if="copiedIpNode !== node.ip">📋</span>
+                  <span v-else>✅</span>
+                </button>
               </div>
-              
-              <!-- Azione Profilo Rapida -->
-              <button class="btn-profile-compact" @click="goToIp(node.ip)" :title="t('campaignDetail.viewProfile')">
-                 <span>{{ t('campaignDetail.viewProfile').toUpperCase() }}</span> <span class="arrow">→</span>
-              </button>
             </div>
 
             <!-- 1. Score Evidente (Sopra le tecniche) -->
@@ -172,10 +172,13 @@
             </div>
             
             <div class="node-footer-actions">
-              <button class="intel-det-btn-mini btn-investigate" @click="handleInvestigateIp(node.ip)">
-                {{ t('campaignDetail.investigate') }}
-              </button>
-            </div>
+               <button class="intel-det-btn-mini btn-profile" @click="goToIp(node.ip)">
+                 {{ t('campaignDetail.viewProfile').toUpperCase() }}
+               </button>
+               <button class="intel-det-btn-mini btn-investigate" @click="handleInvestigateIp(node.ip)">
+                 {{ t('campaignDetail.investigate') }}
+               </button>
+             </div>
           </div>
         </div>
 
@@ -206,6 +209,7 @@ import CyberPager from '../../../components/common/CyberPager.vue';
 import CountryFlag from '../../../components/CountryFlag.vue';
 import CampaignNodesChart from '../../../components/campaigns/CampaignNodesChart.vue';
 import { formatFullDateTime, formatHumanDuration, formatDateTime } from '../../../utils/dateUtils';
+import { useClipboard } from '../../../composable/useClipboard';
 import dayjs from 'dayjs';
 
 const props = defineProps({
@@ -223,8 +227,10 @@ const route = useRoute();
 const router = useRouter();
 const viewStore = useViewSettingsStore();
 const { dashboardSkin: currentSkin } = storeToRefs(viewStore);
+const { copyFormatted } = useClipboard();
 
 const showChart = ref(false);
+const copiedIpNode = ref(null);
 
 // Integrazione Composable
 const {
@@ -304,6 +310,15 @@ function handleInvestigateCluster() {
 
 function goToIp(ip) {
   router.push(`/ip/${ip}`);
+}
+
+async function copyNodeIp(text) {
+  if (!text) return;
+  await copyFormatted('clipboard.ip', { ip: text });
+  copiedIpNode.value = text;
+  setTimeout(() => {
+    if (copiedIpNode.value === text) copiedIpNode.value = null;
+  }, 2000);
 }
 </script>
 
@@ -535,6 +550,7 @@ function goToIp(ip) {
   align-items: center;
   gap: 12px;
   max-width: 100%;
+  min-width: 0;
 }
 
 .ip-val {
@@ -543,12 +559,34 @@ function goToIp(ip) {
   cursor: pointer;
   font-size: 1.05rem;
   letter-spacing: -0.5px;
-  word-break: break-all;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
 }
 
 .ip-val:hover {
   color: var(--cy-primary, #00FF41);
   text-shadow: 0 0 10px var(--cy-primary, #00FF41);
+}
+
+.copy-ip-btn-mini {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0 4px;
+  opacity: 0.4;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.copy-ip-btn-mini:hover {
+  opacity: 1;
+  transform: scale(1.1);
 }
 
 .score-badge {

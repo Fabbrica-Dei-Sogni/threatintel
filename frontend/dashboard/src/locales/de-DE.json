@@ -313,7 +313,8 @@
         "viewProfile": "PROFIL",
         "investigate": "UNTERSUCHEN 👉",
         "investigateCluster": "CLUSTER UNTERSUCHEN 🚀",
-        "timelineAnalysis": "Zeitliche Koordinationsanalyse"
+        "timelineAnalysis": "Zeitliche Koordinationsanalyse",
+        "correlationHub": "Korrelations-Hub"
     },
     "attackChart": {
         "title": "Zeitliche Anomaliesanalyse",

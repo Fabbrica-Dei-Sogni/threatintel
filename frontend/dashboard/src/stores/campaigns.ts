@@ -37,6 +37,10 @@ export interface CampaignsState {
         globalMaxDate: string | null;
     };
     targetedIps: Record<string, string[]>;
+    uiState: Record<string, {
+        showChart: boolean;
+        showHub: boolean;
+    }>;
 }
 
 const DEFAULT_STATE: CampaignsState = {
@@ -71,7 +75,8 @@ const DEFAULT_STATE: CampaignsState = {
         globalMinDate: null,
         globalMaxDate: null
     },
-    targetedIps: {}
+    targetedIps: {},
+    uiState: {}
 };
 
 export const useCampaignsStore = defineStore('campaigns', () => {
@@ -111,6 +116,24 @@ export const useCampaignsStore = defineStore('campaigns', () => {
         state.targetedIps[hash] = [];
     }
 
+    function setTargetedIps(hash: string, ips: string[]) {
+        state.targetedIps[hash] = [...ips];
+    }
+
+    function getUiState(hash: string) {
+        if (!state.uiState[hash]) {
+            state.uiState[hash] = { showChart: false, showHub: false };
+        }
+        return state.uiState[hash];
+    }
+
+    function updateUiState(hash: string, updates: Partial<{ showChart: boolean; showHub: boolean }>) {
+        if (!state.uiState[hash]) {
+            state.uiState[hash] = { showChart: false, showHub: false };
+        }
+        Object.assign(state.uiState[hash], updates);
+    }
+
     function getTargetedIps(hash: string): string[] {
         return state.targetedIps[hash] || [];
     }
@@ -120,6 +143,9 @@ export const useCampaignsStore = defineStore('campaigns', () => {
         resetFilters,
         toggleTargetedIp,
         clearTargetedIps,
+        setTargetedIps,
+        getUiState,
+        updateUiState,
         getTargetedIps
     };
 });

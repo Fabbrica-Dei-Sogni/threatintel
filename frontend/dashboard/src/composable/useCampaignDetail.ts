@@ -16,6 +16,17 @@ export function useCampaignDetail(hash: string) {
     const nodesPage = ref(1);
     const pageSize = ref(10);
 
+    // UI State persistente da Pinia
+    const uiState = computed(() => campaignsStore.getUiState(hash));
+    const showChart = computed({
+        get: () => uiState.value.showChart,
+        set: (val) => campaignsStore.updateUiState(hash, { showChart: val })
+    });
+    const showHub = computed({
+        get: () => uiState.value.showHub,
+        set: (val) => campaignsStore.updateUiState(hash, { showHub: val })
+    });
+
     // Selezione IP tattici da Pinia
     const selectedIps = computed(() => campaignsStore.getTargetedIps(hash));
     
@@ -62,6 +73,10 @@ export function useCampaignDetail(hash: string) {
 
     function clearSelection() {
         campaignsStore.clearTargetedIps(hash);
+    }
+
+    function setTargetedIps(ips: string[]) {
+        campaignsStore.setTargetedIps(hash, ips);
     }
 
     /**
@@ -116,11 +131,14 @@ export function useCampaignDetail(hash: string) {
         error,
         nodesPage,
         pageSize,
+        showChart,
+        showHub,
         selectedIps,
         isTargetedMode,
         loadCampaign,
         toggleIpSelection,
         clearSelection,
+        setTargetedIps,
         investigate
     };
 }

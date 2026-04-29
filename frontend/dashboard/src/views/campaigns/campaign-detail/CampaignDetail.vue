@@ -76,9 +76,12 @@
         <transition name="fade">
           <div v-if="showChart" class="chart-analysis-section">
             <CampaignNodesChart 
+              v-model:showHub="showHub"
               :nodes="campaign.nodes" 
               :campaign-range="{ firstSeen: campaign.firstSeen, lastSeen: campaign.lastSeen }" 
               :selected-ips="selectedIps"
+              @investigate-ips="handleInvestigateIps"
+              @apply-ips="handleApplyIps"
             />
           </div>
         </transition>
@@ -229,7 +232,6 @@ const viewStore = useViewSettingsStore();
 const { dashboardSkin: currentSkin } = storeToRefs(viewStore);
 const { copyFormatted } = useClipboard();
 
-const showChart = ref(false);
 const copiedIpNode = ref(null);
 
 // Integrazione Composable
@@ -239,13 +241,42 @@ const {
   error,
   nodesPage,
   pageSize,
+  showChart,
+  showHub,
   selectedIps,
   isTargetedMode,
   loadCampaign,
   toggleIpSelection,
   clearSelection,
+  setTargetedIps,
   investigate
 } = useCampaignDetail(props.hash);
+
+const handleInvestigateIps = (ips) => {
+  // Impostiamo correttamente gli IP nello store tramite il metodo dedicato
+  setTargetedIps(ips);
+  // Lanciamo l'investigazione cluster passando i parametri derivati dalle props
+  investigate(null, {
+    timeMode: props.timeMode,
+    agoValue: props.agoValue,
+    agoUnit: props.agoUnit,
+    minLogsPerIp: props.minLogsPerIp
+  });
+};
+
+const handleApplyIps = (ips) => {
+  const current = selectedIps.value;
+  // Verifichiamo se la selezione richiesta è identica a quella attuale
+  const isSame = current.length === ips.length && ips.every(ip => current.includes(ip));
+
+  if (isSame) {
+    // Se è la stessa, "spegniamo" il focus e torniamo al default
+    clearSelection();
+  } else {
+    // Altrimenti applichiamo il nuovo focus
+    setTargetedIps(ips);
+  }
+};
 
 // Effettua il caricamento iniziale e reagisce al cambio pagina
 const triggerLoad = () => {

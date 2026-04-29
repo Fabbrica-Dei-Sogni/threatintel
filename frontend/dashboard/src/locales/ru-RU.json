@@ -313,7 +313,8 @@
         "viewProfile": "ПРОФИЛЬ",
         "investigate": "ИССЛЕДОВАТЬ 👉",
         "investigateCluster": "ИССЛЕДОВАТЬ КЛАСТЕР 🚀",
-        "timelineAnalysis": "Анализ временной координации"
+        "timelineAnalysis": "Анализ временной координации",
+        "correlationHub": "Центр корреляции"
     },
     "attackChart": {
         "title": "Анализ атак во времени",

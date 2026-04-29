@@ -313,7 +313,8 @@
         "viewProfile": "PROFIL",
         "investigate": "ENQUÊTER 👉",
         "investigateCluster": "INVESTIGUER LE CLUSTER 🚀",
-        "timelineAnalysis": "Analyse de la coordination temporelle"
+        "timelineAnalysis": "Analyse de Coordination Temporelle",
+        "correlationHub": "Hub de Corrélation"
     },
     "attackChart": {
         "title": "Analyse des anomalies dans le temps",

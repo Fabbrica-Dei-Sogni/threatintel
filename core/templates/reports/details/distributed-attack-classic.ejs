@@ -269,7 +269,7 @@
         <div class="meta-strip">
             <span><strong><%= t('reports.distributedAttackDetail.involvedIps') %>:</strong> <%= data.ipCount %></span>
             <span><strong><%= t('reports.common.generatedAt') %>:</strong> <%= data.generatedAt %></span>
-            <span><strong><%= t('reports.common.protocol') %>:</strong> <%= t('reports.common.httpInvestigative') %> (DISTRIBUTED)</span>
+            <span><strong><%= t('reports.common.protocol') %>:</strong> <%= (data.protocol || 'http').toUpperCase() %> (DISTRIBUTED)</span>
         </div>
 
         <div class="section">

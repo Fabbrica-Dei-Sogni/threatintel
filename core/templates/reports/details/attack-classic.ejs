@@ -269,7 +269,7 @@
         <div class="meta-strip">
             <span><strong><%= t('reports.common.targetIp') %>:</strong> <%= data.ip %></span>
             <span><strong><%= t('reports.common.generatedAt') %>:</strong> <%= data.generatedAt %></span>
-            <span><strong><%= t('reports.common.protocol') %>:</strong> <%= t('reports.common.httpInvestigative') %></span>
+            <span><strong><%= t('reports.common.protocol') %>:</strong> <%= (data.protocol || 'http').toUpperCase() %></span>
         </div>
 
         <div class="section">

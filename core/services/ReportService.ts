@@ -220,6 +220,7 @@ export class ReportService {
                 : this.i18n.t('reports.attackDetail.title', locale),
             generatedAt: new Date().toLocaleString(locale),
             ip: isDistributed ? ipList![0] : ip,
+            protocol: attack?.protocol || 'http',
             isDistributed,
             attack, // Passa l'intero oggetto AttackDTO
             summary: {

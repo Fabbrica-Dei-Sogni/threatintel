@@ -229,6 +229,10 @@
                     <span class="hud-value" style="color: var(--hud-accent);"><%= data.ipCount %></span>
                 </div>
                 <div class="hud-value-row">
+                    <span class="hud-label"><%= t('reports.common.protocol').toUpperCase() %>:</span>
+                    <span class="hud-value"><%= (data.protocol || 'http').toUpperCase() %> (DISTRIBUTED)</span>
+                </div>
+                <div class="hud-value-row">
                     <span class="hud-label"><%= t('reports.attackDetail.criticality').toUpperCase() %>:</span>
                     <span class="hud-badge <%= data.summary.dangerLevel === 'HIGH' || data.summary.dangerLevel === 'CRITICAL' ? 'badge-danger' : (data.summary.dangerLevel === 'MEDIUM' ? 'badge-warning' : 'badge-success') %>">
                         <%= data.summary.dangerLevel %> (<%= data.summary.dangerScore.toFixed(2) %>%)

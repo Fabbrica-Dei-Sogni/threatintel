@@ -58,6 +58,7 @@
             <div class="section-title"><%= t('reports.fragments.telex.subjectIdentification').toUpperCase() %></div>
             <pre>
 <%= t('reports.fragments.telex.ipAddress').toUpperCase() %>: <%= data.ip %>
+<%= t('reports.common.protocol').toUpperCase() %>: <%= (data.protocol || 'http').toUpperCase() %>
 <%= t('reports.fragments.telex.dangerLevel').toUpperCase() %>: <%= data.summary.dangerLevel %>
 <%= t('reports.fragments.telex.dangerScore').toUpperCase() %>: <%= data.summary.dangerScore %>%
 <%= t('reports.fragments.telex.totalLogs').toUpperCase() %>: <%= data.summary.totalLogs %>

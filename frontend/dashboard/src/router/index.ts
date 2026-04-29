@@ -169,6 +169,9 @@ const routes: RouteRecordRaw[] = [
         props: (route: RouteLocationNormalized) => ({
             initialPage: route.query.page ? parseInt(route.query.page as string) : undefined,
             initialMinIps: route.query.minIps ? parseInt(route.query.minIps as string) : undefined,
+            initialMinScore: route.query.minScore ? parseInt(route.query.minScore as string) : undefined,
+            initialMinLogsPerIp: route.query.minLogsPerIp ? parseInt(route.query.minLogsPerIp as string) : undefined,
+            initialProtocol: route.query.protocol,
             initTimeMode: route.query.timeMode,
             initAgoValue: route.query.agoValue ? parseInt(route.query.agoValue as string) : undefined,
             initAgoUnit: route.query.agoUnit,

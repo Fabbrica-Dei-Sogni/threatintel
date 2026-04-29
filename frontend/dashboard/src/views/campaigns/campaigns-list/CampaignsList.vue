@@ -164,7 +164,7 @@
 </template>
 
 <script setup>
-import { computed, toRef } from 'vue';
+import { computed, toRef, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { storeToRefs } from 'pinia';
@@ -178,11 +178,60 @@ import { formatFullDateTime, formatHumanDuration } from '../../../utils/dateUtil
 import { generateSmartScale, generateScoreScale, generateTimeScale } from '../../../utils/filterUtils';
 import dayjs from 'dayjs';
 
+const props = defineProps({
+  initialPage: Number,
+  initialMinIps: Number,
+  initialMinScore: Number,
+  initialMinLogsPerIp: Number,
+  initialProtocol: String,
+  initTimeMode: String,
+  initAgoValue: Number,
+  initAgoUnit: String
+});
+
 const { t } = useI18n();
 const router = useRouter();
 const viewStore = useViewSettingsStore();
 const campaignsStore = useCampaignsStore();
 const { dashboardSkin: currentSkin } = storeToRefs(viewStore);
+
+onMounted(() => {
+  if (props.initialPage !== undefined) campaignsStore.state.pagination.page = props.initialPage;
+  if (props.initialMinIps !== undefined) campaignsStore.state.filters.minIps = props.initialMinIps;
+  if (props.initialMinScore !== undefined) campaignsStore.state.filters.minScore = props.initialMinScore;
+  if (props.initialMinLogsPerIp !== undefined) campaignsStore.state.filters.minLogsPerIp = props.initialMinLogsPerIp;
+  if (props.initialProtocol !== undefined) campaignsStore.state.filters.protocol = props.initialProtocol;
+  if (props.initTimeMode !== undefined) campaignsStore.state.filters.timeMode = props.initTimeMode;
+  if (props.initAgoValue !== undefined) campaignsStore.state.filters.agoValue = props.initAgoValue;
+  if (props.initAgoUnit !== undefined) campaignsStore.state.filters.agoUnit = props.initAgoUnit;
+});
+
+watch(
+  [
+    () => campaignsStore.state.pagination.page,
+    () => campaignsStore.state.filters.minIps,
+    () => campaignsStore.state.filters.minScore,
+    () => campaignsStore.state.filters.minLogsPerIp,
+    () => campaignsStore.state.filters.protocol,
+    () => campaignsStore.state.filters.timeMode,
+    () => campaignsStore.state.filters.agoValue,
+    () => campaignsStore.state.filters.agoUnit
+  ],
+  ([page, minIps, minScore, minLogsPerIp, protocol, timeMode, agoValue, agoUnit]) => {
+    const query = {};
+    if (page > 1) query.page = page;
+    if (minIps > 1) query.minIps = minIps;
+    if (minScore > 0) query.minScore = minScore;
+    if (minLogsPerIp > 1) query.minLogsPerIp = minLogsPerIp;
+    if (protocol && protocol !== 'http') query.protocol = protocol;
+    if (timeMode && timeMode !== 'ago') query.timeMode = timeMode;
+    if (agoValue && agoValue !== 7) query.agoValue = agoValue;
+    if (agoUnit && agoUnit !== 'days') query.agoUnit = agoUnit;
+
+    router.replace({ name: 'Campaigns', query }).catch(() => {});
+  },
+  { deep: true }
+);
 
 // Integrazione composable
 const {

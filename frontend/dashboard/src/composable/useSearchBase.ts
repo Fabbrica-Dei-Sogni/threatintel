@@ -68,6 +68,14 @@ export function useSearchBase(options: UseSearchBaseOptions) {
             query.attackProtocol = filtersValues[0] || undefined;
             query.logProtocol = filtersValues[1] || undefined;
             query.sessionCategory = filtersValues[2] || undefined;
+        } else if (name === 'Campaigns') {
+            query.minIps = filtersValues[0] > 1 ? filtersValues[0] : undefined;
+            query.minScore = filtersValues[1] > 0 ? filtersValues[1] : undefined;
+            query.minLogsPerIp = filtersValues[2] > 1 ? filtersValues[2] : undefined;
+            query.protocol = filtersValues[3] !== 'http' ? filtersValues[3] : undefined;
+            query.timeMode = filtersValues[4] !== 'ago' ? filtersValues[4] : undefined;
+            query.agoValue = filtersValues[5] !== 7 ? filtersValues[5] : undefined;
+            query.agoUnit = filtersValues[6] !== 'days' ? filtersValues[6] : undefined;
         }
 
         searchStore.saveQuery(name, query);

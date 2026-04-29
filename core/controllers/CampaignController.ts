@@ -65,32 +65,37 @@ export class CampaignController {
         const hash = req.body.hash;
         this.logger.info(`[CampaignController] Requesting campaign details for hash ${hash}`);
         try {
-            const { 
-                ips, 
-                minLogsPerIp = 1, minScore = 0, 
-                protocol = null, timeConfig = {},
-                page = 1, pageSize = 10 
-            } = req.body;
-            
-            if (!hash) {
-                res.status(400).json({ error: 'Hash mancante' });
+            if (!hash || typeof hash !== 'string') {
+                res.status(400).json({ error: 'Hash mancante o non valido' });
                 return;
             }
 
-            const pageNum = Math.max(1, parseInt(page as any) || 1);
-            const pageSizeNum = Math.max(1, parseInt(pageSize as any) || 10);
-            const minLogsNum = parseInt(minLogsPerIp as any) || 1;
-            const minScoreNum = parseFloat(minScore as any) || 0;
+            // Sanitizziamo i filtri di base
+            const cleanBody = sanitizeFilters(req.body, FilterAllowedFields.campaign);
+
+            const pageNum = sanitizePage(cleanBody.page || req.body.page);
+            const pageSizeNum = sanitizePageSize(cleanBody.pageSize || req.body.pageSize, 100, 10);
+            const minLogsNum = parseInt(cleanBody.minLogsPerIp as string || req.body.minLogsPerIp) || 1;
+            const minScoreNum = parseFloat(cleanBody.minScore as string || req.body.minScore) || 0;
+            
+            // Gestione timeConfig sicuro
+            const rawTimeConfig = req.body.timeConfig || {};
+            const safeTimeConfig = {
+                startTime: typeof rawTimeConfig.startTime === 'string' ? rawTimeConfig.startTime : undefined,
+                endTime: typeof rawTimeConfig.endTime === 'string' ? rawTimeConfig.endTime : undefined,
+                timeMode: typeof rawTimeConfig.timeMode === 'string' ? rawTimeConfig.timeMode : undefined,
+                agoValue: rawTimeConfig.agoValue ? parseInt(rawTimeConfig.agoValue as string) : undefined,
+                agoUnit: typeof rawTimeConfig.agoUnit === 'string' ? rawTimeConfig.agoUnit : undefined
+            };
 
             this.logger.debug(`[CampaignController] Params: page=${pageNum}, size=${pageSizeNum}, minLogs=${minLogsNum}, score=${minScoreNum}`);
 
             const campaign = await this.campaignService.getCampaignDetail({
-                ips,
                 hash,
                 minLogsPerIp: minLogsNum,
                 minScore: minScoreNum,
-                protocol,
-                timeConfig,
+                protocol: typeof cleanBody.protocol === 'string' ? cleanBody.protocol : (typeof req.body.protocol === 'string' ? req.body.protocol : null),
+                timeConfig: safeTimeConfig,
                 page: pageNum,
                 pageSize: pageSizeNum
             });

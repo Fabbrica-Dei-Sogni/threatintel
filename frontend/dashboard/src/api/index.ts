@@ -560,11 +560,12 @@ export async function fetchCampaigns({
     page = 1,
     pageSize = 10,
     selectedUris = [],
-    search = ''
+    search = '',
+    minCorrelations = 0
 }: FetchCampaignsParams = {}): Promise<FetchCampaignsResponse> {
     try {
         const response = await apiClient.get('/campaigns', {
-            params: { startTime, endTime, timeMode, agoValue, agoUnit, minIps, minScore, minLogsPerIp, protocol, page, pageSize, selectedUris, search }
+            params: { startTime, endTime, timeMode, agoValue, agoUnit, minIps, minScore, minLogsPerIp, minCorrelations, protocol, page, pageSize, selectedUris, search }
         });
         return response.data;
     } catch (error) {

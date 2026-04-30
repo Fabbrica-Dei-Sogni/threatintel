@@ -14,6 +14,7 @@ export interface CampaignsFilters {
     endDate: string | null;
     selectedUris: string[];
     search: string;
+    minCorrelations: number;
 }
 
 export interface CampaignsState {
@@ -33,6 +34,8 @@ export interface CampaignsState {
         maxScore: number;
         minLogsPerIp: number;
         maxLogsPerIp: number;
+        minCorrelations: number;
+        maxCorrelations: number;
         minDate: string | null;
         maxDate: string | null;
         globalMinDate: string | null;
@@ -56,6 +59,7 @@ const DEFAULT_STATE: CampaignsState = {
         minIps: 1,
         minScore: 0,
         minLogsPerIp: 1,
+        minCorrelations: 0,
         protocol: 'http',
         timeMode: 'ago',
         agoValue: 7,
@@ -80,6 +84,8 @@ const DEFAULT_STATE: CampaignsState = {
         maxScore: 100,
         minLogsPerIp: 1,
         maxLogsPerIp: 10,
+        minCorrelations: 0,
+        maxCorrelations: 10,
         minDate: null,
         maxDate: null,
         globalMinDate: null,

@@ -283,6 +283,7 @@
         "noHubs": "No correlations found",
         "hubSignal": "CORRELATIONS: {count}",
         "minIpsLabel": "Minimum number of involved IPs:",
+        "minCorrelationsLabel": "Minimum correlations:",
         "ipsInvolved": "{count} involved IPs",
         "totalLogs": "Total log volume",
         "firstSeen": "Activity Started",

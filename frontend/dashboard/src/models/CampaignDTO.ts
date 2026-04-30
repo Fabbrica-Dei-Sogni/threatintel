@@ -73,6 +73,7 @@ export interface FetchCampaignsParams {
     pageSize?: number;
     selectedUris?: string[];
     search?: string;
+    minCorrelations?: number;
 }
 
 export interface FetchCampaignsResponse {

@@ -23,12 +23,14 @@ export function useCampaignsDiscovery(
     initialStartDate: (string | null) | Ref<string | null> = null,
     initialEndDate: (string | null) | Ref<string | null> = null,
     initialSelectedUris: string[] | Ref<string[]> = [],
-    initialSearch: string | Ref<string> = ''
+    initialSearch: string | Ref<string> = '',
+    initialMinCorrelations: number | Ref<number> = 0
 ) {
     const minIps = toRef(initialMinIps);
     const campaignsStore = useCampaignsStore();
     const minScore = toRef(initialMinScore);
     const minLogsPerIp = toRef(initialMinLogsPerIp);
+    const minCorrelations = toRef(initialMinCorrelations);
     const protocol = toRef(initialProtocol);
     const timeMode = toRef(initialTimeMode);
     const agoValue = toRef(initialAgoValue);
@@ -44,6 +46,7 @@ export function useCampaignsDiscovery(
         minIps,
         minScore,
         minLogsPerIp,
+        minCorrelations,
         protocol,
         timeMode,
         agoValue,
@@ -68,6 +71,7 @@ export function useCampaignsDiscovery(
                 minIps: minIps.value,
                 minScore: minScore.value,
                 minLogsPerIp: minLogsPerIp.value,
+                minCorrelations: minCorrelations.value,
                 protocol: protocol.value,
                 page: page.value,
                 pageSize: pageSize.value,
@@ -85,6 +89,10 @@ export function useCampaignsDiscovery(
                 campaignsStore.state.metadata.maxScore = response.metadata.maxScore || 0;
                 campaignsStore.state.metadata.minLogsPerIp = response.metadata.minLogsPerIp || 0;
                 campaignsStore.state.metadata.maxLogsPerIp = response.metadata.maxLogsPerIp || 0;
+                // Gestione opzionale se il backend ritorna range di correlazioni
+                // campaignsStore.state.metadata.minCorrelations = response.metadata.minCorrelations || 0;
+                // campaignsStore.state.metadata.maxCorrelations = response.metadata.maxCorrelations || 10;
+                
                 campaignsStore.state.metadata.minDate = response.metadata.minDate || null;
                 campaignsStore.state.metadata.maxDate = response.metadata.maxDate || null;
                 campaignsStore.state.metadata.globalMinDate = response.metadata.globalMinDate || null;
@@ -130,6 +138,7 @@ export function useCampaignsDiscovery(
         minIps,
         minScore,
         minLogsPerIp,
+        minCorrelations,
         protocol,
         timeMode,
         agoValue,

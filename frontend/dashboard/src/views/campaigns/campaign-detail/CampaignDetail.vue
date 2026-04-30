@@ -349,7 +349,7 @@ const handleApplyIps = (ips) => {
 
 // Effettua il caricamento iniziale e reagisce al cambio pagina
 const triggerLoad = () => {
-  loadCampaign({
+  loadCampaign(props.hash, {
     minLogsPerIp: props.minLogsPerIp,
     minScore: props.minScore,
     protocol: props.protocol,
@@ -361,6 +361,23 @@ const triggerLoad = () => {
 
 onMounted(triggerLoad);
 watch(nodesPage, triggerLoad);
+
+// Reagisce al cambio dei parametri in URL (incluso l'hash se il componente viene riutilizzato)
+watch(() => [
+  props.hash,
+  props.minLogsPerIp,
+  props.minScore,
+  props.protocol,
+  props.timeMode,
+  props.agoValue,
+  props.agoUnit
+], (newVal, oldVal) => {
+  // Se è cambiato l'hash, resettiamo la pagina dei nodi
+  if (newVal[0] !== oldVal[0]) {
+    nodesPage.value = 1;
+  }
+  triggerLoad();
+});
 
 function formatDate(ts) {
   return formatFullDateTime(ts);

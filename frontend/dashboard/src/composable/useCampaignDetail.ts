@@ -50,7 +50,7 @@ export function useCampaignDetail(hash: string) {
         return campaign.value?.correlations || [];
     });
 
-    async function loadCampaign(params: {
+    async function loadCampaign(targetHash: string, params: {
         minLogsPerIp: number;
         minScore: number;
         protocol: string | null;
@@ -62,7 +62,7 @@ export function useCampaignDetail(hash: string) {
         error.value = null;
         try {
             const data = await fetchCampaignDetail({
-                hash,
+                hash: targetHash,
                 minLogsPerIp: params.minLogsPerIp,
                 minScore: params.minScore,
                 protocol: params.protocol,

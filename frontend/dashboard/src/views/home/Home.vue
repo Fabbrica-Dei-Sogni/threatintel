@@ -490,11 +490,12 @@
                       name: 'CampaignDetail',
                       params: { hash: item.hash },
                       query: {
-                        minLogs: dashboardState.rankings.attackMinLogs,
+                        minLogsPerIp: dashboardState.rankings.campaignMinLogsPerIp,
                         minScore: dashboardState.rankings.campaignMinScore,
                         timeMode: 'ago',
-                        agoValue: dashboardState.rankings.attackTimeValue,
-                        agoUnit: dashboardState.rankings.attackTimeUnit
+                        agoValue: dashboardState.rankings.campaignTimeValue,
+                        agoUnit: dashboardState.rankings.campaignTimeUnit,
+                        protocol: dashboardState.rankings.campaignProtocol
                       }
                     }" class="intel-det-btn" :data-noc-tooltip="t('common.detail')">
                       DET
@@ -514,10 +515,16 @@
 
                 <!-- Forensics Col -->
                 <div class="item-col item-col-forensics">
-                   <div class="time-row" :data-noc-tooltip="$t('campaigns.firstSeen')">
-                    <span class="date-part">{{ formatDateOnly(item.firstSeen) }}</span>
-                    <span class="time-part">{{ formatTimeOnly(item.firstSeen) }}</span>
-                  </div>
+                    <div v-if="item.correlationHubsCount > 0" class="mini-signal-indicator" 
+                         :class="{ 'high-intensity': item.correlationHubsCount > 2 }"
+                         :data-noc-tooltip="$t('campaigns.hubSignal', { count: item.correlationHubsCount })">
+                      <span class="signal-icon">📡</span>
+                      <span class="signal-val">{{ item.correlationHubsCount }}</span>
+                    </div>
+                    <div class="time-row" :data-noc-tooltip="$t('campaigns.firstSeen')">
+                      <span class="date-part">{{ formatDateOnly(item.firstSeen) }}</span>
+                      <span class="time-part">{{ formatTimeOnly(item.firstSeen) }}</span>
+                    </div>
                   <span class="duration-badge" v-if="item.lastSeen && item.lastSeen !== item.firstSeen">
                     ({{ computeDuration(item.firstSeen, item.lastSeen) }})
                   </span>

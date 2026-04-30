@@ -108,6 +108,17 @@
             </div>
           </div>
 
+          <div class="filter-group">
+            <label class="cyber-label">{{ t('campaigns.minCorrelationsLabel') }}</label>
+            <div class="tabs-row">
+              <button v-for="val in [0, 2, 5, 10]" :key="val" class="tab-btn"
+                :class="{ active: minCorrelations === val }"
+                @click="minCorrelations = (minCorrelations === val ? 0 : val)">
+                {{ val === 0 ? 'TUTTE' : (val === 10 ? '10+' : val) }}
+              </button>
+            </div>
+          </div>
+
           <div class="filter-group" v-if="dynamicLogsPerIpScale.length > 0 && campaignsStore.state.metadata.maxLogsPerIp > 0">
             <label class="cyber-label">LOGS/IP</label>
             <div class="tabs-row">
@@ -147,13 +158,11 @@
           
           <!-- Card Header: Fixed height for consistent alignment -->
           <div class="card-header-tech">
-            <div class="header-spacer"></div>
-            <div v-if="campaign.correlationHubsCount > 0" class="correlation-signal" :class="{ 'high-intensity': campaign.correlationHubsCount > 2 }">
-              <span class="signal-icon">📡</span>
-              <span class="signal-text">HUB: {{ campaign.correlationHubsCount }}</span>
-              <div class="signal-pulse"></div>
+            <div class="sample-url-header">
+              <span class="t-label-mini">{{ t('common.sample_url').toUpperCase() }}</span>
+              <div class="t-value-mini">{{ campaign.sampleUrl || '/' }}</div>
             </div>
-            <!-- Se non ci sono Hub, l'header rimane vuoto ma mantiene lo spazio -->
+            <div class="header-spacer"></div>
           </div>
 
           <!-- Core Metrics: Fixed Grid -->
@@ -172,9 +181,15 @@
             </div>
           </div>
 
-          <div class="card-target-section">
-             <span class="t-label">{{ t('common.sample_url').toUpperCase() }}</span>
-             <div class="t-value-wrap">{{ campaign.sampleUrl || '/' }}</div>
+          <div class="card-hub-section">
+            <div v-if="campaign.correlationHubsCount > 0" class="correlation-signal" :class="{ 'high-intensity': campaign.correlationHubsCount > 2 }">
+              <span class="signal-icon">📡</span>
+              <span class="signal-text">{{ t('campaigns.hubSignal', { count: campaign.correlationHubsCount }).toUpperCase() }}</span>
+              <div class="signal-pulse"></div>
+            </div>
+            <div v-else class="no-hub-signal">
+              {{ t('campaigns.noHubs').toUpperCase() }}
+            </div>
           </div>
 
           <div v-if="campaign.attackPatterns?.length" class="card-techniques-area">
@@ -231,7 +246,8 @@ const props = defineProps({
   initTimeMode: String,
   initAgoValue: Number,
   initAgoUnit: String,
-  initialUris: String // Comma separated string from query
+  initialUris: String, // Comma separated string from query
+  initialMinCorrelations: Number
 });
 
 const { t } = useI18n();
@@ -250,6 +266,7 @@ onMounted(() => {
   if (props.initAgoValue !== undefined) campaignsStore.state.filters.agoValue = props.initAgoValue;
   if (props.initAgoUnit !== undefined) campaignsStore.state.filters.agoUnit = props.initAgoUnit;
   if (props.initialUris) campaignsStore.state.filters.selectedUris = props.initialUris.split(',');
+  if (props.initialMinCorrelations !== undefined) campaignsStore.state.filters.minCorrelations = props.initialMinCorrelations;
 });
 
 watch(
@@ -262,9 +279,10 @@ watch(
     () => campaignsStore.state.filters.timeMode,
     () => campaignsStore.state.filters.agoValue,
     () => campaignsStore.state.filters.agoUnit,
-    () => campaignsStore.state.filters.selectedUris
+    () => campaignsStore.state.filters.selectedUris,
+    () => campaignsStore.state.filters.minCorrelations
   ],
-  ([page, minIps, minScore, minLogsPerIp, protocol, timeMode, agoValue, agoUnit, uris]) => {
+  ([page, minIps, minScore, minLogsPerIp, protocol, timeMode, agoValue, agoUnit, uris, minCorrelations]) => {
     const query = {};
     if (page > 1) query.page = page;
     if (minIps > 1) query.minIps = minIps;
@@ -275,6 +293,7 @@ watch(
     if (agoValue && agoValue !== 7) query.agoValue = agoValue;
     if (agoUnit && agoUnit !== 'days') query.agoUnit = agoUnit;
     if (uris && uris.length > 0) query.uris = uris.join(',');
+    if (minCorrelations > 0) query.minCorrelations = minCorrelations;
 
     router.replace({ name: 'Campaigns', query }).catch(() => {});
   },
@@ -292,6 +311,7 @@ const {
   minIps,
   minScore,
   minLogsPerIp,
+  minCorrelations,
   protocol,
   timeMode,
   agoValue,
@@ -309,7 +329,9 @@ const {
   toRef(campaignsStore.state.filters, 'minLogsPerIp'),
   toRef(campaignsStore.state.filters, 'startDate'),
   toRef(campaignsStore.state.filters, 'endDate'),
-  toRef(campaignsStore.state.filters, 'selectedUris')
+  toRef(campaignsStore.state.filters, 'selectedUris'),
+  toRef(campaignsStore.state.filters, 'search'),
+  toRef(campaignsStore.state.filters, 'minCorrelations')
 );
 
 // Scale dinamiche calcolate dai metadati del backend

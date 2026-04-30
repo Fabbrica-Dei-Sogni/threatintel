@@ -100,3 +100,9 @@
   border: 1px solid var(--cy-border) !important;
   opacity: 1 !important;
 }
+
+.skin-cyber.campaigns-page .no-hub-signal {
+  border-color: var(--cy-border) !important;
+  color: var(--cy-primary) !important;
+  opacity: 0.2 !important;
+}

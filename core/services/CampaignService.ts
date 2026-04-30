@@ -146,11 +146,9 @@ export class CampaignService {
             },
             {
                 $facet: {
-                    pagedData: [
+                    discoveryCandidates: [
                         { $match: { ipCount: { $gte: Number(minIps) }, averageScore: { $gte: Number(minScore) } } },
-                        { $sort: { firstSeen: -1 as const, ipCount: -1 as const } },
-                        { $skip: (page - 1) * pageSize },
-                        { $limit: pageSize }
+                        { $sort: { firstSeen: -1 as const, ipCount: -1 as const } }
                     ],
                     totalFiltered: [
                         { $match: { ipCount: { $gte: Number(minIps) }, averageScore: { $gte: Number(minScore) } } },
@@ -171,27 +169,43 @@ export class CampaignService {
                 }
             }
         ];
- 
+
         try {
             const [result] = await ThreatLog.aggregate(pipeline).allowDiskUse(true);
-            const data = result?.pagedData || [];
+            
+            // 1. Estraiamo tutti i candidati idonei
+            const allCandidates = result?.discoveryCandidates || [];
+            
+            // 2. Arricchimento e Filtraggio in memoria per correlazioni
+            const enrichedAndFiltered = allCandidates
+                .map((c: any) => {
+                    const hubs = calculateCorrelationHubs(c.timeInfo || []);
+                    const { timeInfo, ...rest } = c;
+                    return {
+                        ...rest,
+                        correlationHubsCount: hubs.length
+                    };
+                })
+                .filter((c: any) => c.correlationHubsCount >= Number(params.minCorrelations || 0));
+
+            // 3. Ordinamento e Paginazione Manuale (post-filtro correlazioni)
+            const totalCount = enrichedAndFiltered.length;
+            const sortedData = enrichedAndFiltered.sort((a, b) => {
+                const dateA = new Date(a.firstSeen).getTime();
+                const dateB = new Date(b.firstSeen).getTime();
+                return dateB - dateA || b.ipCount - a.ipCount;
+            });
+            
+            const pNum = Number(page);
+            const psNum = Number(pageSize);
+            const pagedData = sortedData.slice((pNum - 1) * psNum, pNum * psNum);
+
             const bIps = result?.boundsIps[0] || { min: 0, max: 0 };
             const bScore = result?.boundsScore[0] || { min: 0, max: 0 };
             const bLogs = result?.boundsLogsPerIp[0] || { min: 0, max: 0 };
-            const totalCount = result?.totalFiltered[0]?.total || 0;
-            
-            // Calcolo correlazioni per ogni campagna nella pagina
-            const enrichedCampaigns = data.map((c: any) => {
-                const hubs = calculateCorrelationHubs(c.timeInfo || []);
-                const { timeInfo, ...rest } = c; // Rimuoviamo timeInfo per non appesantire il payload
-                return {
-                    ...rest,
-                    correlationHubsCount: hubs.length
-                };
-            });
 
             return { 
-                campaigns: enrichedCampaigns, 
+                campaigns: pagedData, 
                 total: totalCount,
                 metadata: {
                     minIpCount: bIps.min || 0,

@@ -112,7 +112,8 @@ export class CampaignService {
                     firstSeen: { $min: '$firstSeen' },
                     lastSeen: { $max: '$lastSeen' },
                     sampleUrl: { $first: '$sampleUrl' },
-                    allIndicators: { $push: '$indicatorsPerIp' }
+                    allIndicators: { $push: '$indicatorsPerIp' },
+                    timeInfo: { $push: { ip: '$_id.ip', firstSeen: '$firstSeen', lastSeen: '$lastSeen' } }
                 }
             },
             {
@@ -125,6 +126,7 @@ export class CampaignService {
                     lastSeen: 1,
                     sampleUrl: 1,
                     averageScore: { $divide: ['$sumScore', '$totaleLogs'] },
+                    timeInfo: 1,
                     attackPatterns: {
                         $reduce: {
                             input: '$allIndicators',
@@ -170,8 +172,18 @@ export class CampaignService {
             const bLogs = result?.boundsLogsPerIp[0] || { min: 0, max: 0 };
             const totalCount = result?.totalFiltered[0]?.total || 0;
             
+            // Calcolo correlazioni per ogni campagna nella pagina
+            const enrichedCampaigns = data.map((c: any) => {
+                const hubs = calculateCorrelationHubs(c.timeInfo || []);
+                const { timeInfo, ...rest } = c; // Rimuoviamo timeInfo per non appesantire il payload
+                return {
+                    ...rest,
+                    correlationHubsCount: hubs.length
+                };
+            });
+
             return { 
-                campaigns: data, 
+                campaigns: enrichedCampaigns, 
                 total: totalCount,
                 metadata: {
                     minIpCount: bIps.min || 0,

@@ -144,6 +144,10 @@
               <span class="box-label">{{ t('attackDetail.avgScore').toUpperCase() }}</span>
               <span class="box-value">{{ campaign.averageScore?.toFixed(1) || '0.0' }}</span>
             </div>
+            <div class="metric-box correlation-box" v-if="campaign.correlationHubsCount > 0">
+              <span class="box-label">HUBS</span>
+              <span class="box-value">📡 {{ campaign.correlationHubsCount }}</span>
+            </div>
           </div>
 
           <div class="card-target">

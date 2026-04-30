@@ -494,7 +494,7 @@
 /* New Metrics Grid Layout */
 .card-metrics-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
     gap: 0.8rem;
 }
 
@@ -537,6 +537,8 @@
 .metric-box.danger-medium .box-value { color: #f39c12; text-shadow: 0 0 10px rgba(243, 156, 18, 0.3); }
 .metric-box.danger-low .box-value { color: #3498db; text-shadow: 0 0 10px rgba(52, 152, 219, 0.3); }
 .metric-box.danger-info .box-value { color: var(--theme-primary); text-shadow: 0 0 10px rgba(var(--theme-primary-rgb), 0.3); }
+.metric-box.correlation-box .box-value { color: #a78bfa; text-shadow: 0 0 10px rgba(167, 139, 250, 0.4); }
+.metric-box.correlation-box { border-color: rgba(167, 139, 250, 0.3); background: rgba(124, 77, 255, 0.05); }
 
 /* Target URI section */
 .card-target {

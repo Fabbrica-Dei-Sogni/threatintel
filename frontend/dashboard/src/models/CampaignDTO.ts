@@ -38,6 +38,7 @@ export interface CampaignSummaryDTO {
     firstSeen: string;
     lastSeen: string;
     protocols: string[];
+    correlationHubsCount?: number;
 }
 
 export interface CorrelationWindowDTO {

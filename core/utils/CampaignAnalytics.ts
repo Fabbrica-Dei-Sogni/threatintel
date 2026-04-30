@@ -18,51 +18,52 @@ export interface NodeTimeInfo {
 export function calculateCorrelationHubs(nodes: NodeTimeInfo[]): CorrelationWindow[] {
     if (!nodes || nodes.length < 2) return [];
 
-    // 1. Tutti i timestamps rilevanti
-    const ts = new Set<number>();
+    // 1. Creazione eventi (inizio e fine attività)
+    const events: { time: number; type: number; ip: string }[] = [];
     nodes.forEach(n => {
-        if (n.firstSeen) ts.add(new Date(n.firstSeen).getTime());
-        if (n.lastSeen) ts.add(new Date(n.lastSeen).getTime());
+        const start = new Date(n.firstSeen).getTime();
+        const end = new Date(n.lastSeen).getTime();
+        if (!isNaN(start) && !isNaN(end)) {
+            events.push({ time: start, type: 1, ip: n.ip });  // 1 = START
+            events.push({ time: end, type: -1, ip: n.ip }); // -1 = END
+        }
     });
-    const sortedTs = Array.from(ts).sort((a, b) => a - b);
 
-    // 2. Per ogni intervallo, vediamo chi è attivo
+    // 2. Ordinamento eventi per tempo (in caso di parità, processiamo prima gli START)
+    events.sort((a, b) => a.time - b.time || b.type - a.type);
+
     const windows: CorrelationWindow[] = [];
-    for (let i = 0; i < sortedTs.length - 1; i++) {
-        const start = sortedTs[i];
-        const end = sortedTs[i + 1];
-        const mid = (start + end) / 2;
+    let activeIps = new Set<string>();
+    let lastTime = events[0].time;
 
-        const activeIps = nodes
-            .filter(n => {
-                const nStart = new Date(n.firstSeen).getTime();
-                const nEnd = new Date(n.lastSeen).getTime();
-                return mid >= nStart && mid <= nEnd;
-            })
-            .map(n => n.ip);
+    // 3. Sweep-line: scansione degli eventi
+    for (const event of events) {
+        const currentTime = event.time;
 
-        if (activeIps.length > 1) {
-            windows.push({ start, end, ips: activeIps });
+        // Se c'è un intervallo e avevamo più di un IP attivo, salviamo la finestra
+        if (currentTime > lastTime && activeIps.size > 1) {
+            const ipsArray = Array.from(activeIps).sort();
+            
+            // Unione intelligente: se l'ultima finestra ha gli stessi IP, la allunghiamo
+            const lastWindow = windows[windows.length - 1];
+            if (lastWindow && 
+                lastWindow.ips.length === ipsArray.length && 
+                lastWindow.ips.every((ip, idx) => ip === ipsArray[idx])) {
+                lastWindow.end = currentTime;
+            } else {
+                windows.push({ start: lastTime, end: currentTime, ips: ipsArray });
+            }
         }
-    }
 
-    // 3. Uniamo le finestre consecutive con gli stessi IP
-    if (windows.length === 0) return [];
-
-    const merged: CorrelationWindow[] = [windows[0]];
-    for (let i = 1; i < windows.length; i++) {
-        const last = merged[merged.length - 1];
-        const current = windows[i];
-
-        const sameIps = last.ips.length === current.ips.length &&
-            last.ips.every(ip => current.ips.includes(ip));
-
-        if (sameIps) {
-            last.end = current.end;
+        // Aggiorniamo il set degli IP attivi
+        if (event.type === 1) {
+            activeIps.add(event.ip);
         } else {
-            merged.push(current);
+            activeIps.delete(event.ip);
         }
+        
+        lastTime = currentTime;
     }
 
-    return merged;
+    return windows;
 }

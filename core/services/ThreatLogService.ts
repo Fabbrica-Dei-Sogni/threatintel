@@ -667,74 +667,103 @@ export class ThreatLogService {
 
         const effectiveLimit = limit > 0 ? limit : 1000;
 
-        // Pipeline lineare per evitare facet annidati e garantire coerenza
+        // Pipeline definitiva: separa il traffico globale dall'analisi delle minacce filtrata
         const results = await ThreatLog.aggregate([
             { $match: timeframeMatch },
-            // Fase 1: Raggruppamento per IP per calcolare i totali per attore
-            {
-                $group: {
-                    _id: "$request.ip",
-                    totalLogs: { $sum: 1 },
-                    suspiciousLogs: {
-                        $sum: {
-                            $cond: [
-                                {
-                                    $and: [
-                                        { $eq: ['$fingerprint.suspicious', true] },
-                                        { $gte: ['$fingerprint.score', minScore] }
-                                    ]
-                                },
-                                1,
-                                0
-                            ]
-                        }
-                    },
-                    country: { $first: "$geo.country" },
-                    indicators: { $push: "$fingerprint.indicators" },
-                    scores: { $push: "$fingerprint.score" }
-                }
-            },
-            // Fase 2: Applicazione della soglia minima di log (minLogs)
-            { $match: { totalLogs: { $gte: minLogs } } },
-            // Fase 3: Calcolo delle statistiche globali su dati filtrati
             {
                 $facet: {
-                    scoreDistribution: [
-                        { $unwind: "$scores" },
-                        { $group: { _id: null, min: { $min: "$scores" }, max: { $max: "$scores" }, avg: { $avg: "$scores" } } }
-                    ],
-                    mainStats: [
+                    // 1. Traffico Totale e Distribuzione Score (UNFILTERED)
+                    global: [
                         {
                             $group: {
                                 _id: null,
-                                totalRequests: { $sum: "$totalLogs" },
-                                suspiciousRequests: { $sum: "$suspiciousLogs" },
-                                ips: { $push: "$_id" }
+                                totalTraffic: { $sum: 1 },
+                                min: { $min: "$fingerprint.score" },
+                                max: { $max: "$fingerprint.score" },
+                                avg: { $avg: "$fingerprint.score" }
                             }
                         }
                     ],
+                    // 2. Conteggio Minacce Attenzionate (FILTERED BY minLogs)
+                    threatsCount: [
+                        {
+                            $group: {
+                                _id: "$request.ip",
+                                count: { $sum: 1 },
+                                isSuspicious: {
+                                    $max: {
+                                        $cond: [
+                                            { $and: [{ $eq: ['$fingerprint.suspicious', true] }, { $gte: ['$fingerprint.score', minScore] }] },
+                                            1, 0
+                                        ]
+                                    }
+                                }
+                            }
+                        },
+                        { $match: { count: { $gte: minLogs }, isSuspicious: 1 } },
+                        { $count: "count" }
+                    ],
+                    // 3. Top Paesi (FILTERED BY minLogs)
                     topCountries: [
-                        { $match: { suspiciousLogs: { $gt: 0 }, country: { $exists: true, $ne: null } } },
-                        { $group: { _id: '$country', count: { $sum: "$suspiciousLogs" } } },
+                        {
+                            $group: {
+                                _id: "$request.ip",
+                                count: { $sum: 1 },
+                                country: { $first: "$geo.country" },
+                                isSuspicious: {
+                                    $max: {
+                                        $cond: [
+                                            { $and: [{ $eq: ['$fingerprint.suspicious', true] }, { $gte: ['$fingerprint.score', minScore] }] },
+                                            1, 0
+                                        ]
+                                    }
+                                }
+                            }
+                        },
+                        { $match: { count: { $gte: minLogs }, isSuspicious: 1, country: { $exists: true, $ne: null } } },
+                        { $group: { _id: "$country", count: { $sum: 1 } } },
                         { $sort: { count: -1 } },
                         { $limit: effectiveLimit }
                     ],
+                    // 4. Top Indicators (FILTERED BY minLogs)
                     topIndicators: [
-                        { $match: { suspiciousLogs: { $gt: 0 } } },
+                        {
+                            $group: {
+                                _id: "$request.ip",
+                                count: { $sum: 1 },
+                                indicators: { $addToSet: "$fingerprint.indicators" },
+                                isSuspicious: {
+                                    $max: {
+                                        $cond: [
+                                            { $and: [{ $eq: ['$fingerprint.suspicious', true] }, { $gte: ['$fingerprint.score', minScore] }] },
+                                            1, 0
+                                        ]
+                                    }
+                                }
+                            }
+                        },
+                        { $match: { count: { $gte: minLogs }, isSuspicious: 1 } },
                         { $unwind: "$indicators" },
                         { $unwind: "$indicators" },
-                        { $group: { _id: "$indicators", count: { $sum: 1 } } },
+                        { $group: { _id: { ip: "$_id", ind: "$indicators" } } },
+                        { $group: { _id: "$_id.ind", count: { $sum: 1 } } },
                         { $sort: { count: -1 } },
                         { $limit: effectiveLimit }
+                    ],
+                    // 5. Nodi Unici (FILTERED BY minLogs)
+                    uniqueIPs: [
+                        { $group: { _id: "$request.ip", count: { $sum: 1 } } },
+                        { $match: { count: { $gte: minLogs } } },
+                        { $group: { _id: null, ips: { $push: "$_id" } } }
                     ]
                 }
             }
         ]);
 
         const facet = results[0];
-        const mainStats = facet.mainStats[0] || { totalRequests: 0, suspiciousRequests: 0, ips: [] };
+        const global = facet.global[0] || { totalTraffic: 0, min: 0, max: 100, avg: 15 };
+        const threats = facet.threatsCount[0] || { count: 0 };
 
-        // Formattazione per il frontend
         const countriesMap: Record<string, number> = {};
         (facet.topCountries || []).forEach((c: any) => { countriesMap[c._id] = c.count; });
 
@@ -742,12 +771,12 @@ export class ThreatLogService {
         (facet.topIndicators || []).forEach((i: any) => { indicatorsMap[i._id] = i.count; });
 
         return {
-            totalRequests: mainStats.totalRequests,
-            suspiciousRequests: mainStats.suspiciousRequests,
+            totalRequests: global.totalTraffic,
+            suspiciousRequests: threats.count,
             topCountries: countriesMap,
             topIndicators: indicatorsMap,
-            uniqueIPs: mainStats.ips || [],
-            scoreDistribution: facet.scoreDistribution[0] || { min: 0, max: 100, avg: 15 }
+            uniqueIPs: facet.uniqueIPs[0]?.ips || [],
+            scoreDistribution: { min: global.min, max: global.max, avg: global.avg }
         };
     }
 

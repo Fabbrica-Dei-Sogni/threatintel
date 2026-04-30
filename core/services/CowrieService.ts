@@ -271,7 +271,7 @@ export class CowrieService implements ILongRunningService {
 
         for (const [key, value] of Object.entries(safeFilters)) {
             if (typeof value === 'string') {
-                mongoFilters[key] = { $regex: value, $options: 'i' };
+                mongoFilters[key] = { $regex: escapeRegex(value), $options: 'i' };
             } else if (value !== undefined && value !== null) {
                 mongoFilters[key] = value;
             }

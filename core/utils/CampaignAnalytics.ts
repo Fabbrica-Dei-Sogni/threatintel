@@ -29,8 +29,8 @@ export function calculateCorrelationHubs(nodes: NodeTimeInfo[]): CorrelationWind
         }
     });
 
-    // 2. Ordinamento eventi per tempo (in caso di parità, processiamo prima gli START)
-    events.sort((a, b) => a.time - b.time || b.type - a.type);
+    // 2. Ordinamento eventi per tempo (in caso di parità, processiamo prima gli END per favorire l'unione di segmenti contigui)
+    events.sort((a, b) => a.time - b.time || a.type - b.type);
 
     const windows: CorrelationWindow[] = [];
     let activeIps = new Set<string>();
@@ -48,7 +48,8 @@ export function calculateCorrelationHubs(nodes: NodeTimeInfo[]): CorrelationWind
             const lastWindow = windows[windows.length - 1];
             if (lastWindow && 
                 lastWindow.ips.length === ipsArray.length && 
-                lastWindow.ips.every((ip, idx) => ip === ipsArray[idx])) {
+                lastWindow.ips.every((ip, idx) => ip === ipsArray[idx]) &&
+                lastWindow.end === lastTime) {
                 lastWindow.end = currentTime;
             } else {
                 windows.push({ start: lastTime, end: currentTime, ips: ipsArray });

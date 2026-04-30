@@ -26,6 +26,7 @@ export interface CampaignDetailDTO {
     lastSeen: string;
     sampleUrl?: string;
     allIps: string[];
+    correlations?: CorrelationWindowDTO[];
     nodes: CampaignNodeDTO[];
 }
 

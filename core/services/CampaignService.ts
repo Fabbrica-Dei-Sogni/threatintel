@@ -4,6 +4,7 @@ import { LOGGER_TOKEN } from '../di/tokens';
 import ThreatLog from '../models/ThreatLogSchema';
 import { ForensicPipelineService } from './forense/ForensicPipelineService';
 import { TimeFilterStage } from './forense/pipeline/stages/TimeFilterStage';
+import { calculateCorrelationHubs } from '../utils/CampaignAnalytics';
 
 @injectable()
 export class CampaignService {
@@ -272,7 +273,8 @@ export class CampaignService {
                                 clusterFirstSeen: { $min: '$firstSeen' },
                                 clusterLastSeen: { $max: '$lastSeen' },
                                 sampleUrl: { $first: '$sampleUrl' },
-                                allIps: { $push: '$ip' }
+                                allIps: { $push: '$ip' },
+                                timeInfo: { $push: { ip: '$ip', firstSeen: '$firstSeen', lastSeen: '$lastSeen' } }
                             }
                         }
                     ],
@@ -287,7 +289,11 @@ export class CampaignService {
 
         try {
             const [result] = await ThreatLog.aggregate(pipeline).allowDiskUse(true);
-            const meta = result?.meta[0] || { ipCount: 0, clusterLogs: 0, clusterAvgScore: 0 };
+            const meta = result?.meta[0] || { ipCount: 0, clusterLogs: 0, clusterAvgScore: 0, timeInfo: [] };
+            
+            // Calcolo correlazioni su tutti i nodi (non solo quelli paginati)
+            const correlations = calculateCorrelationHubs(meta.timeInfo || []);
+
             return {
                 hash,
                 ipCount: meta.ipCount,
@@ -297,6 +303,7 @@ export class CampaignService {
                 lastSeen: meta.clusterLastSeen,
                 sampleUrl: meta.sampleUrl,
                 allIps: meta.allIps || [],
+                correlations,
                 nodes: result?.nodes || [],
                 page, pageSize
             };

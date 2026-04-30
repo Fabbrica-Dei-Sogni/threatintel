@@ -3,7 +3,6 @@ import { useRouter, useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { fetchCampaignDetail } from '../api';
 import { useCampaignsStore } from '../stores/campaigns';
-import { calculateCorrelationHubs } from '../utils/campaignUtils';
 import type { CampaignDetailDTO } from '../models/CampaignDTO';
 
 export function useCampaignDetail(hash: string) {
@@ -34,10 +33,9 @@ export function useCampaignDetail(hash: string) {
     
     const isTargetedMode = computed(() => selectedIps.value.length > 0);
 
-    // DTO delle correlazioni calcolato sui nodi correnti
+    // DTO delle correlazioni fornito dal backend (su tutti gli IP della campagna)
     const correlationHubs = computed(() => {
-        if (!campaign.value?.nodes) return [];
-        return calculateCorrelationHubs(campaign.value.nodes);
+        return campaign.value?.correlations || [];
     });
 
     async function loadCampaign(params: {

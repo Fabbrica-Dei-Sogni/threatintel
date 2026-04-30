@@ -73,14 +73,17 @@ const visibleRange = computed(() => {
 
 const chartData = computed(() => {
     const sortedTimesForNode = (node) => {
-        // 1. Trova le finestre di intersezione basandosi sui nodi filtrati (selezionati)
-        // Se l'utente ha selezionato degli IP, calcoliamo le intersezioni SOLO tra quelli
-        const intersections = filteredNodes.value
-            .filter(other => other.ip !== node.ip)
-            .map(other => {
-                const start = Math.max(dayjs(node.firstSeen).valueOf(), dayjs(other.firstSeen).valueOf());
-                const end = Math.min(dayjs(node.lastSeen).valueOf(), dayjs(other.lastSeen).valueOf());
-                return start < end ? { start, end } : null;
+        // 1. Usiamo gli hub del backend per trovare le intersezioni di questo nodo
+        // Consideriamo un'intersezione valida se coinvolge il nodo corrente e almeno un altro nodo
+        // che fa parte della selezione attiva (o di tutti se nulla è selezionato).
+        const intersections = props.correlationHubs
+            .filter(hub => hub.ips.includes(node.ip))
+            .map(hub => {
+                const othersInSelection = hub.ips.filter(ip => 
+                    ip !== node.ip && 
+                    (props.selectedIps.length === 0 || props.selectedIps.includes(ip))
+                );
+                return othersInSelection.length > 0 ? { start: hub.start, end: hub.end } : null;
             })
             .filter(i => i !== null);
 
@@ -118,16 +121,19 @@ const chartData = computed(() => {
             label: node.ip,
             // Per ogni punto, calcoliamo esattamente chi altro era attivo in quel momento
             data: sortedTimes.map(t => {
-                const activeOthers = filteredNodes.value
-                    .filter(other => other.ip !== node.ip)
-                    .filter(other => {
-                        const start = dayjs(other.firstSeen).valueOf();
-                        const end = dayjs(other.lastSeen).valueOf();
-                        return t >= start && t <= end;
-                    })
-                    .map(other => other.ip);
+                // Troviamo gli IP contemporanei usando i dati del backend
+                const othersSet = new Set();
+                props.correlationHubs
+                    .filter(hub => t >= hub.start && t <= hub.end && hub.ips.includes(node.ip))
+                    .forEach(hub => {
+                        hub.ips.forEach(ip => {
+                            if (ip !== node.ip && (props.selectedIps.length === 0 || props.selectedIps.includes(ip))) {
+                                othersSet.add(ip);
+                            }
+                        });
+                    });
                 
-                return { x: t, y: node.ip, activeOthers };
+                return { x: t, y: node.ip, activeOthers: Array.from(othersSet) };
             }),
             borderColor: baseColor,
             borderWidth: isSelected ? 3 : 1.5,

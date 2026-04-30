@@ -10,6 +10,16 @@ export default (manageLimitController: ManageLimitController) => {
      *   post:
      *     tags: [System & Security]
      *     summary: Aggiunge manualmente un IP alla blacklist (violazioni)
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             required: [ip]
+     *             properties:
+     *               ip:
+     *                 type: string
      *     responses:
      *       200:
      *         description: IP aggiunto alla blacklist.
@@ -22,6 +32,16 @@ export default (manageLimitController: ManageLimitController) => {
      *   post:
      *     tags: [System & Security]
      *     summary: Rimuove manualmente un IP dalla blacklist
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             required: [ip]
+     *             properties:
+     *               ip:
+     *                 type: string
      *     responses:
      *       200:
      *         description: IP rimosso dalla blacklist.

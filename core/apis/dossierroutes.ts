@@ -11,6 +11,34 @@ export default (controller: DossierController, authMiddleware: AuthMiddleware) =
      *   get:
      *     tags: [Dossier & Forensics]
      *     summary: Elenca tutti i dossier investigativi
+     *     parameters:
+     *       - name: status
+     *         in: query
+     *         schema:
+     *           type: string
+     *       - name: tags
+     *         in: query
+     *         description: Filtra per tag (separati da virgola)
+     *         schema:
+     *           type: string
+     *       - name: ip
+     *         in: query
+     *         schema:
+     *           type: string
+     *       - name: search
+     *         in: query
+     *         schema:
+     *           type: string
+     *       - name: page
+     *         in: query
+     *         schema:
+     *           type: integer
+     *           default: 1
+     *       - name: pageSize
+     *         in: query
+     *         schema:
+     *           type: integer
+     *           default: 20
      *     responses:
      *       200:
      *         description: Elenco dossier.
@@ -47,6 +75,20 @@ export default (controller: DossierController, authMiddleware: AuthMiddleware) =
      *         application/json:
      *           schema:
      *             type: object
+     *             required: [title, sections]
+     *             properties:
+     *               title:
+     *                 type: string
+     *               description:
+     *                 type: string
+     *               sections:
+     *                 type: array
+     *                 items:
+     *                   type: object
+     *               tags:
+     *                 type: array
+     *                 items:
+     *                   type: string
      *     responses:
      *       201:
      *         description: Dossier creato.
@@ -65,6 +107,28 @@ export default (controller: DossierController, authMiddleware: AuthMiddleware) =
      *         required: true
      *         schema:
      *           type: string
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             properties:
+     *               title:
+     *                 type: string
+     *               description:
+     *                 type: string
+     *               status:
+     *                 type: string
+     *                 enum: [open, closed, archived]
+     *               sections:
+     *                 type: array
+     *                 items:
+     *                   type: object
+     *               tags:
+     *                 type: array
+     *                 items:
+     *                   type: string
      *     responses:
      *       200:
      *         description: Dossier aggiornato.
@@ -101,6 +165,23 @@ export default (controller: DossierController, authMiddleware: AuthMiddleware) =
      *         required: true
      *         schema:
      *           type: string
+     *       - name: format
+     *         in: query
+     *         schema:
+     *           type: string
+     *           enum: [html, pdf]
+     *           default: pdf
+     *       - name: style
+     *         in: query
+     *         schema:
+     *           type: string
+     *           enum: [classic, hud, telex]
+     *           default: classic
+     *       - name: locale
+     *         in: query
+     *         schema:
+     *           type: string
+     *           default: it-IT
      *     responses:
      *       200:
      *         description: File esportato con successo.

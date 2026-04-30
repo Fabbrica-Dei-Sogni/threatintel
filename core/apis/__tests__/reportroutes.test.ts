@@ -50,7 +50,7 @@ describe('ReportRoutes API', () => {
             expect(response.headers['content-type']).toBe('application/pdf');
             expect(response.headers['content-disposition']).toBe('attachment; filename=dossier_attack_1.2.3.4.pdf');
             expect(response.body).toEqual(fakePdfBuffer);
-            expect(mockReportService.generateDetailReport).toHaveBeenCalledWith('attack', '1.2.3.4', 'pdf', 'it-IT', 'classic');
+            expect(mockReportService.generateDetailReport).toHaveBeenCalledWith('attack', '1.2.3.4', 'pdf', 'it-IT', 'classic', undefined);
         });
 
         it('should generate an HTML report for an IP attack successfully', async () => {
@@ -64,7 +64,7 @@ describe('ReportRoutes API', () => {
             expect(response.status).toBe(200);
             expect(response.headers['content-type']).toContain('text/html');
             expect(response.text).toBe(fakeHtml);
-            expect(mockReportService.generateDetailReport).toHaveBeenCalledWith('attack', '1.2.3.4', 'html', 'it-IT', 'classic');
+            expect(mockReportService.generateDetailReport).toHaveBeenCalledWith('attack', '1.2.3.4', 'html', 'it-IT', 'classic', undefined);
         });
 
         it('should generate a PDF report for a telnet session successfully', async () => {
@@ -78,7 +78,7 @@ describe('ReportRoutes API', () => {
             expect(response.status).toBe(200);
             expect(response.headers['content-type']).toBe('application/pdf');
             expect(response.headers['content-disposition']).toBe('attachment; filename=dossier_telnet_session123.pdf');
-            expect(mockReportService.generateDetailReport).toHaveBeenCalledWith('telnet', 'session123', 'pdf', 'en-US', 'hud');
+            expect(mockReportService.generateDetailReport).toHaveBeenCalledWith('telnet', 'session123', 'pdf', 'en-US', 'hud', undefined);
         });
 
         it('should return 400 if ID is not provided', async () => {
@@ -87,7 +87,7 @@ describe('ReportRoutes API', () => {
                 .query({ type: 'attack' }); // ip o sessionId mancante
 
             expect(response.status).toBe(400);
-            expect(response.body.error).toBe('È necessario fornire un ID valido per il tipo attack');
+            expect(response.body.error).toBe('È necessario fornire un ID o una lista IP valida per il tipo attack');
             expect(mockReportService.generateDetailReport).not.toHaveBeenCalled();
         });
 
@@ -112,7 +112,7 @@ describe('ReportRoutes API', () => {
                 .query({ ip: '1.2.3.4' });
 
             // 'attack' è il tipo di default, 'pdf' è il formato di default, 'it-IT' locale, 'classic' stile
-            expect(mockReportService.generateDetailReport).toHaveBeenCalledWith('attack', '1.2.3.4', 'pdf', 'it-IT', 'classic');
+            expect(mockReportService.generateDetailReport).toHaveBeenCalledWith('attack', '1.2.3.4', 'pdf', 'it-IT', 'classic', undefined);
         });
 
     });

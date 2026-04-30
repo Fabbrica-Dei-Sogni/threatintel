@@ -72,6 +72,15 @@ export default (configController: ConfigController, authMiddleware: AuthMiddlewa
      *     summary: Ricerca tra le chiavi di configurazione
      *     security:
      *       - BearerAuth: []
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             properties:
+     *               query:
+     *                 type: string
      *     responses:
      *       200:
      *         description: Risultati della ricerca.

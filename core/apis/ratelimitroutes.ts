@@ -10,6 +10,19 @@ export default (rateLimitController: RateLimitController) => {
      *   post:
      *     tags: [System & Security]
      *     summary: Ricerca nei log dei blocchi di rate limiting
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             properties:
+     *               page:
+     *                 type: integer
+     *               pageSize:
+     *                 type: integer
+     *               filters:
+     *                 type: object
      *     responses:
      *       200:
      *         description: Risultati ricerca.

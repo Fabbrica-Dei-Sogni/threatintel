@@ -280,6 +280,8 @@
         "title": "Kampagnen",
         "homeButton": "Kampagnen",
         "noCampaignsFound": "Keine verteilten Kampagnen erkannt",
+        "noHubs": "Keine Korrelationen gefunden",
+        "hubSignal": "KORRELATIONEN: {count}",
         "minIpsLabel": "Minimale Anzahl beteiligter IPs:",
         "ipsInvolved": "{count} beteiligte IPs",
         "totalLogs": "Gesamtes Log-Volumen",

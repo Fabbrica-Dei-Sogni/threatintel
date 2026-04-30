@@ -133,13 +133,11 @@
           
           <!-- Card Header: Fixed height for consistent alignment -->
           <div class="card-header-tech">
-            <div class="header-spacer"></div>
-            <div v-if="campaign.correlationHubsCount > 0" class="correlation-signal" :class="{ 'high-intensity': campaign.correlationHubsCount > 2 }">
-              <span class="signal-icon">📡</span>
-              <span class="signal-text">HUB: {{ campaign.correlationHubsCount }}</span>
-              <div class="signal-pulse"></div>
+            <div class="sample-url-header">
+              <span class="t-label-mini">{{ t('common.sample_url').toUpperCase() }}</span>
+              <div class="t-value-mini">{{ campaign.sampleUrl || '/' }}</div>
             </div>
-            <!-- Se non ci sono Hub, l'header rimane vuoto ma mantiene lo spazio -->
+            <div class="header-spacer"></div>
           </div>
 
           <!-- Core Metrics: Fixed Grid -->
@@ -158,9 +156,15 @@
             </div>
           </div>
 
-          <div class="card-target-section">
-             <span class="t-label">{{ t('common.sample_url').toUpperCase() }}</span>
-             <div class="t-value-wrap">{{ campaign.sampleUrl || '/' }}</div>
+          <div class="card-hub-section">
+            <div v-if="campaign.correlationHubsCount > 0" class="correlation-signal" :class="{ 'high-intensity': campaign.correlationHubsCount > 2 }">
+              <span class="signal-icon">📡</span>
+              <span class="signal-text">{{ t('campaigns.hubSignal', { count: campaign.correlationHubsCount }).toUpperCase() }}</span>
+              <div class="signal-pulse"></div>
+            </div>
+            <div v-else class="no-hub-signal">
+              {{ t('campaigns.noHubs').toUpperCase() }}
+            </div>
           </div>
 
           <div v-if="campaign.attackPatterns?.length" class="card-techniques-area">

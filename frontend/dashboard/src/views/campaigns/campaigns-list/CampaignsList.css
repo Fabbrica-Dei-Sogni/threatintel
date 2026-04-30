@@ -481,126 +481,191 @@
     cursor: pointer;
     display: flex;
     flex-direction: column;
-    gap: 1.2rem;
+    gap: 1rem;
 }
 
 .campaign-card:hover {
     transform: translateY(-4px);
     border-color: var(--theme-primary);
-    background: rgba(var(--theme-primary-rgb), 0.05);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    background: rgba(var(--theme-primary-rgb), 0.08);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
 }
 
-/* New Metrics Grid Layout */
-.card-metrics-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
-    gap: 0.8rem;
-}
-
-.metric-box {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 0.6rem;
-    background: rgba(0, 0, 0, 0.3);
-    border: 1px solid var(--theme-border);
-    border-radius: 4px;
-    transition: all 0.2s ease;
-}
-
-.metric-box:hover {
-    border-color: var(--theme-primary);
-    background: rgba(var(--theme-primary-rgb), 0.1);
-}
-
-.box-label {
-    font-size: 0.5rem;
-    text-transform: uppercase;
-    opacity: 0.6;
-    margin-bottom: 0.3rem;
-    letter-spacing: 1px;
-    font-family: 'JetBrains Mono', monospace;
-    font-weight: 800;
-}
-
-.box-value {
-    font-weight: 900;
-    font-size: 1.1rem;
-    font-family: 'JetBrains Mono', monospace;
-    color: #fff;
-}
-
-/* Score colors inherited from Forensic style */
-.metric-box.danger-high .box-value { color: #ff3366; text-shadow: 0 0 10px rgba(255, 51, 102, 0.3); }
-.metric-box.danger-medium .box-value { color: #f39c12; text-shadow: 0 0 10px rgba(243, 156, 18, 0.3); }
-.metric-box.danger-low .box-value { color: #3498db; text-shadow: 0 0 10px rgba(52, 152, 219, 0.3); }
-.metric-box.danger-info .box-value { color: var(--theme-primary); text-shadow: 0 0 10px rgba(var(--theme-primary-rgb), 0.3); }
-.metric-box.correlation-box .box-value { color: #a78bfa; text-shadow: 0 0 10px rgba(167, 139, 250, 0.4); }
-.metric-box.correlation-box { border-color: rgba(167, 139, 250, 0.3); background: rgba(124, 77, 255, 0.05); }
-
-/* Target URI section */
-.card-target {
-    display: flex;
-    flex-direction: column;
-    gap: 0.2rem;
-}
-
-.target-label {
-    font-size: 0.55rem;
-    text-transform: uppercase;
-    color: var(--theme-primary);
-    opacity: 0.7;
-    font-weight: 800;
-    letter-spacing: 1.5px;
-}
-
-.target-value {
-    font-weight: 600;
-    font-size: 0.85rem;
-    font-family: 'JetBrains Mono', monospace;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    opacity: 0.9;
-}
-
-.card-techniques {
-    padding-top: 0.5rem;
-    border-top: 1px dashed rgba(var(--theme-primary-rgb), 0.1);
-}
-
-.tech-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.4rem;
-}
-
-.tech-tag {
-    font-size: 0.6rem;
-    padding: 2px 8px;
-    background: rgba(var(--theme-primary-rgb, 0, 255, 65), 0.05);
-    border: 1px solid rgba(var(--theme-primary-rgb, 0, 255, 65), 0.2);
-    color: var(--theme-primary);
-    border-radius: 10px;
-    text-transform: uppercase;
-    font-weight: 800;
-    letter-spacing: 0.4px;
-}
-
-.card-footer {
+/* Header Tech Section */
+.card-header-tech {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    padding-top: 0.8rem;
-    border-top: 1px solid var(--theme-border);
+    align-items: flex-start;
+    min-height: 20px;
 }
 
-.timeline-info {
-    font-size: 0.65rem;
-    opacity: 0.5;
+.header-spacer { flex: 1; }
+
+/* Correlation Signal */
+.correlation-signal {
+    position: relative;
+    background: rgba(124, 77, 255, 0.1);
+    border: 1px solid rgba(124, 77, 255, 0.3);
+    padding: 2px 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border-radius: 2px;
+}
+
+.signal-icon { font-size: 0.7rem; }
+.signal-text {
     font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem;
+    color: #a78bfa;
+    font-weight: 900;
+}
+
+.signal-pulse {
+    position: absolute;
+    top: -1px; left: -1px; right: -1px; bottom: -1px;
+    border: 1px solid #7C4DFF;
+    border-radius: 2px;
+    opacity: 0;
+    animation: signal-pulse-anim 2s infinite;
+}
+
+@keyframes signal-pulse-anim {
+    0% { transform: scale(1); opacity: 0.5; }
+    100% { transform: scale(1.2, 1.4); opacity: 0; }
+}
+
+.correlation-signal.high-intensity {
+    background: rgba(124, 77, 255, 0.2);
+    border-color: #7C4DFF;
+    box-shadow: 0 0 10px rgba(124, 77, 255, 0.3);
+}
+
+.correlation-signal.high-intensity .signal-text { color: #fff; }
+
+/* Metrics Row (Fixed 3 columns) */
+.card-metrics-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+.metric-item {
+    display: flex;
+    flex-direction: column;
+    padding: 8px;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.m-label {
+    font-size: 0.5rem;
+    opacity: 0.5;
+    font-weight: 800;
+    margin-bottom: 2px;
+}
+
+.m-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.1rem;
+    font-weight: 900;
+}
+
+/* Score colors */
+.metric-item.danger-high .m-value { color: #ff3366; }
+.metric-item.danger-medium .m-value { color: #f39c12; }
+.metric-item.danger-low .m-value { color: #3498db; }
+.metric-item.danger-info .m-value { color: var(--theme-primary); }
+
+/* Target Section */
+.card-target-section {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    background: rgba(0, 0, 0, 0.1);
+    padding: 8px;
+    border-left: 2px solid var(--theme-primary);
+}
+
+.t-label {
+    font-size: 0.55rem;
+    color: var(--theme-primary);
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    opacity: 0.7;
+}
+
+.t-value-wrap {
+    font-size: 0.75rem;
+    font-family: 'JetBrains Mono', monospace;
+    word-break: break-all;
+    opacity: 0.85;
+    line-height: 1.2;
+}
+
+/* Techniques Area */
+.card-techniques-area {
+    min-height: 24px;
+}
+
+.tech-mini-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.tech-mini-tag {
+    font-size: 0.55rem;
+    padding: 1px 6px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--theme-text-muted);
+    border-radius: 2px;
+    text-transform: uppercase;
+}
+
+.tech-more {
+    font-size: 0.55rem;
+    color: var(--theme-primary);
+    font-weight: bold;
+}
+
+/* Footer Timeline */
+.card-footer-timeline {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-top: auto;
+    padding-top: 0.8rem;
+    border-top: 1px dashed rgba(255, 255, 255, 0.05);
+}
+
+.time-block {
+    display: flex;
+    flex-direction: column;
+}
+
+.time-label {
+    font-size: 0.5rem;
+    opacity: 0.4;
+    font-weight: 800;
+}
+
+.time-val {
+    font-size: 0.65rem;
+    opacity: 0.6;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.go-action {
+    color: var(--theme-primary);
+    font-size: 0.8rem;
+    transition: transform 0.3s;
+}
+
+.campaign-card:hover .go-action {
+    transform: translateX(5px);
+    text-shadow: 0 0 10px var(--theme-primary);
 }
 
 /* Skin Cyber */

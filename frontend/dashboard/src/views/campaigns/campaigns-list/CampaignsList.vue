@@ -131,47 +131,54 @@
         <div v-for="campaign in campaigns" :key="campaign.hash" class="campaign-card"
           @click="goToDetail(campaign.hash)">
           
-          <div class="card-metrics-grid">
-            <div class="metric-box">
-              <span class="box-label">{{ t('campaigns.table.ips').toUpperCase() }}</span>
-              <span class="box-value">{{ campaign.ipCount }}</span>
+          <!-- Card Header: Fixed height for consistent alignment -->
+          <div class="card-header-tech">
+            <div class="header-spacer"></div>
+            <div v-if="campaign.correlationHubsCount > 0" class="correlation-signal" :class="{ 'high-intensity': campaign.correlationHubsCount > 2 }">
+              <span class="signal-icon">📡</span>
+              <span class="signal-text">HUB: {{ campaign.correlationHubsCount }}</span>
+              <div class="signal-pulse"></div>
             </div>
-            <div class="metric-box">
-              <span class="box-label">{{ t('campaigns.table.logs').toUpperCase() }}</span>
-              <span class="box-value">{{ campaign.totaleLogs }}</span>
+            <!-- Se non ci sono Hub, l'header rimane vuoto ma mantiene lo spazio -->
+          </div>
+
+          <!-- Core Metrics: Fixed Grid -->
+          <div class="card-metrics-row">
+            <div class="metric-item">
+              <span class="m-label">{{ t('campaigns.table.ips').toUpperCase() }}</span>
+              <span class="m-value">{{ campaign.ipCount }}</span>
             </div>
-            <div class="metric-box" :class="getScoreClass(campaign.averageScore)">
-              <span class="box-label">{{ t('attackDetail.avgScore').toUpperCase() }}</span>
-              <span class="box-value">{{ campaign.averageScore?.toFixed(1) || '0.0' }}</span>
+            <div class="metric-item">
+              <span class="m-label">{{ t('campaigns.table.logs').toUpperCase() }}</span>
+              <span class="m-value">{{ campaign.totaleLogs }}</span>
             </div>
-            <div class="metric-box correlation-box" v-if="campaign.correlationHubsCount > 0">
-              <span class="box-label">HUBS</span>
-              <span class="box-value">📡 {{ campaign.correlationHubsCount }}</span>
+            <div class="metric-item" :class="getScoreClass(campaign.averageScore)">
+              <span class="m-label">SCORE</span>
+              <span class="m-value">{{ campaign.averageScore?.toFixed(1) || '0.0' }}</span>
             </div>
           </div>
 
-          <div class="card-target">
-             <span class="target-label">{{ t('common.sample_url').toUpperCase() }}</span>
-             <span class="target-value" :title="campaign.sampleUrl">{{ campaign.sampleUrl || '/' }}</span>
+          <div class="card-target-section">
+             <span class="t-label">{{ t('common.sample_url').toUpperCase() }}</span>
+             <div class="t-value-wrap">{{ campaign.sampleUrl || '/' }}</div>
           </div>
 
-          <div class="card-techniques" v-if="campaign.attackPatterns?.length">
-             <div class="tech-tags">
-                <span v-for="tech in campaign.attackPatterns" :key="tech" class="tech-tag">
-                   {{ tech }}
-                </span>
-             </div>
-          </div>
-
-          <div class="card-footer">
-            <div class="timeline-info">
-              <div>{{ t('campaigns.firstSeen') }}: {{ formatDate(campaign.firstSeen) }}</div>
-              <div v-if="campaign.lastSeen !== campaign.firstSeen">
-                {{ t('common.duration_label').toUpperCase() }}: {{ computeDuration(campaign.firstSeen, campaign.lastSeen) }}
+          <div v-if="campaign.attackPatterns?.length" class="card-techniques-area">
+              <div class="tech-mini-list">
+                 <span v-for="tech in campaign.attackPatterns.slice(0, 3)" :key="tech" class="tech-mini-tag">
+                    {{ tech }}
+                 </span>
+                 <span v-if="campaign.attackPatterns.length > 3" class="tech-more">+{{ campaign.attackPatterns.length - 3 }}</span>
               </div>
+          </div>
+
+          <div class="card-footer-timeline">
+            <div class="time-block">
+              <span class="time-label">FIRST_SEEN</span>
+              <span class="time-val">{{ formatDate(campaign.firstSeen) }}</span>
             </div>
-            <div class="go-btn">
-              <span class="badge-icon">👉</span>
+            <div class="go-action">
+              <span class="arrow-icon">▶</span>
             </div>
           </div>
         </div>

@@ -653,88 +653,100 @@ export class ThreatLogService {
         }
     }
 
-    async getStats(timeframe = '24h', minScore = 15, limit = 10) {
+    async getStats(timeframe = '24h', minScore = 15, limit = 10, minLogs = 1) {
         let timeframeMatch: any = {};
 
         if (timeframe !== 'all') {
             const hours = this.getTimeframeHours(timeframe);
             const since = new Date(Date.now() - hours * 60 * 60 * 1000);
             timeframeMatch.timestamp = { $gte: since };
-            this.logger.info(`[ThreatLogService] Calculating stats for timeframe: ${timeframe} (since: ${since.toISOString()}) with minScore: ${minScore}, limit: ${limit}`);
+            this.logger.info(`[ThreatLogService] Calculating stats for timeframe: ${timeframe} (since: ${since.toISOString()}) with minScore: ${minScore}, minLogs: ${minLogs}, limit: ${limit}`);
         } else {
-            this.logger.info(`[ThreatLogService] Calculating stats for ALL TIME with minScore: ${minScore}, limit: ${limit}`);
+            this.logger.info(`[ThreatLogService] Calculating stats for ALL TIME with minScore: ${minScore}, minLogs: ${minLogs}, limit: ${limit}`);
         }
 
         const effectiveLimit = limit > 0 ? limit : 1000;
 
+        // Pipeline lineare per evitare facet annidati e garantire coerenza
         const results = await ThreatLog.aggregate([
             { $match: timeframeMatch },
+            // Fase 1: Raggruppamento per IP per calcolare i totali per attore
+            {
+                $group: {
+                    _id: "$request.ip",
+                    totalLogs: { $sum: 1 },
+                    suspiciousLogs: {
+                        $sum: {
+                            $cond: [
+                                {
+                                    $and: [
+                                        { $eq: ['$fingerprint.suspicious', true] },
+                                        { $gte: ['$fingerprint.score', minScore] }
+                                    ]
+                                },
+                                1,
+                                0
+                            ]
+                        }
+                    },
+                    country: { $first: "$geo.country" },
+                    indicators: { $push: "$fingerprint.indicators" },
+                    scores: { $push: "$fingerprint.score" }
+                }
+            },
+            // Fase 2: Applicazione della soglia minima di log (minLogs)
+            { $match: { totalLogs: { $gte: minLogs } } },
+            // Fase 3: Calcolo delle statistiche globali su dati filtrati
             {
                 $facet: {
                     scoreDistribution: [
-                        { $group: { _id: null, min: { $min: "$fingerprint.score" }, max: { $max: "$fingerprint.score" }, avg: { $avg: "$fingerprint.score" } } }
+                        { $unwind: "$scores" },
+                        { $group: { _id: null, min: { $min: "$scores" }, max: { $max: "$scores" }, avg: { $avg: "$scores" } } }
                     ],
                     mainStats: [
                         {
                             $group: {
                                 _id: null,
-                                totalRequests: { $sum: 1 },
-                                suspiciousRequests: {
-                                    $sum: {
-                                        $cond: [
-                                            {
-                                                $and: [
-                                                    { $eq: ['$fingerprint.suspicious', true] },
-                                                    { $gte: ['$fingerprint.score', minScore] }
-                                                ]
-                                            },
-                                            1,
-                                            0
-                                        ]
-                                    }
-                                }
+                                totalRequests: { $sum: "$totalLogs" },
+                                suspiciousRequests: { $sum: "$suspiciousLogs" },
+                                ips: { $push: "$_id" }
                             }
                         }
                     ],
                     topCountries: [
-                        { $match: { 'fingerprint.suspicious': true, 'fingerprint.score': { $gte: minScore } } },
-                        { $match: { 'geo.country': { $exists: true, $ne: null } } },
-                        { $group: { _id: '$geo.country', count: { $sum: 1 } } },
+                        { $match: { suspiciousLogs: { $gt: 0 }, country: { $exists: true, $ne: null } } },
+                        { $group: { _id: '$country', count: { $sum: "$suspiciousLogs" } } },
                         { $sort: { count: -1 } },
                         { $limit: effectiveLimit }
                     ],
                     topIndicators: [
-                        { $match: { 'fingerprint.suspicious': true, 'fingerprint.score': { $gte: minScore } } },
-                        { $match: { 'fingerprint.indicators': { $exists: true, $ne: [] } } },
-                        { $unwind: '$fingerprint.indicators' },
-                        { $group: { _id: '$fingerprint.indicators', count: { $sum: 1 } } },
+                        { $match: { suspiciousLogs: { $gt: 0 } } },
+                        { $unwind: "$indicators" },
+                        { $unwind: "$indicators" },
+                        { $group: { _id: "$indicators", count: { $sum: 1 } } },
                         { $sort: { count: -1 } },
                         { $limit: effectiveLimit }
-                    ],
-                    uniqueIPs: [
-                        { $group: { _id: '$request.ip' } },
-                        { $group: { _id: null, ips: { $push: '$_id' } } }
                     ]
                 }
             }
         ]);
 
         const facet = results[0];
-        const stats = facet.mainStats[0] || { totalRequests: 0, suspiciousRequests: 0 };
+        const mainStats = facet.mainStats[0] || { totalRequests: 0, suspiciousRequests: 0, ips: [] };
 
-        // Formattazione per il frontend: convertiamo gli array di _id/count in mappe Record<string, number>
+        // Formattazione per il frontend
         const countriesMap: Record<string, number> = {};
-        facet.topCountries.forEach((c: any) => { countriesMap[c._id] = c.count; });
+        (facet.topCountries || []).forEach((c: any) => { countriesMap[c._id] = c.count; });
 
         const indicatorsMap: Record<string, number> = {};
-        facet.topIndicators.forEach((i: any) => { indicatorsMap[i._id] = i.count; });
+        (facet.topIndicators || []).forEach((i: any) => { indicatorsMap[i._id] = i.count; });
 
         return {
-            totalRequests: stats.totalRequests,
-            suspiciousRequests: stats.suspiciousRequests,
+            totalRequests: mainStats.totalRequests,
+            suspiciousRequests: mainStats.suspiciousRequests,
             topCountries: countriesMap,
             topIndicators: indicatorsMap,
-            uniqueIPs: facet.uniqueIPs[0]?.ips || [],
+            uniqueIPs: mainStats.ips || [],
             scoreDistribution: facet.scoreDistribution[0] || { min: 0, max: 100, avg: 15 }
         };
     }

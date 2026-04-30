@@ -69,11 +69,11 @@
     <div class="stats-grid" v-loading="loading" element-loading-background="rgba(0,0,0,0.3)">
       <div class="stat-card">
         <div class="stat-lbl">{{ t('telemetry.label_traffic') }}</div>
-        <div class="stat-val">{{ stats?.totalRequests || 0 }}</div>
+        <div class="stat-val"><AnimatedNumber :value="stats?.totalRequests || 0" /></div>
       </div>
       <div class="stat-card pink">
         <div class="stat-lbl">{{ t('telemetry.label_threats') }}</div>
-        <div class="stat-val">{{ stats?.suspiciousRequests || 0 }}</div>
+        <div class="stat-val"><AnimatedNumber :value="stats?.suspiciousRequests || 0" /></div>
       </div>
       <!-- Nodi Unici hidden as requested -->
       <!-- 
@@ -148,6 +148,7 @@ import { useStats } from '../composable/useStats';
 import CountryFlag from './CountryFlag.vue';
 
 import IntelRanking from './common/IntelRanking.vue';
+import AnimatedNumber from './common/AnimatedNumber.vue';
 import './TelemetryStatsCyber.css';
 import './TelemetryStatsClassic.css';
 

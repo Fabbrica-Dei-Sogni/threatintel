@@ -1,6 +1,9 @@
 {
     "name": "honeypot-dashboard",
-    "version": "0.1.1",
+    "version": "1.0.0",
+    "description": "ThreatIntel Reference Implementation Dashboard (Vue.js)",
+    "author": "Alessandro Modica",
+    "license": "BSL-1.1",
     "publishConfig": {
         "registry": "http://alessandromodica.com:8081/repository/npm-cloud-pubblico/"
     },

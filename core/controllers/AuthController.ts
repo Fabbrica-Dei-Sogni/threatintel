@@ -1,3 +1,11 @@
+/**
+ * ThreatIntel - Distributed Forensics Engine
+ *
+ * Copyright (C) 2026 Alessandro Modica. All rights reserved.
+ * Licensed under the Business Source License 1.1 (BSL-1.1).
+ * See LICENSE.md in the project root for license terms.
+ */
+
 import { Request, Response } from 'express';
 import { inject, singleton } from 'tsyringe';
 import { AuthService } from '../services/AuthService';

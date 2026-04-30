@@ -1,3 +1,17 @@
+<!--
+  ThreatIntel - Reference Implementation Dashboard
+  
+  This frontend application is provided as a reference implementation of the 
+  ThreatIntel Distributed Forensics Engine. 
+  
+  Copyright (C) 2026 Alessandro Modica. All rights reserved.
+  
+  Use of this frontend for educational, research, and non-commercial purposes 
+  is permitted. Production or commercial use of this specific dashboard 
+  interface requires a valid commercial license from the author.
+  
+  See root LICENSE.md for core engine licensing details.
+-->
 <script setup>
 import { computed, inject } from 'vue';
 import { Chart as ChartJS, Title, Tooltip, Legend, RadialLinearScale, PointElement, LineElement, Filler } from 'chart.js';

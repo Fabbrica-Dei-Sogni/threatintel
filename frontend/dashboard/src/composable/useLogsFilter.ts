@@ -1,3 +1,15 @@
+/**
+ * ThreatIntel - Reference Implementation Dashboard
+ * 
+ * This file is part of the reference frontend implementation of the 
+ * ThreatIntel Distributed Forensics Engine.
+ * 
+ * Copyright (C) 2026 Alessandro Modica. All rights reserved.
+ * 
+ * Production or commercial use of this specific interface requires 
+ * a valid commercial license from the author.
+ */
+
 // src/composables/useLogsFilter.ts
 import { ref, isRef, type Ref } from 'vue';
 import { fetchSearch } from '../api/index.js';

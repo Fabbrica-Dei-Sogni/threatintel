@@ -6,17 +6,19 @@ import { logger } from '../logger';
 import ratelimitroutes from './apis/ratelimitroutes';
 import threatroutes from './apis/threatroutes';
 import campaignroutes from './apis/campaignroutes';
-
 import routes from './apis/routes';
 import managelimitroutes from './apis/managelimitroutes';
 import configroutes from './apis/configroutes';
 import reportroutes from './apis/reportroutes';
+import dossierroutes from './apis/dossierroutes';
+import authroutes from './apis/authroutes';
+import cowrieroutes from './apis/cowrieroutes';
+
 import { getComponent } from './di/container';
 import { ThreatLogger } from "./threatLogger";
 import { CowrieController } from "./controllers/CowrieController";
 import { ThreatController } from "./controllers/ThreatController";
 import { CampaignController } from "./controllers/CampaignController";
-
 import { ConfigController } from "./controllers/ConfigController";
 import { RateLimitController } from "./controllers/RateLimitController";
 import { ManageLimitController } from "./controllers/ManageLimitController";
@@ -25,13 +27,12 @@ import { ReportController } from "./controllers/ReportController";
 import { DossierController } from "./controllers/DossierController";
 import { AuthController } from "./controllers/AuthController";
 import { AuthMiddleware } from "./middlewares/AuthMiddleware";
-import dossierroutes from './apis/dossierroutes';
-
+import { RateLimitMiddleware } from "./rateLimitMiddleware";
+import { setupSwagger } from "./swagger";
 
 // Instantiate controllers via DI container
 const threatController = getComponent(ThreatController);
 const campaignController = getComponent(CampaignController);
-
 const configController = getComponent(ConfigController);
 const rateLimitController = getComponent(RateLimitController);
 const manageLimitController = getComponent(ManageLimitController);
@@ -42,10 +43,7 @@ const dossierController = getComponent(DossierController);
 const authController = getComponent(AuthController);
 const authMiddleware = getComponent(AuthMiddleware);
 
-
 const threatLogger = getComponent(ThreatLogger);
-import { RateLimitMiddleware } from "./rateLimitMiddleware";
-import { setupSwagger } from "./swagger";
 const rateLimitMiddleware = getComponent(RateLimitMiddleware);
 
 const router = express.Router();
@@ -60,54 +58,7 @@ router.use(rateLimitMiddleware.ddosProtectionLimiter());
 router.use(rateLimitMiddleware.applicationLimiter());
 
 // Proxy Auth Reale (Pubblico)
-const authRouter = express.Router();
-
-/**
- * @openapi
- * /auth/login:
- *   post:
- *     tags: [Auth Proxy]
- *     summary: Effettua il login verso l'Identity Provider
- *     description: Invia le credenziali al Digital-Auth-TS e restituisce un JWT token.
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               username:
- *                 type: string
- *               password:
- *                 type: string
- *     responses:
- *       200:
- *         description: Login riuscito, token restituito.
- *       401:
- *         description: Credenziali non valide.
- */
-authRouter.post('/auth/login', (req, res) => authController.login(req, res));
-
-/**
- * @openapi
- * /auth/register:
- *   post:
- *     tags: [Auth Proxy]
- *     summary: Registra un nuovo utente sull'Identity Provider
- *     description: Crea un nuovo account associato a questa istanza di ThreatIntel.
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *     responses:
- *       201:
- *         description: Registrazione completata, email di attivazione inviata.
- */
-authRouter.post('/auth/register', (req, res) => authController.register(req, res));
-authRouter.get('/auth/mode', (req, res) => authController.getAuthMode(req, res));
-router.use('/api', authRouter);
+router.use('/api', authroutes(authController));
 
 // Integrazione Documentazione Swagger (OpenAPI) - PUBBLICA (Visualizzazione consentita a tutti)
 setupSwagger(router);
@@ -133,7 +84,6 @@ router.use('/', ratelimitroutes(rateLimitController));
 router.use('/', configroutes(configController, authMiddleware));
 
 // API Honeypot Telnet (Cowrie)
-import cowrieroutes from './apis/cowrieroutes';
 router.use('/', cowrieroutes(logger, cowrieController));
 
 // API Dossier (Persistenza investigazioni)

@@ -12,6 +12,27 @@ export default function cowrieroutes(logger: Logger, cowrieController: CowrieCon
      *   get:
      *     tags: [Dashboard API]
      *     summary: Elenca le sessioni catturate da Cowrie (Telnet/SSH)
+     *     parameters:
+     *       - name: page
+     *         in: query
+     *         schema:
+     *           type: integer
+     *           default: 1
+     *       - name: pageSize
+     *         in: query
+     *         schema:
+     *           type: integer
+     *           default: 20
+     *       - name: sort
+     *         in: query
+     *         description: JSON string per l'ordinamento (es. {"timestamp":-1})
+     *         schema:
+     *           type: string
+     *       - name: filters
+     *         in: query
+     *         description: JSON string per i filtri
+     *         schema:
+     *           type: string
      *     responses:
      *       200:
      *         description: Elenco sessioni.
@@ -24,6 +45,21 @@ export default function cowrieroutes(logger: Logger, cowrieController: CowrieCon
      *   post:
      *     tags: [Dashboard API]
      *     summary: Ricerca avanzata nelle sessioni Cowrie
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             properties:
+     *               page:
+     *                 type: integer
+     *               pageSize:
+     *                 type: integer
+     *               filters:
+     *                 type: object
+     *               sortFields:
+     *                 type: object
      *     responses:
      *       200:
      *         description: Risultati ricerca.

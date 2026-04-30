@@ -16,6 +16,23 @@ export default (
      *   get:
      *     tags: [Dashboard API]
      *     summary: Ottiene le statistiche generali delle minacce
+     *     parameters:
+     *       - name: timeframe
+     *         in: query
+     *         schema:
+     *           type: string
+     *           enum: [1h, 24h, 7d, 30d]
+     *           default: 24h
+     *       - name: minScore
+     *         in: query
+     *         schema:
+     *           type: integer
+     *           default: 15
+     *       - name: top
+     *         in: query
+     *         schema:
+     *           type: string
+     *           default: '10'
      *     responses:
      *       200:
      *         description: Statistiche recuperate con successo.
@@ -28,6 +45,26 @@ export default (
      *   get:
      *     tags: [Dashboard API]
      *     summary: Recupera la lista dei log delle minacce
+     *     parameters:
+     *       - name: page
+     *         in: query
+     *         schema:
+     *           type: integer
+     *           default: 1
+     *       - name: pageSize
+     *         in: query
+     *         schema:
+     *           type: integer
+     *           default: 20
+     *       - name: ip
+     *         in: query
+     *         schema:
+     *           type: string
+     *       - name: suspicious
+     *         in: query
+     *         schema:
+     *           type: string
+     *           enum: ['true', 'false']
      *     responses:
      *       200:
      *         description: Elenco log restituito.
@@ -41,10 +78,20 @@ export default (
      *     tags: [Dashboard API]
      *     summary: Ricerca avanzata nei log
      *     requestBody:
+     *       required: true
      *       content:
      *         application/json:
      *           schema:
      *             type: object
+     *             properties:
+     *               page:
+     *                 type: integer
+     *               pageSize:
+     *                 type: integer
+     *               filters:
+     *                 type: object
+     *               sortFields:
+     *                 type: object
      *     responses:
      *       200:
      *         description: Risultati della ricerca.

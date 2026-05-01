@@ -1,42 +1,62 @@
 import { Request, Response } from 'express';
-import { injectable } from 'tsyringe';
+import { singleton } from 'tsyringe';
 import { DossierService } from '../services/DossierService';
 import { CreateDossierDTO, UpdateDossierDTO } from '../models/dto/DossierDTO';
 import { sanitizePage, sanitizePageSize } from '../utils/queryGuard';
+import { Controller, Get, Post, Patch, Delete } from '../registry/decorators';
+import { getComponent } from '../di/container';
+import { AuthMiddleware } from '../middlewares/AuthMiddleware';
 
-@injectable()
+const auth = getComponent(AuthMiddleware);
+
+@singleton()
+@Controller('/api')
 export class DossierController {
     constructor(private readonly dossierService: DossierService) { }
 
     private safeFilename(value: string): string {
         return value.replace(/[^a-zA-Z0-9._-]/g, '_').slice(0, 64);
     }
-    /**
-     * Crea un nuovo Dossier.
-     * POST /api/dossiers
-     */
-    async create(req: Request, res: Response) {
-        try {
-            const user = (req as any).user;
-            const dto: CreateDossierDTO = req.body;
-            
-            if (!dto.title || !dto.sections) {
-                return res.status(400).json({ error: 'Title and sections are required' });
-            }
-
-            // Forza l'owner con l'utente autenticato (IDOR Protection)
-            const dossier = await this.dossierService.createDossier(dto, user.username);
-            return res.status(201).json(dossier);
-        } catch (error: any) {
-            console.error('[DossierController] create error:', error);
-            return res.status(500).json({ error: 'Operazione non riuscita' });
-        }
-    }
 
     /**
-     * Elenca i dossier con filtri e paginazione.
-     * GET /api/dossiers
+     * @openapi
+     * /dossiers:
+     *   get:
+     *     tags: [Dossier & Forensics]
+     *     summary: Elenca tutti i dossier investigativi
+     *     parameters:
+     *       - name: status
+     *         in: query
+     *         schema:
+     *           type: string
+     *       - name: tags
+     *         in: query
+     *         description: Filtra per tag (separati da virgola)
+     *         schema:
+     *           type: string
+     *       - name: ip
+     *         in: query
+     *         schema:
+     *           type: string
+     *       - name: search
+     *         in: query
+     *         schema:
+     *           type: string
+     *       - name: page
+     *         in: query
+     *         schema:
+     *           type: integer
+     *           default: 1
+     *       - name: pageSize
+     *         in: query
+     *         schema:
+     *           type: integer
+     *           default: 20
+     *     responses:
+     *       200:
+     *         description: Elenco dossier.
      */
+    @Get('/dossiers', [auth.isIdentified()])
     async list(req: Request, res: Response) {
         try {
             const user = (req as any).user;
@@ -58,9 +78,22 @@ export class DossierController {
     }
 
     /**
-     * Recupera un singolo dossier per ID.
-     * GET /api/dossiers/:id
+     * @openapi
+     * /dossiers/{id}:
+     *   get:
+     *     tags: [Dossier & Forensics]
+     *     summary: Ottiene un dossier specifico tramite ID
+     *     parameters:
+     *       - name: id
+     *         in: path
+     *         required: true
+     *         schema:
+     *           type: string
+     *     responses:
+     *       200:
+     *         description: Dettaglio dossier.
      */
+    @Get('/dossiers/:id', [auth.isIdentified()])
     async getById(req: Request, res: Response) {
         try {
             const id = req.params.id as string;
@@ -77,9 +110,93 @@ export class DossierController {
     }
 
     /**
-     * Aggiorna un dossier per ID.
-     * PATCH /api/dossiers/:id
+     * @openapi
+     * /dossiers:
+     *   post:
+     *     tags: [Dossier & Forensics]
+     *     summary: Crea un nuovo dossier investigativo
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             required: [title, sections]
+     *             properties:
+     *               title:
+     *                 type: string
+     *               description:
+     *                 type: string
+     *               sections:
+     *                 type: array
+     *                 items:
+     *                   type: object
+     *               tags:
+     *                 type: array
+     *                 items:
+     *                   type: string
+     *     responses:
+     *       201:
+     *         description: Dossier creato.
      */
+    @Post('/dossiers', [auth.isIdentified()])
+    async create(req: Request, res: Response) {
+        try {
+            const user = (req as any).user;
+            const dto: CreateDossierDTO = req.body;
+            
+            if (!dto.title || !dto.sections) {
+                return res.status(400).json({ error: 'Title and sections are required' });
+            }
+
+            // Forza l'owner con l'utente autenticato (IDOR Protection)
+            const dossier = await this.dossierService.createDossier(dto, user.username);
+            return res.status(201).json(dossier);
+        } catch (error: any) {
+            console.error('[DossierController] create error:', error);
+            return res.status(500).json({ error: 'Operazione non riuscita' });
+        }
+    }
+
+    /**
+     * @openapi
+     * /dossiers/{id}:
+     *   patch:
+     *     tags: [Dossier & Forensics]
+     *     summary: Aggiorna un dossier esistente
+     *     parameters:
+     *       - name: id
+     *         in: path
+     *         required: true
+     *         schema:
+     *           type: string
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             properties:
+     *               title:
+     *                 type: string
+     *               description:
+     *                 type: string
+     *               status:
+     *                 type: string
+     *                 enum: [open, closed, archived]
+     *               sections:
+     *                 type: array
+     *                 items:
+     *                   type: object
+     *               tags:
+     *                 type: array
+     *                 items:
+     *                   type: string
+     *     responses:
+     *       200:
+     *         description: Dossier aggiornato.
+     */
+    @Patch('/dossiers/:id', [auth.isIdentified()])
     async update(req: Request, res: Response) {
         try {
             const user = (req as any).user;
@@ -100,9 +217,22 @@ export class DossierController {
     }
 
     /**
-     * Elimina un dossier per ID.
-     * DELETE /api/dossiers/:id
+     * @openapi
+     * /dossiers/{id}:
+     *   delete:
+     *     tags: [Dossier & Forensics]
+     *     summary: Elimina un dossier investigativo
+     *     parameters:
+     *       - name: id
+     *         in: path
+     *         required: true
+     *         schema:
+     *           type: string
+     *     responses:
+     *       200:
+     *         description: Dossier eliminato.
      */
+    @Delete('/dossiers/:id', [auth.isIdentified()])
     async delete(req: Request, res: Response) {
         try {
             const user = (req as any).user;
@@ -123,9 +253,39 @@ export class DossierController {
     }
 
     /**
-     * Esporta un dossier salvato in formato PDF o HTML.
-     * GET /api/dossiers/:id/export
+     * @openapi
+     * /dossiers/{id}/export:
+     *   get:
+     *     tags: [Dossier & Forensics]
+     *     summary: Esporta un dossier in formato forense (Classico/HUD)
+     *     parameters:
+     *       - name: id
+     *         in: path
+     *         required: true
+     *         schema:
+     *           type: string
+     *       - name: format
+     *         in: query
+     *         schema:
+     *           type: string
+     *           enum: [html, pdf]
+     *           default: pdf
+     *       - name: style
+     *         in: query
+     *         schema:
+     *           type: string
+     *           enum: [classic, hud, telex]
+     *           default: classic
+     *       - name: locale
+     *         in: query
+     *         schema:
+     *           type: string
+     *           default: it-IT
+     *     responses:
+     *       200:
+     *         description: File esportato con successo.
      */
+    @Get('/dossiers/:id/export', [auth.isIdentified()])
     async export(req: Request, res: Response) {
         try {
             const id = req.params.id as string;

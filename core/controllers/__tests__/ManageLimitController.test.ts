@@ -2,14 +2,29 @@ import 'reflect-metadata';
 import request from 'supertest';
 import express from 'express';
 import { container } from 'tsyringe';
-import { ManageLimitController } from '../../controllers/ManageLimitController';
+import { ManageLimitController } from '../ManageLimitController';
 import { RateLimitMiddleware } from '../../rateLimitMiddleware';
-import manageLimitRoutes from '../managelimitroutes';
-import { LOGGER_TOKEN } from '../../di/tokens';
+import { RouterHub } from '../../registry/RouterHub';
 import { Logger } from 'winston';
+import { LOGGER_TOKEN } from '../../di/tokens';
+import { AuthMiddleware } from '../../middlewares/AuthMiddleware';
+
+// Mock AuthMiddleware
+jest.mock('../../middlewares/AuthMiddleware', () => {
+    return {
+        AuthMiddleware: jest.fn().mockImplementation(() => {
+            return {
+                isAuthenticated: jest.fn().mockReturnValue((req: any, res: any, next: any) => next()),
+                isIdentified: jest.fn().mockReturnValue((req: any, res: any, next: any) => next()),
+                hasRole: jest.fn().mockReturnValue((req: any, res: any, next: any) => next()),
+            };
+        })
+    };
+});
 
 const mockRateLimitMiddleware = {
     manualBlacklistIP: jest.fn(),
+    removeIPFromBlacklist: jest.fn(),
 };
 
 const mockLogger = {
@@ -21,11 +36,13 @@ const mockLogger = {
 container.register(RateLimitMiddleware, { useValue: mockRateLimitMiddleware as any });
 container.register(LOGGER_TOKEN, { useValue: mockLogger });
 
-const manageLimitController = container.resolve(ManageLimitController);
-
 const app = express();
 app.use(express.json());
-app.use('/', manageLimitRoutes(manageLimitController));
+
+// Registrazione e bind tramite RouterHub
+const hub = container.resolve(RouterHub);
+hub.register(ManageLimitController);
+hub.bindHttp(app, container);
 
 describe('ManageLimitRoutes API', () => {
 

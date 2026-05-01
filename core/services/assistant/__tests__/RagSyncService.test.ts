@@ -4,6 +4,7 @@ import { RagTranslationService } from '../RagTranslationService';
 import { QdrantClientService } from '../QdrantClientService';
 import { OllamaService } from '../OllamaService';
 import { Logger } from 'winston';
+import { stringToUuid } from '../../../utils/uuid';
 
 describe('RagSyncService', () => {
     let ragSyncService: RagSyncService;
@@ -71,7 +72,7 @@ describe('RagSyncService', () => {
         // Verifica l'upsert su Qdrant
         expect(mockQdrant.upsertPoints).toHaveBeenCalledWith([
             expect.objectContaining({
-                id: 'mongo-id-123',
+                id: stringToUuid('mongo-id-123'),
                 vector: [0.1, 0.2, 0.3],
                 payload: expect.objectContaining({
                     type: 'threat_log',
@@ -96,7 +97,7 @@ describe('RagSyncService', () => {
         expect(mockOllama.getEmbedding).toHaveBeenCalled();
         expect(mockQdrant.upsertPoints).toHaveBeenCalledWith([
             expect.objectContaining({
-                id: 'ip-id-456',
+                id: stringToUuid('ip-id-456'),
                 payload: expect.objectContaining({
                     type: 'ip_details',
                     ip: '8.8.8.8',
@@ -120,7 +121,7 @@ describe('RagSyncService', () => {
 
         expect(mockQdrant.upsertPoints).toHaveBeenCalledWith([
             expect.objectContaining({
-                id: 'campaign-campaign-hash-789',
+                id: stringToUuid('campaign-campaign-hash-789'),
                 vector: vector,
                 payload: expect.objectContaining({
                     type: 'campaign_summary',

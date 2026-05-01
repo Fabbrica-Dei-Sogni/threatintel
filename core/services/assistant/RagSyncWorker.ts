@@ -72,6 +72,19 @@ export class RagSyncWorker implements ILongRunningService {
 
         this.isMaterializing = true;
         try {
+            // Verifica se il sistema RAG è operativo, altrimenti tenta il recupero (Auto-Recovery)
+            const status = this.ragSync.getStatus();
+            if (!status.operational) {
+                this.logger.info(`[${this.serviceName}] RAG system is not operational. Attempting auto-recovery/initialization...`);
+                await this.ragSync.initialize();
+                
+                // Se ancora non è operativo, saltiamo questo ciclo per evitare errori a catena
+                if (!this.ragSync.getStatus().operational) {
+                    this.logger.warn(`[${this.serviceName}] Auto-recovery failed. Skipping materialization cycle.`);
+                    return;
+                }
+            }
+
             this.logger.info(`[${this.serviceName}] Running scheduled materialization...`);
 
             await this.campaignService.materializeCampaignSummaries().catch(err =>

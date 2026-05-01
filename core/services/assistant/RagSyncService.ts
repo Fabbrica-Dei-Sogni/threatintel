@@ -8,6 +8,7 @@ import { IThreatLog } from '../../models/ThreatLogSchema';
 import { IIpDetails } from '../../models/IpDetailsSchema';
 import { IAbuseIpDb } from '../../models/AbuseIpDbSchema';
 import { IAbuseReport } from '../../models/AbuseReportSchema';
+import { stringToUuid } from '../../utils/uuid';
 
 @injectable()
 export class RagSyncService {
@@ -38,7 +39,7 @@ export class RagSyncService {
 
             // 3. Upsert su Qdrant
             await this.qdrant.upsertPoints([{
-                id: log._id.toString(),
+                id: stringToUuid(log._id.toString()),
                 vector: vector,
                 payload: {
                     type: 'threat_log',
@@ -71,7 +72,7 @@ export class RagSyncService {
 
             // 3. Upsert su Qdrant
             await this.qdrant.upsertPoints([{
-                id: ipDetails._id.toString(),
+                id: stringToUuid(ipDetails._id.toString()),
                 vector: vector,
                 payload: {
                     type: 'ip_details',
@@ -96,7 +97,7 @@ export class RagSyncService {
             this.logger.debug(`[RagSync] Syncing Campaign Summary for ${campaign.hash}`);
 
             await this.qdrant.upsertPoints([{
-                id: `campaign-${campaign.hash}`,
+                id: stringToUuid(`campaign-${campaign.hash}`),
                 vector: vector,
                 payload: {
                     type: 'campaign_summary',
@@ -124,7 +125,7 @@ export class RagSyncService {
             this.logger.debug(`[RagSync] Syncing Attack Summary for IP ${ip}`);
 
             await this.qdrant.upsertPoints([{
-                id: `attack-${ip.replace(/\./g, '-')}`,
+                id: stringToUuid(`attack-${ip}`),
                 vector: vector,
                 payload: {
                     type: 'attack_summary',

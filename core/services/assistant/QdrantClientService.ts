@@ -35,7 +35,16 @@ export class QdrantClientService {
                     }
                 });
             } else {
-                this.logger.debug(`[Qdrant] Collection ${this.collectionName} already exists.`);
+                // Verifica integrità (dimensioni)
+                const info = await this.client.getCollection(this.collectionName);
+                const currentSize = (info.config.params.vectors as any).size;
+                
+                if (currentSize !== vectorSize) {
+                    this.logger.error(`[Qdrant] Collection ${this.collectionName} size mismatch! Expected ${vectorSize}, found ${currentSize}. RAG might fail.`);
+                    // Non cancelliamo automaticamente per sicurezza, ma avvisiamo l'utente
+                } else {
+                    this.logger.debug(`[Qdrant] Collection ${this.collectionName} verified (Size: ${currentSize}).`);
+                }
             }
         } catch (error) {
             this.logger.error(`[Qdrant] Error initializing collection: ${error}`);

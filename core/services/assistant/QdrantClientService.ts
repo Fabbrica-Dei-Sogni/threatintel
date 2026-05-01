@@ -7,28 +7,29 @@ import { AppConfigProvider } from '../AppConfigProvider';
 @injectable()
 export class QdrantClientService {
     private client: QdrantClient;
-    private collectionName: string;
+    private defaultCollectionName: string;
 
     constructor(
         @inject(LOGGER_TOKEN) private readonly logger: Logger,
         private readonly config: AppConfigProvider
     ) {
         this.client = new QdrantClient({ url: this.config.qdrantUrl });
-        this.collectionName = this.config.ragCollectionName;
+        this.defaultCollectionName = this.config.ragCollectionName;
     }
 
     /**
-     * Inizializza la collection se non esiste.
+     * Inizializza una collection se non esiste.
+     * @param collectionName Nome della collection
      * @param vectorSize La dimensione del vettore (es. 768 per nomic-embed-text)
      */
-    public async initializeCollection(vectorSize: number = 768) {
+    public async initializeCollection(collectionName: string, vectorSize: number = 768) {
         try {
             const collections = await this.client.getCollections();
-            const exists = collections.collections.some(c => c.name === this.collectionName);
+            const exists = collections.collections.some(c => c.name === collectionName);
 
             if (!exists) {
-                this.logger.info(`[Qdrant] Creating collection: ${this.collectionName} (Size: ${vectorSize})`);
-                await this.client.createCollection(this.collectionName, {
+                this.logger.info(`[Qdrant] Creating collection: ${collectionName} (Size: ${vectorSize})`);
+                await this.client.createCollection(collectionName, {
                     vectors: {
                         size: vectorSize,
                         distance: 'Cosine'
@@ -36,30 +37,30 @@ export class QdrantClientService {
                 });
             } else {
                 // Verifica integrità (dimensioni)
-                const info = await this.client.getCollection(this.collectionName);
+                const info = await this.client.getCollection(collectionName);
                 const currentSize = (info.config.params.vectors as any).size;
                 
                 if (currentSize !== vectorSize) {
-                    this.logger.error(`[Qdrant] Collection ${this.collectionName} size mismatch! Expected ${vectorSize}, found ${currentSize}. RAG might fail.`);
-                    // Non cancelliamo automaticamente per sicurezza, ma avvisiamo l'utente
+                    this.logger.error(`[Qdrant] Collection ${collectionName} size mismatch! Expected ${vectorSize}, found ${currentSize}.`);
                 } else {
-                    this.logger.debug(`[Qdrant] Collection ${this.collectionName} verified (Size: ${currentSize}).`);
+                    this.logger.debug(`[Qdrant] Collection ${collectionName} verified (Size: ${currentSize}).`);
                 }
             }
         } catch (error) {
-            this.logger.error(`[Qdrant] Error initializing collection: ${error}`);
+            this.logger.error(`[Qdrant] Error initializing collection ${collectionName}: ${error}`);
             throw error;
         }
     }
 
     /**
      * Inserisce o aggiorna dei punti nel database vettoriale.
+     * @param collectionName Nome della collection
      * @param points Array di punti (vettori + metadati)
      */
-    public async upsertPoints(points: Array<{ id: string | number, vector: number[], payload: any }>) {
+    public async upsertPoints(collectionName: string, points: Array<{ id: string | number, vector: number[], payload: any }>) {
         try {
-            this.logger.debug(`[Qdrant] Upserting ${points.length} points to ${this.collectionName}`);
-            await this.client.upsert(this.collectionName, {
+            this.logger.debug(`[Qdrant] Upserting ${points.length} points to ${collectionName}`);
+            await this.client.upsert(collectionName, {
                 wait: true,
                 points: points.map(p => ({
                     id: p.id,
@@ -68,42 +69,38 @@ export class QdrantClientService {
                 }))
             });
         } catch (error) {
-            this.logger.error(`[Qdrant] Error during upsert: ${error}`);
+            this.logger.error(`[Qdrant] Error during upsert on ${collectionName}: ${error}`);
             throw error;
         }
     }
 
     /**
      * Ricerca per similarità vettoriale.
-     * @param vector Il vettore della query
-     * @param limit Numero massimo di risultati
-     * @returns Risultati della ricerca
      */
-    public async search(vector: number[], limit: number = 5) {
+    public async search(collectionName: string, vector: number[], limit: number = 5) {
         try {
-            this.logger.debug(`[Qdrant] Searching for similarity in ${this.collectionName}`);
-            return await this.client.search(this.collectionName, {
+            this.logger.debug(`[Qdrant] Searching for similarity in ${collectionName}`);
+            return await this.client.search(collectionName, {
                 vector: vector,
                 limit: limit,
                 with_payload: true
             });
         } catch (error) {
-            this.logger.error(`[Qdrant] Error during search: ${error}`);
+            this.logger.error(`[Qdrant] Error during search on ${collectionName}: ${error}`);
             throw error;
         }
     }
 
     /**
      * Elimina un punto specifico.
-     * @param id ID del punto
      */
-    public async deletePoint(id: string | number) {
+    public async deletePoint(collectionName: string, id: string | number) {
         try {
-            await this.client.delete(this.collectionName, {
+            await this.client.delete(collectionName, {
                 points: [id]
             });
         } catch (error) {
-            this.logger.error(`[Qdrant] Error during delete: ${error}`);
+            this.logger.error(`[Qdrant] Error during delete on ${collectionName}: ${error}`);
         }
     }
 }

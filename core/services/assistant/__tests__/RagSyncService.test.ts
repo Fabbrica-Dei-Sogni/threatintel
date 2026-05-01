@@ -14,6 +14,7 @@ describe('RagSyncService', () => {
     let mockOllama: jest.Mocked<OllamaService>;
 
     beforeEach(async () => {
+        jest.useFakeTimers();
         // Setup Mocks
         mockLogger = {
             debug: jest.fn(),
@@ -52,6 +53,10 @@ describe('RagSyncService', () => {
         await ragSyncService.initialize();
     });
 
+    afterEach(() => {
+        jest.useRealTimers();
+    });
+
     it('should correctly sync a ThreatLog', async () => {
         const mockLog = {
             _id: { toString: () => 'mongo-id-123' },
@@ -62,6 +67,9 @@ describe('RagSyncService', () => {
         } as any;
 
         await ragSyncService.syncThreatLog(mockLog);
+        
+        // Poiché ora c'è il batching, dobbiamo forzare il flush o aspettare
+        await (ragSyncService as any).flushLogBuffer();
 
         // Verifica che la traduzione sia stata chiamata
         expect(mockTranslator.translateThreatLog).toHaveBeenCalledWith(mockLog);
@@ -69,19 +77,22 @@ describe('RagSyncService', () => {
         // Verifica che l'embedding sia stato richiesto per la narrativa prodotta
         expect(mockOllama.getEmbedding).toHaveBeenCalledWith('Narrativa di test log');
 
-        // Verifica l'upsert su Qdrant
-        expect(mockQdrant.upsertPoints).toHaveBeenCalledWith([
-            expect.objectContaining({
-                id: stringToUuid('mongo-id-123'),
-                vector: [0.1, 0.2, 0.3],
-                payload: expect.objectContaining({
-                    type: 'threat_log',
-                    ip: '1.2.3.4',
-                    score: 75,
-                    mongoId: 'mongo-id-123'
+        // Verifica l'upsert su Qdrant (nella collection corretta)
+        expect(mockQdrant.upsertPoints).toHaveBeenCalledWith(
+            'threat_logs',
+            expect.arrayContaining([
+                expect.objectContaining({
+                    id: stringToUuid('mongo-id-123'),
+                    vector: [0.1, 0.2, 0.3],
+                    payload: expect.objectContaining({
+                        type: 'threat_log',
+                        ip: '1.2.3.4',
+                        score: 75,
+                        mongoId: 'mongo-id-123'
+                    })
                 })
-            })
-        ]);
+            ])
+        );
     });
 
     it('should correctly sync IpDetails', async () => {
@@ -95,16 +106,19 @@ describe('RagSyncService', () => {
 
         expect(mockTranslator.translateIpDetails).toHaveBeenCalled();
         expect(mockOllama.getEmbedding).toHaveBeenCalled();
-        expect(mockQdrant.upsertPoints).toHaveBeenCalledWith([
-            expect.objectContaining({
-                id: stringToUuid('ip-id-456'),
-                payload: expect.objectContaining({
-                    type: 'ip_details',
-                    ip: '8.8.8.8',
-                    mongoId: 'ip-id-456'
+        expect(mockQdrant.upsertPoints).toHaveBeenCalledWith(
+            'threat_intelligence',
+            expect.arrayContaining([
+                expect.objectContaining({
+                    id: stringToUuid('ip-id-456'),
+                    payload: expect.objectContaining({
+                        type: 'ip_details',
+                        ip: '8.8.8.8',
+                        mongoId: 'ip-id-456'
+                    })
                 })
-            })
-        ]);
+            ])
+        );
     });
 
     it('should correctly sync a Campaign Summary', async () => {
@@ -119,29 +133,38 @@ describe('RagSyncService', () => {
 
         await ragSyncService.syncCampaignSummary(mockCampaign, aiSummary, vector);
 
-        expect(mockQdrant.upsertPoints).toHaveBeenCalledWith([
-            expect.objectContaining({
-                id: stringToUuid('campaign-campaign-hash-789'),
-                vector: vector,
-                payload: expect.objectContaining({
-                    type: 'campaign_summary',
-                    campaignId: 'campaign-hash-789',
-                    text: aiSummary
+        expect(mockQdrant.upsertPoints).toHaveBeenCalledWith(
+            'threat_intelligence',
+            expect.arrayContaining([
+                expect.objectContaining({
+                    id: stringToUuid('campaign-campaign-hash-789'),
+                    vector: vector,
+                    payload: expect.objectContaining({
+                        type: 'campaign_summary',
+                        campaignId: 'campaign-hash-789',
+                        text: aiSummary
+                    })
                 })
-            })
-        ]);
+            ])
+        );
     });
 
     it('should handle errors gracefully during sync', async () => {
+        const mockLog = { 
+            _id: { toString: () => 'id' }, 
+            request: { ip: '1.1.1.1' },
+            fingerprint: { score: 10 } // Deve passare il filtro
+        } as any;
+        
+        // Prepariamo l'errore per il flush
         mockOllama.getEmbedding.mockRejectedValueOnce(new Error('Ollama Down'));
         
-        const mockLog = { _id: { toString: () => 'id' }, request: { ip: '1.1.1.1' } } as any;
-        
         await ragSyncService.syncThreatLog(mockLog);
+        await (ragSyncService as any).flushLogBuffer();
 
         // Dovrebbe aver loggato l'errore senza crashare il processo
         expect(mockLogger.error).toHaveBeenCalledWith(
-            expect.stringContaining('[RagSync] Error during syncThreatLog: Ollama Down')
+            expect.stringContaining('[RagSync] Failed to flush log buffer: Ollama Down')
         );
     });
 

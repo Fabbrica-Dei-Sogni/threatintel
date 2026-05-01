@@ -14,6 +14,15 @@ import { stringToUuid } from '../../utils/uuid';
 export class RagSyncService {
     private isOperational: boolean = false;
     private initializationAttempted: boolean = false;
+    
+    // Configurazione Batching per i Log
+    private logBuffer: any[] = [];
+    private readonly BATCH_SIZE = 10; // Processiamo 10 log alla volta
+    private readonly BATCH_TIMEOUT = 30000; // O ogni 30 secondi
+    private batchTimer: NodeJS.Timeout | null = null;
+
+    private readonly COLL_INTELLIGENCE = 'threat_intelligence';
+    private readonly COLL_LOGS = 'threat_logs';
 
     constructor(
         @inject(LOGGER_TOKEN) private readonly logger: Logger,
@@ -23,35 +32,74 @@ export class RagSyncService {
     ) { }
 
     /**
-     * Sincronizza un ThreatLog nel database vettoriale.
+     * Sincronizza un ThreatLog nel database vettoriale (con Filtro e Batching).
      */
     public async syncThreatLog(log: IThreatLog) {
         if (!this.checkOperational()) return;
 
+        // FILTRO: Ignoriamo i log con score basso per ridurre il rumore nel RAG
+        const score = log.fingerprint?.score || 0;
+        if (score < 3) {
+            this.logger.debug(`[RagSync] Skipping log ${log._id} due to low score (${score})`);
+            return;
+        }
+
         try {
-            this.logger.debug(`[RagSync] Syncing ThreatLog ${log.id}`);
+            // Aggiungiamo al buffer per processamento batch
+            this.logBuffer.push(log);
+            this.logger.debug(`[RagSync] Log added to buffer (${this.logBuffer.length}/${this.BATCH_SIZE})`);
 
-            // 1. Traduzione
-            const narrative = this.translator.translateThreatLog(log);
-
-            // 2. Embedding
-            const vector = await this.ollama.getEmbedding(narrative);
-
-            // 3. Upsert su Qdrant
-            await this.qdrant.upsertPoints([{
-                id: stringToUuid(log._id.toString()),
-                vector: vector,
-                payload: {
-                    type: 'threat_log',
-                    mongoId: log._id.toString(),
-                    ip: log.request?.ip,
-                    timestamp: log.timestamp,
-                    score: log.fingerprint?.score,
-                    text: narrative
-                }
-            }]);
+            if (this.logBuffer.length >= this.BATCH_SIZE) {
+                await this.flushLogBuffer();
+            } else if (!this.batchTimer) {
+                this.batchTimer = setTimeout(() => this.flushLogBuffer(), this.BATCH_TIMEOUT);
+            }
         } catch (error) {
             this.handleOperationError('syncThreatLog', error);
+        }
+    }
+
+    /**
+     * Svuota il buffer dei log e li invia a Qdrant in blocco.
+     */
+    private async flushLogBuffer() {
+        if (this.logBuffer.length === 0) return;
+        
+        if (this.batchTimer) {
+            clearTimeout(this.batchTimer);
+            this.batchTimer = null;
+        }
+
+        const logsToProcess = [...this.logBuffer];
+        this.logBuffer = [];
+
+        this.logger.info(`[RagSync] Flushing ${logsToProcess.length} logs to Qdrant...`);
+
+        try {
+            const points = [];
+            for (const log of logsToProcess) {
+                const narrative = this.translator.translateThreatLog(log);
+                const vector = await this.ollama.getEmbedding(narrative);
+                
+                points.push({
+                    id: stringToUuid(log._id.toString()),
+                    vector: vector,
+                    payload: {
+                        type: 'threat_log',
+                        mongoId: log._id.toString(),
+                        ip: log.request?.ip,
+                        timestamp: log.timestamp,
+                        score: log.fingerprint?.score,
+                        text: narrative
+                    }
+                });
+            }
+
+            if (points.length > 0) {
+                await this.qdrant.upsertPoints(this.COLL_LOGS, points);
+            }
+        } catch (error) {
+            this.logger.error(`[RagSync] Failed to flush log buffer: ${error.message}`);
         }
     }
 
@@ -71,7 +119,7 @@ export class RagSyncService {
             const vector = await this.ollama.getEmbedding(narrative);
 
             // 3. Upsert su Qdrant
-            await this.qdrant.upsertPoints([{
+            await this.qdrant.upsertPoints(this.COLL_INTELLIGENCE, [{
                 id: stringToUuid(ipDetails._id.toString()),
                 vector: vector,
                 payload: {
@@ -96,7 +144,7 @@ export class RagSyncService {
         try {
             this.logger.debug(`[RagSync] Syncing Campaign Summary for ${campaign.hash}`);
 
-            await this.qdrant.upsertPoints([{
+            await this.qdrant.upsertPoints(this.COLL_INTELLIGENCE, [{
                 id: stringToUuid(`campaign-${campaign.hash}`),
                 vector: vector,
                 payload: {
@@ -124,7 +172,7 @@ export class RagSyncService {
             const ip = attack.request?.ip || attack.ip;
             this.logger.debug(`[RagSync] Syncing Attack Summary for IP ${ip}`);
 
-            await this.qdrant.upsertPoints([{
+            await this.qdrant.upsertPoints(this.COLL_INTELLIGENCE, [{
                 id: stringToUuid(`attack-${ip}`),
                 vector: vector,
                 payload: {
@@ -149,8 +197,9 @@ export class RagSyncService {
         this.logger.info('[RagSync] Initializing RAG Synchronization system...');
 
         try {
-            // Verifica connettività Qdrant
-            await this.qdrant.initializeCollection(768);
+            // Inizializza le collection necessarie
+            await this.qdrant.initializeCollection(this.COLL_INTELLIGENCE, 768);
+            await this.qdrant.initializeCollection(this.COLL_LOGS, 768);
 
             // Verifica connettività Ollama
             const ollamaOk = await this.ollama.checkHealth();
@@ -182,5 +231,15 @@ export class RagSyncService {
             operational: this.isOperational,
             initializationAttempted: this.initializationAttempted
         };
+    }
+
+    /**
+     * Ferma eventuali timer attivi.
+     */
+    public stop() {
+        if (this.batchTimer) {
+            clearTimeout(this.batchTimer);
+            this.batchTimer = null;
+        }
     }
 }

@@ -28,9 +28,14 @@ describe('ReportService', () => {
     beforeEach(() => {
         jest.clearAllMocks();
         mockLogger = { info: jest.fn(), error: jest.fn() } as any;
-        mockThreatLogService = new ThreatLogService(mockLogger, {} as any, {} as any, {} as any, {} as any) as any;
+        const mockRagSync = {} as any;
+        const mockOllama = {} as any;
+        const mockTranslator = {} as any;
+
+        mockThreatLogService = new ThreatLogService(mockLogger, {} as any, {} as any, {} as any, {} as any, mockRagSync, mockOllama, mockTranslator) as any;
         mockCowrieService = new CowrieService(mockLogger, {} as any) as any;
-        mockIpDetailsService = new IpDetailsService(mockLogger) as any;
+        mockIpDetailsService = new IpDetailsService(mockLogger, mockRagSync) as any;
+        
         mockI18nService = { 
             t: jest.fn().mockImplementation((key) => key),
             tm: jest.fn()

@@ -12,7 +12,7 @@ describe('RagSyncService', () => {
     let mockQdrant: jest.Mocked<QdrantClientService>;
     let mockOllama: jest.Mocked<OllamaService>;
 
-    beforeEach(() => {
+    beforeEach(async () => {
         // Setup Mocks
         mockLogger = {
             debug: jest.fn(),
@@ -46,13 +46,16 @@ describe('RagSyncService', () => {
             mockQdrant,
             mockOllama
         );
+
+        // Inizializza per rendere il servizio operativo
+        await ragSyncService.initialize();
     });
 
     it('should correctly sync a ThreatLog', async () => {
         const mockLog = {
             _id: { toString: () => 'mongo-id-123' },
             id: 'log-123',
-            timestamp: new Date(),
+            timestamp: new Date('2026-05-01T15:00:00Z'),
             request: { ip: '1.2.3.4' },
             fingerprint: { score: 75 }
         } as any;
@@ -73,7 +76,8 @@ describe('RagSyncService', () => {
                 payload: expect.objectContaining({
                     type: 'threat_log',
                     ip: '1.2.3.4',
-                    score: 75
+                    score: 75,
+                    mongoId: 'mongo-id-123'
                 })
             })
         ]);
@@ -95,7 +99,8 @@ describe('RagSyncService', () => {
                 id: 'ip-id-456',
                 payload: expect.objectContaining({
                     type: 'ip_details',
-                    ip: '8.8.8.8'
+                    ip: '8.8.8.8',
+                    mongoId: 'ip-id-456'
                 })
             })
         ]);
@@ -129,13 +134,25 @@ describe('RagSyncService', () => {
     it('should handle errors gracefully during sync', async () => {
         mockOllama.getEmbedding.mockRejectedValueOnce(new Error('Ollama Down'));
         
-        const mockLog = { _id: { toString: () => 'id' }, request: {} } as any;
+        const mockLog = { _id: { toString: () => 'id' }, request: { ip: '1.1.1.1' } } as any;
         
         await ragSyncService.syncThreatLog(mockLog);
 
         // Dovrebbe aver loggato l'errore senza crashare il processo
         expect(mockLogger.error).toHaveBeenCalledWith(
-            expect.stringContaining('Error syncing ThreatLog: Error: Ollama Down')
+            expect.stringContaining('[RagSync] Error during syncThreatLog: Ollama Down')
         );
+    });
+
+    it('should skip operations if not operational', async () => {
+        mockOllama.checkHealth.mockResolvedValueOnce(false);
+        const degradedService = new RagSyncService(mockLogger, mockTranslator, mockQdrant, mockOllama);
+        await degradedService.initialize();
+
+        expect(degradedService.getStatus().operational).toBe(false);
+
+        await degradedService.syncThreatLog({} as any);
+
+        expect(mockTranslator.translateThreatLog).not.toHaveBeenCalled();
     });
 });

@@ -109,6 +109,38 @@ export class RagTranslationService {
         return narrative + torContext;
     }
 
+    /**
+     * Traduce i dati tecnici di una campagna in una narrazione deterministica.
+     */
+    public translateCampaign(campaign: any): string {
+        return RAG_TEMPLATES.INTERPOLATE(RAG_TEMPLATES.NARRATIVES.CAMPAIGN_SUMMARY_BASE, {
+            hash: campaign.hash,
+            ipCount: campaign.ipCount.toString(),
+            totalLogs: campaign.totaleLogs.toString(),
+            firstSeen: new Date(campaign.firstSeen).toLocaleString('it-IT'),
+            lastSeen: new Date(campaign.lastSeen).toLocaleString('it-IT'),
+            averageScore: (campaign.averageScore || 0).toFixed(2),
+            patterns: campaign.attackPatterns?.join(', ') || 'generici',
+            sampleUrl: campaign.sampleUrl || '/'
+        });
+    }
+
+    /**
+     * Traduce i dati tecnici di un attacco (IP-centrico) in una narrazione deterministica.
+     */
+    public translateAttack(attack: any): string {
+        const ip = attack.ip || attack.request?.ip || 'N/A';
+        return RAG_TEMPLATES.INTERPOLATE(RAG_TEMPLATES.NARRATIVES.ATTACK_SUMMARY_BASE, {
+            ip,
+            totalLogs: attack.totaleLogs.toString(),
+            firstSeen: new Date(attack.firstSeen).toLocaleString('it-IT'),
+            lastSeen: new Date(attack.lastSeen).toLocaleString('it-IT'),
+            averageScore: (attack.averageScore || 0).toFixed(2),
+            patterns: attack.attackPatterns?.join(', ') || 'nessuno',
+            sampleUrl: attack.sampleUrl || attack.request?.url || '/'
+        });
+    }
+
     private sanitizeComment(comment: string): string {
         if (!comment) return '';
         const spamPatterns = [/fail2ban/i, /port scan/i, /bad ip/i];

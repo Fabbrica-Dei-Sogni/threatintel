@@ -5,6 +5,7 @@ import ThreatLog from '../models/ThreatLogSchema';
 import { ForensicPipelineService } from './forense/ForensicPipelineService';
 import { TimeFilterStage } from './forense/pipeline/stages/TimeFilterStage';
 import { calculateCorrelationHubs } from '../utils/CampaignAnalytics';
+import { ConfigService } from './ConfigService';
 import { RagSyncService } from './assistant/RagSyncService';
 import { OllamaService } from './assistant/OllamaService';
 import { RagTranslationService } from './assistant/RagTranslationService';
@@ -15,6 +16,7 @@ export class CampaignService {
     constructor(
         @inject(LOGGER_TOKEN) private readonly logger: Logger,
         private readonly forensicPipelineService: ForensicPipelineService,
+        private readonly configService: ConfigService,
         @inject(RAG_SYNC_SERVICE_TOKEN) private readonly ragSync: RagSyncService,
         @inject(OLLAMA_SERVICE_TOKEN) private readonly ollama: OllamaService,
         @inject(RAG_TRANSLATION_TOKEN) private readonly translator: RagTranslationService
@@ -491,12 +493,16 @@ export class CampaignService {
     /**
      * Materializza i riassunti AI delle campagne nel database vettoriale.
      */
-    async materializeCampaignSummaries() {
+    async materializeCampaignSummaries(options: { forceAi?: boolean } = {}) {
         // Controllo Fallback
         if (!this.ragSync.getStatus().operational) {
             this.logger.debug('[CampaignService] RAG materialization skipped: System is not operational.');
             return;
         }
+
+        // Verifica se la generazione AI è abilitata
+        const aiEnabledConfig = await this.configService.getConfigValue('RAG_AI_SUMMARY_ENABLED');
+        const isAiEnabled = options.forceAi || aiEnabledConfig === 'true' || process.env.RAG_AI_SUMMARY_ENABLED === 'true';
 
         this.logger.info('[CampaignService] Starting campaign materialization for RAG...');
         try {
@@ -510,11 +516,25 @@ export class CampaignService {
                 try {
                     this.logger.debug(`[CampaignService] Materializing summary for campaign: ${campaign.hash}`);
                     
-                    const prompt = this.translator.buildCampaignSummaryPrompt(campaign);
-                    const aiSummary = await this.ollama.generate(prompt);
-                    const vector = await this.ollama.getEmbedding(aiSummary);
+                    // 1. Narrazione Tecnica (Deterministica)
+                    const technicalNarrative = this.translator.translateCampaign(campaign);
+                    let finalContent = technicalNarrative;
+
+                    // 2. Generazione AI (Opzionale)
+                    if (isAiEnabled) {
+                        try {
+                            const prompt = this.translator.buildCampaignSummaryPrompt(campaign);
+                            const aiSummary = await this.ollama.generate(prompt);
+                            finalContent = `REPORT AI CAMPAGNA: ${aiSummary}\n\nDETTAGLI TECNICI AGGREGATI:\n${technicalNarrative}`;
+                        } catch (aiErr) {
+                            this.logger.warn(`[CampaignService] AI Generation failed for campaign ${campaign.hash}, falling back to technical data: ${aiErr.message}`);
+                        }
+                    }
                     
-                    await this.ragSync.syncCampaignSummary(campaign, aiSummary, vector);
+                    // 3. Embedding
+                    const vector = await this.ollama.getEmbedding(finalContent);
+                    
+                    await this.ragSync.syncCampaignSummary(campaign, finalContent, vector);
                 } catch (campaignError) {
                     this.logger.error(`[CampaignService] Error materializing campaign ${campaign.hash}: ${campaignError}`);
                 }

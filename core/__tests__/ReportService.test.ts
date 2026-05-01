@@ -31,8 +31,19 @@ describe('ReportService', () => {
         const mockRagSync = {} as any;
         const mockOllama = {} as any;
         const mockTranslator = {} as any;
+        const mockConfigService = { getConfigValue: jest.fn().mockResolvedValue(null) } as any;
 
-        mockThreatLogService = new ThreatLogService(mockLogger, {} as any, {} as any, {} as any, {} as any, mockRagSync, mockOllama, mockTranslator) as any;
+        mockThreatLogService = new ThreatLogService(
+            mockLogger, 
+            {} as any, 
+            {} as any, 
+            {} as any, 
+            {} as any, 
+            mockConfigService, 
+            mockRagSync, 
+            mockOllama, 
+            mockTranslator
+        ) as any;
         mockCowrieService = new CowrieService(mockLogger, {} as any) as any;
         mockIpDetailsService = new IpDetailsService(mockLogger, mockRagSync) as any;
         

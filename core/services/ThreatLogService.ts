@@ -10,6 +10,7 @@ import { inject, injectable } from 'tsyringe';
 import { LOGGER_TOKEN, RAG_SYNC_SERVICE_TOKEN, OLLAMA_SERVICE_TOKEN, RAG_TRANSLATION_TOKEN } from '../di/tokens';
 import { Logger } from 'winston';
 import { IpDetailsService } from './IpDetailsService';
+import { ConfigService } from './ConfigService';
 import { RagSyncService } from './assistant/RagSyncService';
 import { OllamaService } from './assistant/OllamaService';
 import { RagTranslationService } from './assistant/RagTranslationService';
@@ -39,6 +40,7 @@ export class ThreatLogService {
         private readonly forensicPipelineService: ForensicPipelineService,
         private readonly ipDetailsService: IpDetailsService,
         private readonly patternAnalysisService: PatternAnalysisService,
+        private readonly configService: ConfigService,
         @inject(RAG_SYNC_SERVICE_TOKEN) private readonly ragSync: RagSyncService,
         @inject(OLLAMA_SERVICE_TOKEN) private readonly ollama: OllamaService,
         @inject(RAG_TRANSLATION_TOKEN) private readonly translator: RagTranslationService
@@ -816,7 +818,7 @@ export class ThreatLogService {
     /**
      * Materializza i riassunti AI degli attacchi (IP-centrici) nel database vettoriale.
      */
-    async materializeAttackSummaries() {
+    async materializeAttackSummaries(options: { forceAi?: boolean } = {}) {
         this.logger.info('[ThreatLogService] Starting attack materialization for RAG...');
 
         // Controllo Fallback: evita chiamate se il sistema RAG non è operativo
@@ -824,6 +826,10 @@ export class ThreatLogService {
             this.logger.debug('[ThreatLogService] RAG materialization skipped: System is not operational.');
             return;
         }
+
+        // Verifica se la generazione AI è abilitata (configurazione o override)
+        const aiEnabledConfig = await this.configService.getConfigValue('RAG_AI_SUMMARY_ENABLED');
+        const isAiEnabled = options.forceAi || aiEnabledConfig === 'true' || process.env.RAG_AI_SUMMARY_ENABLED === 'true';
 
         try {
             const result = await this.getAttacks({
@@ -835,16 +841,31 @@ export class ThreatLogService {
             const attacks = result.items || [];
 
             for (const attack of attacks) {
+                const ip = attack.request?.ip || 'N/A';
                 try {
-                    this.logger.debug(`[ThreatLogService] Materializing summary for attack by IP: ${attack.request.ip}`);
+                    this.logger.debug(`[ThreatLogService] Materializing summary for attack by IP: ${ip}`);
 
-                    const prompt = this.translator.buildAttackSummaryPrompt(attack);
-                    const aiSummary = await this.ollama.generate(prompt);
-                    const vector = await this.ollama.getEmbedding(aiSummary);
+                    // 1. Narrazione Tecnica (Deterministica)
+                    const technicalNarrative = this.translator.translateAttack(attack);
+                    let finalContent = technicalNarrative;
 
-                    await this.ragSync.syncAttackSummary(attack, aiSummary, vector);
+                    // 2. Generazione AI (Opzionale - solo se abilitata e Ollama risponde)
+                    if (isAiEnabled) {
+                        try {
+                            const prompt = this.translator.buildAttackSummaryPrompt(attack);
+                            const aiSummary = await this.ollama.generate(prompt);
+                            finalContent = `RIASSUNTO ANALISTA AI: ${aiSummary}\n\nDETTAGLI TECNICI CORRELATI:\n${technicalNarrative}`;
+                        } catch (aiErr) {
+                            this.logger.warn(`[ThreatLogService] AI Generation failed for IP ${ip}, falling back to technical data: ${aiErr.message}`);
+                        }
+                    }
+
+                    // 3. Embedding (Sempre necessario per il RAG)
+                    const vector = await this.ollama.getEmbedding(finalContent);
+
+                    await this.ragSync.syncAttackSummary(attack, finalContent, vector);
                 } catch (err) {
-                    this.logger.error(`[ThreatLogService] Error materializing attack for IP ${attack.request.ip}: ${err}`);
+                    this.logger.error(`[ThreatLogService] Error materializing attack for IP ${ip}: ${err}`);
                 }
             }
 

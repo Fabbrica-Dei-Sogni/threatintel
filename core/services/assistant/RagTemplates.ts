@@ -9,7 +9,10 @@ export const RAG_TEMPLATES = {
         SSH_CONTEXT: "L'attività riguarda tentativi di accesso non autorizzati tramite protocollo SSH, suggerendo attacchi brute-force o tentativi di credential stuffing.",
         
         IP_DETAILS_BASE: "Profilo Intelligence IP {ip}. Localizzazione: {geo}. ISP: {isp}. Reputazione AbuseIPDB: {abuseScore}/100 con {totalReports} segnalazioni totali. Analisi report recenti:\n{reports}",
-        TOR_NODE_INFO: "L'indirizzo IP è noto per essere un nodo di uscita TOR, aumentando il rischio di anonimato malevolo."
+        TOR_NODE_INFO: "L'indirizzo IP è noto per essere un nodo di uscita TOR, aumentando il rischio di anonimato malevolo.",
+        
+        ATTACK_SUMMARY_BASE: "Analisi tecnica dell'attaccante {ip}. Attività rilevata dal {firstSeen} al {lastSeen} con un totale di {totalLogs} richieste. Score di pericolosità medio: {averageScore}/100. Pattern comportamentali: {patterns}. Target primario: {sampleUrl}.",
+        CAMPAIGN_SUMMARY_BASE: "Rilevata Campagna di Attacco Distribuita (Hash: {hash}). La campagna coinvolge {ipCount} indirizzi IP unici, con un volume totale di {totalLogs} log. Prima apparizione: {firstSeen}, Ultima apparizione: {lastSeen}. Score medio della campagna: {averageScore}/100. Pattern di attacco: {patterns}. Esempi di URL target: {sampleUrl}."
     },
     PROMPTS: {
         CAMPAIGN_SYSTEM: `

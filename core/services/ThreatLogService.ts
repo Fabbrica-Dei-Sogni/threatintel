@@ -69,7 +69,7 @@ export class ThreatLogService {
 
         // SYNC TO RAG (Asincrono e non bloccante)
         if (log) {
-            this.ragSync.syncThreatLog(log).catch(err => 
+            this.ragSync.syncThreatLog(log).catch(err =>
                 this.logger.error(`[ThreatLogService] Error during RAG sync: ${err}`)
             );
         }
@@ -829,18 +829,18 @@ export class ThreatLogService {
 
             for (const attack of attacks) {
                 try {
-                    this.logger.debug(`[ThreatLogService] Materializing summary for attack by IP: ${attack.ip}`);
-                    
+                    this.logger.debug(`[ThreatLogService] Materializing summary for attack by IP: ${attack.request.ip}`);
+
                     const prompt = this.translator.buildAttackSummaryPrompt(attack);
                     const aiSummary = await this.ollama.generate(prompt);
                     const vector = await this.ollama.getEmbedding(aiSummary);
-                    
+
                     await this.ragSync.syncAttackSummary(attack, aiSummary, vector);
                 } catch (err) {
-                    this.logger.error(`[ThreatLogService] Error materializing attack for IP ${attack.ip}: ${err}`);
+                    this.logger.error(`[ThreatLogService] Error materializing attack for IP ${attack.request.ip}: ${err}`);
                 }
             }
-            
+
             this.logger.info(`[ThreatLogService] Materialization completed for ${attacks.length} attacks.`);
         } catch (error) {
             this.logger.error(`[ThreatLogService] Attack materialization failed: ${error}`);

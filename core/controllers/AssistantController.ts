@@ -5,8 +5,14 @@ import { OllamaService } from '../services/assistant/OllamaService';
 import { RagSyncService } from '../services/assistant/RagSyncService';
 import { LOGGER_TOKEN, QDRANT_CLIENT_TOKEN, OLLAMA_SERVICE_TOKEN, RAG_SYNC_SERVICE_TOKEN } from '../di/tokens';
 import { Logger } from 'winston';
+import { Controller, Post } from '../registry/decorators';
+import { getComponent } from '../di/container';
+import { AuthMiddleware } from '../middlewares/AuthMiddleware';
+
+const auth = getComponent(AuthMiddleware);
 
 @singleton()
+@Controller('/api/assistant')
 export class AssistantController {
     constructor(
         @inject(QDRANT_CLIENT_TOKEN) private qdrant: QdrantClientService,
@@ -16,10 +22,29 @@ export class AssistantController {
     ) { }
 
     /**
-     * POST /api/assistant/search
-     * Esegue una ricerca semantica nel database vettoriale RAG.
-     * Ideale per l'integrazione come tool in agenti LangChain.
+     * @openapi
+     * /api/assistant/search:
+     *   post:
+     *     summary: Esegue una ricerca semantica RAG
+     *     tags: [Assistant]
+     *     security:
+     *       - bearerAuth: []
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             properties:
+     *               query:
+     *                 type: string
+     *               limit:
+     *                 type: number
+     *               type:
+     *                 type: string
+     *                 enum: [threat_log, ip_details, campaign_summary]
      */
+    @Post('/search', [auth.isAuthenticated()])
     async search(req: Request, res: Response): Promise<void> {
         const { query, limit = 5, scoreThreshold = 0.5, type } = req.body;
 
@@ -78,9 +103,13 @@ export class AssistantController {
     }
 
     /**
-     * POST /api/assistant/ask
-     * Endpoint sperimentale per una risposta diretta basata su contesto RAG.
+     * @openapi
+     * /api/assistant/ask:
+     *   post:
+     *     summary: Risponde a una domanda basandosi sul contesto RAG
+     *     tags: [Assistant]
      */
+    @Post('/ask', [auth.isAuthenticated()])
     async ask(req: Request, res: Response): Promise<void> {
         const { question } = req.body;
 

@@ -7,19 +7,7 @@ const mockMiddleware = (req: any, res: any, next: any) => next();
 const mockRouter = express.Router();
 mockRouter.get('/test', (req, res) => res.status(200).send('ok'));
 
-// Mocking the route factories
-jest.mock('../apis/threatroutes', () => jest.fn(() => mockRouter));
-jest.mock('../apis/reportroutes', () => jest.fn(() => mockRouter));
-jest.mock('../apis/ratelimitroutes', () => jest.fn(() => mockRouter));
-jest.mock('../apis/configroutes', () => jest.fn(() => mockRouter));
-jest.mock('../apis/cowrieroutes', () => jest.fn(() => mockRouter));
-jest.mock('../apis/dossierroutes', () => jest.fn(() => mockRouter));
-jest.mock('../apis/managelimitroutes', () => jest.fn(() => mockRouter));
-jest.mock('../apis/routes', () => jest.fn(() => mockRouter));
-jest.mock('../apis/assistantroutes', () => jest.fn(() => mockRouter));
-jest.mock('../apis/campaignroutes', () => jest.fn(() => mockRouter));
-jest.mock('../apis/authroutes', () => jest.fn(() => mockRouter));
-jest.mock('../swagger', () => ({ setupSwagger: jest.fn() }));
+// [REMOVED] Legacy route factory mocks
 
 // Mocking logging and DI container
 jest.mock('../../logger', () => ({ logger: { info: jest.fn() } }));
@@ -34,33 +22,36 @@ const mockRateLimitMiddleware = {
     trapEndpointsLimiter: jest.fn(() => mockMiddleware)
 };
 
+const mockRouterHub = {
+    register: jest.fn(),
+    bindHttp: jest.fn((router) => {
+        router.get('/test', (req: any, res: any) => res.status(200).send('ok'));
+    })
+};
+
 const mockAuthMiddleware = { 
     isAuthenticated: jest.fn(() => (req: any, res: any, next: any) => next()),
     isAuthorized: jest.fn(() => (req: any, res: any, next: any) => next()),
-    hasRole: jest.fn(() => (req: any, res: any, next: any) => next())
+    hasRole: jest.fn(() => (req: any, res: any, next: any) => next()),
+    isIdentified: jest.fn(() => (req: any, res: any, next: any) => next())
 };
 
 // Mocking getComponent
 jest.mock('../di/container', () => ({
     getComponent: jest.fn((token) => {
-        const name = token?.name || (typeof token === 'string' ? token : '');
-        if (name.includes('ThreatLogger')) return mockThreatLogger;
-        if (name.includes('RateLimitMiddleware')) return mockRateLimitMiddleware;
-        if (name.includes('AuthMiddleware')) return mockAuthMiddleware;
-        
-        // Return a mock object for any other component
-        return {
-            middleware: jest.fn(() => mockMiddleware),
-            isAuthenticated: jest.fn(() => mockMiddleware),
-            isAuthorized: jest.fn(() => mockMiddleware),
-            hasRole: jest.fn(() => mockMiddleware),
-            getCampaigns: jest.fn(),
-            getCampaignDetail: jest.fn(),
-            getUniqueUris: jest.fn(),
-            search: jest.fn(),
-            ask: jest.fn()
-        };
-    })
+        // Ritorno un oggetto vuoto o una funzione middleware a seconda del caso
+        if (token && token.name === 'ThreatLogger') return mockThreatLogger;
+        if (token && token.name === 'RateLimitMiddleware') return mockRateLimitMiddleware;
+        if (token && token.name === 'RouterHub') return mockRouterHub;
+        if (token && token.name === 'AuthMiddleware') return mockAuthMiddleware;
+        return (req: any, res: any, next: any) => next(); 
+    }),
+    container: {
+        resolve: jest.fn((token) => {
+            if (token && token.name === 'RouterHub') return mockRouterHub;
+            return {};
+        })
+    }
 }));
 
 // Impedisci il tentativo di connessione ioredis
@@ -120,3 +111,4 @@ describe('Endpoint Router Rate Limits', () => {
         }
     });
 });
+

@@ -4,15 +4,37 @@ import { RateLimitMiddleware } from '../rateLimitMiddleware';
 import { LOGGER_TOKEN } from '../di/tokens';
 import { Logger } from 'winston';
 import { isValidIp } from '../utils/ipValidator';
+import { Controller, Post } from '../registry/decorators';
 
 @singleton()
+@Controller('/api')
 export class ManageLimitController {
     constructor(
         @inject(LOGGER_TOKEN) private logger: Logger,
         private rateLimitMiddleware: RateLimitMiddleware
     ) { }
 
-    // POST /api/blacklist-ip
+    /**
+     * @openapi
+     * /blacklist-ip:
+     *   post:
+     *     tags: [System & Security]
+     *     summary: Aggiunge manualmente un IP alla blacklist (violazioni)
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             required: [ip]
+     *             properties:
+     *               ip:
+     *                 type: string
+     *     responses:
+     *       200:
+     *         description: IP aggiunto alla blacklist.
+     */
+    @Post('/blacklist-ip')
     async blacklistIP(req: Request, res: Response): Promise<void> {
         const { ip } = req.body;
 
@@ -37,7 +59,27 @@ export class ManageLimitController {
         }
     }
 
-    // POST /api/unblacklist-ip
+    /**
+     * @openapi
+     * /unblacklist-ip:
+     *   post:
+     *     tags: [System & Security]
+     *     summary: Rimuove manualmente un IP dalla blacklist
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             required: [ip]
+     *             properties:
+     *               ip:
+     *                 type: string
+     *     responses:
+     *       200:
+     *         description: IP rimosso dalla blacklist.
+     */
+    @Post('/unblacklist-ip')
     async unblacklistIP(req: Request, res: Response): Promise<void> {
         const { ip } = req.body;
 

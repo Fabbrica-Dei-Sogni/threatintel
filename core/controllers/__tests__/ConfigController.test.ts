@@ -2,13 +2,35 @@ import 'reflect-metadata';
 import express from 'express';
 import request from 'supertest';
 import mongoose from 'mongoose';
-import configroutes from '../configroutes';
-import { ConfigController } from '../../controllers/ConfigController';
+import { ConfigController } from '../ConfigController';
 import Configuration from '../../models/ConfigSchema';
 import { container } from '../../di/container';
 import { ConfigService } from '../../services/ConfigService';
 import { SshLogService } from '../../services/SshLogService';
 import { AuthMiddleware } from '../../middlewares/AuthMiddleware';
+import { RouterHub } from '../../registry/RouterHub';
+
+// Mock AuthMiddleware
+jest.mock('../../middlewares/AuthMiddleware', () => {
+    return {
+        AuthMiddleware: jest.fn().mockImplementation(() => {
+            return {
+                isAuthenticated: jest.fn().mockReturnValue((req: any, res: any, next: any) => {
+                    req.user = { username: 'testuser', roles: [{ name: 'admin' }] };
+                    next();
+                }),
+                isIdentified: jest.fn().mockReturnValue((req: any, res: any, next: any) => {
+                    req.user = { username: 'testuser', roles: [{ name: 'admin' }] };
+                    next();
+                }),
+                hasRole: jest.fn().mockReturnValue((req: any, res: any, next: any) => {
+                    req.user = { username: 'testuser', roles: [{ name: 'admin' }] };
+                    next();
+                }),
+            };
+        })
+    };
+});
 
 describe('ConfigRoutes API', () => {
     let app: express.Application;
@@ -21,17 +43,10 @@ describe('ConfigRoutes API', () => {
         app = express();
         app.use(express.json());
 
-        configController = container.resolve(ConfigController);
-        
-        // Mock AuthMiddleware
-        const authMiddlewareMock = {
-            isAuthenticated: jest.fn().mockReturnValue((req: any, res: any, next: any) => next()),
-            hasRole: jest.fn().mockImplementation((role: string) => {
-                return (req: any, res: any, next: any) => next();
-            })
-        } as unknown as AuthMiddleware;
-
-        app.use('/', configroutes(configController, authMiddlewareMock));
+        // Registra il controller nel RouterHub
+        const hub = container.resolve(RouterHub);
+        hub.register(ConfigController);
+        hub.bindHttp(app, container);
     });
 
     afterAll(async () => {

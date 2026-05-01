@@ -492,6 +492,12 @@ export class CampaignService {
      * Materializza i riassunti AI delle campagne nel database vettoriale.
      */
     async materializeCampaignSummaries() {
+        // Controllo Fallback
+        if (!this.ragSync.getStatus().operational) {
+            this.logger.debug('[CampaignService] RAG materialization skipped: System is not operational.');
+            return;
+        }
+
         this.logger.info('[CampaignService] Starting campaign materialization for RAG...');
         try {
             const result = await this.getCampaigns({ 

@@ -11,26 +11,31 @@ import { IAbuseReport } from '../../models/AbuseReportSchema';
 
 @injectable()
 export class RagSyncService {
+    private isOperational: boolean = false;
+    private initializationAttempted: boolean = false;
+
     constructor(
         @inject(LOGGER_TOKEN) private readonly logger: Logger,
         @inject(RAG_TRANSLATION_TOKEN) private readonly translator: RagTranslationService,
         @inject(QDRANT_CLIENT_TOKEN) private readonly qdrant: QdrantClientService,
         @inject(OLLAMA_SERVICE_TOKEN) private readonly ollama: OllamaService
-    ) {}
+    ) { }
 
     /**
      * Sincronizza un ThreatLog nel database vettoriale.
      */
     public async syncThreatLog(log: IThreatLog) {
+        if (!this.checkOperational()) return;
+
         try {
             this.logger.debug(`[RagSync] Syncing ThreatLog ${log.id}`);
-            
+
             // 1. Traduzione
             const narrative = this.translator.translateThreatLog(log);
-            
+
             // 2. Embedding
             const vector = await this.ollama.getEmbedding(narrative);
-            
+
             // 3. Upsert su Qdrant
             await this.qdrant.upsertPoints([{
                 id: log._id.toString(),
@@ -45,7 +50,7 @@ export class RagSyncService {
                 }
             }]);
         } catch (error) {
-            this.logger.error(`[RagSync] Error syncing ThreatLog: ${error}`);
+            this.handleOperationError('syncThreatLog', error);
         }
     }
 
@@ -53,15 +58,17 @@ export class RagSyncService {
      * Sincronizza IpDetails nel database vettoriale.
      */
     public async syncIpDetails(ipDetails: IIpDetails, abuseData?: IAbuseIpDb | null, abuseReports?: IAbuseReport[]) {
+        if (!this.checkOperational()) return;
+
         try {
             this.logger.debug(`[RagSync] Syncing IpDetails for ${ipDetails.ip}`);
-            
+
             // 1. Traduzione
             const narrative = this.translator.translateIpDetails(ipDetails, abuseData, abuseReports);
-            
+
             // 2. Embedding
             const vector = await this.ollama.getEmbedding(narrative);
-            
+
             // 3. Upsert su Qdrant
             await this.qdrant.upsertPoints([{
                 id: ipDetails._id.toString(),
@@ -75,7 +82,7 @@ export class RagSyncService {
                 }
             }]);
         } catch (error) {
-            this.logger.error(`[RagSync] Error syncing IpDetails: ${error}`);
+            this.handleOperationError('syncIpDetails', error);
         }
     }
 
@@ -83,9 +90,11 @@ export class RagSyncService {
      * Sincronizza un riassunto di campagna nel database vettoriale.
      */
     public async syncCampaignSummary(campaign: any, aiSummary: string, vector: number[]) {
+        if (!this.checkOperational()) return;
+
         try {
             this.logger.debug(`[RagSync] Syncing Campaign Summary for ${campaign.hash}`);
-            
+
             await this.qdrant.upsertPoints([{
                 id: `campaign-${campaign.hash}`,
                 vector: vector,
@@ -100,7 +109,7 @@ export class RagSyncService {
                 }
             }]);
         } catch (error) {
-            this.logger.error(`[RagSync] Error syncing Campaign Summary: ${error}`);
+            this.handleOperationError('syncCampaignSummary', error);
         }
     }
 
@@ -108,9 +117,11 @@ export class RagSyncService {
      * Sincronizza un riassunto di attacco (IP-centrico) nel database vettoriale.
      */
     public async syncAttackSummary(attack: any, aiSummary: string, vector: number[]) {
+        if (!this.checkOperational()) return;
+
         try {
             this.logger.debug(`[RagSync] Syncing Attack Summary for IP ${attack.ip}`);
-            
+
             await this.qdrant.upsertPoints([{
                 id: `attack-${attack.ip.replace(/\./g, '-')}`,
                 vector: vector,
@@ -124,23 +135,50 @@ export class RagSyncService {
                 }
             }]);
         } catch (error) {
-            this.logger.error(`[RagSync] Error syncing Attack Summary: ${error}`);
+            this.handleOperationError('syncAttackSummary', error);
         }
     }
 
     /**
-     * Inizializza il sistema RAG.
+     * Inizializza il sistema RAG con controllo di integrità.
      */
     public async initialize() {
+        this.initializationAttempted = true;
         this.logger.info('[RagSync] Initializing RAG Synchronization system...');
+
         try {
+            // Verifica connettività Qdrant
             await this.qdrant.initializeCollection(768);
+
+            // Verifica connettività Ollama
             const ollamaOk = await this.ollama.checkHealth();
             if (!ollamaOk) {
-                this.logger.warn('[RagSync] Ollama service is not reachable.');
+                throw new Error('Ollama service is unreachable');
             }
+
+            this.isOperational = true;
+            this.logger.info('[RagSync] RAG system is fully operational.');
         } catch (error) {
-            this.logger.error(`[RagSync] Initialization failed: ${error}`);
+            this.isOperational = false;
+            this.logger.warn(`[RagSync] RAG system initialized in DEGRADED mode (Disabled): ${error.message}`);
         }
+    }
+
+    private checkOperational(): boolean {
+        if (!this.initializationAttempted) return false;
+        return this.isOperational;
+    }
+
+    private handleOperationError(operation: string, error: any) {
+        this.logger.error(`[RagSync] Error during ${operation}: ${error.message}`);
+        // Se riceviamo troppi errori consecutivi, potremmo disattivare il sistema temporaneamente
+        // Per ora facciamo solo il log silenziato.
+    }
+
+    public getStatus() {
+        return {
+            operational: this.isOperational,
+            initializationAttempted: this.initializationAttempted
+        };
     }
 }

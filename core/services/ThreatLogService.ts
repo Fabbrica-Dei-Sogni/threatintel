@@ -340,7 +340,7 @@ export class ThreatLogService {
             const result = await ThreatLog.populate(attack, { path: 'ipDetailsId', model: 'IpDetails' });
             // Sincronizza il campo ipDetails per retrocompatibilità con il frontend (che si aspetta ipDetails anziché ipDetailsId)
             const resAny = result as any;
-            // Sincronizza il campo ipDetails per retrocompatibilità con il frontend (che si aspetta ipDetails anziché ipDetailsId)
+            // Sincronizza il campo ipDetails per retrocompatibilità con il frontend (che si asaptte ipDetails anziché ipDetailsId)
             if (resAny.ipDetailsId) {
                 resAny.ipDetails = resAny.ipDetailsId;
             }
@@ -818,6 +818,13 @@ export class ThreatLogService {
      */
     async materializeAttackSummaries() {
         this.logger.info('[ThreatLogService] Starting attack materialization for RAG...');
+
+        // Controllo Fallback: evita chiamate se il sistema RAG non è operativo
+        if (!this.ragSync.getStatus().operational) {
+            this.logger.debug('[ThreatLogService] RAG materialization skipped: System is not operational.');
+            return;
+        }
+
         try {
             const result = await this.getAttacks({
                 minLogsForAttack: 10,

@@ -9,6 +9,7 @@ export class OllamaService {
     private baseUrl: string;
     private embeddingModel: string;
     private summaryModel: string;
+    private timeout: number = 5000; // 5 secondi max per AI operations
 
     constructor(
         @inject(LOGGER_TOKEN) private readonly logger: Logger,
@@ -30,7 +31,7 @@ export class OllamaService {
             const response = await axios.post(`${this.baseUrl}/api/embeddings`, {
                 model: this.embeddingModel,
                 prompt: text
-            });
+            }, { timeout: this.timeout });
 
             if (response.data && response.data.embedding) {
                 return response.data.embedding;
@@ -53,8 +54,8 @@ export class OllamaService {
             const response = await axios.post(`${this.baseUrl}/api/generate`, {
                 model: this.summaryModel,
                 prompt: prompt,
-                stream: false // Vogliamo la risposta completa in una volta sola
-            });
+                stream: false
+            }, { timeout: 15000 }); // Più tempo per la generazione (15s)
 
             if (response.data && response.data.response) {
                 return response.data.response;
@@ -71,10 +72,10 @@ export class OllamaService {
      */
     public async checkHealth(): Promise<boolean> {
         try {
-            await axios.get(`${this.baseUrl}/api/tags`);
+            await axios.get(`${this.baseUrl}/api/tags`, { timeout: 2000 });
             return true;
         } catch (error) {
-            this.logger.error(`[Ollama] Health check failed for ${this.baseUrl}: ${error}`);
+            this.logger.warn(`[Ollama] Health check failed: ${error}`);
             return false;
         }
     }

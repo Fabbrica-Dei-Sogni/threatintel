@@ -5,12 +5,19 @@ import ThreatLog from '../models/ThreatLogSchema';
 import { ForensicPipelineService } from './forense/ForensicPipelineService';
 import { TimeFilterStage } from './forense/pipeline/stages/TimeFilterStage';
 import { calculateCorrelationHubs } from '../utils/CampaignAnalytics';
+import { RagSyncService } from './assistant/RagSyncService';
+import { OllamaService } from './assistant/OllamaService';
+import { RagTranslationService } from './assistant/RagTranslationService';
+import { RAG_SYNC_SERVICE_TOKEN, OLLAMA_SERVICE_TOKEN, RAG_TRANSLATION_TOKEN } from '../di/tokens';
 
 @injectable()
 export class CampaignService {
     constructor(
         @inject(LOGGER_TOKEN) private readonly logger: Logger,
-        private readonly forensicPipelineService: ForensicPipelineService
+        private readonly forensicPipelineService: ForensicPipelineService,
+        @inject(RAG_SYNC_SERVICE_TOKEN) private readonly ragSync: RagSyncService,
+        @inject(OLLAMA_SERVICE_TOKEN) private readonly ollama: OllamaService,
+        @inject(RAG_TRANSLATION_TOKEN) private readonly translator: RagTranslationService
     ) {}
 
     /**
@@ -478,6 +485,38 @@ export class CampaignService {
         } catch (err: any) {
             this.logger.error(`[CampaignService] Unique URIs Error: ${err.message}`);
             throw err;
+        }
+    }
+
+    /**
+     * Materializza i riassunti AI delle campagne nel database vettoriale.
+     */
+    async materializeCampaignSummaries() {
+        this.logger.info('[CampaignService] Starting campaign materialization for RAG...');
+        try {
+            const result = await this.getCampaigns({ 
+                minIps: 2, 
+                pageSize: 50, 
+                timeConfig: { timeMode: 'ago', agoUnit: 'h', agoValue: 24 } 
+            });
+
+            for (const campaign of result.campaigns) {
+                try {
+                    this.logger.debug(`[CampaignService] Materializing summary for campaign: ${campaign.hash}`);
+                    
+                    const prompt = this.translator.buildCampaignSummaryPrompt(campaign);
+                    const aiSummary = await this.ollama.generate(prompt);
+                    const vector = await this.ollama.getEmbedding(aiSummary);
+                    
+                    await this.ragSync.syncCampaignSummary(campaign, aiSummary, vector);
+                } catch (campaignError) {
+                    this.logger.error(`[CampaignService] Error materializing campaign ${campaign.hash}: ${campaignError}`);
+                }
+            }
+            
+            this.logger.info(`[CampaignService] Materialization completed for ${result.campaigns.length} campaigns.`);
+        } catch (error) {
+            this.logger.error(`[CampaignService] Materialization failed: ${error}`);
         }
     }
 }

@@ -7,9 +7,12 @@ import PatternAnalysisService from './PatternAnalysisService';
 import { ForensicService } from './forense/ForensicService';
 import { ForensicPipelineService } from './forense/ForensicPipelineService';
 import { inject, injectable } from 'tsyringe';
-import { LOGGER_TOKEN } from '../di/tokens';
+import { LOGGER_TOKEN, RAG_SYNC_SERVICE_TOKEN, OLLAMA_SERVICE_TOKEN, RAG_TRANSLATION_TOKEN } from '../di/tokens';
 import { Logger } from 'winston';
 import { IpDetailsService } from './IpDetailsService';
+import { RagSyncService } from './assistant/RagSyncService';
+import { OllamaService } from './assistant/OllamaService';
+import { RagTranslationService } from './assistant/RagTranslationService';
 import { LogFilters } from '../types/threat-log.types';
 import { ThreatIndicator } from '../types/indicators';
 import { Types } from 'mongoose';
@@ -36,6 +39,9 @@ export class ThreatLogService {
         private readonly forensicPipelineService: ForensicPipelineService,
         private readonly ipDetailsService: IpDetailsService,
         private readonly patternAnalysisService: PatternAnalysisService,
+        @inject(RAG_SYNC_SERVICE_TOKEN) private readonly ragSync: RagSyncService,
+        @inject(OLLAMA_SERVICE_TOKEN) private readonly ollama: OllamaService,
+        @inject(RAG_TRANSLATION_TOKEN) private readonly translator: RagTranslationService
     ) {
         // Parse della variabile di ambiente al costruttore
         //this.patternAnalysisService = new PatternAnalysis({ geoEnabled: true });
@@ -60,6 +66,13 @@ export class ThreatLogService {
             { $set: logEntry },
             { upsert: true, new: true, setDefaultsOnInsert: true }
         );
+
+        // SYNC TO RAG (Asincrono e non bloccante)
+        if (log) {
+            this.ragSync.syncThreatLog(log).catch(err => 
+                this.logger.error(`[ThreatLogService] Error during RAG sync: ${err}`)
+            );
+        }
 
         return log;
     }
@@ -798,6 +811,40 @@ export class ThreatLogService {
             .sort({ timestamp: -1 })
             .limit(limit)
             .select('request.ip request.url fingerprint.score fingerprint.indicators geo.country timestamp');
+    }
+
+    /**
+     * Materializza i riassunti AI degli attacchi (IP-centrici) nel database vettoriale.
+     */
+    async materializeAttackSummaries() {
+        this.logger.info('[ThreatLogService] Starting attack materialization for RAG...');
+        try {
+            const result = await this.getAttacks({
+                minLogsForAttack: 10,
+                pageSize: 50,
+                timeConfig: { timeMode: 'ago', agoUnit: 'h', agoValue: 24 }
+            });
+
+            const attacks = result.items || [];
+
+            for (const attack of attacks) {
+                try {
+                    this.logger.debug(`[ThreatLogService] Materializing summary for attack by IP: ${attack.ip}`);
+                    
+                    const prompt = this.translator.buildAttackSummaryPrompt(attack);
+                    const aiSummary = await this.ollama.generate(prompt);
+                    const vector = await this.ollama.getEmbedding(aiSummary);
+                    
+                    await this.ragSync.syncAttackSummary(attack, aiSummary, vector);
+                } catch (err) {
+                    this.logger.error(`[ThreatLogService] Error materializing attack for IP ${attack.ip}: ${err}`);
+                }
+            }
+            
+            this.logger.info(`[ThreatLogService] Materialization completed for ${attacks.length} attacks.`);
+        } catch (error) {
+            this.logger.error(`[ThreatLogService] Attack materialization failed: ${error}`);
+        }
     }
 }
 

@@ -3,7 +3,11 @@ import { container, type InjectionToken } from "tsyringe";
 import { I18nService } from "../services/I18nService";
 import { AppConfigProvider } from "../services/AppConfigProvider";
 import { RagTranslationService } from "../services/assistant/RagTranslationService";
-import { LOGGER_TOKEN, I18N_TOKEN, CONFIG_PROVIDER_TOKEN, RAG_TRANSLATION_TOKEN } from "./tokens";
+import { QdrantClientService } from "../services/assistant/QdrantClientService";
+import { OllamaService } from "../services/assistant/OllamaService";
+import { RagSyncService } from "../services/assistant/RagSyncService";
+import { RagSyncWorker } from "../services/assistant/RagSyncWorker";
+import { LOGGER_TOKEN, I18N_TOKEN, CONFIG_PROVIDER_TOKEN, RAG_TRANSLATION_TOKEN, QDRANT_CLIENT_TOKEN, OLLAMA_SERVICE_TOKEN, RAG_SYNC_SERVICE_TOKEN, RAG_SYNC_WORKER_TOKEN } from "./tokens";
 import logger from "../../logger";
 
 export const coreContainer = container;
@@ -45,6 +49,22 @@ coreContainer.register(CONFIG_PROVIDER_TOKEN, { useClass: AppConfigProvider });
 // registrazione del servizio RagTranslationService come singleton
 coreContainer.registerSingleton(RagTranslationService);
 coreContainer.register(RAG_TRANSLATION_TOKEN, { useClass: RagTranslationService });
+
+// registrazione del servizio QdrantClientService come singleton
+coreContainer.registerSingleton(QdrantClientService);
+coreContainer.register(QDRANT_CLIENT_TOKEN, { useClass: QdrantClientService });
+
+// registrazione del servizio OllamaService come singleton
+coreContainer.registerSingleton(OllamaService);
+coreContainer.register(OLLAMA_SERVICE_TOKEN, { useClass: OllamaService });
+
+// registrazione del servizio RagSyncService come singleton
+coreContainer.registerSingleton(RagSyncService);
+coreContainer.register(RAG_SYNC_SERVICE_TOKEN, { useClass: RagSyncService });
+
+// registrazione del servizio RagSyncWorker come singleton
+coreContainer.registerSingleton(RagSyncWorker);
+coreContainer.register(RAG_SYNC_WORKER_TOKEN, { useClass: RagSyncWorker });
 
 
 // nuova funzione generica

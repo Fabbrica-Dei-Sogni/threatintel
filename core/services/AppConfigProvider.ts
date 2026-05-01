@@ -47,6 +47,32 @@ export class AppConfigProvider {
     }
 
     /**
+     * Configurazione Qdrant
+     */
+    get qdrantUrl(): string {
+        return process.env.QDRANT_URL || 'http://localhost:6333';
+    }
+
+    get ragCollectionName(): string {
+        return process.env.RAG_COLLECTION_NAME || 'threat_intelligence';
+    }
+
+    /**
+     * Configurazione Ollama
+     */
+    get ollamaUrl(): string {
+        return process.env.OLLAMA_URL || 'http://localhost:11434';
+    }
+
+    get embeddingModel(): string {
+        return process.env.EMBEDDING_MODEL || 'nomic-embed-text';
+    }
+
+    get summaryModel(): string {
+        return process.env.SUMMARY_MODEL || 'gemma';
+    }
+
+    /**
      * Esempi di recupero parametri dinamici da Database tramite ConfigService
      */
     async getDynamicConfig(key: ConfigKey): Promise<string | null> {

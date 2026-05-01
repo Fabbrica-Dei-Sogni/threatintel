@@ -5,144 +5,143 @@ import { IThreatLog } from '../../models/ThreatLogSchema';
 import { IIpDetails } from '../../models/IpDetailsSchema';
 import { IAbuseIpDb } from '../../models/AbuseIpDbSchema';
 import { IAbuseReport } from '../../models/AbuseReportSchema';
-import { RAG_TEMPLATES, interpolate } from './RagTemplates';
+import { RAG_TEMPLATES } from './RagTemplates';
 
-
-/**
- * Servizio dedicato alla "Traduzione Semantica" per l'indicizzazione RAG.
- * Converte i modelli di dominio strutturati (JSON) in stringhe narrative 
- * ricche di parole chiave, ottimizzate per la ricerca vettoriale su Qdrant.
- */
 @injectable()
 export class RagTranslationService {
-
     constructor(
         @inject(LOGGER_TOKEN) private readonly logger: Logger
     ) {}
 
     /**
-     * Traduce un singolo ThreatLog (Atomo) in testo narrativo.
-     * Approccio: Deterministico (Zero costi LLM, esecuzione istantanea).
+     * Traduce un ThreatLog in una narrazione testuale per il RAG.
      */
     public translateThreatLog(log: IThreatLog): string {
-        this.logger.debug('Translating ThreatLog to semantic narrative');
-        const ip = log.request?.ip || "Sconosciuto";
-        const protocol = log.protocol || "Sconosciuto";
-        const method = log.request?.method || "N/A";
+        this.logger.debug(`Translating ThreatLog ${log.id} for RAG`);
         
-        let geoInfo = "provenienza sconosciuta";
-        if (log.geo) {
-            const parts = [];
-            if (log.geo.city) parts.push(log.geo.city);
-            if (log.geo.country) parts.push(log.geo.country);
-            if (log.geo.isp) parts.push(`(ISP: ${log.geo.isp})`);
-            if (parts.length > 0) {
-                geoInfo = parts.join(', ');
-            }
+        const timestamp = new Date(log.timestamp).toLocaleString('it-IT');
+        const ip = log.request?.ip || 'sconosciuto';
+        const method = log.request?.method || 'N/A';
+        const url = log.request?.url || '/';
+        const protocol = log.protocol || 'http';
+        const score = log.fingerprint?.score || 0;
+        const indicators = log.fingerprint?.indicators?.join(', ') || 'nessuno';
+        
+        // Informazioni geografiche
+        const country = log.geo?.country || 'paese sconosciuto';
+        const city = log.geo?.city || 'città sconosciuta';
+        const geoInfo = `${city}, ${country}`;
+
+        let contextParts = [];
+        
+        if (log.fingerprint?.suspicious) {
+            contextParts.push(RAG_TEMPLATES.NARRATIVES.SUSPICIOUS_YES);
         }
 
-        const score = log.fingerprint?.score || 0;
-        const isSuspicious = log.fingerprint?.suspicious 
-            ? RAG_TEMPLATES.THREAT_LOG.SUSPICIOUS_YES 
-            : RAG_TEMPLATES.THREAT_LOG.SUSPICIOUS_NO;
-        
-        const timestamp = new Date(log.timestamp).toISOString();
+        if (log.request?.jndiPayload || indicators.toLowerCase().includes('jndi')) {
+            const payload = log.request?.jndiPayload || 'rilevato dai sensori';
+            contextParts.push(RAG_TEMPLATES.INTERPOLATE(RAG_TEMPLATES.NARRATIVES.JNDI_ALERT, { payload }));
+        }
 
-        // 1. Core Narrative
-        let narrative = interpolate(RAG_TEMPLATES.THREAT_LOG.CORE, {
+        if (protocol === 'ssh') {
+            contextParts.push(RAG_TEMPLATES.NARRATIVES.SSH_CONTEXT);
+        }
+
+        const context = contextParts.join(' ');
+
+        return RAG_TEMPLATES.INTERPOLATE(RAG_TEMPLATES.NARRATIVES.THREAT_LOG_BASE, {
             timestamp,
             ip,
-            geoInfo,
-            protocol,
             method,
-            score
-        }) + " " + isSuspicious;
-
-        // 2. Keyword Density (Aggiungiamo indicatori specifici se presenti)
-        if (log.request?.jndiPayload) {
-            narrative += " " + interpolate(RAG_TEMPLATES.THREAT_LOG.JNDI_ALERT, { payload: log.request.jndiPayload });
-        }
-        
-        if (log.fingerprint?.indicators && log.fingerprint.indicators.length > 0) {
-            narrative += " " + interpolate(RAG_TEMPLATES.THREAT_LOG.INDICATORS, { indicators: log.fingerprint.indicators.join(', ') });
-        }
-
-        return narrative;
+            url,
+            protocol,
+            indicators,
+            score: score.toString(),
+            geoInfo,
+            context
+        });
     }
 
     /**
-     * Traduce le informazioni di base di un IP (Atomo) in testo narrativo.
-     * Approccio: Deterministico (Zero costi LLM).
-     * @param ipDetails I dettagli base dell'IP
-     * @param abuseData Opzionale. I dati di intelligence provenienti da AbuseIPDB, se disponibili.
-     * @param abuseReports Opzionale. Array di report correlati per estrarre TTPs dai commenti.
+     * Traduce i dettagli di un IP e i relativi report in un sommario semantico.
      */
-    public translateIpDetails(ipDetails: IIpDetails, abuseData?: IAbuseIpDb | null, abuseReports?: IAbuseReport[]): string {
-        this.logger.debug('Translating IpDetails to semantic narrative');
-        const ip = ipDetails.ip;
-        const firstSeen = new Date(ipDetails.firstSeenAt).toISOString();
-        const lastSeen = new Date(ipDetails.lastSeenAt).toISOString();
+    public translateIpDetails(
+        ipDetails: IIpDetails, 
+        abuseData?: IAbuseIpDb | any | null, 
+        abuseReports?: IAbuseReport[]
+    ): string {
+        this.logger.debug(`Translating IP Details for ${ipDetails.ip} for RAG`);
+
+        const geo = ipDetails.ipinfo?.city 
+            ? `${ipDetails.ipinfo.city}, ${ipDetails.ipinfo.country}` 
+            : 'posizione sconosciuta';
         
-        let orgInfo = "";
-        if (ipDetails.ipinfo && ipDetails.ipinfo.org) {
-            orgInfo = interpolate(RAG_TEMPLATES.IP_DETAILS.ORG, { org: ipDetails.ipinfo.org });
-        }
+        const isp = ipDetails.ipinfo?.org || 'ISP sconosciuto';
+        
+        const details = ipDetails as any;
+        const isTor = abuseData?.isTor || 
+                     details.threatScore?.isTor || 
+                     (abuseReports && abuseReports.some(r => r.comment.toLowerCase().includes('tor node')));
+        
+        const torContext = isTor ? `\n[ALERT] ${RAG_TEMPLATES.NARRATIVES.TOR_NODE_INFO}` : '';
 
-        let narrative = interpolate(RAG_TEMPLATES.IP_DETAILS.HEADER, { ip }) + " " +
-                        interpolate(RAG_TEMPLATES.IP_DETAILS.TIMELINE, { firstSeen, lastSeen }) + " " +
-                        orgInfo + " " +
-                        RAG_TEMPLATES.IP_DETAILS.FOOTER;
+        const reportsSummary = (abuseReports || [])
+            .map(r => {
+                const cleanComment = this.sanitizeComment(r.comment);
+                return cleanComment ? `- ${cleanComment}` : null;
+            })
+            .filter(Boolean)
+            .slice(0, 5)
+            .join('\n');
 
-        // Aggiunta Intelligence esterna (AbuseIPDB)
-        if (abuseData) {
-            const score = abuseData.abuseConfidenceScore || 0;
-            const totalReports = abuseData.totalReports || 0;
-            const isTor = abuseData.isTor ? RAG_TEMPLATES.IP_DETAILS.TOR_NODE : "";
-            
-            narrative += " " + interpolate(RAG_TEMPLATES.IP_DETAILS.ABUSE_SCORE, { score, totalReports }) + " " + isTor;
-        }
+        const abuseScore = abuseData?.abuseConfidenceScore || 0;
+        const totalReports = abuseData?.totalReports || 0;
 
-        // Estrazione Semantica dai Commenti (Filtro Anti-Spam e Deduplicazione)
-        if (abuseReports && abuseReports.length > 0) {
-            const spamRegex = /(fail2ban|ban triggered|port scan|blocked via|banned|honeypot)/i;
-            
-            const uniqueComments = new Set<string>();
-            const semanticComments: string[] = [];
+        let narrative = RAG_TEMPLATES.INTERPOLATE(RAG_TEMPLATES.NARRATIVES.IP_DETAILS_BASE, {
+            ip: ipDetails.ip,
+            geo,
+            isp,
+            abuseScore: abuseScore.toString(),
+            totalReports: totalReports.toString(),
+            reports: reportsSummary || 'Nessun report dettagliato disponibile.'
+        });
 
-            for (const report of abuseReports) {
-                const comment = report.comment?.trim();
-                if (!comment || comment.length < 15) continue; // Salta commenti troppo brevi
-                
-                if (spamRegex.test(comment)) continue; // Filtra lo spam automatico noto
-                
-                if (!uniqueComments.has(comment)) {
-                    uniqueComments.add(comment);
-                    semanticComments.push(comment);
-                }
-                
-                if (semanticComments.length >= 5) break; // Limite massimo 5 per non esplodere coi token
-            }
-
-            if (semanticComments.length > 0) {
-                const comments = semanticComments.map(c => `"${c}"`).join('; ');
-                narrative += " " + interpolate(RAG_TEMPLATES.IP_DETAILS.COMMUNITY_REPORTS, { comments });
-            }
-        }
-
-        return narrative.trim().replace(/\s+/g, ' '); // Pulisce spazi doppi
+        return narrative + torContext;
     }
 
-    /**
-     * Genera il Prompt di Sistema da inviare all'LLM (es. Ollama/OpenAI) 
-     * per riassumere le Campagne o gli Attacchi generati on-the-fly.
-     * Approccio: Generativo (Richiede invocazione LLM esterna).
-     */
+    private sanitizeComment(comment: string): string {
+        if (!comment) return '';
+        const spamPatterns = [/fail2ban/i, /port scan/i, /bad ip/i];
+        if (spamPatterns.some(p => p.test(comment))) return '';
+
+        let clean = comment
+            .replace(/\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/g, '')
+            .trim();
+        if (clean.length < 5) return '';
+        return clean;
+    }
+
     public buildCampaignSummaryPrompt(campaignJsonData: any): string {
-        this.logger.debug('Building campaign summary prompt for LLM materialization');
-        
         return RAG_TEMPLATES.PROMPTS.CAMPAIGN_SYSTEM + 
                "\n\n--- INIZIO DATI JSON DELLA CAMPAGNA ---\n" + 
                JSON.stringify(campaignJsonData, null, 2) + 
                "\n--- FINE DATI ---";
+    }
+
+    public buildAttackSummaryPrompt(attack: any): string {
+        const ip = attack.ip || attack.request?.ip || 'N/A';
+        return `Descrivi brevemente l'attività di questo attaccante basandoti sui dati tecnici forniti. 
+Sii conciso e focalizzati sulla pericolosità e sulla tecnica.
+
+Dati Attaccante:
+- IP: ${ip}
+- Totale Colpi: ${attack.totaleLogs}
+- Score Medio: ${attack.averageScore?.toFixed(2)}
+- Prima Attività: ${attack.firstSeen}
+- Ultima Attività: ${attack.lastSeen}
+- Pattern Rilevati: ${attack.attackPatterns?.join(', ') || 'Nessuno'}
+- URL Target (campione): ${attack.sampleUrl || attack.request?.url}
+
+Istruzioni: Spiega che tipo di minaccia rappresenta questo IP e se sembra un attacco mirato o una scansione automatica di massa.`;
     }
 }

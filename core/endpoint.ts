@@ -27,6 +27,8 @@ import { ReportController } from "./controllers/ReportController";
 import { DossierController } from "./controllers/DossierController";
 import { AuthController } from "./controllers/AuthController";
 import { AuthMiddleware } from "./middlewares/AuthMiddleware";
+import { AssistantController } from "./controllers/AssistantController";
+import assistantroutes from "./apis/assistantroutes";
 import { RateLimitMiddleware } from "./rateLimitMiddleware";
 import { setupSwagger } from "./swagger";
 
@@ -42,6 +44,7 @@ const reportController = getComponent(ReportController);
 const dossierController = getComponent(DossierController);
 const authController = getComponent(AuthController);
 const authMiddleware = getComponent(AuthMiddleware);
+const assistantController = getComponent(AssistantController);
 
 const threatLogger = getComponent(ThreatLogger);
 const rateLimitMiddleware = getComponent(RateLimitMiddleware);
@@ -71,6 +74,9 @@ router.use('/', threatroutes(threatController, authMiddleware));
 
 // API Campagne (Distributed Threat Analytics)
 router.use('/', campaignroutes(campaignController));
+
+// API Assistant (RAG & AI)
+router.use('/', assistantroutes(assistantController, authMiddleware));
 
 
 

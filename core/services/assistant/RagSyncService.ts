@@ -120,14 +120,15 @@ export class RagSyncService {
         if (!this.checkOperational()) return;
 
         try {
-            this.logger.debug(`[RagSync] Syncing Attack Summary for IP ${attack.ip}`);
+            const ip = attack.request?.ip || attack.ip;
+            this.logger.debug(`[RagSync] Syncing Attack Summary for IP ${ip}`);
 
             await this.qdrant.upsertPoints([{
-                id: `attack-${attack.ip.replace(/\./g, '-')}`,
+                id: `attack-${ip.replace(/\./g, '-')}`,
                 vector: vector,
                 payload: {
                     type: 'attack_summary',
-                    ip: attack.ip,
+                    ip: ip,
                     totalLogs: attack.totaleLogs,
                     averageScore: attack.averageScore,
                     text: aiSummary,

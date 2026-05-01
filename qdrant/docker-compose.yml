@@ -1,0 +1,33 @@
+name: "threatintel-rag"
+
+services:
+  qdrant-threatintel:
+    image: qdrant/qdrant:latest
+    container_name: qdrant-threatintel
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:6333:6333" # REST API (per l'Agent AI / Node.js Backend)
+      - "127.0.0.1:6334:6334" # gRPC API (opzionale, per performance massime)
+    volumes:
+      - qdrant_storage:/qdrant/storage
+    networks:
+      - shared-network
+
+volumes:
+  qdrant_storage:
+    # Utilizza lo stesso pattern di storage locale del tuo MongoDB.
+    # ASSICURATI che la cartella specificata in 'device' esista sul server host,
+    # altrimenti il comando 'docker-compose up' fallirà.
+    # Puoi crearla con: sudo mkdir -p /mnt/threatintel/qdrant-storage
+    driver_opts:
+      type: local
+      o: bind
+      device: ${MOUNT_STORAGE_QDRANT:-/mnt/threatintel/qdrant-storage}
+
+networks:
+  shared-network:
+    # Specifichiamo che la rete è esterna (gestita dall'altro docker-compose)
+    external: true
+    # Il nome reale della rete creata dal compose di MongoDB è la concatenazione 
+    # del 'name' del progetto e della chiave di rete.
+    name: threat-intelligence-suite_network-threatintel

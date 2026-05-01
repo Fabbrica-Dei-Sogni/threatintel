@@ -75,14 +75,15 @@ export class QdrantClientService {
     }
 
     /**
-     * Ricerca per similarità vettoriale.
+     * Ricerca per similarità vettoriale con supporto ai filtri.
      */
-    public async search(collectionName: string, vector: number[], limit: number = 5) {
+    public async search(collectionName: string, vector: number[], limit: number = 5, filter?: any) {
         try {
             this.logger.debug(`[Qdrant] Searching for similarity in ${collectionName}`);
             return await this.client.search(collectionName, {
                 vector: vector,
                 limit: limit,
+                filter: filter,
                 with_payload: true
             });
         } catch (error) {

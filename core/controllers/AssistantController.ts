@@ -44,8 +44,11 @@ export class AssistantController {
             // 1. Generazione embedding per la query
             const queryVector = await this.ollama.getEmbedding(query);
 
-            // 2. Ricerca semantica su Qdrant
-            const results = await this.qdrant.search(queryVector, limit);
+            // 2. Selezione collection (se type è log usiamo threat_logs, altrimenti intelligence)
+            const collection = type === 'threat_log' ? 'threat_logs' : 'threat_intelligence';
+
+            // 3. Ricerca semantica su Qdrant
+            const results = await this.qdrant.search(collection, queryVector, limit);
 
             // 3. Filtraggio opzionale per tipo e score
             const filteredResults = results
@@ -99,9 +102,9 @@ export class AssistantController {
                 return;
             }
 
-            // 1. Retrieval
+            // 1. Retrieval (Cerchiamo principalmente nella collection intelligence per avere i riassunti)
             const queryVector = await this.ollama.getEmbedding(question);
-            const contextResults = await this.qdrant.search(queryVector, 3);
+            const contextResults = await this.qdrant.search('threat_intelligence', queryVector, 3);
             const contextText = contextResults.map(r => r.payload?.text).join('\n---\n');
 
             // 2. Generation (Augmentation)

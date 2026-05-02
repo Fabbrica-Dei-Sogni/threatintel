@@ -10,7 +10,7 @@ export class RagValidator {
      * Valida le opzioni di ricerca.
      */
     public static validateSearchOptions(options: RagSearchOptions): { valid: boolean; error?: string } {
-        if (options.limit && (options.limit < 1 || options.limit > 50)) {
+        if (options.limit !== undefined && (options.limit < 1 || options.limit > 50)) {
             return { valid: false, error: 'Il limite di ricerca deve essere compreso tra 1 e 50' };
         }
         if (options.scoreThreshold && (options.scoreThreshold < 0 || options.scoreThreshold > 1)) {

@@ -63,6 +63,7 @@ describe('RagSyncService', () => {
     });
 
     afterEach(() => {
+        ragSyncService.stop();
         jest.useRealTimers();
     });
 

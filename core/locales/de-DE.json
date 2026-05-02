@@ -353,6 +353,16 @@
             "notFound": "Ressource nicht gefunden",
             "fetchError": "Fehler beim Abrufen der Daten",
             "searchError": "Fehler bei der Suche"
+        },
+        "rag": {
+            "notOperational": "RAG-Dienst vorübergehend nicht verfügbar",
+            "searchError": "RAG semantischer Suchfehler",
+            "askError": "RAG Antwortgenerierungsfehler",
+            "resolveError": "Fehler bei der Quellenauflösung",
+            "missingQuery": "Suchanfrage fehlt o. ungültig",
+            "missingQuestion": "Frage fehlt",
+            "missingSourceRef": "SourceRef fehlt",
+            "invalidSourceType": "Nicht unterstützter Quellentyp"
         }
     }
 }

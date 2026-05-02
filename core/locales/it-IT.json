@@ -358,6 +358,16 @@
             "notFound": "Risorsa non trovata",
             "fetchError": "Errore durante il recupero dei dati",
             "searchError": "Errore durante la ricerca"
+        },
+        "rag": {
+            "notOperational": "Servizio RAG temporaneamente non disponibile",
+            "searchError": "Errore durante la ricerca semantica RAG",
+            "askError": "Errore durante la generazione della risposta RAG",
+            "resolveError": "Errore durante la risoluzione della sorgente",
+            "missingQuery": "Query di ricerca mancante o non valida",
+            "missingQuestion": "Domanda mancante",
+            "missingSourceRef": "SourceRef mancante",
+            "invalidSourceType": "Tipo di sorgente non supportato"
         }
     }
 }

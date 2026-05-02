@@ -10,10 +10,8 @@ import { inject, injectable } from 'tsyringe';
 import { LOGGER_TOKEN, RAG_SYNC_SERVICE_TOKEN } from '../di/tokens';
 import { Logger } from 'winston';
 import { IpDetailsService } from './IpDetailsService';
-import { ConfigService } from './ConfigService';
 import { RagSyncService } from './assistant/RagSyncService';
 import { LogFilters } from '../types/threat-log.types';
-import { ThreatIndicator } from '../types/indicators';
 import { Types } from 'mongoose';
 import {
     sanitizeSortFields,
@@ -22,8 +20,7 @@ import {
     sanitizePage,
     sanitizeLimit,
     SortAllowedFields,
-    FilterAllowedFields,
-    escapeRegex
+    FilterAllowedFields
 } from '../utils/queryGuard';
 
 dotenv.config();
@@ -38,7 +35,6 @@ export class ThreatLogService {
         private readonly forensicPipelineService: ForensicPipelineService,
         private readonly ipDetailsService: IpDetailsService,
         private readonly patternAnalysisService: PatternAnalysisService,
-        private readonly configService: ConfigService,
         @inject(RAG_SYNC_SERVICE_TOKEN) private readonly ragSync: RagSyncService
     ) {
         // Parse della variabile di ambiente al costruttore
@@ -810,10 +806,5 @@ export class ThreatLogService {
             .limit(limit)
             .select('request.ip request.url fingerprint.score fingerprint.indicators geo.country timestamp');
     }
-
-    /**
-     * Materializza i riassunti AI degli attacchi (Anomalie) nel database vettoriale.
-     * Implementa un loop di recupero totale (Fetch-All) per garantire la coerenza.
-     */
 }
 

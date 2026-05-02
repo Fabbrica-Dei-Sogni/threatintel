@@ -39,10 +39,7 @@ describe('ReportService', () => {
             {} as any, 
             {} as any, 
             {} as any, 
-            mockConfigService, 
-            mockRagSync, 
-            mockOllama, 
-            mockTranslator
+            mockRagSync
         ) as any;
         mockCowrieService = new CowrieService(mockLogger, {} as any) as any;
         mockIpDetailsService = new IpDetailsService(mockLogger, mockRagSync) as any;

@@ -118,3 +118,31 @@ export interface IpDetailsPayload extends RagBasePayload {
     ip: string;
     lastSeen: Date;
 }
+
+/**
+ * Risultato di una ricerca semantica standardizzato.
+ */
+export interface RagSearchHit {
+    id: string | number;
+    score: number;
+    text: string;
+    sourceRef: RagSourceRef;
+}
+
+/**
+ * Risposta del sistema RAG ad una domanda (Ask).
+ */
+export interface RagAskResponse {
+    question: string;
+    answer: string;
+    sources: RagSearchHit[];
+}
+
+/**
+ * Opzioni per la ricerca semantica.
+ */
+export interface RagSearchOptions {
+    limit?: number;
+    scoreThreshold?: number;
+    type?: RagEntityType;
+}

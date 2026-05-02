@@ -353,6 +353,16 @@
             "notFound": "Ресурс не найден",
             "fetchError": "Ошибка при получении данных",
             "searchError": "Ошибка при поиске"
+        },
+        "rag": {
+            "notOperational": "Сервис RAG временно недоступен",
+            "searchError": "Ошибка семантического поиска RAG",
+            "askError": "Ошибка генерации ответа RAG",
+            "resolveError": "Ошибка разрешения источника",
+            "missingQuery": "Поисковый запрос отсутствует или недействителен",
+            "missingQuestion": "Вопрос отсутствует",
+            "missingSourceRef": "SourceRef отсутствует",
+            "invalidSourceType": "Неподдерживаемый тип источника"
         }
     }
 }

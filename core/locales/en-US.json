@@ -359,6 +359,16 @@
             "notFound": "Resource not found",
             "fetchError": "Error fetching data",
             "searchError": "Error during search"
+        },
+        "rag": {
+            "notOperational": "RAG service temporarily unavailable",
+            "searchError": "RAG semantic search error",
+            "askError": "RAG answer generation error",
+            "resolveError": "Source resolution error",
+            "missingQuery": "Search query missing or invalid",
+            "missingQuestion": "Question missing",
+            "missingSourceRef": "SourceRef missing",
+            "invalidSourceType": "Unsupported source type"
         }
     }
 }

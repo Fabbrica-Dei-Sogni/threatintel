@@ -3,6 +3,7 @@ import { RagSyncService } from '../RagSyncService';
 import { RagTranslationService } from '../RagTranslationService';
 import { QdrantClientService } from '../QdrantClientService';
 import { OllamaService } from '../OllamaService';
+import { AppConfigProvider } from '../../AppConfigProvider';
 import { Logger } from 'winston';
 import { stringToUuid } from '../../../utils/uuid';
 
@@ -12,6 +13,7 @@ describe('RagSyncService', () => {
     let mockTranslator: jest.Mocked<RagTranslationService>;
     let mockQdrant: jest.Mocked<QdrantClientService>;
     let mockOllama: jest.Mocked<OllamaService>;
+    let mockConfig: jest.Mocked<AppConfigProvider>;
 
     beforeEach(async () => {
         jest.useFakeTimers();
@@ -42,11 +44,18 @@ describe('RagSyncService', () => {
             checkHealth: jest.fn().mockResolvedValue(true)
         } as any;
 
+        mockConfig = {
+            ragCollectionName: 'threat_intelligence',
+            ragLogsCollectionName: 'threat_logs',
+            ragEnabled: true
+        } as any;
+
         ragSyncService = new RagSyncService(
             mockLogger,
             mockTranslator,
             mockQdrant,
-            mockOllama
+            mockOllama,
+            mockConfig
         );
 
         // Inizializza per rendere il servizio operativo
@@ -170,7 +179,7 @@ describe('RagSyncService', () => {
 
     it('should skip operations if not operational', async () => {
         mockOllama.checkHealth.mockResolvedValueOnce(false);
-        const degradedService = new RagSyncService(mockLogger, mockTranslator, mockQdrant, mockOllama);
+        const degradedService = new RagSyncService(mockLogger, mockTranslator, mockQdrant, mockOllama, mockConfig);
         await degradedService.initialize();
 
         expect(degradedService.getStatus().operational).toBe(false);

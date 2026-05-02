@@ -7,7 +7,8 @@ import { QdrantClientService } from "../services/assistant/QdrantClientService";
 import { OllamaService } from "../services/assistant/OllamaService";
 import { RagSyncService } from "../services/assistant/RagSyncService";
 import { RagSyncWorker } from "../services/assistant/RagSyncWorker";
-import { LOGGER_TOKEN, I18N_TOKEN, CONFIG_PROVIDER_TOKEN, RAG_TRANSLATION_TOKEN, QDRANT_CLIENT_TOKEN, OLLAMA_SERVICE_TOKEN, RAG_SYNC_SERVICE_TOKEN, RAG_SYNC_WORKER_TOKEN } from "./tokens";
+import { AssistantService } from "../services/assistant/AssistantService";
+import { LOGGER_TOKEN, I18N_TOKEN, CONFIG_PROVIDER_TOKEN, RAG_TRANSLATION_TOKEN, QDRANT_CLIENT_TOKEN, OLLAMA_SERVICE_TOKEN, RAG_SYNC_SERVICE_TOKEN, RAG_SYNC_WORKER_TOKEN, ASSISTANT_SERVICE_TOKEN } from "./tokens";
 import logger from "../../logger";
 
 export const coreContainer = container;
@@ -58,6 +59,9 @@ coreContainer.registerSingleton(RAG_SYNC_SERVICE_TOKEN, RagSyncService);
 
 // registrazione del servizio RagSyncWorker come singleton
 coreContainer.registerSingleton(RAG_SYNC_WORKER_TOKEN, RagSyncWorker);
+
+// registrazione del servizio AssistantService come singleton
+coreContainer.registerSingleton(ASSISTANT_SERVICE_TOKEN, AssistantService);
 
 
 // nuova funzione generica

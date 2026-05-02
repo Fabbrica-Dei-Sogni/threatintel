@@ -388,7 +388,9 @@ export class RagSyncService {
         return {
             operational: this.isOperational,
             initializationAttempted: this.initializationAttempted,
-            enabled: this.config.ragEnabled
+            enabled: this.config.ragEnabled,
+            intelligenceCollection: this.COLL_INTELLIGENCE,
+            logsCollection: this.COLL_LOGS
         };
     }
 

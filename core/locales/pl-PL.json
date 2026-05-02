@@ -353,6 +353,16 @@
             "notFound": "Zasób nie został znaleziony",
             "fetchError": "Błąd podczas pobierania danych",
             "searchError": "Błąd podczas wyszukiwania"
+        },
+        "rag": {
+            "notOperational": "Usługa RAG tymczasowo niedostępna",
+            "searchError": "Błąd wyszukiwania semantycznego RAG",
+            "askError": "Błąd generowania odpowiedzi RAG",
+            "resolveError": "Błąd rozstrzygania źródła",
+            "missingQuery": "Brak zapytania lub jest ono nieprawidłowe",
+            "missingQuestion": "Brak pytania",
+            "missingSourceRef": "Brak SourceRef",
+            "invalidSourceType": "Nieobsługiwany typ źródła"
         }
     }
 }

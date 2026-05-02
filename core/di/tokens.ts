@@ -13,3 +13,4 @@ export const QDRANT_CLIENT_TOKEN = Symbol("QdrantClientService");
 export const OLLAMA_SERVICE_TOKEN = Symbol("OllamaService");
 export const RAG_SYNC_SERVICE_TOKEN = Symbol("RagSyncService");
 export const RAG_SYNC_WORKER_TOKEN = Symbol("RagSyncWorker");
+export const ASSISTANT_SERVICE_TOKEN = Symbol("AssistantService");

@@ -1,4 +1,4 @@
-import { RagEntityType } from "../../types/assistant/rag.types";
+import { RagEntityType, RagTimeConfig } from "../../types/assistant/rag.types";
 
 export interface RagPolicy {
     entityType: RagEntityType;
@@ -8,11 +8,7 @@ export interface RagPolicy {
     minLogsPerIp?: number;
     protocol?: string;
     pageSize?: number;
-    timeConfig?: {
-        timeMode: 'ago' | 'range';
-        agoUnit: string;
-        agoValue: number;
-    };
+    timeConfig?: RagTimeConfig;
     apiRef: {
         endpoint: string;
         method: 'GET' | 'POST';

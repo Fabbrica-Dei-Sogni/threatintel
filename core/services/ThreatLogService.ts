@@ -846,7 +846,7 @@ export class ThreatLogService {
                 const result = await this.getAttacks({ 
                     page: currentPage, 
                     pageSize: policy.pageSize, 
-                    minLogs: policy.minLogs, 
+                    minLogsForAttack: policy.minLogs, 
                     timeConfig: { 
                         timeMode: 'ago', 
                         agoUnit: policy.timeWindow.agoUnit, 
@@ -888,8 +888,9 @@ export class ThreatLogService {
                             endpoint: policy.apiRef.endpoint,
                             method: policy.apiRef.method,
                             params: { 
+                                type: 'attack',
                                 ip: ip,
-                                minLogs: policy.minLogs,
+                                minLogsForAttack: policy.minLogs,
                                 timeWindow: policy.timeWindow
                             }
                         };

@@ -2,7 +2,40 @@
  * Definizione dei tipi per i payload e i riferimenti sorgente del sistema RAG.
  */
 
-export type RagEntityType = 'threat_log' | 'attack_summary' | 'campaign_summary';
+export type RagEntityType = 'threat_log' | 'attack_summary' | 'campaign_summary' | 'ip_details';
+
+/**
+ * Parametri specifici per la ricostruzione di un Log
+ */
+export interface LogSourceParams {
+    type: 'log';
+    id: string;
+}
+
+/**
+ * Parametri specifici per la ricostruzione di un Attacco (Anomalia)
+ */
+export interface AttackSourceParams {
+    type: 'attack';
+    ip: string;
+    minLogsForAttack: number;
+    timeWindow: { agoUnit: string, agoValue: number };
+}
+
+/**
+ * Parametri specifici per la ricostruzione di una Campagna
+ */
+export interface CampaignSourceParams {
+    type: 'campaign';
+    campaignId: string;
+    minIps: number;
+    minScore: number;
+    minLogsPerIp: number;
+    timeWindow: { agoUnit: string, agoValue: number };
+    protocol: string;
+}
+
+export type RagSourceParams = LogSourceParams | AttackSourceParams | CampaignSourceParams;
 
 /**
  * Riferimento alla sorgente originale del dato (API).
@@ -11,7 +44,7 @@ export type RagEntityType = 'threat_log' | 'attack_summary' | 'campaign_summary'
 export interface RagSourceRef {
     endpoint: string;
     method: 'GET' | 'POST';
-    params: Record<string, any>;
+    params: RagSourceParams;
 }
 
 /**

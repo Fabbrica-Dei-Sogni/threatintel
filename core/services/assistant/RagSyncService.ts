@@ -97,7 +97,7 @@ export class RagSyncService {
                     sourceRef: {
                         endpoint: RAG_POLICIES.LOGS.apiRef.endpoint.replace(':id', log._id.toString()),
                         method: RAG_POLICIES.LOGS.apiRef.method,
-                        params: { id: log._id.toString() }
+                        params: { type: 'log', id: log._id.toString() }
                     }
                 };
 
@@ -168,7 +168,15 @@ export class RagSyncService {
                 sourceRef: sourceRef || {
                     endpoint: RAG_POLICIES.CAMPAIGNS.apiRef.endpoint,
                     method: RAG_POLICIES.CAMPAIGNS.apiRef.method,
-                    params: { hash: campaign.hash }
+                    params: { 
+                        type: 'campaign',
+                        campaignId: campaign.hash,
+                        minIps: RAG_POLICIES.CAMPAIGNS.minIps,
+                        minScore: RAG_POLICIES.CAMPAIGNS.minScore,
+                        minLogsPerIp: RAG_POLICIES.CAMPAIGNS.minLogsPerIp,
+                        protocol: RAG_POLICIES.CAMPAIGNS.protocol,
+                        timeWindow: RAG_POLICIES.CAMPAIGNS.timeWindow
+                    }
                 }
             };
 
@@ -202,7 +210,12 @@ export class RagSyncService {
                 sourceRef: sourceRef || {
                     endpoint: RAG_POLICIES.ATTACKS.apiRef.endpoint,
                     method: RAG_POLICIES.ATTACKS.apiRef.method,
-                    params: { ip: ip }
+                    params: { 
+                        type: 'attack',
+                        ip: ip,
+                        minLogsForAttack: RAG_POLICIES.ATTACKS.minLogs,
+                        timeWindow: RAG_POLICIES.ATTACKS.timeWindow
+                    }
                 }
             };
 

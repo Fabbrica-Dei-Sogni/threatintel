@@ -558,11 +558,15 @@ export class CampaignService {
                         
                         // 4. Source Reference per la tracciabilità agentica
                         const sourceRef: RagSourceRef = {
-                            endpoint: '/api/campaigns/detail',
-                            method: 'GET',
+                            endpoint: policy.apiRef.endpoint,
+                            method: policy.apiRef.method,
                             params: { 
-                                hash: campaign.hash,
+                                type: 'campaign',
+                                campaignId: campaign.hash,
                                 minIps: policy.minIps,
+                                minScore: policy.minScore,
+                                minLogsPerIp: policy.minLogsPerIp,
+                                protocol: policy.protocol,
                                 timeWindow: policy.timeWindow
                             }
                         };

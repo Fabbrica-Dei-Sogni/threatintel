@@ -22,6 +22,9 @@ export const RAG_POLICIES = {
     CAMPAIGNS: {
         entityType: 'campaign_summary',
         minIps: 2,                   // Solo campagne con almeno 2 IP
+        minScore: 0,                 // Score minimo aggregato
+        minLogsPerIp: 1,             // Minimo log per IP nel cluster
+        protocol: 'http',            // Protocollo di default
         pageSize: 50,                // Dimensione pagina per il job
         timeWindow: { 
             agoUnit: 'h', 

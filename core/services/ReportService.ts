@@ -343,7 +343,7 @@ export class ReportService {
      * @returns 
      */
     private async getIpReportData(ip: string, locale: string) {
-        const data = await this.ipDetailsService.getIpDetails(ip);
+        const data = await this.ipDetailsService.getIpDetails({ ip });
         const details = data?.ipDetails;
         const abuseDb = details?.abuseipdbId as any;
         
@@ -399,7 +399,7 @@ export class ReportService {
      */
     private async prepareAbuseData(ip: string, locale: string) {
         try {
-            const data = await this.ipDetailsService.getIpDetails(ip);
+            const data = await this.ipDetailsService.getIpDetails({ ip });
             if (!data || !data.ipDetails) return this.getDefaultAbuseObject(locale);
 
             const details = data.ipDetails;

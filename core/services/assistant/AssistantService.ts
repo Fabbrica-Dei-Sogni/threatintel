@@ -28,7 +28,8 @@ import {
     RagAskResponse, 
     RagSearchOptions, 
     RagSourceRef,
-    RagBasePayload
+    RagBasePayload,
+    RAG_SCHEMA_VERSION
 } from '../../types/assistant/rag.types';
 
 @injectable()
@@ -138,39 +139,64 @@ Risposta:`;
             throw new Error(validation.error || this.i18n.t('errors.rag.resolveError'));
         }
 
-        const { params } = ref;
+        const params = validation.sanitizedParams;
         this.logger.info(`[AssistantService] Resolving source for type: ${params.type}`);
 
         try {
             switch (params.type) {
                 case 'log':
-                    return await this.threatLogService.getLogById(params.id);
+                    // Pass-through del DNA di ricostruzione
+                    return await this.threatLogService.getLogById(params);
                 
                 case 'ip_details':
-                    return await this.ipDetailsService.getIpDetails(params.ip);
+                    // Pass-through del DNA di ricostruzione
+                    return await this.ipDetailsService.getIpDetails(params);
                 
                 case 'attack':
-                    return await this.threatLogService.getAttackDetail({
-                        ip: params.ip,
-                        minLogsForAttack: params.minLogsForAttack,
-                        timeConfig: params.timeConfig
-                    });
+                    // Pass-through garantito dai tipi derivati
+                    return await this.threatLogService.getAttackDetail(params);
                 
                 case 'campaign':
-                    return await this.campaignService.getCampaignDetail({
-                        hash: params.hash,
-                        minScore: params.minScore,
-                        minLogsPerIp: params.minLogsPerIp,
-                        protocol: params.protocol,
-                        timeConfig: params.timeConfig
-                    });
+                    // Pass-through garantito dai tipi derivati
+                    return await this.campaignService.getCampaignDetail(params);
                 
                 default:
-                    const _exhaustive: never = params;
+                    const _exhaustive: never = params as never;
                     throw new Error(`Tipo di sorgente non supportato: ${JSON.stringify(_exhaustive)}`);
             }
         } catch (error: any) {
             this.logger.error(`[AssistantService] Source resolution failed: ${error.message}`);
+            throw error;
+        }
+    }
+
+    /**
+     * Verifica l'integrità dello schema vettoriale e identifica punti obsoleti.
+     * Utile per la manutenzione e il re-indexing.
+     */
+    public async checkSchemaIntegrity(collectionName: string): Promise<{ total: number, obsolete: number }> {
+        let obsoleteCount = 0;
+        let totalCount = 0;
+        let offset: any = null;
+
+        try {
+            do {
+                const result = await this.qdrant.scrollPoints(collectionName, { offset, limit: 100 });
+                totalCount += result.points.length;
+
+                for (const point of result.points) {
+                    const payload = point.payload as any;
+                    if (!payload || (payload.schemaVersion || 0) < RAG_SCHEMA_VERSION) {
+                        obsoleteCount++;
+                    }
+                }
+
+                offset = result.next_page_offset;
+            } while (offset);
+
+            return { total: totalCount, obsolete: obsoleteCount };
+        } catch (error) {
+            this.logger.error(`[AssistantService] Schema integrity check failed: ${error}`);
             throw error;
         }
     }

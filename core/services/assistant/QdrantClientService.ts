@@ -101,6 +101,24 @@ export class QdrantClientService {
     }
 
     /**
+     * Scorre i punti di una collection (paginazione).
+     */
+    public async scrollPoints(collectionName: string, options: { limit?: number, offset?: any, filter?: any } = {}) {
+        try {
+            return await this.client.scroll(collectionName, {
+                limit: options.limit || 100,
+                offset: options.offset,
+                filter: options.filter,
+                with_payload: true,
+                with_vector: false
+            });
+        } catch (error) {
+            this.logger.error(`[Qdrant] Error scrolling collection ${collectionName}: ${error}`);
+            throw error;
+        }
+    }
+
+    /**
      * Elimina un punto specifico.
      */
     public async deletePoint(collectionName: string, id: string | number) {

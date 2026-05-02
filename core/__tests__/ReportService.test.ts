@@ -118,7 +118,7 @@ describe('ReportService', () => {
         const result = await reportService.generateDetailReport('ip', '1.2.3.4', 'html');
 
         expect(result).toBe('<html>Test IP</html>');
-        expect(mockIpDetailsService.getIpDetails).toHaveBeenCalledWith('1.2.3.4');
+        expect(mockIpDetailsService.getIpDetails).toHaveBeenCalledWith({ ip: '1.2.3.4' });
     });
 
     it('dovrebbe supportare stili diversi (hud, telex) nella generazione report dettaglio', async () => {

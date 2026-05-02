@@ -24,11 +24,12 @@ import { SequenceAnalysisStage } from './pipeline/stages/SequenceAnalysisStage';
 import { PayloadAnalysisStage } from './pipeline/stages/PayloadAnalysisStage';
 import { FingerprintAnalysisStage } from './pipeline/stages/FingerprintAnalysisStage';
 
+import { TimeConfig } from '../../types/common.types';
+
 dotenv.config();
 
 /**
  * Servizio per la gestione della pipeline di analisi forense.
- * Utilizza il pattern Builder per costruire pipeline di aggregazione modulari.
  */
 @injectable()
 export class ForensicPipelineService {
@@ -104,7 +105,7 @@ export class ForensicPipelineService {
     async buildStandardPipeline(
         mongoFilters: any,
         minLogsForAttack: number,
-        timeConfig: any = null
+        timeConfig: TimeConfig | null = null
     ): Promise<any[]> {
         await this.initialized;
 

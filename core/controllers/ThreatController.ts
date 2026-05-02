@@ -309,7 +309,7 @@ export class ThreatController {
     async getLogById(req: Request, res: Response): Promise<void> {
         this.logger.info(`[ThreatController] Requesting log ${req.params.id}`);
         try {
-            const log = await this.threatLogService.getLogById(req.params.id as string);
+            const log = await this.threatLogService.getLogById({ id: req.params.id as string });
             if (!log) {
                 res.status(404).json({ error: 'Log non trovato' });
                 return;
@@ -413,7 +413,7 @@ export class ThreatController {
     async getIpDetail(req: Request, res: Response): Promise<void> {
         try {
             assertPublicIp(req.params.ip as string);
-            const ipDetails = await this.ipDetailsService.getIpDetails(req.params.ip as string);
+            const ipDetails = await this.ipDetailsService.getIpDetails({ ip: req.params.ip as string });
             if (!ipDetails) {
                 res.status(404).json({ error: 'Ip detail non trovato' });
                 return;

@@ -31,6 +31,9 @@ import {
     FilterAllowedFields
 } from '../utils/queryGuard';
 
+import { TimeConfig } from '../types/common.types';
+import { GetAttackDetailParams, GetLogByIdParams, GetAttacksParams } from '../types/service-params.types';
+
 dotenv.config();
 
 @injectable()
@@ -107,104 +110,20 @@ export class ThreatLogService {
         return await ThreatLog.countDocuments(mongoFilters);
     }
 
-
-    /**
-     * @deprecated
-     * Recupera linearmente degli attacchi con min log per attacco di 3
-     * Ritorna in una sola aggregazione sia gli item paginati che il totale risultato dal filtro
-     * @param {*} param0 
-     * @returns 
-     */
-    async getAttacksLegacy({
-        page = 1,
-        pageSize = 20,
-        filters = {},
-        minLogsForAttack = 10,
-        timeConfig = {},
-        sortFields = null
-    }: any = {}) {
-        const skip = (page - 1) * pageSize;
-        const mongoFilters = this.buildRegExpFilter(filters);
-
-        // Costruisci sort dinamico
-        const safeSort = sanitizeSortFields(sortFields, SortAllowedFields.threatLog);
-        const sortStage = { $sort: safeSort };
-
-        // Pipeline base condivisa: match, group, match(minLogs), replaceRoot
-        const basePipeline = await this.forensicService.buildAttackGroupsBasePipeline(mongoFilters, minLogsForAttack, timeConfig);
-
-        // Unico aggregate con facet che restituisce dati e conteggio
-        const pipeline = [
-            ...basePipeline,
-            {
-                $facet: {
-                    dati: [
-                        // Lookup e popolazione
-                        {
-                            $lookup: {
-                                from: 'ipdetails',
-                                localField: 'ipDetailsId',
-                                foreignField: '_id',
-                                as: 'ipDetails'
-                            }
-                        },
-                        {
-                            $addFields: {
-                                ipDetails: { $arrayElemAt: ['$ipDetails', 0] }
-                            }
-                        },
-                        // Ordinamento e paginazione
-                        //{ $sort: { timestamp: -1 } },
-                        sortStage,
-                        { $skip: skip },
-                        { $limit: pageSize }
-                    ],
-                    totale: [
-                        // Conta quanti documenti escono dallo replaceRoot
-                        { $count: 'totalCount' }
-                    ]
-                }
-            },
-            // Estrai il conteggio dal facet
-            {
-                $addFields: {
-                    totalCount: { $arrayElemAt: ['$totale.totalCount', 0] }
-                }
-            },
-            // Proietta solo i campi che servono
-            {
-                $project: {
-                    dati: 1,
-                    totalCount: 1
-                }
-            }
-        ];
-
-
-        const [result] = await ThreatLog.aggregate(pipeline).allowDiskUse(true);
-
-        const attacks: AttackDTO[] = result.dati;
-
-
-        return {
-            items: attacks,
-            totalCount: result.totalCount || 0
-        };
-    }
-
     /**
      * Versione V2 di getAttacks che utilizza la nuova ForensicPipelineService (Builder Pattern).
      * @param param0 
      * @returns 
      */
-    async getAttacks({
-        page = 1,
-        pageSize = 20,
-        filters = {},
-        minLogsForAttack = 10,
-        timeConfig = {},
-        sortFields = null
-    }: any = {}) {
+    async getAttacks(params: GetAttacksParams = {}) {
+        const {
+            page = 1,
+            pageSize = 20,
+            filters = {},
+            minLogsForAttack = 10,
+            timeConfig = {},
+            sortFields = null
+        } = params;
         const skip = (page - 1) * pageSize;
 
         // Estrai dangerLevel dai filtri prima di buildRegExpFilter per gestirlo manualmente post-aggregazione
@@ -286,15 +205,12 @@ export class ThreatLogService {
         };
     }
 
-    async getAttackDetail({
-        ip,
-        minLogsForAttack = 1,
-        timeConfig = {}
-    }: {
-        ip: string;
-        minLogsForAttack?: number;
-        timeConfig?: any;
-    }) {
+    async getAttackDetail(params: GetAttackDetailParams) {
+        const {
+            ip,
+            minLogsForAttack = 1,
+            timeConfig = {}
+        } = params;
         const mongoFilters = { 'request.ip': ip };
 
         // Pipeline base costruita col nuovo Builder
@@ -388,8 +304,8 @@ export class ThreatLogService {
 
 
     // Dettaglio singolo log per id
-    async getLogById(id: string) {
-        return await ThreatLog.findOne({ id: id })
+    async getLogById(params: GetLogByIdParams) {
+        return await ThreatLog.findOne({ id: params.id })
             .populate('ipDetailsId');
     }
 

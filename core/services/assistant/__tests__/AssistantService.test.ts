@@ -109,7 +109,7 @@ describe('AssistantService', () => {
             const result = await service.resolveSource(ref);
 
             expect(result._id).toBe('log123');
-            expect(mockThreatLog.getLogById).toHaveBeenCalledWith('log123');
+            expect(mockThreatLog.getLogById).toHaveBeenCalledWith({ type: 'log', id: 'log123' });
         });
 
         it('should resolve a campaign source correctly', async () => {

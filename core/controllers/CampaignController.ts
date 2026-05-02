@@ -89,7 +89,7 @@ export class CampaignController {
                 timeConfig: {
                     startTime: cleanQuery.startTime as string, 
                     endTime: cleanQuery.endTime as string,
-                    timeMode: cleanQuery.timeMode as string,
+                    timeMode: cleanQuery.timeMode as 'ago' | 'range',
                     agoValue: cleanQuery.agoValue ? parseInt(cleanQuery.agoValue as string) : undefined,
                     agoUnit: cleanQuery.agoUnit as string
                 }, 
@@ -236,7 +236,7 @@ export class CampaignController {
                 timeConfig: {
                     startTime: cleanQuery.startTime as string,
                     endTime: cleanQuery.endTime as string,
-                    timeMode: cleanQuery.timeMode as string,
+                    timeMode: cleanQuery.timeMode as 'ago' | 'range',
                     agoValue: cleanQuery.agoValue ? parseInt(cleanQuery.agoValue as string) : undefined,
                     agoUnit: cleanQuery.agoUnit as string
                 }

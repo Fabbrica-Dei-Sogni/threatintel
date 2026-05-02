@@ -24,6 +24,7 @@ import { Logger } from 'winston';
 import ipRangeCheck from 'ip-range-check';
 import { IpDetailsMapper } from '../models/dto/IpDetailsDTO';
 import { RagSyncService } from './assistant/RagSyncService';
+import { GetIpDetailsParams } from '../types/service-params.types';
 
 const whoisAsync = util.promisify(whois.lookup);
 
@@ -183,7 +184,8 @@ export class IpDetailsService {
         }
     }
 
-    async getIpDetails(ip: string) {
+    async getIpDetails(params: GetIpDetailsParams) {
+        const { ip } = params;
         const ipDetails = await IpDetails.findOne({ ip })
             .populate('abuseipdbId')  // Popola il riferimento AbuseIpDb
             .exec();

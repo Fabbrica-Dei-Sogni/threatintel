@@ -141,6 +141,7 @@ export class RagSyncWorker implements ILongRunningService {
                 if (!result.campaigns || result.campaigns.length === 0) break;
 
                 for (const campaign of result.campaigns) {
+                    // campaign qui è il risultato dell'aggregazione di CampaignService
                     await this.ragSync.materializeCampaign(campaign, { isAiEnabled });
                     totalProcessed++;
                 }

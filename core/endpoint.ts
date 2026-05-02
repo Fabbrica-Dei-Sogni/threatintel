@@ -40,17 +40,7 @@ import { setupSwagger } from "./swagger";
 import { RouterHub } from "./registry/RouterHub";
 
 // Instantiate controllers via DI container
-const campaignController = getComponent(CampaignController);
-const configController = getComponent(ConfigController);
-const rateLimitController = getComponent(RateLimitController);
-const manageLimitController = getComponent(ManageLimitController);
-const fakeLoginController = getComponent(FakeLoginController);
-const cowrieController = getComponent(CowrieController);
-const reportController = getComponent(ReportController);
-const dossierController = getComponent(DossierController);
-const authController = getComponent(AuthController);
 const authMiddleware = getComponent(AuthMiddleware);
-const assistantController = getComponent(AssistantController);
 
 const threatLogger = getComponent(ThreatLogger);
 const rateLimitMiddleware = getComponent(RateLimitMiddleware);
@@ -90,39 +80,6 @@ setupSwagger(router);
 router.use('/api', authMiddleware.isAuthenticated());
 
 // [NEW] Bind decorated routes (ThreatController, etc.)
-routerHub.bindHttp(router, container);
-
-// API Dashboards e statistiche
-// router.use('/', threatroutes(threatController, authMiddleware)); // [REMOVED]
-
-// API Campagne (Distributed Threat Analytics)
-// router.use('/', campaignroutes(campaignController)); // [REMOVED]
-
-// API Assistant (RAG & AI)
-// router.use('/', assistantroutes(assistantController, authMiddleware)); // [REMOVED]
-
-// API Reports
-// router.use('/', reportroutes(reportController, authMiddleware)); // [REMOVED]
-
-// API Rate Limit (Redis)
-// router.use('/', ratelimitroutes(rateLimitController)); // [REMOVED]
-
-// API Configurazione
-// router.use('/', configroutes(configController, authMiddleware)); // [REMOVED]
-
-// API Honeypot Telnet (Cowrie)
-// router.use('/', cowrieroutes(logger, cowrieController)); // [REMOVED]
-
-// router.use('/', dossierroutes(dossierController, authMiddleware)); // [REMOVED]
-
-// API Gestione Limiti (Blacklist manuale)
-// router.use('/', managelimitroutes(manageLimitController)); // [REMOVED]
-
-//XXX: ogni nuova api da importare definirlo prima di questa istruzione
-// API Honeypot Trap e Fake Login
-// router.use('/', routes(logger, fakeLoginController, rateLimitMiddleware)); // [REMOVED]
-
-
 routerHub.bindHttp(router, container);
 
 export default router;

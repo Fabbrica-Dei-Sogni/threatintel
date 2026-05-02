@@ -30,8 +30,18 @@ export class TimeFilterStage implements PipelineStage {
         const fromStr = this.timeConfig.fromDate || this.timeConfig.startTime || this.timeConfig.start;
         const toStr = this.timeConfig.toDate || this.timeConfig.endTime || this.timeConfig.end;
 
+        // Caso 0: Supporto nativo per il formato Frontend/RAG (timeMode, agoUnit, agoValue)
+        if (this.timeConfig.timeMode === 'ago' && this.timeConfig.agoUnit && this.timeConfig.agoValue) {
+            const unit = this.timeConfig.agoUnit;
+            const val = Number(this.timeConfig.agoValue);
+            if (unit === 'minutes' || unit === 'm') timeAgo = new Date(now.getTime() - (val * 60 * 1000));
+            else if (unit === 'hours' || unit === 'h') timeAgo = new Date(now.getTime() - (val * 60 * 60 * 1000));
+            else if (unit === 'days' || unit === 'd') timeAgo = new Date(now.getTime() - (val * 24 * 60 * 60 * 1000));
+            else if (unit === 'months' || unit === 'M') timeAgo = new Date(now.getTime() - (val * 30 * 24 * 60 * 60 * 1000));
+            else if (unit === 'years' || unit === 'y') timeAgo = new Date(now.getTime() - (val * 365 * 24 * 60 * 60 * 1000));
+        }
         // Gestione intervallo da date assolute (prioritaria se presenti)
-        if (fromStr || toStr) {
+        else if (fromStr || toStr) {
             if (fromStr) timeAgo = parseDate(fromStr);
             if (toStr) {
                 const toDateParsed = parseDate(toStr);

@@ -175,6 +175,7 @@ export class RagSyncWorker implements ILongRunningService {
                     page: currentPage, 
                     pageSize: policy.pageSize, 
                     minLogsForAttack: policy.minLogs, 
+                    filters: { protocol: policy.protocol },
                     timeConfig: policy.timeConfig
                 });
 

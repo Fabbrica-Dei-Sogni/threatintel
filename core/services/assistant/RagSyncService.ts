@@ -21,6 +21,7 @@ import { stringToUuid } from '../../utils/uuid';
 import { RAG_POLICIES } from './RagPolicies';
 import { RagSourceRef, ThreatLogPayload, AttackSummaryPayload, CampaignSummaryPayload, AttackSourceParams, CampaignSourceParams, RAG_SCHEMA_VERSION, IpDetailsPayload } from '../../types/assistant/rag.types';
 import AttackDTO from '../../models/dto/AttackDTO';
+import { RAG_TEMPLATES } from './RagTemplates';
 
 @injectable()
 export class RagSyncService {
@@ -210,7 +211,10 @@ export class RagSyncService {
                 try {
                     const prompt = this.translator.buildCampaignSummaryPrompt(campaign);
                     const aiSummary = await this.ollama.generate(prompt);
-                    finalContent = `REPORT AI CAMPAGNA: ${aiSummary}\n\nDETTAGLI TECNICI AGGREGATI:\n${technicalNarrative}`;
+                    finalContent = RAG_TEMPLATES.INTERPOLATE(RAG_TEMPLATES.PROMPTS.CAMPAIGN_REPORT_LABEL, {
+                        aiSummary,
+                        technicalNarrative
+                    });
                 } catch (aiErr) {
                     this.logger.warn(`[RagSync] AI Generation failed for campaign ${campaign.hash}, falling back to technical data: ${aiErr.message}`);
                 }
@@ -248,7 +252,7 @@ export class RagSyncService {
      * Gestisce traduzione, generazione AI (opzionale) e sync.
      */
     public async materializeAttack(attack: AttackDTO, options: { isAiEnabled?: boolean } = {}) {
-        const ip = attack.request?.ip || 'N/A';
+        const ip = attack.request?.ip || attack.ip || 'N/A';
         try {
             this.logger.debug(`[RagSync] Materializing summary for attack by IP: ${ip}`);
 
@@ -261,7 +265,10 @@ export class RagSyncService {
                 try {
                     const prompt = this.translator.buildAttackSummaryPrompt(attack);
                     const aiSummary = await this.ollama.generate(prompt);
-                    finalContent = `RIASSUNTO ANALISTA AI: ${aiSummary}\n\nDETTAGLI TECNICI CORRELATI:\n${technicalNarrative}`;
+                    finalContent = RAG_TEMPLATES.INTERPOLATE(RAG_TEMPLATES.PROMPTS.ATTACK_REPORT_LABEL, {
+                        aiSummary,
+                        technicalNarrative
+                    });
                 } catch (aiErr) {
                     this.logger.warn(`[RagSync] AI Generation failed for IP ${ip}, falling back to technical data: ${aiErr.message}`);
                 }
@@ -346,7 +353,7 @@ export class RagSyncService {
         if (!this.checkOperational()) return;
 
         try {
-            const ip = attack.request?.ip;
+            const ip = attack.request?.ip || attack.ip;
             this.logger.debug(`[RagSync] Syncing Attack Summary for IP ${ip}`);
 
             const payload: AttackSummaryPayload = {

@@ -37,11 +37,15 @@ export class RagSyncService {
      * Sincronizza un ThreatLog nel database vettoriale (con Filtro e Batching).
      */
     public async syncThreatLog(log: IThreatLog) {
-        if (!this.checkOperational()) return;
-
-        // LOG VISIBILE: Vediamo se il log arriva al sistema RAG
+        // LOG VISIBILE: Vediamo se il log arriva al sistema RAG (prima del check operativo)
         const score = log.fingerprint?.score || 0;
-        this.logger.info(`[RagSync] Received log for IP ${log.request?.ip} (Score: ${score})`);
+        const ip = log.request?.ip || 'N/A';
+        this.logger.info(`[RagSync] Received log for IP ${ip} (Score: ${score})`);
+
+        if (!this.checkOperational()) {
+            this.logger.debug(`[RagSync] Skipping processing for IP ${ip}: system not operational (Ollama/Qdrant down)`);
+            return;
+        }
 
         // FILTRO: Ignoriamo i log con score basso
         if (score < RAG_POLICIES.LOGS.minScore) {
@@ -258,7 +262,7 @@ export class RagSyncService {
             this.logger.info('[RagSync] RAG system is fully operational and connected to Ollama.');
         } catch (error) {
             this.isOperational = false;
-            this.logger.error(`[RagSync] CRITICAL: RAG system is NOT operational: ${error.message}`);
+            this.logger.warn(`[RagSync] RAG system is NOT operational (AI features disabled): ${error.message}`);
         }
     }
 
@@ -268,9 +272,8 @@ export class RagSyncService {
     }
 
     private handleOperationError(operation: string, error: any) {
-        this.logger.error(`[RagSync] Error during ${operation}: ${error.message}`);
+        this.logger.warn(`[RagSync] Non-blocking error during ${operation}: ${error.message}`);
         // Se riceviamo troppi errori consecutivi, potremmo disattivare il sistema temporaneamente
-        // Per ora facciamo solo il log silenziato.
     }
 
     public getStatus() {

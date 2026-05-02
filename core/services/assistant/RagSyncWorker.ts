@@ -39,8 +39,8 @@ export class RagSyncWorker implements ILongRunningService {
 
         } catch (error) {
             this.status = ServiceStatus.FAILED;
-            this.logger.error(`[${this.serviceName}] Failed to start: ${error}`);
-            throw error;
+            this.logger.warn(`[${this.serviceName}] Worker in degraded state: ${error}`);
+            // Non rilanciamo l'errore per non bloccare il bootstrap globale
         }
     }
 

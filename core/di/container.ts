@@ -39,32 +39,25 @@ export function get<T>(token: InjectionToken<T>): T {
 registerValue<Logger>(LOGGER_TOKEN, logger);
 
 // registrazione del servizio i18n come singleton
-coreContainer.registerSingleton(I18nService);
-coreContainer.register(I18N_TOKEN, { useClass: I18nService });
+coreContainer.registerSingleton(I18N_TOKEN, I18nService);
 
 // registrazione del servizio AppConfigProvider come singleton
-coreContainer.registerSingleton(AppConfigProvider);
-coreContainer.register(CONFIG_PROVIDER_TOKEN, { useClass: AppConfigProvider });
+coreContainer.registerSingleton(CONFIG_PROVIDER_TOKEN, AppConfigProvider);
 
 // registrazione del servizio RagTranslationService come singleton
-coreContainer.registerSingleton(RagTranslationService);
-coreContainer.register(RAG_TRANSLATION_TOKEN, { useClass: RagTranslationService });
+coreContainer.registerSingleton(RAG_TRANSLATION_TOKEN, RagTranslationService);
 
 // registrazione del servizio QdrantClientService come singleton
-coreContainer.registerSingleton(QdrantClientService);
-coreContainer.register(QDRANT_CLIENT_TOKEN, { useClass: QdrantClientService });
+coreContainer.registerSingleton(QDRANT_CLIENT_TOKEN, QdrantClientService);
 
 // registrazione del servizio OllamaService come singleton
-coreContainer.registerSingleton(OllamaService);
-coreContainer.register(OLLAMA_SERVICE_TOKEN, { useClass: OllamaService });
+coreContainer.registerSingleton(OLLAMA_SERVICE_TOKEN, OllamaService);
 
 // registrazione del servizio RagSyncService come singleton
-coreContainer.registerSingleton(RagSyncService);
-coreContainer.register(RAG_SYNC_SERVICE_TOKEN, { useClass: RagSyncService });
+coreContainer.registerSingleton(RAG_SYNC_SERVICE_TOKEN, RagSyncService);
 
 // registrazione del servizio RagSyncWorker come singleton
-coreContainer.registerSingleton(RagSyncWorker);
-coreContainer.register(RAG_SYNC_WORKER_TOKEN, { useClass: RagSyncWorker });
+coreContainer.registerSingleton(RAG_SYNC_WORKER_TOKEN, RagSyncWorker);
 
 
 // nuova funzione generica

@@ -569,7 +569,7 @@ export class CampaignService {
                         await this.ragSync.syncCampaignSummary(campaign, finalContent, vector, sourceRef);
                         totalProcessed++;
                     } catch (campaignError) {
-                        this.logger.error(`[CampaignService] Error materializing campaign ${campaign.hash}: ${campaignError}`);
+                        this.logger.warn(`[CampaignService] Non-blocking materialization error for campaign ${campaign.hash}: ${campaignError.message}`);
                     }
                 }
 

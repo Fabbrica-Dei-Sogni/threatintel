@@ -166,6 +166,101 @@ export class RagSyncService {
     }
 
     /**
+     * Materializza un singolo riassunto di campagna.
+     * Gestisce traduzione, generazione AI (opzionale) e sync.
+     */
+    public async materializeCampaign(campaign: any, options: { isAiEnabled?: boolean } = {}) {
+        try {
+            this.logger.debug(`[RagSync] Materializing summary for campaign: ${campaign.hash}`);
+            
+            // 1. Narrazione Tecnica (Deterministica)
+            const technicalNarrative = this.translator.translateCampaign(campaign);
+            let finalContent = technicalNarrative;
+
+            // 2. Generazione AI (Opzionale)
+            if (options.isAiEnabled) {
+                try {
+                    const prompt = this.translator.buildCampaignSummaryPrompt(campaign);
+                    const aiSummary = await this.ollama.generate(prompt);
+                    finalContent = `REPORT AI CAMPAGNA: ${aiSummary}\n\nDETTAGLI TECNICI AGGREGATI:\n${technicalNarrative}`;
+                } catch (aiErr) {
+                    this.logger.warn(`[RagSync] AI Generation failed for campaign ${campaign.hash}, falling back to technical data: ${aiErr.message}`);
+                }
+            }
+            
+            // 3. Embedding
+            const vector = await this.ollama.getEmbedding(finalContent);
+            
+            // 4. Source Reference per la tracciabilità agentica
+            const sourceRef: RagSourceRef = {
+                endpoint: RAG_POLICIES.CAMPAIGNS.apiRef.endpoint,
+                method: RAG_POLICIES.CAMPAIGNS.apiRef.method,
+                params: { 
+                    type: 'campaign',
+                    hash: campaign.hash,
+                    minScore: RAG_POLICIES.CAMPAIGNS.minScore,
+                    minLogsPerIp: RAG_POLICIES.CAMPAIGNS.minLogsPerIp,
+                    protocol: RAG_POLICIES.CAMPAIGNS.protocol,
+                    timeConfig: RAG_POLICIES.CAMPAIGNS.timeConfig
+                }
+            };
+            
+            await this.syncCampaignSummary(campaign, finalContent, vector, sourceRef);
+            return true;
+        } catch (error) {
+            this.logger.error(`[RagSync] Error materializing campaign ${campaign.hash}: ${error.message}`);
+            return false;
+        }
+    }
+
+    /**
+     * Materializza un singolo riassunto di attacco (IP-centrico).
+     * Gestisce traduzione, generazione AI (opzionale) e sync.
+     */
+    public async materializeAttack(attack: any, options: { isAiEnabled?: boolean } = {}) {
+        const ip = attack.request?.ip || attack.ip || 'N/A';
+        try {
+            this.logger.debug(`[RagSync] Materializing summary for attack by IP: ${ip}`);
+
+            // 1. Narrazione Tecnica (Deterministica)
+            const technicalNarrative = this.translator.translateAttack(attack);
+            let finalContent = technicalNarrative;
+
+            // 2. Generazione AI (Opzionale)
+            if (options.isAiEnabled) {
+                try {
+                    const prompt = this.translator.buildAttackSummaryPrompt(attack);
+                    const aiSummary = await this.ollama.generate(prompt);
+                    finalContent = `RIASSUNTO ANALISTA AI: ${aiSummary}\n\nDETTAGLI TECNICI CORRELATI:\n${technicalNarrative}`;
+                } catch (aiErr) {
+                    this.logger.warn(`[RagSync] AI Generation failed for IP ${ip}, falling back to technical data: ${aiErr.message}`);
+                }
+            }
+
+            // 3. Embedding
+            const vector = await this.ollama.getEmbedding(finalContent);
+
+            // 4. Source Reference per la tracciabilità agentica
+            const sourceRef: RagSourceRef = {
+                endpoint: RAG_POLICIES.ATTACKS.apiRef.endpoint,
+                method: RAG_POLICIES.ATTACKS.apiRef.method,
+                params: { 
+                    type: 'attack',
+                    ip: ip,
+                    minLogsForAttack: RAG_POLICIES.ATTACKS.minLogs,
+                    timeConfig: RAG_POLICIES.ATTACKS.timeConfig
+                }
+            };
+
+            await this.syncAttackSummary(attack, finalContent, vector, sourceRef);
+            return true;
+        } catch (error) {
+            this.logger.error(`[RagSync] Error materializing attack for IP ${ip}: ${error.message}`);
+            return false;
+        }
+    }
+
+    /**
      * Sincronizza un riassunto di campagna nel database vettoriale.
      */
     public async syncCampaignSummary(campaign: any, aiSummary: string, vector: number[], sourceRef?: RagSourceRef) {

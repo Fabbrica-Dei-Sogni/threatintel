@@ -4,7 +4,9 @@ import { LOGGER_TOKEN, RAG_SYNC_SERVICE_TOKEN } from '../../di/tokens';
 import { RagSyncService } from './RagSyncService';
 import { CampaignService } from '../CampaignService';
 import { ThreatLogService } from '../ThreatLogService';
+import { ConfigService } from '../ConfigService';
 import { ILongRunningService, ServiceStatus } from '../../types/lifecycle';
+import { RAG_POLICIES } from './RagPolicies';
 
 @injectable()
 export class RagSyncWorker implements ILongRunningService {
@@ -17,7 +19,8 @@ export class RagSyncWorker implements ILongRunningService {
         @inject(LOGGER_TOKEN) private readonly logger: Logger,
         @inject(RAG_SYNC_SERVICE_TOKEN) private readonly ragSync: RagSyncService,
         private readonly campaignService: CampaignService,
-        private readonly threatLogService: ThreatLogService
+        private readonly threatLogService: ThreatLogService,
+        private readonly configService: ConfigService
     ) { }
 
     public async start(): Promise<void> {
@@ -95,14 +98,95 @@ export class RagSyncWorker implements ILongRunningService {
 
             this.logger.info(`[${this.serviceName}] Running scheduled materialization...`);
 
-            await this.campaignService.materializeCampaignSummaries().catch(err =>
-                this.logger.error(`Campaign materialization failed: ${err}`)
-            );
-            await this.threatLogService.materializeAttackSummaries().catch(err =>
-                this.logger.error(`Attack materialization failed: ${err}`)
-            );
+            const aiEnabledConfig = await this.configService.getConfigValue('RAG_AI_SUMMARY_ENABLED');
+            const isAiEnabled = aiEnabledConfig === 'true' || process.env.RAG_AI_SUMMARY_ENABLED === 'true';
+
+            // 1. Materializzazione Campagne
+            await this.runCampaignMaterialization(isAiEnabled);
+
+            // 2. Materializzazione Attacchi (Anomalie IP)
+            await this.runAttackMaterialization(isAiEnabled);
         } finally {
             this.isMaterializing = false;  // ← reset garantito anche in caso di errore
         }
+    }
+
+    /**
+     * Loop di materializzazione per le campagne.
+     */
+    private async runCampaignMaterialization(isAiEnabled: boolean) {
+        this.logger.info(`[${this.serviceName}] Starting campaign materialization...`);
+        let currentPage = 1;
+        const policy = RAG_POLICIES.CAMPAIGNS;
+        let totalProcessed = 0;
+        let hasMore = true;
+
+        while (hasMore) {
+            try {
+                const result = await this.campaignService.getCampaigns({ 
+                    minIps: policy.minIps, 
+                    pageSize: policy.pageSize, 
+                    page: currentPage,
+                    timeConfig: policy.timeConfig
+                });
+
+                if (!result.campaigns || result.campaigns.length === 0) break;
+
+                for (const campaign of result.campaigns) {
+                    await this.ragSync.materializeCampaign(campaign, { isAiEnabled });
+                    totalProcessed++;
+                }
+
+                if (result.campaigns.length < policy.pageSize || totalProcessed >= result.total) {
+                    hasMore = false;
+                } else {
+                    currentPage++;
+                }
+            } catch (error) {
+                this.logger.error(`[${this.serviceName}] Campaign materialization error at page ${currentPage}: ${error.message}`);
+                hasMore = false;
+            }
+        }
+        this.logger.info(`[${this.serviceName}] Campaign materialization finished. Total: ${totalProcessed}`);
+    }
+
+    /**
+     * Loop di materializzazione per gli attacchi (Anomalie).
+     */
+    private async runAttackMaterialization(isAiEnabled: boolean) {
+        this.logger.info(`[${this.serviceName}] Starting attack materialization...`);
+        let currentPage = 1;
+        const policy = RAG_POLICIES.ATTACKS;
+        let totalProcessed = 0;
+        let hasMore = true;
+
+        while (hasMore) {
+            try {
+                const result = await this.threatLogService.getAttacks({ 
+                    page: currentPage, 
+                    pageSize: policy.pageSize, 
+                    minLogsForAttack: policy.minLogs, 
+                    timeConfig: policy.timeConfig
+                });
+
+                const attacks = result.items || [];
+                if (attacks.length === 0) break;
+
+                for (const attack of attacks) {
+                    await this.ragSync.materializeAttack(attack, { isAiEnabled });
+                    totalProcessed++;
+                }
+
+                if (attacks.length < policy.pageSize || totalProcessed >= result.totalCount) {
+                    hasMore = false;
+                } else {
+                    currentPage++;
+                }
+            } catch (error) {
+                this.logger.error(`[${this.serviceName}] Attack materialization error at page ${currentPage}: ${error.message}`);
+                hasMore = false;
+            }
+        }
+        this.logger.info(`[${this.serviceName}] Attack materialization finished. Total: ${totalProcessed}`);
     }
 }

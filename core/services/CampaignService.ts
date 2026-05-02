@@ -7,11 +7,7 @@ import { TimeFilterStage } from './forense/pipeline/stages/TimeFilterStage';
 import { calculateCorrelationHubs } from '../utils/CampaignAnalytics';
 import { ConfigService } from './ConfigService';
 import { RagSyncService } from './assistant/RagSyncService';
-import { OllamaService } from './assistant/OllamaService';
-import { RagTranslationService } from './assistant/RagTranslationService';
-import { RAG_SYNC_SERVICE_TOKEN, OLLAMA_SERVICE_TOKEN, RAG_TRANSLATION_TOKEN } from '../di/tokens';
-import { RAG_POLICIES } from './assistant/RagPolicies';
-import { RagSourceRef } from '../types/assistant/rag.types';
+import { RAG_SYNC_SERVICE_TOKEN } from '../di/tokens';
 
 @injectable()
 export class CampaignService {
@@ -19,9 +15,7 @@ export class CampaignService {
         @inject(LOGGER_TOKEN) private readonly logger: Logger,
         private readonly forensicPipelineService: ForensicPipelineService,
         private readonly configService: ConfigService,
-        @inject(RAG_SYNC_SERVICE_TOKEN) private readonly ragSync: RagSyncService,
-        @inject(OLLAMA_SERVICE_TOKEN) private readonly ollama: OllamaService,
-        @inject(RAG_TRANSLATION_TOKEN) private readonly translator: RagTranslationService
+        @inject(RAG_SYNC_SERVICE_TOKEN) private readonly ragSync: RagSyncService
     ) {}
 
     /**
@@ -492,98 +486,4 @@ export class CampaignService {
         }
     }
 
-    /**
-     * Materializza i riassunti AI delle campagne nel database vettoriale.
-     * Implementa un loop di recupero totale (Fetch-All) per garantire la coerenza.
-     */
-    async materializeCampaignSummaries(options: { forceAi?: boolean } = {}) {
-        // Controllo Fallback
-        if (!this.ragSync.getStatus().operational) {
-            this.logger.debug('[CampaignService] RAG materialization skipped: System is not operational.');
-            return;
-        }
-
-        // Verifica se la generazione AI è abilitata
-        const aiEnabledConfig = await this.configService.getConfigValue('RAG_AI_SUMMARY_ENABLED');
-        const isAiEnabled = options.forceAi || aiEnabledConfig === 'true' || process.env.RAG_AI_SUMMARY_ENABLED === 'true';
-
-        this.logger.info('[CampaignService] Starting campaign materialization for RAG (Fetch-All)...');
-
-        let currentPage = 1;
-        const policy = RAG_POLICIES.CAMPAIGNS;
-        let totalProcessed = 0;
-        let hasMore = true;
-
-        try {
-            while (hasMore) {
-                this.logger.debug(`[CampaignService] Fetching page ${currentPage} for RAG materialization...`);
-                
-                const result = await this.getCampaigns({ 
-                    minIps: policy.minIps, 
-                    pageSize: policy.pageSize, 
-                    page: currentPage,
-                    timeConfig: policy.timeConfig
-                });
-
-                if (!result.campaigns || result.campaigns.length === 0) {
-                    hasMore = false;
-                    break;
-                }
-
-                for (const campaign of result.campaigns) {
-                    try {
-                        this.logger.debug(`[CampaignService] Materializing summary for campaign: ${campaign.hash}`);
-                        
-                        // 1. Narrazione Tecnica (Deterministica)
-                        const technicalNarrative = this.translator.translateCampaign(campaign);
-                        let finalContent = technicalNarrative;
-
-                        // 2. Generazione AI (Opzionale)
-                        if (isAiEnabled) {
-                            try {
-                                const prompt = this.translator.buildCampaignSummaryPrompt(campaign);
-                                const aiSummary = await this.ollama.generate(prompt);
-                                finalContent = `REPORT AI CAMPAGNA: ${aiSummary}\n\nDETTAGLI TECNICI AGGREGATI:\n${technicalNarrative}`;
-                            } catch (aiErr) {
-                                this.logger.warn(`[CampaignService] AI Generation failed for campaign ${campaign.hash}, falling back to technical data: ${aiErr.message}`);
-                            }
-                        }
-                        
-                        // 3. Embedding
-                        const vector = await this.ollama.getEmbedding(finalContent);
-                        
-                        // 4. Source Reference per la tracciabilità agentica
-                        const sourceRef: RagSourceRef = {
-                            endpoint: policy.apiRef.endpoint,
-                            method: policy.apiRef.method,
-                            params: { 
-                                type: 'campaign',
-                                hash: campaign.hash,
-                                minScore: policy.minScore,
-                                minLogsPerIp: policy.minLogsPerIp,
-                                protocol: policy.protocol,
-                                timeConfig: policy.timeConfig
-                            }
-                        };
-                        
-                        await this.ragSync.syncCampaignSummary(campaign, finalContent, vector, sourceRef);
-                        totalProcessed++;
-                    } catch (campaignError) {
-                        this.logger.error(`[CampaignService] Error materializing campaign ${campaign.hash}: ${campaignError.message}`);
-                    }
-                }
-
-                // Controllo uscita dal loop
-                if (result.campaigns.length < policy.pageSize || totalProcessed >= result.total) {
-                    hasMore = false;
-                } else {
-                    currentPage++;
-                }
-            }
-            
-            this.logger.info(`[CampaignService] Materialization completed. Total campaigns synced: ${totalProcessed}`);
-        } catch (error) {
-            this.logger.error(`[CampaignService] Materialization failed: ${error}`);
-        }
-    }
 }

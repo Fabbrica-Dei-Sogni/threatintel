@@ -19,6 +19,7 @@
         "clear-redis": "redis-cli flushdb"
     },
     "dependencies": {
+        "@qdrant/js-client-rest": "^1.17.0",
         "axios": ">=1.15.0",
         "cors": "^2.8.5",
         "dotenv": "^17.2.1",

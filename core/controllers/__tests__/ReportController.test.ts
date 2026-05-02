@@ -2,14 +2,30 @@ import 'reflect-metadata';
 import request from 'supertest';
 import express from 'express';
 import { container } from 'tsyringe';
-import { ReportController } from '../../controllers/ReportController';
+import { ReportController } from '../ReportController';
 import { ReportService, ReportType } from '../../services/ReportService';
 import { AuthMiddleware } from '../../middlewares/AuthMiddleware';
-import reportRoutes from '../reportroutes';
+import { RouterHub } from '../../registry/RouterHub';
+
+// Mock AuthMiddleware
+jest.mock('../../middlewares/AuthMiddleware', () => {
+    return {
+        AuthMiddleware: jest.fn().mockImplementation(() => {
+            return {
+                isAuthenticated: jest.fn().mockReturnValue((req: any, res: any, next: any) => next()),
+                isIdentified: jest.fn().mockReturnValue((req: any, res: any, next: any) => next()),
+                hasRole: jest.fn().mockReturnValue((req: any, res: any, next: any) => next()),
+            };
+        })
+    };
+});
 
 // Mock del ReportService
 const mockReportService = {
     generateDetailReport: jest.fn(),
+    generateHudReport: jest.fn(),
+    generateClassicReport: jest.fn(),
+    generateTelexReport: jest.fn(),
 };
 
 // Mock AuthMiddleware
@@ -21,13 +37,15 @@ const mockAuthMiddleware = {
 
 // Mocking container per iniettare il servizio fittizio
 container.register<ReportService>(ReportService, { useValue: mockReportService as any });
-
-// Creazione dell'istanza del controller con il servizio mockato
-const reportController = new ReportController(mockReportService as any);
+container.register<AuthMiddleware>(AuthMiddleware, { useValue: mockAuthMiddleware as any });
 
 const app = express();
 app.use(express.json());
-app.use('/', reportRoutes(reportController, mockAuthMiddleware as any));
+
+// Registrazione e bind tramite RouterHub
+const hub = container.resolve(RouterHub);
+hub.register(ReportController);
+hub.bindHttp(app, container);
 
 describe('ReportRoutes API', () => {
 

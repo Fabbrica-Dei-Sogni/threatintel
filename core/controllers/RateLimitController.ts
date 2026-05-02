@@ -11,15 +11,40 @@ import { inject, singleton } from 'tsyringe';
 import { RateLimitService } from '../services/RateLimitService';
 import { LOGGER_TOKEN } from '../di/tokens';
 import { Logger } from 'winston';
+import { Controller, Post } from '../registry/decorators';
 
 @singleton()
+@Controller('/api')
 export class RateLimitController {
     constructor(
         private rateLimitService: RateLimitService,
         @inject(LOGGER_TOKEN) private logger: Logger
     ) {}
 
-    // POST /api/ratelimit/search
+    /**
+     * @openapi
+     * /ratelimit/search:
+     *   post:
+     *     tags: [System & Security]
+     *     summary: Ricerca nei log dei blocchi di rate limiting
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             properties:
+     *               page:
+     *                 type: integer
+     *               pageSize:
+     *                 type: integer
+     *               filters:
+     *                 type: object
+     *     responses:
+     *       200:
+     *         description: Risultati ricerca.
+     */
+    @Post('/ratelimit/search')
     async searchRateLimits(req: Request, res: Response): Promise<void> {
         this.logger.info('[RateLimitController] Searching rate limits');
         try {

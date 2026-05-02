@@ -7,9 +7,23 @@ import { ThreatLogService } from '../../services/ThreatLogService';
 import { IpDetailsService } from '../../services/IpDetailsService';
 import { SshLogService } from '../../services/SshLogService';
 import { LOGGER_TOKEN } from '../../di/tokens';
-import threatRoutes from '../threatroutes';
 import { Logger } from 'winston';
 import { AuthMiddleware } from '../../middlewares/AuthMiddleware';
+import { RouterHub } from '../../registry/RouterHub';
+
+// Mock AuthMiddleware PRIMA di importare il controller se possibile, 
+// ma qui lo facciamo con jest.mock
+jest.mock('../../middlewares/AuthMiddleware', () => {
+    return {
+        AuthMiddleware: jest.fn().mockImplementation(() => {
+            return {
+                isAuthenticated: jest.fn().mockReturnValue((req: any, res: any, next: any) => next()),
+                isIdentified: jest.fn().mockReturnValue((req: any, res: any, next: any) => next()),
+                hasRole: jest.fn().mockReturnValue((req: any, res: any, next: any) => next()),
+            };
+        })
+    };
+});
 
 // Mock dei servizi e del logger
 const mockThreatLogService = {
@@ -49,20 +63,14 @@ container.register<IpDetailsService>(IpDetailsService, { useValue: mockIpDetails
 container.register<SshLogService>(SshLogService, { useValue: mockSshLogService as any });
 container.register<Logger>(LOGGER_TOKEN, { useValue: mockLogger });
 
-// Creazione istanza del controller e dell'app express
-const threatController = container.resolve(ThreatController);
-
-// Mock AuthMiddleware
-const authMiddlewareMock = {
-    isAuthenticated: jest.fn().mockReturnValue((req: any, res: any, next: any) => next()),
-    hasRole: jest.fn().mockImplementation((role: string) => {
-        return (req: any, res: any, next: any) => next();
-    })
-} as unknown as AuthMiddleware;
-
+// Creazione istanza dell'app express
 const app = express();
 app.use(express.json());
-app.use('/', threatRoutes(threatController, authMiddlewareMock));
+
+// Registrazione e bind tramite RouterHub
+const hub = container.resolve(RouterHub);
+hub.register(ThreatController);
+hub.bindHttp(app, container);
 
 
 describe('ThreatRoutes API', () => {

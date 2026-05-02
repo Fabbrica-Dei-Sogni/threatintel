@@ -2,9 +2,32 @@ import 'reflect-metadata';
 import request from 'supertest';
 import express from 'express';
 import { container } from 'tsyringe';
-import { DossierController } from '../../controllers/DossierController';
+import { DossierController } from '../DossierController';
 import { DossierService } from '../../services/DossierService';
-import dossierRoutes from '../dossierroutes';
+import { AuthMiddleware } from '../../middlewares/AuthMiddleware';
+import { RouterHub } from '../../registry/RouterHub';
+
+// Mock AuthMiddleware
+jest.mock('../../middlewares/AuthMiddleware', () => {
+    return {
+        AuthMiddleware: jest.fn().mockImplementation(() => {
+            return {
+                isAuthenticated: jest.fn().mockReturnValue((req: any, res: any, next: any) => {
+                    req.user = { username: 'testuser', roles: [{ name: 'admin' }] };
+                    next();
+                }),
+                isIdentified: jest.fn().mockReturnValue((req: any, res: any, next: any) => {
+                    req.user = { username: 'testuser', roles: [{ name: 'admin' }] };
+                    next();
+                }),
+                hasRole: jest.fn().mockReturnValue((req: any, res: any, next: any) => {
+                    req.user = { username: 'testuser', roles: [{ name: 'admin' }] };
+                    next();
+                }),
+            };
+        })
+    };
+});
 
 // Mock del DossierService
 const mockDossierService = {
@@ -13,24 +36,19 @@ const mockDossierService = {
     createDossier: jest.fn(),
     updateDossier: jest.fn(),
     deleteDossier: jest.fn(),
-};
-
-// Mock AuthMiddleware
-const mockAuthMiddleware = {
-    isIdentified: jest.fn().mockReturnValue((req: any, res: any, next: any) => {
-        req.user = { username: 'testuser', roles: [{ name: 'admin' }] };
-        next();
-    }),
+    generatePdfFromDossier: jest.fn(),
 };
 
 // Mocking container
 container.register<DossierService>(DossierService, { useValue: mockDossierService as any });
 
-const dossierController = new DossierController(mockDossierService as any);
-
 const app = express();
 app.use(express.json());
-app.use('/', dossierRoutes(dossierController, mockAuthMiddleware as any));
+
+// Registrazione e bind tramite RouterHub
+const hub = container.resolve(RouterHub);
+hub.register(DossierController);
+hub.bindHttp(app, container);
 
 describe('DossierRoutes API', () => {
 

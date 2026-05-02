@@ -19,10 +19,11 @@ import IpDetails from '../models/IpDetailsSchema';
 import AbuseIpDb from '../models/AbuseIpDbSchema';
 import { AbuseCategoryEnum } from '../models/AbuseCategoryEnum';
 import { inject, injectable } from 'tsyringe';
-import { LOGGER_TOKEN } from '../di/tokens';
+import { LOGGER_TOKEN, RAG_SYNC_SERVICE_TOKEN } from '../di/tokens';
 import { Logger } from 'winston';
 import ipRangeCheck from 'ip-range-check';
 import { IpDetailsMapper } from '../models/dto/IpDetailsDTO';
+import { RagSyncService } from './assistant/RagSyncService';
 
 const whoisAsync = util.promisify(whois.lookup);
 
@@ -35,6 +36,7 @@ export class IpDetailsService {
 
     constructor(
         @inject(LOGGER_TOKEN) private readonly logger: Logger,
+        @inject(RAG_SYNC_SERVICE_TOKEN) private readonly ragSync: RagSyncService
     ) {
         this.excludedIPs = this.parseExcludedIPs();
     }
@@ -133,6 +135,12 @@ export class IpDetailsService {
             }
 
             await ipDetails.save();
+
+            // SYNC TO RAG (Asincrono)
+            this.syncToRag(ipDetails).catch(err => 
+                this.logger.error(`[IpDetailsService] Error during RAG sync: ${err}`)
+            );
+
             return ipDetails._id;
         } else {
             this.logger.info(`[IpDetailsService] Primo avvistamento per ${ip}. Esecuzione enrichment completo...`);
@@ -165,6 +173,11 @@ export class IpDetailsService {
             if (isIpInfoRateLimited) {
                 this.logger.warn(`[IpDetailsService] Primo salvataggio per ${ip} con arricchimento parziale (Rate Limit).`);
             }
+
+            // SYNC TO RAG (Asincrono)
+            this.syncToRag(result).catch(err => 
+                this.logger.error(`[IpDetailsService] Error during RAG sync: ${err}`)
+            );
 
             return result._id;
         }
@@ -411,6 +424,18 @@ export class IpDetailsService {
                 resolve(data);
             });
         });
+    }
+
+    private async syncToRag(ipDetails: any) {
+        try {
+            // Recupera dati completi per la traduzione semantica
+            const abuseData = ipDetails.abuseipdbId ? await AbuseIpDb.findById(ipDetails.abuseipdbId) : null;
+            const reports = abuseData ? await AbuseReport.find({ abuseIpDbId: abuseData._id }).sort({ reportedAt: -1 }).limit(20) : [];
+            
+            await this.ragSync.syncIpDetails(ipDetails, abuseData, reports);
+        } catch (error) {
+            this.logger.error(`[IpDetailsService] RAG sync failed for ${ipDetails.ip}: ${error}`);
+        }
     }
 
 }

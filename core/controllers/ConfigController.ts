@@ -14,8 +14,14 @@ import { NginxLogService } from '../services/NginxLogService';
 import { PatternAnalysisService } from '../services/PatternAnalysisService';
 import { LOGGER_TOKEN } from '../di/tokens';
 import { Logger } from 'winston';
+import { Controller, Get, Post, Delete } from '../registry/decorators';
+import { getComponent } from '../di/container';
+import { AuthMiddleware } from '../middlewares/AuthMiddleware';
+
+const auth = getComponent(AuthMiddleware);
 
 @singleton()
+@Controller('/api')
 export class ConfigController {
     constructor(
         private configService: ConfigService,
@@ -25,7 +31,19 @@ export class ConfigController {
         @inject(LOGGER_TOKEN) private logger: Logger
     ) {}
 
-    // GET /api/config
+    /**
+     * @openapi
+     * /config:
+     *   get:
+     *     tags: [System & Security]
+     *     summary: Recupera tutte le configurazioni di sistema
+     *     security:
+     *       - BearerAuth: []
+     *     responses:
+     *       200:
+     *         description: Elenco configurazioni restituito.
+     */
+    @Get('/config', [auth.hasRole('admin')])
     async getAllConfigs(req: Request, res: Response): Promise<void> {
         this.logger.info('[ConfigController] Fetching all configurations');
         try {
@@ -37,7 +55,30 @@ export class ConfigController {
         }
     }
 
-    // POST /api/config
+    /**
+     * @openapi
+     * /config:
+     *   post:
+     *     tags: [System & Security]
+     *     summary: Salva o aggiorna una configurazione
+     *     security:
+     *       - BearerAuth: []
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             properties:
+     *               key:
+     *                 type: string
+     *               value:
+     *                 type: string
+     *     responses:
+     *       200:
+     *         description: Configurazione salvata.
+     */
+    @Post('/config', [auth.hasRole('admin')])
     async saveConfig(req: Request, res: Response): Promise<void> {
         const { key, value } = req.body;
         this.logger.info(`[ConfigController] Saving configuration: ${key}`);
@@ -62,7 +103,25 @@ export class ConfigController {
         }
     }
 
-    // DELETE /api/config/:key
+    /**
+     * @openapi
+     * /config/{key}:
+     *   delete:
+     *     tags: [System & Security]
+     *     summary: Elimina una configurazione tramite chiave
+     *     security:
+     *       - BearerAuth: []
+     *     parameters:
+     *       - name: key
+     *         in: path
+     *         required: true
+     *         schema:
+     *           type: string
+     *     responses:
+     *       200:
+     *         description: Configurazione eliminata.
+     */
+    @Delete('/config/:key', [auth.hasRole('admin')])
     async deleteConfig(req: Request, res: Response): Promise<void> {
         const key = req.params.key as string;
         this.logger.info(`[ConfigController] Deleting configuration: ${key}`);
@@ -80,7 +139,28 @@ export class ConfigController {
         }
     }
 
-    // POST /api/config/search
+    /**
+     * @openapi
+     * /config/search:
+     *   post:
+     *     tags: [System & Security]
+     *     summary: Ricerca tra le chiavi di configurazione
+     *     security:
+     *       - BearerAuth: []
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             properties:
+     *               query:
+     *                 type: string
+     *     responses:
+     *       200:
+     *         description: Risultati della ricerca.
+     */
+    @Post('/config/search', [auth.hasRole('admin')])
     async searchConfigs(req: Request, res: Response): Promise<void> {
         const { query } = req.body;
         this.logger.info(`[ConfigController] Searching configurations with query: ${query}`);

@@ -2,11 +2,25 @@ import 'reflect-metadata';
 import request from 'supertest';
 import express from 'express';
 import { container } from 'tsyringe';
-import { RateLimitController } from '../../controllers/RateLimitController';
+import { RateLimitController } from '../RateLimitController';
 import { RateLimitService } from '../../services/RateLimitService';
-import rateLimitRoutes from '../ratelimitroutes';
-import { LOGGER_TOKEN } from '../../di/tokens';
+import { RouterHub } from '../../registry/RouterHub';
 import { Logger } from 'winston';
+import { LOGGER_TOKEN } from '../../di/tokens';
+import { AuthMiddleware } from '../../middlewares/AuthMiddleware';
+
+// Mock AuthMiddleware
+jest.mock('../../middlewares/AuthMiddleware', () => {
+    return {
+        AuthMiddleware: jest.fn().mockImplementation(() => {
+            return {
+                isAuthenticated: jest.fn().mockReturnValue((req: any, res: any, next: any) => next()),
+                isIdentified: jest.fn().mockReturnValue((req: any, res: any, next: any) => next()),
+                hasRole: jest.fn().mockReturnValue((req: any, res: any, next: any) => next()),
+            };
+        })
+    };
+});
 
 const mockRateLimitService = {
     getEventsByIp: jest.fn(),
@@ -22,11 +36,13 @@ const mockLogger = {
 container.register(RateLimitService, { useValue: mockRateLimitService as any });
 container.register(LOGGER_TOKEN, { useValue: mockLogger });
 
-const rateLimitController = container.resolve(RateLimitController);
-
 const app = express();
 app.use(express.json());
-app.use('/', rateLimitRoutes(rateLimitController));
+
+// Registrazione e bind tramite RouterHub
+const hub = container.resolve(RouterHub);
+hub.register(RateLimitController);
+hub.bindHttp(app, container);
 
 describe('RateLimitRoutes API', () => {
 

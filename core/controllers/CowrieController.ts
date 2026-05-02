@@ -12,12 +12,14 @@ import { CowrieService } from '../services/CowrieService';
 import { I18nService } from '../services/I18nService';
 import { LOGGER_TOKEN } from '../di/tokens';
 import { Logger } from 'winston';
+import { Controller, Get, Post } from '../registry/decorators';
 
 @singleton()
+@Controller('/api/cowrie')
 export class CowrieController {
     constructor(
         private cowrieService: CowrieService,
-        @inject(I18nService) private i18n: I18nService,
+        private i18n: I18nService,
         @inject(LOGGER_TOKEN) private logger: Logger
     ) {}
     
@@ -28,7 +30,38 @@ export class CowrieController {
                'it-IT';
     }
 
-    // GET /api/cowrie/sessions
+    /**
+     * @openapi
+     * /cowrie/sessions:
+     *   get:
+     *     tags: [Dashboard API]
+     *     summary: Elenca le sessioni catturate da Cowrie (Telnet/SSH)
+     *     parameters:
+     *       - name: page
+     *         in: query
+     *         schema:
+     *           type: integer
+     *           default: 1
+     *       - name: pageSize
+     *         in: query
+     *         schema:
+     *           type: integer
+     *           default: 20
+     *       - name: sort
+     *         in: query
+     *         description: JSON string per l'ordinamento (es. {"timestamp":-1})
+     *         schema:
+     *           type: string
+     *       - name: filters
+     *         in: query
+     *         description: JSON string per i filtri
+     *         schema:
+     *           type: string
+     *     responses:
+     *       200:
+     *         description: Elenco sessioni.
+     */
+    @Get('/sessions')
     async getSessions(req: Request, res: Response): Promise<void> {
         try {
             const page = parseInt(req.query.page as string) || 1;
@@ -70,7 +103,32 @@ export class CowrieController {
         }
     }
 
-    // POST /api/cowrie/search
+    /**
+     * @openapi
+     * /cowrie/search:
+     *   post:
+     *     tags: [Dashboard API]
+     *     summary: Ricerca avanzata nelle sessioni Cowrie
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             properties:
+     *               page:
+     *                 type: integer
+     *               pageSize:
+     *                 type: integer
+     *               filters:
+     *                 type: object
+     *               sortFields:
+     *                 type: object
+     *     responses:
+     *       200:
+     *         description: Risultati ricerca.
+     */
+    @Post('/search')
     async searchSessions(req: Request, res: Response): Promise<void> {
         try {
             const page = parseInt(req.body.page as string) || 1;
@@ -93,7 +151,23 @@ export class CowrieController {
         }
     }
 
-    // GET /api/cowrie/sessions/:id
+    /**
+     * @openapi
+     * /cowrie/sessions/{id}:
+     *   get:
+     *     tags: [Dashboard API]
+     *     summary: Ottiene i dettagli completi di una sessione Cowrie
+     *     parameters:
+     *       - name: id
+     *         in: path
+     *         required: true
+     *         schema:
+     *           type: string
+     *     responses:
+     *       200:
+     *         description: Dettagli sessione.
+     */
+    @Get('/sessions/:id')
     async getSessionDetails(req: Request, res: Response): Promise<void> {
         try {
             const id = req.params.id as string;
@@ -111,7 +185,23 @@ export class CowrieController {
         }
     }
 
-    // GET /api/cowrie/sessions/:id/events
+    /**
+     * @openapi
+     * /cowrie/sessions/{id}/events:
+     *   get:
+     *     tags: [Dashboard API]
+     *     summary: Ottiene la timeline degli eventi di una sessione specifica
+     *     parameters:
+     *       - name: id
+     *         in: path
+     *         required: true
+     *         schema:
+     *           type: string
+     *     responses:
+     *       200:
+     *         description: Timeline eventi.
+     */
+    @Get('/sessions/:id/events')
     async getSessionEvents(req: Request, res: Response): Promise<void> {
         try {
             const id = req.params.id as string;

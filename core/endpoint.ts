@@ -11,18 +11,17 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 import { logger } from '../logger';
-import ratelimitroutes from './apis/ratelimitroutes';
-import threatroutes from './apis/threatroutes';
-import campaignroutes from './apis/campaignroutes';
-import routes from './apis/routes';
-import managelimitroutes from './apis/managelimitroutes';
-import configroutes from './apis/configroutes';
-import reportroutes from './apis/reportroutes';
-import dossierroutes from './apis/dossierroutes';
-import authroutes from './apis/authroutes';
-import cowrieroutes from './apis/cowrieroutes';
+// import ratelimitroutes from './apis/ratelimitroutes'; // [REMOVED]
+// import threatroutes from './apis/threatroutes'; // [REMOVED] - Now handled by RouterHub
+// import campaignroutes from './apis/campaignroutes'; // [REMOVED]
+// import routes from './apis/routes'; // [REMOVED]
+// import managelimitroutes from './apis/managelimitroutes'; // [REMOVED]
+// import configroutes from './apis/configroutes'; // [REMOVED]
+// import dossierroutes from './apis/dossierroutes'; // [REMOVED]
+// import authroutes from './apis/authroutes'; // [REMOVED]
+// import cowrieroutes from './apis/cowrieroutes'; // [REMOVED]
 
-import { getComponent } from './di/container';
+import { getComponent, container } from './di/container';
 import { ThreatLogger } from "./threatLogger";
 import { CowrieController } from "./controllers/CowrieController";
 import { ThreatController } from "./controllers/ThreatController";
@@ -35,11 +34,12 @@ import { ReportController } from "./controllers/ReportController";
 import { DossierController } from "./controllers/DossierController";
 import { AuthController } from "./controllers/AuthController";
 import { AuthMiddleware } from "./middlewares/AuthMiddleware";
+import { AssistantController } from "./controllers/AssistantController";
 import { RateLimitMiddleware } from "./rateLimitMiddleware";
 import { setupSwagger } from "./swagger";
+import { RouterHub } from "./registry/RouterHub";
 
 // Instantiate controllers via DI container
-const threatController = getComponent(ThreatController);
 const campaignController = getComponent(CampaignController);
 const configController = getComponent(ConfigController);
 const rateLimitController = getComponent(RateLimitController);
@@ -50,11 +50,26 @@ const reportController = getComponent(ReportController);
 const dossierController = getComponent(DossierController);
 const authController = getComponent(AuthController);
 const authMiddleware = getComponent(AuthMiddleware);
+const assistantController = getComponent(AssistantController);
 
 const threatLogger = getComponent(ThreatLogger);
 const rateLimitMiddleware = getComponent(RateLimitMiddleware);
+const routerHub = getComponent(RouterHub);
 
 const router = express.Router();
+
+// [NEW] Register controllers with RouterHub
+routerHub.register(ThreatController);
+routerHub.register(CampaignController);
+routerHub.register(ConfigController);
+routerHub.register(RateLimitController);
+routerHub.register(ManageLimitController);
+routerHub.register(ReportController);
+routerHub.register(DossierController);
+routerHub.register(AuthController);
+routerHub.register(CowrieController);
+routerHub.register(FakeLoginController);
+routerHub.register(AssistantController);
 
 // Configurazione Threat Logger
 // **IMPORTANTE: Il middleware di threat logging deve essere PRIMO**
@@ -66,7 +81,7 @@ router.use(rateLimitMiddleware.ddosProtectionLimiter());
 router.use(rateLimitMiddleware.applicationLimiter());
 
 // Proxy Auth Reale (Pubblico)
-router.use('/api', authroutes(authController));
+// router.use('/api', authroutes(authController)); // [REMOVED]
 
 // Integrazione Documentazione Swagger (OpenAPI) - PUBBLICA (Visualizzazione consentita a tutti)
 setupSwagger(router);
@@ -74,35 +89,40 @@ setupSwagger(router);
 // Protezione Globale API (Escluso le trap e l'auth che passano prima in questo file)
 router.use('/api', authMiddleware.isAuthenticated());
 
+// [NEW] Bind decorated routes (ThreatController, etc.)
+routerHub.bindHttp(router, container);
+
 // API Dashboards e statistiche
-router.use('/', threatroutes(threatController, authMiddleware));
+// router.use('/', threatroutes(threatController, authMiddleware)); // [REMOVED]
 
 // API Campagne (Distributed Threat Analytics)
-router.use('/', campaignroutes(campaignController));
+// router.use('/', campaignroutes(campaignController)); // [REMOVED]
 
-
+// API Assistant (RAG & AI)
+// router.use('/', assistantroutes(assistantController, authMiddleware)); // [REMOVED]
 
 // API Reports
-router.use('/', reportroutes(reportController, authMiddleware));
+// router.use('/', reportroutes(reportController, authMiddleware)); // [REMOVED]
 
 // API Rate Limit (Redis)
-router.use('/', ratelimitroutes(rateLimitController));
+// router.use('/', ratelimitroutes(rateLimitController)); // [REMOVED]
 
 // API Configurazione
-router.use('/', configroutes(configController, authMiddleware));
+// router.use('/', configroutes(configController, authMiddleware)); // [REMOVED]
 
 // API Honeypot Telnet (Cowrie)
-router.use('/', cowrieroutes(logger, cowrieController));
+// router.use('/', cowrieroutes(logger, cowrieController)); // [REMOVED]
 
-// API Dossier (Persistenza investigazioni)
-router.use('/', dossierroutes(dossierController, authMiddleware));
+// router.use('/', dossierroutes(dossierController, authMiddleware)); // [REMOVED]
 
 // API Gestione Limiti (Blacklist manuale)
-router.use('/', managelimitroutes(manageLimitController));
+// router.use('/', managelimitroutes(manageLimitController)); // [REMOVED]
 
 //XXX: ogni nuova api da importare definirlo prima di questa istruzione
 // API Honeypot Trap e Fake Login
-router.use('/', routes(logger, fakeLoginController, rateLimitMiddleware));
+// router.use('/', routes(logger, fakeLoginController, rateLimitMiddleware)); // [REMOVED]
 
+
+routerHub.bindHttp(router, container);
 
 export default router;

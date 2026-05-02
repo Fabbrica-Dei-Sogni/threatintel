@@ -55,12 +55,16 @@ describe('IpDetailsService Rate Limit & Retry', () => {
             debug: jest.fn()
         };
 
-        // Create service instance manually with mocked logger
-        ipDetailsService = new IpDetailsService(mockLogger as Logger);
+        // Mock RagSync
+        const mockRagSync = {
+            syncIpDetails: jest.fn().mockResolvedValue(true)
+        };
+
+        // Create service instance manually with mocked logger and ragSync
+        ipDetailsService = new IpDetailsService(mockLogger as Logger, mockRagSync as any);
     });
 
     test('should handle 429 Rate Limit error from ipinfo (err arg) by returning the error object', async () => {
-        // Setup mock to return 429 error
         const error = {
             status: 429,
             error: 'Rate limit exceeded'
@@ -73,13 +77,11 @@ describe('IpDetailsService Rate Limit & Retry', () => {
         const ip = '1.1.1.1';
         const data = await ipDetailsService.enrichIpData(ip);
 
-        // Expectation changed: should return the error object, not null
         expect(data.ipinfo).toEqual(error);
         expect(mockLogger.warn).toHaveBeenCalledWith(expect.stringMatching(/Rate limit superato per ipinfo/));
     });
 
     test('should handle 429 Rate Limit error from ipinfo (data arg) by returning the error object', async () => {
-        // Setup mock to return 429 error in DATA
         const errorData = {
             status: 429,
             error: 'Rate limit exceeded'
@@ -92,15 +94,12 @@ describe('IpDetailsService Rate Limit & Retry', () => {
         const ip = '1.1.1.2';
         const data = await ipDetailsService.enrichIpData(ip);
 
-        // Expectation changed: should return the error object, not null
         expect(data.ipinfo).toEqual(errorData);
         expect(mockLogger.warn).toHaveBeenCalledWith(expect.stringMatching(/Rate limit superato per ipinfo/));
     });
 
     test('should retry enrichment in findOrCreate if ipinfo contains Rate Limit error', async () => {
         const ip = '2.2.2.2';
-
-        // 1. Create an entry with ERROR ipinfo (simulating previous rate limit saving error)
         const errorDetails = {
             status: 429,
             error: 'Rate limit exceeded'
@@ -114,7 +113,6 @@ describe('IpDetailsService Rate Limit & Retry', () => {
             enrichedAt: null
         });
 
-        // 2. Setup mock to return valid data this time
         mockIpInfo.mockImplementation((ip: any, opts: any, cb: any) => {
             cb(null, {
                 ip: ip,
@@ -123,20 +121,15 @@ describe('IpDetailsService Rate Limit & Retry', () => {
             });
         });
 
-        // 3. Call findOrCreate
         await ipDetailsService.findOrCreate(ip);
 
-        // 4. Verify that ipinfo was updated
         const updated = await IpDetails.findOne({ ip });
         expect(updated).toBeDefined();
-        // It should have replaced the error object with the valid data
         expect((updated?.ipinfo as any).city).toBe('New City');
     });
 
     test('should retry enrichment in findOrCreate if ipinfo is null (legacy support)', async () => {
         const ip = '4.4.4.4';
-
-        // 1. Create an entry with NULL ipinfo 
         await IpDetails.create({
             ip,
             ipinfo: null,
@@ -145,7 +138,6 @@ describe('IpDetailsService Rate Limit & Retry', () => {
             enrichedAt: null
         });
 
-        // 2. Setup mock to return valid data
         mockIpInfo.mockImplementation((ip: any, opts: any, cb: any) => {
             cb(null, {
                 ip: ip,
@@ -154,10 +146,8 @@ describe('IpDetailsService Rate Limit & Retry', () => {
             });
         });
 
-        // 3. Call findOrCreate
         await ipDetailsService.findOrCreate(ip);
 
-        // 4. Verify that ipinfo was updated
         const updated = await IpDetails.findOne({ ip });
         expect(updated).toBeDefined();
         expect((updated?.ipinfo as any).city).toBe('Legacy City');
@@ -165,8 +155,6 @@ describe('IpDetailsService Rate Limit & Retry', () => {
 
     test('should NOT retry enrichment if ipinfo is already present and valid', async () => {
         const ip = '3.3.3.3';
-
-        // 1. Create an entry WITH valid ipinfo
         await IpDetails.create({
             ip,
             ipinfo: { city: 'Old City' },
@@ -174,15 +162,12 @@ describe('IpDetailsService Rate Limit & Retry', () => {
             lastSeenAt: new Date()
         });
 
-        // 2. Setup mock (should not be called for enrichment)
         mockIpInfo.mockImplementation((ip: any, opts: any, cb: any) => {
             cb(null, { city: 'New City Attempt' });
         });
 
-        // 3. Call findOrCreate
         await ipDetailsService.findOrCreate(ip);
 
-        // 4. Verify that ipinfo was NOT updated
         expect(mockIpInfo).not.toHaveBeenCalled();
 
         const notUpdated = await IpDetails.findOne({ ip });

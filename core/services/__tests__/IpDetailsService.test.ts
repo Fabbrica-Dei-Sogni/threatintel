@@ -66,8 +66,13 @@ describe('IpDetailsService (DI)', () => {
             debug: jest.fn()
         };
 
-        // Create service instance manually with mocked logger
-        ipDetailsService = new IpDetailsService(mockLogger as Logger);
+        // Mock RagSync
+        const mockRagSync = {
+            syncIpDetails: jest.fn().mockResolvedValue(true)
+        };
+
+        // Create service instance manually with mocked logger and ragSync
+        ipDetailsService = new IpDetailsService(mockLogger as Logger, mockRagSync as any);
     });
 
     describe('isIPExcluded', () => {

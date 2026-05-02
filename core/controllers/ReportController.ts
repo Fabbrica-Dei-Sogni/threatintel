@@ -7,11 +7,17 @@
  */
 
 import { Request, Response } from 'express';
-import { injectable } from 'tsyringe';
+import { singleton } from 'tsyringe';
 import { ReportService, ReportType } from '../services/ReportService';
 import { IDossierSection } from '../models/DossierSchema';
+import { Controller, Get, Post } from '../registry/decorators';
+import { getComponent } from '../di/container';
+import { AuthMiddleware } from '../middlewares/AuthMiddleware';
 
-@injectable()
+const auth = getComponent(AuthMiddleware);
+
+@singleton()
+@Controller('/api')
 export class ReportController {
     constructor(private readonly reportService: ReportService) { }
 
@@ -19,6 +25,54 @@ export class ReportController {
         return value.replace(/[^a-zA-Z0-9._-]/g, '_').slice(0, 64);
     }
 
+    /**
+     * @openapi
+     * /reports/dettaglio:
+     *   get:
+     *     tags: [Dossier & Forensics]
+     *     summary: Genera un report dettagliato per un attacco (IP o SessionID)
+     *     parameters:
+     *       - name: ip
+     *         in: query
+     *         schema:
+     *           type: string
+     *       - name: sessionId
+     *         in: query
+     *         schema:
+     *           type: string
+     *       - name: type
+     *         in: query
+     *         schema:
+     *           type: string
+     *           enum: [attack, telnet, ip]
+     *           default: attack
+     *       - name: format
+     *         in: query
+     *         schema:
+     *           type: string
+     *           enum: [html, pdf]
+     *           default: pdf
+     *       - name: locale
+     *         in: query
+     *         schema:
+     *           type: string
+     *           default: it-IT
+     *       - name: style
+     *         in: query
+     *         schema:
+     *           type: string
+     *           enum: [classic, hud, telex]
+     *           default: classic
+     *       - name: ipList
+     *         in: query
+     *         description: JSON array di IP per report distribuiti
+     *         schema:
+     *           type: string
+     *     responses:
+     *       200:
+     *         description: Report generato.
+     */
+    @Get('/reports/dettaglio', [auth.isIdentified()])
     async generateDetailReport(req: Request, res: Response) {
         try {
             const { ip, sessionId, type, locale, ipList } = req.query;
@@ -64,6 +118,31 @@ export class ReportController {
         }
     }
 
+    /**
+     * @openapi
+     * /reports/custom:
+     *   post:
+     *     tags: [Dossier & Forensics]
+     *     summary: Genera un report personalizzato basato su criteri specifici
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             properties:
+     *               sections:
+     *                 type: array
+     *                 items:
+     *                   type: object
+     *               locale:
+     *                 type: string
+     *                 default: it-IT
+     *     responses:
+     *       200:
+     *         description: Report custom generato.
+     */
+    @Post('/reports/custom', [auth.isIdentified()])
     async generateCustomReport(req: Request, res: Response) {
         try {
             const { sections, locale }: { sections: IDossierSection[], locale: string } = req.body;

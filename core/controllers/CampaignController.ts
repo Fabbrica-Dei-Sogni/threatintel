@@ -12,8 +12,10 @@ import { CampaignService } from '../services/CampaignService';
 import { LOGGER_TOKEN } from '../di/tokens';
 import { Logger } from 'winston';
 import { sanitizeFilters, sanitizePage, sanitizePageSize, FilterAllowedFields } from '../utils/queryGuard';
+import { Controller, Get, Post } from '../registry/decorators';
 
 @singleton()
+@Controller('/api')
 export class CampaignController {
     constructor(
         private campaignService: CampaignService,
@@ -21,9 +23,53 @@ export class CampaignController {
     ) { }
 
     /**
-     * GET /api/campaigns
-     * Scopre pattern di attacco (hash) condivisi da più IP
+     * @openapi
+     * /campaigns:
+     *   get:
+     *     tags: [Campaigns Analysis]
+     *     summary: Scopre pattern di attacco (hash) condivisi da più IP
+     *     parameters:
+     *       - name: minIps
+     *         in: query
+     *         schema:
+     *           type: integer
+     *           default: 2
+     *       - name: minScore
+     *         in: query
+     *         schema:
+     *           type: integer
+     *           default: 0
+     *       - name: minLogsPerIp
+     *         in: query
+     *         schema:
+     *           type: integer
+     *           default: 1
+     *       - name: protocol
+     *         in: query
+     *         schema:
+     *           type: string
+     *           enum: [http, telnet, ssh]
+     *           default: http
+     *       - name: page
+     *         in: query
+     *         schema:
+     *           type: integer
+     *           default: 1
+     *       - name: pageSize
+     *         in: query
+     *         schema:
+     *           type: integer
+     *           default: 10
+     *       - name: search
+     *         in: query
+     *         schema:
+     *           type: string
+     *           default: ''
+     *     responses:
+     *       200:
+     *         description: Elenco campagne distribuite trovate.
      */
+    @Get('/campaigns')
     async getCampaigns(req: Request, res: Response): Promise<void> {
         this.logger.info('[CampaignController] Requesting distributed campaigns discovery');
         try {
@@ -72,9 +118,30 @@ export class CampaignController {
     }
 
     /**
-     * POST /api/campaign/details
-     * Ottiene dettagli forensi aggregati per una campagna
+     * @openapi
+     * /campaign/details:
+     *   post:
+     *     tags: [Campaigns Analysis]
+     *     summary: Ottiene dettagli forensi aggregati per una campagna
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             required: [hash]
+     *             properties:
+     *               hash:
+     *                 type: string
+     *               minLogsPerIp:
+     *                 type: integer
+     *               minScore:
+     *                 type: number
+     *     responses:
+     *       200:
+     *         description: Dettagli della campagna.
      */
+    @Post('/campaign/details')
     async getCampaignDetail(req: Request, res: Response): Promise<void> {
         const hash = req.body.hash;
         this.logger.info(`[CampaignController] Requesting campaign details for hash ${hash}`);
@@ -127,9 +194,29 @@ export class CampaignController {
     }
 
     /**
-     * GET /api/campaigns/uris
-     * Ottiene la lista degli URI unici coinvolti nelle campagne
+     * @openapi
+     * /campaigns/uris:
+     *   get:
+     *     tags: [Campaigns Analysis]
+     *     summary: Ottiene gli URI unici (Target URLs) coinvolti nelle campagne
+     *     parameters:
+     *       - name: protocol
+     *         in: query
+     *         schema:
+     *           type: string
+     *       - name: minIps
+     *         in: query
+     *         schema:
+     *           type: integer
+     *       - name: minScore
+     *         in: query
+     *         schema:
+     *           type: integer
+     *     responses:
+     *       200:
+     *         description: Elenco degli URI con conteggi.
      */
+    @Get('/campaigns/uris')
     async getUniqueUris(req: Request, res: Response): Promise<void> {
         this.logger.info('[CampaignController] Requesting unique URIs from campaigns');
         try {

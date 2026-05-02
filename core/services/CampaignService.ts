@@ -10,28 +10,29 @@ import { injectable, inject } from 'tsyringe';
 import { Logger } from 'winston';
 import { LOGGER_TOKEN } from '../di/tokens';
 import ThreatLog from '../models/ThreatLogSchema';
-import { ForensicPipelineService } from './forense/ForensicPipelineService';
 import { TimeFilterStage } from './forense/pipeline/stages/TimeFilterStage';
 import { calculateCorrelationHubs } from '../utils/CampaignAnalytics';
+import { RagSyncService } from './assistant/RagSyncService';
+import { RAG_SYNC_SERVICE_TOKEN } from '../di/tokens';
 
 @injectable()
 export class CampaignService {
     constructor(
         @inject(LOGGER_TOKEN) private readonly logger: Logger,
-        private readonly forensicPipelineService: ForensicPipelineService
-    ) {}
+        @inject(RAG_SYNC_SERVICE_TOKEN) private readonly ragSync: RagSyncService
+    ) { }
 
     /**
      * Discovery (Lista): Ricerca dei cluster.
      */
     async getCampaigns(params: any) {
-        const { 
-            minIps = 2, 
-            minScore = 0, 
+        const {
+            minIps = 2,
+            minScore = 0,
             minLogsPerIp = 1,
-            protocol = 'http', 
-            page = 1, 
-            pageSize = 10, 
+            protocol = 'http',
+            page = 1,
+            pageSize = 10,
             timeConfig = {},
             selectedUris = [],
             search = ''
@@ -79,7 +80,7 @@ export class CampaignService {
         const [newestLog] = await ThreatLog.find(baseFilters).sort({ timestamp: -1 }).limit(1).select('timestamp').lean();
         const globalMinDate = oldestLog?.timestamp || null;
         const globalMaxDate = newestLog?.timestamp || null;
- 
+
         const timeParams = { ...timeConfig };
         if (timeConfig.timeMode === 'ago' && timeConfig.agoUnit && timeConfig.agoValue) {
             timeParams[timeConfig.agoUnit] = timeConfig.agoValue;
@@ -94,7 +95,7 @@ export class CampaignService {
             { $group: { _id: null, maxLogs: { $max: '$logs' }, minLogs: { $min: '$logs' } } }
         ];
         const [logsMeta] = await ThreatLog.aggregate(logsPerIpMetadataPipeline).allowDiskUse(true);
- 
+
         const pipeline = [
             ...timeStage,
             { $match: baseFilters },
@@ -172,10 +173,10 @@ export class CampaignService {
 
         try {
             const [result] = await ThreatLog.aggregate(pipeline).allowDiskUse(true);
-            
+
             // 1. Estraiamo tutti i candidati idonei
             const allCandidates = result?.discoveryCandidates || [];
-            
+
             // 2. Arricchimento e Filtraggio in memoria per correlazioni
             const enrichedAndFiltered = allCandidates
                 .map((c: any) => {
@@ -195,7 +196,7 @@ export class CampaignService {
                 const dateB = new Date(b.firstSeen).getTime();
                 return dateB - dateA || b.ipCount - a.ipCount;
             });
-            
+
             const pNum = Number(page);
             const psNum = Number(pageSize);
             const pagedData = sortedData.slice((pNum - 1) * psNum, pNum * psNum);
@@ -204,8 +205,8 @@ export class CampaignService {
             const bScore = result?.boundsScore[0] || { min: 0, max: 0 };
             const bLogs = result?.boundsLogsPerIp[0] || { min: 0, max: 0 };
 
-            return { 
-                campaigns: pagedData, 
+            return {
+                campaigns: pagedData,
                 total: totalCount,
                 metadata: {
                     minIpCount: bIps.min || 0,
@@ -228,14 +229,14 @@ export class CampaignService {
      * Dettaglio (Forensics): Analisi profonda dello stesso cluster con nodi IP arricchiti.
      */
     async getCampaignDetail(params: any) {
-        const { 
-            hash, 
+        const {
+            hash,
             minScore = 0,
             minLogsPerIp = 1,
-            protocol = null, 
-            timeConfig = {}, 
-            page = 1, 
-            pageSize = 10 
+            protocol = null,
+            timeConfig = {},
+            page = 1,
+            pageSize = 10
         } = params;
 
         const baseFilters: any = { 'fingerprint.hash': hash };
@@ -246,7 +247,7 @@ export class CampaignService {
                 baseFilters.protocol = protocol;
             }
         }
-        
+
         const timeParams = { ...timeConfig };
         if (timeConfig.timeMode === 'ago' && timeConfig.agoUnit && timeConfig.agoValue) {
             timeParams[timeConfig.agoUnit] = timeConfig.agoValue;
@@ -287,11 +288,11 @@ export class CampaignService {
                 }
             },
             // FILTRI DI COERENZA (FOTOGRAFIA): Solo nodi che hanno passato la soglia di scoperta
-            { 
-                $match: { 
+            {
+                $match: {
                     totaleLogs: { $gte: Number(minLogsPerIp) },
                     averageScore: { $gte: Number(minScore) }
-                } 
+                }
             },
             { $lookup: { from: 'ipdetails', localField: 'ip', foreignField: 'ip', as: 'geo' } },
             { $addFields: { geoInfo: { $arrayElemAt: ['$geo', 0] } } },
@@ -324,7 +325,7 @@ export class CampaignService {
         try {
             const [result] = await ThreatLog.aggregate(pipeline).allowDiskUse(true);
             const meta = result?.meta[0] || { ipCount: 0, clusterLogs: 0, clusterAvgScore: 0, timeInfo: [] };
-            
+
             // Calcolo correlazioni su tutti i nodi (non solo quelli paginati)
             const correlations = calculateCorrelationHubs(meta.timeInfo || []);
 
@@ -488,4 +489,5 @@ export class CampaignService {
             throw err;
         }
     }
+
 }

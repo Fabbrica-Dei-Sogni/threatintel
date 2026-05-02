@@ -15,11 +15,11 @@ import PatternAnalysisService from './PatternAnalysisService';
 import { ForensicService } from './forense/ForensicService';
 import { ForensicPipelineService } from './forense/ForensicPipelineService';
 import { inject, injectable } from 'tsyringe';
-import { LOGGER_TOKEN } from '../di/tokens';
+import { LOGGER_TOKEN, RAG_SYNC_SERVICE_TOKEN } from '../di/tokens';
 import { Logger } from 'winston';
 import { IpDetailsService } from './IpDetailsService';
+import { RagSyncService } from './assistant/RagSyncService';
 import { LogFilters } from '../types/threat-log.types';
-import { ThreatIndicator } from '../types/indicators';
 import { Types } from 'mongoose';
 import {
     sanitizeSortFields,
@@ -28,8 +28,7 @@ import {
     sanitizePage,
     sanitizeLimit,
     SortAllowedFields,
-    FilterAllowedFields,
-    escapeRegex
+    FilterAllowedFields
 } from '../utils/queryGuard';
 
 dotenv.config();
@@ -44,6 +43,7 @@ export class ThreatLogService {
         private readonly forensicPipelineService: ForensicPipelineService,
         private readonly ipDetailsService: IpDetailsService,
         private readonly patternAnalysisService: PatternAnalysisService,
+        @inject(RAG_SYNC_SERVICE_TOKEN) private readonly ragSync: RagSyncService
     ) {
         // Parse della variabile di ambiente al costruttore
         //this.patternAnalysisService = new PatternAnalysis({ geoEnabled: true });
@@ -68,6 +68,13 @@ export class ThreatLogService {
             { $set: logEntry },
             { upsert: true, new: true, setDefaultsOnInsert: true }
         );
+
+        // SYNC TO RAG (Asincrono e non bloccante)
+        if (log) {
+            this.ragSync.syncThreatLog(log).catch(err =>
+                this.logger.error(`[ThreatLogService] Error during RAG sync: ${err}`)
+            );
+        }
 
         return log;
     }
@@ -335,7 +342,7 @@ export class ThreatLogService {
             const result = await ThreatLog.populate(attack, { path: 'ipDetailsId', model: 'IpDetails' });
             // Sincronizza il campo ipDetails per retrocompatibilità con il frontend (che si aspetta ipDetails anziché ipDetailsId)
             const resAny = result as any;
-            // Sincronizza il campo ipDetails per retrocompatibilità con il frontend (che si aspetta ipDetails anziché ipDetailsId)
+            // Sincronizza il campo ipDetails per retrocompatibilità con il frontend (che si asaptte ipDetails anziché ipDetailsId)
             if (resAny.ipDetailsId) {
                 resAny.ipDetails = resAny.ipDetailsId;
             }

@@ -15,7 +15,10 @@ import { ForensicService } from '../forense/ForensicService';
 import { ForensicPipelineService } from '../forense/ForensicPipelineService';
 import { IpDetailsService } from '../IpDetailsService';
 import PatternAnalysisService from '../PatternAnalysisService';
-import { LOGGER_TOKEN } from '../../di/tokens';
+import { LOGGER_TOKEN, RAG_SYNC_SERVICE_TOKEN, OLLAMA_SERVICE_TOKEN, RAG_TRANSLATION_TOKEN } from '../../di/tokens';
+import { RagSyncService } from '../assistant/RagSyncService';
+import { OllamaService } from '../assistant/OllamaService';
+import { RagTranslationService } from '../assistant/RagTranslationService';
 
 describe('ThreatLogService', () => {
     console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
@@ -27,6 +30,9 @@ describe('ThreatLogService', () => {
     let mockForensicPipelineService: any;
     let mockIpDetailsService: any;
     let mockPatternAnalysisService: any;
+    let mockRagSync: any;
+    let mockOllama: any;
+    let mockTranslator: any;
 
     beforeAll(async () => {
         const uri = process.env.MONGO_URI_TEST || 'mongodb://127.0.0.1:27017/threatintel_test';
@@ -74,12 +80,31 @@ describe('ThreatLogService', () => {
             loadConfigFromDB: jest.fn().mockResolvedValue(null)
         };
 
+        mockRagSync = {
+            syncThreatLog: jest.fn().mockResolvedValue(true),
+            syncIpDetails: jest.fn().mockResolvedValue(true),
+            syncAttackSummary: jest.fn().mockResolvedValue(true),
+            syncCampaignSummary: jest.fn().mockResolvedValue(true)
+        };
+
+        mockOllama = {
+            getEmbedding: jest.fn().mockResolvedValue([0.1, 0.2]),
+            generate: jest.fn().mockResolvedValue('Mock Summary')
+        };
+
+        mockTranslator = {
+            buildAttackSummaryPrompt: jest.fn().mockReturnValue('Mock Prompt')
+        };
+
         container.clearInstances();
         container.registerInstance(LOGGER_TOKEN, mockLogger);
         container.registerInstance(ForensicService, mockForensicService);
         container.registerInstance(ForensicPipelineService, mockForensicPipelineService);
         container.registerInstance(IpDetailsService, mockIpDetailsService);
         container.registerInstance(PatternAnalysisService, mockPatternAnalysisService);
+        container.registerInstance(RAG_SYNC_SERVICE_TOKEN, mockRagSync);
+        container.registerInstance(OLLAMA_SERVICE_TOKEN, mockOllama);
+        container.registerInstance(RAG_TRANSLATION_TOKEN, mockTranslator);
 
         service = container.resolve(ThreatLogService);
     });

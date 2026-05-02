@@ -15,8 +15,14 @@ import { LOGGER_TOKEN } from '../di/tokens';
 import { Logger } from 'winston';
 import { assertPublicIp, IpValidationError } from '../utils/ipValidator';
 import { sanitizePage, sanitizePageSize, sanitizeLimit } from '../utils/queryGuard';
+import { Controller, Get, Post } from '../registry/decorators';
+import { getComponent } from '../di/container';
+import { AuthMiddleware } from '../middlewares/AuthMiddleware';
+
+const auth = getComponent(AuthMiddleware);
 
 @singleton()
+@Controller('/api')
 export class ThreatController {
     constructor(
         private threatLogService: ThreatLogService,
@@ -24,7 +30,34 @@ export class ThreatController {
         @inject(LOGGER_TOKEN) private logger: Logger
     ) { }
 
-    // GET /api/stats
+    /**
+     * @openapi
+     * /stats:
+     *   get:
+     *     tags: [Dashboard API]
+     *     summary: Ottiene le statistiche generali delle minacce
+     *     parameters:
+     *       - name: timeframe
+     *         in: query
+     *         schema:
+     *           type: string
+     *           enum: [1h, 24h, 7d, 30d]
+     *           default: 24h
+     *       - name: minScore
+     *         in: query
+     *         schema:
+     *           type: integer
+     *           default: 15
+     *       - name: top
+     *         in: query
+     *         schema:
+     *           type: string
+     *           default: '10'
+     *     responses:
+     *       200:
+     *         description: Statistiche recuperate con successo.
+     */
+    @Get('/stats')
     async getStats(req: Request, res: Response): Promise<void> {
         this.logger.info('[ThreatController] Requesting stats');
         try {
@@ -47,7 +80,37 @@ export class ThreatController {
         }
     }
 
-    // GET /api/logs
+    /**
+     * @openapi
+     * /logs:
+     *   get:
+     *     tags: [Dashboard API]
+     *     summary: Recupera la lista dei log delle minacce
+     *     parameters:
+     *       - name: page
+     *         in: query
+     *         schema:
+     *           type: integer
+     *           default: 1
+     *       - name: pageSize
+     *         in: query
+     *         schema:
+     *           type: integer
+     *           default: 20
+     *       - name: ip
+     *         in: query
+     *         schema:
+     *           type: string
+     *       - name: suspicious
+     *         in: query
+     *         schema:
+     *           type: string
+     *           enum: ['true', 'false']
+     *     responses:
+     *       200:
+     *         description: Elenco log restituito.
+     */
+    @Get('/logs')
     async getLogs(req: Request, res: Response): Promise<void> {
         this.logger.info('[ThreatController] Requesting logs');
         try {
@@ -69,7 +132,32 @@ export class ThreatController {
         }
     }
 
-    // POST /api/search
+    /**
+     * @openapi
+     * /search:
+     *   post:
+     *     tags: [Dashboard API]
+     *     summary: Ricerca avanzata nei log
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             properties:
+     *               page:
+     *                 type: integer
+     *               pageSize:
+     *                 type: integer
+     *               filters:
+     *                 type: object
+     *               sortFields:
+     *                 type: object
+     *     responses:
+     *       200:
+     *         description: Risultati della ricerca.
+     */
+    @Post('/search')
     async searchLogs(req: Request, res: Response): Promise<void> {
         this.logger.info('[ThreatController] Requesting log search');
         try {
@@ -88,7 +176,17 @@ export class ThreatController {
         }
     }
 
-    // POST /api/attack/search
+    /**
+     * @openapi
+     * /attack/search:
+     *   post:
+     *     tags: [Dashboard API]
+     *     summary: Ricerca attacchi raggruppati
+     *     responses:
+     *       200:
+     *         description: Elenco attacchi aggregati.
+     */
+    @Post('/attack/search')
     async searchAttacks(req: Request, res: Response): Promise<void> {
         this.logger.info('[ThreatController] Requesting attack search');
         try {
@@ -114,7 +212,17 @@ export class ThreatController {
         }
     }
 
-    // POST /api/attack/details
+    /**
+     * @openapi
+     * /attack/details:
+     *   post:
+     *     tags: [Dashboard API]
+     *     summary: Ottiene dettagli specifici di un attacco
+     *     responses:
+     *       200:
+     *         description: Dettagli dell'attacco.
+     */
+    @Post('/attack/details')
     async getAttackDetails(req: Request, res: Response): Promise<void> {
         this.logger.info(`[ThreatController] Requesting attack details for IP ${req.body.ip}`);
         try {
@@ -142,7 +250,17 @@ export class ThreatController {
         }
     }
 
-    // POST /api/attack/distributed
+    /**
+     * @openapi
+     * /attack/distributed:
+     *   post:
+     *     tags: [Dashboard API]
+     *     summary: Ottiene dettagli investigativi per un cluster di IP (Attacco Distribuito)
+     *     responses:
+     *       200:
+     *         description: Dettagli dell'attacco distribuito.
+     */
+    @Post('/attack/distributed')
     async getDistributedAttackDetails(req: Request, res: Response): Promise<void> {
         this.logger.info(`[ThreatController] Requesting distributed attack details for ${req.body.ipList?.length || 0} IPs`);
         try {
@@ -171,8 +289,23 @@ export class ThreatController {
         }
     }
 
-    // POST /api/search
-
+    /**
+     * @openapi
+     * /logs/{id}:
+     *   get:
+     *     tags: [Dashboard API]
+     *     summary: Recupera un singolo log tramite ID
+     *     parameters:
+     *       - name: id
+     *         in: path
+     *         required: true
+     *         schema:
+     *           type: string
+     *     responses:
+     *       200:
+     *         description: Dettaglio del log.
+     */
+    @Get('/logs/:id')
     async getLogById(req: Request, res: Response): Promise<void> {
         this.logger.info(`[ThreatController] Requesting log ${req.params.id}`);
         try {
@@ -187,7 +320,23 @@ export class ThreatController {
         }
     }
 
-    // GET /api/reputationscore/:ip
+    /**
+     * @openapi
+     * /reputationscore/{ip}:
+     *   get:
+     *     tags: [Dashboard API]
+     *     summary: Calcola il Reputation Score di un IP
+     *     parameters:
+     *       - name: ip
+     *         in: path
+     *         required: true
+     *         schema:
+     *           type: string
+     *     responses:
+     *       200:
+     *         description: Score calcolato.
+     */
+    @Get('/reputationscore/:ip')
     async getReputationScore(req: Request, res: Response): Promise<void> {
         try {
             assertPublicIp(req.params.ip as string);
@@ -215,7 +364,17 @@ export class ThreatController {
         }
     }
 
-    // POST /api/enrichreports/:ip
+    /**
+     * @openapi
+     * /enrichreports/{ip}:
+     *   post:
+     *     tags: [Dashboard API]
+     *     summary: Arricchisce i report per un IP specifico
+     *     responses:
+     *       200:
+     *         description: Dati arricchiti.
+     */
+    @Post('/enrichreports/:ip')
     async enrichReports(req: Request, res: Response): Promise<void> {
         const user = (req as any).user;
         if (user?.username === 'anonymous') {
@@ -240,7 +399,17 @@ export class ThreatController {
         }
     }
 
-    // GET /api/ipdetail/:ip
+    /**
+     * @openapi
+     * /ipdetail/{ip}:
+     *   get:
+     *     tags: [Dashboard API]
+     *     summary: Ottiene dettagli geolocalizzati e tecnici di un IP
+     *     responses:
+     *       200:
+     *         description: Dettagli IP.
+     */
+    @Get('/ipdetail/:ip')
     async getIpDetail(req: Request, res: Response): Promise<void> {
         try {
             assertPublicIp(req.params.ip as string);
@@ -260,7 +429,17 @@ export class ThreatController {
         }
     }
 
-    // POST /api/enrich/:ip
+    /**
+     * @openapi
+     * /enrich/{ip}:
+     *   post:
+     *     tags: [Dashboard API]
+     *     summary: Esegue l'enrichment manuale di un IP
+     *     responses:
+     *       200:
+     *         description: Enrichment completato.
+     */
+    @Post('/enrich/:ip')
     async enrichIp(req: Request, res: Response): Promise<void> {
         const user = (req as any).user;
         if (user?.username === 'anonymous') {
@@ -284,7 +463,17 @@ export class ThreatController {
         }
     }
 
-    // POST /api/enrich
+    /**
+     * @openapi
+     * /enrich:
+     *   post:
+     *     tags: [Dashboard API]
+     *     summary: Esegue l'enrichment massivo (batch)
+     *     responses:
+     *       200:
+     *         description: Risultati batch.
+     */
+    @Post('/enrich')
     async batchEnrich(req: Request, res: Response): Promise<void> {
         const user = (req as any).user;
         if (user?.username === 'anonymous') {
@@ -309,7 +498,19 @@ export class ThreatController {
         }
     }
 
-    // POST /api/reanalyze-all
+    /**
+     * @openapi
+     * /reanalyze-all:
+     *   post:
+     *     tags: [System & Security]
+     *     summary: Ri-analizza tutti i log presenti nel DB (Admin Only)
+     *     security:
+     *       - BearerAuth: []
+     *     responses:
+     *       200:
+     *         description: Processo avviato.
+     */
+    @Post('/reanalyze-all', [auth.hasRole('admin')])
     async reanalyzeAll(req: Request, res: Response): Promise<void> {
         this.logger.info('[ThreatController] Starting full logs reanalysis');
         try {
@@ -324,7 +525,17 @@ export class ThreatController {
         }
     }
 
-    // GET /api/analyze-preview
+    /**
+     * @openapi
+     * /analyze-preview:
+     *   get:
+     *     tags: [Dashboard API]
+     *     summary: Anteprima dell'analisi dei log
+     *     responses:
+     *       200:
+     *         description: Anteprima generata.
+     */
+    @Get('/analyze-preview')
     async analyzePreview(req: Request, res: Response): Promise<void> {
         this.logger.info('[ThreatController] Starting reanalysis preview (dry-run)');
         try {

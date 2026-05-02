@@ -847,11 +847,7 @@ export class ThreatLogService {
                     page: currentPage, 
                     pageSize: policy.pageSize, 
                     minLogsForAttack: policy.minLogs, 
-                    timeConfig: { 
-                        timeMode: 'ago', 
-                        agoUnit: policy.timeWindow.agoUnit, 
-                        agoValue: policy.timeWindow.agoValue 
-                    } 
+                    timeConfig: policy.timeConfig
                 });
 
                 const attacks = result.items || [];
@@ -891,11 +887,7 @@ export class ThreatLogService {
                                 type: 'attack',
                                 ip: ip,
                                 minLogsForAttack: policy.minLogs,
-                                timeConfig: { 
-                                    timeMode: 'ago',
-                                    agoUnit: policy.timeWindow.agoUnit,
-                                    agoValue: policy.timeWindow.agoValue
-                                }
+                                timeConfig: policy.timeConfig
                             }
                         };
 

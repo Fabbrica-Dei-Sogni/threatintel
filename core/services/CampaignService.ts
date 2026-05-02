@@ -522,11 +522,7 @@ export class CampaignService {
                     minIps: policy.minIps, 
                     pageSize: policy.pageSize, 
                     page: currentPage,
-                    timeConfig: { 
-                        timeMode: 'ago', 
-                        agoUnit: policy.timeWindow.agoUnit, 
-                        agoValue: policy.timeWindow.agoValue 
-                    } 
+                    timeConfig: policy.timeConfig
                 });
 
                 if (!result.campaigns || result.campaigns.length === 0) {
@@ -566,11 +562,7 @@ export class CampaignService {
                                 minScore: policy.minScore,
                                 minLogsPerIp: policy.minLogsPerIp,
                                 protocol: policy.protocol,
-                                timeConfig: { 
-                                    timeMode: 'ago',
-                                    agoUnit: policy.timeWindow.agoUnit,
-                                    agoValue: policy.timeWindow.agoValue
-                                }
+                                timeConfig: policy.timeConfig
                             }
                         };
                         

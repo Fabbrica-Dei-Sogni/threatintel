@@ -5,11 +5,30 @@
 export type RagEntityType = 'threat_log' | 'attack_summary' | 'campaign_summary' | 'ip_details';
 
 /**
+ * Configurazione temporale standard per il sistema RAG.
+ */
+export interface RagTimeConfig {
+    timeMode: 'ago' | 'range';
+    agoUnit: string;
+    agoValue: number;
+    startTime?: string;
+    endTime?: string;
+}
+
+/**
  * Parametri specifici per la ricostruzione di un Log
  */
 export interface LogSourceParams {
     type: 'log';
     id: string;
+}
+
+/**
+ * Parametri specifici per la ricostruzione di un IP Details (Reputazione)
+ */
+export interface IpDetailsSourceParams {
+    type: 'ip_details';
+    ip: string;
 }
 
 /**
@@ -20,11 +39,7 @@ export interface AttackSourceParams {
     type: 'attack';
     ip: string; 
     minLogsForAttack: number;
-    timeConfig: { 
-        timeMode: 'ago', 
-        agoUnit: string, 
-        agoValue: number 
-    };
+    timeConfig: RagTimeConfig;
 }
 
 /**
@@ -37,14 +52,10 @@ export interface CampaignSourceParams {
     minScore: number;
     minLogsPerIp: number;
     protocol: string;
-    timeConfig: { 
-        timeMode: 'ago', 
-        agoUnit: string, 
-        agoValue: number 
-    };
+    timeConfig: RagTimeConfig;
 }
 
-export type RagSourceParams = LogSourceParams | AttackSourceParams | CampaignSourceParams;
+export type RagSourceParams = LogSourceParams | IpDetailsSourceParams | AttackSourceParams | CampaignSourceParams;
 
 /**
  * Riferimento alla sorgente originale del dato (API).
@@ -96,4 +107,14 @@ export interface CampaignSummaryPayload extends RagBasePayload {
     ipCount: number;
     protocols: string[];
     topIps: string[];
+}
+
+/**
+ * Payload specifico per i dettagli tecnici e reputazionali di un IP.
+ */
+export interface IpDetailsPayload extends RagBasePayload {
+    type: 'ip_details';
+    mongoId: string;
+    ip: string;
+    lastSeen: Date;
 }

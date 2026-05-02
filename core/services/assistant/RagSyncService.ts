@@ -140,7 +140,15 @@ export class RagSyncService {
                     mongoId: ipDetails._id.toString(),
                     ip: ipDetails.ip,
                     lastSeen: ipDetails.lastSeenAt,
-                    text: narrative
+                    text: narrative,
+                    sourceRef: {
+                        endpoint: RAG_POLICIES.IP_DETAILS.apiRef.endpoint,
+                        method: RAG_POLICIES.IP_DETAILS.apiRef.method,
+                        params: {
+                            type: 'ip_details',
+                            ip: ipDetails.ip
+                        }
+                    }
                 }
             }]);
         } catch (error) {
@@ -174,11 +182,7 @@ export class RagSyncService {
                         minScore: RAG_POLICIES.CAMPAIGNS.minScore,
                         minLogsPerIp: RAG_POLICIES.CAMPAIGNS.minLogsPerIp,
                         protocol: RAG_POLICIES.CAMPAIGNS.protocol,
-                        timeConfig: { 
-                            timeMode: 'ago',
-                            agoUnit: RAG_POLICIES.CAMPAIGNS.timeWindow.agoUnit,
-                            agoValue: RAG_POLICIES.CAMPAIGNS.timeWindow.agoValue
-                        }
+                        timeConfig: RAG_POLICIES.CAMPAIGNS.timeConfig
                     }
                 }
             };
@@ -217,11 +221,7 @@ export class RagSyncService {
                         type: 'attack',
                         ip: ip,
                         minLogsForAttack: RAG_POLICIES.ATTACKS.minLogs,
-                        timeConfig: { 
-                            timeMode: 'ago',
-                            agoUnit: RAG_POLICIES.ATTACKS.timeWindow.agoUnit,
-                            agoValue: RAG_POLICIES.ATTACKS.timeWindow.agoValue
-                        }
+                        timeConfig: RAG_POLICIES.ATTACKS.timeConfig
                     }
                 }
             };

@@ -4,6 +4,7 @@ import { LOGGER_TOKEN, RAG_TRANSLATION_TOKEN, QDRANT_CLIENT_TOKEN, OLLAMA_SERVIC
 import { RagTranslationService } from './RagTranslationService';
 import { QdrantClientService } from './QdrantClientService';
 import { OllamaService } from './OllamaService';
+import { AppConfigProvider } from '../AppConfigProvider';
 import { IThreatLog } from '../../models/ThreatLogSchema';
 import { IIpDetails } from '../../models/IpDetailsSchema';
 import { IAbuseIpDb } from '../../models/AbuseIpDbSchema';
@@ -23,15 +24,19 @@ export class RagSyncService {
     private readonly BATCH_TIMEOUT = 30000; // O ogni 30 secondi
     private batchTimer: NodeJS.Timeout | null = null;
 
-    private readonly COLL_INTELLIGENCE = 'threat_intelligence';
-    private readonly COLL_LOGS = 'threat_logs';
+    private readonly COLL_INTELLIGENCE: string;
+    private readonly COLL_LOGS: string;
 
     constructor(
         @inject(LOGGER_TOKEN) private readonly logger: Logger,
         @inject(RAG_TRANSLATION_TOKEN) private readonly translator: RagTranslationService,
         @inject(QDRANT_CLIENT_TOKEN) private readonly qdrant: QdrantClientService,
-        @inject(OLLAMA_SERVICE_TOKEN) private readonly ollama: OllamaService
-    ) { }
+        @inject(OLLAMA_SERVICE_TOKEN) private readonly ollama: OllamaService,
+        private readonly config: AppConfigProvider
+    ) { 
+        this.COLL_INTELLIGENCE = this.config.ragCollectionName;
+        this.COLL_LOGS = this.config.ragLogsCollectionName;
+    }
 
     /**
      * Sincronizza un ThreatLog nel database vettoriale (con Filtro e Batching).
@@ -244,6 +249,13 @@ export class RagSyncService {
      * Inizializza il sistema RAG con controllo di integrità.
      */
     public async initialize() {
+        if (!this.config.ragEnabled) {
+            this.logger.info('[RagSync] RAG system is disabled via configuration.');
+            this.initializationAttempted = true;
+            this.isOperational = false;
+            return;
+        }
+
         this.initializationAttempted = true;
         this.logger.info('[RagSync] Initializing RAG Synchronization system...');
 
@@ -262,24 +274,26 @@ export class RagSyncService {
             this.logger.info('[RagSync] RAG system is fully operational and connected to Ollama.');
         } catch (error) {
             this.isOperational = false;
-            this.logger.warn(`[RagSync] RAG system is NOT operational (AI features disabled): ${error.message}`);
+            this.logger.error(`[RagSync] CRITICAL: RAG system is NOT operational: ${error.message}`);
         }
     }
 
     private checkOperational(): boolean {
+        if (!this.config.ragEnabled) return false;
         if (!this.initializationAttempted) return false;
         return this.isOperational;
     }
 
     private handleOperationError(operation: string, error: any) {
-        this.logger.warn(`[RagSync] Non-blocking error during ${operation}: ${error.message}`);
+        this.logger.error(`[RagSync] Error during ${operation}: ${error.message}`);
         // Se riceviamo troppi errori consecutivi, potremmo disattivare il sistema temporaneamente
     }
 
     public getStatus() {
         return {
             operational: this.isOperational,
-            initializationAttempted: this.initializationAttempted
+            initializationAttempted: this.initializationAttempted,
+            enabled: this.config.ragEnabled
         };
     }
 

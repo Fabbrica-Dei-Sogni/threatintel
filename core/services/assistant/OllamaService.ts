@@ -38,7 +38,7 @@ export class OllamaService {
             }
             throw new Error('Invalid response from Ollama embeddings API');
         } catch (error) {
-            this.logger.warn(`[Ollama] Error getting embedding: ${error.message}`);
+            this.logger.error(`[Ollama] Error getting embedding: ${error.message}`);
             throw error;
         }
     }
@@ -62,7 +62,7 @@ export class OllamaService {
             }
             throw new Error('Invalid response from Ollama generate API');
         } catch (error) {
-            this.logger.warn(`[Ollama] Error during generation: ${error.message}`);
+            this.logger.error(`[Ollama] Error during generation: ${error.message}`);
             throw error;
         }
     }

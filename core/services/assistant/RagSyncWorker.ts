@@ -29,6 +29,14 @@ export class RagSyncWorker implements ILongRunningService {
             await this.ragSync.initialize();
 
             this.status = ServiceStatus.RUNNING;
+            
+            // Se disabilitato, non avviamo nemmeno il materializzatore
+            const ragStatus = this.ragSync.getStatus();
+            if (!ragStatus.operational && !ragStatus.enabled) {
+                this.logger.info(`[${this.serviceName}] RAG Worker idle (disabled).`);
+                return;
+            }
+
             this.logger.info(`[${this.serviceName}] RAG Worker is now running.`);
 
             // Avvio loop periodico per la materializzazione (ogni 30 minuti)
@@ -39,8 +47,8 @@ export class RagSyncWorker implements ILongRunningService {
 
         } catch (error) {
             this.status = ServiceStatus.FAILED;
-            this.logger.warn(`[${this.serviceName}] Worker in degraded state: ${error}`);
-            // Non rilanciamo l'errore per non bloccare il bootstrap globale
+            this.logger.error(`[${this.serviceName}] Failed to start: ${error}`);
+            // Non rilanciamo l'errore per non bloccare il bootstrap globale (ma lo logghiamo come errore)
         }
     }
 

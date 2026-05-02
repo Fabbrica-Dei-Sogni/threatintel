@@ -74,7 +74,7 @@ export class ThreatLogService {
         // SYNC TO RAG (Asincrono e non bloccante)
         if (log) {
             this.ragSync.syncThreatLog(log).catch(err =>
-                this.logger.warn(`[ThreatLogService] RAG sync skipped or failed (non-blocking): ${err}`)
+                this.logger.error(`[ThreatLogService] Error during RAG sync: ${err}`)
             );
         }
 
@@ -894,7 +894,7 @@ export class ThreatLogService {
                         await this.ragSync.syncAttackSummary(attack, finalContent, vector, sourceRef);
                         totalProcessed++;
                     } catch (err) {
-                        this.logger.warn(`[ThreatLogService] Non-blocking materialization error for IP ${ip}: ${err.message}`);
+                        this.logger.error(`[ThreatLogService] Error materializing attack for IP ${ip}: ${err.message}`);
                     }
                 }
 

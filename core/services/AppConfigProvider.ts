@@ -53,8 +53,16 @@ export class AppConfigProvider {
         return process.env.QDRANT_URL || 'http://localhost:6333';
     }
 
+    get ragEnabled(): boolean {
+        return process.env.RAG_ENABLED !== 'false';
+    }
+
     get ragCollectionName(): string {
         return process.env.RAG_COLLECTION_NAME || 'threat_intelligence';
+    }
+
+    get ragLogsCollectionName(): string {
+        return process.env.RAG_LOGS_COLLECTION_NAME || 'threat_logs';
     }
 
     /**

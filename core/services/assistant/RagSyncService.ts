@@ -170,12 +170,15 @@ export class RagSyncService {
                     method: RAG_POLICIES.CAMPAIGNS.apiRef.method,
                     params: { 
                         type: 'campaign',
-                        campaignId: campaign.hash,
-                        minIps: RAG_POLICIES.CAMPAIGNS.minIps,
+                        hash: campaign.hash,
                         minScore: RAG_POLICIES.CAMPAIGNS.minScore,
                         minLogsPerIp: RAG_POLICIES.CAMPAIGNS.minLogsPerIp,
                         protocol: RAG_POLICIES.CAMPAIGNS.protocol,
-                        timeWindow: RAG_POLICIES.CAMPAIGNS.timeWindow
+                        timeConfig: { 
+                            timeMode: 'ago',
+                            agoUnit: RAG_POLICIES.CAMPAIGNS.timeWindow.agoUnit,
+                            agoValue: RAG_POLICIES.CAMPAIGNS.timeWindow.agoValue
+                        }
                     }
                 }
             };
@@ -214,7 +217,11 @@ export class RagSyncService {
                         type: 'attack',
                         ip: ip,
                         minLogsForAttack: RAG_POLICIES.ATTACKS.minLogs,
-                        timeWindow: RAG_POLICIES.ATTACKS.timeWindow
+                        timeConfig: { 
+                            timeMode: 'ago',
+                            agoUnit: RAG_POLICIES.ATTACKS.timeWindow.agoUnit,
+                            agoValue: RAG_POLICIES.ATTACKS.timeWindow.agoValue
+                        }
                     }
                 }
             };

@@ -891,7 +891,11 @@ export class ThreatLogService {
                                 type: 'attack',
                                 ip: ip,
                                 minLogsForAttack: policy.minLogs,
-                                timeWindow: policy.timeWindow
+                                timeConfig: { 
+                                    timeMode: 'ago',
+                                    agoUnit: policy.timeWindow.agoUnit,
+                                    agoValue: policy.timeWindow.agoValue
+                                }
                             }
                         };
 

@@ -562,12 +562,15 @@ export class CampaignService {
                             method: policy.apiRef.method,
                             params: { 
                                 type: 'campaign',
-                                campaignId: campaign.hash,
-                                minIps: policy.minIps,
+                                hash: campaign.hash,
                                 minScore: policy.minScore,
                                 minLogsPerIp: policy.minLogsPerIp,
                                 protocol: policy.protocol,
-                                timeWindow: policy.timeWindow
+                                timeConfig: { 
+                                    timeMode: 'ago',
+                                    agoUnit: policy.timeWindow.agoUnit,
+                                    agoValue: policy.timeWindow.agoValue
+                                }
                             }
                         };
                         

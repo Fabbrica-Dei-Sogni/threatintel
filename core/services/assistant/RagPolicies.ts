@@ -13,8 +13,8 @@ export const RAG_POLICIES = {
             agoValue: 24             // Ultime 24 ore
         },
         apiRef: {
-            endpoint: '/api/threats/attacks',
-            method: 'GET'
+            endpoint: '/api/attack/details',
+            method: 'POST'
         }
     },
     
@@ -31,8 +31,8 @@ export const RAG_POLICIES = {
             agoValue: 24             // Ultime 24 ore
         },
         apiRef: {
-            endpoint: '/api/campaigns/discovery',
-            method: 'GET'
+            endpoint: '/api/campaign/details',
+            method: 'POST'
         }
     },
 

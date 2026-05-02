@@ -14,25 +14,34 @@ export interface LogSourceParams {
 
 /**
  * Parametri specifici per la ricostruzione di un Attacco (Anomalia)
+ * Rispecchia la firma di ThreatLogService.getAttacks
  */
 export interface AttackSourceParams {
     type: 'attack';
-    ip: string;
+    ip: string; 
     minLogsForAttack: number;
-    timeWindow: { agoUnit: string, agoValue: number };
+    timeConfig: { 
+        timeMode: 'ago', 
+        agoUnit: string, 
+        agoValue: number 
+    };
 }
 
 /**
  * Parametri specifici per la ricostruzione di una Campagna
+ * Rispecchia la firma di CampaignService.getCampaigns
  */
 export interface CampaignSourceParams {
     type: 'campaign';
-    campaignId: string;
-    minIps: number;
+    hash: string;
     minScore: number;
     minLogsPerIp: number;
-    timeWindow: { agoUnit: string, agoValue: number };
     protocol: string;
+    timeConfig: { 
+        timeMode: 'ago', 
+        agoUnit: string, 
+        agoValue: number 
+    };
 }
 
 export type RagSourceParams = LogSourceParams | AttackSourceParams | CampaignSourceParams;

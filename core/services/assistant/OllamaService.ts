@@ -27,13 +27,14 @@ export class OllamaService {
      */
     public async getEmbedding(text: string): Promise<number[]> {
         try {
-            this.logger.info(`[Ollama] Requesting embedding for text length: ${text.length} (Model: ${this.embeddingModel})`);
+            this.logger.debug(`[Ollama] Requesting embedding for text length: ${text.length} (Model: ${this.embeddingModel}, URL: ${this.baseUrl}/api/embeddings)`);
             const response = await axios.post(`${this.baseUrl}/api/embeddings`, {
                 model: this.embeddingModel,
                 prompt: text
             }, { timeout: this.timeout });
 
             if (response.data && response.data.embedding) {
+                this.logger.debug(`[Ollama] Successfully received embedding (Size: ${response.data.embedding.length})`);
                 return response.data.embedding;
             }
             throw new Error('Invalid response from Ollama embeddings API');
@@ -50,7 +51,7 @@ export class OllamaService {
      */
     public async generate(prompt: string): Promise<string> {
         try {
-            this.logger.debug(`[Ollama] Generating text with model ${this.summaryModel}`);
+            this.logger.debug(`[Ollama] Generating text with model ${this.summaryModel} (Prompt length: ${prompt.length})`);
             const response = await axios.post(`${this.baseUrl}/api/generate`, {
                 model: this.summaryModel,
                 prompt: prompt,
@@ -58,6 +59,7 @@ export class OllamaService {
             }, { timeout: 15000 }); // Più tempo per la generazione (15s)
 
             if (response.data && response.data.response) {
+                this.logger.debug(`[Ollama] Generation successful (Response length: ${response.data.response.length})`);
                 return response.data.response;
             }
             throw new Error('Invalid response from Ollama generate API');

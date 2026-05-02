@@ -1,3 +1,11 @@
+/**
+ * ThreatIntel - Distributed Forensics Engine
+ * 
+ * Copyright (C) 2026 Alessandro Modica. All rights reserved.
+ * 
+ * Licensed under the Business Source License 1.1 (BSL-1.1).
+ * See root LICENSE.md for core engine licensing details.
+ */
 import 'reflect-metadata';
 import { CowrieController } from '../controllers/CowrieController';
 import { CowrieService } from '../services/CowrieService';

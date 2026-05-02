@@ -1,3 +1,11 @@
+/**
+ * ThreatIntel - Distributed Forensics Engine
+ * 
+ * Copyright (C) 2026 Alessandro Modica. All rights reserved.
+ * 
+ * Licensed under the Business Source License 1.1 (BSL-1.1).
+ * See root LICENSE.md for core engine licensing details.
+ */
 import { Logger } from "winston";
 import { container, type InjectionToken } from "tsyringe";
 import { I18nService } from "../services/I18nService";

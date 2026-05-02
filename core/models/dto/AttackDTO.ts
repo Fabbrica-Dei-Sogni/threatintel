@@ -1,3 +1,11 @@
+/**
+ * ThreatIntel - Distributed Forensics Engine
+ * 
+ * Copyright (C) 2026 Alessandro Modica. All rights reserved.
+ * 
+ * Licensed under the Business Source License 1.1 (BSL-1.1).
+ * See root LICENSE.md for core engine licensing details.
+ */
 export default class AttackDTO {
     protocol?: string;
     // Original fields from the JS DTO (all optional for flexibility)

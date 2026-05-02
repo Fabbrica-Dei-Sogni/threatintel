@@ -1,3 +1,11 @@
+/**
+ * ThreatIntel - Distributed Forensics Engine
+ * 
+ * Copyright (C) 2026 Alessandro Modica. All rights reserved.
+ * 
+ * Licensed under the Business Source License 1.1 (BSL-1.1).
+ * See root LICENSE.md for core engine licensing details.
+ */
 import rateLimit, { ipKeyGenerator } from 'express-rate-limit';
 import RedisStoreImport from 'rate-limit-redis';
 const RedisStore: any = (RedisStoreImport as any).default || RedisStoreImport;

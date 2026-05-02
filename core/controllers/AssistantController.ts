@@ -4,9 +4,10 @@ import { AssistantService } from '../services/assistant/AssistantService';
 import { LOGGER_TOKEN, ASSISTANT_SERVICE_TOKEN, I18N_TOKEN } from '../di/tokens';
 import { Logger } from 'winston';
 import { I18nService } from '../services/I18nService';
-import { Controller, Post } from '../registry/decorators';
+import { Controller, Get, Post } from '../registry/decorators';
 import { getComponent } from '../di/container';
 import { AuthMiddleware } from '../middlewares/AuthMiddleware';
+import { RagValidator } from '../services/assistant/RagValidator';
 
 const auth = getComponent(AuthMiddleware);
 
@@ -115,6 +116,51 @@ export class AssistantController {
         } catch (err: any) {
             this.logger.error('[AssistantController] Source Resolution error:', err);
             res.status(500).json({ error: this.i18n.t('errors.rag.resolveError') });
+        }
+    }
+
+    /**
+     * @openapi
+     * /api/assistant/integrity-check:
+     *   post:
+     *     summary: Verifica l'integrità dello schema vettoriale e identifica punti obsoleti
+     *     tags: [Assistant]
+     */
+    @Post('/integrity-check', [auth.hasRole('admin')])
+    async checkIntegrity(req: Request, res: Response): Promise<void> {
+        const { collection } = req.body;
+        try {
+            if (!collection) {
+                res.status(400).json({ error: 'Specificare la collection da controllare' });
+                return;
+            }
+
+            const stats = await this.assistant.checkSchemaIntegrity(collection);
+            res.json(stats);
+        } catch (err: any) {
+            this.logger.error('[AssistantController] Integrity check error:', err);
+            res.status(500).json({ error: 'Errore durante il controllo integrità' });
+        }
+    }
+
+    /**
+     * @openapi
+     * /api/assistant/tools:
+     *   get:
+     *     summary: Restituisce la definizione dei tool per l'Agente AI
+     *     tags: [Assistant]
+     */
+    @Get('/tools', [auth.isAuthenticated()])
+    async getTools(req: Request, res: Response): Promise<void> {
+        try {
+            const tools = [
+                RagValidator.getToolDefinition()
+                // In futuro potremmo aggiungere altri tool qui
+            ];
+            res.json({ tools });
+        } catch (err: any) {
+            this.logger.error('[AssistantController] Get Tools error:', err);
+            res.status(500).json({ error: 'Errore durante il recupero dei tool' });
         }
     }
 }

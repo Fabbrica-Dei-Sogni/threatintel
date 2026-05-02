@@ -11,7 +11,8 @@ import { IAbuseIpDb } from '../../models/AbuseIpDbSchema';
 import { IAbuseReport } from '../../models/AbuseReportSchema';
 import { stringToUuid } from '../../utils/uuid';
 import { RAG_POLICIES } from './RagPolicies';
-import { RagSourceRef, ThreatLogPayload, AttackSummaryPayload, CampaignSummaryPayload } from '../../types/assistant/rag.types';
+import { RagSourceRef, ThreatLogPayload, AttackSummaryPayload, CampaignSummaryPayload, AttackSourceParams, CampaignSourceParams, RAG_SCHEMA_VERSION, IpDetailsPayload } from '../../types/assistant/rag.types';
+import AttackDTO from '../../models/dto/AttackDTO';
 
 @injectable()
 export class RagSyncService {
@@ -103,10 +104,20 @@ export class RagSyncService {
                     score: log.fingerprint?.score || 0,
                     text: narrative,
                     materializedAt: new Date(),
+                    schemaVersion: RAG_SCHEMA_VERSION,
                     sourceRef: {
                         endpoint: RAG_POLICIES.LOGS.apiRef.endpoint.replace(':id', log._id.toString()),
                         method: RAG_POLICIES.LOGS.apiRef.method,
                         params: { type: 'log', id: log._id.toString() }
+                    },
+                    // Campi DTO estesi
+                    protocol: log.protocol,
+                    geo: log.geo,
+                    fingerprint: log.fingerprint,
+                    request: {
+                        method: log.request?.method,
+                        url: log.request?.url,
+                        ip: log.request?.ip
                     }
                 };
 
@@ -141,24 +152,33 @@ export class RagSyncService {
             const vector = await this.ollama.getEmbedding(narrative);
 
             // 3. Upsert su Qdrant
+            const payload: IpDetailsPayload = {
+                type: 'ip_details',
+                mongoId: ipDetails._id.toString(),
+                ip: ipDetails.ip,
+                lastSeen: ipDetails.lastSeenAt,
+                text: narrative,
+                materializedAt: new Date(),
+                schemaVersion: RAG_SCHEMA_VERSION,
+                sourceRef: {
+                    endpoint: RAG_POLICIES.IP_DETAILS.apiRef.endpoint,
+                    method: RAG_POLICIES.IP_DETAILS.apiRef.method,
+                    params: {
+                        type: 'ip_details',
+                        ip: ipDetails.ip
+                    }
+                },
+                // Campi DTO estesi
+                firstSeenAt: ipDetails.firstSeenAt,
+                lastSeenAt: ipDetails.lastSeenAt,
+                enrichedAt: ipDetails.enrichedAt,
+                ipinfo: ipDetails.ipinfo
+            };
+
             await this.qdrant.upsertPoints(this.COLL_INTELLIGENCE, [{
                 id: stringToUuid(ipDetails._id.toString()),
                 vector: vector,
-                payload: {
-                    type: 'ip_details',
-                    mongoId: ipDetails._id.toString(),
-                    ip: ipDetails.ip,
-                    lastSeen: ipDetails.lastSeenAt,
-                    text: narrative,
-                    sourceRef: {
-                        endpoint: RAG_POLICIES.IP_DETAILS.apiRef.endpoint,
-                        method: RAG_POLICIES.IP_DETAILS.apiRef.method,
-                        params: {
-                            type: 'ip_details',
-                            ip: ipDetails.ip
-                        }
-                    }
-                }
+                payload
             }]);
         } catch (error) {
             this.handleOperationError('syncIpDetails', error);
@@ -192,17 +212,19 @@ export class RagSyncService {
             const vector = await this.ollama.getEmbedding(finalContent);
             
             // 4. Source Reference per la tracciabilità agentica
+            const params: CampaignSourceParams = { 
+                type: 'campaign',
+                hash: campaign.hash,
+                minScore: RAG_POLICIES.CAMPAIGNS.minScore,
+                minLogsPerIp: RAG_POLICIES.CAMPAIGNS.minLogsPerIp,
+                protocol: RAG_POLICIES.CAMPAIGNS.protocol,
+                timeConfig: RAG_POLICIES.CAMPAIGNS.timeConfig as any
+            };
+
             const sourceRef: RagSourceRef = {
                 endpoint: RAG_POLICIES.CAMPAIGNS.apiRef.endpoint,
                 method: RAG_POLICIES.CAMPAIGNS.apiRef.method,
-                params: { 
-                    type: 'campaign',
-                    hash: campaign.hash,
-                    minScore: RAG_POLICIES.CAMPAIGNS.minScore,
-                    minLogsPerIp: RAG_POLICIES.CAMPAIGNS.minLogsPerIp,
-                    protocol: RAG_POLICIES.CAMPAIGNS.protocol,
-                    timeConfig: RAG_POLICIES.CAMPAIGNS.timeConfig
-                }
+                params
             };
             
             await this.syncCampaignSummary(campaign, finalContent, vector, sourceRef);
@@ -217,8 +239,8 @@ export class RagSyncService {
      * Materializza un singolo riassunto di attacco (IP-centrico).
      * Gestisce traduzione, generazione AI (opzionale) e sync.
      */
-    public async materializeAttack(attack: any, options: { isAiEnabled?: boolean } = {}) {
-        const ip = attack.request?.ip || attack.ip || 'N/A';
+    public async materializeAttack(attack: AttackDTO, options: { isAiEnabled?: boolean } = {}) {
+        const ip = attack.request?.ip || 'N/A';
         try {
             this.logger.debug(`[RagSync] Materializing summary for attack by IP: ${ip}`);
 
@@ -241,15 +263,17 @@ export class RagSyncService {
             const vector = await this.ollama.getEmbedding(finalContent);
 
             // 4. Source Reference per la tracciabilità agentica
+            const params: AttackSourceParams = { 
+                type: 'attack',
+                ip: ip,
+                minLogsForAttack: RAG_POLICIES.ATTACKS.minLogs,
+                timeConfig: RAG_POLICIES.ATTACKS.timeConfig as any
+            };
+
             const sourceRef: RagSourceRef = {
                 endpoint: RAG_POLICIES.ATTACKS.apiRef.endpoint,
                 method: RAG_POLICIES.ATTACKS.apiRef.method,
-                params: { 
-                    type: 'attack',
-                    ip: ip,
-                    minLogsForAttack: RAG_POLICIES.ATTACKS.minLogs,
-                    timeConfig: RAG_POLICIES.ATTACKS.timeConfig
-                }
+                params
             };
 
             await this.syncAttackSummary(attack, finalContent, vector, sourceRef);
@@ -277,6 +301,7 @@ export class RagSyncService {
                 protocols: campaign.protocols || [],
                 text: aiSummary,
                 materializedAt: new Date(),
+                schemaVersion: RAG_SCHEMA_VERSION,
                 sourceRef: sourceRef || {
                     endpoint: RAG_POLICIES.CAMPAIGNS.apiRef.endpoint,
                     method: RAG_POLICIES.CAMPAIGNS.apiRef.method,
@@ -286,9 +311,14 @@ export class RagSyncService {
                         minScore: RAG_POLICIES.CAMPAIGNS.minScore,
                         minLogsPerIp: RAG_POLICIES.CAMPAIGNS.minLogsPerIp,
                         protocol: RAG_POLICIES.CAMPAIGNS.protocol,
-                        timeConfig: RAG_POLICIES.CAMPAIGNS.timeConfig
+                        timeConfig: RAG_POLICIES.CAMPAIGNS.timeConfig as any
                     }
-                }
+                },
+                // Campi DTO estesi
+                totaleLogs: campaign.totaleLogs,
+                averageScore: campaign.averageScore,
+                firstSeen: campaign.firstSeen,
+                lastSeen: campaign.lastSeen
             };
 
             await this.qdrant.upsertPoints(this.COLL_INTELLIGENCE, [{
@@ -304,28 +334,30 @@ export class RagSyncService {
     /**
      * Sincronizza un riassunto di attacco (IP-centrico) nel database vettoriale.
      */
-    public async syncAttackSummary(attack: any, aiSummary: string, vector: number[], sourceRef?: RagSourceRef) {
+    public async syncAttackSummary(attack: AttackDTO, aiSummary: string, vector: number[], sourceRef?: RagSourceRef) {
         if (!this.checkOperational()) return;
 
         try {
-            const ip = attack.request?.ip || attack.ip;
+            const ip = attack.request?.ip;
             this.logger.debug(`[RagSync] Syncing Attack Summary for IP ${ip}`);
 
             const payload: AttackSummaryPayload = {
+                ...attack, // Includiamo tutto l'AttackDTO
                 type: 'attack_summary',
-                ip: ip,
-                totalLogs: attack.totaleLogs,
-                averageScore: attack.averageScore,
+                ip: ip as string,
+                totalLogs: attack.totaleLogs || 0,
+                averageScore: attack.averageScore || 0,
                 text: aiSummary,
                 materializedAt: new Date(),
+                schemaVersion: RAG_SCHEMA_VERSION,
                 sourceRef: sourceRef || {
                     endpoint: RAG_POLICIES.ATTACKS.apiRef.endpoint,
                     method: RAG_POLICIES.ATTACKS.apiRef.method,
                     params: { 
                         type: 'attack',
-                        ip: ip,
+                        ip: ip as string,
                         minLogsForAttack: RAG_POLICIES.ATTACKS.minLogs,
-                        timeConfig: RAG_POLICIES.ATTACKS.timeConfig
+                        timeConfig: RAG_POLICIES.ATTACKS.timeConfig as any
                     }
                 }
             };

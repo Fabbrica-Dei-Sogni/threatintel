@@ -132,7 +132,7 @@ describe('IpDetailsService (DI)', () => {
                 comment: 'Test abuse report',
             });
 
-            const result = await ipDetailsService.getIpDetails(ip);
+            const result = await ipDetailsService.getIpDetails({ ip });
 
             expect(result).toBeDefined();
             expect(result?.ipDetails.ip).toBe(ip);
@@ -140,7 +140,7 @@ describe('IpDetailsService (DI)', () => {
         });
 
         test('should return null for unknown IP', async () => {
-            const result = await ipDetailsService.getIpDetails('9.9.9.9');
+            const result = await ipDetailsService.getIpDetails({ ip: '9.9.9.9' });
             expect(result).toBeNull();
         });
     });

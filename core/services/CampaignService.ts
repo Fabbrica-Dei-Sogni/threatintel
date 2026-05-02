@@ -1,11 +1,12 @@
 import { injectable, inject } from 'tsyringe';
 import { Logger } from 'winston';
-import { LOGGER_TOKEN } from '../di/tokens';
+import { LOGGER_TOKEN, RAG_SYNC_SERVICE_TOKEN } from '../di/tokens';
 import ThreatLog from '../models/ThreatLogSchema';
 import { TimeFilterStage } from './forense/pipeline/stages/TimeFilterStage';
 import { calculateCorrelationHubs } from '../utils/CampaignAnalytics';
 import { RagSyncService } from './assistant/RagSyncService';
-import { RAG_SYNC_SERVICE_TOKEN } from '../di/tokens';
+import { TimeConfig } from '../types/common.types';
+import { GetCampaignDetailParams, GetCampaignsParams } from '../types/service-params.types';
 
 @injectable()
 export class CampaignService {
@@ -17,7 +18,7 @@ export class CampaignService {
     /**
      * Discovery (Lista): Ricerca dei cluster.
      */
-    async getCampaigns(params: any) {
+    async getCampaigns(params: GetCampaignsParams) {
         const {
             minIps = 2,
             minScore = 0,
@@ -73,7 +74,7 @@ export class CampaignService {
         const globalMinDate = oldestLog?.timestamp || null;
         const globalMaxDate = newestLog?.timestamp || null;
 
-        const timeParams = { ...timeConfig };
+        const timeParams = { ...timeConfig } as any;
         if (timeConfig.timeMode === 'ago' && timeConfig.agoUnit && timeConfig.agoValue) {
             timeParams[timeConfig.agoUnit] = timeConfig.agoValue;
         }
@@ -220,7 +221,7 @@ export class CampaignService {
     /**
      * Dettaglio (Forensics): Analisi profonda dello stesso cluster con nodi IP arricchiti.
      */
-    async getCampaignDetail(params: any) {
+    async getCampaignDetail(params: GetCampaignDetailParams) {
         const {
             hash,
             minScore = 0,
@@ -240,7 +241,7 @@ export class CampaignService {
             }
         }
 
-        const timeParams = { ...timeConfig };
+        const timeParams = { ...timeConfig } as any;
         if (timeConfig.timeMode === 'ago' && timeConfig.agoUnit && timeConfig.agoValue) {
             timeParams[timeConfig.agoUnit] = timeConfig.agoValue;
         }
@@ -387,7 +388,7 @@ export class CampaignService {
             }
         }
 
-        const timeParams = { ...timeConfig };
+        const timeParams = { ...timeConfig } as any;
         if (timeConfig.timeMode === 'ago' && timeConfig.agoUnit && timeConfig.agoValue) {
             timeParams[timeConfig.agoUnit] = timeConfig.agoValue;
         }

@@ -15,10 +15,18 @@ export const RAG_TEMPLATES = {
         CAMPAIGN_SUMMARY_BASE: "Rilevata Campagna di Attacco Distribuita (Hash: {hash}). La campagna coinvolge {ipCount} indirizzi IP unici, con un volume totale di {totalLogs} log. Prima apparizione: {firstSeen}, Ultima apparizione: {lastSeen}. Score medio della campagna: {averageScore}/100. Pattern di attacco: {patterns}. Esempi di URL target: {sampleUrl}."
     },
     PROMPTS: {
-        CAMPAIGN_SYSTEM: `
-Sei un analista SOC (Security Operations Center) esperto di Threat Intelligence.
-Di seguito è riportato il dump JSON aggregato di una Campagna di Attacco Distribuita, calcolata al volo dai nostri sistemi di correlazione.
-`.trim()
+        // Prompt per la generazione di riassunti tramite AI
+        CAMPAIGN_SYSTEM: "Sei un analista SOC (Security Operations Center) esperto di Threat Intelligence. Di seguito è riportato il dump JSON aggregato di una Campagna di Attacco Distribuita, calcolata al volo dai nostri sistemi di correlazione.",
+        CAMPAIGN_FOOTER: "\n\n--- INIZIO DATI JSON DELLA CAMPAGNA ---\n{jsonData}\n--- FINE DATI ---",
+        
+        ATTACK_SUMMARY: "Descrivi brevemente l'attività di questo attaccante basandoti sui dati tecnici forniti. Sii conciso e focalizzati sulla pericolosità e sulla tecnica.\n\nDati Attaccante:\n- IP: {ip}\n- Totale Colpi: {totalLogs}\n- Score Medio: {averageScore}\n- Prima Attività: {firstSeen}\n- Ultima Attività: {lastSeen}\n- Pattern Rilevati: {patterns}\n- URL Target (campione): {sampleUrl}\n\nIstruzioni: Spiega che tipo di minaccia rappresenta questo IP e se sembra un attacco mirato o una scansione automatica di massa.",
+        
+        // Prompt per il sistema "Ask" (Q&A)
+        ASK_SYSTEM: "Sei un analista esperto di cybersecurity. Rispondi alla domanda dell'utente basandoti ESCLUSIVAMENTE sul contesto fornito sotto. Se il contesto non contiene informazioni sufficienti, dillo chiaramente.\n\nContesto di Threat Intelligence:\n{contextText}\n\nDomanda: {question}\nRisposta:",
+        
+        // Etichette per i risultati materializzati
+        CAMPAIGN_REPORT_LABEL: "REPORT AI CAMPAGNA: {aiSummary}\n\nDETTAGLI TECNICI AGGREGATI:\n{technicalNarrative}",
+        ATTACK_REPORT_LABEL: "RIASSUNTO ANALISTA AI: {aiSummary}\n\nDETTAGLI TECNICI CORRELATI:\n{technicalNarrative}"
     },
     INTERPOLATE: (template: string, params: Record<string, string>): string => {
         let result = template;

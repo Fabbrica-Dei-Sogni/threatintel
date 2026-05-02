@@ -155,25 +155,21 @@ export class RagTranslationService {
 
     public buildCampaignSummaryPrompt(campaignJsonData: any): string {
         return RAG_TEMPLATES.PROMPTS.CAMPAIGN_SYSTEM + 
-               "\n\n--- INIZIO DATI JSON DELLA CAMPAGNA ---\n" + 
-               JSON.stringify(campaignJsonData, null, 2) + 
-               "\n--- FINE DATI ---";
+               RAG_TEMPLATES.INTERPOLATE(RAG_TEMPLATES.PROMPTS.CAMPAIGN_FOOTER, {
+                   jsonData: JSON.stringify(campaignJsonData, null, 2)
+               });
     }
 
     public buildAttackSummaryPrompt(attack: any): string {
         const ip = attack.ip || attack.request?.ip || 'N/A';
-        return `Descrivi brevemente l'attività di questo attaccante basandoti sui dati tecnici forniti. 
-Sii conciso e focalizzati sulla pericolosità e sulla tecnica.
-
-Dati Attaccante:
-- IP: ${ip}
-- Totale Colpi: ${attack.totaleLogs}
-- Score Medio: ${attack.averageScore?.toFixed(2)}
-- Prima Attività: ${attack.firstSeen}
-- Ultima Attività: ${attack.lastSeen}
-- Pattern Rilevati: ${attack.attackPatterns?.join(', ') || 'Nessuno'}
-- URL Target (campione): ${attack.sampleUrl || attack.request?.url}
-
-Istruzioni: Spiega che tipo di minaccia rappresenta questo IP e se sembra un attacco mirato o una scansione automatica di massa.`;
+        return RAG_TEMPLATES.INTERPOLATE(RAG_TEMPLATES.PROMPTS.ATTACK_SUMMARY, {
+            ip,
+            totalLogs: attack.totaleLogs.toString(),
+            averageScore: (attack.averageScore || 0).toFixed(2),
+            firstSeen: new Date(attack.firstSeen).toLocaleString('it-IT'),
+            lastSeen: new Date(attack.lastSeen).toLocaleString('it-IT'),
+            patterns: attack.attackPatterns?.join(', ') || 'Nessuno',
+            sampleUrl: attack.sampleUrl || attack.request?.url || '/'
+        });
     }
 }

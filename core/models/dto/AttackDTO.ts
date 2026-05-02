@@ -1,5 +1,11 @@
 export default class AttackDTO {
     protocol?: string;
+    /**
+     * Indirizzo IP dell'attaccante. 
+     * TODO: Indagare e risolvere la disambiguità tra l'IP calcolato dagli aggregati (root) 
+     * e l'IP proveniente dalla request originale (request.ip). Assicurarsi che siano sempre coerenti.
+     */
+    ip?: string;
     // Original fields from the JS DTO (all optional for flexibility)
     _id?: string;
     timestamp?: string;

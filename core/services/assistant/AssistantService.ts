@@ -15,6 +15,7 @@ import { RagValidator } from './RagValidator';
 import { ThreatLogService } from '../ThreatLogService';
 import { CampaignService } from '../CampaignService';
 import { IpDetailsService } from '../IpDetailsService';
+import { RAG_TEMPLATES } from './RagTemplates';
 import { 
     RagSearchHit, 
     RagAskResponse, 
@@ -104,13 +105,10 @@ export class AssistantService {
         const hits = await this.search(question, { limit: 3, scoreThreshold: 0.4 });
         const contextText = hits.map(h => h.text).join('\n---\n');
 
-        const prompt = `Sei un analista esperto di cybersecurity. Rispondi alla domanda dell'utente basandoti ESCLUSIVAMENTE sul contesto fornito sotto. Se il contesto non contiene informazioni sufficienti, dillo chiaramente.
-
-Contesto di Threat Intelligence:
-${contextText}
-
-Domanda: ${question}
-Risposta:`;
+        const prompt = RAG_TEMPLATES.INTERPOLATE(RAG_TEMPLATES.PROMPTS.ASK_SYSTEM, {
+            contextText,
+            question
+        });
 
         const answer = await this.ollama.generate(prompt);
 

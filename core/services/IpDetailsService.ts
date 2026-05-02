@@ -11,11 +11,11 @@ import IpDetails from '../models/IpDetailsSchema';
 import AbuseIpDb from '../models/AbuseIpDbSchema';
 import { AbuseCategoryEnum } from '../models/AbuseCategoryEnum';
 import { inject, injectable } from 'tsyringe';
-import { LOGGER_TOKEN, RAG_SYNC_SERVICE_TOKEN } from '../di/tokens';
+import { LOGGER_TOKEN, EVENT_BUS_TOKEN } from '../di/tokens';
 import { Logger } from 'winston';
 import ipRangeCheck from 'ip-range-check';
 import { IpDetailsMapper } from '../models/dto/IpDetailsDTO';
-import { RagSyncService } from './assistant/RagSyncService';
+import { EventBus, AppEvents } from './EventBus';
 import { GetIpDetailsParams } from '../types/service-params.types';
 
 const whoisAsync = util.promisify(whois.lookup);
@@ -29,7 +29,7 @@ export class IpDetailsService {
 
     constructor(
         @inject(LOGGER_TOKEN) private readonly logger: Logger,
-        @inject(RAG_SYNC_SERVICE_TOKEN) private readonly ragSync: RagSyncService
+        @inject(EVENT_BUS_TOKEN) private readonly eventBus: EventBus
     ) {
         this.excludedIPs = this.parseExcludedIPs();
     }
@@ -426,9 +426,10 @@ export class IpDetailsService {
             const abuseData = ipDetails.abuseipdbId ? await AbuseIpDb.findById(ipDetails.abuseipdbId) : null;
             const reports = abuseData ? await AbuseReport.find({ abuseIpDbId: abuseData._id }).sort({ reportedAt: -1 }).limit(20) : [];
             
-            await this.ragSync.syncIpDetails(ipDetails, abuseData, reports);
+            // Notifica il sistema RAG via Event Bus
+            this.eventBus.emit(AppEvents.IP_DETAILS_UPDATED, { ipDetails, abuseData, reports });
         } catch (error) {
-            this.logger.error(`[IpDetailsService] RAG sync failed for ${ipDetails.ip}: ${error}`);
+            this.logger.error(`[IpDetailsService] RAG event emission failed for ${ipDetails.ip}: ${error}`);
         }
     }
 

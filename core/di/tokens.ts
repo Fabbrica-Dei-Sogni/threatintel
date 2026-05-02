@@ -14,3 +14,5 @@ export const OLLAMA_SERVICE_TOKEN = Symbol("OllamaService");
 export const RAG_SYNC_SERVICE_TOKEN = Symbol("RagSyncService");
 export const RAG_SYNC_WORKER_TOKEN = Symbol("RagSyncWorker");
 export const ASSISTANT_SERVICE_TOKEN = Symbol("AssistantService");
+export const EVENT_BUS_TOKEN = Symbol("EventBus");
+export const RAG_EVENT_LISTENER_TOKEN = Symbol("RagEventListener");

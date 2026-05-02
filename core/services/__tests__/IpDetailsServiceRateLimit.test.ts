@@ -47,13 +47,15 @@ describe('IpDetailsService Rate Limit & Retry', () => {
             debug: jest.fn()
         };
 
-        // Mock RagSync
-        const mockRagSync = {
-            syncIpDetails: jest.fn().mockResolvedValue(true)
+        // Mock EventBus
+        const mockEventBus = {
+            emit: jest.fn(),
+            on: jest.fn(),
+            off: jest.fn()
         };
 
-        // Create service instance manually with mocked logger and ragSync
-        ipDetailsService = new IpDetailsService(mockLogger as Logger, mockRagSync as any);
+        // Create service instance manually with mocked logger and eventBus
+        ipDetailsService = new IpDetailsService(mockLogger as Logger, mockEventBus as any);
     });
 
     test('should handle 429 Rate Limit error from ipinfo (err arg) by returning the error object', async () => {

@@ -7,8 +7,7 @@ import { ForensicService } from '../forense/ForensicService';
 import { ForensicPipelineService } from '../forense/ForensicPipelineService';
 import { IpDetailsService } from '../IpDetailsService';
 import PatternAnalysisService from '../PatternAnalysisService';
-import { LOGGER_TOKEN, RAG_SYNC_SERVICE_TOKEN, OLLAMA_SERVICE_TOKEN, RAG_TRANSLATION_TOKEN } from '../../di/tokens';
-import { RagSyncService } from '../assistant/RagSyncService';
+import { LOGGER_TOKEN, EVENT_BUS_TOKEN, OLLAMA_SERVICE_TOKEN, RAG_TRANSLATION_TOKEN } from '../../di/tokens';
 import { OllamaService } from '../assistant/OllamaService';
 import { RagTranslationService } from '../assistant/RagTranslationService';
 
@@ -22,7 +21,7 @@ describe('ThreatLogService', () => {
     let mockForensicPipelineService: any;
     let mockIpDetailsService: any;
     let mockPatternAnalysisService: any;
-    let mockRagSync: any;
+    let mockEventBus: any;
     let mockOllama: any;
     let mockTranslator: any;
 
@@ -72,11 +71,10 @@ describe('ThreatLogService', () => {
             loadConfigFromDB: jest.fn().mockResolvedValue(null)
         };
 
-        mockRagSync = {
-            syncThreatLog: jest.fn().mockResolvedValue(true),
-            syncIpDetails: jest.fn().mockResolvedValue(true),
-            syncAttackSummary: jest.fn().mockResolvedValue(true),
-            syncCampaignSummary: jest.fn().mockResolvedValue(true)
+        mockEventBus = {
+            emit: jest.fn(),
+            on: jest.fn(),
+            off: jest.fn()
         };
 
         mockOllama = {
@@ -94,7 +92,7 @@ describe('ThreatLogService', () => {
         container.registerInstance(ForensicPipelineService, mockForensicPipelineService);
         container.registerInstance(IpDetailsService, mockIpDetailsService);
         container.registerInstance(PatternAnalysisService, mockPatternAnalysisService);
-        container.registerInstance(RAG_SYNC_SERVICE_TOKEN, mockRagSync);
+        container.registerInstance(EVENT_BUS_TOKEN, mockEventBus);
         container.registerInstance(OLLAMA_SERVICE_TOKEN, mockOllama);
         container.registerInstance(RAG_TRANSLATION_TOKEN, mockTranslator);
 

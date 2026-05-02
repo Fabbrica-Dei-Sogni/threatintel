@@ -19,6 +19,8 @@ import { SshLogService } from './core/services/SshLogService';
 import { CowrieService } from './core/services/CowrieService';
 import { NginxLogService } from './core/services/NginxLogService';
 import { RagSyncWorker } from './core/services/assistant/RagSyncWorker';
+import { RAG_EVENT_LISTENER_TOKEN, RAG_SYNC_WORKER_TOKEN } from './core/di/tokens';
+import { RagEventListener } from './core/services/assistant/RagEventListener';
 
 import { LifecycleManager } from './core/services/LifecycleManager';
 
@@ -78,7 +80,10 @@ app.listen(Number(PORT), '0.0.0.0', async () => {
         lifecycleManager.register(getComponent(AnalysisService));
         
         // Registrazione RAG Worker
-        lifecycleManager.register(getComponent(RagSyncWorker));
+        lifecycleManager.register(getComponent<RagSyncWorker>(RAG_SYNC_WORKER_TOKEN));
+        
+        // Registrazione RAG Event Listener
+        lifecycleManager.register(getComponent<RagEventListener>(RAG_EVENT_LISTENER_TOKEN));
 
         // Avvio sequenza di bootstrap (non blocca l'ascolto del server)
         await lifecycleManager.boot();

@@ -66,6 +66,7 @@ export class RagValidator {
 
     /**
      * Restituisce lo schema dei parametri per l'Agente AI (usabile come tool definition).
+     * Espande i parametri per ogni tipo di sorgente tramite oneOf per guidare l'LLM.
      */
     public static getToolDefinition() {
         return {
@@ -80,10 +81,47 @@ export class RagValidator {
                         properties: {
                             params: {
                                 type: "object",
-                                properties: {
-                                    type: { type: "string", enum: ["log", "ip_details", "attack", "campaign"] }
-                                },
-                                required: ["type"]
+                                description: "Parametri di ricostruzione della sorgente",
+                                oneOf: [
+                                    {
+                                        description: "Parametri per risoluzione Log atomico",
+                                        properties: {
+                                            type: { const: "log" },
+                                            id: { type: "string", description: "ID del log MongoDB" }
+                                        },
+                                        required: ["type", "id"]
+                                    },
+                                    {
+                                        description: "Parametri per dettagli IP",
+                                        properties: {
+                                            type: { const: "ip_details" },
+                                            ip: { type: "string", description: "Indirizzo IP da investigare" }
+                                        },
+                                        required: ["type", "ip"]
+                                    },
+                                    {
+                                        description: "Parametri per ricostruzione Attacco (Anomalia)",
+                                        properties: {
+                                            type: { const: "attack" },
+                                            ip: { type: "string" },
+                                            minLogsForAttack: { type: "number" },
+                                            timeConfig: { type: "object" }
+                                        },
+                                        required: ["type", "ip", "minLogsForAttack", "timeConfig"]
+                                    },
+                                    {
+                                        description: "Parametri per ricostruzione Campagna",
+                                        properties: {
+                                            type: { const: "campaign" },
+                                            hash: { type: "string" },
+                                            minScore: { type: "number" },
+                                            minLogsPerIp: { type: "number" },
+                                            protocol: { type: "string" },
+                                            timeConfig: { type: "object" }
+                                        },
+                                        required: ["type", "hash", "minScore", "timeConfig"]
+                                    }
+                                ]
                             }
                         },
                         required: ["params"]

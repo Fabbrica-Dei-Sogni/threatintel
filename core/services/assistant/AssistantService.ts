@@ -79,14 +79,21 @@ export class AssistantService {
             .map(r => {
                 const payload = r.payload as unknown as RagBasePayload;
                 
+                // Validazione Payload Raw: evadiamo buchi di dati malformati o vecchi
+                if (!payload?.text || !payload?.sourceRef) {
+                    this.logger.warn(`[AssistantService] Malformed or legacy payload found for point ${r.id} - skipping`);
+                    return null;
+                }
+
                 // Normalizzazione
                 return {
                     id: r.id,
                     score: r.score,
-                    text: payload?.text || '',
-                    sourceRef: payload?.sourceRef
+                    text: payload.text,
+                    sourceRef: payload.sourceRef
                 };
-            });
+            })
+            .filter((h): h is RagSearchHit => h !== null);
     }
 
     /**
@@ -151,8 +158,8 @@ Risposta:`;
                     });
                 
                 default:
-                    // @ts-ignore
-                    throw new Error(`Tipo di sorgente non supportato: ${params.type}`);
+                    const _exhaustive: never = params;
+                    throw new Error(`Tipo di sorgente non supportato: ${JSON.stringify(_exhaustive)}`);
             }
         } catch (error: any) {
             this.logger.error(`[AssistantService] Source resolution failed: ${error.message}`);

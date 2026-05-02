@@ -1,6 +1,6 @@
 # Agentic RAG Integration Guide: Threat Intelligence Pipeline
 
-Questa guida documenta l'architettura, i passaggi di sviluppo e le best practice implementate per integrare un flusso RAG (Retrieval-Augmented Generation) di classe enterprise nel progetto ThreatIntel. L'obiettivo è rendere i dati forensi fruibili in modo trasparente sia da un frontend classico che da un Agente AI.
+Questa guida documenta l'architettura, i passaggi di sviluppo e le best practice implementate per integrare un flusso RAG (Retrieval-Augmented Generation) di classe enterprise nel progetto ThreatIntel. L'obiettivo è rendere i dati forensi fruibili in modo trasparente sia da un frontend classico che da un Agente AI (es. ChainPrompt).
 
 ---
 
@@ -9,71 +9,81 @@ Questa guida documenta l'architettura, i passaggi di sviluppo e le best practice
 A differenza di un RAG tradizionale che restituisce solo testo, un **Agentic RAG** permette all'IA di interagire con il sistema sottostante. Il pilastro di questa architettura è il **Source Reference Pattern**: il sistema non restituisce solo un "pezzo di testo", ma un riferimento tecnico (`sourceRef`) che l'agente può usare per "scendere nel tecnico" (drill-down).
 
 ### I Tre Livelli
-1.  **Semantic Layer (Qdrant)**: Ricerca per concetto e somiglianza.
-2.  **Logic Layer (AssistantService)**: Orchestrazione, validazione e normalizzazione.
-3.  **Data Layer (MongoDB)**: La verità tecnica originale, accessibile tramite risoluzione.
+1.  **Semantic Layer (Qdrant)**: Ricerca per concetto e somiglianza tramite vettori a 768 dimensioni (Nomic/Ollama).
+2.  **Logic Layer (AssistantService)**: Orchestrazione, validazione ibrida e normalizzazione dei dati.
+3.  **Data Layer (MongoDB)**: La verità tecnica originale, accessibile tramite risoluzione deterministica.
 
 ---
 
-## 2. Roadmap di Sviluppo
+## 2. Evoluzione e Roadmap (Fasi Completate)
 
-### Fase 1: Materializzazione e Decoupling
-*   **Obiettivo**: Separare l'IA dai dati operazionali.
-*   **Azioni**: Creazione di `RagSyncService` e `RagSyncWorker`. Rimozione di ogni dipendenza IA (`Ollama`, `Translation`) dai servizi core (`ThreatLogService`, `CampaignService`).
-*   **Risultato**: I servizi operazionali rimangono snelli e stabili; la logica RAG è isolata.
+### 🟢 Fase 1: Materializzazione e Decoupling
+*   **Obiettivo**: Isolare l'IA dai dati operazionali per garantire stabilità.
+*   **Azioni**: Creazione di `RagSyncService` e `RagSyncWorker`. La logica RAG è ora un'estensione asincrona che non appesantisce i servizi core.
+*   **Batching**: Implementato un sistema di buffering (10 log o 30 secondi) per ottimizzare le chiamate verso Qdrant e Ollama.
 
-### Fase 2: Contratti e Tipizzazione Forte
-*   **Obiettivo**: Definire il linguaggio comune tra Uomo, Macchina e Agente.
-*   **Azioni**: Formalizzazione dei payload (`ThreatLogPayload`, `AttackSummaryPayload`, etc.) e delle unioni discriminate per i `sourceRef`.
-*   **Best Practice**: Mai usare `any`. Ogni dato nel RAG deve avere un contratto tipizzato.
+### 🟢 Fase 2: Unificazione dei Contratti (Type-Driven DNA)
+*   **Obiettivo**: Eliminare il "drift" dei tipi tra Backend e AI.
+*   **Azioni**: 
+    - Centralizzazione dei filtri in `service-params.types.ts`.
+    - I parametri RAG (`LogSourceParams`, `AttackSourceParams`, etc.) derivano biologicamente dai Service tramite `Parameters<typeof Service.method>`.
+*   **Vantaggio**: Se un filtro cambia nel backend, il compilatore TypeScript obbliga l'allineamento del RAG.
 
-### Fase 3: Assistant Service (Business Control)
-*   **Obiettivo**: Centralizzare la business logic della ricerca e della generazione.
-*   **Azioni**: Implementazione dei metodi `search()`, `ask()` e `resolveSource()`.
-*   **Logica di Ricerca**: Segue la catena **Valida -> Recupera -> Filtra -> Normalizza**.
+### 🟢 Fase 3: Payload DTO-Centrici e Versioning
+*   **Obiettivo**: Arricchire la ricerca semantica con dati strutturati.
+*   **Azioni**:
+    - I payload salvati su Qdrant estendono i DTO ufficiali (es. `AttackSummaryPayload` extends `AttackDTO`).
+    - Introdotto `RAG_SCHEMA_VERSION = 2` per tracciare l'evoluzione dei dati vettoriali.
+*   **Vantaggio**: L'Agente riceve dati tecnici immediati (score, rps, geo) già nel primo hit di ricerca.
 
-### Fase 4: Validazione a Runtime e Tooling
-*   **Obiettivo**: Rendere l'Agente sicuro e deterministico.
-*   **Azioni**: Creazione di `RagValidator` per validare le richieste e generare gli schemi JSON per i Tool dell'agente.
-
----
-
-## 3. Best Practice per l'Integrazione
-
-### 🛡️ Resilienza e Degraded Mode
-Il sistema RAG deve essere considerato un "optional di lusso". Se Ollama o Qdrant non sono raggiungibili (es. Error 404/500), il sistema deve entrare in **Degraded Mode**:
-- I servizi core continuano a funzionare.
-- I log di sistema segnalano il problema come `warning`, non come `critical` (bloccante).
-
-### 🔗 Source Reference Pattern (ID Dinamici)
-Evitare l'uso di ID MongoDB statici nei payload RAG per entità derivate (come gli Attacchi).
-- **Perché**: Gli attacchi sono aggregazioni temporali.
-- **Soluzione**: Usare parametri di ricostruzione nel `sourceRef` (`ip`, `timeConfig`, `minLogs`). Questo garantisce che l'Agente possa sempre ricostruire la verità tecnica anche se i dati sono stati ricalcolati.
-
-### 🌐 Coerenza i18n
-Ogni modifica alle stringhe deve essere riflessa in tutti i file locale (`it-IT`, `en-US`, `de-DE`, etc.). L'Agente potrebbe operare in lingue diverse o aver bisogno di messaggi di errore localizzati per l'utente finale.
-
-### 🧪 Atomic Builds e Test
-Validare ogni strato (Backend -> Controller -> UI) immediatamente dopo ogni modifica. I test unitari devono coprire i casi di "sistema non operativo" per garantire che il fallback funzioni.
+### 🟢 Fase 4: Hybrid Validation & Tooling
+*   **Obiettivo**: Blindare la sicurezza e automatizzare l'integrazione agentica.
+*   **Azioni**:
+    - **Ponte QueryGuard**: Il `RagValidator` usa la whitelist di `QueryGuard` per sanitizzare ogni parametro recuperato da Qdrant.
+    - **Auto-Discovery**: Creato l'endpoint `/api/assistant/tools` che espone lo schema JSON dinamico per i tool dell'Agente.
 
 ---
 
-## 4. Flusso Operativo dell'Agente AI
+## 3. Componenti Chiave del Sistema
 
-L'integrazione con un Agente AI (es. via LangChain o OpenAI Tools) segue questo schema:
+### 🛡️ RagValidator (Il Vigile Urbano)
+Valida e sanitizza i `sourceRef`. È l'unico punto di contatto tra il mondo non strutturato dell'AI e il mondo rigoroso del Database. Previene injection e garantisce che i parametri di ricostruzione siano corretti.
 
-1.  **Ricerca Semantica**: L'agente chiama `/api/assistant/search` con una query naturale.
-2.  **Analisi Hit**: L'agente riceve una lista di `RagSearchHit`. Ogni hit contiene un campo `text` (riassunto leggibile) e un `sourceRef`.
-3.  **Decisione Forense**: Se l'agente ha bisogno di dati tecnici (es. "mostrami tutti i log di questo attacco"), invoca il tool `resolve_threat_source` passando il `sourceRef`.
-4.  **Risoluzione**: L' `AssistantService` riceve il riferimento, valida i parametri tramite `RagValidator` e interroga il servizio operazionale appropriato per restituire il dato JSON grezzo.
+### 🔗 AssistantService (L'Orchestratore)
+Implementa il pattern **Pass-Through**:
+```typescript
+case 'attack':
+    // Grazie alla tipizzazione forte, passiamo il pacchetto 'as is'
+    return await this.threatLogService.getAttackDetail(params);
+```
+Questo rende il servizio "immortale": non deve essere modificato quando vengono aggiunti nuovi filtri ai service sottostanti.
+
+### 🌐 RagTranslationService (Il Narratore)
+Trasforma JSON complessi in narrazioni deterministiche i18n utilizzando i `RagTemplates`. Supporta la generazione opzionale di riassunti analitici tramite Ollama per le campagne aggregate.
 
 ---
 
-## 5. Evoluzioni Future (Roadmap 2.0)
+## 4. Manutenzione e Integrità
 
-- **Hybrid Search**: Combinare la ricerca vettoriale con la ricerca full-text di MongoDB per una precisione estrema su ID e IP.
-- **Feedback Loop**: Permettere agli analisti di marcare i SearchHit come "Utili" o "Non Utili" per fare fine-tuning degli embedding.
-- **Multi-Vector Support**: Gestire embedding diversi per diverse lingue nello stesso punto di ingresso.
+### Controllo dello Schema
+Il sistema monitora la coerenza tra il codice e i dati persistiti su Qdrant.
+- **Endpoint**: `POST /api/assistant/integrity-check`
+- **Funzionamento**: Scansiona la collection e identifica i punti con `schemaVersion` obsoleta, segnalando la necessità di un re-indexing.
+
+### Degraded Mode
+Se Ollama o Qdrant sono offline, il backend continua a funzionare regolarmente. Il sistema RAG segnala lo stato di "Non Operativo" senza bloccare la pipeline di acquisizione dei log.
 
 ---
-*Documento generato da Antigravity Core - 2026*
+
+## 5. Flusso Operativo per Agenti Esterni (es. ChainPrompt)
+
+Per integrare un nuovo Agente tematico:
+
+1.  **Discovery**: L'agente interroga `GET /api/assistant/tools` per ottenere la definizione aggiornata dei tool.
+2.  **Search**: L'utente chiede: *"Cosa è successo all'IP 1.2.3.4?"*. L'agente chiama `/api/assistant/search`.
+3.  **Reasoning**: L'agente riceve il `text` (riassunto) e il payload DTO arricchito.
+4.  **Drill-down**: Se l'agente decide di approfondire, usa il tool `resolve_threat_source` passando il `sourceRef`.
+5.  **Technical Truth**: L'Agente riceve il JSON tecnico originale da MongoDB e conclude l'investigazione.
+
+---
+*Documento aggiornato con le evoluzioni della Fase 1-2-3 (Maggio 2026)*

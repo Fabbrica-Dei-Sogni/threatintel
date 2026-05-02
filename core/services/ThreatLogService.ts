@@ -14,6 +14,8 @@ import { ConfigService } from './ConfigService';
 import { RagSyncService } from './assistant/RagSyncService';
 import { OllamaService } from './assistant/OllamaService';
 import { RagTranslationService } from './assistant/RagTranslationService';
+import { RAG_POLICIES } from './assistant/RagPolicies';
+import { RagSourceRef } from '../types/assistant/rag.types';
 import { LogFilters } from '../types/threat-log.types';
 import { ThreatIndicator } from '../types/indicators';
 import { Types } from 'mongoose';
@@ -816,60 +818,98 @@ export class ThreatLogService {
     }
 
     /**
-     * Materializza i riassunti AI degli attacchi (IP-centrici) nel database vettoriale.
+     * Materializza i riassunti AI degli attacchi (Anomalie) nel database vettoriale.
+     * Implementa un loop di recupero totale (Fetch-All) per garantire la coerenza.
      */
     async materializeAttackSummaries(options: { forceAi?: boolean } = {}) {
-        this.logger.info('[ThreatLogService] Starting attack materialization for RAG...');
-
-        // Controllo Fallback: evita chiamate se il sistema RAG non è operativo
+        // Controllo Fallback
         if (!this.ragSync.getStatus().operational) {
             this.logger.debug('[ThreatLogService] RAG materialization skipped: System is not operational.');
             return;
         }
 
-        // Verifica se la generazione AI è abilitata (configurazione o override)
+        // Verifica se la generazione AI è abilitata
         const aiEnabledConfig = await this.configService.getConfigValue('RAG_AI_SUMMARY_ENABLED');
         const isAiEnabled = options.forceAi || aiEnabledConfig === 'true' || process.env.RAG_AI_SUMMARY_ENABLED === 'true';
 
+        this.logger.info('[ThreatLogService] Starting attack materialization for RAG (Fetch-All)...');
+
+        let currentPage = 1;
+        const policy = RAG_POLICIES.ATTACKS;
+        let totalProcessed = 0;
+        let hasMore = true;
+
         try {
-            const result = await this.getAttacks({
-                minLogsForAttack: 10,
-                pageSize: 50,
-                timeConfig: { timeMode: 'ago', agoUnit: 'h', agoValue: 24 }
-            });
+            while (hasMore) {
+                this.logger.debug(`[ThreatLogService] Fetching page ${currentPage} for RAG materialization...`);
+                
+                const result = await this.getAttacks({ 
+                    page: currentPage, 
+                    pageSize: policy.pageSize, 
+                    minLogs: policy.minLogs, 
+                    timeConfig: { 
+                        timeMode: 'ago', 
+                        agoUnit: policy.timeWindow.agoUnit, 
+                        agoValue: policy.timeWindow.agoValue 
+                    } 
+                });
 
-            const attacks = result.items || [];
+                const attacks = result.items || [];
+                if (attacks.length === 0) {
+                    hasMore = false;
+                    break;
+                }
 
-            for (const attack of attacks) {
-                const ip = attack.request?.ip || 'N/A';
-                try {
-                    this.logger.debug(`[ThreatLogService] Materializing summary for attack by IP: ${ip}`);
+                for (const attack of attacks) {
+                    const ip = attack.request?.ip || 'N/A';
+                    try {
+                        this.logger.debug(`[ThreatLogService] Materializing summary for attack by IP: ${ip}`);
 
-                    // 1. Narrazione Tecnica (Deterministica)
-                    const technicalNarrative = this.translator.translateAttack(attack);
-                    let finalContent = technicalNarrative;
+                        // 1. Narrazione Tecnica (Deterministica)
+                        const technicalNarrative = this.translator.translateAttack(attack);
+                        let finalContent = technicalNarrative;
 
-                    // 2. Generazione AI (Opzionale - solo se abilitata e Ollama risponde)
-                    if (isAiEnabled) {
-                        try {
-                            const prompt = this.translator.buildAttackSummaryPrompt(attack);
-                            const aiSummary = await this.ollama.generate(prompt);
-                            finalContent = `RIASSUNTO ANALISTA AI: ${aiSummary}\n\nDETTAGLI TECNICI CORRELATI:\n${technicalNarrative}`;
-                        } catch (aiErr) {
-                            this.logger.warn(`[ThreatLogService] AI Generation failed for IP ${ip}, falling back to technical data: ${aiErr.message}`);
+                        // 2. Generazione AI (Opzionale)
+                        if (isAiEnabled) {
+                            try {
+                                const prompt = this.translator.buildAttackSummaryPrompt(attack);
+                                const aiSummary = await this.ollama.generate(prompt);
+                                finalContent = `RIASSUNTO ANALISTA AI: ${aiSummary}\n\nDETTAGLI TECNICI CORRELATI:\n${technicalNarrative}`;
+                            } catch (aiErr) {
+                                this.logger.warn(`[ThreatLogService] AI Generation failed for IP ${ip}, falling back to technical data: ${aiErr.message}`);
+                            }
                         }
+
+                        // 3. Embedding
+                        const vector = await this.ollama.getEmbedding(finalContent);
+
+                        // 4. Source Reference per la tracciabilità agentica
+                        const sourceRef: RagSourceRef = {
+                            endpoint: policy.apiRef.endpoint,
+                            method: policy.apiRef.method,
+                            params: { 
+                                ip: ip,
+                                minLogs: policy.minLogs,
+                                timeWindow: policy.timeWindow
+                            }
+                        };
+
+                        await this.ragSync.syncAttackSummary(attack, finalContent, vector, sourceRef);
+                        totalProcessed++;
+                    } catch (err) {
+                        this.logger.error(`[ThreatLogService] Error materializing attack for IP ${ip}: ${err}`);
                     }
+                }
 
-                    // 3. Embedding (Sempre necessario per il RAG)
-                    const vector = await this.ollama.getEmbedding(finalContent);
-
-                    await this.ragSync.syncAttackSummary(attack, finalContent, vector);
-                } catch (err) {
-                    this.logger.error(`[ThreatLogService] Error materializing attack for IP ${ip}: ${err}`);
+                // Controllo uscita dal loop
+                if (attacks.length < policy.pageSize || totalProcessed >= result.totalCount) {
+                    hasMore = false;
+                } else {
+                    currentPage++;
                 }
             }
 
-            this.logger.info(`[ThreatLogService] Materialization completed for ${attacks.length} attacks.`);
+            this.logger.info(`[ThreatLogService] Materialization completed. Total attacks synced: ${totalProcessed}`);
         } catch (error) {
             this.logger.error(`[ThreatLogService] Attack materialization failed: ${error}`);
         }

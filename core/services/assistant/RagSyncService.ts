@@ -9,6 +9,8 @@ import { IIpDetails } from '../../models/IpDetailsSchema';
 import { IAbuseIpDb } from '../../models/AbuseIpDbSchema';
 import { IAbuseReport } from '../../models/AbuseReportSchema';
 import { stringToUuid } from '../../utils/uuid';
+import { RAG_POLICIES } from './RagPolicies';
+import { RagSourceRef, ThreatLogPayload, AttackSummaryPayload, CampaignSummaryPayload } from '../../types/assistant/rag.types';
 
 @injectable()
 export class RagSyncService {
@@ -37,10 +39,13 @@ export class RagSyncService {
     public async syncThreatLog(log: IThreatLog) {
         if (!this.checkOperational()) return;
 
-        // FILTRO: Ignoriamo i log con score basso per ridurre il rumore nel RAG
+        // LOG VISIBILE: Vediamo se il log arriva al sistema RAG
         const score = log.fingerprint?.score || 0;
-        if (score < 3) {
-            this.logger.debug(`[RagSync] Skipping log ${log._id} due to low score (${score})`);
+        this.logger.info(`[RagSync] Received log for IP ${log.request?.ip} (Score: ${score})`);
+
+        // FILTRO: Ignoriamo i log con score basso
+        if (score < RAG_POLICIES.LOGS.minScore) {
+            this.logger.info(`[RagSync] Log filtered out (Score ${score} < ${RAG_POLICIES.LOGS.minScore})`);
             return;
         }
 
@@ -81,17 +86,25 @@ export class RagSyncService {
                 const narrative = this.translator.translateThreatLog(log);
                 const vector = await this.ollama.getEmbedding(narrative);
                 
+                const payload: ThreatLogPayload = {
+                    type: 'threat_log',
+                    mongoId: log._id.toString(),
+                    ip: log.request?.ip || 'N/A',
+                    timestamp: log.timestamp,
+                    score: log.fingerprint?.score || 0,
+                    text: narrative,
+                    materializedAt: new Date(),
+                    sourceRef: {
+                        endpoint: RAG_POLICIES.LOGS.apiRef.endpoint.replace(':id', log._id.toString()),
+                        method: RAG_POLICIES.LOGS.apiRef.method,
+                        params: { id: log._id.toString() }
+                    }
+                };
+
                 points.push({
                     id: stringToUuid(log._id.toString()),
                     vector: vector,
-                    payload: {
-                        type: 'threat_log',
-                        mongoId: log._id.toString(),
-                        ip: log.request?.ip,
-                        timestamp: log.timestamp,
-                        score: log.fingerprint?.score,
-                        text: narrative
-                    }
+                    payload
                 });
             }
 
@@ -138,24 +151,31 @@ export class RagSyncService {
     /**
      * Sincronizza un riassunto di campagna nel database vettoriale.
      */
-    public async syncCampaignSummary(campaign: any, aiSummary: string, vector: number[]) {
+    public async syncCampaignSummary(campaign: any, aiSummary: string, vector: number[], sourceRef?: RagSourceRef) {
         if (!this.checkOperational()) return;
 
         try {
             this.logger.debug(`[RagSync] Syncing Campaign Summary for ${campaign.hash}`);
 
+            const payload: CampaignSummaryPayload = {
+                type: 'campaign_summary',
+                campaignId: campaign.hash,
+                ipCount: campaign.ipCount,
+                topIps: campaign.topIps || [],
+                protocols: campaign.protocols || [],
+                text: aiSummary,
+                materializedAt: new Date(),
+                sourceRef: sourceRef || {
+                    endpoint: RAG_POLICIES.CAMPAIGNS.apiRef.endpoint,
+                    method: RAG_POLICIES.CAMPAIGNS.apiRef.method,
+                    params: { hash: campaign.hash }
+                }
+            };
+
             await this.qdrant.upsertPoints(this.COLL_INTELLIGENCE, [{
                 id: stringToUuid(`campaign-${campaign.hash}`),
                 vector: vector,
-                payload: {
-                    type: 'campaign_summary',
-                    campaignId: campaign.hash,
-                    ipCount: campaign.ipCount,
-                    topIps: campaign.topIps,
-                    protocols: campaign.protocols,
-                    text: aiSummary,
-                    materializedAt: new Date()
-                }
+                payload
             }]);
         } catch (error) {
             this.handleOperationError('syncCampaignSummary', error);
@@ -165,24 +185,31 @@ export class RagSyncService {
     /**
      * Sincronizza un riassunto di attacco (IP-centrico) nel database vettoriale.
      */
-    public async syncAttackSummary(attack: any, aiSummary: string, vector: number[]) {
+    public async syncAttackSummary(attack: any, aiSummary: string, vector: number[], sourceRef?: RagSourceRef) {
         if (!this.checkOperational()) return;
 
         try {
             const ip = attack.request?.ip || attack.ip;
             this.logger.debug(`[RagSync] Syncing Attack Summary for IP ${ip}`);
 
+            const payload: AttackSummaryPayload = {
+                type: 'attack_summary',
+                ip: ip,
+                totalLogs: attack.totaleLogs,
+                averageScore: attack.averageScore,
+                text: aiSummary,
+                materializedAt: new Date(),
+                sourceRef: sourceRef || {
+                    endpoint: RAG_POLICIES.ATTACKS.apiRef.endpoint,
+                    method: RAG_POLICIES.ATTACKS.apiRef.method,
+                    params: { ip: ip }
+                }
+            };
+
             await this.qdrant.upsertPoints(this.COLL_INTELLIGENCE, [{
                 id: stringToUuid(`attack-${ip}`),
                 vector: vector,
-                payload: {
-                    type: 'attack_summary',
-                    ip: ip,
-                    totalLogs: attack.totaleLogs,
-                    averageScore: attack.averageScore,
-                    text: aiSummary,
-                    materializedAt: new Date()
-                }
+                payload
             }]);
         } catch (error) {
             this.handleOperationError('syncAttackSummary', error);
@@ -208,10 +235,10 @@ export class RagSyncService {
             }
 
             this.isOperational = true;
-            this.logger.info('[RagSync] RAG system is fully operational.');
+            this.logger.info('[RagSync] RAG system is fully operational and connected to Ollama.');
         } catch (error) {
             this.isOperational = false;
-            this.logger.warn(`[RagSync] RAG system initialized in DEGRADED mode (Disabled): ${error.message}`);
+            this.logger.error(`[RagSync] CRITICAL: RAG system is NOT operational: ${error.message}`);
         }
     }
 

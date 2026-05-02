@@ -27,7 +27,7 @@ export class OllamaService {
      */
     public async getEmbedding(text: string): Promise<number[]> {
         try {
-            this.logger.debug(`[Ollama] Requesting embedding for text length: ${text.length}`);
+            this.logger.info(`[Ollama] Requesting embedding for text length: ${text.length} (Model: ${this.embeddingModel})`);
             const response = await axios.post(`${this.baseUrl}/api/embeddings`, {
                 model: this.embeddingModel,
                 prompt: text

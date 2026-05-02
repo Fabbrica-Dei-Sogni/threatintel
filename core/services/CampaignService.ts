@@ -74,11 +74,7 @@ export class CampaignService {
         const globalMinDate = oldestLog?.timestamp || null;
         const globalMaxDate = newestLog?.timestamp || null;
 
-        const timeParams = { ...timeConfig } as any;
-        if (timeConfig.timeMode === 'ago' && timeConfig.agoUnit && timeConfig.agoValue) {
-            timeParams[timeConfig.agoUnit] = timeConfig.agoValue;
-        }
-        const timeStage = new TimeFilterStage(timeParams).generate();
+        const timeStage = new TimeFilterStage(timeConfig).generate();
 
         // Pipeline per metadati adattivi dello slider LOGS/IP
         const logsPerIpMetadataPipeline = [
@@ -241,11 +237,7 @@ export class CampaignService {
             }
         }
 
-        const timeParams = { ...timeConfig } as any;
-        if (timeConfig.timeMode === 'ago' && timeConfig.agoUnit && timeConfig.agoValue) {
-            timeParams[timeConfig.agoUnit] = timeConfig.agoValue;
-        }
-        const timeStage = new TimeFilterStage(timeParams).generate();
+        const timeStage = new TimeFilterStage(timeConfig).generate();
 
         const pipeline = [
             ...timeStage,
@@ -388,11 +380,7 @@ export class CampaignService {
             }
         }
 
-        const timeParams = { ...timeConfig } as any;
-        if (timeConfig.timeMode === 'ago' && timeConfig.agoUnit && timeConfig.agoValue) {
-            timeParams[timeConfig.agoUnit] = timeConfig.agoValue;
-        }
-        const timeStage = new TimeFilterStage(timeParams).generate();
+        const timeStage = new TimeFilterStage(timeConfig).generate();
 
         const pipeline: any[] = [
             ...timeStage,

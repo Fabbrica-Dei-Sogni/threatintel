@@ -21,10 +21,11 @@ export const RAG_POLICIES = {
         entityType: 'attack_summary',
         minLogs: 10,                  // Alzata soglia per ridurre rumore (allineata a dashboard)
         pageSize: 50,                // Dimensione pagina per il job di sincronizzazione
+        protocol: '',            // Filtro per protocollo (coerente con dashboard)
         timeConfig: { 
             timeMode: 'ago',
-            agoUnit: 'h', 
-            agoValue: 1              // Finestra ridotta a 1 ora per il sync periodico (più efficiente)
+            agoUnit: 'days', 
+            agoValue: 10              // Finestra ridotta a 1 ora per il sync periodico (più efficiente)
         },
         apiRef: {
             endpoint: '/api/attack/details',
@@ -35,15 +36,15 @@ export const RAG_POLICIES = {
     // Configurazione per le Campagne (Cluster di Fingerprint)
     CAMPAIGNS: {
         entityType: 'campaign_summary',
-        minIps: 2,                   
+        minIps: 5,                   
         minScore: 0,                 
-        minLogsPerIp: 1,             
+        minLogsPerIp: 2,             
         protocol: 'http',            
         pageSize: 50,                
         timeConfig: { 
             timeMode: 'ago',
-            agoUnit: 'h', 
-            agoValue: 1              // Finestra ridotta a 1 ora per coerenza con gli attacchi
+            agoUnit: 'days', 
+            agoValue: 30             // Finestra ridotta a 1 ora per coerenza con gli attacchi
         },
         apiRef: {
             endpoint: '/api/campaign/details',

@@ -204,9 +204,13 @@ export class ThreatLogService {
         const {
             ip,
             minLogsForAttack = 1,
-            timeConfig = {}
+            timeConfig = {},
+            protocol = null
         } = params;
-        const mongoFilters = { 'request.ip': ip };
+        const mongoFilters: any = { 'request.ip': ip };
+        if (protocol) {
+            mongoFilters.protocol = protocol;
+        }
 
         // Pipeline base costruita col nuovo Builder
         const basePipeline = await this.forensicPipelineService.buildStandardPipeline(mongoFilters, minLogsForAttack, timeConfig);
@@ -241,14 +245,16 @@ export class ThreatLogService {
     async getDistributedAttackDetail({
         ipList,
         minLogsForAttack = 1,
-        timeConfig = {}
+        timeConfig = {},
+        protocol = null
     }: {
         ipList: string[];
         minLogsForAttack?: number;
         timeConfig?: any;
+        protocol?: string | null;
     }) {
         // Costruisce la pipeline dedicata alla lista IP
-        const pipeline = await this.forensicPipelineService.buildDistributedPipeline(ipList, minLogsForAttack, timeConfig);
+        const pipeline = await this.forensicPipelineService.buildDistributedPipeline(ipList, minLogsForAttack, timeConfig, protocol);
 
         // Esegue l'aggregazione
         const [attack] = await ThreatLog.aggregate(pipeline).allowDiskUse(true);

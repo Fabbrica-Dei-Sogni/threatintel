@@ -218,7 +218,7 @@ export class ThreatController {
     async getAttackDetails(req: Request, res: Response): Promise<void> {
         this.logger.info(`[ThreatController] Requesting attack details for IP ${req.body.ip}`);
         try {
-            const { ip, minLogsForAttack = 10, timeConfig = {} } = req.body;
+            const { ip, minLogsForAttack = 10, timeConfig = {}, protocol } = req.body;
             if (!ip) {
                 res.status(400).json({ error: 'IP mancante' });
                 return;
@@ -227,7 +227,8 @@ export class ThreatController {
             const attack = await this.threatLogService.getAttackDetail({
                 ip,
                 minLogsForAttack: parseInt(minLogsForAttack),
-                timeConfig
+                timeConfig,
+                protocol
             });
 
             if (!attack) {
@@ -256,7 +257,7 @@ export class ThreatController {
     async getDistributedAttackDetails(req: Request, res: Response): Promise<void> {
         this.logger.info(`[ThreatController] Requesting distributed attack details for ${req.body.ipList?.length || 0} IPs`);
         try {
-            const { ipList, minLogsForAttack = 1, timeConfig = {} } = req.body;
+            const { ipList, minLogsForAttack = 1, timeConfig = {}, protocol } = req.body;
 
             if (!ipList || !Array.isArray(ipList) || ipList.length === 0) {
                 res.status(400).json({ error: 'Lista IP mancante o non valida' });
@@ -266,7 +267,8 @@ export class ThreatController {
             const attack = await this.threatLogService.getDistributedAttackDetail({
                 ipList,
                 minLogsForAttack: parseInt(minLogsForAttack),
-                timeConfig
+                timeConfig,
+                protocol
             });
 
             if (!attack) {

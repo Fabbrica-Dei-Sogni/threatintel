@@ -23,7 +23,8 @@ const props = defineProps({
     timeMode: { type: String, default: 'ago' },
     agoValue: { type: Number, default: null },
     agoUnit: { type: String, default: null },
-    minLogsForAttack: { type: Number, default: 1 }
+    minLogsForAttack: { type: Number, default: 1 },
+    protocol: { type: String, default: null }
 });
 
 const emit = defineEmits(['back', 'go-to-ip']);
@@ -56,7 +57,8 @@ async function loadData() {
         attack.value = await fetchDistributedAttackDetail({
             ipList: props.ipList,
             minLogsForAttack: props.minLogsForAttack,
-            timeConfig
+            timeConfig,
+            protocol: props.protocol
         });
     } catch (err) {
         console.error('[DistributedAttackView] Error:', err);

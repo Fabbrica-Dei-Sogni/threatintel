@@ -144,7 +144,8 @@ export class ForensicPipelineService {
     async buildDistributedPipeline(
         ipList: string[],
         minLogsForAttack: number,
-        timeConfig: any = null
+        timeConfig: any = null,
+        protocol: string | null = null
     ): Promise<any[]> {
         await this.initialized;
 
@@ -152,10 +153,17 @@ export class ForensicPipelineService {
             throw new Error("[ForensicPipelineService] ipList non può essere vuota");
         }
 
-        return this.createBuilder()
+        const builder = this.createBuilder()
             .addStage(new TimeFilterStage(timeConfig))
             // Filtra solo gli IP forniti dall'utente
-            .addStage(new MatchFilterStage({ 'request.ip': { $in: ipList } }))
+            .addStage(new MatchFilterStage({ 'request.ip': { $in: ipList } }));
+
+        // Filtro opzionale per protocollo (http, ssh, etc.)
+        if (protocol) {
+            builder.addStage(new MatchFilterStage({ 'protocol': protocol }));
+        }
+
+        return builder
             // Raggruppa la lista di IP come un unico cluster (investigazione)
             .addStage(new DistributedGroupingStage(ipList[0], minLogsForAttack))
             // Calcola RPS e durata complessiva sul cluster

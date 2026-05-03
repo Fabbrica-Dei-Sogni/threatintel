@@ -218,10 +218,12 @@ export async function fetchAttackDetail({
     ip,
     minLogsForAttack,
     timeConfig = {},
+    protocol = null
 }: {
     ip: string;
     minLogsForAttack: number;
     timeConfig: any;
+    protocol?: string | null;
 }): Promise<any> {
     console.log('[fetchAttackDetail] Params:', { ip, minLogsForAttack, timeConfig });
     try {
@@ -229,6 +231,7 @@ export async function fetchAttackDetail({
             ip,
             minLogsForAttack,
             timeConfig,
+            protocol
         });
 
         console.log('[fetchAttackDetail] Response status:', response.status);
@@ -243,10 +246,12 @@ export async function fetchDistributedAttackDetail({
     ipList,
     minLogsForAttack,
     timeConfig = {},
+    protocol = null
 }: {
     ipList: string[];
     minLogsForAttack: number;
     timeConfig: any;
+    protocol?: string | null;
 }): Promise<any> {
     console.log('[fetchDistributedAttackDetail] Params:', { ipList, minLogsForAttack, timeConfig });
     try {
@@ -254,6 +259,7 @@ export async function fetchDistributedAttackDetail({
             ipList,
             minLogsForAttack,
             timeConfig,
+            protocol
         });
 
         console.log('[fetchDistributedAttackDetail] Response status:', response.status);

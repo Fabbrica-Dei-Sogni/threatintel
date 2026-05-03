@@ -267,7 +267,7 @@ const props = defineProps({
   hash: { type: String, required: true },
   minLogsPerIp: { type: Number, default: 1 },
   minScore: { type: Number, default: 0 },
-  protocol: { type: String, default: null },
+  protocol: { type: String, default: 'http' },
   timeMode: { type: String, default: 'ago' },
   agoValue: { type: [Number, null], default: null },
   agoUnit: { type: [String, null], default: null }
@@ -315,7 +315,8 @@ const handleInvestigateIps = (ips) => {
     timeMode: props.timeMode,
     agoValue: props.agoValue,
     agoUnit: props.agoUnit,
-    minLogsPerIp: props.minLogsPerIp
+    minLogsPerIp: props.minLogsPerIp,
+    protocol: props.protocol
   });
 };
 
@@ -398,7 +399,8 @@ function handleInvestigateIp(ip) {
     timeMode: props.timeMode,
     agoValue: props.agoValue,
     agoUnit: props.agoUnit,
-    minLogsPerIp: props.minLogsPerIp
+    minLogsPerIp: props.minLogsPerIp,
+    protocol: props.protocol
   });
 }
 
@@ -407,7 +409,8 @@ function handleInvestigateCluster() {
     timeMode: props.timeMode,
     agoValue: props.agoValue,
     agoUnit: props.agoUnit,
-    minLogsPerIp: props.minLogsPerIp
+    minLogsPerIp: props.minLogsPerIp,
+    protocol: props.protocol
   });
 }
 

@@ -7,6 +7,7 @@ export interface GetAttackDetailParams {
     ip: string;
     minLogsForAttack?: number;
     timeConfig?: TimeConfig;
+    protocol?: string | null;
 }
 
 /**

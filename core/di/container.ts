@@ -18,7 +18,8 @@ import { RagSyncWorker } from "../services/assistant/RagSyncWorker";
 import { AssistantService } from "../services/assistant/AssistantService";
 import { EventBus } from "../services/EventBus";
 import { RagEventListener } from "../services/assistant/RagEventListener";
-import { LOGGER_TOKEN, I18N_TOKEN, CONFIG_PROVIDER_TOKEN, RAG_TRANSLATION_TOKEN, QDRANT_CLIENT_TOKEN, OLLAMA_SERVICE_TOKEN, RAG_SYNC_SERVICE_TOKEN, RAG_SYNC_WORKER_TOKEN, ASSISTANT_SERVICE_TOKEN, EVENT_BUS_TOKEN, RAG_EVENT_LISTENER_TOKEN } from "./tokens";
+import { McpNativeExecutor } from "../assistant/mcp/McpNativeExecutor";
+import { LOGGER_TOKEN, I18N_TOKEN, CONFIG_PROVIDER_TOKEN, RAG_TRANSLATION_TOKEN, QDRANT_CLIENT_TOKEN, OLLAMA_SERVICE_TOKEN, RAG_SYNC_SERVICE_TOKEN, RAG_SYNC_WORKER_TOKEN, ASSISTANT_SERVICE_TOKEN, EVENT_BUS_TOKEN, RAG_EVENT_LISTENER_TOKEN, MCP_EXECUTOR_TOKEN } from "./tokens";
 import logger from "../../logger";
 
 export const coreContainer = container;
@@ -78,6 +79,9 @@ coreContainer.registerSingleton(EVENT_BUS_TOKEN, EventBus);
 
 // registrazione del servizio RagEventListener come singleton
 coreContainer.registerSingleton(RAG_EVENT_LISTENER_TOKEN, RagEventListener);
+
+// registrazione del servizio McpNativeExecutor come singleton
+coreContainer.registerSingleton(MCP_EXECUTOR_TOKEN, McpNativeExecutor);
 
 
 // nuova funzione generica

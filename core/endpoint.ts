@@ -35,6 +35,7 @@ import { DossierController } from "./controllers/DossierController";
 import { AuthController } from "./controllers/AuthController";
 import { AuthMiddleware } from "./middlewares/AuthMiddleware";
 import { AssistantController } from "./controllers/AssistantController";
+import { McpProtocolController } from "./controllers/McpProtocolController";
 import { RateLimitMiddleware } from "./rateLimitMiddleware";
 import { setupSwagger } from "./swagger";
 import { RouterHub } from "./registry/RouterHub";
@@ -59,7 +60,7 @@ routerHub.register(DossierController);
 routerHub.register(AuthController);
 routerHub.register(CowrieController);
 routerHub.register(AssistantController);
-
+routerHub.register(McpProtocolController);  
 
 //XXX: deve essere registrato per ultimo
 routerHub.register(FakeLoginController);

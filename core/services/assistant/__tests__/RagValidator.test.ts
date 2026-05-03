@@ -80,12 +80,13 @@ describe('RagValidator', () => {
         });
     });
 
-    describe('getToolDefinition', () => {
-        it('should return a valid OpenAI-like tool schema', () => {
-            const tool = RagValidator.getToolDefinition();
-            expect(tool.name).toBe('resolve_threat_source');
-            expect(tool.parameters.properties.sourceRef).toBeDefined();
-            expect(tool.parameters.properties.sourceRef.properties.params.oneOf).toBeDefined();
+    describe('getToolDefinitions', () => {
+        it('should return a list of OpenAI-like tool schemas', () => {
+            const tools = RagValidator.getToolDefinitions();
+            expect(Array.isArray(tools)).toBe(true);
+            const resolveTool = tools.find(t => t.name === 'resolve_threat_source');
+            expect(resolveTool).toBeDefined();
+            expect(resolveTool?.parameters.properties.sourceRef).toBeDefined();
         });
     });
 });

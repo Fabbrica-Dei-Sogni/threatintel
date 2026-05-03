@@ -50,8 +50,11 @@ routerHub.register(ReportController);
 routerHub.register(DossierController);
 routerHub.register(AuthController);
 routerHub.register(CowrieController);
-routerHub.register(FakeLoginController);
 routerHub.register(AssistantController);
+
+
+//XXX: deve essere registrato per ultimo
+routerHub.register(FakeLoginController);
 
 // Configurazione Threat Logger
 // **IMPORTANTE: Il middleware di threat logging deve essere PRIMO**

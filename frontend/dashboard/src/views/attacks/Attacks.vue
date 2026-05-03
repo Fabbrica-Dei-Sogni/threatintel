@@ -42,7 +42,7 @@
                 <div class="filter-item">
                     <span class="cyber-label">PROT</span>
                     <div class="protocol-reset-group">
-                        <ProtocolSelector v-model="attacksState.filters.protocol" :options="['http', 'https', 'ssh']" theme="magma" />
+                        <ProtocolSelector v-model="attacksState.filters.protocol" theme="magma" />
                         <button class="reset-btn-mini filter-reset-btn" @click="handleReset" :title="t('telemetry.reset_filters')">
                             <div class="reset-ascii">
                                 <span></span>

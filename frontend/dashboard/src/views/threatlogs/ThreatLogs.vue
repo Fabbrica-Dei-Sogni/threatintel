@@ -28,7 +28,7 @@
         <div class="filter-item">
           <span class="cyber-label">PROT</span>
           <div class="protocol-reset-group">
-            <ProtocolSelector v-model="filterProtocol" :options="['http', 'https', 'ssh']" theme="amber" />
+            <ProtocolSelector v-model="filterProtocol" theme="amber" />
             <button class="reset-btn-mini filter-reset-btn" @click="handleReset" :title="t('telemetry.reset_filters')">
               <div class="reset-ascii">
                 <span></span>

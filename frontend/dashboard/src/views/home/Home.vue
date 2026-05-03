@@ -55,7 +55,7 @@
               :error="errorAttacks" v-model:page="dashboardState.rankings.attackPage" :pageSize="10"
               :total="attackTotal" itemStyle="anomalies-ranking">
               <template #header-actions>
-                <ProtocolSelector v-model="dashboardState.rankings.attackProtocol" :options="['http', 'https', 'ssh']"
+                <ProtocolSelector v-model="dashboardState.rankings.attackProtocol"
                   theme="dark" />
                 <button class="reset-btn-mini" @click="dashboardStore.resetAttacks"
                   :title="t('telemetry.reset_filters')">
@@ -190,7 +190,7 @@
                 v-model:page="dashboardState.rankings.logPage" :pageSize="10" :total="logTotal"
                 itemStyle="logs-ranking">
                 <template #header-actions>
-                  <ProtocolSelector v-model="dashboardState.rankings.logProtocol" :options="['http', 'https', 'ssh']"
+                  <ProtocolSelector v-model="dashboardState.rankings.logProtocol"
                     theme="dark" />
                   <button class="reset-btn-mini" @click="dashboardStore.resetLogs"
                     :title="t('telemetry.reset_filters')">
@@ -386,7 +386,7 @@
               :total="campaignTotal" itemStyle="campaigns-ranking">
               
                <template #header-actions>
-                  <ProtocolSelector v-model="dashboardState.rankings.campaignProtocol" :options="['http', 'https', 'ssh']"
+                  <ProtocolSelector v-model="dashboardState.rankings.campaignProtocol"
                     theme="dark" />
                   <button class="reset-btn-mini" @click="dashboardStore.resetCampaigns"
                    :title="t('telemetry.reset_filters')">

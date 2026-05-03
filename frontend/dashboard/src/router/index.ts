@@ -68,11 +68,12 @@ const routes: RouteRecordRaw[] = [
         props: (route: RouteLocationNormalized) => ({
             ip: route.params.ip,
             ipList: route.query.ipList ? JSON.parse(route.query.ipList as string) : undefined,
-            minLogsForAttack: route.query.minLogsForAttack ? parseInt(route.query.minLogsForAttack as string) : 10,
-            timeMode: route.query.timeMode || 'ago',
-            agoValue: route.query.agoValue ? parseInt(route.query.agoValue as string) : 1,
-            agoUnit: route.query.agoUnit || 'days',
-            dateRange: route.query.dateRange || [null, null],
+            minLogsForAttack: route.query.minLogsForAttack ? parseInt(route.query.minLogsForAttack as string) : undefined,
+            timeMode: route.query.timeMode as string || undefined,
+            agoValue: route.query.agoValue ? parseInt(route.query.agoValue as string) : undefined,
+            agoUnit: route.query.agoUnit as string || undefined,
+            dateRange: route.query.dateRange ? JSON.parse(route.query.dateRange as string) : undefined,
+            protocol: (route.query.protocol as string) || 'http',
             initialPageLogs: route.query.pLogs ? parseInt(route.query.pLogs as string) : 1,
             initialPageEvents: route.query.pEvents ? parseInt(route.query.pEvents as string) : 1,
             initialSearchUrl: typeof route.query.qUrl === 'string' ? route.query.qUrl : '',
@@ -190,7 +191,7 @@ const routes: RouteRecordRaw[] = [
             agoValue: route.query.agoValue ? (route.query.agoValue === 'null' ? null : parseInt(route.query.agoValue as string)) : null,
             agoUnit: route.query.agoUnit || null,
             minScore: route.query.minScore ? parseInt(route.query.minScore as string) : 0,
-            protocol: route.query.protocol || null
+            protocol: (route.query.protocol as string) || 'http'
         })
     }
 ];

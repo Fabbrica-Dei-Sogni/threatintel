@@ -111,77 +111,58 @@ export class RagValidator {
     }
 
     /**
-     * Restituisce lo schema dei parametri per l'Agente AI (usabile come tool definition).
-     * Istruisce l'agente sui campi ammessi partendo dalle whitelist di QueryGuard.
+     * Restituisce le definizioni dei tool per l'Agente AI (LangChain/OpenAI compatible).
      */
-    public static getToolDefinition() {
-        return {
-            name: "resolve_threat_source",
-            description: "Risolve un riferimento sorgente (sourceRef) recuperato da una ricerca semantica per ottenere i dati tecnici completi, originali e aggiornati (MongoDB).",
-            parameters: {
-                type: "object",
-                properties: {
-                    sourceRef: {
-                        type: "object",
-                        description: "L'oggetto sourceRef completo trovato nel metadato di un SearchHit. Passalo integralmente.",
-                        properties: {
-                            params: {
-                                type: "object",
-                                description: "Parametri tecnici di ricostruzione. NON inventare questi parametri, usali ESATTAMENTE come ricevuti dalla ricerca.",
-                                oneOf: [
-                                    {
-                                        description: "Risoluzione Log atomico",
-                                        properties: {
-                                            type: { const: "log" },
-                                            id: { type: "string", description: "ID univoco del log" }
-                                        },
-                                        required: ["type", "id"]
-                                    },
-                                    {
-                                        description: "Dettagli reputazione IP",
-                                        properties: {
-                                            type: { const: "ip_details" },
-                                            ip: { type: "string" }
-                                        },
-                                        required: ["type", "ip"]
-                                    },
-                                    {
-                                        description: "Ricostruzione Attacco (Anomalia IP)",
-                                        properties: {
-                                            type: { const: "attack" },
-                                            ip: { type: "string" },
-                                            minLogsForAttack: { type: "number" },
-                                            timeConfig: { 
-                                                type: "object",
-                                                properties: {
-                                                    timeMode: { type: "string", enum: ["ago", "range"] },
-                                                    agoValue: { type: "number" },
-                                                    agoUnit: { type: "string" }
-                                                }
-                                            }
-                                        },
-                                        required: ["type", "ip", "minLogsForAttack"]
-                                    },
-                                    {
-                                        description: "Ricostruzione Campagna (Cluster Fingerprint)",
-                                        properties: {
-                                            type: { const: "campaign" },
-                                            hash: { type: "string" },
-                                            minScore: { type: "number" },
-                                            minLogsPerIp: { type: "number" },
-                                            protocol: { type: "string" },
-                                            timeConfig: { type: "object" }
-                                        },
-                                        required: ["type", "hash"]
-                                    }
-                                ]
-                            }
+    public static getToolDefinitions() {
+        return [
+            {
+                name: "semantic_search",
+                description: "Esegue una ricerca semantica nel database delle minacce (log, attacchi, campagne). Utile per trovare pattern o attività sospette descritte in linguaggio naturale.",
+                endpoint: "/assistant/search",
+                method: "POST",
+                parameters: {
+                    type: "object",
+                    properties: {
+                        query: { 
+                            type: "string", 
+                            description: "La query di ricerca in linguaggio naturale (es: 'attacchi brute force SSH dalla Cina')" 
                         },
-                        required: ["params"]
-                    }
-                },
-                required: ["sourceRef"]
+                        type: { 
+                            type: "string", 
+                            enum: ["threat_log", "ip_details", "attack_summary", "campaign_summary"],
+                            description: "Opzionale: filtra per tipo di entità."
+                        },
+                        limit: { 
+                            type: "number", 
+                            description: "Numero massimo di risultati (default 5, max 20)." 
+                        }
+                    },
+                    required: ["query"]
+                }
+            },
+            {
+                name: "resolve_threat_source",
+                description: "Ottiene i dati tecnici completi (da MongoDB) partendo da un riferimento sorgente (sourceRef) trovato in una ricerca semantica.",
+                endpoint: "/assistant/resolve",
+                method: "POST",
+                parameters: {
+                    type: "object",
+                    properties: {
+                        sourceRef: {
+                            type: "object",
+                            description: "L'oggetto sourceRef integrale recuperato dall'hit della ricerca semantica.",
+                            required: ["params"],
+                            properties: {
+                                params: {
+                                    type: "object",
+                                    description: "Parametri tecnici per la ricostruzione del dato."
+                                }
+                            }
+                        }
+                    },
+                    required: ["sourceRef"]
+                }
             }
-        };
+        ];
     }
 }

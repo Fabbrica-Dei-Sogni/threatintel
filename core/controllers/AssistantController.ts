@@ -30,26 +30,44 @@ export class AssistantController {
 
     /**
      * @openapi
-     * /api/assistant/search:
+     * /assistant/search:
      *   post:
-     *     summary: Esegue una ricerca semantica RAG
-     *     tags: [Assistant]
+     *     summary: Esegue una ricerca semantica RAG (Cybsersecurity Forensic Search)
+     *     description: Interroga il database vettoriale (Qdrant) per trovare minacce, IP o campagne correlate alla query fornita.
+     *     tags: [AI Assistant & RAG]
      *     security:
-     *       - bearerAuth: []
+     *       - BearerAuth: []
      *     requestBody:
      *       required: true
      *       content:
      *         application/json:
      *           schema:
      *             type: object
+     *             required: [query]
      *             properties:
      *               query:
      *                 type: string
+     *                 description: La query in linguaggio naturale (es. "Log brute force da IP russi")
+     *                 example: "Mostrami attacchi recenti sulla porta 22"
      *               limit:
      *                 type: number
+     *                 description: Numero massimo di risultati da restituire
+     *                 default: 5
+     *               scoreThreshold:
+     *                 type: number
+     *                 description: Soglia minima di similarità (0.0 - 1.0)
+     *                 default: 0.7
      *               type:
      *                 type: string
      *                 enum: [threat_log, ip_details, campaign_summary]
+     *                 description: Tipo di entità su cui focalizzare la ricerca
+     *     responses:
+     *       200:
+     *         description: Risultati della ricerca semantica trovati con successo.
+     *       401:
+     *         description: Non autorizzato (Token mancante o scaduto).
+     *       500:
+     *         description: Errore interno durante la ricerca vettoriale.
      */
     @Post('/search', [auth.isAuthenticated()])
     async search(req: Request, res: Response): Promise<void> {
@@ -76,10 +94,30 @@ export class AssistantController {
 
     /**
      * @openapi
-     * /api/assistant/ask:
+     * /assistant/ask:
      *   post:
-     *     summary: Risponde a una domanda basandosi sul contesto RAG
-     *     tags: [Assistant]
+     *     summary: Genera un'analisi forense basata su RAG
+     *     description: Utilizza un LLM (Ollama) per rispondere a una domanda tecnica analizzando i dati recuperati dal database vettoriale.
+     *     tags: [AI Assistant & RAG]
+     *     security:
+     *       - BearerAuth: []
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             required: [question]
+     *             properties:
+     *               question:
+     *                 type: string
+     *                 description: La domanda tecnica da porre all'assistente
+     *                 example: "Qual è l'impatto di questi attacchi SSH rilevati?"
+     *     responses:
+     *       200:
+     *         description: Analisi generata con successo.
+     *       500:
+     *         description: Errore durante la generazione della risposta AI.
      */
     @Post('/ask', [auth.isAuthenticated()])
     async ask(req: Request, res: Response): Promise<void> {
@@ -101,10 +139,29 @@ export class AssistantController {
 
     /**
      * @openapi
-     * /api/assistant/resolve:
+     * /assistant/resolve:
      *   post:
-     *     summary: Risolve un riferimento sorgente (SourceRef) in dati tecnici completi
-     *     tags: [Assistant]
+     *     summary: Risolve un riferimento sorgente (SourceRef)
+     *     description: Converte un riferimento semantico (hit ID) nei dati tecnici originali presenti nel database SQL/Mongo.
+     *     tags: [AI Assistant & RAG]
+     *     security:
+     *       - BearerAuth: []
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             required: [sourceRef]
+     *             properties:
+     *               sourceRef:
+     *                 type: string
+     *                 description: L'ID del riferimento sorgente da risolvere
+     *     responses:
+     *       200:
+     *         description: Dati tecnici risolti correttamente.
+     *       404:
+     *         description: Riferimento non trovato.
      */
     @Post('/resolve', [auth.isAuthenticated()])
     async resolve(req: Request, res: Response): Promise<void> {
@@ -129,10 +186,27 @@ export class AssistantController {
 
     /**
      * @openapi
-     * /api/assistant/integrity-check:
+     * /assistant/integrity-check:
      *   post:
-     *     summary: Verifica l'integrità dello schema vettoriale e identifica punti obsoleti
-     *     tags: [Assistant]
+     *     summary: Verifica integrità del Vector Store (Admin Only)
+     *     description: Esegue un check di coerenza tra il database vettoriale e le sorgenti dati originali.
+     *     tags: [AI Assistant & RAG]
+     *     security:
+     *       - BearerAuth: []
+     *     requestBody:
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             properties:
+     *               collection:
+     *                 type: string
+     *                 description: Nome della collezione da controllare
+     *     responses:
+     *       200:
+     *         description: Report di integrità generato.
+     *       403:
+     *         description: Permessi insufficienti (Richiesto ruolo admin).
      */
     @Post('/integrity-check', [auth.hasRole('admin')])
     async checkIntegrity(req: Request, res: Response): Promise<void> {
@@ -153,19 +227,29 @@ export class AssistantController {
 
     /**
      * @openapi
-     * /api/assistant/tools:
+     * /assistant/tools:
      *   get:
-     *     summary: Restituisce la definizione dei tool per l'Agente AI
-     *     tags: [Assistant]
+     *     summary: Esporta i tool per orchestratori esterni (MCP Discovery)
+     *     description: Restituisce le definizioni JSON dei tool disponibili, inclusi metadati di endpoint e auth per l'integrazione con ChainPrompt AI.
+     *     tags: [AI Assistant & RAG]
+     *     security:
+     *       - BearerAuth: []
+     *     responses:
+     *       200:
+     *         description: Elenco tool e metadati del server per la discovery dinamica.
      */
     @Get('/tools', [auth.isAuthenticated()])
     async getTools(req: Request, res: Response): Promise<void> {
         try {
-            const tools = [
-                RagValidator.getToolDefinition()
-                // In futuro potremmo aggiungere altri tool qui
-            ];
-            res.json({ tools });
+            const tools = RagValidator.getToolDefinitions();
+            const serverInfo = {
+                name: 'ThreatIntel Forensic Server',
+                version: '1.0.0',
+                // L'URI base viene preso dalla configurazione o dalla richiesta stessa
+                base_uri: process.env.API_BASE_URL || `${req.protocol}://${req.get('host')}/api`,
+                auth: 'bearer_jwt'
+            };
+            res.json({ server: serverInfo, tools });
         } catch (err: any) {
             this.logger.error('[AssistantController] Get Tools error:', err);
             res.status(500).json({ error: 'Errore durante il recupero dei tool' });

@@ -8,11 +8,11 @@
 
 import { injectable, inject } from 'tsyringe';
 import { Logger } from 'winston';
-import { LOGGER_TOKEN, RAG_SYNC_SERVICE_TOKEN } from '../di/tokens';
+import { LOGGER_TOKEN, EVENT_BUS_TOKEN } from '../di/tokens';
 import ThreatLog from '../models/ThreatLogSchema';
 import { TimeFilterStage } from './forense/pipeline/stages/TimeFilterStage';
 import { calculateCorrelationHubs } from '../utils/CampaignAnalytics';
-import { RagSyncService } from './assistant/RagSyncService';
+import { EventBus, AppEvents } from './EventBus';
 import { TimeConfig } from '../types/common.types';
 import { GetCampaignDetailParams, GetCampaignsParams } from '../types/service-params.types';
 
@@ -20,7 +20,7 @@ import { GetCampaignDetailParams, GetCampaignsParams } from '../types/service-pa
 export class CampaignService {
     constructor(
         @inject(LOGGER_TOKEN) private readonly logger: Logger,
-        @inject(RAG_SYNC_SERVICE_TOKEN) private readonly ragSync: RagSyncService
+        @inject(EVENT_BUS_TOKEN) private readonly eventBus: EventBus
     ) { }
 
     /**
@@ -198,6 +198,11 @@ export class CampaignService {
             const psNum = Number(pageSize);
             const pagedData = sortedData.slice((pNum - 1) * psNum, pNum * psNum);
 
+            // Notifica il sistema che è stata eseguita una ricerca di campagne
+            if (pagedData.length > 0) {
+                this.eventBus.emit(AppEvents.CAMPAIGN_SEARCHED, pagedData);
+            }
+
             const bIps = result?.boundsIps[0] || { min: 0, max: 0 };
             const bScore = result?.boundsScore[0] || { min: 0, max: 0 };
             const bLogs = result?.boundsLogsPerIp[0] || { min: 0, max: 0 };
@@ -322,7 +327,7 @@ export class CampaignService {
             // Calcolo correlazioni su tutti i nodi (non solo quelli paginati)
             const correlations = calculateCorrelationHubs(meta.timeInfo || []);
 
-            return {
+            const campaign = {
                 hash,
                 ipCount: meta.ipCount,
                 totaleLogs: meta.clusterLogs,
@@ -335,6 +340,11 @@ export class CampaignService {
                 nodes: result?.nodes || [],
                 page, pageSize
             };
+
+            // Notifica il sistema: il RAG Listener lo catturerà per sincronizzare Qdrant
+            this.eventBus.emit(AppEvents.CAMPAIGN_RESOLVED, campaign);
+
+            return campaign;
         } catch (err: any) {
             this.logger.error(`[CampaignService] Detail Error: ${err.message}`);
             throw err;

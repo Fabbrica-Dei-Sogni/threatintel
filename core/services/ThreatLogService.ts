@@ -15,10 +15,10 @@ import PatternAnalysisService from './PatternAnalysisService';
 import { ForensicService } from './forense/ForensicService';
 import { ForensicPipelineService } from './forense/ForensicPipelineService';
 import { inject, injectable } from 'tsyringe';
-import { LOGGER_TOKEN, RAG_SYNC_SERVICE_TOKEN } from '../di/tokens';
+import { LOGGER_TOKEN, EVENT_BUS_TOKEN } from '../di/tokens';
 import { Logger } from 'winston';
 import { IpDetailsService } from './IpDetailsService';
-import { RagSyncService } from './assistant/RagSyncService';
+import { EventBus, AppEvents } from './EventBus';
 import { LogFilters } from '../types/threat-log.types';
 import { Types } from 'mongoose';
 import {
@@ -46,7 +46,7 @@ export class ThreatLogService {
         private readonly forensicPipelineService: ForensicPipelineService,
         private readonly ipDetailsService: IpDetailsService,
         private readonly patternAnalysisService: PatternAnalysisService,
-        @inject(RAG_SYNC_SERVICE_TOKEN) private readonly ragSync: RagSyncService
+        @inject(EVENT_BUS_TOKEN) private readonly eventBus: EventBus
     ) {
         // Parse della variabile di ambiente al costruttore
         //this.patternAnalysisService = new PatternAnalysis({ geoEnabled: true });
@@ -72,11 +72,9 @@ export class ThreatLogService {
             { upsert: true, new: true, setDefaultsOnInsert: true }
         );
 
-        // SYNC TO RAG (Asincrono e non bloccante)
+        // SYNC TO RAG (Asincrono e non bloccante via Event Bus)
         if (log) {
-            this.ragSync.syncThreatLog(log).catch(err =>
-                this.logger.error(`[ThreatLogService] Error during RAG sync: ${err}`)
-            );
+            this.eventBus.emit(AppEvents.THREAT_LOG_CREATED, log);
         }
 
         return log;
@@ -198,6 +196,11 @@ export class ThreatLogService {
 
         const attacks: AttackDTO[] = result.dati;
 
+        // Notifica il sistema RAG via Event Bus
+        if (attacks.length > 0) {
+            this.eventBus.emit(AppEvents.ATTACK_SEARCHED, { items: attacks, totalCount: result.totalCount || 0 });
+        }
+
 
         return {
             items: attacks,
@@ -209,9 +212,13 @@ export class ThreatLogService {
         const {
             ip,
             minLogsForAttack = 1,
-            timeConfig = {}
+            timeConfig = {},
+            protocol = null
         } = params;
-        const mongoFilters = { 'request.ip': ip };
+        const mongoFilters: any = { 'request.ip': ip };
+        if (protocol) {
+            mongoFilters.protocol = protocol;
+        }
 
         // Pipeline base costruita col nuovo Builder
         const basePipeline = await this.forensicPipelineService.buildStandardPipeline(mongoFilters, minLogsForAttack, timeConfig);
@@ -235,20 +242,27 @@ export class ThreatLogService {
 
         const [attack] = await ThreatLog.aggregate(pipeline).allowDiskUse(true);
 
+        // Notifica il sistema RAG via Event Bus
+        if (attack) {
+            this.eventBus.emit(AppEvents.ATTACK_RESOLVED, attack);
+        }
+
         return attack || null;
     }
 
     async getDistributedAttackDetail({
         ipList,
         minLogsForAttack = 1,
-        timeConfig = {}
+        timeConfig = {},
+        protocol = null
     }: {
         ipList: string[];
         minLogsForAttack?: number;
         timeConfig?: any;
+        protocol?: string | null;
     }) {
         // Costruisce la pipeline dedicata alla lista IP
-        const pipeline = await this.forensicPipelineService.buildDistributedPipeline(ipList, minLogsForAttack, timeConfig);
+        const pipeline = await this.forensicPipelineService.buildDistributedPipeline(ipList, minLogsForAttack, timeConfig, protocol);
 
         // Esegue l'aggregazione
         const [attack] = await ThreatLog.aggregate(pipeline).allowDiskUse(true);
@@ -270,6 +284,9 @@ export class ThreatLogService {
                     .lean();
                 resAny.allIpDetails = allDetails;
             }
+
+            // Notifica il sistema RAG via Event Bus
+            this.eventBus.emit(AppEvents.ATTACK_RESOLVED, resAny);
 
             return result;
         }

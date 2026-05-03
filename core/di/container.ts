@@ -16,7 +16,9 @@ import { OllamaService } from "../services/assistant/OllamaService";
 import { RagSyncService } from "../services/assistant/RagSyncService";
 import { RagSyncWorker } from "../services/assistant/RagSyncWorker";
 import { AssistantService } from "../services/assistant/AssistantService";
-import { LOGGER_TOKEN, I18N_TOKEN, CONFIG_PROVIDER_TOKEN, RAG_TRANSLATION_TOKEN, QDRANT_CLIENT_TOKEN, OLLAMA_SERVICE_TOKEN, RAG_SYNC_SERVICE_TOKEN, RAG_SYNC_WORKER_TOKEN, ASSISTANT_SERVICE_TOKEN } from "./tokens";
+import { EventBus } from "../services/EventBus";
+import { RagEventListener } from "../services/assistant/RagEventListener";
+import { LOGGER_TOKEN, I18N_TOKEN, CONFIG_PROVIDER_TOKEN, RAG_TRANSLATION_TOKEN, QDRANT_CLIENT_TOKEN, OLLAMA_SERVICE_TOKEN, RAG_SYNC_SERVICE_TOKEN, RAG_SYNC_WORKER_TOKEN, ASSISTANT_SERVICE_TOKEN, EVENT_BUS_TOKEN, RAG_EVENT_LISTENER_TOKEN } from "./tokens";
 import logger from "../../logger";
 
 export const coreContainer = container;
@@ -70,6 +72,12 @@ coreContainer.registerSingleton(RAG_SYNC_WORKER_TOKEN, RagSyncWorker);
 
 // registrazione del servizio AssistantService come singleton
 coreContainer.registerSingleton(ASSISTANT_SERVICE_TOKEN, AssistantService);
+
+// registrazione del servizio EventBus come singleton
+coreContainer.registerSingleton(EVENT_BUS_TOKEN, EventBus);
+
+// registrazione del servizio RagEventListener come singleton
+coreContainer.registerSingleton(RAG_EVENT_LISTENER_TOKEN, RagEventListener);
 
 
 // nuova funzione generica

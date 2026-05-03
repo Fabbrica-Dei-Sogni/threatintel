@@ -34,7 +34,7 @@ const props = defineProps({
     },
     options: {
         type: Array as () => string[],
-        default: () => ["http", "ssh", "https"],
+        default: () => ["http", "https", "ssh"],
     },
     theme: {
         type: String,

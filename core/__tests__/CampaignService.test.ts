@@ -12,7 +12,7 @@ import mongoose from 'mongoose';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { CampaignService } from '../services/CampaignService';
 import ThreatLog from '../models/ThreatLogSchema';
-import { LOGGER_TOKEN, RAG_SYNC_SERVICE_TOKEN, OLLAMA_SERVICE_TOKEN, RAG_TRANSLATION_TOKEN } from '../di/tokens';
+import { LOGGER_TOKEN, EVENT_BUS_TOKEN, OLLAMA_SERVICE_TOKEN, RAG_TRANSLATION_TOKEN } from '../di/tokens';
 
 // Mock Logger
 const mockLogger = {
@@ -35,11 +35,10 @@ describe('CampaignService', () => {
         const uri = mongoServer.getUri();
         await mongoose.connect(uri);
 
-        const mockRagSync = {
-            syncThreatLog: jest.fn().mockResolvedValue(true),
-            syncIpDetails: jest.fn().mockResolvedValue(true),
-            syncAttackSummary: jest.fn().mockResolvedValue(true),
-            syncCampaignSummary: jest.fn().mockResolvedValue(true)
+        const mockEventBus = {
+            emit: jest.fn(),
+            on: jest.fn(),
+            off: jest.fn()
         };
 
         const mockOllama = {
@@ -52,7 +51,7 @@ describe('CampaignService', () => {
         };
 
         container.registerInstance(LOGGER_TOKEN, mockLogger);
-        container.registerInstance(RAG_SYNC_SERVICE_TOKEN, mockRagSync);
+        container.registerInstance(EVENT_BUS_TOKEN, mockEventBus);
         container.registerInstance(OLLAMA_SERVICE_TOKEN, mockOllama);
         container.registerInstance(RAG_TRANSLATION_TOKEN, mockTranslator);
         service = container.resolve(CampaignService);

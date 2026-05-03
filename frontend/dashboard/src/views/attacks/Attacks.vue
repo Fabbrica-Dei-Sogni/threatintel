@@ -56,7 +56,7 @@
                 <div class="filter-item">
                     <span class="cyber-label">PROT</span>
                     <div class="protocol-reset-group">
-                        <ProtocolSelector v-model="attacksState.filters.protocol" :options="['http', 'https', 'ssh']" theme="magma" />
+                        <ProtocolSelector v-model="attacksState.filters.protocol" theme="magma" />
                         <button class="reset-btn-mini filter-reset-btn" @click="handleReset" :title="t('telemetry.reset_filters')">
                             <div class="reset-ascii">
                                 <span></span>
@@ -321,6 +321,7 @@
                                             agoValue: attacksState.filters.agoValue,
                                             agoUnit: attacksState.filters.agoUnit,
                                             minLogsForAttack: attacksState.filters.minLogs,
+                                            protocol: attacksState.filters.protocol,
                                             dateRange: attacksState.filters.dateRange && (attacksState.filters.dateRange[0] || attacksState.filters.dateRange[1]) ? JSON.stringify(attacksState.filters.dateRange) : undefined
                                         }
                                     }" class="detail-link">

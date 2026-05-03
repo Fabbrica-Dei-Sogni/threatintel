@@ -120,7 +120,8 @@ export function useCampaignDetail(hash: string) {
             timeMode: params.timeMode,
             agoValue: params.agoValue,
             agoUnit: params.agoUnit,
-            minLogsForAttack: params.minLogsPerIp || 1
+            minLogsForAttack: params.minLogsPerIp || 1,
+            protocol: params.protocol
         };
 
         // Passiamo la lista IP solo se è un'analisi distribuita (> 1 IP o selezione esplicita)

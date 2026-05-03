@@ -16,3 +16,4 @@ export const RAG_SYNC_WORKER_TOKEN = Symbol("RagSyncWorker");
 export const ASSISTANT_SERVICE_TOKEN = Symbol("AssistantService");
 export const EVENT_BUS_TOKEN = Symbol("EventBus");
 export const RAG_EVENT_LISTENER_TOKEN = Symbol("RagEventListener");
+export const MCP_EXECUTOR_TOKEN = Symbol("McpExecutor");

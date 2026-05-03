@@ -1,0 +1,79 @@
+import { inject, singleton } from 'tsyringe';
+import { AssistantService } from '../../services/assistant/AssistantService';
+import { ASSISTANT_SERVICE_TOKEN, LOGGER_TOKEN } from '../../di/tokens';
+import { Logger } from 'winston';
+import { ToolRegistry, McpToolDefinition } from '../tools/ToolRegistry';
+
+/**
+ * McpNativeExecutor
+ * 
+ * Questo service funge da "Bridge" (ponte) tra il protocollo MCP e la business logic dell'applicazione.
+ * A differenza di un approccio basato su chiamate HTTP esterne (Proxy), questo executor
+ * invoca direttamente i Service del backend tramite Dependency Injection.
+ * 
+ * IL GIRO (Native Execution):
+ * 1. Riceve il nome del tool e gli argomenti dal Protocol Controller.
+ * 2. Valida la presenza del tool nel ToolRegistry.
+ * 3. Valida la correttezza dei parametri (inputSchema).
+ * 4. Esegue il mapping: Tool Name -> Metodo del Service (es. AssistantService).
+ * 5. Restituisce il risultato grezzo che verrà poi incapsulato nel protocollo MCP.
+ */
+@singleton()
+export class McpNativeExecutor {
+  constructor(
+    @inject(ASSISTANT_SERVICE_TOKEN) private assistant: AssistantService,
+    @inject(LOGGER_TOKEN) private logger: Logger
+  ) {}
+
+  public async executeToolByName(
+    toolName: string,
+    args: Record<string, any>
+  ): Promise<any> {
+    const tool = ToolRegistry.findByName(toolName);
+
+    if (!tool) {
+      throw new Error(`Unknown tool: ${toolName}`);
+    }
+
+    this.validateToolArguments(tool, args);
+
+    this.logger.info(`[McpNativeExecutor] Executing tool: ${toolName}`, { args });
+
+    switch (toolName) {
+      case 'semantic_search':
+        return this.assistant.search(args.query, {
+          limit: args.limit,
+          type: args.type,
+          scoreThreshold: args.scoreThreshold,
+        });
+
+      case 'resolve_threat_source':
+        return this.assistant.resolveSource(args.sourceRef);
+
+      case 'ask':
+        return this.assistant.ask(args.question);
+
+      default:
+        throw new Error(`Tool ${toolName} logic not implemented in native executor`);
+    }
+  }
+
+  private validateToolArguments(
+    tool: McpToolDefinition,
+    args: Record<string, any>
+  ): void {
+    if (args === null || typeof args !== 'object' || Array.isArray(args)) {
+      throw new Error('Tool arguments must be an object');
+    }
+
+    const required = Array.isArray(tool.inputSchema?.required)
+      ? tool.inputSchema.required
+      : [];
+
+    for (const key of required) {
+      if (args[key] === undefined || args[key] === null) {
+        throw new Error(`Missing required argument: ${key}`);
+      }
+    }
+  }
+}

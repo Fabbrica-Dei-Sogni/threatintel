@@ -1,7 +1,7 @@
-// src/assistant/tools/ToolRegistry.ts
+import { AssistantToolName } from '../../types/assistant/assistant-tool.types';
 
 export type McpToolDefinition = {
-  name: string;
+  name: AssistantToolName;
   description: string;
   inputSchema: {
     type: 'object';

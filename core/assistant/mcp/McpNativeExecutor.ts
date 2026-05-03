@@ -3,6 +3,7 @@ import { AssistantService } from '../../services/assistant/AssistantService';
 import { ASSISTANT_SERVICE_TOKEN, LOGGER_TOKEN } from '../../di/tokens';
 import { Logger } from 'winston';
 import { ToolRegistry, McpToolDefinition } from '../tools/ToolRegistry';
+import { AssistantToolArgumentsMap, AssistantToolName } from '../../types/assistant/assistant-tool.types';
 
 /**
  * McpNativeExecutor
@@ -39,19 +40,26 @@ export class McpNativeExecutor {
 
     this.logger.info(`[McpNativeExecutor] Executing tool: ${toolName}`, { args });
 
-    switch (toolName) {
-      case 'semantic_search':
-        return this.assistant.search(args.query, {
-          limit: args.limit,
-          type: args.type,
-          scoreThreshold: args.scoreThreshold,
+    const name = toolName as AssistantToolName;
+
+    switch (name) {
+      case 'semantic_search': {
+        const sArgs = args as AssistantToolArgumentsMap['semantic_search'];
+        return this.assistant.search(sArgs.query, {
+          limit: sArgs.limit,
+          type: sArgs.type,
         });
+      }
 
-      case 'resolve_threat_source':
-        return this.assistant.resolveSource(args.sourceRef);
+      case 'resolve_threat_source': {
+        const rArgs = args as AssistantToolArgumentsMap['resolve_threat_source'];
+        return this.assistant.resolveSource(rArgs.sourceRef as any);
+      }
 
-      case 'ask':
-        return this.assistant.ask(args.question);
+      case 'ask': {
+        const aArgs = args as AssistantToolArgumentsMap['ask'];
+        return this.assistant.ask(aArgs.question);
+      }
 
       default:
         throw new Error(`Tool ${toolName} logic not implemented in native executor`);

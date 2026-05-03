@@ -84,6 +84,7 @@ export class DistributedGroupingStage implements PipelineStage {
                             {
                                 // Per retrocompatibilità, l'ID dell'attacco è il primo IP della lista
                                 _id: this.firstIp,
+                                ip: this.firstIp,  // Campo esplicito per DTO e RAG
                                 ips: '$ipsInvolved',
                                 ipCount: { $size: '$ipsInvolved' },
                                 isDistributed: true, // Indica che è un'analisi aggregata

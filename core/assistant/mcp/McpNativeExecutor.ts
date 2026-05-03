@@ -36,28 +36,35 @@ export class McpNativeExecutor {
       throw new Error(`Unknown tool: ${toolName}`);
     }
 
-    this.validateToolArguments(tool, args);
+    // Sanitizzazione argomenti: rimuoviamo i valori null che potrebbero rompere la validazione o i service
+    const sanitizedArgs = Object.fromEntries(
+      Object.entries(args).filter(([_, v]) => v !== null)
+    );
 
-    this.logger.info(`[McpNativeExecutor] Executing tool: ${toolName}`, { args });
+    this.validateToolArguments(tool, sanitizedArgs);
+
+    this.logger.info(`[McpNativeExecutor] Executing tool: ${toolName}`, { args: sanitizedArgs });
 
     const name = toolName as AssistantToolName;
 
     switch (name) {
       case 'semantic_search': {
-        const sArgs = args as AssistantToolArgumentsMap['semantic_search'];
+        const sArgs = sanitizedArgs as AssistantToolArgumentsMap['semantic_search'];
         return this.assistant.search(sArgs.query, {
           limit: sArgs.limit,
           type: sArgs.type,
+          sortBy: sArgs.sortBy,
+          sortOrder: sArgs.sortOrder,
         });
       }
 
       case 'resolve_threat_source': {
-        const rArgs = args as AssistantToolArgumentsMap['resolve_threat_source'];
+        const rArgs = sanitizedArgs as AssistantToolArgumentsMap['resolve_threat_source'];
         return this.assistant.resolveSource(rArgs.sourceRef as any);
       }
 
       case 'ask': {
-        const aArgs = args as AssistantToolArgumentsMap['ask'];
+        const aArgs = sanitizedArgs as AssistantToolArgumentsMap['ask'];
         return this.assistant.ask(aArgs.question);
       }
 

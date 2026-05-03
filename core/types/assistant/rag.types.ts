@@ -134,4 +134,6 @@ export interface RagSearchOptions {
     limit?: number;
     scoreThreshold?: number;
     type?: RagEntityType;
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
 }

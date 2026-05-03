@@ -153,11 +153,15 @@ export class AssistantController {
     @Get('/tools', [auth.isAuthenticated()])
     async getTools(req: Request, res: Response): Promise<void> {
         try {
-            const tools = [
-                RagValidator.getToolDefinition()
-                // In futuro potremmo aggiungere altri tool qui
-            ];
-            res.json({ tools });
+            const tools = RagValidator.getToolDefinitions();
+            const serverInfo = {
+                name: 'ThreatIntel Forensic Server',
+                version: '1.0.0',
+                // L'URI base viene preso dalla configurazione o dalla richiesta stessa
+                base_uri: process.env.API_BASE_URL || `${req.protocol}://${req.get('host')}/api`,
+                auth: 'bearer_jwt'
+            };
+            res.json({ server: serverInfo, tools });
         } catch (err: any) {
             this.logger.error('[AssistantController] Get Tools error:', err);
             res.status(500).json({ error: 'Errore durante il recupero dei tool' });

@@ -627,3 +627,60 @@ export async function fetchUniqueUris(params: any = {}): Promise<FetchUrisRespon
     }
 }
 
+
+// ==========================
+// ASSISTANT & AGENTIC RAG (Orchestrated via ChainPrompt AI)
+// ==========================
+
+export const getChainPromptUrl = (): string => {
+    return import.meta.env.VITE_CHAINPROMPT_API_URL || 'http://localhost:5000/api';
+};
+
+/**
+ * Invia una domanda all'Agente AI orchestrato da ChainPrompt
+ * @param question La domanda in linguaggio naturale
+ * @param provider Il provider LLM da usare (ollama, openai, ecc)
+ */
+export async function askAgent(question: string, provider: string = 'ollama'): Promise<any> {
+    const chainPromptUrl = getChainPromptUrl();
+    try {
+        // L'endpoint su chainprompt è /features/:provider/threatintel/
+        const response = await axios.post(`${chainPromptUrl}/features/${provider}/threatintel/`, {
+            question,
+            noappendchat: true // Evita di appendere il contenuto nei log di chainprompt se non necessario
+        });
+        return response.data;
+    } catch (error) {
+        console.error('[askAgent] Error calling ChainPrompt AI:', error);
+        throw error;
+    }
+}
+
+/**
+ * Esegue una ricerca semantica diretta (senza passare per l'agente)
+ */
+export async function semanticSearch(query: string, options: any = {}): Promise<any> {
+    try {
+        const response = await apiClient.post('/assistant/search', {
+            query,
+            ...options
+        });
+        return response.data;
+    } catch (error) {
+        console.error('[semanticSearch] Error:', error);
+        throw error;
+    }
+}
+
+/**
+ * Risolve un riferimento sorgente per ottenere i dati tecnici
+ */
+export async function resolveSource(sourceRef: any): Promise<any> {
+    try {
+        const response = await apiClient.post('/assistant/resolve', { sourceRef });
+        return response.data;
+    } catch (error) {
+        console.error('[resolveSource] Error:', error);
+        throw error;
+    }
+}

@@ -6,6 +6,8 @@ import { IIpDetails } from '../../models/IpDetailsSchema';
 import { IAbuseIpDb } from '../../models/AbuseIpDbSchema';
 import { IAbuseReport } from '../../models/AbuseReportSchema';
 import { RAG_TEMPLATES } from './RagTemplates';
+import CampaignDTO from '../../models/dto/CampaignDTO';
+import AttackDTO from '../../models/dto/AttackDTO';
 
 @injectable()
 export class RagTranslationService {
@@ -112,11 +114,12 @@ export class RagTranslationService {
     /**
      * Traduce i dati tecnici di una campagna in una narrazione deterministica.
      */
-    public translateCampaign(campaign: any): string {
+    public translateCampaign(campaign: CampaignDTO): string {
         return RAG_TEMPLATES.INTERPOLATE(RAG_TEMPLATES.NARRATIVES.CAMPAIGN_SUMMARY_BASE, {
             hash: campaign.hash,
-            ipCount: campaign.ipCount.toString(),
-            totalLogs: campaign.totaleLogs.toString(),
+            ipCount: (campaign.ipCount || 0).toString(),
+            correlations: (campaign.correlationHubsCount || 0).toString(),
+            totaleLogs: (campaign.totaleLogs || 0).toString(),
             firstSeen: new Date(campaign.firstSeen).toLocaleString('it-IT'),
             lastSeen: new Date(campaign.lastSeen).toLocaleString('it-IT'),
             averageScore: (campaign.averageScore || 0).toFixed(2),
@@ -128,16 +131,56 @@ export class RagTranslationService {
     /**
      * Traduce i dati tecnici di un attacco (IP-centrico) in una narrazione deterministica.
      */
-    public translateAttack(attack: any): string {
+    public translateAttack(attack: AttackDTO): string {
         const ip = attack.ip || attack.request?.ip || 'N/A';
+        const intensity = attack.intensityAttack || 'normale';
+        const duration = attack.durataAttacco?.human || `${attack.attackDurationMinutes || 0} minuti`;
+        const patterns = attack.attackPatterns?.join(', ') || 'nessuno';
+        const rateLimits = attack.countRateLimit || 0;
+        
+        // Mappatura Danger Level (da numerico a semantico)
+        const dangerLevelMap: Record<number, string> = {
+            1: 'Critico',
+            2: 'Alto',
+            3: 'Medio',
+            4: 'Basso',
+            5: 'Informativo'
+        };
+        const dangerLevel = typeof attack.dangerLevel === 'number' 
+            ? dangerLevelMap[attack.dangerLevel] || `livello ${attack.dangerLevel}`
+            : (attack.dangerLevel || 'non classificato');
+
+        // Estrazione geografica arricchita
+        const country = attack.geo?.country || attack.ipDetails?.ipinfo?.country || 'paese sconosciuto';
+        const city = attack.geo?.city || attack.ipDetails?.ipinfo?.city || 'città sconosciuta';
+        const geoInfo = (city !== 'città sconosciuta' || country !== 'paese sconosciuto') 
+            ? `[Origine: ${city}, ${country}]` 
+            : '';
+
+        let contextParts = [];
+        if (attack.isDistributed) {
+            contextParts.push("L'attività è parte di una struttura di attacco distribuita.");
+        }
+        if (rateLimits > 0) {
+            contextParts.push(`Sono stati rilevati ${rateLimits} eventi di violazione dei limiti di frequenza (rate limit).`);
+        }
+        
+        const context = contextParts.join(' ');
+
         return RAG_TEMPLATES.INTERPOLATE(RAG_TEMPLATES.NARRATIVES.ATTACK_SUMMARY_BASE, {
             ip,
-            totalLogs: attack.totaleLogs.toString(),
+            geoInfo,
+            dangerLevel,
+            intensity,
+            duration,
+            totaleLogs: (attack.totaleLogs || 0).toString(),
             firstSeen: new Date(attack.firstSeen).toLocaleString('it-IT'),
             lastSeen: new Date(attack.lastSeen).toLocaleString('it-IT'),
             averageScore: (attack.averageScore || 0).toFixed(2),
-            patterns: attack.attackPatterns?.join(', ') || 'nessuno',
-            sampleUrl: attack.sampleUrl || attack.request?.url || '/'
+            patterns,
+            indicators: patterns, // Per ora usiamo gli stessi per entrambi i placeholder nel template
+            sampleUrl: attack.request?.url || '/',
+            context
         });
     }
 
@@ -164,7 +207,7 @@ export class RagTranslationService {
         const ip = attack.ip || attack.request?.ip || 'N/A';
         return RAG_TEMPLATES.INTERPOLATE(RAG_TEMPLATES.PROMPTS.ATTACK_SUMMARY, {
             ip,
-            totalLogs: attack.totaleLogs.toString(),
+            totaleLogs: attack.totaleLogs.toString(),
             averageScore: (attack.averageScore || 0).toFixed(2),
             firstSeen: new Date(attack.firstSeen).toLocaleString('it-IT'),
             lastSeen: new Date(attack.lastSeen).toLocaleString('it-IT'),

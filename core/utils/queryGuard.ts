@@ -46,7 +46,7 @@ const CAMPAIGN_FILTER_FIELDS = new Set([
 ]);
 
 const CAMPAIGN_SORT_FIELDS = new Set([
-    'ipCount', 'totalLogs', 'firstSeen', 'lastSeen'
+    'ipCount', 'totaleLogs', 'firstSeen', 'lastSeen'
 ]);
 
 /**

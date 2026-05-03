@@ -78,7 +78,7 @@ export interface ThreatLogPayload extends RagBasePayload, Partial<IThreatLog> {
 export interface AttackSummaryPayload extends RagBasePayload, Partial<AttackDTO> {
     type: 'attack_summary';
     ip: string;
-    totalLogs: number;
+    totaleLogs: number;
     averageScore: number;
 }
 

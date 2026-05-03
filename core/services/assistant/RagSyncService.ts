@@ -13,6 +13,7 @@ import { stringToUuid } from '../../utils/uuid';
 import { RAG_POLICIES } from './RagPolicies';
 import { RagSourceRef, ThreatLogPayload, AttackSummaryPayload, CampaignSummaryPayload, AttackSourceParams, CampaignSourceParams, RAG_SCHEMA_VERSION, IpDetailsPayload } from '../../types/assistant/rag.types';
 import AttackDTO from '../../models/dto/AttackDTO';
+import CampaignDTO from '../../models/dto/CampaignDTO';
 import { RAG_TEMPLATES } from './RagTemplates';
 
 @injectable()
@@ -190,7 +191,7 @@ export class RagSyncService {
      * Materializza un singolo riassunto di campagna.
      * Gestisce traduzione, generazione AI (opzionale) e sync.
      */
-    public async materializeCampaign(campaign: any, options: { isAiEnabled?: boolean } = {}) {
+    public async materializeCampaign(campaign: CampaignDTO, options: { isAiEnabled?: boolean } = {}) {
         try {
             this.logger.debug(`[RagSync] Materializing summary for campaign: ${campaign.hash}`);
             
@@ -352,7 +353,7 @@ export class RagSyncService {
                 ...attack, // Includiamo tutto l'AttackDTO
                 type: 'attack_summary',
                 ip: ip as string,
-                totalLogs: attack.totaleLogs || 0,
+                totaleLogs: attack.totaleLogs || 0,
                 averageScore: attack.averageScore || 0,
                 text: aiSummary,
                 materializedAt: new Date(),

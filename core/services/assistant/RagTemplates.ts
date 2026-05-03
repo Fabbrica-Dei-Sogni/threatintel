@@ -11,15 +11,15 @@ export const RAG_TEMPLATES = {
         IP_DETAILS_BASE: "Profilo Intelligence IP {ip}. Localizzazione: {geo}. ISP: {isp}. Reputazione AbuseIPDB: {abuseScore}/100 con {totalReports} segnalazioni totali. Analisi report recenti:\n{reports}",
         TOR_NODE_INFO: "L'indirizzo IP è noto per essere un nodo di uscita TOR, aumentando il rischio di anonimato malevolo.",
 
-        ATTACK_SUMMARY_BASE: "Analisi tecnica dell'attaccante {ip}. Attività rilevata dal {firstSeen} al {lastSeen} con un totale di {totalLogs} richieste. Score di pericolosità medio: {averageScore}/100. Pattern comportamentali: {patterns}. Target primario: {sampleUrl}.",
-        CAMPAIGN_SUMMARY_BASE: "Rilevata Campagna di Attacco Distribuita (Hash: {hash}). La campagna coinvolge {ipCount} indirizzi IP unici, con un volume totale di {totalLogs} log. Prima apparizione: {firstSeen}, Ultima apparizione: {lastSeen}. Score medio della campagna: {averageScore}/100. Pattern di attacco: {patterns}. Esempi di URL target: {sampleUrl}."
+        ATTACK_SUMMARY_BASE: "Analisi tecnica dell'attaccante {ip} {geoInfo}. Livello di pericolo {dangerLevel} con intensità {intensity}. Attività rilevata dal {firstSeen} al {lastSeen} (durata: {duration}) per un totale di {totaleLogs} richieste. Score medio di pericolosità: {averageScore}/100. Pattern comportamentali: {patterns}. Indicatori tecnici rilevati: {indicators}. Target primario: {sampleUrl}. {context}",
+        CAMPAIGN_SUMMARY_BASE: "Rilevata Campagna di Attacco Distribuita (Hash: {hash}). La campagna coinvolge {ipCount} indirizzi IP unici e presenta {correlations} hub di correlazione temporale. Volume totale di traffico: {totaleLogs} log. Prima apparizione: {firstSeen}, Ultima apparizione: {lastSeen}. Score medio della campagna: {averageScore}/100. Pattern di attacco: {patterns}. Esempio di URL target: {sampleUrl}."
     },
     PROMPTS: {
         // Prompt per la generazione di riassunti tramite AI
         CAMPAIGN_SYSTEM: "Sei un analista SOC (Security Operations Center) esperto di Threat Intelligence. Di seguito è riportato il dump JSON aggregato di una Campagna di Attacco Distribuita, calcolata al volo dai nostri sistemi di correlazione.",
         CAMPAIGN_FOOTER: "\n\n--- INIZIO DATI JSON DELLA CAMPAGNA ---\n{jsonData}\n--- FINE DATI ---",
 
-        ATTACK_SUMMARY: "Descrivi brevemente l'attività di questo attaccante basandoti sui dati tecnici forniti. Sii conciso e focalizzati sulla pericolosità e sulla tecnica.\n\nDati Attaccante:\n- IP: {ip}\n- Totale Colpi: {totalLogs}\n- Score Medio: {averageScore}\n- Prima Attività: {firstSeen}\n- Ultima Attività: {lastSeen}\n- Pattern Rilevati: {patterns}\n- URL Target (campione): {sampleUrl}\n\nIstruzioni: Spiega che tipo di minaccia rappresenta questo IP e se sembra un attacco mirato o una scansione automatica di massa.",
+        ATTACK_SUMMARY: "Descrivi brevemente l'attività di questo attaccante basandoti sui dati tecnici forniti. Sii conciso e focalizzati sulla pericolosità e sulla tecnica.\n\nDati Attaccante:\n- IP: {ip}\n- Totale Colpi: {totaleLogs}\n- Score Medio: {averageScore}\n- Prima Attività: {firstSeen}\n- Ultima Attività: {lastSeen}\n- Pattern Rilevati: {patterns}\n- URL Target (campione): {sampleUrl}\n\nIstruzioni: Spiega che tipo di minaccia rappresenta questo IP e se sembra un attacco mirato o una scansione automatica di massa.",
 
         // Prompt per il sistema "Ask" (Q&A)
         ASK_SYSTEM: "Sei un analista esperto di cybersecurity. Rispondi alla domanda dell'utente basandoti ESCLUSIVAMENTE sul contesto fornito sotto. Se il contesto non contiene informazioni sufficienti, dillo chiaramente.\n\nContesto di Threat Intelligence:\n{contextText}\n\nDomanda: {question}\nRisposta:",

@@ -17,7 +17,7 @@ export const TOOL_TEMPLATES = {
       QUERY: "La query investigativa. Può contenere IP specifici, URL, protocolli o descrizioni di attacchi (es: '1.2.3.4', '/admin/login', 'tentativi brute force').",
       TYPE: "Filtra il dominio: 'threat_log' (eventi atomici filtrabili per IP/URL), 'ip_details' (reputazione IP), 'attack_summary' (analisi comportamentale di un IP), 'campaign_summary' (cluster distribuiti identificati tramite hash o pattern condivisi).",
       LIMIT: "Numero di risultati. Default 5. Usare valori bassi per precisione su singoli IP, valori alti per analisi di trend.",
-      SORT_BY: "Campo tecnico per l'ordinamento (es. 'score' per pericolosità, 'timestamp' per cronologia, 'totalLogs' per volume).",
+      SORT_BY: "Campo tecnico per l'ordinamento (es. 'score' per pericolosità, 'timestamp' per cronologia, 'totaleLogs' per volume).",
       SORT_ORDER: "Direzione: 'desc' (default per score/volume) o 'asc' (per i log più vecchi)."
     }
   },

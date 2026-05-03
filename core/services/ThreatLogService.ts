@@ -414,13 +414,13 @@ export class ThreatLogService {
         };
 
         // Conta totale log da processare
-        const totalLogs = await this.countLogs(httpFilter);
+        const totaleLogs = await this.countLogs(httpFilter);
         let processed = 0;
         let updated = 0;
         let errors = 0;
 
         const results: any = {
-            totalLogs,
+            totaleLogs,
             processed: 0,
             updated: 0,
             errors: 0,
@@ -428,10 +428,10 @@ export class ThreatLogService {
             batches: []
         };
 
-        this.logger.info(`Totale log HTTP da processare: ${totalLogs}`);
+        this.logger.info(`Totale log HTTP da processare: ${totaleLogs}`);
 
         // Processa in batch per evitare memory overflow
-        for (let skip = 0; skip < totalLogs; skip += batchSize) {
+        for (let skip = 0; skip < totaleLogs; skip += batchSize) {
             const batchStart = Date.now();
             const batchNumber = Math.floor(skip / batchSize) + 1;
 

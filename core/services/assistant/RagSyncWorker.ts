@@ -4,6 +4,7 @@ import { LOGGER_TOKEN, RAG_SYNC_SERVICE_TOKEN } from '../../di/tokens';
 import { RagSyncService } from './RagSyncService';
 import { CampaignService } from '../CampaignService';
 import { ThreatLogService } from '../ThreatLogService';
+import { AttackLogService } from '../AttackLogService';
 import { ConfigService } from '../ConfigService';
 import { ILongRunningService, ServiceStatus } from '../../types/lifecycle';
 import { RAG_POLICIES } from './RagPolicies';
@@ -20,6 +21,7 @@ export class RagSyncWorker implements ILongRunningService {
         @inject(RAG_SYNC_SERVICE_TOKEN) private readonly ragSync: RagSyncService,
         private readonly campaignService: CampaignService,
         private readonly threatLogService: ThreatLogService,
+        private readonly attackLogService: AttackLogService,
         private readonly configService: ConfigService
     ) { }
 
@@ -194,7 +196,7 @@ export class RagSyncWorker implements ILongRunningService {
 
         while (hasMore) {
             try {
-                const result = await this.threatLogService.getAttacks({ 
+                const result = await this.attackLogService.getAttacks({ 
                     page: currentPage, 
                     pageSize: policy.pageSize, 
                     minLogsForAttack: policy.minLogs, 

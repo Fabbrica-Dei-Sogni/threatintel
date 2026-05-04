@@ -13,6 +13,7 @@ import { RagSyncService } from './RagSyncService';
 import { I18nService } from '../I18nService';
 import { RagValidator } from './RagValidator';
 import { ThreatLogService } from '../ThreatLogService';
+import { AttackLogService } from '../AttackLogService';
 import { CampaignService } from '../CampaignService';
 import { IpDetailsService } from '../IpDetailsService';
 import { RAG_TEMPLATES } from './RagTemplates';
@@ -39,6 +40,7 @@ export class AssistantService {
         @inject(RAG_SYNC_SERVICE_TOKEN) private readonly ragSync: RagSyncService,
         @inject(I18N_TOKEN) private readonly i18n: I18nService,
         private readonly threatLogService: ThreatLogService,
+        private readonly attackLogService: AttackLogService,
         private readonly campaignService: CampaignService,
         private readonly ipDetailsService: IpDetailsService,
         private readonly ragTranslation: RagTranslationService,  // ← aggiunto
@@ -191,7 +193,7 @@ export class AssistantService {
 
                 case 'attack':
                     // Pass-through garantito dai tipi derivati
-                    return await this.threatLogService.getAttackDetail(params);
+                    return await this.attackLogService.getAttackDetail(params);
 
                 case 'campaign':
                     // Pass-through garantito dai tipi derivati
@@ -257,7 +259,7 @@ export class AssistantService {
             }
         };
 
-        const result = await this.threatLogService.getAttacks(serviceParams);
+        const result = await this.attackLogService.getAttacks(serviceParams);
 
         return result.items.map((attack: any) => {
             const attackIp = attack.ip || attack.request?.ip;

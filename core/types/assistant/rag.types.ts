@@ -1,4 +1,5 @@
 import { ThreatLogService } from '../../services/ThreatLogService';
+import { AttackLogService } from '../../services/AttackLogService';
 import { CampaignService } from '../../services/CampaignService';
 import { IpDetailsService } from '../../services/IpDetailsService';
 import { IThreatLog } from '../../models/ThreatLogSchema';
@@ -32,11 +33,11 @@ export type LogSourceParams = Parameters<ThreatLogService['getLogById']>[0] & { 
 
 export type IpDetailsSourceParams = Parameters<IpDetailsService['getIpDetails']>[0] & { type: 'ip_details' };
 
-export type AttackSourceParams = Parameters<ThreatLogService['getAttackDetail']>[0] & { type: 'attack' };
+export type AttackSourceParams = Parameters<AttackLogService['getAttackDetail']>[0] & { type: 'attack' };
 
 export type CampaignSourceParams = Parameters<CampaignService['getCampaignDetail']>[0] & { type: 'campaign' };
 
-export type AttackSearchSourceParams = Parameters<ThreatLogService['getAttacks']>[0] & { type: 'search_attack' };
+export type AttackSearchSourceParams = Parameters<AttackLogService['getAttacks']>[0] & { type: 'search_attack' };
 export type CampaignSearchSourceParams = Parameters<CampaignService['getCampaigns']>[0] & { type: 'search_campaign' };
 
 

@@ -31,8 +31,6 @@ const mockThreatLogService = {
     getTopThreats: jest.fn(),
     getLogs: jest.fn(),
     countLogs: jest.fn(),
-    getAttacks: jest.fn(),
-    getAttackDetail: jest.fn(),
     getLogById: jest.fn(),
     getDistinctIPs: jest.fn(),
     assignIpDetailsToLogs: jest.fn(),
@@ -107,35 +105,6 @@ describe('ThreatRoutes API', () => {
         });
     });
     
-    describe('POST /api/attack/search', () => {
-        it('should return attacks based on search criteria', async () => {
-            mockThreatLogService.getAttacks.mockResolvedValue({ items: [{ ip: '1.1.1.1', count: 50 }], totalCount: 1 });
-            const response = await request(app).post('/api/attack/search').send({ filters: { country: 'USA' }});
-            expect(response.status).toBe(200);
-            expect(response.body.attacks.length).toBe(1);
-            expect(response.body.total).toBe(1);
-        });
-    });
-
-    describe('POST /api/attack/details', () => {
-        it('should return attack details for a given IP', async () => {
-            mockThreatLogService.getAttackDetail.mockResolvedValue({ ip: '1.1.1.1', logs: [] });
-            const response = await request(app).post('/api/attack/details').send({ ip: '1.1.1.1' });
-            expect(response.status).toBe(200);
-            expect(response.body.ip).toBe('1.1.1.1');
-        });
-
-        it('should return 400 if IP is missing', async () => {
-            const response = await request(app).post('/api/attack/details').send({});
-            expect(response.status).toBe(400);
-        });
-
-        it('should return 404 if attack is not found', async () => {
-            mockThreatLogService.getAttackDetail.mockResolvedValue(null);
-            const response = await request(app).post('/api/attack/details').send({ ip: '1.1.1.1' });
-            expect(response.status).toBe(404);
-        });
-    });
 
     describe('GET /api/logs/:id', () => {
         it('should return a log by its ID', async () => {

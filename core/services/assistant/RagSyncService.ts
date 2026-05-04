@@ -14,6 +14,8 @@ import { RAG_POLICIES } from './RagPolicies';
 import { RagSourceRef, ThreatLogPayload, AttackSummaryPayload, CampaignSummaryPayload, AttackSourceParams, CampaignSourceParams, RAG_SCHEMA_VERSION, IpDetailsPayload } from '../../types/assistant/rag.types';
 import AttackDTO from '../../models/dto/AttackDTO';
 import CampaignDTO from '../../models/dto/CampaignDTO';
+import { AttackLogService } from '../AttackLogService';
+import { CampaignService } from '../CampaignService';
 import { RAG_TEMPLATES } from './RagTemplates';
 
 @injectable()
@@ -35,7 +37,9 @@ export class RagSyncService {
         @inject(RAG_TRANSLATION_TOKEN) private readonly translator: RagTranslationService,
         @inject(QDRANT_CLIENT_TOKEN) private readonly qdrant: QdrantClientService,
         @inject(OLLAMA_SERVICE_TOKEN) private readonly ollama: OllamaService,
-        private readonly config: AppConfigProvider
+        private readonly config: AppConfigProvider,
+        private readonly attackLogService: AttackLogService,
+        private readonly campaignService: CampaignService
     ) { 
         this.COLL_INTELLIGENCE = this.config.ragCollectionName;
         this.COLL_LOGS = this.config.ragLogsCollectionName;
@@ -141,7 +145,7 @@ export class RagSyncService {
                             const ip = payload.ip || payload.sourceRef.params?.ip;
                             if (ip) {
                                 // Carichiamo i dati freschi (con le nuove metriche) e ri-materializziamo
-                                const freshAttack = await this.config.ragEnabled ? await (this as any).threatLogService.getAttackDetail(payload.sourceRef.params) : null;
+                                const freshAttack = await this.config.ragEnabled ? await this.attackLogService.getAttackDetail(payload.sourceRef.params) : null;
                                 if (freshAttack) {
                                     await this.materializeAttack(freshAttack);
                                     success = true;
@@ -153,15 +157,9 @@ export class RagSyncService {
                             // Le campagne hanno hash nel payload o sourceRef
                             const hash = payload.campaignId || payload.sourceRef.params?.hash;
                             if (hash) {
-                                const freshCampaign = await (this as any).campaignService.getCampaignDetail(payload.sourceRef.params);
-                                if (freshCampaign && freshCampaign.meta?.[0]) {
-                                    // Adattiamo il meta all'oggetto CampaignDTO atteso
-                                    const campaignDto = { 
-                                        hash: hash, 
-                                        ...freshCampaign.meta[0], 
-                                        attackPatterns: freshCampaign.nodes?.[0]?.attackPatterns || [] 
-                                    };
-                                    await this.materializeCampaign(campaignDto as any);
+                                const freshCampaign = await this.campaignService.getCampaignDetail(payload.sourceRef.params);
+                                if (freshCampaign) {
+                                    await this.materializeCampaign(freshCampaign as any);
                                     success = true;
                                 }
                             }

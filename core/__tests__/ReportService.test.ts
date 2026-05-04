@@ -2,6 +2,7 @@ import "reflect-metadata";
 import { IDossierSection } from '../models/DossierSchema';
 import { ReportService } from '../services/ReportService';
 import { ThreatLogService } from '../services/ThreatLogService';
+import { AttackLogService } from '../services/AttackLogService';
 import { CowrieService } from '../services/CowrieService';
 import { IpDetailsService } from '../services/IpDetailsService';
 import { I18nService } from '../services/I18nService';
@@ -13,6 +14,7 @@ import puppeteer from 'puppeteer';
 jest.mock('ejs');
 jest.mock('puppeteer');
 jest.mock('../services/ThreatLogService');
+jest.mock('../services/AttackLogService');
 jest.mock('../services/CowrieService');
 jest.mock('../services/IpDetailsService');
 jest.mock('../services/I18nService');
@@ -21,6 +23,7 @@ describe('ReportService', () => {
     let reportService: ReportService;
     let mockLogger: Logger;
     let mockThreatLogService: jest.Mocked<ThreatLogService>;
+    let mockAttackLogService: jest.Mocked<AttackLogService>;
     let mockCowrieService: jest.Mocked<CowrieService>;
     let mockIpDetailsService: jest.Mocked<IpDetailsService>;
     let mockI18nService: jest.Mocked<I18nService>;
@@ -40,6 +43,11 @@ describe('ReportService', () => {
             {} as any,
             {} as any
         ) as any;
+        mockAttackLogService = new AttackLogService(
+            mockLogger,
+            {} as any,
+            {} as any
+        ) as any;
         mockCowrieService = new CowrieService(mockLogger, {} as any) as any;
         mockIpDetailsService = new IpDetailsService(mockLogger, mockRagSync) as any;
 
@@ -51,6 +59,7 @@ describe('ReportService', () => {
         reportService = new ReportService(
             mockLogger,
             mockThreatLogService,
+            mockAttackLogService,
             mockCowrieService,
             mockIpDetailsService,
             mockI18nService
@@ -61,14 +70,14 @@ describe('ReportService', () => {
         const mockAttack = { ipDetails: { country: 'Italy' } };
         const mockLogs = [{ timestamp: new Date(), request: { url: '/', ip: '1.2.3.4' } }];
 
-        mockThreatLogService.getAttackDetail.mockResolvedValue(mockAttack as any);
+        mockAttackLogService.getAttackDetail.mockResolvedValue(mockAttack as any);
         mockThreatLogService.getLogs.mockResolvedValue(mockLogs as any);
         (ejs.renderFile as jest.Mock).mockResolvedValue('<html>Test Attack</html>');
 
         const result = await reportService.generateDetailReport('attack', '1.2.3.4', 'html');
 
         expect(result).toBe('<html>Test Attack</html>');
-        expect(mockThreatLogService.getAttackDetail).toHaveBeenCalledWith({ ip: '1.2.3.4' });
+        expect(mockAttackLogService.getAttackDetail).toHaveBeenCalledWith({ ip: '1.2.3.4' });
     });
 
     it('dovrebbe generare un report PDF per una sessione Cowrie', async () => {

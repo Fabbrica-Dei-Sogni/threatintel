@@ -11,6 +11,7 @@ describe('AssistantService', () => {
     let mockRagSync: any;
     let mockI18n: any;
     let mockThreatLog: any;
+    let mockAttackLog: any;
     let mockCampaign: any;
     let mockIpDetails: any;
     let mockRagTranslation: any;
@@ -25,7 +26,8 @@ describe('AssistantService', () => {
             logsCollection: 'logs' 
         }) };
         mockI18n = { t: jest.fn().mockImplementation(k => k) };
-        mockThreatLog = { getLogById: jest.fn(), getAttackDetail: jest.fn(), getAttacks: jest.fn() };
+        mockThreatLog = { getLogById: jest.fn() };
+        mockAttackLog = { getAttackDetail: jest.fn(), getAttacks: jest.fn() };
         mockCampaign = { getCampaignDetail: jest.fn(), getCampaigns: jest.fn() };
         mockIpDetails = { getIpDetails: jest.fn() };
         mockRagTranslation = { translateAttack: jest.fn(), translateCampaign: jest.fn() };
@@ -37,6 +39,7 @@ describe('AssistantService', () => {
             mockRagSync,
             mockI18n,
             mockThreatLog,
+            mockAttackLog,
             mockCampaign,
             mockIpDetails,
             mockRagTranslation

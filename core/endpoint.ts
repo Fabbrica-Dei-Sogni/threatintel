@@ -18,6 +18,7 @@ import { ThreatLogger } from "./threatLogger";
 import { CowrieController } from "./controllers/CowrieController";
 import { ThreatController } from "./controllers/ThreatController";
 import { CampaignController } from "./controllers/CampaignController";
+import { AttackLogController } from "./controllers/AttackLogController";
 import { ConfigController } from "./controllers/ConfigController";
 import { RateLimitController } from "./controllers/RateLimitController";
 import { ManageLimitController } from "./controllers/ManageLimitController";
@@ -43,6 +44,7 @@ const router = express.Router();
 
 // [NEW] Register controllers with RouterHub
 routerHub.register(ThreatController);
+routerHub.register(AttackLogController);
 routerHub.register(CampaignController);
 routerHub.register(ConfigController);
 routerHub.register(RateLimitController);

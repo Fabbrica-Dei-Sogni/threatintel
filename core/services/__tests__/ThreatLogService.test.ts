@@ -170,6 +170,23 @@ describe('ThreatLogService', () => {
             ]);
         });
 
+        it('should handle status fallback to active/null', () => {
+            // Case 1: status not provided
+            const filtersNoStatus = { 'request.ip': '1.1.1.1' };
+            const query1 = service.buildRegExpFilter(filtersNoStatus);
+            expect(query1.status).toEqual({ $in: [null, 'active'] });
+
+            // Case 2: status explicitely set to active
+            const filtersActive = { status: 'active' };
+            const query2 = service.buildRegExpFilter(filtersActive);
+            expect(query2.status).toEqual({ $in: [null, 'active'] });
+
+            // Case 3: status explicitely set to archived
+            const filtersArchived = { status: 'archived' };
+            const query3 = service.buildRegExpFilter(filtersArchived);
+            expect(query3.status).toBe('archived');
+        });
+
         it('should build multi-word AND filter with $and', () => {
             const filters = { attackPatterns: 'sql injection brute' };
             const mongoFilters = service.buildRegExpFilter(filters, new Set(['attackPatterns']));

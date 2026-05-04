@@ -33,6 +33,7 @@ export class RagTranslationService {
         const country = log.geo?.country || 'paese sconosciuto';
         const city = log.geo?.city || 'città sconosciuta';
         const geoInfo = `${city}, ${country}`;
+        const status = log.status || 'active';
 
         let contextParts = [];
         
@@ -60,7 +61,8 @@ export class RagTranslationService {
             indicators,
             score: score.toString(),
             geoInfo,
-            context
+            context,
+            status
         });
     }
 

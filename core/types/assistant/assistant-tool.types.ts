@@ -8,6 +8,7 @@ export interface SemanticSearchArgs {
   limit?: number;
   sortBy?: string;
   sortOrder?: 'asc' | 'desc';
+  status?: 'active' | 'archived' | 'deleted';
 }
 
 export interface ResolveThreatSourceArgs {

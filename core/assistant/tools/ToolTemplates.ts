@@ -18,7 +18,8 @@ export const TOOL_TEMPLATES = {
       TYPE: "Filtra il dominio: 'threat_log' (eventi atomici filtrabili per IP/URL), 'ip_details' (reputazione IP), 'attack_summary' (analisi comportamentale di un IP), 'campaign_summary' (cluster distribuiti identificati tramite hash o pattern condivisi).",
       LIMIT: "Numero di risultati. Default 5. Usare valori bassi per precisione su singoli IP, valori alti per analisi di trend.",
       SORT_BY: "Campo tecnico per l'ordinamento (es. 'score' per pericolosità, 'timestamp' per cronologia, 'totaleLogs' per volume).",
-      SORT_ORDER: "Direzione: 'desc' (default per score/volume) o 'asc' (per i log più vecchi)."
+      SORT_ORDER: "Direzione: 'desc' (default per score/volume) o 'asc' (per i log più vecchi).",
+      STATUS: "Stato del log: 'active' (default), 'archived' (storico/whitelist), 'deleted' (cestino).",
     }
   },
   RESOLVE_THREAT_SOURCE: {

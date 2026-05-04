@@ -118,7 +118,7 @@ export class ForensicPipelineService {
      * Costruisce la pipeline specifica per l'analisi delle Campagne distribuite (Discovery).
      * Raggruppamento per Hash (CampaignGroupingStage).
      */
-    async buildCampaignPipeline(
+    /*async buildCampaignPipeline(
         mongoFilters: any,
         minLogsForAttack: number,
         timeConfig: any = null
@@ -135,7 +135,7 @@ export class ForensicPipelineService {
             .addStage(new FingerprintAnalysisStage(this.suspiciousReferers))
             .addStage(new ScoringStage(this.dangerWeights, this.tolleranceWeights))
             .build();
-    }
+    }*/
 
     /**
      * Costruisce la pipeline per l'analisi investigativa su una lista di IP (Attacco Distribuito).
@@ -145,7 +145,8 @@ export class ForensicPipelineService {
         ipList: string[],
         minLogsForAttack: number,
         timeConfig: any = null,
-        protocol: string | null = null
+        protocol: string | null = null,
+        status: string | null = null
     ): Promise<any[]> {
         await this.initialized;
 
@@ -153,10 +154,15 @@ export class ForensicPipelineService {
             throw new Error("[ForensicPipelineService] ipList non può essere vuota");
         }
 
+        const filters: any = { 'request.ip': { $in: ipList } };
+        if (status) {
+            filters.status = status;
+        }
+
         const builder = this.createBuilder()
             .addStage(new TimeFilterStage(timeConfig))
-            // Filtra solo gli IP forniti dall'utente
-            .addStage(new MatchFilterStage({ 'request.ip': { $in: ipList } }));
+            // Filtra solo gli IP forniti dall'utente e lo stato richiesto
+            .addStage(new MatchFilterStage(filters));
 
         // Filtro opzionale per protocollo (http, ssh, etc.)
         if (protocol) {

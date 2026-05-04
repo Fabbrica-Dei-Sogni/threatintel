@@ -55,6 +55,7 @@ export class McpNativeExecutor {
           type: sArgs.type,
           sortBy: sArgs.sortBy,
           sortOrder: sArgs.sortOrder,
+          status: sArgs.status,
         });
       }
 

@@ -8,6 +8,7 @@ export interface GetAttackDetailParams {
     minLogsForAttack?: number;
     timeConfig?: TimeConfig;
     protocol?: string | null;
+    status?: string;
 }
 
 /**
@@ -78,6 +79,7 @@ export interface GetCampaignDetailParams {
     timeConfig?: TimeConfig;
     page?: number;
     pageSize?: number;
+    status?: string;
 }
 
 /**

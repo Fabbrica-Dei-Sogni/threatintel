@@ -28,10 +28,19 @@ export class CampaignService {
             pageSize = 10,
             timeConfig = {},
             selectedUris = [],
-            search = ''
+            search = '',
+            status = 'active'
         } = params;
 
         const baseFilters: any = {};
+
+        // Gestione Status con fallback
+        if (!status || status === 'active') {
+            baseFilters.status = { $in: [null, 'active'] };
+        } else {
+            baseFilters.status = status;
+        }
+
         if (protocol) {
             if (protocol === 'http') {
                 baseFilters.$or = [{ protocol: 'http' }, { protocol: { $exists: false } }, { protocol: null }];
@@ -97,7 +106,8 @@ export class CampaignService {
                     firstSeen: { $min: '$timestamp' },
                     lastSeen: { $max: '$timestamp' },
                     sampleUrl: { $first: '$request.url' },
-                    protocols: { $addToSet: '$protocol' }
+                    protocols: { $addToSet: '$protocol' },
+                    status: { $first: '$status' }
                 }
             },
             { $match: { '_id.hash': { $ne: null }, logsPerIp: { $gte: Number(minLogsPerIp) } } },
@@ -113,7 +123,8 @@ export class CampaignService {
                     sampleUrl: { $first: '$sampleUrl' },
                     allIndicators: { $push: '$indicatorsPerIp' },
                     timeInfo: { $push: { ip: '$_id.ip', firstSeen: '$firstSeen', lastSeen: '$lastSeen' } },
-                    allProtocols: { $push: '$protocols' }
+                    allProtocols: { $push: '$protocols' },
+                    status: { $first: '$status' }
                 }
             },
             {
@@ -125,6 +136,7 @@ export class CampaignService {
                     firstSeen: 1,
                     lastSeen: 1,
                     sampleUrl: 1,
+                    status: 1,
                     averageScore: { $divide: ['$sumScore', '$totaleLogs'] },
                     timeInfo: 1,
                     protocols: {
@@ -239,10 +251,19 @@ export class CampaignService {
             protocol = null,
             timeConfig = {},
             page = 1,
-            pageSize = 10
+            pageSize = 10,
+            status = 'active'
         } = params;
 
         const baseFilters: any = { 'fingerprint.hash': hash };
+
+        // Gestione Status con fallback
+        if (!status || status === 'active') {
+            baseFilters.status = { $in: [null, 'active'] };
+        } else {
+            baseFilters.status = status;
+        }
+
         if (protocol) {
             if (protocol === 'http') {
                 baseFilters.$or = [{ protocol: 'http' }, { protocol: { $exists: false } }, { protocol: null }];
@@ -264,7 +285,8 @@ export class CampaignService {
                     firstSeen: { $min: '$timestamp' },
                     lastSeen: { $max: '$timestamp' },
                     allIndicators: { $push: '$fingerprint.indicators' },
-                    sampleUrl: { $first: '$request.url' }
+                    sampleUrl: { $first: '$request.url' },
+                    status: { $first: '$status' }
                 }
             },
             // Filtro Fotografia: Solo gli IP che hanno partecipato alla scoperta
@@ -276,6 +298,7 @@ export class CampaignService {
                     firstSeen: 1,
                     lastSeen: 1,
                     sampleUrl: 1,
+                    status: 1,
                     averageScore: { $divide: ['$sumScore', '$totaleLogs'] },
                     attackPatterns: {
                         $reduce: {
@@ -307,6 +330,7 @@ export class CampaignService {
                                 clusterFirstSeen: { $min: '$firstSeen' },
                                 clusterLastSeen: { $max: '$lastSeen' },
                                 sampleUrl: { $first: '$sampleUrl' },
+                                status: { $first: '$status' },
                                 allIps: { $push: '$ip' },
                                 timeInfo: { $push: { ip: '$ip', firstSeen: '$firstSeen', lastSeen: '$lastSeen' } }
                             }
@@ -336,6 +360,7 @@ export class CampaignService {
                 firstSeen: meta.clusterFirstSeen,
                 lastSeen: meta.clusterLastSeen,
                 sampleUrl: meta.sampleUrl,
+                status: meta.status,
                 allIps: meta.allIps || [],
                 correlations,
                 nodes: result?.nodes || [],
@@ -365,10 +390,19 @@ export class CampaignService {
             page = 1,
             pageSize = 20,
             sortBy = 'count',
-            order = -1
+            order = -1,
+            status = 'active'
         } = params;
 
         const baseFilters: any = {};
+
+        // Gestione Status con fallback
+        if (!status || status === 'active') {
+            baseFilters.status = { $in: [null, 'active'] };
+        } else {
+            baseFilters.status = status;
+        }
+
         if (protocol) {
             if (protocol === 'http') {
                 baseFilters.$or = [{ protocol: 'http' }, { protocol: { $exists: false } }, { protocol: null }];

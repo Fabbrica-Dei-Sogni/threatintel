@@ -7,6 +7,7 @@ export default class CampaignDTO {
     averageScore: number = 0;
     attackPatterns: string[] = [];
     protocols: string[] = [];
+    status?: 'active' | 'archived' | 'deleted';
     sampleUrl: string = '/';
     correlationHubsCount?: number;
     maxLogsInThisCampaign?: number;

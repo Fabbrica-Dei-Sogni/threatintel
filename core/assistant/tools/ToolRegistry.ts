@@ -56,6 +56,11 @@ const TOOLS: McpToolDefinition[] = [
           enum: ['asc', 'desc'],
           description: TOOL_TEMPLATES.SEMANTIC_SEARCH.FIELDS.SORT_ORDER,
         },
+        status: {
+          type: 'string',
+          enum: ['active', 'archived', 'deleted'],
+          description: TOOL_TEMPLATES.SEMANTIC_SEARCH.FIELDS.STATUS,
+        }        
       },
       required: ['query'],
     },

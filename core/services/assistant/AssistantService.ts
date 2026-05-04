@@ -46,7 +46,7 @@ export class AssistantService {
     ) { }
 
     public async search(query: string, options: RagSearchOptions = {}): Promise<RagSearchHit[]> {
-        const { limit = 5, scoreThreshold = 0.5, type, sortBy, sortOrder = 'desc' } = options;
+        const { limit = 5, scoreThreshold = 0.5, type, sortBy, sortOrder = 'desc', status: searchStatus } = options;
 
         // 1. Validare la richiesta di ricerca
         const validation = RagValidator.validateSearchOptions(options);
@@ -54,26 +54,39 @@ export class AssistantService {
             throw new Error(validation.error || 'Parametri di ricerca non validi');
         }
 
-        const status = this.ragSync.getStatus();
-        if (!status.operational) {
+        const ragStatus = this.ragSync.getStatus();
+        if (!ragStatus.operational) {
             throw new Error(this.i18n.t('errors.rag.notOperational'));
         }
 
-        this.logger.debug(`[AssistantService] Searching for: "${query}" (Type: ${type || 'all'}, SortBy: ${sortBy || 'similarity'})`);
+        this.logger.debug(`[AssistantService] Searching for: "${query}" (Type: ${type || 'all'}, Status: ${searchStatus || 'active'})`);
 
         // 2. Chiamare Qdrant con collection e filtri coerenti
         const queryVector = await this.ollama.getEmbedding(query);
 
+        // Costruzione Filtro Qdrant
+        const filter: any = { must: [] };
+
+        // Filtro Status (Fallback active/null)
+        if (!searchStatus || searchStatus === 'active') {
+            filter.must.push({
+                should: [
+                    { key: 'status', match: { value: 'active' } },
+                    { is_empty: { key: 'status' } }
+                ]
+            });
+        } else {
+            filter.must.push({ key: 'status', match: { value: searchStatus } });
+        }
+
         // Determiniamo la collection corretta in base al tipo (se specificato)
         const collectionsToSearch = type === 'threat_log'
-            ? [this.ragSync.getStatus().logsCollection || 'threat_logs']
-            : [this.ragSync.getStatus().intelligenceCollection || 'threat_intelligence'];
+            ? [ragStatus.logsCollection || 'threat_logs']
+            : [ragStatus.intelligenceCollection || 'threat_intelligence'];
 
-        // Se cerchiamo "tutto" (nessun tipo), potremmo voler cercare in entrambe o solo in intelligence
-        // Per ora rispettiamo il comportamento precedente: default intelligence
         const collection = collectionsToSearch[0];
 
-        const rawResults = await this.qdrant.search(collection, queryVector, limit);
+        const rawResults = await this.qdrant.search(collection, queryVector, limit, filter);
 
         // 3. Validare il risultato raw, 4. Mappare in SearchHit, 5. Restituire oggetti normalizzati
         const hits = rawResults

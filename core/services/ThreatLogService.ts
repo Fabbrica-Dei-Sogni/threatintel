@@ -232,12 +232,15 @@ export class ThreatLogService {
             ip,
             minLogsForAttack = 1,
             timeConfig = {},
-            protocol = null
+            protocol = null,
+            status = 'active'
         } = params;
-        const mongoFilters: any = { 'request.ip': ip };
-        if (protocol) {
-            mongoFilters.protocol = protocol;
-        }
+
+        const mongoFilters = this.buildRegExpFilter({
+            'request.ip': ip,
+            protocol,
+            status
+        }, FilterAllowedFields.attack);
 
         // Pipeline base costruita col nuovo Builder
         const basePipeline = await this.forensicPipelineService.buildStandardPipeline(mongoFilters, minLogsForAttack, timeConfig);
@@ -273,15 +276,17 @@ export class ThreatLogService {
         ipList,
         minLogsForAttack = 1,
         timeConfig = {},
-        protocol = null
+        protocol = null,
+        status = 'active'
     }: {
         ipList: string[];
         minLogsForAttack?: number;
         timeConfig?: any;
         protocol?: string | null;
+        status?: string;
     }) {
         // Costruisce la pipeline dedicata alla lista IP
-        const pipeline = await this.forensicPipelineService.buildDistributedPipeline(ipList, minLogsForAttack, timeConfig, protocol);
+        const pipeline = await this.forensicPipelineService.buildDistributedPipeline(ipList, minLogsForAttack, timeConfig, protocol, status);
 
         // Esegue l'aggregazione
         const [attack] = await ThreatLog.aggregate(pipeline).allowDiskUse(true);
@@ -317,6 +322,18 @@ export class ThreatLogService {
         const mongoFilters: any = {};
         const andFilters: any[] = [];
         const safeFilters = sanitizeFilters(filters, allowedFields);
+
+        // Gestione speciale dello status con fallback ad active (null/active)
+        if (allowedFields.has('status')) {
+            const statusValue = safeFilters.status;
+            if (!statusValue || statusValue === 'active') {
+                mongoFilters.status = { $in: [null, 'active'] };
+            } else {
+                mongoFilters.status = statusValue;
+            }
+            // Rimuoviamo status dai filtri safe per non processarlo nuovamente nel loop generico
+            delete safeFilters.status;
+        }
 
         for (const [key, value] of Object.entries(safeFilters)) {
             if (key === 'protocol') {

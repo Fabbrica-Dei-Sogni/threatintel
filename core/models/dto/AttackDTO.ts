@@ -9,6 +9,9 @@ export default class AttackDTO {
     isDistributed?: boolean; // Indica se l'attacco è distribuito su più IP
     // [SORTABLE] Indirizzo IP
     ip?: string;
+
+    // Stato del log (active, archived, deleted)
+    status?: 'active' | 'archived' | 'deleted';
     
     // [SORTABLE] Timestamps
     timestamp?: string; // ISO Date

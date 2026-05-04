@@ -25,6 +25,9 @@ export class RagValidator {
         if (options.sortOrder && !['asc', 'desc'].includes(options.sortOrder)) {
             return { valid: false, error: RAG_TEMPLATES.VALIDATION.SORT_ORDER_INVALID };
         }
+        if (options.status && !['active', 'archived', 'deleted'].includes(options.status)) {
+            return { valid: false, error: 'Stato non supportato' };
+        }
         return { valid: true };
     }
     

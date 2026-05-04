@@ -216,6 +216,7 @@ export class RagSyncService {
                 
                 const payload: ThreatLogPayload = {
                     type: 'threat_log',
+                    status: log.status,
                     mongoId: log._id.toString(),
                     ip: log.request?.ip || 'N/A',
                     timestamp: log.timestamp,
@@ -444,6 +445,7 @@ export class RagSyncService {
                 text: aiSummary,
                 materializedAt: new Date(),
                 schemaVersion: RAG_SCHEMA_VERSION,
+                status: campaign.status,
                 sourceRef: sourceRef || {
                     endpoint: RAG_POLICIES.CAMPAIGNS.apiRef.endpoint,
                     method: RAG_POLICIES.CAMPAIGNS.apiRef.method,
@@ -496,6 +498,7 @@ export class RagSyncService {
                 text: aiSummary,
                 materializedAt: new Date(),
                 schemaVersion: RAG_SCHEMA_VERSION,
+                status: attack.status,
                 sourceRef: sourceRef || {
                     endpoint: RAG_POLICIES.ATTACKS.apiRef.endpoint,
                     method: RAG_POLICIES.ATTACKS.apiRef.method,

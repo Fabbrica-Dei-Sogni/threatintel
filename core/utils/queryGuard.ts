@@ -34,7 +34,7 @@ const THREAT_LOG_FILTER_FIELDS = new Set([
 
 const ATTACK_FILTER_FIELDS = new Set([
     'request.ip', 'request.url', 'request.method', 'protocol', 'timestamp',
-    'dangerLevel', 'fingerprint.hash', 'totaleLogs', 'dangerScore', 'averageScore'
+    'dangerLevel', 'fingerprint.hash', 'totaleLogs', 'dangerScore', 'averageScore', 'attackPatterns'
 ]);
 
 const COWRIE_SESSION_FILTER_FIELDS = new Set([

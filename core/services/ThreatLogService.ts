@@ -116,9 +116,20 @@ export class ThreatLogService {
         } = params;
         const skip = (page - 1) * pageSize;
 
-        // Estrai dangerLevel dai filtri prima di buildRegExpFilter per gestirlo manualmente post-aggregazione
-        const { dangerLevel, ...restFilters } = filters;
-        const mongoFilters = this.buildRegExpFilter(restFilters, FilterAllowedFields.attack);
+        // Separiamo i filtri iniziali (sui log raw) da quelli post-aggregazione (campi calcolati)
+        const postAggFields = ['dangerLevel', 'attackPatterns', 'dangerScore', 'averageScore', 'totaleLogs'];
+        const initialFilters: any = {};
+        const postAggregationFilters: any = {};
+
+        for (const [key, value] of Object.entries(filters)) {
+            if (postAggFields.includes(key)) {
+                postAggregationFilters[key] = value;
+            } else {
+                initialFilters[key] = value;
+            }
+        }
+
+        const mongoFilters = this.buildRegExpFilter(initialFilters, FilterAllowedFields.attack);
 
         // Costruisci sort dinamico
         const safeSort = sanitizeSortFields(sortFields, SortAllowedFields.attack, { lastSeen: -1 });
@@ -127,20 +138,30 @@ export class ThreatLogService {
         // Pipeline base costruita col nuovo Builder
         const basePipeline = await this.forensicPipelineService.buildStandardPipeline(mongoFilters, minLogsForAttack, timeConfig);
 
-        // Aggiungi filtro dangerLevel se presente (va fatto dopo ScoringStage che lo calcola)
-        if (dangerLevel) {
-            let levels: number[] = [];
-            
-            if (typeof dangerLevel === 'string') {
-                levels = dangerLevel.split(',').map(l => parseInt(l.trim())).filter(l => !isNaN(l));
-            } else if (Array.isArray(dangerLevel)) {
-                levels = dangerLevel.map(l => typeof l === 'string' ? parseInt(l) : l).filter(l => !isNaN(l));
-            } else if (typeof dangerLevel === 'number') {
-                levels = [dangerLevel];
+        // Applicazione filtri post-aggregazione
+        if (Object.keys(postAggregationFilters).length > 0) {
+            const { dangerLevel, ...otherPostFilters } = postAggregationFilters;
+
+            // 1. Gestione specifica dangerLevel (che può essere stringa "1,2" o array o numero)
+            if (dangerLevel) {
+                let levels: number[] = [];
+                if (typeof dangerLevel === 'string') {
+                    levels = dangerLevel.split(',').map(l => parseInt(l.trim())).filter(l => !isNaN(l));
+                } else if (Array.isArray(dangerLevel)) {
+                    levels = dangerLevel.map(l => typeof l === 'string' ? parseInt(l) : l).filter(l => !isNaN(l));
+                } else if (typeof dangerLevel === 'number') {
+                    levels = [dangerLevel];
+                }
+
+                if (levels.length > 0) {
+                    basePipeline.push({ $match: { dangerLevel: { $in: levels } } });
+                }
             }
 
-            if (levels.length > 0) {
-                basePipeline.push({ $match: { dangerLevel: { $in: levels } } });
+            // 2. Altri filtri post-aggregazione (incluso attackPatterns che supporta regex su array)
+            if (Object.keys(otherPostFilters).length > 0) {
+                const postMongoFilters = this.buildRegExpFilter(otherPostFilters, FilterAllowedFields.attack);
+                basePipeline.push({ $match: postMongoFilters });
             }
         }
 
@@ -294,6 +315,7 @@ export class ThreatLogService {
 
     buildRegExpFilter(filters: any, allowedFields: Set<string> = FilterAllowedFields.threatLog) {
         const mongoFilters: any = {};
+        const andFilters: any[] = [];
         const safeFilters = sanitizeFilters(filters, allowedFields);
 
         for (const [key, value] of Object.entries(safeFilters)) {
@@ -308,10 +330,23 @@ export class ThreatLogService {
                     mongoFilters[key] = value;
                 }
             } else if (typeof value === 'string') {
-                mongoFilters[key] = { $regex: value, $options: 'i' };
+                // Supporto multi-parola con logica AND
+                const words = value.trim().split(/\s+/).filter(w => w.length > 0);
+                if (words.length > 1) {
+                    // Usiamo $and per compatibilità massima invece di $all con regex
+                    words.forEach(w => {
+                        andFilters.push({ [key]: { $regex: w, $options: 'i' } });
+                    });
+                } else if (words.length === 1) {
+                    mongoFilters[key] = { $regex: words[0], $options: 'i' };
+                }
             } else {
                 mongoFilters[key] = value;
             }
+        }
+
+        if (andFilters.length > 0) {
+            mongoFilters.$and = andFilters;
         }
 
         return mongoFilters;

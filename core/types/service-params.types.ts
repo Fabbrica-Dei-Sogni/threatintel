@@ -31,6 +31,7 @@ export interface AttackFilter {
     totaleLogs?: number | any;
     dangerScore?: number | any;
     averageScore?: number | any;
+    attackPatterns?: string;
 }
 
 /**

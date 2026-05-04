@@ -169,6 +169,16 @@ describe('ThreatLogService', () => {
                 { protocol: null }
             ]);
         });
+
+        it('should build multi-word AND filter with $and', () => {
+            const filters = { attackPatterns: 'sql injection brute' };
+            const mongoFilters = service.buildRegExpFilter(filters, new Set(['attackPatterns']));
+            expect(mongoFilters.$and).toEqual([
+                { attackPatterns: { $regex: 'sql', $options: 'i' } },
+                { attackPatterns: { $regex: 'injection', $options: 'i' } },
+                { attackPatterns: { $regex: 'brute', $options: 'i' } }
+            ]);
+        });
     });
 
     describe('getStats', () => {

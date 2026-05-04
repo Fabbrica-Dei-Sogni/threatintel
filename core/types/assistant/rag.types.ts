@@ -31,6 +31,8 @@ export type RagTimeConfig = TimeConfig;
 
 export type LogSourceParams = Parameters<ThreatLogService['getLogById']>[0] & { type: 'log' };
 
+export type ThreatLogSearchSourceParams = Parameters<ThreatLogService['searchLogs']>[0] & { type: 'search_logs' };
+
 export type IpDetailsSourceParams = Parameters<IpDetailsService['getIpDetails']>[0] & { type: 'ip_details' };
 
 export type AttackSourceParams = Parameters<AttackLogService['getAttackDetail']>[0] & { type: 'attack' };
@@ -41,7 +43,7 @@ export type AttackSearchSourceParams = Parameters<AttackLogService['getAttacks']
 export type CampaignSearchSourceParams = Parameters<CampaignService['getCampaigns']>[0] & { type: 'search_campaign' };
 
 
-export type RagSourceParams = LogSourceParams | IpDetailsSourceParams | AttackSourceParams | CampaignSourceParams | AttackSearchSourceParams | CampaignSearchSourceParams;
+export type RagSourceParams = LogSourceParams | IpDetailsSourceParams | AttackSourceParams | CampaignSourceParams | AttackSearchSourceParams | CampaignSearchSourceParams | ThreatLogSearchSourceParams;
 
 /**
  * Riferimento alla sorgente originale del dato (API).

@@ -2,7 +2,6 @@ import { Request, Response } from 'express';
 import { inject, singleton } from 'tsyringe';
 import { ThreatLogService } from '../services/ThreatLogService';
 import { IpDetailsService } from '../services/IpDetailsService';
-import { SshLogService } from '../services/SshLogService';
 import { LOGGER_TOKEN } from '../di/tokens';
 import { Logger } from 'winston';
 import { assertPublicIp, IpValidationError } from '../utils/ipValidator';
@@ -10,6 +9,7 @@ import { sanitizePage, sanitizePageSize, sanitizeLimit } from '../utils/queryGua
 import { Controller, Get, Post } from '../registry/decorators';
 import { getComponent } from '../di/container';
 import { AuthMiddleware } from '../middlewares/AuthMiddleware';
+import { StatusManagerService } from '../services/StatusManagerService';
 
 const auth = getComponent(AuthMiddleware);
 
@@ -19,7 +19,8 @@ export class ThreatController {
     constructor(
         private threatLogService: ThreatLogService,
         private ipDetailsService: IpDetailsService,
-        @inject(LOGGER_TOKEN) private logger: Logger
+        @inject(LOGGER_TOKEN) private logger: Logger,
+        private statusManager: StatusManagerService
     ) { }
 
     /**
@@ -543,5 +544,71 @@ export class ThreatController {
         }
     }
 
+    /**
+     * @openapi
+     * /status:
+     *   post:
+     *     tags: [Log Management]
+     *     summary: Cambia lo stato di un log, attacco o campagna (active, archived, deleted)
+     *     responses:
+     *       202:
+     *         description: Richiesta accettata.
+     */
+    @Post('/status', [auth.isAuthenticated()])
+    async changeStatus(req: Request, res: Response): Promise<void> {
+        const { type, id, status, reason = 'manual_update' } = req.body;
+        const user = (req as any).user?.name || 'anonymous';
+
+        try {
+            if (!type || !id || !status) {
+                res.status(400).json({ error: 'Parametri type, id e status obbligatori' });
+                return;
+            }
+
+            await this.statusManager.processStatusChange(type, id, status, reason, user);
+
+            res.status(202).json({
+                message: 'Richiesta di cambio stato presa in carico',
+                operation: { type, id, status, user }
+            });
+        } catch (err: any) {
+            this.logger.error('[ThreatController] Change Status error:', err);
+            res.status(500).json({ error: 'Errore durante la richiesta di cambio stato' });
+        }
+    }
+
+    /**
+     * @openapi
+     * /restore:
+     *   post:
+     *     tags: [Log Management]
+     *     summary: Ripristina i log da un contesto di archiviazione
+     *     responses:
+     *       202:
+     *         description: Ripristino avviato.
+     */
+    @Post('/restore', [auth.isAuthenticated()])
+    async restore(req: Request, res: Response): Promise<void> {
+        const { sourceId } = req.body;
+        const user = (req as any).user?.name || 'anonymous';
+
+        try {
+            if (!sourceId) {
+                res.status(400).json({ error: 'Parametro sourceId obbligatorio' });
+                return;
+            }
+
+            await this.statusManager.restoreByContext(sourceId, user);
+
+            res.status(202).json({
+                message: 'Ripristino contesto avviato',
+                sourceId,
+                user
+            });
+        } catch (err: any) {
+            this.logger.error('[ThreatController] Restore error:', err);
+            res.status(500).json({ error: 'Errore durante il ripristino' });
+        }
+    }
 }
 

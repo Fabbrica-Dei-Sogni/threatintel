@@ -33,6 +33,7 @@ export interface AttackFilter {
     dangerScore?: number | any;
     averageScore?: number | any;
     attackPatterns?: string;
+    status?: string;
 }
 
 /**
@@ -51,6 +52,7 @@ export interface CampaignFilter {
     agoUnit?: string;
     selectedUris?: string[];
     search?: string;
+    status?: string;
 }
 
 /**

@@ -61,7 +61,8 @@ export const TOOL_TEMPLATES = {
       MIN_LOGS: "Numero minimo di log per considerare un IP come attacco. Default: 10.",
       LIMIT: "Numero massimo di risultati. Default: 20.",
       SORT_BY: "Campo di ordinamento: 'lastSeen', 'totaleLogs', 'dangerScore', 'averageScore'.",
-      SORT_ORDER: "'desc' (default) o 'asc'."
+      SORT_ORDER: "'desc' (default) o 'asc'.",
+      STATUS: "Stato del log: 'active' (default), 'archived' (storico/whitelist), 'deleted' (cestino)."
     }
   },
 
@@ -82,7 +83,8 @@ export const TOOL_TEMPLATES = {
       MIN_LOGS_PER_IP: "Log minimi per ciascun IP partecipante.",
       LIMIT: "Numero massimo di risultati. Default: 20.",
       SORT_BY: "Campo di ordinamento: 'lastSeen', 'firstSeen', 'ipCount', 'totaleLogs', 'averageScore'.",
-      SORT_ORDER: "'desc' (default) o 'asc'."
+      SORT_ORDER: "'desc' (default) o 'asc'.",
+      STATUS: "Stato dei log della campagna: 'active' (default), 'archived', 'deleted'."
     }
   }
 

@@ -239,7 +239,8 @@ export class AssistantService {
                 'request.ip': args.ip,
                 'geo.country': args.country as any, // Cast temporaneo o aggiunta a interfaccia
                 protocol: args.protocol,
-                dangerScore: args.dangerScore
+                dangerScore: args.dangerScore,
+                status: args.status
             }
         };
 
@@ -286,6 +287,7 @@ export class AssistantService {
                 endTime: args.dateTo,
                 timeMode: 'range'
             } : {},
+            status: args.status
             // CampaignService.getCampaigns non usa un oggetto 'filters' ma i campi sono diretti
             // search: args.search // se volessimo mappare anche una ricerca testuale
         };

@@ -32,6 +32,7 @@ export interface SearchAttacksArgs {
   limit?: number;
   sortBy?: string;
   sortOrder?: 'asc' | 'desc';
+  status?: 'active' | 'archived' | 'deleted';
 }
 
 export interface SearchCampaignsArgs {
@@ -44,6 +45,7 @@ export interface SearchCampaignsArgs {
   limit?: number;
   sortBy?: string;
   sortOrder?: 'asc' | 'desc';
+  status?: 'active' | 'archived' | 'deleted';
 }
 
 

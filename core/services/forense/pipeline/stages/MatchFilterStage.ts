@@ -4,9 +4,17 @@ export class MatchFilterStage implements PipelineStage {
     constructor(private readonly filters: any) { }
 
     generate(): any[] {
-        if (!this.filters || Object.keys(this.filters).length === 0) {
+        const query = { ...this.filters };
+
+        // Se lo status non è specificato esplicitamente, filtriamo per active o null (default trasparente)
+        if (!query.status) {
+            query.status = { $in: [null, 'active'] };
+        }
+
+        if (Object.keys(query).length === 0) {
             return [];
         }
-        return [{ $match: this.filters }];
+
+        return [{ $match: query }];
     }
 }

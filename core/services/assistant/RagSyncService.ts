@@ -217,13 +217,21 @@ export class RagSyncService {
             const vector = await this.ollama.getEmbedding(finalContent);
             
             // 4. Source Reference per la tracciabilità agentica
+            const bufferMs = 60 * 60 * 1000; // 1 ora di buffer per garantire inclusione
+            const startTime = new Date(new Date(campaign.firstSeen).getTime() - bufferMs).toISOString();
+            const endTime = new Date(new Date(campaign.lastSeen).getTime() + bufferMs).toISOString();
+
             const params: CampaignSourceParams = { 
                 type: 'campaign',
                 hash: campaign.hash,
                 minScore: RAG_POLICIES.CAMPAIGNS.minScore,
                 minLogsPerIp: RAG_POLICIES.CAMPAIGNS.minLogsPerIp,
-                protocol: RAG_POLICIES.CAMPAIGNS.protocol,
-                timeConfig: RAG_POLICIES.CAMPAIGNS.timeConfig as any
+                protocol: campaign.protocols?.length === 1 ? campaign.protocols[0] : null,
+                timeConfig: {
+                    timeMode: 'range',
+                    startTime,
+                    endTime
+                } as any
             };
 
             const sourceRef: RagSourceRef = {
@@ -271,11 +279,21 @@ export class RagSyncService {
             const vector = await this.ollama.getEmbedding(finalContent);
 
             // 4. Source Reference per la tracciabilità agentica
+            const bufferMs = 60 * 60 * 1000; // 1 ora di buffer
+            const startTime = attack.firstSeen ? new Date(new Date(attack.firstSeen).getTime() - bufferMs).toISOString() : undefined;
+            const endTime = attack.lastSeen ? new Date(new Date(attack.lastSeen).getTime() + bufferMs).toISOString() : undefined;
+
             const params: AttackSourceParams = { 
                 type: 'attack',
                 ip: ip,
                 minLogsForAttack: RAG_POLICIES.ATTACKS.minLogs,
-                timeConfig: RAG_POLICIES.ATTACKS.timeConfig as any
+                timeConfig: {
+                    timeMode: (startTime && endTime) ? 'range' : 'ago',
+                    startTime,
+                    endTime,
+                    agoUnit: (startTime && endTime) ? undefined : RAG_POLICIES.ATTACKS.timeConfig.agoUnit,
+                    agoValue: (startTime && endTime) ? undefined : RAG_POLICIES.ATTACKS.timeConfig.agoValue
+                } as any
             };
 
             const sourceRef: RagSourceRef = {
@@ -318,8 +336,12 @@ export class RagSyncService {
                         hash: campaign.hash,
                         minScore: RAG_POLICIES.CAMPAIGNS.minScore,
                         minLogsPerIp: RAG_POLICIES.CAMPAIGNS.minLogsPerIp,
-                        protocol: RAG_POLICIES.CAMPAIGNS.protocol,
-                        timeConfig: RAG_POLICIES.CAMPAIGNS.timeConfig as any
+                        protocol: campaign.protocols?.length === 1 ? campaign.protocols[0] : null,
+                        timeConfig: {
+                            timeMode: 'range',
+                            startTime: campaign.firstSeen ? new Date(new Date(campaign.firstSeen).getTime() - 3600000).toISOString() : undefined,
+                            endTime: campaign.lastSeen ? new Date(new Date(campaign.lastSeen).getTime() + 3600000).toISOString() : undefined
+                        } as any
                     }
                 },
                 // Campi DTO estesi
@@ -365,7 +387,11 @@ export class RagSyncService {
                         type: 'attack',
                         ip: ip as string,
                         minLogsForAttack: RAG_POLICIES.ATTACKS.minLogs,
-                        timeConfig: RAG_POLICIES.ATTACKS.timeConfig as any
+                        timeConfig: {
+                            timeMode: 'range',
+                            startTime: attack.firstSeen ? new Date(new Date(attack.firstSeen).getTime() - 3600000).toISOString() : undefined,
+                            endTime: attack.lastSeen ? new Date(new Date(attack.lastSeen).getTime() + 3600000).toISOString() : undefined
+                        } as any
                     }
                 }
             };

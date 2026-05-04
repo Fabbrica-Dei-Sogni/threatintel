@@ -53,6 +53,21 @@ export class QdrantClientService {
     }
 
     /**
+     * Elimina una collection intera.
+     * @param collectionName Nome della collection da eliminare
+     */
+    public async deleteCollection(collectionName: string) {
+        try {
+            this.logger.warn(`[Qdrant] Deleting collection: ${collectionName}`);
+            await this.client.deleteCollection(collectionName);
+            return true;
+        } catch (error) {
+            this.logger.error(`[Qdrant] Error deleting collection ${collectionName}: ${error}`);
+            return false;
+        }
+    }
+
+    /**
      * Inserisce o aggiorna dei punti nel database vettoriale.
      * @param collectionName Nome della collection
      * @param points Array di punti (vettori + metadati)

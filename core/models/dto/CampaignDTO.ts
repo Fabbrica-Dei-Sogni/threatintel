@@ -6,6 +6,7 @@ export default class CampaignDTO {
     lastSeen: string | Date = '';
     averageScore: number = 0;
     attackPatterns: string[] = [];
+    protocols: string[] = [];
     sampleUrl: string = '/';
     correlationHubsCount?: number;
     maxLogsInThisCampaign?: number;

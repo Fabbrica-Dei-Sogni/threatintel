@@ -176,7 +176,7 @@ export class RagTranslationService {
         }
         
         // Analisi strumenti e automazione
-        if (attack.fingerprintAnalysis?.isTool || attack.toolRiskScore && attack.toolRiskScore > 50) {
+        if (attack.fingerprintAnalysis?.isTool || (attack.toolRiskScore && attack.toolRiskScore > 50)) {
             contextParts.push("L'attacco sembra essere stato condotto tramite uno strumento automatizzato o uno scanner di vulnerabilità.");
         }
 

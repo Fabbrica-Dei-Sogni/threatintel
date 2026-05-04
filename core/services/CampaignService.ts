@@ -104,7 +104,8 @@ export class CampaignService {
                     indicatorsPerIp: { $push: '$fingerprint.indicators' },
                     firstSeen: { $min: '$timestamp' },
                     lastSeen: { $max: '$timestamp' },
-                    sampleUrl: { $first: '$request.url' }
+                    sampleUrl: { $first: '$request.url' },
+                    protocols: { $addToSet: '$protocol' }
                 }
             },
             { $match: { '_id.hash': { $ne: null }, logsPerIp: { $gte: Number(minLogsPerIp) } } },
@@ -119,7 +120,8 @@ export class CampaignService {
                     lastSeen: { $max: '$lastSeen' },
                     sampleUrl: { $first: '$sampleUrl' },
                     allIndicators: { $push: '$indicatorsPerIp' },
-                    timeInfo: { $push: { ip: '$_id.ip', firstSeen: '$firstSeen', lastSeen: '$lastSeen' } }
+                    timeInfo: { $push: { ip: '$_id.ip', firstSeen: '$firstSeen', lastSeen: '$lastSeen' } },
+                    allProtocols: { $push: '$protocols' }
                 }
             },
             {
@@ -133,6 +135,13 @@ export class CampaignService {
                     sampleUrl: 1,
                     averageScore: { $divide: ['$sumScore', '$totaleLogs'] },
                     timeInfo: 1,
+                    protocols: {
+                        $reduce: {
+                            input: '$allProtocols',
+                            initialValue: [],
+                            in: { $setUnion: ['$$value', '$$this'] }
+                        }
+                    },
                     attackPatterns: {
                         $reduce: {
                             input: '$allIndicators',

@@ -4,7 +4,6 @@ import { LOGGER_TOKEN, EVENT_BUS_TOKEN, FORENSIC_PIPELINE_TOKEN } from '../di/to
 import ThreatLog from '../models/ThreatLogSchema';
 import { calculateCorrelationHubs } from '../utils/CampaignAnalytics';
 import { EventBus, AppEvents } from './EventBus';
-import { TimeConfig } from '../types/common.types';
 import { GetCampaignDetailParams, GetCampaignsParams } from '../types/service-params.types';
 import { ForensicPipelineService } from './forense/ForensicPipelineService';
 
@@ -21,8 +20,6 @@ export class CampaignService {
      */
     async getCampaigns(params: GetCampaignsParams) {
         const {
-            minIps = 2,
-            minScore = 0,
             page = 1,
             pageSize = 10,
             selectedUris = [],

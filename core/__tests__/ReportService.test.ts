@@ -40,7 +40,6 @@ describe('ReportService', () => {
             mockLogger,
             {} as any,
             {} as any,
-            {} as any,
             {} as any
         ) as any;
         mockAttackLogService = new AttackLogService(

@@ -38,12 +38,14 @@ export function useAttacksFilter(
     initialToUnit: string | Ref<string>,
     initialSortFields: SortFields | Ref<SortFields> = null,
     initialPageSize: number | Ref<number> = 20,
-    initialDangerLevels: number[] | Ref<number[]> = []
+    initialDangerLevels: number[] | Ref<number[]> = [],
+    initialAttackPatterns: string | Ref<string> = ''
 ) {
     // Filtri specifici - Normalizzati come Ref (se passati come computed o ref dallo store, rimangono legati)
     const filterIp = toRef(initialIp);
     const filterProtocol = toRef(initialProtocol);
     const filterDangerLevels = toRef(initialDangerLevels);
+    const filterAttackPatterns = toRef(initialAttackPatterns);
     const minLogsForAttack = toRef(initialMinLogsForAttack);
     const timeMode = toRef(initialTimeMode);
     const agoValue = toRef(initialAgoValue);
@@ -69,7 +71,8 @@ export function useAttacksFilter(
         fromUnit,
         toValue,
         toUnit,
-        filterDangerLevels
+        filterDangerLevels,
+        filterAttackPatterns
     ];
 
     async function fetchData() {
@@ -95,7 +98,8 @@ export function useAttacksFilter(
             filters: {
                 'request.ip': filterIp.value,
                 protocol: filterProtocol.value,
-                dangerLevel: filterDangerLevels.value.length > 0 ? filterDangerLevels.value.join(',') : null
+                dangerLevel: filterDangerLevels.value.length > 0 ? filterDangerLevels.value.join(',') : null,
+                attackPatterns: filterAttackPatterns.value || null
             },
             minLogsForAttack: minLogsForAttack.value,
             timeConfig,
@@ -151,6 +155,7 @@ export function useAttacksFilter(
         toValue,
         toUnit,
         filterDangerLevels,
+        filterAttackPatterns,
         loading,
         error,
         pageSize,

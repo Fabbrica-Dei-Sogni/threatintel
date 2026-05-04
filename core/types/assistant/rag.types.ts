@@ -24,7 +24,7 @@ export type RagEntityType = 'threat_log' | 'attack_summary' | 'campaign_summary'
  * Versione attuale dello schema dei payload RAG.
  * Incrementare questo valore quando si modificano le interfacce dei payload per forzare il re-indexing.
  */
-export const RAG_SCHEMA_VERSION = 2;
+export const RAG_SCHEMA_VERSION = 3;
 
 /**
  * Configurazione temporale standard per il sistema RAG.
@@ -86,7 +86,7 @@ export interface ThreatLogPayload extends RagBasePayload, Partial<IThreatLog> {
 export interface AttackSummaryPayload extends RagBasePayload, Partial<AttackDTO> {
     type: 'attack_summary';
     ip: string;
-    totalLogs: number;
+    totaleLogs: number;
     averageScore: number;
 }
 
@@ -142,4 +142,6 @@ export interface RagSearchOptions {
     limit?: number;
     scoreThreshold?: number;
     type?: RagEntityType;
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
 }

@@ -83,6 +83,7 @@ export class GroupingStage implements PipelineStage {
                             '$representative',
                             {
                                 _id: '$_id', // L'IP attaccante
+                                ip: '$_id',  // Campo esplicito per DTO e RAG
                                 logsRaggruppati: '$logsRaggruppati',
                                 totaleLogs: '$totaleLogs',
                                 firstSeen: '$firstSeen',

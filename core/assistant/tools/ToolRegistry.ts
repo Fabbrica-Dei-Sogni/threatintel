@@ -1,4 +1,5 @@
 import { AssistantToolName } from '../../types/assistant/assistant-tool.types';
+import { TOOL_TEMPLATES } from './ToolTemplates';
 
 export type McpToolDefinition = {
   name: AssistantToolName;
@@ -23,16 +24,14 @@ export type McpToolDefinition = {
 
 const TOOLS: McpToolDefinition[] = [
   {
-    name: 'semantic_search',
-    description:
-      'Esegue una ricerca semantica nel database delle minacce (log, attacchi, campagne). Utile per trovare pattern o attività sospette descritte in linguaggio naturale.',
+    name: TOOL_TEMPLATES.SEMANTIC_SEARCH.NAME as AssistantToolName,
+    description: TOOL_TEMPLATES.SEMANTIC_SEARCH.DESCRIPTION,
     inputSchema: {
       type: 'object',
       properties: {
         query: {
           type: 'string',
-          description:
-            "La query di ricerca in linguaggio naturale (es: 'attacchi brute force SSH dalla Cina')",
+          description: TOOL_TEMPLATES.SEMANTIC_SEARCH.FIELDS.QUERY,
         },
         type: {
           type: 'string',
@@ -42,11 +41,20 @@ const TOOLS: McpToolDefinition[] = [
             'attack_summary',
             'campaign_summary',
           ],
-          description: 'Opzionale: filtra per tipo di entità.',
+          description: TOOL_TEMPLATES.SEMANTIC_SEARCH.FIELDS.TYPE,
         },
         limit: {
           type: 'number',
-          description: 'Numero massimo di risultati (default 5, max 20).',
+          description: TOOL_TEMPLATES.SEMANTIC_SEARCH.FIELDS.LIMIT,
+        },
+        sortBy: {
+          type: 'string',
+          description: TOOL_TEMPLATES.SEMANTIC_SEARCH.FIELDS.SORT_BY,
+        },
+        sortOrder: {
+          type: 'string',
+          enum: ['asc', 'desc'],
+          description: TOOL_TEMPLATES.SEMANTIC_SEARCH.FIELDS.SORT_ORDER,
         },
       },
       required: ['query'],
@@ -64,20 +72,18 @@ const TOOLS: McpToolDefinition[] = [
     },
   },
   {
-    name: 'resolve_threat_source',
-    description:
-      "Ottiene i dati tecnici completi (da MongoDB) partendo da un riferimento sorgente (sourceRef) trovato in una ricerca semantica.",
+    name: TOOL_TEMPLATES.RESOLVE_THREAT_SOURCE.NAME as AssistantToolName,
+    description: TOOL_TEMPLATES.RESOLVE_THREAT_SOURCE.DESCRIPTION,
     inputSchema: {
       type: 'object',
       properties: {
         sourceRef: {
           type: 'object',
-          description:
-            "L'oggetto sourceRef integrale recuperato dall'hit della ricerca semantica.",
+          description: TOOL_TEMPLATES.RESOLVE_THREAT_SOURCE.FIELDS.SOURCE_REF,
           properties: {
             params: {
               type: 'object',
-              description: 'Parametri tecnici per la ricostruzione del dato.',
+              description: TOOL_TEMPLATES.RESOLVE_THREAT_SOURCE.FIELDS.PARAMS,
             },
           },
           required: ['params'],
@@ -98,19 +104,18 @@ const TOOLS: McpToolDefinition[] = [
     },
   },
   {
-    name: 'ask',
-    description:
-      "Esegue una domanda libera al motore investigativo e restituisce una risposta contestualizzata.",
+    name: TOOL_TEMPLATES.ASK.NAME as AssistantToolName,
+    description: TOOL_TEMPLATES.ASK.DESCRIPTION,
     inputSchema: {
       type: 'object',
       properties: {
         question: {
           type: 'string',
-          description: "Domanda libera da sottoporre all'assistente.",
+          description: TOOL_TEMPLATES.ASK.FIELDS.QUESTION,
         },
         scope: {
           type: 'string',
-          description: 'Ambito opzionale della domanda.',
+          description: TOOL_TEMPLATES.ASK.FIELDS.SCOPE,
         },
       },
       required: ['question'],

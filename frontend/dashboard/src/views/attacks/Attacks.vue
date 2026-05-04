@@ -79,6 +79,14 @@
                         <button v-if="attacksState.filters.ip" @click="attacksState.filters.ip = ''" class="clear-btn">×</button>
                     </div>
                 </div>
+
+                <div class="filter-item search-box">
+                    <span class="cyber-label">ANOMALY SEARCH</span>
+                    <div class="ip-input-wrapper">
+                        <input type="text" v-model="attacksState.filters.attackPatterns" placeholder="Search patterns..." class="ip-input" />
+                        <button v-if="attacksState.filters.attackPatterns" @click="attacksState.filters.attackPatterns = ''" class="clear-btn">×</button>
+                    </div>
+                </div>
             </div>
 
             <div class="filter-row secondary-filters">
@@ -505,6 +513,9 @@ onMounted(() => {
     if (props.initAgoUnit !== undefined) attacksState.filters.agoUnit = props.initAgoUnit || 'days';
     if (props.initDateRange !== undefined) attacksState.filters.dateRange = props.initDateRange || [null, null];
     if (props.initialSortFields !== undefined) attacksState.sort.fields = props.initialSortFields || { firstSeen: -1 };
+    if (router.currentRoute.value.query.attackPatterns) {
+        attacksState.filters.attackPatterns = router.currentRoute.value.query.attackPatterns;
+    }
 });
 
 // Watcher per i bottoni browser (Back/Forward)
@@ -539,7 +550,8 @@ const {
     toRef(attacksState.filters, 'toUnit'),
     toRef(attacksState.sort, 'fields'),
     toRef(attacksState.pagination, 'pageSize'),
-    toRef(attacksState.filters, 'dangerLevels')
+    toRef(attacksState.filters, 'dangerLevels'),
+    toRef(attacksState.filters, 'attackPatterns')
 );
 
 const totalPages = computed(() => Math.ceil(total.value / pageSize.value));
@@ -556,9 +568,10 @@ watch(
         () => attacksState.filters.dateRange, 
         () => attacksState.filters.dangerLevels, 
         () => attacksState.pagination.page, 
-        () => attacksState.sort.fields
+        () => attacksState.sort.fields,
+        () => attacksState.filters.attackPatterns
     ],
-    ([nip, nproto, nmin, ntMode, nAgoVal, nAgoUnit, ndRange, nDanger, nPage, nSort]) => {
+    ([nip, nproto, nmin, ntMode, nAgoVal, nAgoUnit, ndRange, nDanger, nPage, nSort, nPatterns]) => {
         router.replace({
             name: 'Attacks',
             query: {
@@ -571,7 +584,8 @@ watch(
                 agoUnit: nAgoUnit !== 'days' ? nAgoUnit : undefined,
                 dateRange: ndRange && (ndRange[0] || ndRange[1]) ? JSON.stringify(ndRange) : undefined,
                 dangerLevels: nDanger && nDanger.length > 0 ? nDanger.join(',') : undefined,
-                sortFields: nSort && Object.keys(nSort).length > 0 ? JSON.stringify(nSort) : undefined
+                sortFields: nSort && Object.keys(nSort).length > 0 ? JSON.stringify(nSort) : undefined,
+                attackPatterns: nPatterns || undefined
             }
         });
     }, { deep: true });

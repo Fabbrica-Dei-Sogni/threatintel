@@ -47,7 +47,7 @@ export class AssistantService {
     ) {}
 
     public async search(query: string, options: RagSearchOptions = {}): Promise<RagSearchHit[]> {
-        const { limit = 5, scoreThreshold = 0.5, type } = options;
+        const { limit = 5, scoreThreshold = 0.5, type, sortBy, sortOrder = 'desc' } = options;
         
         // 1. Validare la richiesta di ricerca
         const validation = RagValidator.validateSearchOptions(options);
@@ -60,7 +60,7 @@ export class AssistantService {
             throw new Error(this.i18n.t('errors.rag.notOperational'));
         }
 
-        this.logger.debug(`[AssistantService] Searching for: "${query}" (Type: ${type || 'all'})`);
+        this.logger.debug(`[AssistantService] Searching for: "${query}" (Type: ${type || 'all'}, SortBy: ${sortBy || 'similarity'})`);
 
         // 2. Chiamare Qdrant con collection e filtri coerenti
         const queryVector = await this.ollama.getEmbedding(query);
@@ -77,7 +77,7 @@ export class AssistantService {
         const rawResults = await this.qdrant.search(collection, queryVector, limit);
         
         // 3. Validare il risultato raw, 4. Mappare in SearchHit, 5. Restituire oggetti normalizzati
-        return rawResults
+        const hits = rawResults
             .filter(r => {
                 // Filtro coerenza RAG_POLICIES (Soglia punteggio vettoriale)
                 return r.score >= scoreThreshold;
@@ -100,10 +100,37 @@ export class AssistantService {
                     id: r.id,
                     score: r.score,
                     text: payload.text,
-                    sourceRef: payload.sourceRef
+                    sourceRef: payload.sourceRef,
+                    // Includiamo il payload originale per permettere l'ordinamento post-recupero
+                    _rawPayload: payload 
                 };
             })
-            .filter((h): h is RagSearchHit => h !== null);
+            .filter((h): h is any => h !== null);
+
+        // 6. Ordinamento post-recupero se richiesto
+        if (sortBy) {
+            hits.sort((a: any, b: any) => {
+                const valA = a._rawPayload[sortBy];
+                const valB = b._rawPayload[sortBy];
+
+                if (valA === undefined || valB === undefined) return 0;
+
+                // Gestione date
+                if (valA instanceof Date && valB instanceof Date) {
+                    return sortOrder === 'asc' 
+                        ? valA.getTime() - valB.getTime() 
+                        : valB.getTime() - valA.getTime();
+                }
+
+                // Gestione stringhe e numeri
+                if (valA < valB) return sortOrder === 'asc' ? -1 : 1;
+                if (valA > valB) return sortOrder === 'asc' ? 1 : -1;
+                return 0;
+            });
+        }
+
+        // Rimuoviamo il payload raw prima di restituire i risultati all'agente
+        return hits.map(({ _rawPayload, ...hit }) => hit);
     }
 
     /**

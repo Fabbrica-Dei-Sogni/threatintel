@@ -79,14 +79,4 @@ describe('RagValidator', () => {
             expect(result.error).toContain('Hash campagna mancante');
         });
     });
-
-    describe('getToolDefinitions', () => {
-        it('should return a list of OpenAI-like tool schemas', () => {
-            const tools = RagValidator.getToolDefinitions();
-            expect(Array.isArray(tools)).toBe(true);
-            const resolveTool = tools.find(t => t.name === 'resolve_threat_source');
-            expect(resolveTool).toBeDefined();
-            expect(resolveTool?.parameters.properties.sourceRef).toBeDefined();
-        });
-    });
 });

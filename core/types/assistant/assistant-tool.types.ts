@@ -4,6 +4,8 @@ export interface SemanticSearchArgs {
   query: string;
   type?: 'threat_log' | 'ip_details' | 'attack_summary' | 'campaign_summary';
   limit?: number;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
 }
 
 export interface ResolveThreatSourceArgs {

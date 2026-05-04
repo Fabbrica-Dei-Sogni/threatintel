@@ -40,7 +40,8 @@ export class RagEventListener implements ILongRunningService {
 
             // Materializzazione Attacco (Anomalia) - Triggerata da ricerca o resolve
             this.eventBus.on(AppEvents.ATTACK_RESOLVED, async (attack) => {
-                this.logger.info(`[${this.serviceName}] Event received: ${AppEvents.ATTACK_RESOLVED} for IP: ${attack.ip}`);
+                const ip = attack.ip || attack.request?.ip || 'N/A';
+                this.logger.info(`[${this.serviceName}] Event received: ${AppEvents.ATTACK_RESOLVED} for IP: ${ip}`);
                 await this.ragSync.materializeAttack(attack);
             });
 

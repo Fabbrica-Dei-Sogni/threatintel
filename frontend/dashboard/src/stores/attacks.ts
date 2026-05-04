@@ -17,6 +17,7 @@ export interface AttacksState {
         toValue: number;
         toUnit: string;
         dangerLevels: number[];
+        attackPatterns: string;
     };
     pagination: {
         page: number;
@@ -45,7 +46,8 @@ const DEFAULT_STATE: AttacksState = {
         fromUnit: 'days',
         toValue: 0,
         toUnit: 'days',
-        dangerLevels: [3]
+        dangerLevels: [3],
+        attackPatterns: ''
     },
     pagination: {
         page: 1,

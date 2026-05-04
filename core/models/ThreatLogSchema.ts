@@ -52,6 +52,12 @@ export interface IMetadata {
     eventCount?: number;
 }
 
+export interface IStatusContext {
+    reason?: string;
+    sourceId?: string;
+    updatedBy?: string;
+}
+
 export interface IThreatLog extends Document {
     id: string;
     timestamp: Date;
@@ -63,6 +69,9 @@ export interface IThreatLog extends Document {
     ipDetailsId?: Types.ObjectId | null;
     //il campo protocol per differenziare tipi di richieste diverse da http e ssh e altri futuri
     protocol?: string;
+    status?: 'active' | 'archived' | 'deleted';
+    statusChangedAt?: Date;
+    statusContext?: IStatusContext;
 }
 
 const RequestSchema: Schema = new Schema({
@@ -119,10 +128,26 @@ const ThreatLogSchema: Schema = new Schema({
     metadata: MetadataSchema,
     ipDetailsId: { type: Schema.Types.ObjectId, ref: 'IpDetails', default: null },
     //il campo protocol per differenziare tipi di richieste diverse da http e ssh e altri futuri
-    protocol: { type: String, default: 'http' }
+    protocol: { type: String, default: 'http' },
+    status: { 
+        type: String, 
+        enum: ['active', 'archived', 'deleted'], 
+        default: 'active',
+        index: true 
+    },
+    statusChangedAt: { 
+        type: Date, 
+        default: Date.now 
+    },
+    statusContext: {
+        reason: String,
+        sourceId: String,
+        updatedBy: String
+    }
 });
 
 // Indici per ottimizzazione performance
+ThreatLogSchema.index({ status: 1, timestamp: -1 });
 ThreatLogSchema.index({ protocol: 1, timestamp: 1 });
 ThreatLogSchema.index({ timestamp: -1 });
 ThreatLogSchema.index({ 'request.ip': 1 });

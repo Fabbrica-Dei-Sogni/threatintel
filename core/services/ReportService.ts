@@ -10,6 +10,7 @@ import { inject, injectable } from 'tsyringe';
 import { LOGGER_TOKEN } from '../di/tokens';
 import { Logger } from 'winston';
 import { ThreatLogService } from './ThreatLogService';
+import { AttackLogService } from './AttackLogService';
 import { CowrieService } from './CowrieService';
 import path from 'path';
 import ejs from 'ejs';
@@ -27,6 +28,7 @@ export class ReportService {
     constructor(
         @inject(LOGGER_TOKEN) private readonly logger: Logger,
         private readonly threatLogService: ThreatLogService,
+        private readonly attackLogService: AttackLogService,
         private readonly cowrieService: CowrieService,
         private readonly ipDetailsService: IpDetailsService,
         private readonly i18n: I18nService
@@ -209,13 +211,13 @@ export class ReportService {
         const isDistributed = ipList && ipList.length > 1;
 
         if (isDistributed) {
-            attack = await this.threatLogService.getDistributedAttackDetail({ ipList: ipList! });
+            attack = await this.attackLogService.getDistributedAttackDetail({ ipList: ipList! });
             logs = await this.threatLogService.getLogs({ 
                 filters: { 'request.ip': { $in: ipList } }, 
                 pageSize: 100 
             });
         } else {
-            attack = await this.threatLogService.getAttackDetail({ ip });
+            attack = await this.attackLogService.getAttackDetail({ ip });
             logs = await this.threatLogService.getLogs({ 
                 filters: { 'request.ip': ip }, 
                 pageSize: 100 

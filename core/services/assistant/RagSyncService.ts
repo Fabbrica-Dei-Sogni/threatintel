@@ -22,6 +22,8 @@ import { RAG_POLICIES } from './RagPolicies';
 import { RagSourceRef, ThreatLogPayload, AttackSummaryPayload, CampaignSummaryPayload, AttackSourceParams, CampaignSourceParams, RAG_SCHEMA_VERSION, IpDetailsPayload } from '../../types/assistant/rag.types';
 import AttackDTO from '../../models/dto/AttackDTO';
 import CampaignDTO from '../../models/dto/CampaignDTO';
+import { AttackLogService } from '../AttackLogService';
+import { CampaignService } from '../CampaignService';
 import { RAG_TEMPLATES } from './RagTemplates';
 
 @injectable()
@@ -43,7 +45,9 @@ export class RagSyncService {
         @inject(RAG_TRANSLATION_TOKEN) private readonly translator: RagTranslationService,
         @inject(QDRANT_CLIENT_TOKEN) private readonly qdrant: QdrantClientService,
         @inject(OLLAMA_SERVICE_TOKEN) private readonly ollama: OllamaService,
-        private readonly config: AppConfigProvider
+        private readonly config: AppConfigProvider,
+        private readonly attackLogService: AttackLogService,
+        private readonly campaignService: CampaignService
     ) { 
         this.COLL_INTELLIGENCE = this.config.ragCollectionName;
         this.COLL_LOGS = this.config.ragLogsCollectionName;
@@ -85,6 +89,116 @@ export class RagSyncService {
     }
 
     /**
+     * Identifica i punti con schema obsoleto e tenta di ri-materializzarli.
+     * @param collectionName Nome della collection
+     * @param limit Massimo numero di punti da processare per ciclo
+     */
+    public async reindexObsoletePoints(collectionName: string, limit: number = 20): Promise<{ processed: number, updated: number, deleted: number }> {
+        if (!this.checkOperational()) return { processed: 0, updated: 0, deleted: 0 };
+
+        this.logger.info(`[RagSync] Starting re-indexing check for obsolete points in ${collectionName}...`);
+        let stats = { processed: 0, updated: 0, deleted: 0 };
+
+        try {
+            // Filtro Qdrant per trovare versioni inferiori alla corrente
+            const filter = {
+                must: [
+                    {
+                        key: "schemaVersion",
+                        range: { lt: RAG_SCHEMA_VERSION }
+                    }
+                ]
+            };
+
+            const result = await this.qdrant.scrollPoints(collectionName, { 
+                filter, 
+                limit 
+            });
+
+            stats.processed = result.points.length;
+
+            for (const point of result.points) {
+                const payload = point.payload as any;
+                if (!payload?.sourceRef) {
+                    // Se non c'è riferimento alla sorgente, non possiamo ri-materializzare
+                    // Procediamo col "pruning" (cancellazione) dell'orfano obsoleto
+                    this.logger.warn(`[RagSync] Point ${point.id} has no sourceRef. Pruning...`);
+                    await this.qdrant.deletePoint(collectionName, point.id);
+                    stats.deleted++;
+                    continue;
+                }
+
+                try {
+                    this.logger.debug(`[RagSync] Re-indexing point ${point.id} of type ${payload.type}...`);
+                    
+                    // Invochiamo il dispatcher di materializzazione in base al tipo
+                    let success = false;
+                    switch (payload.type) {
+                        case 'threat_log':
+                            // Per i log atomici, basta risincronizzare il log originale (che verrà ricaricato)
+                            // Usiamo l'ID dal sourceRef
+                            const logId = payload.sourceRef.params?.id;
+                            if (logId) {
+                                // Qui servirebbe caricare il log dal DB, ma syncThreatLog è pensato per eventi live.
+                                // In alternativa, se abbiamo i dati nel payload, potremmo usarli (ma non avremmo i nuovi campi).
+                                // Per semplicità, i log atomici obsoleti li cancelliamo e lasciamo che vengano reinseriti
+                                // se riprocessati, oppure aggiungiamo un metodo getLogById nel service.
+                                await this.qdrant.deletePoint(collectionName, point.id);
+                                stats.deleted++;
+                            }
+                            break;
+                        
+                        case 'attack_summary':
+                            // Gli attacchi raggruppati hanno IP nel payload o sourceRef
+                            const ip = payload.ip || payload.sourceRef.params?.ip;
+                            if (ip) {
+                                // Carichiamo i dati freschi (con le nuove metriche) e ri-materializziamo
+                                const freshAttack = await this.config.ragEnabled ? await this.attackLogService.getAttackDetail(payload.sourceRef.params) : null;
+                                if (freshAttack) {
+                                    await this.materializeAttack(freshAttack);
+                                    success = true;
+                                }
+                            }
+                            break;
+
+                        case 'campaign_summary':
+                            // Le campagne hanno hash nel payload o sourceRef
+                            const hash = payload.campaignId || payload.sourceRef.params?.hash;
+                            if (hash) {
+                                const freshCampaign = await this.campaignService.getCampaignDetail(payload.sourceRef.params);
+                                if (freshCampaign) {
+                                    await this.materializeCampaign(freshCampaign as any);
+                                    success = true;
+                                }
+                            }
+                            break;
+                    }
+
+                    if (success) stats.updated++;
+                    else {
+                        // Se la materializzazione fallisce (es. dati non più esistenti), potremmo voler cancellare
+                        this.logger.warn(`[RagSync] Could not re-materialize point ${point.id}. Pruning...`);
+                        await this.qdrant.deletePoint(collectionName, point.id);
+                        stats.deleted++;
+                    }
+
+                } catch (err) {
+                    this.logger.error(`[RagSync] Failed to re-index point ${point.id}: ${err.message}`);
+                }
+            }
+
+            if (stats.processed > 0) {
+                this.logger.info(`[RagSync] Re-indexing finished: ${stats.updated} updated, ${stats.deleted} deleted.`);
+            }
+
+            return stats;
+        } catch (error) {
+            this.logger.error(`[RagSync] Error during re-indexing obsolete points: ${error.message}`);
+            return stats;
+        }
+    }
+
+    /**
      * Svuota il buffer dei log e li invia a Qdrant in blocco.
      */
     private async flushLogBuffer() {
@@ -108,6 +222,7 @@ export class RagSyncService {
                 
                 const payload: ThreatLogPayload = {
                     type: 'threat_log',
+                    status: log.status,
                     mongoId: log._id.toString(),
                     ip: log.request?.ip || 'N/A',
                     timestamp: log.timestamp,
@@ -336,6 +451,7 @@ export class RagSyncService {
                 text: aiSummary,
                 materializedAt: new Date(),
                 schemaVersion: RAG_SCHEMA_VERSION,
+                status: campaign.status,
                 sourceRef: sourceRef || {
                     endpoint: RAG_POLICIES.CAMPAIGNS.apiRef.endpoint,
                     method: RAG_POLICIES.CAMPAIGNS.apiRef.method,
@@ -388,6 +504,7 @@ export class RagSyncService {
                 text: aiSummary,
                 materializedAt: new Date(),
                 schemaVersion: RAG_SCHEMA_VERSION,
+                status: attack.status,
                 sourceRef: sourceRef || {
                     endpoint: RAG_POLICIES.ATTACKS.apiRef.endpoint,
                     method: RAG_POLICIES.ATTACKS.apiRef.method,

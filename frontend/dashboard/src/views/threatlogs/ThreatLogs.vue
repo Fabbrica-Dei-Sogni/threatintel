@@ -43,6 +43,13 @@
           <span class="cyber-label">PROT</span>
           <div class="protocol-reset-group">
             <ProtocolSelector v-model="filterProtocol" theme="amber" />
+          </div>
+        </div>
+
+        <div class="filter-item">
+          <span class="cyber-label">{{ t('common.status').toUpperCase() }}</span>
+          <div class="protocol-reset-group">
+            <StatusSelector v-model="filterStatus" theme="amber" />
             <button class="reset-btn-mini filter-reset-btn" @click="handleReset" :title="t('telemetry.reset_filters')">
               <div class="reset-ascii">
                 <span></span>
@@ -228,6 +235,7 @@ import { useLogsFilter } from '../../composable/useLogsFilter';
 import { useClipboard } from '../../composable/useClipboard';
 import { useI18n } from 'vue-i18n';
 import ProtocolSelector from '../../components/common/ProtocolSelector.vue';
+import StatusSelector from '../../components/common/StatusSelector.vue';
 import ViewToggle from '../../components/common/ViewToggle.vue';
 import dayjs from 'dayjs';
 import CountryFlag from '../../components/CountryFlag.vue';
@@ -268,6 +276,7 @@ const {
   filterIp,
   filterUrl,
   filterProtocol,
+  filterStatus,
   sortFields,
   page,
   logs,
@@ -283,6 +292,7 @@ const {
   toRef(logsState.filters, 'ip'),
   toRef(logsState.filters, 'url'),
   toRef(logsState.filters, 'protocol'),
+  toRef(logsState.filters, 'status'),
   toRef(logsState.pagination, 'page'),
   toRef(logsState.sort, 'fields'),
   toRef(logsState.pagination, 'pageSize')
@@ -344,13 +354,14 @@ watch(() => props.initialPage,       (v) => { page.value           = v ?? 1; });
 watch(() => props.initialSortFields, (v) => { sortFields.value     = v ?? {}; }, { deep: true });
 
 // Sincronizzazione Ref -> URL query
-watch([filterIp, filterUrl, filterProtocol, page, sortFields], ([newIp, newUrl, newProto, newPage, newSortFields]) => {
+watch([filterIp, filterUrl, filterProtocol, filterStatus, page, sortFields], ([newIp, newUrl, newProto, newStatus, newPage, newSortFields]) => {
   router.replace({
     name: 'ThreatLogs',
     query: {
       ip: newIp || undefined,
       url: newUrl || undefined,
       protocol: newProto !== 'http' ? newProto : undefined,
+      status: newStatus !== 'active' ? newStatus : undefined,
       page: newPage > 1 ? newPage : undefined,
       sortFields: newSortFields && Object.keys(newSortFields).length > 0 ? JSON.stringify(newSortFields) : undefined
     },

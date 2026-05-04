@@ -10,7 +10,6 @@ import { Request, Response } from 'express';
 import { inject, singleton } from 'tsyringe';
 import { ThreatLogService } from '../services/ThreatLogService';
 import { IpDetailsService } from '../services/IpDetailsService';
-import { SshLogService } from '../services/SshLogService';
 import { LOGGER_TOKEN } from '../di/tokens';
 import { Logger } from 'winston';
 import { assertPublicIp, IpValidationError } from '../utils/ipValidator';
@@ -18,6 +17,7 @@ import { sanitizePage, sanitizePageSize, sanitizeLimit } from '../utils/queryGua
 import { Controller, Get, Post } from '../registry/decorators';
 import { getComponent } from '../di/container';
 import { AuthMiddleware } from '../middlewares/AuthMiddleware';
+import { StatusManagerService } from '../services/StatusManagerService';
 
 const auth = getComponent(AuthMiddleware);
 
@@ -27,7 +27,8 @@ export class ThreatController {
     constructor(
         private threatLogService: ThreatLogService,
         private ipDetailsService: IpDetailsService,
-        @inject(LOGGER_TOKEN) private logger: Logger
+        @inject(LOGGER_TOKEN) private logger: Logger,
+        private statusManager: StatusManagerService
     ) { }
 
     /**
@@ -176,120 +177,6 @@ export class ThreatController {
         }
     }
 
-    /**
-     * @openapi
-     * /attack/search:
-     *   post:
-     *     tags: [Dashboard API]
-     *     summary: Ricerca attacchi raggruppati
-     *     responses:
-     *       200:
-     *         description: Elenco attacchi aggregati.
-     */
-    @Post('/attack/search')
-    async searchAttacks(req: Request, res: Response): Promise<void> {
-        this.logger.info('[ThreatController] Requesting attack search');
-        try {
-            const { page = 1, pageSize = 20, filters = {}, minLogsForAttack = 10, timeConfig = {}, sortFields = {} } = req.body;
-
-            const pageNum = sanitizePage(page);
-            const pageSizeNum = sanitizePageSize(pageSize);
-            const minLogsForAttackNum = Math.min(Math.max(1, parseInt(minLogsForAttack)), 1000);
-
-            const data = await this.threatLogService.getAttacks({
-                page: pageNum,
-                pageSize: pageSizeNum,
-                filters,
-                minLogsForAttack: minLogsForAttackNum,
-                timeConfig,
-                sortFields
-            });
-
-            res.json({ attacks: data.items, total: data.totalCount, page: pageNum, pageSize: pageSizeNum });
-        } catch (err: any) {
-            this.logger.error('[ThreatController] Error searching attacks:', err);
-            res.status(err.status || 500).json({ error: 'Errore recupero attacchi' });
-        }
-    }
-
-    /**
-     * @openapi
-     * /attack/details:
-     *   post:
-     *     tags: [Dashboard API]
-     *     summary: Ottiene dettagli specifici di un attacco
-     *     responses:
-     *       200:
-     *         description: Dettagli dell'attacco.
-     */
-    @Post('/attack/details')
-    async getAttackDetails(req: Request, res: Response): Promise<void> {
-        this.logger.info(`[ThreatController] Requesting attack details for IP ${req.body.ip}`);
-        try {
-            const { ip, minLogsForAttack = 10, timeConfig = {}, protocol } = req.body;
-            if (!ip) {
-                res.status(400).json({ error: 'IP mancante' });
-                return;
-            }
-
-            const attack = await this.threatLogService.getAttackDetail({
-                ip,
-                minLogsForAttack: parseInt(minLogsForAttack),
-                timeConfig,
-                protocol
-            });
-
-            if (!attack) {
-                res.status(404).json({ error: 'Attacco non trovato' });
-                return;
-            }
-
-            res.json(attack);
-        } catch (err: any) {
-            this.logger.error('[ThreatController] Error fetching attack details:', err);
-            res.status(500).json({ error: 'Errore durante il recupero dei dettagli dell\'attacco' });
-        }
-    }
-
-    /**
-     * @openapi
-     * /attack/distributed:
-     *   post:
-     *     tags: [Dashboard API]
-     *     summary: Ottiene dettagli investigativi per un cluster di IP (Attacco Distribuito)
-     *     responses:
-     *       200:
-     *         description: Dettagli dell'attacco distribuito.
-     */
-    @Post('/attack/distributed')
-    async getDistributedAttackDetails(req: Request, res: Response): Promise<void> {
-        this.logger.info(`[ThreatController] Requesting distributed attack details for ${req.body.ipList?.length || 0} IPs`);
-        try {
-            const { ipList, minLogsForAttack = 1, timeConfig = {}, protocol } = req.body;
-
-            if (!ipList || !Array.isArray(ipList) || ipList.length === 0) {
-                res.status(400).json({ error: 'Lista IP mancante o non valida' });
-                return;
-            }
-
-            const attack = await this.threatLogService.getDistributedAttackDetail({
-                ipList,
-                minLogsForAttack: parseInt(minLogsForAttack),
-                timeConfig,
-                protocol
-            });
-
-            if (!attack) {
-                res.status(404).json({ error: 'Nessun dato trovato per il cluster di IP fornito' });
-                return;
-            }
-
-            res.json(attack);
-        } catch (err: any) {
-            this.logger.error('[ThreatController] Error fetching distributed attack details:', err);
-            res.status(500).json({ error: 'Errore durante l\'analisi investigativa distribuita' });
-        }
-    }
 
     /**
      * @openapi
@@ -551,5 +438,71 @@ export class ThreatController {
         }
     }
 
+    /**
+     * @openapi
+     * /status:
+     *   post:
+     *     tags: [Log Management]
+     *     summary: Cambia lo stato di un log, attacco o campagna (active, archived, deleted)
+     *     responses:
+     *       202:
+     *         description: Richiesta accettata.
+     */
+    @Post('/status', [auth.isAuthenticated()])
+    async changeStatus(req: Request, res: Response): Promise<void> {
+        const { type, id, status, reason = 'manual_update' } = req.body;
+        const user = (req as any).user?.name || 'anonymous';
+
+        try {
+            if (!type || !id || !status) {
+                res.status(400).json({ error: 'Parametri type, id e status obbligatori' });
+                return;
+            }
+
+            await this.statusManager.processStatusChange(type, id, status, reason, user);
+
+            res.status(202).json({
+                message: 'Richiesta di cambio stato presa in carico',
+                operation: { type, id, status, user }
+            });
+        } catch (err: any) {
+            this.logger.error('[ThreatController] Change Status error:', err);
+            res.status(500).json({ error: 'Errore durante la richiesta di cambio stato' });
+        }
+    }
+
+    /**
+     * @openapi
+     * /restore:
+     *   post:
+     *     tags: [Log Management]
+     *     summary: Ripristina i log da un contesto di archiviazione
+     *     responses:
+     *       202:
+     *         description: Ripristino avviato.
+     */
+    @Post('/restore', [auth.isAuthenticated()])
+    async restore(req: Request, res: Response): Promise<void> {
+        const { sourceId } = req.body;
+        const user = (req as any).user?.name || 'anonymous';
+
+        try {
+            if (!sourceId) {
+                res.status(400).json({ error: 'Parametro sourceId obbligatorio' });
+                return;
+            }
+
+            await this.statusManager.restoreByContext(sourceId, user);
+
+            res.status(202).json({
+                message: 'Ripristino contesto avviato',
+                sourceId,
+                user
+            });
+        } catch (err: any) {
+            this.logger.error('[ThreatController] Restore error:', err);
+            res.status(500).json({ error: 'Errore durante il ripristino' });
+        }
+    }
 }
 

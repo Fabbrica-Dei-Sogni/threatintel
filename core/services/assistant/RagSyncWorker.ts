@@ -12,6 +12,7 @@ import { LOGGER_TOKEN, RAG_SYNC_SERVICE_TOKEN } from '../../di/tokens';
 import { RagSyncService } from './RagSyncService';
 import { CampaignService } from '../CampaignService';
 import { ThreatLogService } from '../ThreatLogService';
+import { AttackLogService } from '../AttackLogService';
 import { ConfigService } from '../ConfigService';
 import { ILongRunningService, ServiceStatus } from '../../types/lifecycle';
 import { RAG_POLICIES } from './RagPolicies';
@@ -28,6 +29,7 @@ export class RagSyncWorker implements ILongRunningService {
         @inject(RAG_SYNC_SERVICE_TOKEN) private readonly ragSync: RagSyncService,
         private readonly campaignService: CampaignService,
         private readonly threatLogService: ThreatLogService,
+        private readonly attackLogService: AttackLogService,
         private readonly configService: ConfigService
     ) { }
 
@@ -53,8 +55,12 @@ export class RagSyncWorker implements ILongRunningService {
             // Avvio loop periodico per la materializzazione (ogni 30 minuti)
             this.startMaterializer(30 * 60 * 1000);
 
+            // Avvio loop periodico per la manutenzione e auto-pruning (ogni 4 ore)
+            this.startMaintenance(4 * 60 * 60 * 1000);
+
             // Esecuzione immediata al primo avvio (Asincrona)
             this.runMaterialization();
+            this.runMaintenance();
 
         } catch (error) {
             this.status = ServiceStatus.FAILED;
@@ -81,6 +87,33 @@ export class RagSyncWorker implements ILongRunningService {
         this.timer = setInterval(async () => {
             await this.runMaterialization();
         }, intervalMs);
+    }
+
+    private startMaintenance(intervalMs: number) {
+        this.logger.info(`[${this.serviceName}] Maintenance (Pruning/Re-indexing) scheduled every ${intervalMs / 3600000} hours.`);
+        setInterval(async () => {
+            await this.runMaintenance();
+        }, intervalMs);
+    }
+
+    private async runMaintenance() {
+        try {
+            this.logger.info(`[${this.serviceName}] Running scheduled maintenance task...`);
+            
+            const intelligenceColl = this.ragSync.getStatus().intelligenceCollection;
+            const logsColl = this.ragSync.getStatus().logsCollection;
+
+            if (intelligenceColl) {
+                await this.ragSync.reindexObsoletePoints(intelligenceColl, 50);
+            }
+            if (logsColl) {
+                await this.ragSync.reindexObsoletePoints(logsColl, 50);
+            }
+            
+            this.logger.info(`[${this.serviceName}] Maintenance task completed.`);
+        } catch (error) {
+            this.logger.error(`[${this.serviceName}] Maintenance task failed: ${error.message}`);
+        }
     }
 
     private async runMaterialization() {
@@ -171,7 +204,7 @@ export class RagSyncWorker implements ILongRunningService {
 
         while (hasMore) {
             try {
-                const result = await this.threatLogService.getAttacks({ 
+                const result = await this.attackLogService.getAttacks({ 
                     page: currentPage, 
                     pageSize: policy.pageSize, 
                     minLogsForAttack: policy.minLogs, 

@@ -76,6 +76,24 @@ export class QdrantClientService {
     }
 
     /**
+     * Elimina dei punti basandosi su un filtro.
+     * @param collectionName Nome della collection
+     * @param filter Filtro Qdrant
+     */
+    public async deleteByFilter(collectionName: string, filter: any) {
+        try {
+            this.logger.info(`[Qdrant] Deleting points in ${collectionName} by filter: ${JSON.stringify(filter)}`);
+            await this.client.delete(collectionName, {
+                filter: filter
+            });
+            return true;
+        } catch (error) {
+            this.logger.error(`[Qdrant] Error deleting by filter on ${collectionName}: ${error}`);
+            return false;
+        }
+    }
+
+    /**
      * Inserisce o aggiorna dei punti nel database vettoriale.
      * @param collectionName Nome della collection
      * @param points Array di punti (vettori + metadati)

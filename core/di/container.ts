@@ -18,8 +18,11 @@ import { RagSyncWorker } from "../services/assistant/RagSyncWorker";
 import { AssistantService } from "../services/assistant/AssistantService";
 import { EventBus } from "../services/EventBus";
 import { RagEventListener } from "../services/assistant/RagEventListener";
+import { StatusEventListener } from "../services/StatusEventListener";
+import { PruningService } from "../services/PruningService";
 import { McpNativeExecutor } from "../assistant/mcp/McpNativeExecutor";
-import { LOGGER_TOKEN, I18N_TOKEN, CONFIG_PROVIDER_TOKEN, RAG_TRANSLATION_TOKEN, QDRANT_CLIENT_TOKEN, OLLAMA_SERVICE_TOKEN, RAG_SYNC_SERVICE_TOKEN, RAG_SYNC_WORKER_TOKEN, ASSISTANT_SERVICE_TOKEN, EVENT_BUS_TOKEN, RAG_EVENT_LISTENER_TOKEN, MCP_EXECUTOR_TOKEN } from "./tokens";
+import { ForensicPipelineService } from "../services/forense/ForensicPipelineService";
+import { LOGGER_TOKEN, I18N_TOKEN, CONFIG_PROVIDER_TOKEN, RAG_TRANSLATION_TOKEN, QDRANT_CLIENT_TOKEN, OLLAMA_SERVICE_TOKEN, RAG_SYNC_SERVICE_TOKEN, RAG_SYNC_WORKER_TOKEN, ASSISTANT_SERVICE_TOKEN, EVENT_BUS_TOKEN, RAG_EVENT_LISTENER_TOKEN, STATUS_EVENT_LISTENER_TOKEN, PRUNING_SERVICE_TOKEN, MCP_EXECUTOR_TOKEN, FORENSIC_PIPELINE_TOKEN } from "./tokens";
 import logger from "../../logger";
 
 export const coreContainer = container;
@@ -80,8 +83,17 @@ coreContainer.registerSingleton(EVENT_BUS_TOKEN, EventBus);
 // registrazione del servizio RagEventListener come singleton
 coreContainer.registerSingleton(RAG_EVENT_LISTENER_TOKEN, RagEventListener);
 
+// registrazione del servizio StatusEventListener come singleton
+coreContainer.registerSingleton(STATUS_EVENT_LISTENER_TOKEN, StatusEventListener);
+
+// registrazione del servizio PruningService come singleton
+coreContainer.registerSingleton(PRUNING_SERVICE_TOKEN, PruningService);
+
 // registrazione del servizio McpNativeExecutor come singleton
 coreContainer.registerSingleton(MCP_EXECUTOR_TOKEN, McpNativeExecutor);
+
+// registrazione del servizio ForensicPipelineService come singleton
+coreContainer.registerSingleton(FORENSIC_PIPELINE_TOKEN, ForensicPipelineService);
 
 
 // nuova funzione generica

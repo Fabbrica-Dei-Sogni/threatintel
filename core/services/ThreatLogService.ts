@@ -9,11 +9,7 @@
 import dotenv from 'dotenv';
 // Import model
 import ThreatLog, { IThreatLog } from '../models/ThreatLogSchema';
-import IpDetails from '../models/IpDetailsSchema';
-import AttackDTO from '../models/dto/AttackDTO';
 import PatternAnalysisService from './PatternAnalysisService';
-import { ForensicService } from './forense/ForensicService';
-import { ForensicPipelineService } from './forense/ForensicPipelineService';
 import { inject, injectable } from 'tsyringe';
 import { LOGGER_TOKEN, EVENT_BUS_TOKEN } from '../di/tokens';
 import { Logger } from 'winston';
@@ -31,8 +27,7 @@ import {
     FilterAllowedFields
 } from '../utils/queryGuard';
 
-import { TimeConfig } from '../types/common.types';
-import { GetAttackDetailParams, GetLogByIdParams, GetAttacksParams } from '../types/service-params.types';
+import { GetLogByIdParams } from '../types/service-params.types';
 
 dotenv.config();
 
@@ -42,8 +37,6 @@ export class ThreatLogService {
 
     constructor(
         @inject(LOGGER_TOKEN) private readonly logger: Logger,
-        private readonly forensicService: ForensicService,
-        private readonly forensicPipelineService: ForensicPipelineService,
         private readonly ipDetailsService: IpDetailsService,
         private readonly patternAnalysisService: PatternAnalysisService,
         @inject(EVENT_BUS_TOKEN) private readonly eventBus: EventBus
@@ -108,223 +101,23 @@ export class ThreatLogService {
         return await ThreatLog.countDocuments(mongoFilters);
     }
 
-    /**
-     * Versione V2 di getAttacks che utilizza la nuova ForensicPipelineService (Builder Pattern).
-     * @param param0 
-     * @returns 
-     */
-    async getAttacks(params: GetAttacksParams = {}) {
-        const {
-            page = 1,
-            pageSize = 20,
-            filters = {},
-            minLogsForAttack = 10,
-            timeConfig = {},
-            sortFields = null
-        } = params;
-        const skip = (page - 1) * pageSize;
-
-        // Separiamo i filtri iniziali (sui log raw) da quelli post-aggregazione (campi calcolati)
-        const postAggFields = ['dangerLevel', 'attackPatterns', 'dangerScore', 'averageScore', 'totaleLogs'];
-        const initialFilters: any = {};
-        const postAggregationFilters: any = {};
-
-        for (const [key, value] of Object.entries(filters)) {
-            if (postAggFields.includes(key)) {
-                postAggregationFilters[key] = value;
-            } else {
-                initialFilters[key] = value;
-            }
-        }
-
-        const mongoFilters = this.buildRegExpFilter(initialFilters, FilterAllowedFields.attack);
-
-        // Costruisci sort dinamico
-        const safeSort = sanitizeSortFields(sortFields, SortAllowedFields.attack, { lastSeen: -1 });
-        const sortStage = { $sort: safeSort };
-
-        // Pipeline base costruita col nuovo Builder
-        const basePipeline = await this.forensicPipelineService.buildStandardPipeline(mongoFilters, minLogsForAttack, timeConfig);
-
-        // Applicazione filtri post-aggregazione
-        if (Object.keys(postAggregationFilters).length > 0) {
-            const { dangerLevel, ...otherPostFilters } = postAggregationFilters;
-
-            // 1. Gestione specifica dangerLevel (che può essere stringa "1,2" o array o numero)
-            if (dangerLevel) {
-                let levels: number[] = [];
-                if (typeof dangerLevel === 'string') {
-                    levels = dangerLevel.split(',').map(l => parseInt(l.trim())).filter(l => !isNaN(l));
-                } else if (Array.isArray(dangerLevel)) {
-                    levels = dangerLevel.map(l => typeof l === 'string' ? parseInt(l) : l).filter(l => !isNaN(l));
-                } else if (typeof dangerLevel === 'number') {
-                    levels = [dangerLevel];
-                }
-
-                if (levels.length > 0) {
-                    basePipeline.push({ $match: { dangerLevel: { $in: levels } } });
-                }
-            }
-
-            // 2. Altri filtri post-aggregazione (incluso attackPatterns che supporta regex su array)
-            if (Object.keys(otherPostFilters).length > 0) {
-                const postMongoFilters = this.buildRegExpFilter(otherPostFilters, FilterAllowedFields.attack);
-                basePipeline.push({ $match: postMongoFilters });
-            }
-        }
-
-        // Unico aggregate con facet che restituisce dati e conteggio
-        const pipeline = [
-            ...basePipeline,
-            {
-                $facet: {
-                    dati: [
-                        // Lookup e popolazione
-                        {
-                            $lookup: {
-                                from: 'ipdetails',
-                                localField: 'ipDetailsId',
-                                foreignField: '_id',
-                                as: 'ipDetails'
-                            }
-                        },
-                        {
-                            $addFields: {
-                                ipDetails: { $arrayElemAt: ['$ipDetails', 0] }
-                            }
-                        },
-                        // Ordinamento e paginazione
-                        sortStage,
-                        { $skip: skip },
-                        { $limit: pageSize }
-                    ],
-                    totale: [
-                        // Conta quanti documenti escono dallo replaceRoot
-                        { $count: 'totalCount' }
-                    ]
-                }
-            },
-            // Estrai il conteggio dal facet
-            {
-                $addFields: {
-                    totalCount: { $arrayElemAt: ['$totale.totalCount', 0] }
-                }
-            },
-            // Proietta solo i campi che servono
-            {
-                $project: {
-                    dati: 1,
-                    totalCount: 1
-                }
-            }
-        ];
-
-        const [result] = await ThreatLog.aggregate(pipeline).allowDiskUse(true);
-
-        const attacks: AttackDTO[] = result.dati;
-
-        // Notifica il sistema RAG via Event Bus
-        if (attacks.length > 0) {
-            this.eventBus.emit(AppEvents.ATTACK_SEARCHED, { items: attacks, totalCount: result.totalCount || 0 });
-        }
-
-
-        return {
-            items: attacks,
-            totalCount: result.totalCount || 0
-        };
-    }
-
-    async getAttackDetail(params: GetAttackDetailParams) {
-        const {
-            ip,
-            minLogsForAttack = 1,
-            timeConfig = {},
-            protocol = null
-        } = params;
-        const mongoFilters: any = { 'request.ip': ip };
-        if (protocol) {
-            mongoFilters.protocol = protocol;
-        }
-
-        // Pipeline base costruita col nuovo Builder
-        const basePipeline = await this.forensicPipelineService.buildStandardPipeline(mongoFilters, minLogsForAttack, timeConfig);
-
-        const pipeline = [
-            ...basePipeline,
-            {
-                $lookup: {
-                    from: 'ipdetails',
-                    localField: 'ipDetailsId',
-                    foreignField: '_id',
-                    as: 'ipDetails'
-                }
-            },
-            {
-                $addFields: {
-                    ipDetails: { $arrayElemAt: ['$ipDetails', 0] }
-                }
-            }
-        ];
-
-        const [attack] = await ThreatLog.aggregate(pipeline).allowDiskUse(true);
-
-        // Notifica il sistema RAG via Event Bus
-        if (attack) {
-            this.eventBus.emit(AppEvents.ATTACK_RESOLVED, attack);
-        }
-
-        return attack || null;
-    }
-
-    async getDistributedAttackDetail({
-        ipList,
-        minLogsForAttack = 1,
-        timeConfig = {},
-        protocol = null
-    }: {
-        ipList: string[];
-        minLogsForAttack?: number;
-        timeConfig?: any;
-        protocol?: string | null;
-    }) {
-        // Costruisce la pipeline dedicata alla lista IP
-        const pipeline = await this.forensicPipelineService.buildDistributedPipeline(ipList, minLogsForAttack, timeConfig, protocol);
-
-        // Esegue l'aggregazione
-        const [attack] = await ThreatLog.aggregate(pipeline).allowDiskUse(true);
-
-        // Aggiunge metadati extra se necessario (lookup ipDetails per il "rappresentante")
-        if (attack) {
-            const result = await ThreatLog.populate(attack, { path: 'ipDetailsId', model: 'IpDetails' });
-            // Sincronizza il campo ipDetails per retrocompatibilità con il frontend (che si aspetta ipDetails anziché ipDetailsId)
-            const resAny = result as any;
-            // Sincronizza il campo ipDetails per retrocompatibilità con il frontend (che si asaptte ipDetails anziché ipDetailsId)
-            if (resAny.ipDetailsId) {
-                resAny.ipDetails = resAny.ipDetailsId;
-            }
-
-            // Recupera ipDetails per TUTTI gli IP coinvolti per visualizzazione su mappa
-            if (resAny.ips && resAny.ips.length > 0) {
-                const allDetails = await IpDetails.find({ ip: { $in: resAny.ips } })
-                    .populate('abuseipdbId')
-                    .lean();
-                resAny.allIpDetails = allDetails;
-            }
-
-            // Notifica il sistema RAG via Event Bus
-            this.eventBus.emit(AppEvents.ATTACK_RESOLVED, resAny);
-
-            return result;
-        }
-
-        return null;
-    }
 
     buildRegExpFilter(filters: any, allowedFields: Set<string> = FilterAllowedFields.threatLog) {
         const mongoFilters: any = {};
         const andFilters: any[] = [];
         const safeFilters = sanitizeFilters(filters, allowedFields);
+
+        // Gestione speciale dello status con fallback ad active (null/active)
+        if (allowedFields.has('status')) {
+            const statusValue = safeFilters.status;
+            if (!statusValue || statusValue === 'active') {
+                mongoFilters.status = { $in: [null, 'active'] };
+            } else {
+                mongoFilters.status = statusValue;
+            }
+            // Rimuoviamo status dai filtri safe per non processarlo nuovamente nel loop generico
+            delete safeFilters.status;
+        }
 
         for (const [key, value] of Object.entries(safeFilters)) {
             if (key === 'protocol') {

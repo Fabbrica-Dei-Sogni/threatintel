@@ -8,19 +8,19 @@
 
 import { injectable, inject } from 'tsyringe';
 import { Logger } from 'winston';
-import { LOGGER_TOKEN, EVENT_BUS_TOKEN } from '../di/tokens';
+import { LOGGER_TOKEN, EVENT_BUS_TOKEN, FORENSIC_PIPELINE_TOKEN } from '../di/tokens';
 import ThreatLog from '../models/ThreatLogSchema';
-import { TimeFilterStage } from './forense/pipeline/stages/TimeFilterStage';
 import { calculateCorrelationHubs } from '../utils/CampaignAnalytics';
 import { EventBus, AppEvents } from './EventBus';
-import { TimeConfig } from '../types/common.types';
 import { GetCampaignDetailParams, GetCampaignsParams } from '../types/service-params.types';
+import { ForensicPipelineService } from './forense/ForensicPipelineService';
 
 @injectable()
 export class CampaignService {
     constructor(
         @inject(LOGGER_TOKEN) private readonly logger: Logger,
-        @inject(EVENT_BUS_TOKEN) private readonly eventBus: EventBus
+        @inject(EVENT_BUS_TOKEN) private readonly eventBus: EventBus,
+        @inject(FORENSIC_PIPELINE_TOKEN) private readonly forensicPipeline: ForensicPipelineService
     ) { }
 
     /**
@@ -28,18 +28,24 @@ export class CampaignService {
      */
     async getCampaigns(params: GetCampaignsParams) {
         const {
-            minIps = 2,
-            minScore = 0,
-            minLogsPerIp = 1,
-            protocol = 'http',
             page = 1,
             pageSize = 10,
-            timeConfig = {},
             selectedUris = [],
-            search = ''
+            search = '',
+            status = 'active',
+            protocol = 'http'
         } = params;
 
+        // 1. Preparazione Filtro Mongo Base (richiesto dall'utente)
         const baseFilters: any = {};
+
+        // Gestione Status con fallback
+        if (!status || status === 'active') {
+            baseFilters.status = { $in: [null, 'active'] };
+        } else {
+            baseFilters.status = status;
+        }
+
         if (protocol) {
             if (protocol === 'http') {
                 baseFilters.$or = [{ protocol: 'http' }, { protocol: { $exists: false } }, { protocol: null }];
@@ -50,11 +56,9 @@ export class CampaignService {
 
         if (selectedUris.length > 0) {
             if (selectedUris.length === 1) {
-                // Se c'è un solo URI, usiamo regex per massima robustezza contro punti e case-sensitivity
                 const escapedUri = selectedUris[0].replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
                 baseFilters['request.url'] = { $regex: `^${escapedUri}$`, $options: 'i' };
             } else {
-                // Se sono più di uno, usiamo $in (match esatto letterale)
                 baseFilters['request.url'] = { $in: selectedUris };
             }
         }
@@ -77,113 +81,21 @@ export class CampaignService {
             }
         }
 
-        const [oldestLog] = await ThreatLog.find(baseFilters).sort({ timestamp: 1 }).limit(1).select('timestamp').lean();
-        const [newestLog] = await ThreatLog.find(baseFilters).sort({ timestamp: -1 }).limit(1).select('timestamp').lean();
-        const globalMinDate = oldestLog?.timestamp || null;
-        const globalMaxDate = newestLog?.timestamp || null;
-
-        const timeStage = new TimeFilterStage(timeConfig).generate();
-
-        // Pipeline per metadati adattivi dello slider LOGS/IP
-        const logsPerIpMetadataPipeline = [
-            ...timeStage,
-            { $match: baseFilters },
-            { $group: { _id: { hash: '$fingerprint.hash', ip: '$request.ip' }, logs: { $sum: 1 } } },
-            { $group: { _id: null, maxLogs: { $max: '$logs' }, minLogs: { $min: '$logs' } } }
-        ];
-        const [logsMeta] = await ThreatLog.aggregate(logsPerIpMetadataPipeline).allowDiskUse(true);
-
-        const pipeline = [
-            ...timeStage,
-            { $match: baseFilters },
-            {
-                $group: {
-                    _id: { hash: '$fingerprint.hash', ip: '$request.ip' },
-                    logsPerIp: { $sum: 1 },
-                    sumScorePerIp: { $sum: '$fingerprint.score' },
-                    indicatorsPerIp: { $push: '$fingerprint.indicators' },
-                    firstSeen: { $min: '$timestamp' },
-                    lastSeen: { $max: '$timestamp' },
-                    sampleUrl: { $first: '$request.url' },
-                    protocols: { $addToSet: '$protocol' }
-                }
-            },
-            { $match: { '_id.hash': { $ne: null }, logsPerIp: { $gte: Number(minLogsPerIp) } } },
-            {
-                $group: {
-                    _id: '$_id.hash',
-                    ipCount: { $sum: 1 },
-                    totaleLogs: { $sum: '$logsPerIp' },
-                    sumScore: { $sum: '$sumScorePerIp' },
-                    maxLogsInThisCampaign: { $max: '$logsPerIp' },
-                    firstSeen: { $min: '$firstSeen' },
-                    lastSeen: { $max: '$lastSeen' },
-                    sampleUrl: { $first: '$sampleUrl' },
-                    allIndicators: { $push: '$indicatorsPerIp' },
-                    timeInfo: { $push: { ip: '$_id.ip', firstSeen: '$firstSeen', lastSeen: '$lastSeen' } },
-                    allProtocols: { $push: '$protocols' }
-                }
-            },
-            {
-                $project: {
-                    hash: '$_id',
-                    ipCount: 1,
-                    totaleLogs: 1,
-                    maxLogsInThisCampaign: 1,
-                    firstSeen: 1,
-                    lastSeen: 1,
-                    sampleUrl: 1,
-                    averageScore: { $divide: ['$sumScore', '$totaleLogs'] },
-                    timeInfo: 1,
-                    protocols: {
-                        $reduce: {
-                            input: '$allProtocols',
-                            initialValue: [],
-                            in: { $setUnion: ['$$value', '$$this'] }
-                        }
-                    },
-                    attackPatterns: {
-                        $reduce: {
-                            input: '$allIndicators',
-                            initialValue: [],
-                            in: { $setUnion: ['$$value', { $reduce: { input: '$$this', initialValue: [], in: { $setUnion: ['$$value', '$$this'] } } }] }
-                        }
-                    }
-                }
-            },
-            {
-                $facet: {
-                    discoveryCandidates: [
-                        { $match: { ipCount: { $gte: Number(minIps) }, averageScore: { $gte: Number(minScore) } } },
-                        { $sort: { firstSeen: -1 as const, ipCount: -1 as const } }
-                    ],
-                    totalFiltered: [
-                        { $match: { ipCount: { $gte: Number(minIps) }, averageScore: { $gte: Number(minScore) } } },
-                        { $count: "total" }
-                    ],
-                    boundsIps: [
-                        { $match: { averageScore: { $gte: Number(minScore) } } },
-                        { $group: { _id: null, min: { $min: "$ipCount" }, max: { $max: "$ipCount" } } }
-                    ],
-                    boundsScore: [
-                        { $match: { ipCount: { $gte: Number(minIps) } } },
-                        { $group: { _id: null, min: { $min: "$averageScore" }, max: { $max: "$averageScore" } } }
-                    ],
-                    boundsLogsPerIp: [
-                        { $match: { ipCount: { $gte: Number(minIps) }, averageScore: { $gte: Number(minScore) } } },
-                        { $group: { _id: null, min: { $min: "$maxLogsInThisCampaign" }, max: { $max: "$maxLogsInThisCampaign" } } }
-                    ]
-                }
-            }
-        ];
-
         try {
+            // Calcolo date globali per i metadati (bounds temporali)
+            const [oldestLog] = await ThreatLog.find(baseFilters).sort({ timestamp: 1 }).limit(1).select('timestamp').lean();
+            const [newestLog] = await ThreatLog.find(baseFilters).sort({ timestamp: -1 }).limit(1).select('timestamp').lean();
+            const globalMinDate = oldestLog?.timestamp || null;
+            const globalMaxDate = newestLog?.timestamp || null;
+
+            // 2. Costruzione Pipeline tramite ForensicPipelineService
+            const pipeline = await this.forensicPipeline.buildCampaignDiscoveryPipeline(baseFilters, params);
+
+            // 3. Esecuzione Aggregazione
             const [result] = await ThreatLog.aggregate(pipeline).allowDiskUse(true);
 
-            // 1. Estraiamo tutti i candidati idonei
+            // 4. Processamento Risultati (Arricchimento e Filtraggio Correlazioni)
             const allCandidates = result?.discoveryCandidates || [];
-
-            // 2. Arricchimento e Filtraggio in memoria per correlazioni
             const enrichedAndFiltered = allCandidates
                 .map((c: any) => {
                     const hubs = calculateCorrelationHubs(c.timeInfo || []);
@@ -195,7 +107,7 @@ export class CampaignService {
                 })
                 .filter((c: any) => c.correlationHubsCount >= Number(params.minCorrelations || 0));
 
-            // 3. Ordinamento e Paginazione Manuale (post-filtro correlazioni)
+            // 5. Ordinamento e Paginazione Manuale (post-filtro correlazioni)
             const totalCount = enrichedAndFiltered.length;
             const sortedData = enrichedAndFiltered.sort((a, b) => {
                 const dateA = new Date(a.firstSeen).getTime();
@@ -207,7 +119,6 @@ export class CampaignService {
             const psNum = Number(pageSize);
             const pagedData = sortedData.slice((pNum - 1) * psNum, pNum * psNum);
 
-            // Notifica il sistema che è stata eseguita una ricerca di campagne
             if (pagedData.length > 0) {
                 this.eventBus.emit(AppEvents.CAMPAIGN_SEARCHED, pagedData);
             }
@@ -242,15 +153,19 @@ export class CampaignService {
     async getCampaignDetail(params: GetCampaignDetailParams) {
         const {
             hash,
-            minScore = 0,
-            minLogsPerIp = 1,
-            protocol = null,
-            timeConfig = {},
-            page = 1,
-            pageSize = 10
+            status = 'active',
+            protocol = null
         } = params;
 
+        // 1. Preparazione Filtro Mongo Base
         const baseFilters: any = { 'fingerprint.hash': hash };
+
+        if (!status || status === 'active') {
+            baseFilters.status = { $in: [null, 'active'] };
+        } else {
+            baseFilters.status = status;
+        }
+
         if (protocol) {
             if (protocol === 'http') {
                 baseFilters.$or = [{ protocol: 'http' }, { protocol: { $exists: false } }, { protocol: null }];
@@ -259,81 +174,15 @@ export class CampaignService {
             }
         }
 
-        const timeStage = new TimeFilterStage(timeConfig).generate();
-
-        const pipeline = [
-            ...timeStage,
-            { $match: baseFilters },
-            {
-                $group: {
-                    _id: '$request.ip',
-                    totaleLogs: { $sum: 1 },
-                    sumScore: { $sum: '$fingerprint.score' },
-                    firstSeen: { $min: '$timestamp' },
-                    lastSeen: { $max: '$timestamp' },
-                    allIndicators: { $push: '$fingerprint.indicators' },
-                    sampleUrl: { $first: '$request.url' }
-                }
-            },
-            // Filtro Fotografia: Solo gli IP che hanno partecipato alla scoperta
-            { $match: { totaleLogs: { $gte: Number(minLogsPerIp) } } },
-            {
-                $project: {
-                    ip: '$_id',
-                    totaleLogs: 1,
-                    firstSeen: 1,
-                    lastSeen: 1,
-                    sampleUrl: 1,
-                    averageScore: { $divide: ['$sumScore', '$totaleLogs'] },
-                    attackPatterns: {
-                        $reduce: {
-                            input: '$allIndicators',
-                            initialValue: [],
-                            in: { $setUnion: ['$$value', '$$this'] }
-                        }
-                    }
-                }
-            },
-            // FILTRI DI COERENZA (FOTOGRAFIA): Solo nodi che hanno passato la soglia di scoperta
-            {
-                $match: {
-                    totaleLogs: { $gte: Number(minLogsPerIp) },
-                    averageScore: { $gte: Number(minScore) }
-                }
-            },
-            { $lookup: { from: 'ipdetails', localField: 'ip', foreignField: 'ip', as: 'geo' } },
-            { $addFields: { geoInfo: { $arrayElemAt: ['$geo', 0] } } },
-            {
-                $facet: {
-                    meta: [
-                        {
-                            $group: {
-                                _id: null,
-                                ipCount: { $sum: 1 },
-                                clusterLogs: { $sum: '$totaleLogs' },
-                                clusterAvgScore: { $avg: '$averageScore' },
-                                clusterFirstSeen: { $min: '$firstSeen' },
-                                clusterLastSeen: { $max: '$lastSeen' },
-                                sampleUrl: { $first: '$sampleUrl' },
-                                allIps: { $push: '$ip' },
-                                timeInfo: { $push: { ip: '$ip', firstSeen: '$firstSeen', lastSeen: '$lastSeen' } }
-                            }
-                        }
-                    ],
-                    nodes: [
-                        { $sort: { firstSeen: -1, totaleLogs: -1 } },
-                        { $skip: (Number(page) - 1) * Number(pageSize) },
-                        { $limit: Number(pageSize) }
-                    ]
-                }
-            }
-        ];
-
         try {
+            // 2. Costruzione Pipeline tramite ForensicPipelineService
+            const pipeline = await this.forensicPipeline.buildCampaignDetailPipeline(baseFilters, params);
+
+            // 3. Esecuzione Aggregazione
             const [result] = await ThreatLog.aggregate(pipeline).allowDiskUse(true);
             const meta = result?.meta[0] || { ipCount: 0, clusterLogs: 0, clusterAvgScore: 0, timeInfo: [] };
 
-            // Calcolo correlazioni su tutti i nodi (non solo quelli paginati)
+            // 4. Calcolo correlazioni e preparazione oggetto finale
             const correlations = calculateCorrelationHubs(meta.timeInfo || []);
 
             const campaign = {
@@ -344,13 +193,14 @@ export class CampaignService {
                 firstSeen: meta.clusterFirstSeen,
                 lastSeen: meta.clusterLastSeen,
                 sampleUrl: meta.sampleUrl,
+                status: meta.status,
                 allIps: meta.allIps || [],
                 correlations,
                 nodes: result?.nodes || [],
-                page, pageSize
+                page: params.page,
+                pageSize: params.pageSize
             };
 
-            // Notifica il sistema: il RAG Listener lo catturerà per sincronizzare Qdrant
             this.eventBus.emit(AppEvents.CAMPAIGN_RESOLVED, campaign);
 
             return campaign;
@@ -366,17 +216,20 @@ export class CampaignService {
     async getUniqueSampleUrls(params: any) {
         const {
             protocol = 'http',
-            timeConfig = {},
-            minIps = 2,
-            minScore = 0,
             search = '',
-            page = 1,
-            pageSize = 20,
-            sortBy = 'count',
-            order = -1
+            status = 'active'
         } = params;
 
+        // 1. Preparazione Filtro Mongo Base
         const baseFilters: any = {};
+
+        // Gestione Status con fallback
+        if (!status || status === 'active') {
+            baseFilters.status = { $in: [null, 'active'] };
+        } else {
+            baseFilters.status = status;
+        }
+
         if (protocol) {
             if (protocol === 'http') {
                 baseFilters.$or = [{ protocol: 'http' }, { protocol: { $exists: false } }, { protocol: null }];
@@ -394,12 +247,8 @@ export class CampaignService {
                         { 'fingerprint.hash': cleanSearch }
                     ]
                 };
-                // Se abbiamo già un $or (per il protocollo http), usiamo $and
                 if (baseFilters.$or) {
-                    baseFilters.$and = [
-                        { $or: baseFilters.$or },
-                        searchFilter
-                    ];
+                    baseFilters.$and = [{ $or: baseFilters.$or }, searchFilter];
                     delete baseFilters.$or;
                 } else {
                     baseFilters.$or = searchFilter.$or;
@@ -407,87 +256,12 @@ export class CampaignService {
             }
         }
 
-        const timeStage = new TimeFilterStage(timeConfig).generate();
-
-        const pipeline: any[] = [
-            ...timeStage,
-            { $match: baseFilters },
-            // Step 1: Raggruppiamo per Hash + IP per determinare i cluster (come in discovery)
-            {
-                $group: {
-                    _id: { hash: '$fingerprint.hash', ip: '$request.ip' },
-                    logsPerIp: { $sum: 1 },
-                    sumScorePerIp: { $sum: '$fingerprint.score' },
-                    sampleUrl: { $first: '$request.url' },
-                    lastSeen: { $max: '$timestamp' }
-                }
-            },
-            { $match: { '_id.hash': { $ne: null } } },
-            // Step 2: Raggruppiamo per Hash per avere le metriche della campagna
-            {
-                $group: {
-                    _id: '$_id.hash',
-                    ipCount: { $sum: 1 },
-                    totaleLogs: { $sum: '$logsPerIp' },
-                    sumScore: { $sum: '$sumScorePerIp' },
-                    sampleUrl: { $first: '$sampleUrl' },
-                    lastSeen: { $max: '$lastSeen' }
-                }
-            },
-            {
-                $project: {
-                    ipCount: 1,
-                    totaleLogs: 1,
-                    sampleUrl: 1,
-                    lastSeen: 1,
-                    averageScore: { $divide: ['$sumScore', '$totaleLogs'] }
-                }
-            },
-            // Step 3: Filtriamo le campagne che non passano i criteri di base
-            { $match: { ipCount: { $gte: Number(minIps) }, averageScore: { $gte: Number(minScore) } } },
-            // Step 4: Raggruppiamo per URI finale
-            {
-                $group: {
-                    _id: '$sampleUrl',
-                    campaignCount: { $sum: 1 },
-                    totaleLogs: { $sum: '$totaleLogs' },
-                    lastSeen: { $max: '$lastSeen' }
-                }
-            },
-            {
-                $project: {
-                    uri: { $ifNull: ['$_id', '/'] },
-                    campaignCount: 1,
-                    totaleLogs: 1,
-                    lastSeen: 1
-                }
-            }
-        ];
-
-        // Sorting dinamico
-        const sortStage: any = {};
-        if (sortBy === 'uri') sortStage.uri = order;
-        else if (sortBy === 'logs') sortStage.totaleLogs = order;
-        else sortStage.campaignCount = order;
-
-        const facetPipeline = [
-            ...pipeline,
-            {
-                $facet: {
-                    data: [
-                        { $sort: sortStage },
-                        { $skip: (page - 1) * pageSize },
-                        { $limit: pageSize }
-                    ],
-                    totalCount: [
-                        { $count: 'count' }
-                    ]
-                }
-            }
-        ];
-
         try {
-            const [result] = await ThreatLog.aggregate(facetPipeline).allowDiskUse(true);
+            // 2. Costruzione Pipeline tramite ForensicPipelineService
+            const pipeline = await this.forensicPipeline.buildUniqueSampleUrlsPipeline(baseFilters, params);
+
+            // 3. Esecuzione Aggregazione
+            const [result] = await ThreatLog.aggregate(pipeline).allowDiskUse(true);
             return {
                 uris: result?.data || [],
                 total: result?.totalCount[0]?.count || 0

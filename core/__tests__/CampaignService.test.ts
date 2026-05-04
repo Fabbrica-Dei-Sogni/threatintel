@@ -12,7 +12,8 @@ import mongoose from 'mongoose';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { CampaignService } from '../services/CampaignService';
 import ThreatLog from '../models/ThreatLogSchema';
-import { LOGGER_TOKEN, EVENT_BUS_TOKEN, OLLAMA_SERVICE_TOKEN, RAG_TRANSLATION_TOKEN } from '../di/tokens';
+import { LOGGER_TOKEN, EVENT_BUS_TOKEN, OLLAMA_SERVICE_TOKEN, RAG_TRANSLATION_TOKEN, FORENSIC_PIPELINE_TOKEN } from '../di/tokens';
+import { ForensicPipelineService } from '../services/forense/ForensicPipelineService';
 
 // Mock Logger
 const mockLogger = {
@@ -50,10 +51,17 @@ describe('CampaignService', () => {
             buildCampaignSummaryPrompt: jest.fn().mockReturnValue('Mock Prompt')
         };
 
+        const mockConfig = {
+            getConfigValue: jest.fn().mockResolvedValue(null)
+        };
+        
         container.registerInstance(LOGGER_TOKEN, mockLogger);
         container.registerInstance(EVENT_BUS_TOKEN, mockEventBus);
         container.registerInstance(OLLAMA_SERVICE_TOKEN, mockOllama);
         container.registerInstance(RAG_TRANSLATION_TOKEN, mockTranslator);
+        container.registerInstance('ConfigService' as any, mockConfig);
+        container.registerSingleton(FORENSIC_PIPELINE_TOKEN, ForensicPipelineService);
+        
         service = container.resolve(CampaignService);
     });
 

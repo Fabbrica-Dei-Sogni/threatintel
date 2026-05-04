@@ -1,3 +1,10 @@
+/**
+ * ThreatIntel - Distributed Forensics Engine
+ *
+ * Copyright (C) 2026 Alessandro Modica. All rights reserved.
+ * Licensed under the Business Source License 1.1 (BSL-1.1).
+ * See LICENSE.md in the project root for license terms.
+ */
 import { EventEmitter } from 'events';
 import { singleton, inject } from 'tsyringe';
 import { Logger } from 'winston';
@@ -12,7 +19,9 @@ export enum AppEvents {
     ATTACK_SEARCHED = 'attack.searched',
     CAMPAIGN_SEARCHED = 'campaign.searched',
     ATTACK_RESOLVED = 'attack.resolved',
-    CAMPAIGN_RESOLVED = 'campaign.resolved'
+    CAMPAIGN_RESOLVED = 'campaign.resolved',
+    LOGS_STATUS_UPDATE_REQUESTED = 'logs.status.update.requested',
+    LOGS_STATUS_UPDATED = 'logs.status.updated'
 }
 
 /**

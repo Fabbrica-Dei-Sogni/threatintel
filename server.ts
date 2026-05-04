@@ -27,8 +27,11 @@ import { SshLogService } from './core/services/SshLogService';
 import { CowrieService } from './core/services/CowrieService';
 import { NginxLogService } from './core/services/NginxLogService';
 import { RagSyncWorker } from './core/services/assistant/RagSyncWorker';
-import { RAG_EVENT_LISTENER_TOKEN, RAG_SYNC_WORKER_TOKEN } from './core/di/tokens';
+import { RAG_EVENT_LISTENER_TOKEN, RAG_SYNC_WORKER_TOKEN, STATUS_EVENT_LISTENER_TOKEN, PRUNING_SERVICE_TOKEN } from './core/di/tokens';
 import { RagEventListener } from './core/services/assistant/RagEventListener';
+import { StatusEventListener } from './core/services/StatusEventListener';
+import { PruningService } from './core/services/PruningService';
+import { ServiceStatus } from './core/types/lifecycle';
 
 import { LifecycleManager } from './core/services/LifecycleManager';
 
@@ -92,6 +95,24 @@ app.listen(Number(PORT), '0.0.0.0', async () => {
         
         // Registrazione RAG Event Listener
         lifecycleManager.register(getComponent<RagEventListener>(RAG_EVENT_LISTENER_TOKEN));
+
+        // Registrazione Status Event Listener
+        const statusEventListener = getComponent<StatusEventListener>(STATUS_EVENT_LISTENER_TOKEN);
+        lifecycleManager.register({
+            serviceName: 'StatusEventListener',
+            start: async () => statusEventListener.start(),
+            stop: () => {},
+            getStatus: () => ServiceStatus.RUNNING
+        } as any);
+
+        // Registrazione Pruning Service
+        const pruningService = getComponent<PruningService>(PRUNING_SERVICE_TOKEN);
+        lifecycleManager.register({
+            serviceName: 'PruningService',
+            start: async () => pruningService.start(),
+            stop: () => pruningService.stop(),
+            getStatus: () => ServiceStatus.RUNNING
+        } as any);
 
         // Avvio sequenza di bootstrap (non blocca l'ascolto del server)
         await lifecycleManager.boot();

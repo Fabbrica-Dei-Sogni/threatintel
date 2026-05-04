@@ -103,7 +103,8 @@ export class CampaignController {
                 selectedUris: Array.isArray(cleanQuery.selectedUris) 
                     ? cleanQuery.selectedUris 
                     : (cleanQuery.selectedUris ? [cleanQuery.selectedUris as string] : []),
-                search: cleanQuery.search as string
+                search: cleanQuery.search as string,
+                status: cleanQuery.status as string
             });
 
             res.json({ 
@@ -178,7 +179,8 @@ export class CampaignController {
                 protocol: typeof cleanBody.protocol === 'string' ? cleanBody.protocol : (typeof req.body.protocol === 'string' ? req.body.protocol : null),
                 timeConfig: safeTimeConfig,
                 page: pageNum,
-                pageSize: pageSizeNum
+                pageSize: pageSizeNum,
+                status: cleanBody.status as string || req.body.status
             });
 
             if (!campaign) {
@@ -239,7 +241,8 @@ export class CampaignController {
                     timeMode: cleanQuery.timeMode as 'ago' | 'range',
                     agoValue: cleanQuery.agoValue ? parseInt(cleanQuery.agoValue as string) : undefined,
                     agoUnit: cleanQuery.agoUnit as string
-                }
+                },
+                status: cleanQuery.status as string
             });
 
             res.json(result);

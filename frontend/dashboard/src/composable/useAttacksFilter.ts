@@ -36,6 +36,7 @@ export function useAttacksFilter(
     initialFromUnit: string | Ref<string>,
     initialToValue: number | Ref<number>,
     initialToUnit: string | Ref<string>,
+    initialStatus: string | Ref<string> = 'active',
     initialSortFields: SortFields | Ref<SortFields> = null,
     initialPageSize: number | Ref<number> = 20,
     initialDangerLevels: number[] | Ref<number[]> = [],
@@ -44,6 +45,7 @@ export function useAttacksFilter(
     // Filtri specifici - Normalizzati come Ref (se passati come computed o ref dallo store, rimangono legati)
     const filterIp = toRef(initialIp);
     const filterProtocol = toRef(initialProtocol);
+    const filterStatus = toRef(initialStatus);
     const filterDangerLevels = toRef(initialDangerLevels);
     const filterAttackPatterns = toRef(initialAttackPatterns);
     const minLogsForAttack = toRef(initialMinLogsForAttack);
@@ -62,6 +64,7 @@ export function useAttacksFilter(
     const filterRefs = [
         filterIp,
         filterProtocol,
+        filterStatus,
         minLogsForAttack,
         timeMode,
         agoValue,
@@ -98,6 +101,7 @@ export function useAttacksFilter(
             filters: {
                 'request.ip': filterIp.value,
                 protocol: filterProtocol.value,
+                status: filterStatus.value,
                 dangerLevel: filterDangerLevels.value.length > 0 ? filterDangerLevels.value.join(',') : null,
                 attackPatterns: filterAttackPatterns.value || null
             },
@@ -144,6 +148,7 @@ export function useAttacksFilter(
         attacks,
         filterIp,
         filterProtocol,
+        filterStatus,
         sortFields,
         minLogsForAttack,
         timeMode,

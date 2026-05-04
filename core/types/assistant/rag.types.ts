@@ -1,4 +1,5 @@
 import { ThreatLogService } from '../../services/ThreatLogService';
+import { AttackLogService } from '../../services/AttackLogService';
 import { CampaignService } from '../../services/CampaignService';
 import { IpDetailsService } from '../../services/IpDetailsService';
 import { IThreatLog } from '../../models/ThreatLogSchema';
@@ -24,7 +25,7 @@ export type RagEntityType = 'threat_log' | 'attack_summary' | 'campaign_summary'
  * Versione attuale dello schema dei payload RAG.
  * Incrementare questo valore quando si modificano le interfacce dei payload per forzare il re-indexing.
  */
-export const RAG_SCHEMA_VERSION = 3;
+export const RAG_SCHEMA_VERSION = 4;
 
 /**
  * Configurazione temporale standard per il sistema RAG.
@@ -40,11 +41,15 @@ export type LogSourceParams = Parameters<ThreatLogService['getLogById']>[0] & { 
 
 export type IpDetailsSourceParams = Parameters<IpDetailsService['getIpDetails']>[0] & { type: 'ip_details' };
 
-export type AttackSourceParams = Parameters<ThreatLogService['getAttackDetail']>[0] & { type: 'attack' };
+export type AttackSourceParams = Parameters<AttackLogService['getAttackDetail']>[0] & { type: 'attack' };
 
 export type CampaignSourceParams = Parameters<CampaignService['getCampaignDetail']>[0] & { type: 'campaign' };
 
-export type RagSourceParams = LogSourceParams | IpDetailsSourceParams | AttackSourceParams | CampaignSourceParams;
+export type AttackSearchSourceParams = Parameters<AttackLogService['getAttacks']>[0] & { type: 'search_attack' };
+export type CampaignSearchSourceParams = Parameters<CampaignService['getCampaigns']>[0] & { type: 'search_campaign' };
+
+
+export type RagSourceParams = LogSourceParams | IpDetailsSourceParams | AttackSourceParams | CampaignSourceParams | AttackSearchSourceParams | CampaignSearchSourceParams;
 
 /**
  * Riferimento alla sorgente originale del dato (API).
@@ -77,6 +82,7 @@ export interface ThreatLogPayload extends RagBasePayload, Partial<IThreatLog> {
     ip: string;
     timestamp: Date;
     score: number;
+    status?: 'active' | 'archived' | 'deleted';
 }
 
 /**
@@ -88,6 +94,7 @@ export interface AttackSummaryPayload extends RagBasePayload, Partial<AttackDTO>
     ip: string;
     totaleLogs: number;
     averageScore: number;
+    status?: 'active' | 'archived' | 'deleted';
 }
 
 /**
@@ -103,6 +110,7 @@ export interface CampaignSummaryPayload extends RagBasePayload {
     averageScore?: number;
     firstSeen?: Date;
     lastSeen?: Date;
+    status?: 'active' | 'archived' | 'deleted';
 }
 
 /**
@@ -144,4 +152,16 @@ export interface RagSearchOptions {
     type?: RagEntityType;
     sortBy?: string;
     sortOrder?: 'asc' | 'desc';
+    status?: 'active' | 'archived' | 'deleted';
+}
+
+/**
+ * Struttura di un risultato di ricerca semantica "diretta", ovvero quando il sistema RAG è in grado di restituire un risultato già "narrato" e arricchito, senza necessità di ulteriori chiamate API.
+ */
+export interface DirectSearchHit {
+    id: string;
+    score: number;
+    text: string;           // narrazione come ora
+    summary: Record<string, any>;  // i campi chiave dell'oggetto (ip, paese, score, pattern...)
+    resolveRef?: RagSourceRef;     // opzionale: solo se vuoi permettere il drill-down
 }

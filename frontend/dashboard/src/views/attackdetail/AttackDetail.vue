@@ -23,6 +23,7 @@
       :ago-unit="agoUnit"
       :min-logs-for-attack="minLogsForAttack"
       :protocol="protocol"
+      :status="status"
       @back="goBack"
       @go-to-ip="goToIpDetails"
     />
@@ -42,7 +43,8 @@ const props = defineProps({
   agoValue: { type: Number, default: null },
   agoUnit: { type: String, default: null },
   minLogsForAttack: { type: Number, default: 1 },
-  protocol: { type: String, default: 'http' }
+  protocol: { type: String, default: 'http' },
+  status: { type: String, default: 'active' }
 });
 
 const router = useRouter();

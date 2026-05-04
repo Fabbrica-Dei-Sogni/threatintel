@@ -46,6 +46,13 @@
             <label class="cyber-label">PROT</label>
             <div class="protocol-reset-group">
               <ProtocolSelector v-model="campaignsStore.state.filters.protocol" theme="phosphorus" />
+            </div>
+          </div>
+
+          <div class="filter-group">
+            <label class="cyber-label">{{ t('common.status').toUpperCase() }}</label>
+            <div class="protocol-reset-group">
+              <StatusSelector v-model="filterStatus" theme="phosphorus" />
               <button class="reset-btn-mini filter-reset-btn" @click="campaignsStore.resetFilters" :title="t('telemetry.reset_filters')">
                 <div class="reset-ascii">
                   <span></span>
@@ -231,6 +238,7 @@ import { useCampaignsStore } from '../../../stores/campaigns';
 import { useCampaignsDiscovery } from '../../../composable/useCampaignsDiscovery';
 import GlobalHeader from '../../../components/GlobalHeader.vue';
 import ProtocolSelector from '../../../components/common/ProtocolSelector.vue';
+import StatusSelector from '../../../components/common/StatusSelector.vue';
 import CyberPager from '../../../components/common/CyberPager.vue';
 import UriFilterPicker from '../../../components/campaigns/UriFilterPicker.vue';
 import { formatFullDateTime, formatHumanDuration } from '../../../utils/dateUtils';
@@ -267,6 +275,7 @@ onMounted(() => {
   if (props.initAgoUnit !== undefined) campaignsStore.state.filters.agoUnit = props.initAgoUnit;
   if (props.initialUris) campaignsStore.state.filters.selectedUris = props.initialUris.split(',');
   if (props.initialMinCorrelations !== undefined) campaignsStore.state.filters.minCorrelations = props.initialMinCorrelations;
+  if (props.status !== undefined) campaignsStore.state.filters.status = props.status;
 });
 
 watch(
@@ -276,19 +285,21 @@ watch(
     () => campaignsStore.state.filters.minScore,
     () => campaignsStore.state.filters.minLogsPerIp,
     () => campaignsStore.state.filters.protocol,
+    () => campaignsStore.state.filters.status,
     () => campaignsStore.state.filters.timeMode,
     () => campaignsStore.state.filters.agoValue,
     () => campaignsStore.state.filters.agoUnit,
     () => campaignsStore.state.filters.selectedUris,
     () => campaignsStore.state.filters.minCorrelations
   ],
-  ([page, minIps, minScore, minLogsPerIp, protocol, timeMode, agoValue, agoUnit, uris, minCorrelations]) => {
+  ([page, minIps, minScore, minLogsPerIp, protocol, status, timeMode, agoValue, agoUnit, uris, minCorrelations]) => {
     const query = {};
     if (page > 1) query.page = page;
     if (minIps > 1) query.minIps = minIps;
     if (minScore > 0) query.minScore = minScore;
     if (minLogsPerIp > 1) query.minLogsPerIp = minLogsPerIp;
     if (protocol && protocol !== 'http') query.protocol = protocol;
+    if (status && status !== 'active') query.status = status;
     if (timeMode && timeMode !== 'ago') query.timeMode = timeMode;
     if (agoValue && agoValue !== 7) query.agoValue = agoValue;
     if (agoUnit && agoUnit !== 'days') query.agoUnit = agoUnit;
@@ -313,6 +324,7 @@ const {
   minLogsPerIp,
   minCorrelations,
   protocol,
+  filterStatus,
   timeMode,
   agoValue,
   agoUnit,
@@ -331,7 +343,8 @@ const {
   toRef(campaignsStore.state.filters, 'endDate'),
   toRef(campaignsStore.state.filters, 'selectedUris'),
   toRef(campaignsStore.state.filters, 'search'),
-  toRef(campaignsStore.state.filters, 'minCorrelations')
+  toRef(campaignsStore.state.filters, 'minCorrelations'),
+  toRef(campaignsStore.state.filters, 'status')
 );
 
 // Scale dinamiche calcolate dai metadati del backend

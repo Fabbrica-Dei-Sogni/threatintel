@@ -1,3 +1,10 @@
+/**
+ * ThreatIntel - Distributed Forensics Engine
+ *
+ * Copyright (C) 2026 Alessandro Modica. All rights reserved.
+ * Licensed under the Business Source License 1.1 (BSL-1.1).
+ * See LICENSE.md in the project root for license terms.
+ */
 import { TimeConfig } from './common.types';
 
 /**
@@ -8,6 +15,7 @@ export interface GetAttackDetailParams {
     minLogsForAttack?: number;
     timeConfig?: TimeConfig;
     protocol?: string | null;
+    status?: string;
 }
 
 /**
@@ -24,6 +32,7 @@ export interface AttackFilter {
     'request.ip'?: string;
     'request.url'?: string;
     'request.method'?: string;
+    'geo.country'?: string;
     protocol?: string;
     timestamp?: string | any;
     dangerLevel?: string | number | number[];
@@ -32,6 +41,7 @@ export interface AttackFilter {
     dangerScore?: number | any;
     averageScore?: number | any;
     attackPatterns?: string;
+    status?: string;
 }
 
 /**
@@ -50,6 +60,7 @@ export interface CampaignFilter {
     agoUnit?: string;
     selectedUris?: string[];
     search?: string;
+    status?: string;
 }
 
 /**
@@ -75,6 +86,7 @@ export interface GetCampaignDetailParams {
     timeConfig?: TimeConfig;
     page?: number;
     pageSize?: number;
+    status?: string;
 }
 
 /**

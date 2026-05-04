@@ -57,6 +57,13 @@
                     <span class="cyber-label">PROT</span>
                     <div class="protocol-reset-group">
                         <ProtocolSelector v-model="attacksState.filters.protocol" theme="magma" />
+                    </div>
+                </div>
+
+                <div class="filter-item">
+                    <span class="cyber-label">{{ t('common.status').toUpperCase() }}</span>
+                    <div class="protocol-reset-group">
+                        <StatusSelector v-model="attacksState.filters.status" theme="magma" />
                         <button class="reset-btn-mini filter-reset-btn" @click="handleReset" :title="t('telemetry.reset_filters')">
                             <div class="reset-ascii">
                                 <span></span>
@@ -476,6 +483,7 @@ import { storeToRefs } from 'pinia';
 const { copyFormatted } = useClipboard();
 const { t } = useI18n();
 import ProtocolSelector from '../../components/common/ProtocolSelector.vue';
+import StatusSelector from '../../components/common/StatusSelector.vue';
 import ViewToggle from '../../components/common/ViewToggle.vue';
 import CyberPager from '../../components/common/CyberPager.vue';
 import DefconIndicator from '../../components/DefconIndicator.vue';
@@ -548,6 +556,7 @@ const {
     toRef(attacksState.filters, 'fromUnit'),
     toRef(attacksState.filters, 'toValue'),
     toRef(attacksState.filters, 'toUnit'),
+    toRef(attacksState.filters, 'status'),
     toRef(attacksState.sort, 'fields'),
     toRef(attacksState.pagination, 'pageSize'),
     toRef(attacksState.filters, 'dangerLevels'),
@@ -567,11 +576,12 @@ watch(
         () => attacksState.filters.agoUnit, 
         () => attacksState.filters.dateRange, 
         () => attacksState.filters.dangerLevels, 
+        () => attacksState.filters.status,
         () => attacksState.pagination.page, 
         () => attacksState.sort.fields,
         () => attacksState.filters.attackPatterns
     ],
-    ([nip, nproto, nmin, ntMode, nAgoVal, nAgoUnit, ndRange, nDanger, nPage, nSort, nPatterns]) => {
+    ([nip, nproto, nmin, ntMode, nAgoVal, nAgoUnit, ndRange, nDanger, nStatus, nPage, nSort, nPatterns]) => {
         router.replace({
             name: 'Attacks',
             query: {
@@ -584,6 +594,7 @@ watch(
                 agoUnit: nAgoUnit !== 'days' ? nAgoUnit : undefined,
                 dateRange: ndRange && (ndRange[0] || ndRange[1]) ? JSON.stringify(ndRange) : undefined,
                 dangerLevels: nDanger && nDanger.length > 0 ? nDanger.join(',') : undefined,
+                status: nStatus !== 'active' ? nStatus : undefined,
                 sortFields: nSort && Object.keys(nSort).length > 0 ? JSON.stringify(nSort) : undefined,
                 attackPatterns: nPatterns || undefined
             }

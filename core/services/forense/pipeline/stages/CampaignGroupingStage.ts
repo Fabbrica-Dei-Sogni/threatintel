@@ -8,68 +8,81 @@
 
 import { PipelineStage } from '../PipelineStage';
 
+/**
+ * Stage di raggruppamento per le Campagne (Discovery).
+ * Implementa un raggruppamento a due livelli:
+ * 1. Raggruppamento per { Hash, IP } per contare i log per singolo nodo sorgente.
+ * 2. Raggruppamento per Hash per aggregare i dati della campagna globale.
+ */
 export class CampaignGroupingStage implements PipelineStage {
-    constructor(private readonly minLogsForAttack: number) { }
+    constructor(private readonly minLogsPerIp: number = 1) { }
 
     generate(): any[] {
         return [
-            // Stage 2: Raggruppa per Hash (Discovery delle Campagne)
+            // Stage 1: Raggruppamento per Hash + IP (Nodi sorgente)
             {
                 $group: {
-                    _id: '$fingerprint.hash',
-                    // Rappresentante della campagna
-                    representative: { $first: '$$ROOT' },
-                    // Tracking IP coinvolti
-                    ipsInvolved: { $addToSet: '$request.ip' },
-                    // Log aggregati
-                    logsRaggruppati: {
-                        $push: {
-                            _id: '$_id',
-                            timestamp: '$timestamp',
-                            request: {
-                                method: '$request.method',
-                                url: '$request.url',
-                                ip: '$request.ip'
-                            },
-                            response: {
-                                statusCode: '$response.statusCode'
-                            },
-                            fingerprint: '$fingerprint',
-                            session_id: '$session_id',
-                            metadata: '$metadata'
-                        }
-                    },
-                    totaleLogs: { $sum: 1 },
+                    _id: { hash: '$fingerprint.hash', ip: '$request.ip' },
+                    logsPerIp: { $sum: 1 },
+                    sumScorePerIp: { $sum: '$fingerprint.score' },
+                    indicatorsPerIp: { $push: '$fingerprint.indicators' },
                     firstSeen: { $min: '$timestamp' },
                     lastSeen: { $max: '$timestamp' },
-                    sumScore: { $sum: '$fingerprint.score' }
+                    sampleUrl: { $first: '$request.url' },
+                    protocols: { $addToSet: '$protocol' },
+                    status: { $first: '$status' }
                 }
             },
-            // Stage 3: Filtra per minimi logs (se richiesto)
+            // Stage 2: Filtro per minimi logs per IP e rimozione null hash
             {
                 $match: {
-                    totaleLogs: { $gte: this.minLogsForAttack },
-                    _id: { $ne: null }
+                    '_id.hash': { $ne: null },
+                    logsPerIp: { $gte: Number(this.minLogsPerIp) }
                 }
             },
-            // Stage 4: Struttura finale per Campagna
+            // Stage 3: Raggruppamento finale per Hash (Campagna globale)
             {
-                $replaceRoot: {
-                    newRoot: {
-                        $mergeObjects: [
-                            '$representative',
-                            {
-                                _id: '$_id',
-                                hash: '$_id',
-                                ips: '$ipsInvolved',
-                                ipCount: { $size: '$ipsInvolved' },
-                                logsRaggruppati: '$logsRaggruppati',
-                                totaleLogs: '$totaleLogs',
-                                firstSeen: '$firstSeen',
-                                lastSeen: '$lastSeen',
-                                sumScore: '$sumScore'
-                            },
-                        ]
+                $group: {
+                    _id: '$_id.hash',
+                    ipCount: { $sum: 1 },
+                    totaleLogs: { $sum: '$logsPerIp' },
+                    sumScore: { $sum: '$sumScorePerIp' },
+                    maxLogsInThisCampaign: { $max: '$logsPerIp' },
+                    firstSeen: { $min: '$firstSeen' },
+                    lastSeen: { $max: '$lastSeen' },
+                    sampleUrl: { $first: '$sampleUrl' },
+                    allIndicators: { $push: '$indicatorsPerIp' },
+                    timeInfo: { $push: { ip: '$_id.ip', firstSeen: '$firstSeen', lastSeen: '$lastSeen' } },
+                    allProtocols: { $push: '$protocols' },
+                    status: { $first: '$status' }
+                }
+            },
+            // Stage 4: Proiezione finale con calcolo indicatori e protocolli univoci
+            {
+                $project: {
+                    hash: '$_id',
+                    ipCount: 1,
+                    totaleLogs: 1,
+                    maxLogsInThisCampaign: 1,
+                    firstSeen: 1,
+                    lastSeen: 1,
+                    sampleUrl: 1,
+                    status: 1,
+                    averageScore: { $divide: ['$sumScore', '$totaleLogs'] },
+                    timeInfo: 1,
+                    protocols: {
+                        $reduce: {
+                            input: '$allProtocols',
+                            initialValue: [],
+                            in: { $setUnion: ['$$value', '$$this'] }
+                        }
+                    },
+                    attackPatterns: {
+                        $reduce: {
+                            input: '$allIndicators',
+                            initialValue: [],
+                            in: { $setUnion: ['$$value', { $reduce: { input: '$$this', initialValue: [], in: { $setUnion: ['$$value', '$$this'] } } }] }
+                        }
                     }
                 }
             }

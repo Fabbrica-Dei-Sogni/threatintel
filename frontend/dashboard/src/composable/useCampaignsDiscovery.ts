@@ -36,7 +36,8 @@ export function useCampaignsDiscovery(
     initialEndDate: (string | null) | Ref<string | null> = null,
     initialSelectedUris: string[] | Ref<string[]> = [],
     initialSearch: string | Ref<string> = '',
-    initialMinCorrelations: number | Ref<number> = 0
+    initialMinCorrelations: number | Ref<number> = 0,
+    initialStatus: string | Ref<string> = 'active'
 ) {
     const minIps = toRef(initialMinIps);
     const campaignsStore = useCampaignsStore();
@@ -44,6 +45,7 @@ export function useCampaignsDiscovery(
     const minLogsPerIp = toRef(initialMinLogsPerIp);
     const minCorrelations = toRef(initialMinCorrelations);
     const protocol = toRef(initialProtocol);
+    const filterStatus = toRef(initialStatus);
     const timeMode = toRef(initialTimeMode);
     const agoValue = toRef(initialAgoValue);
     const agoUnit = toRef(initialAgoUnit);
@@ -60,6 +62,7 @@ export function useCampaignsDiscovery(
         minLogsPerIp,
         minCorrelations,
         protocol,
+        filterStatus,
         timeMode,
         agoValue,
         agoUnit,
@@ -88,7 +91,8 @@ export function useCampaignsDiscovery(
                 page: page.value,
                 pageSize: pageSize.value,
                 selectedUris: selectedUris.value,
-                search: search.value
+                search: search.value,
+                status: filterStatus.value
             });
             
             campaigns.value = response.campaigns || [];
@@ -152,6 +156,7 @@ export function useCampaignsDiscovery(
         minLogsPerIp,
         minCorrelations,
         protocol,
+        filterStatus,
         timeMode,
         agoValue,
         agoUnit,

@@ -38,15 +38,21 @@ describe('Forensic Pipeline Stages', () => {
     });
 
     describe('MatchFilterStage', () => {
-        it('should return empty array if no filters provided', () => {
+        it('should return the default status filter if no filters provided', () => {
             const stage = new MatchFilterStage({});
-            expect(stage.generate()).toEqual([]);
+            const pipeline = stage.generate();
+            expect(pipeline[0].$match).toEqual({
+                status: { $in: [null, 'active'] }
+            });
         });
 
-        it('should generate $match stage for filters', () => {
+        it('should generate $match stage for filters with default status', () => {
             const stage = new MatchFilterStage({ 'request.ip': '1.2.3.4' });
             const pipeline = stage.generate();
-            expect(pipeline[0].$match).toEqual({ 'request.ip': '1.2.3.4' });
+            expect(pipeline[0].$match).toEqual({
+                'request.ip': '1.2.3.4',
+                status: { $in: [null, 'active'] }
+            });
         });
     });
 

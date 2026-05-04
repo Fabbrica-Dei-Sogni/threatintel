@@ -1,4 +1,13 @@
+/**
+ * ThreatIntel - Distributed Forensics Engine
+ *
+ * Copyright (C) 2026 Alessandro Modica. All rights reserved.
+ * Licensed under the Business Source License 1.1 (BSL-1.1).
+ * See LICENSE.md in the project root for license terms.
+ */
 // core/assistant/types/assistant-tool.types.ts
+
+import { GetAttacksParams, GetCampaignsParams } from "../service-params.types";
 
 export interface SemanticSearchArgs {
   query: string;
@@ -6,6 +15,7 @@ export interface SemanticSearchArgs {
   limit?: number;
   sortBy?: string;
   sortOrder?: 'asc' | 'desc';
+  status?: 'active' | 'archived' | 'deleted';
 }
 
 export interface ResolveThreatSourceArgs {
@@ -19,13 +29,45 @@ export interface AskArgs {
   scope?: string;
 }
 
+export interface SearchAttacksArgs {
+  dateFrom?: string;
+  dateTo?: string;
+  ip?: string;
+  country?: string;
+  protocol?: string;
+  dangerScore?: number;
+  minLogs?: number;
+  limit?: number;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+  status?: 'active' | 'archived' | 'deleted';
+}
+
+export interface SearchCampaignsArgs {
+  dateFrom?: string;
+  dateTo?: string;
+  protocol?: string;
+  minIps?: number;
+  minScore?: number;
+  minLogsPerIp?: number;
+  limit?: number;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+  status?: 'active' | 'archived' | 'deleted';
+}
+
+
 export type AssistantToolName =
   | 'semantic_search'
   | 'resolve_threat_source'
-  | 'ask';
+  | 'ask'
+  | 'search_attacks'     // ← nuovo
+  | 'search_campaigns';  // ← nuovo
 
 export interface AssistantToolArgumentsMap {
   semantic_search: SemanticSearchArgs;
   resolve_threat_source: ResolveThreatSourceArgs;
   ask: AskArgs;
+  search_attacks: SearchAttacksArgs;     // ← nuovo
+  search_campaigns: SearchCampaignsArgs; // ← nuovo  
 }

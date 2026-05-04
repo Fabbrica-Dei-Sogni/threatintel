@@ -9,13 +9,13 @@
 import { Request, Response } from 'express';
 import { inject, singleton } from 'tsyringe';
 import { AssistantService } from '../services/assistant/AssistantService';
+import { StatusManagerService } from '../services/StatusManagerService';
 import { LOGGER_TOKEN, ASSISTANT_SERVICE_TOKEN, I18N_TOKEN } from '../di/tokens';
 import { Logger } from 'winston';
 import { I18nService } from '../services/I18nService';
 import { Controller, Get, Post } from '../registry/decorators';
 import { getComponent } from '../di/container';
 import { AuthMiddleware } from '../middlewares/AuthMiddleware';
-import { RagValidator } from '../services/assistant/RagValidator';
 
 const auth = getComponent(AuthMiddleware);
 

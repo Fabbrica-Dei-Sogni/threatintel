@@ -11,7 +11,7 @@
  */
 export const RAG_TEMPLATES = {
     NARRATIVES: {
-        THREAT_LOG_BASE: "In data {timestamp}, è stata registrata un'attività di minaccia dall'indirizzo IP {ip} (Origine: {geoInfo}). L'attacco ha utilizzato il protocollo {protocol} tramite metodo {method} sull'URL {url}. Score evento: {score}/100. Indicatori rilevati: {indicators}. {context}",
+        THREAT_LOG_BASE: "In data {timestamp}, è stata registrata un'attività di minaccia dall'indirizzo IP {ip} (Origine: {geoInfo}). L'attacco ha utilizzato il protocollo {protocol} tramite metodo {method} sull'URL {url}. Score evento: {score}/100. Indicatori rilevati: {indicators}. {context}. Il log e' in stato {status}",
         SUSPICIOUS_YES: "L'attività è stata contrassegnata come sospetta dal fingerprinting.",
         JNDI_ALERT: "Attenzione: è stato rilevato un payload JNDI malevolo nel traffico: \"{payload}\".",
         SSH_CONTEXT: "L'attività riguarda tentativi di accesso non autorizzati tramite protocollo SSH, suggerendo attacchi brute-force o tentativi di credential stuffing.",

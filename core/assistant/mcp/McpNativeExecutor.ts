@@ -1,3 +1,10 @@
+/**
+ * ThreatIntel - Distributed Forensics Engine
+ *
+ * Copyright (C) 2026 Alessandro Modica. All rights reserved.
+ * Licensed under the Business Source License 1.1 (BSL-1.1).
+ * See LICENSE.md in the project root for license terms.
+ */
 import { inject, singleton } from 'tsyringe';
 import { AssistantService } from '../../services/assistant/AssistantService';
 import { ASSISTANT_SERVICE_TOKEN, LOGGER_TOKEN } from '../../di/tokens';
@@ -55,6 +62,7 @@ export class McpNativeExecutor {
           type: sArgs.type,
           sortBy: sArgs.sortBy,
           sortOrder: sArgs.sortOrder,
+          status: sArgs.status,
         });
       }
 
@@ -67,6 +75,16 @@ export class McpNativeExecutor {
         const aArgs = sanitizedArgs as AssistantToolArgumentsMap['ask'];
         return this.assistant.ask(aArgs.question);
       }
+        
+      case 'search_attacks': {
+        const aArgs = sanitizedArgs as AssistantToolArgumentsMap['search_attacks'];
+        return this.assistant.searchAttacks(aArgs);
+      }
+
+      case 'search_campaigns': {
+        const cArgs = sanitizedArgs as AssistantToolArgumentsMap['search_campaigns'];
+        return this.assistant.searchCampaigns(cArgs);
+      }    
 
       default:
         throw new Error(`Tool ${toolName} logic not implemented in native executor`);

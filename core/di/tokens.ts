@@ -19,3 +19,4 @@ export const RAG_EVENT_LISTENER_TOKEN = Symbol("RagEventListener");
 export const STATUS_EVENT_LISTENER_TOKEN = Symbol("StatusEventListener");
 export const PRUNING_SERVICE_TOKEN = Symbol("PruningService");
 export const MCP_EXECUTOR_TOKEN = Symbol("McpExecutor");
+export const FORENSIC_PIPELINE_TOKEN = Symbol("ForensicPipelineService");

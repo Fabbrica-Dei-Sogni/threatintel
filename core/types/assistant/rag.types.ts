@@ -36,7 +36,11 @@ export type AttackSourceParams = Parameters<ThreatLogService['getAttackDetail']>
 
 export type CampaignSourceParams = Parameters<CampaignService['getCampaignDetail']>[0] & { type: 'campaign' };
 
-export type RagSourceParams = LogSourceParams | IpDetailsSourceParams | AttackSourceParams | CampaignSourceParams;
+export type AttackSearchSourceParams = Parameters<ThreatLogService['getAttacks']>[0] & { type: 'search_attack' };
+export type CampaignSearchSourceParams = Parameters<CampaignService['getCampaigns']>[0] & { type: 'search_campaign' };
+
+
+export type RagSourceParams = LogSourceParams | IpDetailsSourceParams | AttackSourceParams | CampaignSourceParams | AttackSearchSourceParams | CampaignSearchSourceParams;
 
 /**
  * Riferimento alla sorgente originale del dato (API).
@@ -136,4 +140,15 @@ export interface RagSearchOptions {
     type?: RagEntityType;
     sortBy?: string;
     sortOrder?: 'asc' | 'desc';
+}
+
+/**
+ * Struttura di un risultato di ricerca semantica "diretta", ovvero quando il sistema RAG è in grado di restituire un risultato già "narrato" e arricchito, senza necessità di ulteriori chiamate API.
+ */
+export interface DirectSearchHit {
+    id: string;
+    score: number;
+    text: string;           // narrazione come ora
+    summary: Record<string, any>;  // i campi chiave dell'oggetto (ip, paese, score, pattern...)
+    resolveRef?: RagSourceRef;     // opzionale: solo se vuoi permettere il drill-down
 }

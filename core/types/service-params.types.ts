@@ -24,6 +24,7 @@ export interface AttackFilter {
     'request.ip'?: string;
     'request.url'?: string;
     'request.method'?: string;
+    'geo.country'?: string;
     protocol?: string;
     timestamp?: string | any;
     dangerLevel?: string | number | number[];

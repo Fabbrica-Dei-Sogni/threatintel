@@ -1,9 +1,9 @@
 import { injectable, inject } from 'tsyringe';
 import { Logger } from 'winston';
-import { 
-    LOGGER_TOKEN, 
-    QDRANT_CLIENT_TOKEN, 
-    OLLAMA_SERVICE_TOKEN, 
+import {
+    LOGGER_TOKEN,
+    QDRANT_CLIENT_TOKEN,
+    OLLAMA_SERVICE_TOKEN,
     RAG_SYNC_SERVICE_TOKEN,
     I18N_TOKEN
 } from '../../di/tokens';
@@ -16,14 +16,19 @@ import { ThreatLogService } from '../ThreatLogService';
 import { CampaignService } from '../CampaignService';
 import { IpDetailsService } from '../IpDetailsService';
 import { RAG_TEMPLATES } from './RagTemplates';
-import { 
-    RagSearchHit, 
-    RagAskResponse, 
-    RagSearchOptions, 
+import {
+    RagSearchHit,
+    RagAskResponse,
+    RagSearchOptions,
     RagSourceRef,
     RagBasePayload,
-    RAG_SCHEMA_VERSION
+    RAG_SCHEMA_VERSION,
+    RagSourceParams,
+    DirectSearchHit
 } from '../../types/assistant/rag.types';
+import { GetAttacksParams, GetCampaignsParams } from '../../types/service-params.types';
+import { SearchAttacksArgs, SearchCampaignsArgs } from 'core/types/assistant/assistant-tool.types';
+import { RagTranslationService } from './RagTranslationService';
 
 @injectable()
 export class AssistantService {
@@ -35,12 +40,14 @@ export class AssistantService {
         @inject(I18N_TOKEN) private readonly i18n: I18nService,
         private readonly threatLogService: ThreatLogService,
         private readonly campaignService: CampaignService,
-        private readonly ipDetailsService: IpDetailsService
-    ) {}
+        private readonly ipDetailsService: IpDetailsService,
+        private readonly ragTranslation: RagTranslationService,  // ← aggiunto
+
+    ) { }
 
     public async search(query: string, options: RagSearchOptions = {}): Promise<RagSearchHit[]> {
         const { limit = 5, scoreThreshold = 0.5, type, sortBy, sortOrder = 'desc' } = options;
-        
+
         // 1. Validare la richiesta di ricerca
         const validation = RagValidator.validateSearchOptions(options);
         if (!validation.valid) {
@@ -56,18 +63,18 @@ export class AssistantService {
 
         // 2. Chiamare Qdrant con collection e filtri coerenti
         const queryVector = await this.ollama.getEmbedding(query);
-        
+
         // Determiniamo la collection corretta in base al tipo (se specificato)
-        const collectionsToSearch = type === 'threat_log' 
-            ? [this.ragSync.getStatus().logsCollection || 'threat_logs'] 
+        const collectionsToSearch = type === 'threat_log'
+            ? [this.ragSync.getStatus().logsCollection || 'threat_logs']
             : [this.ragSync.getStatus().intelligenceCollection || 'threat_intelligence'];
 
         // Se cerchiamo "tutto" (nessun tipo), potremmo voler cercare in entrambe o solo in intelligence
         // Per ora rispettiamo il comportamento precedente: default intelligence
         const collection = collectionsToSearch[0];
-        
+
         const rawResults = await this.qdrant.search(collection, queryVector, limit);
-        
+
         // 3. Validare il risultato raw, 4. Mappare in SearchHit, 5. Restituire oggetti normalizzati
         const hits = rawResults
             .filter(r => {
@@ -80,7 +87,7 @@ export class AssistantService {
             })
             .map(r => {
                 const payload = r.payload as unknown as RagBasePayload;
-                
+
                 // Validazione Payload Raw: evadiamo buchi di dati malformati o vecchi
                 if (!payload?.text || !payload?.sourceRef) {
                     this.logger.warn(`[AssistantService] Malformed or legacy payload found for point ${r.id} - skipping`);
@@ -94,7 +101,7 @@ export class AssistantService {
                     text: payload.text,
                     sourceRef: payload.sourceRef,
                     // Includiamo il payload originale per permettere l'ordinamento post-recupero
-                    _rawPayload: payload 
+                    _rawPayload: payload
                 };
             })
             .filter((h): h is any => h !== null);
@@ -109,8 +116,8 @@ export class AssistantService {
 
                 // Gestione date
                 if (valA instanceof Date && valB instanceof Date) {
-                    return sortOrder === 'asc' 
-                        ? valA.getTime() - valB.getTime() 
+                    return sortOrder === 'asc'
+                        ? valA.getTime() - valB.getTime()
                         : valB.getTime() - valA.getTime();
                 }
 
@@ -164,19 +171,19 @@ export class AssistantService {
                 case 'log':
                     // Pass-through del DNA di ricostruzione
                     return await this.threatLogService.getLogById(params);
-                
+
                 case 'ip_details':
                     // Pass-through del DNA di ricostruzione
                     return await this.ipDetailsService.getIpDetails(params);
-                
+
                 case 'attack':
                     // Pass-through garantito dai tipi derivati
                     return await this.threatLogService.getAttackDetail(params);
-                
+
                 case 'campaign':
                     // Pass-through garantito dai tipi derivati
                     return await this.campaignService.getCampaignDetail(params);
-                
+
                 default:
                     const _exhaustive: never = params as never;
                     throw new Error(`Tipo di sorgente non supportato: ${JSON.stringify(_exhaustive)}`);
@@ -216,5 +223,97 @@ export class AssistantService {
             this.logger.error(`[AssistantService] Schema integrity check failed: ${error}`);
             throw error;
         }
+    }
+
+    public async searchAttacks(args: SearchAttacksArgs): Promise<DirectSearchHit[]> {
+        const serviceParams: GetAttacksParams = {
+            pageSize: args.limit || 20,
+            minLogsForAttack: args.minLogs || 10,
+            sortFields: args.sortBy ? { [args.sortBy]: args.sortOrder === 'asc' ? 1 : -1 } : { lastSeen: -1 },
+            timeConfig: (args.dateFrom || args.dateTo) ? {
+                startTime: args.dateFrom,
+                endTime: args.dateTo,
+                timeMode: 'range'
+            } : {},
+            filters: {
+                'request.ip': args.ip,
+                'geo.country': args.country as any, // Cast temporaneo o aggiunta a interfaccia
+                protocol: args.protocol,
+                dangerScore: args.dangerScore
+            }
+        };
+
+        const result = await this.threatLogService.getAttacks(serviceParams);
+
+        return result.items.map((attack: any) => {
+            const attackIp = attack.ip || attack.request?.ip;
+
+            return {
+                id: attackIp,
+                score: attack.dangerScore ?? attack.averageScore ?? 0,
+                text: this.ragTranslation.translateAttack(attack),
+                summary: {
+                    ip: attackIp,
+                    country: attack.geo?.country,
+                    protocol: attack.protocol,
+                    dangerScore: attack.dangerScore,
+                    totaleLogs: attack.totaleLogs,
+                    firstSeen: attack.firstSeen,
+                    lastSeen: attack.lastSeen,
+                    attackPatterns: attack.attackPatterns,
+                },
+                resolveRef: {
+                    endpoint: '/api/attacks/detail',
+                    method: 'GET',
+                    params: {
+                        type: 'attack',
+                        ip: attackIp,
+                    } as any,
+                },
+            };
+        });
+    }
+
+    public async searchCampaigns(args: SearchCampaignsArgs): Promise<DirectSearchHit[]> {
+        const serviceParams: GetCampaignsParams = {
+            pageSize: args.limit || 20,
+            minIps: args.minIps || 2,
+            minScore: args.minScore || 0,
+            minLogsPerIp: args.minLogsPerIp || 1,
+            protocol: args.protocol as any,
+            timeConfig: (args.dateFrom || args.dateTo) ? {
+                startTime: args.dateFrom,
+                endTime: args.dateTo,
+                timeMode: 'range'
+            } : {},
+            // CampaignService.getCampaigns non usa un oggetto 'filters' ma i campi sono diretti
+            // search: args.search // se volessimo mappare anche una ricerca testuale
+        };
+
+        const result = await this.campaignService.getCampaigns(serviceParams);
+
+        return result.campaigns.map((campaign: any) => ({
+            id: campaign.hash,
+            score: campaign.averageScore ?? 0,
+            text: this.ragTranslation.translateCampaign(campaign),
+            summary: {
+                hash: campaign.hash,
+                ipCount: campaign.ipCount,
+                protocol: campaign.protocol,
+                totaleLogs: campaign.totaleLogs,
+                averageScore: campaign.averageScore,
+                firstSeen: campaign.firstSeen,
+                lastSeen: campaign.lastSeen,
+                attackPatterns: campaign.attackPatterns,
+            },
+            resolveRef: {
+                endpoint: '/api/campaigns/detail',
+                method: 'GET',
+                params: {
+                    type: 'campaign',
+                    hash: campaign.hash,
+                } as any,
+            },
+        }));
     }
 }

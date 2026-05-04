@@ -67,6 +67,16 @@ export class McpNativeExecutor {
         const aArgs = sanitizedArgs as AssistantToolArgumentsMap['ask'];
         return this.assistant.ask(aArgs.question);
       }
+        
+      case 'search_attacks': {
+        const aArgs = sanitizedArgs as AssistantToolArgumentsMap['search_attacks'];
+        return this.assistant.searchAttacks(aArgs);
+      }
+
+      case 'search_campaigns': {
+        const cArgs = sanitizedArgs as AssistantToolArgumentsMap['search_campaigns'];
+        return this.assistant.searchCampaigns(cArgs);
+      }    
 
       default:
         throw new Error(`Tool ${toolName} logic not implemented in native executor`);

@@ -41,5 +41,50 @@ export const TOOL_TEMPLATES = {
       QUESTION: "La domanda complessa da sottoporre all'analista virtuale.",
       SCOPE: "Contesto opzionale (es. 'focus su protocollo SSH')."
     }
+  },
+
+ SEARCH_ATTACKS: {
+    NAME: "search_attacks",
+    DESCRIPTION:
+      "Ricerca diretta su MongoDB degli attacchi aggregati per IP, SENZA passare per Qdrant. " +
+      "Usare quando la domanda è temporale o parametrica: 'ultimi 10 giorni', 'attacchi dalla Cina', 'attacchi SSH con dangerScore 5'. " +
+      "Filtri disponibili: dateFrom/dateTo (ISO8601), ip (stringa esatta), country (codice ISO: IT, CN, RU...), " +
+      "protocol (http, ssh, ftp), dangerScore (1-5), minLogs (soglia minima log per IP). " +
+      "Restituisce una lista di attacchi con sourceRef pronto per resolve_threat_source.",
+    FIELDS: {
+      DATE_FROM: "Data di inizio in formato ISO8601. Calcolata dinamicamente dall'agente (es: 'ultimi 10 giorni' → now - 10d).",
+      DATE_TO: "Data di fine in formato ISO8601. Default: ora corrente.",
+      IP: "Filtra per IP esatto.",
+      COUNTRY: "Filtra per paese di origine (codice ISO: CN, RU, US, IT...).",
+      PROTOCOL: "Filtra per protocollo: 'http', 'ssh', 'ftp'.",
+      DANGER_SCORE: "Filtra per livello di pericolo (1=Critico, 5=Informativo).",
+      MIN_LOGS: "Numero minimo di log per considerare un IP come attacco. Default: 10.",
+      LIMIT: "Numero massimo di risultati. Default: 20.",
+      SORT_BY: "Campo di ordinamento: 'lastSeen', 'totaleLogs', 'dangerScore', 'averageScore'.",
+      SORT_ORDER: "'desc' (default) o 'asc'."
+    }
+  },
+
+  SEARCH_CAMPAIGNS: {
+    NAME: "search_campaigns",
+    DESCRIPTION:
+      "Ricerca diretta su MongoDB delle campagne distribuite, SENZA passare per Qdrant. " +
+      "Usare quando la domanda riguarda attività coordinate multi-IP: 'campagne degli ultimi 7 giorni', 'campagne SSH con più di 5 IP'. " +
+      "Filtri disponibili: dateFrom/dateTo (ISO8601), protocol, minIps (numero minimo IP coinvolti), " +
+      "minScore (score minimo), minLogsPerIp (log minimi per IP partecipante). " +
+      "Restituisce una lista di campagne con sourceRef pronto per resolve_threat_source.",
+    FIELDS: {
+      DATE_FROM: "Data di inizio in formato ISO8601.",
+      DATE_TO: "Data di fine in formato ISO8601.",
+      PROTOCOL: "Filtra per protocollo: 'http', 'ssh', 'ftp'.",
+      MIN_IPS: "Numero minimo di IP coinvolti nella campagna.",
+      MIN_SCORE: "Score medio minimo della campagna.",
+      MIN_LOGS_PER_IP: "Log minimi per ciascun IP partecipante.",
+      LIMIT: "Numero massimo di risultati. Default: 20.",
+      SORT_BY: "Campo di ordinamento: 'lastSeen', 'firstSeen', 'ipCount', 'totaleLogs', 'averageScore'.",
+      SORT_ORDER: "'desc' (default) o 'asc'."
+    }
   }
+
+
 };

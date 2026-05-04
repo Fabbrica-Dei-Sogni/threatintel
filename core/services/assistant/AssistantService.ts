@@ -320,11 +320,12 @@ export class AssistantService {
                     attackPatterns: attack.attackPatterns,
                 },
                 resolveRef: {
-                    endpoint: '/api/attacks/detail',
-                    method: 'GET',
+                    endpoint: '/api/attack/details',
+                    method: 'POST',
                     params: {
                         type: 'attack',
                         ip: attackIp,
+                        minLogsForAttack: args.minLogs || 10
                     } as any,
                 },
             };
@@ -365,11 +366,13 @@ export class AssistantService {
                 attackPatterns: campaign.attackPatterns,
             },
             resolveRef: {
-                endpoint: '/api/campaigns/detail',
-                method: 'GET',
+                endpoint: '/api/campaign/details',
+                method: 'POST',
                 params: {
                     type: 'campaign',
                     hash: campaign.hash,
+                    minLogsPerIp: args.minLogsPerIp || 1,
+                    minScore: args.minScore || 0
                 } as any,
             },
         }));

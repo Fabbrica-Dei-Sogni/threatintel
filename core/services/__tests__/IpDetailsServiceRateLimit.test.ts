@@ -18,18 +18,26 @@ jest.mock('whois', () => ({
 jest.mock('ip-range-check', () => jest.fn(() => false));
 
 describe('IpDetailsService Rate Limit & Retry', () => {
+    let mongoServer: any;
     let ipDetailsService: IpDetailsService;
     let mockLogger: any;
 
     beforeAll(async () => {
-        const uri = process.env.MONGO_URI_TEST || 'mongodb://127.0.0.1:27017/test_ratelimit';
-        if (mongoose.connection.readyState === 0) {
-            await mongoose.connect(uri);
-        }
+        const { MongoMemoryServer } = require('mongodb-memory-server');
+        mongoServer = await MongoMemoryServer.create({
+            binary: {
+                version: '7.0.14',
+            },
+        });
+        const uri = mongoServer.getUri();
+        await mongoose.connect(uri);
     });
 
     afterAll(async () => {
         await mongoose.disconnect();
+        if (mongoServer) {
+            await mongoServer.stop();
+        }
     });
 
     beforeEach(async () => {

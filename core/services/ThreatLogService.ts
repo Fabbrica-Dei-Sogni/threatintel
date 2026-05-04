@@ -4,7 +4,6 @@ import ThreatLog, { IThreatLog } from '../models/ThreatLogSchema';
 import IpDetails from '../models/IpDetailsSchema';
 import AttackDTO from '../models/dto/AttackDTO';
 import PatternAnalysisService from './PatternAnalysisService';
-import { ForensicService } from './forense/ForensicService';
 import { ForensicPipelineService } from './forense/ForensicPipelineService';
 import { inject, injectable } from 'tsyringe';
 import { LOGGER_TOKEN, EVENT_BUS_TOKEN } from '../di/tokens';
@@ -34,7 +33,6 @@ export class ThreatLogService {
 
     constructor(
         @inject(LOGGER_TOKEN) private readonly logger: Logger,
-        private readonly forensicService: ForensicService,
         private readonly forensicPipelineService: ForensicPipelineService,
         private readonly ipDetailsService: IpDetailsService,
         private readonly patternAnalysisService: PatternAnalysisService,

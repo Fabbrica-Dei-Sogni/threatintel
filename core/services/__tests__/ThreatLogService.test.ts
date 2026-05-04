@@ -3,13 +3,10 @@ import { container } from 'tsyringe';
 import mongoose from 'mongoose';
 import { ThreatLogService } from '../ThreatLogService';
 import ThreatLog from '../../models/ThreatLogSchema';
-import { ForensicService } from '../forense/ForensicService';
 import { ForensicPipelineService } from '../forense/ForensicPipelineService';
 import { IpDetailsService } from '../IpDetailsService';
 import PatternAnalysisService from '../PatternAnalysisService';
 import { LOGGER_TOKEN, EVENT_BUS_TOKEN, OLLAMA_SERVICE_TOKEN, RAG_TRANSLATION_TOKEN } from '../../di/tokens';
-import { OllamaService } from '../assistant/OllamaService';
-import { RagTranslationService } from '../assistant/RagTranslationService';
 
 describe('ThreatLogService', () => {
     console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
@@ -17,7 +14,6 @@ describe('ThreatLogService', () => {
     console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
     let service: ThreatLogService;
     let mockLogger: any;
-    let mockForensicService: any;
     let mockForensicPipelineService: any;
     let mockIpDetailsService: any;
     let mockPatternAnalysisService: any;
@@ -46,9 +42,6 @@ describe('ThreatLogService', () => {
             debug: jest.fn()
         };
 
-        mockForensicService = {
-            buildAttackGroupsBasePipeline: jest.fn()
-        };
 
         mockForensicPipelineService = {
             buildStandardPipeline: jest.fn().mockResolvedValue([])
@@ -88,7 +81,6 @@ describe('ThreatLogService', () => {
 
         container.clearInstances();
         container.registerInstance(LOGGER_TOKEN, mockLogger);
-        container.registerInstance(ForensicService, mockForensicService);
         container.registerInstance(ForensicPipelineService, mockForensicPipelineService);
         container.registerInstance(IpDetailsService, mockIpDetailsService);
         container.registerInstance(PatternAnalysisService, mockPatternAnalysisService);
@@ -234,7 +226,7 @@ describe('ThreatLogService', () => {
             expect(top[0].fingerprint.score).toBe(90);
         });
     });
-    
+
     describe('dryRunAnalyzeLogs', () => {
         it('should perform a dry run analysis', async () => {
             await ThreatLog.create({
@@ -304,21 +296,21 @@ describe('ThreatLogService', () => {
 
             const { results } = await service.analyzeLogs({ batchSize: 10, updateDatabase: false });
             expect(results.updated).toBe(0);
-            
+
             const log = await ThreatLog.findOne({ id: 'no-update' });
             expect(log?.fingerprint.suspicious).toBe(false); // Should not have changed
         });
 
         it('should handle batch errors gracefully', async () => {
             await ThreatLog.create({ id: 'err-log', request: { ip: '1.1.1.1' }, timestamp: new Date() });
-            
+
             // Mock getLogs to throw on the first call
             const realGetLogs = service.getLogs.bind(service);
             service.getLogs = jest.fn().mockRejectedValueOnce(new Error('Batch Error'));
-            
+
             const { results } = await service.analyzeLogs({ batchSize: 1, updateDatabase: true });
             expect(results.errors).toBe(1);
-            
+
             // Restore
             service.getLogs = realGetLogs;
         });
@@ -334,7 +326,7 @@ describe('ThreatLogService', () => {
 
             const logs = await service.getLogs({ filters: { 'request.ip': '1.2.3.4' }, page: 1, pageSize: 1 });
             expect(logs).toHaveLength(1);
-            
+
             const total = await service.countLogs({ 'request.ip': '1.2.3.4' });
             expect(total).toBe(2);
         });

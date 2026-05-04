@@ -74,6 +74,7 @@ export interface FetchCampaignsParams {
     selectedUris?: string[];
     search?: string;
     minCorrelations?: number;
+    status?: string;
 }
 
 export interface FetchCampaignsResponse {

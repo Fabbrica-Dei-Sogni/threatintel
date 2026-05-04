@@ -218,20 +218,23 @@ export async function fetchAttackDetail({
     ip,
     minLogsForAttack,
     timeConfig = {},
-    protocol = null
+    protocol = null,
+    status = 'active'
 }: {
     ip: string;
     minLogsForAttack: number;
     timeConfig: any;
     protocol?: string | null;
+    status?: string;
 }): Promise<any> {
-    console.log('[fetchAttackDetail] Params:', { ip, minLogsForAttack, timeConfig });
+    console.log('[fetchAttackDetail] Params:', { ip, minLogsForAttack, timeConfig, status });
     try {
         const response = await apiClient.post<any>('/attack/details', {
             ip,
             minLogsForAttack,
             timeConfig,
-            protocol
+            protocol,
+            status
         });
 
         console.log('[fetchAttackDetail] Response status:', response.status);
@@ -246,20 +249,23 @@ export async function fetchDistributedAttackDetail({
     ipList,
     minLogsForAttack,
     timeConfig = {},
-    protocol = null
+    protocol = null,
+    status = 'active'
 }: {
     ipList: string[];
     minLogsForAttack: number;
     timeConfig: any;
     protocol?: string | null;
+    status?: string;
 }): Promise<any> {
-    console.log('[fetchDistributedAttackDetail] Params:', { ipList, minLogsForAttack, timeConfig });
+    console.log('[fetchDistributedAttackDetail] Params:', { ipList, minLogsForAttack, timeConfig, status });
     try {
         const response = await apiClient.post<any>('/attack/distributed', {
             ipList,
             minLogsForAttack,
             timeConfig,
-            protocol
+            protocol,
+            status
         });
 
         console.log('[fetchDistributedAttackDetail] Response status:', response.status);
@@ -567,11 +573,12 @@ export async function fetchCampaigns({
     pageSize = 10,
     selectedUris = [],
     search = '',
-    minCorrelations = 0
+    minCorrelations = 0,
+    status = 'active'
 }: FetchCampaignsParams = {}): Promise<FetchCampaignsResponse> {
     try {
         const response = await apiClient.get('/campaigns', {
-            params: { startTime, endTime, timeMode, agoValue, agoUnit, minIps, minScore, minLogsPerIp, minCorrelations, protocol, page, pageSize, selectedUris, search }
+            params: { startTime, endTime, timeMode, agoValue, agoUnit, minIps, minScore, minLogsPerIp, minCorrelations, protocol, page, pageSize, selectedUris, search, status }
         });
         return response.data;
     } catch (error) {
@@ -588,7 +595,8 @@ export async function fetchCampaignDetail({
     protocol = null,
     timeConfig = {},
     page = 1,
-    pageSize = 10
+    pageSize = 10,
+    status = 'active'
 }: {
     hash: string;
     ips?: string[];
@@ -598,6 +606,7 @@ export async function fetchCampaignDetail({
     timeConfig?: any;
     page?: number;
     pageSize?: number;
+    status?: string;
 }): Promise<CampaignDetailDTO> {
     try {
         const response = await apiClient.post('/campaign/details', {
@@ -608,7 +617,8 @@ export async function fetchCampaignDetail({
             protocol,
             timeConfig,
             page,
-            pageSize
+            pageSize,
+            status
         });
         return response.data;
     } catch (error) {

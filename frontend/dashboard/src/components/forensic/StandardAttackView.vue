@@ -22,7 +22,8 @@ const props = defineProps({
     agoValue: { type: Number, default: null },
     agoUnit: { type: String, default: null },
     minLogsForAttack: { type: Number, default: 1 },
-    protocol: { type: String, default: null }
+    protocol: { type: String, default: null },
+    status: { type: String, default: 'active' }
 });
 
 const emit = defineEmits(['back', 'go-to-ip']);
@@ -57,7 +58,8 @@ async function loadData() {
             ip: props.ip,
             minLogsForAttack: props.minLogsForAttack,
             timeConfig,
-            protocol: props.protocol
+            protocol: props.protocol,
+            status: props.status
         });
     } catch (err) {
         console.error('[StandardAttackView] Error:', err);

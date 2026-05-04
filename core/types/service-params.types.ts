@@ -18,12 +18,46 @@ export interface GetLogByIdParams {
 }
 
 /**
+ * Filtro specifico per la ricerca degli attacchi.
+ */
+export interface AttackFilter {
+    'request.ip'?: string;
+    'request.url'?: string;
+    'request.method'?: string;
+    protocol?: string;
+    timestamp?: string | any;
+    dangerLevel?: string | number | number[];
+    'fingerprint.hash'?: string;
+    totaleLogs?: number | any;
+    dangerScore?: number | any;
+    averageScore?: number | any;
+}
+
+/**
+ * Filtro specifico per la ricerca delle campagne.
+ */
+export interface CampaignFilter {
+    minIps?: number;
+    minScore?: number;
+    minLogsPerIp?: number;
+    minCorrelations?: number;
+    protocol?: string;
+    startTime?: string;
+    endTime?: string;
+    timeMode?: 'ago' | 'range';
+    agoValue?: number;
+    agoUnit?: string;
+    selectedUris?: string[];
+    search?: string;
+}
+
+/**
  * Parametri per la ricerca e il raggruppamento degli attacchi.
  */
 export interface GetAttacksParams {
     page?: number;
     pageSize?: number;
-    filters?: any;
+    filters?: AttackFilter;
     minLogsForAttack?: number;
     timeConfig?: TimeConfig;
     sortFields?: any;
@@ -45,17 +79,10 @@ export interface GetCampaignDetailParams {
 /**
  * Parametri per la ricerca e il discovery delle campagne.
  */
-export interface GetCampaignsParams {
-    minIps?: number;
-    minScore?: number;
-    minLogsPerIp?: number;
-    protocol?: string;
+export interface GetCampaignsParams extends CampaignFilter {
     page?: number;
     pageSize?: number;
     timeConfig?: TimeConfig;
-    selectedUris?: string[];
-    search?: string;
-    minCorrelations?: number;
 }
 
 /**

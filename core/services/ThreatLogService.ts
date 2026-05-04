@@ -129,9 +129,15 @@ export class ThreatLogService {
 
         // Aggiungi filtro dangerLevel se presente (va fatto dopo ScoringStage che lo calcola)
         if (dangerLevel) {
-            const levels = typeof dangerLevel === 'string'
-                ? dangerLevel.split(',').map(l => parseInt(l.trim())).filter(l => !isNaN(l))
-                : [parseInt(dangerLevel)];
+            let levels: number[] = [];
+            
+            if (typeof dangerLevel === 'string') {
+                levels = dangerLevel.split(',').map(l => parseInt(l.trim())).filter(l => !isNaN(l));
+            } else if (Array.isArray(dangerLevel)) {
+                levels = dangerLevel.map(l => typeof l === 'string' ? parseInt(l) : l).filter(l => !isNaN(l));
+            } else if (typeof dangerLevel === 'number') {
+                levels = [dangerLevel];
+            }
 
             if (levels.length > 0) {
                 basePipeline.push({ $match: { dangerLevel: { $in: levels } } });

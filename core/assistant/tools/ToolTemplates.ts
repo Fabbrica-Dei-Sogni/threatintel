@@ -44,6 +44,27 @@ export const TOOL_TEMPLATES = {
     }
   },
 
+  SEARCH_LOGS: {
+    NAME: "search_logs",
+    DESCRIPTION:
+      "Ricerca diretta su MongoDB dei log atomici, SENZA passare per Qdrant. " +
+      "Usare quando la domanda riguarda eventi singoli o parametri specifici: 'log dell'IP 1.2.3.4', 'log HTTP delle ultime 2 ore', 'log sospetti con score > 50'. " +
+      "Restituisce una lista di log con resolveRef pronto per resolve_threat_source.",
+    FIELDS: {
+      START_DATE: "Data di inizio in formato ISO8601.",
+      END_DATE: "Data di fine in formato ISO8601.",
+      IP: "Filtra per IP esatto.",
+      URL: "Filtra per URL o parte di esso (es: '/admin', '.php').",
+      PROTOCOL: "Filtra per protocollo: 'http', 'ssh', 'ftp'.",
+      MIN_SCORE: "Score minimo del log (0-100).",
+      LIMIT: "Numero massimo di risultati. Default: 20.",
+      OFFSET: "Numero di risultati da saltare per paginazione.",
+      SORT_BY: "Campo di ordinamento: 'timestamp', 'fingerprint.score'.",
+      SORT_ORDER: "'desc' (default) o 'asc'.",
+      STATUS: "Stato del log: 'active' (default), 'archived', 'deleted'."
+    }
+  },
+
  SEARCH_ATTACKS: {
     NAME: "search_attacks",
     DESCRIPTION:

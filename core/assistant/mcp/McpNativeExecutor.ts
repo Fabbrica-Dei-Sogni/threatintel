@@ -24,7 +24,7 @@ export class McpNativeExecutor {
   constructor(
     @inject(ASSISTANT_SERVICE_TOKEN) private assistant: AssistantService,
     @inject(LOGGER_TOKEN) private logger: Logger
-  ) {}
+  ) { }
 
   public async executeToolByName(
     toolName: string,
@@ -68,7 +68,12 @@ export class McpNativeExecutor {
         const aArgs = sanitizedArgs as AssistantToolArgumentsMap['ask'];
         return this.assistant.ask(aArgs.question);
       }
-        
+
+      case 'search_logs': {
+        const cArgs = sanitizedArgs as AssistantToolArgumentsMap['search_logs'];
+        return this.assistant.searchLogs(cArgs);
+      }
+
       case 'search_attacks': {
         const aArgs = sanitizedArgs as AssistantToolArgumentsMap['search_attacks'];
         return this.assistant.searchAttacks(aArgs);
@@ -77,7 +82,7 @@ export class McpNativeExecutor {
       case 'search_campaigns': {
         const cArgs = sanitizedArgs as AssistantToolArgumentsMap['search_campaigns'];
         return this.assistant.searchCampaigns(cArgs);
-      }    
+      }
 
       default:
         throw new Error(`Tool ${toolName} logic not implemented in native executor`);

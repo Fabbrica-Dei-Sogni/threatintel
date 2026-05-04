@@ -36,6 +36,21 @@ export interface SearchAttacksArgs {
   status?: 'active' | 'archived' | 'deleted';
 }
 
+export interface SearchLogArgs {
+  ip?: string;
+  url?: string;
+  protocol?: string;
+  startDate?: Date;
+  endDate?: Date;
+  minScore?: number;
+  tags?: string[];
+  limit?: number;
+  offset?: number;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+  status?: 'active' | 'archived' | 'deleted';
+}
+
 export interface SearchCampaignsArgs {
   dateFrom?: string;
   dateTo?: string;
@@ -54,6 +69,7 @@ export type AssistantToolName =
   | 'semantic_search'
   | 'resolve_threat_source'
   | 'ask'
+  | 'search_logs'
   | 'search_attacks'     // ← nuovo
   | 'search_campaigns';  // ← nuovo
 
@@ -61,6 +77,7 @@ export interface AssistantToolArgumentsMap {
   semantic_search: SemanticSearchArgs;
   resolve_threat_source: ResolveThreatSourceArgs;
   ask: AskArgs;
+  search_logs: SearchLogArgs;     // ← nuovo
   search_attacks: SearchAttacksArgs;     // ← nuovo
   search_campaigns: SearchCampaignsArgs; // ← nuovo  
 }

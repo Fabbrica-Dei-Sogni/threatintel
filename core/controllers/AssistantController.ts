@@ -178,6 +178,90 @@ export class AssistantController {
 
     /**
      * @openapi
+     * /assistant/logs:
+     *   post:
+     *     summary: Ricerca diretta nei log (Tool MCP)
+     *     tags: [AI Assistant & RAG]
+     *     security:
+     *       - BearerAuth: []
+     *     requestBody:
+     *       content:
+     *         application/json:
+     *           schema:
+     *             $ref: '#/components/schemas/SearchLogArgs'
+     *     responses:
+     *       200:
+     *         description: Risultati ricerca log.
+     */
+    @Post('/logs', [auth.isAuthenticated()])
+    async searchLogs(req: Request, res: Response): Promise<void> {
+        try {
+            const results = await this.assistant.searchLogs(req.body);
+            res.json(results);
+        } catch (err: any) {
+            this.logger.error('[AssistantController] SearchLogs error:', err);
+            res.status(500).json({ error: err.message });
+        }
+    }
+
+    /**
+     * @openapi
+     * /assistant/attacks:
+     *   post:
+     *     summary: Ricerca diretta negli attacchi (Tool MCP)
+     *     tags: [AI Assistant & RAG]
+     *     security:
+     *       - BearerAuth: []
+     *     requestBody:
+     *       content:
+     *         application/json:
+     *           schema:
+     *             $ref: '#/components/schemas/SearchAttacksArgs'
+     *     responses:
+     *       200:
+     *         description: Risultati ricerca attacchi.
+     */
+    @Post('/attacks', [auth.isAuthenticated()])
+    async searchAttacks(req: Request, res: Response): Promise<void> {
+        try {
+            const results = await this.assistant.searchAttacks(req.body);
+            res.json(results);
+        } catch (err: any) {
+            this.logger.error('[AssistantController] SearchAttacks error:', err);
+            res.status(500).json({ error: err.message });
+        }
+    }
+
+    /**
+     * @openapi
+     * /assistant/campaigns:
+     *   post:
+     *     summary: Ricerca diretta nelle campagne (Tool MCP)
+     *     tags: [AI Assistant & RAG]
+     *     security:
+     *       - BearerAuth: []
+     *     requestBody:
+     *       content:
+     *         application/json:
+     *           schema:
+     *             $ref: '#/components/schemas/SearchCampaignsArgs'
+     *     responses:
+     *       200:
+     *         description: Risultati ricerca campagne.
+     */
+    @Post('/campaigns', [auth.isAuthenticated()])
+    async searchCampaigns(req: Request, res: Response): Promise<void> {
+        try {
+            const results = await this.assistant.searchCampaigns(req.body);
+            res.json(results);
+        } catch (err: any) {
+            this.logger.error('[AssistantController] SearchCampaigns error:', err);
+            res.status(500).json({ error: err.message });
+        }
+    }
+
+    /**
+     * @openapi
      * /assistant/integrity-check:
      *   post:
      *     summary: Verifica integrità del Vector Store (Admin Only)

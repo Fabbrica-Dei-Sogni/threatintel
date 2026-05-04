@@ -19,7 +19,7 @@ import {
     FilterAllowedFields
 } from '../utils/queryGuard';
 
-import { GetLogByIdParams } from '../types/service-params.types';
+import { GetLogByIdParams, GetThreatLogParams } from '../types/service-params.types';
 
 dotenv.config();
 
@@ -91,6 +91,98 @@ export class ThreatLogService {
         const mongoFilters = this.buildRegExpFilter(filters);
 
         return await ThreatLog.countDocuments(mongoFilters);
+    }
+
+    /**
+     * Ricerca avanzata nei log con supporto a paginazione, filtri e timeConfig.
+     */
+    async searchLogs(params: GetThreatLogParams): Promise<{ logs: IThreatLog[], total: number, page: number, pageSize: number }> {
+        const { page = 1, pageSize = 20, filters = {}, sortFields = { timestamp: -1 }, timeConfig } = params;
+        const safePage = sanitizePage(page);
+        const safePageSize = sanitizePageSize(pageSize);
+        const safeSort = sanitizeSortFields(sortFields, SortAllowedFields.threatLog);
+        const skip = (safePage - 1) * safePageSize;
+
+        const mongoFilters = this.buildRegExpFilter(filters);
+
+        // Integrazione timeConfig se presente
+        if (timeConfig) {
+            const timeFilter = this.buildTimeFilter(timeConfig);
+            if (timeFilter) {
+                mongoFilters.timestamp = timeFilter;
+            }
+        }
+
+        // Eseguiamo in parallelo per migliorare i tempi di risposta
+        const [logs, total] = await Promise.all([
+            ThreatLog.find(mongoFilters)
+                .sort(safeSort)
+                .skip(skip)
+                .limit(safePageSize)
+                .populate('ipDetailsId')
+                .exec(),
+            ThreatLog.countDocuments(mongoFilters).exec()
+        ]);
+
+        return { logs, total, page: safePage, pageSize: safePageSize };
+    }
+
+    private buildTimeFilter(timeConfig: any): any {
+        const now = new Date();
+        let timeAgo: Date | null = null;
+        let timeToStart: Date | null = null;
+
+        const parseDate = (d: any) => {
+            if (d instanceof Date) return d;
+            if (typeof d === 'string') {
+                const parsed = new Date(d);
+                return isNaN(parsed.getTime()) ? null : parsed;
+            }
+            return null;
+        };
+
+        const fromStr = timeConfig.fromDate || timeConfig.startTime || timeConfig.start;
+        const toStr = timeConfig.toDate || timeConfig.endTime || timeConfig.end;
+
+        if (timeConfig.timeMode === 'ago' && timeConfig.agoUnit && timeConfig.agoValue) {
+            const unit = timeConfig.agoUnit;
+            const val = Number(timeConfig.agoValue);
+            if (unit === 'minutes' || unit === 'm') timeAgo = new Date(now.getTime() - (val * 60 * 1000));
+            else if (unit === 'hours' || unit === 'h') timeAgo = new Date(now.getTime() - (val * 60 * 60 * 1000));
+            else if (unit === 'days' || unit === 'd') timeAgo = new Date(now.getTime() - (val * 24 * 60 * 60 * 1000));
+            else if (unit === 'months' || unit === 'M') timeAgo = new Date(now.getTime() - (val * 30 * 24 * 60 * 60 * 1000));
+            else if (unit === 'years' || unit === 'y') timeAgo = new Date(now.getTime() - (val * 365 * 24 * 60 * 60 * 1000));
+        } else if (fromStr || toStr) {
+            if (fromStr) timeAgo = parseDate(fromStr);
+            if (toStr) {
+                const toDateParsed = parseDate(toStr);
+                if (toDateParsed) {
+                    if (typeof toStr === 'string' && toStr.length <= 10) {
+                        toDateParsed.setHours(23, 59, 59, 999);
+                    }
+                    timeToStart = toDateParsed;
+                }
+            }
+        } else {
+            const minutes = timeConfig.minutes || timeConfig.m;
+            const hours = timeConfig.hours || timeConfig.h;
+            const days = timeConfig.days || timeConfig.d;
+            if (minutes) timeAgo = new Date(now.getTime() - (minutes * 60 * 1000));
+            else if (hours) timeAgo = new Date(now.getTime() - (hours * 60 * 60 * 1000));
+            else if (days) timeAgo = new Date(now.getTime() - (days * 24 * 60 * 60 * 1000));
+        }
+
+        const timeFilter: any = {};
+        if (timeAgo && timeToStart) {
+            timeFilter.$gte = timeAgo;
+            timeFilter.$lte = timeToStart;
+        } else if (timeAgo) {
+            timeFilter.$gte = timeAgo;
+        } else if (timeToStart) {
+            timeFilter.$lte = timeToStart;
+        }
+
+        return Object.keys(timeFilter).length > 0 ? timeFilter : null;
     }
 
 

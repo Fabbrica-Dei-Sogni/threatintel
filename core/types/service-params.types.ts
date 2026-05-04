@@ -19,6 +19,31 @@ export interface GetLogByIdParams {
 }
 
 /**
+ * Filtro specifico per la ricerca dei log.
+ */
+export interface ThreatLogFilter {
+    'request.ip'?: string;
+    'request.url'?: string;
+    'request.method'?: string;
+    'geo.country'?: string;
+    protocol?: string;
+    'fingerprint.suspicious'?: boolean;
+    status?: string;
+    [key: string]: any;
+}
+
+/**
+ * Parametri per la ricerca dei log.
+ */
+export interface GetThreatLogParams {
+    page?: number;
+    pageSize?: number;
+    filters?: ThreatLogFilter;
+    sortFields?: any;
+    timeConfig?: TimeConfig;
+}
+
+/**
  * Filtro specifico per la ricerca degli attacchi.
  */
 export interface AttackFilter {

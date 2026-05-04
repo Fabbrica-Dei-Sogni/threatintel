@@ -27,8 +27,8 @@ import {
     RagSourceParams,
     DirectSearchHit
 } from '../../types/assistant/rag.types';
-import { GetAttacksParams, GetCampaignsParams } from '../../types/service-params.types';
-import { SearchAttacksArgs, SearchCampaignsArgs } from 'core/types/assistant/assistant-tool.types';
+import { GetAttacksParams, GetCampaignsParams, GetThreatLogParams } from '../../types/service-params.types';
+import { SearchAttacksArgs, SearchCampaignsArgs, SearchLogArgs } from '../../types/assistant/assistant-tool.types';
 import { RagTranslationService } from './RagTranslationService';
 
 @injectable()
@@ -238,6 +238,47 @@ export class AssistantService {
             this.logger.error(`[AssistantService] Schema integrity check failed: ${error}`);
             throw error;
         }
+    }
+
+    public async searchLogs(args: SearchLogArgs): Promise<DirectSearchHit[]> {
+        const serviceParams: GetThreatLogParams = {
+            pageSize: args.limit || 20,
+            page: (args.offset && args.limit) ? Math.floor(args.offset / args.limit) + 1 : 1,
+            filters: {
+                'request.ip': args.ip,
+                'request.url': args.url,
+                protocol: args.protocol,
+                status: args.status
+            }
+        };
+
+        if (args.startDate || args.endDate) {
+            serviceParams.timeConfig = {
+                startTime: args.startDate instanceof Date ? args.startDate.toISOString() : args.startDate,
+                endTime: args.endDate instanceof Date ? args.endDate.toISOString() : args.endDate
+            };
+        }
+
+        const { logs } = await this.threatLogService.searchLogs(serviceParams);
+
+        return logs.map(log => ({
+            id: log.id,
+            score: 1.0,
+            text: this.ragTranslation.translateThreatLog(log),
+            summary: {
+                id: log.id,
+                ip: log.request?.ip,
+                protocol: log.protocol,
+                timestamp: log.timestamp,
+                url: log.request?.url,
+                score: log.fingerprint?.score
+            },
+            resolveRef: {
+                endpoint: `/api/logs/${log.id}`,
+                method: 'GET',
+                params: { id: log.id, type: 'log' }
+            }
+        }));
     }
 
     public async searchAttacks(args: SearchAttacksArgs): Promise<DirectSearchHit[]> {

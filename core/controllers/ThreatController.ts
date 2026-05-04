@@ -113,11 +113,12 @@ export class ThreatController {
             if (suspicious === 'true') filters['fingerprint.suspicious'] = true;
             else if (suspicious === 'false') filters['fingerprint.suspicious'] = false;
 
-            const safePage = sanitizePage(page);
-            const safePageSize = sanitizePageSize(pageSize);
-
-            const logs = await this.threatLogService.getLogs({ page: safePage, pageSize: safePageSize, filters });
-            const total = await this.threatLogService.countLogs(filters);
+            const logsParams = {
+                page: sanitizePage(page),
+                pageSize: sanitizePageSize(pageSize),
+                filters
+            };
+            const { logs, total, page: safePage, pageSize: safePageSize } = await this.threatLogService.searchLogs(logsParams);
 
             res.json({ logs, total, page: safePage, pageSize: safePageSize });
         } catch (err: any) {

@@ -185,7 +185,32 @@ const TOOLS: McpToolDefinition[] = [
     },
     annotations: { title: 'Search Campaigns', readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
     execution: { endpoint: '/assistant/campaigns', method: 'POST' },
-  },  
+  },
+
+  // ── NUOVO: search_logs ────────────────────────────────────────────────────
+  {
+    name: TOOL_TEMPLATES.SEARCH_LOGS.NAME as AssistantToolName,
+    description: TOOL_TEMPLATES.SEARCH_LOGS.DESCRIPTION,
+    inputSchema: {
+      type: 'object',
+      properties: {
+        startDate: { type: 'string', description: TOOL_TEMPLATES.SEARCH_LOGS.FIELDS.START_DATE },
+        endDate: { type: 'string', description: TOOL_TEMPLATES.SEARCH_LOGS.FIELDS.END_DATE },
+        ip: { type: 'string', description: TOOL_TEMPLATES.SEARCH_LOGS.FIELDS.IP },
+        url: { type: 'string', description: TOOL_TEMPLATES.SEARCH_LOGS.FIELDS.URL },
+        protocol: { type: 'string', description: TOOL_TEMPLATES.SEARCH_LOGS.FIELDS.PROTOCOL },
+        minScore: { type: 'number', description: TOOL_TEMPLATES.SEARCH_LOGS.FIELDS.MIN_SCORE },
+        limit: { type: 'number', description: TOOL_TEMPLATES.SEARCH_LOGS.FIELDS.LIMIT },
+        offset: { type: 'number', description: TOOL_TEMPLATES.SEARCH_LOGS.FIELDS.OFFSET },
+        sortBy: { type: 'string', description: TOOL_TEMPLATES.SEARCH_LOGS.FIELDS.SORT_BY },
+        sortOrder: { type: 'string', enum: ['asc', 'desc'], description: TOOL_TEMPLATES.SEARCH_LOGS.FIELDS.SORT_ORDER },
+        status: { type: 'string', enum: ['active', 'archived', 'deleted'], description: TOOL_TEMPLATES.SEARCH_LOGS.FIELDS.STATUS },
+      },
+      required: [],
+    },
+    annotations: { title: 'Search Logs', readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+    execution: { endpoint: '/assistant/logs', method: 'POST' },
+  },
 ];
 
 /**

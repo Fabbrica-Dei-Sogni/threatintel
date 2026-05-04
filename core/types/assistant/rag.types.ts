@@ -16,7 +16,7 @@ export type RagEntityType = 'threat_log' | 'attack_summary' | 'campaign_summary'
  * Versione attuale dello schema dei payload RAG.
  * Incrementare questo valore quando si modificano le interfacce dei payload per forzare il re-indexing.
  */
-export const RAG_SCHEMA_VERSION = 2;
+export const RAG_SCHEMA_VERSION = 3;
 
 /**
  * Configurazione temporale standard per il sistema RAG.

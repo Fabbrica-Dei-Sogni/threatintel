@@ -137,6 +137,8 @@ export class RagTranslationService {
         const duration = attack.durataAttacco?.human || `${attack.attackDurationMinutes || 0} minuti`;
         const patterns = attack.attackPatterns?.join(', ') || 'nessuno';
         const rateLimits = attack.countRateLimit || 0;
+        const protocol = attack.protocol || 'N/A';
+        const isp = attack.ipDetails?.ipinfo?.org || attack.ipDetails?.isp || 'ISP sconosciuto';
         
         // Mappatura Danger Level (da numerico a semantico)
         const dangerLevelMap: Record<number, string> = {
@@ -165,6 +167,31 @@ export class RagTranslationService {
             contextParts.push(`Sono stati rilevati ${rateLimits} eventi di violazione dei limiti di frequenza (rate limit).`);
         }
         
+        // Analisi strumenti e automazione
+        if (attack.fingerprintAnalysis?.isTool || attack.toolRiskScore && attack.toolRiskScore > 50) {
+            contextParts.push("L'attacco sembra essere stato condotto tramite uno strumento automatizzato o uno scanner di vulnerabilità.");
+        }
+
+        // Analisi sequenze e movimenti
+        if (attack.sequenceAnalysis?.bruteForceSuccess) {
+            contextParts.push("Attenzione: è stato rilevato un possibile successo in un attacco brute-force (codice di risposta positivo dopo vari tentativi).");
+        }
+        if (attack.sequenceAnalysis?.lateralMovement) {
+            contextParts.push("Sono stati identificati pattern riconducibili a tentativi di movimento laterale all'interno della rete.");
+        }
+
+        // Metadati bot/crawler
+        if (attack.metadata?.isBot) {
+            contextParts.push("L'indirizzo IP è identificato come un Bot noto.");
+        } else if (attack.metadata?.isCrawler) {
+            contextParts.push("L'indirizzo IP è identificato come un Crawler di ricerca.");
+        }
+
+        // Score di rischio specifici
+        if (attack.payloadRiskScore && attack.payloadRiskScore > 70) {
+            contextParts.push(`Il rischio associato ai payload inviati è estremamente elevato (${attack.payloadRiskScore.toFixed(0)}/100).`);
+        }
+
         const context = contextParts.join(' ');
 
         return RAG_TEMPLATES.INTERPOLATE(RAG_TEMPLATES.NARRATIVES.ATTACK_SUMMARY_BASE, {
@@ -180,6 +207,8 @@ export class RagTranslationService {
             patterns,
             indicators: patterns, // Per ora usiamo gli stessi per entrambi i placeholder nel template
             sampleUrl: attack.request?.url || '/',
+            protocol,
+            isp,
             context
         });
     }

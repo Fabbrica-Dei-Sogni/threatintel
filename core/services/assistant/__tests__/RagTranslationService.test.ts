@@ -110,6 +110,63 @@ describe('RagTranslationService Unit Test', () => {
         });
     });
 
+    describe('Attack Translation', () => {
+        it('should translate an AttackDTO with enriched context', () => {
+            const attack = {
+                ip: '10.20.30.40',
+                dangerLevel: 2,
+                intensityAttack: 'burst persistente',
+                firstSeen: '2026-05-01T10:00:00Z',
+                lastSeen: '2026-05-01T11:00:00Z',
+                attackDurationMinutes: 60,
+                durataAttacco: { human: '1 ora' },
+                totaleLogs: 500,
+                averageScore: 75.5,
+                attackPatterns: ['SQL Injection', 'Path Traversal'],
+                protocol: 'http',
+                ipDetails: {
+                    ipinfo: { org: 'Amazon Data Services' }
+                },
+                fingerprintAnalysis: { isTool: true },
+                sequenceAnalysis: { bruteForceSuccess: true, lateralMovement: true },
+                payloadRiskScore: 90,
+                request: { url: '/admin/login' }
+            };
+
+            const narrative = service.translateAttack(attack as any);
+
+            expect(narrative).toContain('10.20.30.40');
+            expect(narrative).toContain('Alto'); // Danger Level 2
+            expect(narrative).toContain('burst persistente');
+            expect(narrative).toContain('1 ora');
+            expect(narrative).toContain('500 richieste');
+            expect(narrative).toContain('protocollo http');
+            expect(narrative).toContain('Amazon Data Services');
+            expect(narrative).toContain('strumento automatizzato');
+            expect(narrative).toContain('successo in un attacco brute-force');
+            expect(narrative).toContain('movimento laterale');
+            expect(narrative).toContain('rischio associato ai payload inviati è estremamente elevato');
+            expect(narrative).toContain('/admin/login');
+        });
+
+        it('should handle missing fields in AttackDTO gracefully', () => {
+            const minimalAttack = {
+                ip: '5.6.7.8',
+                firstSeen: '2026-05-01T10:00:00Z',
+                lastSeen: '2026-05-01T10:05:00Z',
+                totaleLogs: 10
+            };
+
+            const narrative = service.translateAttack(minimalAttack as any);
+
+            expect(narrative).toContain('5.6.7.8');
+            expect(narrative).toContain('non classificato');
+            expect(narrative).toContain('protocollo N/A');
+            expect(narrative).toContain('ISP sconosciuto');
+            expect(narrative).not.toContain('strumento automatizzato');
+        });
+    });
+
     describe('Generative Prompt Builder', () => {
         it('should build a valid prompt for campaign summarization', () => {
             const campaignData = {

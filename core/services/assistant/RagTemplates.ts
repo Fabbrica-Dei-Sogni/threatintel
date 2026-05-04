@@ -11,7 +11,7 @@ export const RAG_TEMPLATES = {
         IP_DETAILS_BASE: "Profilo Intelligence IP {ip}. Localizzazione: {geo}. ISP: {isp}. Reputazione AbuseIPDB: {abuseScore}/100 con {totalReports} segnalazioni totali. Analisi report recenti:\n{reports}",
         TOR_NODE_INFO: "L'indirizzo IP è noto per essere un nodo di uscita TOR, aumentando il rischio di anonimato malevolo.",
 
-        ATTACK_SUMMARY_BASE: "Analisi tecnica dell'attaccante {ip} {geoInfo}. Livello di pericolo {dangerLevel} con intensità {intensity}. Attività rilevata dal {firstSeen} al {lastSeen} (durata: {duration}) per un totale di {totaleLogs} richieste. Score medio di pericolosità: {averageScore}/100. Pattern comportamentali: {patterns}. Indicatori tecnici rilevati: {indicators}. Target primario: {sampleUrl}. {context}",
+        ATTACK_SUMMARY_BASE: "Analisi tecnica dell'attaccante {ip} {geoInfo}. Livello di pericolo {dangerLevel} con intensità {intensity}. Attività rilevata dal {firstSeen} al {lastSeen} (durata: {duration}) per un totale di {totaleLogs} richieste su protocollo {protocol}. Score medio di pericolosità: {averageScore}/100. ISP rilevato: {isp}. Pattern comportamentali: {patterns}. Indicatori tecnici rilevati: {indicators}. Target primario: {sampleUrl}. {context}",
         CAMPAIGN_SUMMARY_BASE: "Rilevata Campagna di Attacco Distribuita (Hash: {hash}). La campagna coinvolge {ipCount} indirizzi IP unici e presenta {correlations} hub di correlazione temporale. Volume totale di traffico: {totaleLogs} log. Prima apparizione: {firstSeen}, Ultima apparizione: {lastSeen}. Score medio della campagna: {averageScore}/100. Pattern di attacco: {patterns}. Esempio di URL target: {sampleUrl}."
     },
     PROMPTS: {

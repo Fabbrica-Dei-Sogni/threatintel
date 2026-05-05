@@ -7,7 +7,7 @@ import { sanitizeFilters, sanitizePage, sanitizePageSize, FilterAllowedFields } 
 import { Controller, Get, Post } from '../registry/decorators';
 
 @singleton()
-@Controller('/api')
+@Controller('/api/campaign')
 export class CampaignController {
     constructor(
         private campaignService: CampaignService,
@@ -61,7 +61,7 @@ export class CampaignController {
      *       200:
      *         description: Elenco campagne distribuite trovate.
      */
-    @Get('/campaigns')
+    @Get('/search')
     async getCampaigns(req: Request, res: Response): Promise<void> {
         this.logger.info('[CampaignController] Requesting distributed campaigns discovery');
         try {
@@ -134,7 +134,7 @@ export class CampaignController {
      *       200:
      *         description: Dettagli della campagna.
      */
-    @Post('/campaign/details')
+    @Post('/detail')
     async getCampaignDetail(req: Request, res: Response): Promise<void> {
         const hash = req.body.hash;
         this.logger.info(`[CampaignController] Requesting campaign details for hash ${hash}`);
@@ -210,7 +210,7 @@ export class CampaignController {
      *       200:
      *         description: Elenco degli URI con conteggi.
      */
-    @Get('/campaigns/uris')
+    @Get('/uris')
     async getUniqueUris(req: Request, res: Response): Promise<void> {
         this.logger.info('[CampaignController] Requesting unique URIs from campaigns');
         try {

@@ -6,7 +6,7 @@ import { Logger } from 'winston';
 import { Controller, Post } from '../registry/decorators';
 
 @singleton()
-@Controller('/api')
+@Controller('/api/ratelimit')
 export class RateLimitController {
     constructor(
         private rateLimitService: RateLimitService,
@@ -36,7 +36,7 @@ export class RateLimitController {
      *       200:
      *         description: Risultati ricerca.
      */
-    @Post('/ratelimit/search')
+    @Post('/search')
     async searchRateLimits(req: Request, res: Response): Promise<void> {
         this.logger.info('[RateLimitController] Searching rate limits');
         try {

@@ -13,7 +13,7 @@ import { AuthMiddleware } from '../middlewares/AuthMiddleware';
 const auth = getComponent(AuthMiddleware);
 
 @singleton()
-@Controller('/api')
+@Controller('/api/config')
 export class ConfigController {
     constructor(
         private configService: ConfigService,
@@ -35,7 +35,7 @@ export class ConfigController {
      *       200:
      *         description: Elenco configurazioni restituito.
      */
-    @Get('/config', [auth.hasRole('admin')])
+    @Get('/', [auth.hasRole('admin')])
     async getAllConfigs(req: Request, res: Response): Promise<void> {
         this.logger.info('[ConfigController] Fetching all configurations');
         try {
@@ -70,7 +70,7 @@ export class ConfigController {
      *       200:
      *         description: Configurazione salvata.
      */
-    @Post('/config', [auth.hasRole('admin')])
+    @Post('/', [auth.hasRole('admin')])
     async saveConfig(req: Request, res: Response): Promise<void> {
         const { key, value } = req.body;
         this.logger.info(`[ConfigController] Saving configuration: ${key}`);
@@ -113,7 +113,7 @@ export class ConfigController {
      *       200:
      *         description: Configurazione eliminata.
      */
-    @Delete('/config/:key', [auth.hasRole('admin')])
+    @Delete('/:key', [auth.hasRole('admin')])
     async deleteConfig(req: Request, res: Response): Promise<void> {
         const key = req.params.key as string;
         this.logger.info(`[ConfigController] Deleting configuration: ${key}`);
@@ -152,7 +152,7 @@ export class ConfigController {
      *       200:
      *         description: Risultati della ricerca.
      */
-    @Post('/config/search', [auth.hasRole('admin')])
+    @Post('/search', [auth.hasRole('admin')])
     async searchConfigs(req: Request, res: Response): Promise<void> {
         const { query } = req.body;
         this.logger.info(`[ConfigController] Searching configurations with query: ${query}`);

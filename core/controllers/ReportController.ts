@@ -9,7 +9,7 @@ import { AuthMiddleware } from '../middlewares/AuthMiddleware';
 const auth = getComponent(AuthMiddleware);
 
 @singleton()
-@Controller('/api')
+@Controller('/api/reports')
 export class ReportController {
     constructor(private readonly reportService: ReportService) { }
 
@@ -64,7 +64,7 @@ export class ReportController {
      *       200:
      *         description: Report generato.
      */
-    @Get('/reports/dettaglio', [auth.isIdentified()])
+    @Get('/dettaglio', [auth.isIdentified()])
     async generateDetailReport(req: Request, res: Response) {
         try {
             const { ip, sessionId, type, locale, ipList } = req.query;
@@ -134,7 +134,7 @@ export class ReportController {
      *       200:
      *         description: Report custom generato.
      */
-    @Post('/reports/custom', [auth.isIdentified()])
+    @Post('/custom', [auth.isIdentified()])
     async generateCustomReport(req: Request, res: Response) {
         try {
             const { sections, locale }: { sections: IDossierSection[], locale: string } = req.body;

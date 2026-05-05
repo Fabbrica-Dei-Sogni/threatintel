@@ -10,7 +10,7 @@ import { AuthMiddleware } from '../middlewares/AuthMiddleware';
 const auth = getComponent(AuthMiddleware);
 
 @singleton()
-@Controller('/api')
+@Controller('/api/dossiers')
 export class DossierController {
     constructor(private readonly dossierService: DossierService) { }
 
@@ -56,7 +56,7 @@ export class DossierController {
      *       200:
      *         description: Elenco dossier.
      */
-    @Get('/dossiers', [auth.isIdentified()])
+    @Get('/', [auth.isIdentified()])
     async list(req: Request, res: Response) {
         try {
             const user = (req as any).user;
@@ -93,7 +93,7 @@ export class DossierController {
      *       200:
      *         description: Dettaglio dossier.
      */
-    @Get('/dossiers/:id', [auth.isIdentified()])
+    @Get('/:id', [auth.isIdentified()])
     async getById(req: Request, res: Response) {
         try {
             const id = req.params.id as string;
@@ -139,7 +139,7 @@ export class DossierController {
      *       201:
      *         description: Dossier creato.
      */
-    @Post('/dossiers', [auth.isIdentified()])
+    @Post('/', [auth.isIdentified()])
     async create(req: Request, res: Response) {
         try {
             const user = (req as any).user;
@@ -196,7 +196,7 @@ export class DossierController {
      *       200:
      *         description: Dossier aggiornato.
      */
-    @Patch('/dossiers/:id', [auth.isIdentified()])
+    @Patch('/:id', [auth.isIdentified()])
     async update(req: Request, res: Response) {
         try {
             const user = (req as any).user;
@@ -232,7 +232,7 @@ export class DossierController {
      *       200:
      *         description: Dossier eliminato.
      */
-    @Delete('/dossiers/:id', [auth.isIdentified()])
+    @Delete('/:id', [auth.isIdentified()])
     async delete(req: Request, res: Response) {
         try {
             const user = (req as any).user;
@@ -285,7 +285,7 @@ export class DossierController {
      *       200:
      *         description: File esportato con successo.
      */
-    @Get('/dossiers/:id/export', [auth.isIdentified()])
+    @Get('/:id/export', [auth.isIdentified()])
     async export(req: Request, res: Response) {
         try {
             const id = req.params.id as string;

@@ -577,7 +577,7 @@ export async function fetchCampaigns({
     status = 'active'
 }: FetchCampaignsParams = {}): Promise<FetchCampaignsResponse> {
     try {
-        const response = await apiClient.get('/campaigns', {
+        const response = await apiClient.get('/campaign/search', {
             params: { startTime, endTime, timeMode, agoValue, agoUnit, minIps, minScore, minLogsPerIp, minCorrelations, protocol, page, pageSize, selectedUris, search, status }
         });
         return response.data;
@@ -609,7 +609,7 @@ export async function fetchCampaignDetail({
     status?: string;
 }): Promise<CampaignDetailDTO> {
     try {
-        const response = await apiClient.post('/campaign/details', {
+        const response = await apiClient.post('/campaign/detail', {
             hash,
             ips,
             minLogsPerIp,
@@ -629,7 +629,7 @@ export async function fetchCampaignDetail({
 
 export async function fetchUniqueUris(params: any = {}): Promise<FetchUrisResponse> {
     try {
-        const response = await apiClient.get<FetchUrisResponse>('/campaigns/uris', { params });
+        const response = await apiClient.get<FetchUrisResponse>('/campaign/uris', { params });
         return response.data;
     } catch (error) {
         console.error('[fetchUniqueUris] Error:', error);

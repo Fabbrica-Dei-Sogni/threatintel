@@ -50,7 +50,7 @@ Invece di copiare i file nelle cartelle di sistema, l'installer crea dei **Link 
 
 ### 📦 1. Creazione Release
 ```bash
-./scripts/build/interactive-release.sh
+./installer/build/interactive-release.sh
 ```
 - Compila il bundle con NCC.
 - Prepara i template Nginx e Systemd risolvendo le variabili (Porte, Percorsi Node, Nomi Servizio).
@@ -66,7 +66,7 @@ cd deployments/{servizio}/ && ./install.sh
 
 ### 🗑️ 3. Unistallazione
 ```bash
-./scripts/build/uninstall-release.sh
+./installer/build/uninstall-release.sh
 ```
 - Individua tutti i servizi gestiti tramite il tag `Managed-By`.
 - Rimuove in modo pulito i link simbolici da `/etc/systemd/system/`.

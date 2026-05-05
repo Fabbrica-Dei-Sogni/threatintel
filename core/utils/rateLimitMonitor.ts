@@ -1,21 +1,29 @@
-import { redisClient } from '../rateLimitMiddleware';
+import { container } from '../di/container';
+import { RedisService } from '../services/RedisService';
+import { REDIS_SERVICE_TOKEN } from '../di/tokens';
 
 export default class RateLimitMonitor {
+    private static getRedisService(): RedisService {
+        return container.resolve<RedisService>(REDIS_SERVICE_TOKEN);
+    }
+
     static async getStats(): Promise<any> {
-        if (!redisClient) {
+        const redisService = this.getRedisService();
+        if (!redisService.isReady()) {
             return { error: 'Redis not available' };
         }
 
+        const client = redisService.getClient()!;
         try {
             const stats: any = {
                 timestamp: new Date().toISOString(),
-                blacklistedIPs: (await redisClient.scard('blacklisted-ips')) || 0,
+                blacklistedIPs: (await client.scard('blacklisted-ips')) || 0,
                 activeRateLimits: 0,
                 violationStats: {}
             };
 
             // Conta chiavi attive di rate limiting
-            const keys: string[] = await redisClient.keys('*');
+            const keys: string[] = await client.keys('*');
             stats.activeRateLimits = keys.filter(k =>
                 k.startsWith('ddos:') ||
                 k.startsWith('critical:') ||
@@ -30,13 +38,15 @@ export default class RateLimitMonitor {
     }
 
     static async clearBlacklist(): Promise<boolean> {
-        if (!redisClient) return false;
+        const redisService = this.getRedisService();
+        if (!redisService.isReady()) return false;
 
+        const client = redisService.getClient()!;
         try {
-            await redisClient.del('blacklisted-ips');
-            const blacklistKeys: string[] = await redisClient.keys('blacklist:*');
+            await client.del('blacklisted-ips');
+            const blacklistKeys: string[] = await client.keys('blacklist:*');
             if (blacklistKeys.length > 0) {
-                await redisClient.del(...blacklistKeys);
+                await client.del(...blacklistKeys);
             }
             return true;
         } catch (error) {

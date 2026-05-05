@@ -1,10 +1,8 @@
 import { logger } from '../../logger';
-import util from 'util';
 import axios from 'axios';
 import dotenv from 'dotenv';
 
 // Import JS dependencies
-import * as whois from 'whois';
 import ipinfo from 'ipinfo';
 import AbuseReport from '../models/AbuseReportSchema';
 import IpDetails from '../models/IpDetailsSchema';
@@ -17,8 +15,6 @@ import ipRangeCheck from 'ip-range-check';
 import { IpDetailsMapper } from '../models/dto/IpDetailsDTO';
 import { EventBus, AppEvents } from './EventBus';
 import { GetIpDetailsParams } from '../types/service-params.types';
-
-const whoisAsync = util.promisify(whois.lookup);
 
 dotenv.config();
 
@@ -372,11 +368,7 @@ export class IpDetailsService {
         // Dettaglio da ipinfo (puoi registrarti per key se sfori il free tier)
         const info = await this.ipinfoPromise(ip);
 
-        // Whois con promisify (richiede connessione)
-        let whoisData: any = '';
-        try {
-            whoisData = await whoisAsync(ip);
-        } catch (e) { whoisData = null; }
+        const whoisData = await this.whoisPromise(ip);
 
         return {
             ip,
@@ -384,6 +376,47 @@ export class IpDetailsService {
             whois_raw: whoisData || null,
             enrichedAt: new Date()
         };
+    }
+
+    private whoisPromise(ip: string): Promise<string | null> {
+        return new Promise((resolve) => {
+            this.logger.info(`[IpDetailsService] Avvio lookup WHOIS per ${ip}...`);
+            const timeout = setTimeout(() => {
+                this.logger.warn(`[IpDetailsService] Timeout lookup WHOIS per ${ip}`);
+                resolve(null);
+            }, 5000); // 5 secondi di timeout per whois
+
+            try {
+                const importer = new Function('specifier', 'return import(specifier)') as (specifier: string) => Promise<any>;
+                importer('whois').then(whoisModule => {
+                    const lookup = whoisModule.lookup || whoisModule.default?.lookup;
+
+                    if (typeof lookup !== 'function') {
+                        clearTimeout(timeout);
+                        this.logger.error(`[IpDetailsService] Modulo WHOIS non valido per ${ip}`);
+                        return resolve(null);
+                    }
+
+                    lookup(ip, (err: Error | null, data: string) => {
+                        clearTimeout(timeout);
+                        if (err) {
+                            this.logger.warn(`[IpDetailsService] Fallimento lookup WHOIS per ${ip}:`, err.message);
+                            return resolve(null);
+                        }
+                        this.logger.info(`[IpDetailsService] Lookup WHOIS per ${ip} completato (${data?.length || 0} bytes).`);
+                        resolve(data);
+                    });
+                }).catch(err => {
+                    clearTimeout(timeout);
+                    this.logger.warn(`[IpDetailsService] Errore caricamento modulo WHOIS per ${ip}:`, err.message);
+                    resolve(null);
+                });
+            } catch (err: any) {
+                clearTimeout(timeout);
+                this.logger.warn(`[IpDetailsService] Eccezione lookup WHOIS per ${ip}:`, err.message);
+                resolve(null);
+            }
+        });
     }
 
     private ipinfoPromise(ip: string): Promise<any> {

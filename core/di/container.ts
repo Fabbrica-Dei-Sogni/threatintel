@@ -14,7 +14,8 @@ import { StatusEventListener } from "../services/StatusEventListener";
 import { PruningService } from "../services/PruningService";
 import { McpNativeExecutor } from "../assistant/mcp/McpNativeExecutor";
 import { ForensicPipelineService } from "../services/forense/ForensicPipelineService";
-import { LOGGER_TOKEN, I18N_TOKEN, CONFIG_PROVIDER_TOKEN, RAG_TRANSLATION_TOKEN, QDRANT_CLIENT_TOKEN, OLLAMA_SERVICE_TOKEN, RAG_SYNC_SERVICE_TOKEN, RAG_SYNC_WORKER_TOKEN, ASSISTANT_SERVICE_TOKEN, EVENT_BUS_TOKEN, RAG_EVENT_LISTENER_TOKEN, STATUS_EVENT_LISTENER_TOKEN, PRUNING_SERVICE_TOKEN, MCP_EXECUTOR_TOKEN, FORENSIC_PIPELINE_TOKEN } from "./tokens";
+import { RedisService } from "../services/RedisService";
+import { LOGGER_TOKEN, I18N_TOKEN, CONFIG_PROVIDER_TOKEN, RAG_TRANSLATION_TOKEN, QDRANT_CLIENT_TOKEN, OLLAMA_SERVICE_TOKEN, RAG_SYNC_SERVICE_TOKEN, RAG_SYNC_WORKER_TOKEN, ASSISTANT_SERVICE_TOKEN, EVENT_BUS_TOKEN, RAG_EVENT_LISTENER_TOKEN, STATUS_EVENT_LISTENER_TOKEN, PRUNING_SERVICE_TOKEN, MCP_EXECUTOR_TOKEN, FORENSIC_PIPELINE_TOKEN, REDIS_SERVICE_TOKEN } from "./tokens";
 import logger from "../../logger";
 
 export const coreContainer = container;
@@ -86,6 +87,9 @@ coreContainer.registerSingleton(MCP_EXECUTOR_TOKEN, McpNativeExecutor);
 
 // registrazione del servizio ForensicPipelineService come singleton
 coreContainer.registerSingleton(FORENSIC_PIPELINE_TOKEN, ForensicPipelineService);
+
+// registrazione del servizio RedisService come singleton
+coreContainer.registerSingleton(REDIS_SERVICE_TOKEN, RedisService);
 
 
 // nuova funzione generica

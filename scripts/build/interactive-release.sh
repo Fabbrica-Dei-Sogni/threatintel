@@ -73,17 +73,22 @@ echo "✅ Bundle estratto in $DEPLOY_PATH"
 
 echo "------------------------------------------------------------"
 # 4. Parametrizzazione Servizio (Nuova logica: il file è pronto SUBITO dopo il deploy)
-echo "⚙️  Parametrizzazione file di servizio..."
+echo "⚙️  Parametrizzazione file di servizio e proxy..."
 TEMPLATE_FILE="$DEPLOY_PATH/threatintel.service.template"
 FINAL_SERVICE_FILE="$DEPLOY_PATH/$SERVICE_NAME.service"
+
+# Riferimenti Nginx nel bundle
+PROXY_DIR="$DEPLOY_PATH/proxy"
 
 # Rilevamento Node.js (Eseguito sulla macchina di deploy)
 NODE_PATH=$(which node)
 NODE_BIN_DIR=$(dirname "$NODE_PATH")
 
+# 1. Risoluzione Systemd Service
 if [ -f "$TEMPLATE_FILE" ]; then
     sed -e "s|{{WORKING_DIR}}|$DEPLOY_PATH|g" \
         -e "s|{{USER}}|$DEPLOY_USER|g" \
+        -e "s|{{SERVICE_NAME}}|$SERVICE_NAME|g" \
         -e "s|{{PORT}}|$DEPLOY_PORT|g" \
         -e "s|{{NODE_ENV}}|$DEPLOY_ENV|g" \
         -e "s|{{DESCRIPTION}}|$DEPLOY_DESC|g" \
@@ -91,11 +96,24 @@ if [ -f "$TEMPLATE_FILE" ]; then
         -e "s|{{NODE_PATH}}|$NODE_PATH|g" \
         -e "s|{{NODE_BIN_DIR}}|$NODE_BIN_DIR|g" \
         "$TEMPLATE_FILE" > "$FINAL_SERVICE_FILE"
-    
     rm "$TEMPLATE_FILE"
     echo "✅ File di servizio creato: $SERVICE_NAME.service"
-else
-    echo "⚠️  Attenzione: Template non trovato in $TEMPLATE_FILE"
+fi
+
+# 2. Risoluzione Nginx Globals
+if [ -f "$PROXY_DIR/nginx_globals.template" ]; then
+    sed -e "s|{{SERVICE_NAME}}|$SERVICE_NAME|g" "$PROXY_DIR/nginx_globals.template" > "$PROXY_DIR/threatintel_globals_$SERVICE_NAME.conf"
+    rm "$PROXY_DIR/nginx_globals.template"
+    echo "✅ Globals Nginx parametrizzati."
+fi
+
+# 3. Risoluzione Nginx Vhost
+if [ -f "$PROXY_DIR/nginx_vhost.template" ]; then
+    sed -e "s|{{SERVICE_NAME}}|$SERVICE_NAME|g" \
+        -e "s|{{PORT}}|$DEPLOY_PORT|g" \
+        "$PROXY_DIR/nginx_vhost.template" > "$PROXY_DIR/$SERVICE_NAME.conf"
+    rm "$PROXY_DIR/nginx_vhost.template"
+    echo "✅ Vhost Nginx parametrizzato."
 fi
 
 echo "------------------------------------------------------------"

@@ -38,7 +38,30 @@ else
     exit 1
 fi
 
-# 2. Environment check (per sicurezza)
+# 2. Nginx Configuration (Optional)
+echo "------------------------------------------------------------"
+read -p "🌐 Vuoi configurare anche Nginx (Proxy & Traps) ora? [y/N]: " DO_NGINX
+if [[ "$DO_NGINX" =~ ^([yY][eE][sS]|[yY])$ ]]; then
+    echo "⚙️  Configurazione Nginx in corso..."
+    PROXY_DIR="$WORKING_DIR/proxy"
+    if [ -d "$PROXY_DIR" ]; then
+        echo "🔗 Linking globals..."
+        sudo ln -sf "$PROXY_DIR/threatintel_globals_$SERVICE_NAME.conf" /etc/nginx/conf.d/threatintel_globals_$SERVICE_NAME.conf
+        echo "🔗 Linking vhost..."
+        sudo ln -sf "$PROXY_DIR/$SERVICE_NAME.conf" "/etc/nginx/sites-available/$SERVICE_NAME.conf"
+        sudo ln -sf "/etc/nginx/sites-available/$SERVICE_NAME.conf" "/etc/nginx/sites-enabled/$SERVICE_NAME.conf"
+        if sudo nginx -t; then
+            sudo systemctl reload nginx
+            echo "✅ Nginx ricaricato con successo."
+        else
+            echo "❌ Errore Nginx. Controlla manualmente."
+        fi
+    else
+        echo "⚠️  Cartella proxy non trovata nel bundle."
+    fi
+fi
+
+# 3. Environment check (per sicurezza)
 if [ ! -f ".env" ]; then
     if [ -f ".env.example" ]; then
         echo "📝 Creating .env from template (please edit it!)"

@@ -1,0 +1,62 @@
+# ThreatIntel Virtual Host Configuration Template for {{SERVICE_NAME}}
+# Spostare in /etc/nginx/sites-available/{{SERVICE_NAME}}.conf e creare symlink in sites-enabled
+
+server {
+    listen 80;
+    listen [::]:80;
+    
+    # Porte Traps
+    listen 8080;
+    listen 8000;
+    listen 5000;
+    listen 4200;
+    listen 7000;
+
+    server_name _; 
+
+    # Security Headers (Specifici per istanza per evitare conflitti globali)
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-XSS-Protection "0" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+
+    # Access Log in formato JSON specifico per questa istanza
+    access_log /var/log/nginx/{{SERVICE_NAME}}_access.log json_{{SERVICE_NAME}};
+    error_log /var/log/nginx/{{SERVICE_NAME}}_error.log warn;
+
+    # Rate limiting specifico per questa istanza
+    limit_req zone=general_{{SERVICE_NAME}} burst=20 nodelay;
+
+    # Blocha User Agents sospetti
+    if ($http_user_agent ~* (sqlmap|nikto|nmap|masscan|netsparker)) {
+        return 444;
+    }
+
+    # Location principale - Proxy verso il backend Node.js
+    location / {
+        proxy_pass http://127.0.0.1:{{PORT}};
+        
+        proxy_set_header X-Server-Port $server_port;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Host $host;
+
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        
+        proxy_cache_bypass $http_upgrade;
+    }
+
+    # Endpoint Sensibile: Login (Protezione rinforzata)
+    location /login {
+        limit_req zone=login_{{SERVICE_NAME}} burst=3 nodelay;
+        proxy_pass http://127.0.0.1:{{PORT}};
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+
+    # Protezione file sensibili
+    location ~ /\. { deny all; access_log off; log_not_found off; }
+}

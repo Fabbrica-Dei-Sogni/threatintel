@@ -48,6 +48,12 @@ cp "$PROJECT_ROOT/scripts/deploy/uninstall.sh" "$RELEASE_DIR/" 2>/dev/null || tr
 chmod +x "$RELEASE_DIR/install.sh" "$RELEASE_DIR/uninstall.sh"
 cp "$PROJECT_ROOT/scripts/deploy/threatintel.service.template" "$RELEASE_DIR/threatintel.service.template" 2>/dev/null || true
 
+# E. Proxy Configurations (Modular Nginx Templates)
+echo "🌐 Adding proxy templates..."
+mkdir -p "$RELEASE_DIR/proxy"
+cp "$PROJECT_ROOT/scripts/deploy/nginx_globals.conf.template" "$RELEASE_DIR/proxy/nginx_globals.template"
+cp "$PROJECT_ROOT/scripts/deploy/nginx_vhost.conf.template" "$RELEASE_DIR/proxy/nginx_vhost.template"
+
 # 4. Final Archive
 echo "🗜️  Creating archive: $ARTIFACT_NAME..."
 mkdir -p "$PROJECT_ROOT/artifact"

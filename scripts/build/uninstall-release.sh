@@ -50,7 +50,42 @@ if [ -L "$SERVICE_PATH" ] || [ -f "$SERVICE_PATH" ]; then
     fi
     
     sudo systemctl daemon-reload
-    echo "✅ Servizio $SERVICE_TO_REMOVE rimosso correttamente."
-else
+    echo "✅ Servizio $SERVICE_NAME rimosso correttamente da systemd."
+
+    # 3. Rimozione Nginx (Se presente)
+    echo "🧹 Verifico configurazioni Nginx..."
+    NGINX_VHOST_ENABLED="/etc/nginx/sites-enabled/$SERVICE_NAME.conf"
+    NGINX_VHOST_AVAILABLE="/etc/nginx/sites-available/$SERVICE_NAME.conf"
+    NGINX_GLOBALS="/etc/nginx/conf.d/threatintel_globals_$SERVICE_NAME.conf"
+
+    RELOAD_NGINX=false
+
+    if [ -L "$NGINX_VHOST_ENABLED" ] || [ -f "$NGINX_VHOST_ENABLED" ]; then
+        sudo rm "$NGINX_VHOST_ENABLED"
+        echo "🗑️  Rimosso vhost-enabled Nginx."
+        RELOAD_NGINX=true
+    fi
+
+    if [ -L "$NGINX_VHOST_AVAILABLE" ] || [ -f "$NGINX_VHOST_AVAILABLE" ]; then
+        sudo rm "$NGINX_VHOST_AVAILABLE"
+        echo "🗑️  Rimosso vhost-available Nginx."
+        RELOAD_NGINX=true
+    fi
+
+    if [ -L "$NGINX_GLOBALS" ] || [ -f "$NGINX_GLOBALS" ]; then
+        sudo rm "$NGINX_GLOBALS"
+        echo "🗑️  Rimosse configurazioni globali Nginx."
+        RELOAD_NGINX=true
+    fi
+
+    if [ "$RELOAD_NGINX" = true ]; then
+        if sudo nginx -t 2>/dev/null; then
+            sudo systemctl reload nginx
+            echo "✅ Nginx ricaricato correttamente."
+        else
+            echo "⚠️  Nginx ha errori di configurazione. Controlla manualmente."
+        fi
+    fi
+    else
     echo "⚠️  Il file $SERVICE_PATH non esiste più o è già stato rimosso."
-fi
+    fi

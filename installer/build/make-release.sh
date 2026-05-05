@@ -19,6 +19,9 @@ DEPLOY_DESC=${6:-"Threat Intelligence Logger (Release Bundle)"}
 ALLOWED_ORIGINS=${7:-"http://localhost:5173,http://localhost:4300,https://localhost,http://192.168.0.1:5173,http://192.168.0.1:4300"}
 APP_DOMAIN=${8:-"localhost"}
 API_BASE_URL=${9:-"http://localhost/honeypot/api"}
+APP_ID=${10:-"honeypot-host-001"}
+ALLOW_ANONYMOUS=${11:-"true"}
+URI_DIGITAL_AUTH=${12:-"https://localhost:3443/auth/api/v1"}
 
 # Paths
 DEPLOY_PATH="$PROJECT_ROOT/deployments/$SERVICE_NAME"
@@ -83,6 +86,9 @@ if [ -f "$SERVICE_TEMPLATE" ]; then
         -e "s|{{ALLOWED_ORIGINS}}|$ALLOWED_ORIGINS|g" \
         -e "s|{{APP_DOMAIN}}|$APP_DOMAIN|g" \
         -e "s|{{API_BASE_URL}}|$API_BASE_URL|g" \
+        -e "s|{{APP_ID}}|$APP_ID|g" \
+        -e "s|{{ALLOW_ANONYMOUS}}|$ALLOW_ANONYMOUS|g" \
+        -e "s|{{URI_DIGITAL_AUTH}}|$URI_DIGITAL_AUTH|g" \
         -e "s|{{NODE_PATH}}|$NODE_PATH|g" \
         -e "s|{{NODE_BIN_DIR}}|$NODE_BIN_DIR|g" \
         "$SERVICE_TEMPLATE" > "$DEPLOY_PATH/$SERVICE_NAME.service"

@@ -8,7 +8,7 @@ export const ConfigDefaults = {
     MONGO_URI: 'mongodb://localhost:17017/threatintel',
     APP_DOMAIN: 'localhost',
     AUTH_URI: 'https://localhost:3443/auth/api/v1',
-    APP_ID: 'threat-intel-01',
+    APP_ID: 'honeypot-host-001',
     QDRANT_URL: 'http://localhost:6333',
     OLLAMA_URL: 'http://localhost:11434',
     ALLOWED_ORIGINS: [

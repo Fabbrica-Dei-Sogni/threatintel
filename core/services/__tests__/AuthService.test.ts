@@ -8,6 +8,7 @@ const mockedAxios = axios as jest.Mocked<typeof axios>;
 describe('AuthService', () => {
     let service: AuthService;
     let mockLogger: any;
+    let mockConfigProvider: any;
     const mockToken = 'mock-token';
 
     beforeEach(() => {
@@ -16,6 +17,11 @@ describe('AuthService', () => {
             warn: jest.fn(),
             error: jest.fn()
         };
+        mockConfigProvider = {
+            authStrictSsl: true,
+            appId: 'test-app',
+            authUri: 'http://auth-test/api'
+        };
         
         // Setup axios mock instance
         const mockInstance = {
@@ -23,7 +29,7 @@ describe('AuthService', () => {
         };
         (axios.create as jest.Mock).mockReturnValue(mockInstance);
         
-        service = new AuthService(mockLogger);
+        service = new AuthService(mockLogger, mockConfigProvider);
         (service as any).instance = mockInstance;
     });
 

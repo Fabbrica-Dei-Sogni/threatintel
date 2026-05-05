@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { inject, singleton } from 'tsyringe';
 import { AuthService } from '../services/AuthService';
+import { AppConfigProvider } from '../services/AppConfigProvider';
 import { LOGGER_TOKEN } from '../di/tokens';
 import { Logger } from 'winston';
 import { Controller, Get, Post } from '../registry/decorators';
@@ -10,6 +11,7 @@ import { Controller, Get, Post } from '../registry/decorators';
 export class AuthController {
     constructor(
         private authService: AuthService,
+        private configProvider: AppConfigProvider,
         @inject(LOGGER_TOKEN) private logger: Logger
     ) {}
 
@@ -62,8 +64,8 @@ export class AuthController {
     @Get('/mode')
     public async getAuthMode(req: Request, res: Response): Promise<void> {
         res.status(200).json({
-            allowAnonymous: process.env.ALLOW_ANONYMOUS === 'true',
-            anonymousRole: process.env.ANONYMOUS_ROLE || 'viewer'
+            allowAnonymous: this.configProvider.allowAnonymous,
+            anonymousRole: this.configProvider.anonymousRole
         });
     }
 

@@ -58,7 +58,7 @@ export class AppConfigProvider {
      * Recupera App ID per il servizio Auth
      */
     get appId(): string {
-        return process.env.APP_ID || process.env.HONEYPOT_INSTANCE_ID || ConfigDefaults.APP_ID;
+        return process.env.APP_ID || ConfigDefaults.APP_ID;
     }
 
     /**
@@ -66,6 +66,20 @@ export class AppConfigProvider {
      */
     get authStrictSsl(): boolean {
         return process.env.AUTH_STRICT_SSL !== 'false';
+    }
+
+    /**
+     * Verifica se l'accesso anonimo è consentito
+     */
+    get allowAnonymous(): boolean {
+        return process.env.ALLOW_ANONYMOUS === 'true';
+    }
+
+    /**
+     * Recupera il ruolo per gli utenti anonimi
+     */
+    get anonymousRole(): string {
+        return process.env.ANONYMOUS_ROLE || 'viewer';
     }
 
     /**

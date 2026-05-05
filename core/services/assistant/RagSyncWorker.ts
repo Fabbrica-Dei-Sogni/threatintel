@@ -131,8 +131,10 @@ export class RagSyncWorker implements ILongRunningService {
 
             this.logger.info(`[${this.serviceName}] Running scheduled materialization...`);
 
-            const aiEnabledConfig = await this.configService.getConfigValue('RAG_AI_SUMMARY_ENABLED');
-            const isAiEnabled = aiEnabledConfig === 'true' || process.env.RAG_AI_SUMMARY_ENABLED === 'true';
+            //TODO: al momento non cè un supporto pieno alle configurazioni rag e di altri aspetti su mongodb
+            //const aiEnabledConfig = await this.configService.getConfigValue('RAG_AI_SUMMARY_ENABLED');
+            //const isAiEnabled = aiEnabledConfig === 'true' || process.env.RAG_AI_SUMMARY_ENABLED === 'true';
+            const isAiEnabled = process.env.RAG_AI_SUMMARY_ENABLED === 'true';
 
             // 1. Materializzazione Campagne
             await this.runCampaignMaterialization(isAiEnabled);

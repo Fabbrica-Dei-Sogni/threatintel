@@ -1,5 +1,5 @@
 #!/bin/bash
-
+#script deprecato e da rimuovere, ora è tutto gestito da make-release.sh e install.sh
 echo "🚀 Setup Threat Intelligence System"
 
 # Crea servizio systemd per l'app Node.js

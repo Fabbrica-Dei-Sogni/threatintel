@@ -29,7 +29,7 @@ export class AppConfigProvider {
      * Recupera URI servizio Auth
      */
     get authUri(): string {
-        return process.env.URI_DIGITAL_AUTH || 'https://alessandromodica.com:3443/auth/api/v1';
+        return process.env.URI_DIGITAL_AUTH || 'https://localhost:3443/auth/api/v1';
     }
 
     /**

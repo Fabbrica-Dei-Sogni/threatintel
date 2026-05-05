@@ -4,7 +4,7 @@ import { inject, singleton } from 'tsyringe';
 import { LOGGER_TOKEN } from '../di/tokens';
 import { Logger } from 'winston';
 
-const defaultDigitalAuthUri = 'https://alessandromodica.com:3443/auth/api/v1';
+const defaultDigitalAuthUri = 'https://localhost:3443/auth/api/v1';
 
 @singleton()
 export class AuthService {

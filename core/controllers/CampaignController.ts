@@ -16,7 +16,7 @@ export class CampaignController {
 
     /**
      * @openapi
-     * /campaigns:
+     * /campaign/search:
      *   get:
      *     tags: [Campaigns Analysis]
      *     summary: Scopre pattern di attacco (hash) condivisi da più IP
@@ -112,7 +112,7 @@ export class CampaignController {
 
     /**
      * @openapi
-     * /campaign/details:
+     * /campaign/detail:
      *   post:
      *     tags: [Campaigns Analysis]
      *     summary: Ottiene dettagli forensi aggregati per una campagna
@@ -189,7 +189,7 @@ export class CampaignController {
 
     /**
      * @openapi
-     * /campaigns/uris:
+     * /campaign/uris:
      *   get:
      *     tags: [Campaigns Analysis]
      *     summary: Ottiene gli URI unici (Target URLs) coinvolti nelle campagne

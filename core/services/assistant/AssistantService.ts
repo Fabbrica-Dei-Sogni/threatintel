@@ -366,7 +366,7 @@ export class AssistantService {
                 attackPatterns: campaign.attackPatterns,
             },
             resolveRef: {
-                endpoint: '/api/campaign/details',
+                endpoint: '/api/campaign/detail',
                 method: 'POST',
                 params: {
                     type: 'campaign',

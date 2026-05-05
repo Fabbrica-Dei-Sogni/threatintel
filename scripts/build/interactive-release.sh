@@ -72,19 +72,46 @@ tar -xzf "$LATEST_TAR" -C "$DEPLOY_PATH"
 echo "✅ Bundle estratto in $DEPLOY_PATH"
 
 echo "------------------------------------------------------------"
-# 4. Registrazione Servizio (Opzionale)
+# 4. Parametrizzazione Servizio (Nuova logica: il file è pronto SUBITO dopo il deploy)
+echo "⚙️  Parametrizzazione file di servizio..."
+TEMPLATE_FILE="$DEPLOY_PATH/threatintel.service.template"
+FINAL_SERVICE_FILE="$DEPLOY_PATH/$SERVICE_NAME.service"
+
+# Rilevamento Node.js (Eseguito sulla macchina di deploy)
+NODE_PATH=$(which node)
+NODE_BIN_DIR=$(dirname "$NODE_PATH")
+
+if [ -f "$TEMPLATE_FILE" ]; then
+    sed -e "s|{{WORKING_DIR}}|$DEPLOY_PATH|g" \
+        -e "s|{{USER}}|$DEPLOY_USER|g" \
+        -e "s|{{PORT}}|$DEPLOY_PORT|g" \
+        -e "s|{{NODE_ENV}}|$DEPLOY_ENV|g" \
+        -e "s|{{DESCRIPTION}}|$DEPLOY_DESC|g" \
+        -e "s|{{VERSION}}|$RELEASE_VERSION|g" \
+        -e "s|{{NODE_PATH}}|$NODE_PATH|g" \
+        -e "s|{{NODE_BIN_DIR}}|$NODE_BIN_DIR|g" \
+        "$TEMPLATE_FILE" > "$FINAL_SERVICE_FILE"
+    
+    rm "$TEMPLATE_FILE"
+    echo "✅ File di servizio creato: $SERVICE_NAME.service"
+else
+    echo "⚠️  Attenzione: Template non trovato in $TEMPLATE_FILE"
+fi
+
+echo "------------------------------------------------------------"
+# 5. Registrazione Servizio (Opzionale)
 read -p "🚀 Vuoi registrare e avviare il servizio systemd ora? [y/N]: " DO_INSTALL
 if [[ "$DO_INSTALL" =~ ^([yY][eE][sS]|[yY])$ ]]; then
     echo "⚙️  Installazione servizio in corso..."
     cd "$DEPLOY_PATH"
     
-    # Esegue l'installer con i parametri raccolti
-    PORT=$DEPLOY_PORT NODE_ENV=$DEPLOY_ENV DESC="$DEPLOY_DESC" ./install.sh "$SERVICE_NAME" "$DEPLOY_USER"
+    # L'installer ora è molto più semplice, riceve solo il nome del servizio
+    ./install.sh "$SERVICE_NAME"
     
     echo ""
     echo "✨ Servizio configurato e avviato!"
     echo "👉 Status: sudo systemctl status $SERVICE_NAME"
 else
     echo "✅ Release preparata in deployments/$SERVICE_NAME."
-    echo "💡 Puoi attivare il servizio in seguito usando scripts/build/deploy-pending.sh"
+    echo "💡 Il file di servizio è già pronto. Puoi attivarlo in seguito con install.sh o manualmente."
 fi

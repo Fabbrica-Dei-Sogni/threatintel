@@ -46,7 +46,7 @@ cp "$PROJECT_ROOT/.env.example" "$RELEASE_DIR/" 2>/dev/null || true
 cp "$PROJECT_ROOT/scripts/deploy/install.sh" "$RELEASE_DIR/" 2>/dev/null || true
 cp "$PROJECT_ROOT/scripts/deploy/uninstall.sh" "$RELEASE_DIR/" 2>/dev/null || true
 chmod +x "$RELEASE_DIR/install.sh" "$RELEASE_DIR/uninstall.sh"
-cp "$PROJECT_ROOT/scripts/deploy/threatintel.service.template" "$RELEASE_DIR/threatintel.service" 2>/dev/null || true
+cp "$PROJECT_ROOT/scripts/deploy/threatintel.service.template" "$RELEASE_DIR/threatintel.service.template" 2>/dev/null || true
 
 # 4. Final Archive
 echo "🗜️  Creating archive: $ARTIFACT_NAME..."

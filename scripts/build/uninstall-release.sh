@@ -6,7 +6,7 @@ echo "🗑️  ThreatIntel Release Uninstaller"
 echo "----------------------------------"
 
 # 1. Scoperta dei servizi gestiti
-MANAGED_SERVICES=$(grep -l "Managed-By: threatintel-release-workflow" /etc/systemd/system/*.service 2>/dev/null | xargs -n1 basename | sort -u)
+MANAGED_SERVICES=$(grep -l "Managed-By: threatintel-release-workflow" /etc/systemd/system/*.service 2>/dev/null | xargs -r -n1 basename | sort -u)
 
 if [ -z "$MANAGED_SERVICES" ]; then
     echo "ℹ️  Nessun servizio gestito trovato nel sistema."

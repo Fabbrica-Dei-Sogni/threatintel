@@ -110,11 +110,6 @@ cd "$PROJECT_ROOT"
 # Cleanup temp build files
 rm -rf "$BUILD_TMP"
 
-# Cleanup the old release directory if it exists (DEPRECATION)
-if [ -d "$PROJECT_ROOT/release" ]; then
-    rm -rf "$PROJECT_ROOT/release"
-fi
-
 echo "------------------------------------------------------------"
 echo "✅ Success! Deployment ready in: deployments/$SERVICE_NAME"
 echo "📦 Archive created in: artifact/$ARTIFACT_NAME"

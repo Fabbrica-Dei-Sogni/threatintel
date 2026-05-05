@@ -19,3 +19,9 @@ log_format json_{{SERVICE_NAME}} escape=json
 # 2. Global Rate Limiting Zones (Istanza Specifica)
 limit_req_zone $binary_remote_addr zone=general_{{SERVICE_NAME}}:10m rate=10r/s;
 limit_req_zone $binary_remote_addr zone=login_{{SERVICE_NAME}}:10m rate=1r/s;
+
+# 3. Global Security Headers (Ottimizzati per portabilità)
+add_header X-Frame-Options "SAMEORIGIN" always;
+add_header X-Content-Type-Options "nosniff" always;
+add_header X-XSS-Protection "0" always;
+add_header Referrer-Policy "strict-origin-when-cross-origin" always;

@@ -55,8 +55,72 @@ server {
         proxy_pass http://127.0.0.1:{{PORT}};
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Host $host;
+    }
+
+    # API stats con restrizioni severe
+    location /api/ {
+        allow 127.0.0.1;
+        allow ::1;
+        deny all;
+        
+        proxy_pass http://127.0.0.1:{{PORT}};
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
     }
 
     # Protezione file sensibili
     location ~ /\. { deny all; access_log off; log_not_found off; }
+}
+
+# Honeypot SSL Traps (Esempio)
+# NOTA: Per abilitare queste trappole SSL, è necessario:
+# 1. Ottenere dei certificati (es. tramite Certbot) per il proprio dominio.
+# 2. Decommentare le righe 'listen' e le direttive 'ssl_certificate'.
+# 3. Sostituire 'example.com' con il proprio dominio.
+
+server {
+    # listen 8443 ssl;
+    # listen 9443 ssl;
+    # listen 10443 ssl;
+    server_name example.com;
+
+    # ssl_certificate /etc/letsencrypt/live/example.com/fullchain.pem;
+    # ssl_certificate_key /etc/letsencrypt/live/example.com/privkey.pem;
+    # include /etc/letsencrypt/options-ssl-nginx.conf;
+    # ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+
+    access_log /var/log/nginx/{{SERVICE_NAME}}_access.log json_{{SERVICE_NAME}};
+
+    location / {
+        proxy_pass http://127.0.0.1:{{PORT}};
+        proxy_set_header X-Server-Port $server_port;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Host $host;
+    }
+}
+
+# Secure Proxy for other services (fallback/example)
+server {
+    # listen 5543 ssl;
+    server_name example.com;
+
+    # ssl_certificate /etc/letsencrypt/live/example.com/fullchain.pem;
+    # ssl_certificate_key /etc/letsencrypt/live/example.com/privkey.pem;
+
+    location / {
+        proxy_pass http://localhost:5540/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        proxy_ssl_verify off;
+        proxy_ssl_server_name on;
+    }    
 }

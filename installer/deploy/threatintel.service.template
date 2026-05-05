@@ -13,6 +13,9 @@ WorkingDirectory={{WORKING_DIR}}
 Environment=NODE_ENV={{NODE_ENV}}
 Environment=PORT={{PORT}}
 Environment=VERSION={{VERSION}}
+Environment=ALLOWED_ORIGINS={{ALLOWED_ORIGINS}}
+Environment=APP_DOMAIN={{APP_DOMAIN}}
+Environment=API_BASE_URL={{API_BASE_URL}}
 Environment=NODE_OPTIONS=--openssl-legacy-provider
 Environment=NGINX_LOG_PREFIX=nginx_threat_{{SERVICE_NAME}}:
 # Environment variable to guide geoip-lite to the local data folder

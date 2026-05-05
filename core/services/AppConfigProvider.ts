@@ -26,6 +26,20 @@ export class AppConfigProvider {
     }
 
     /**
+     * Recupera le origini consentite per CORS e CSP
+     */
+    get allowedOrigins(): string[] {
+        const envOrigins = process.env.ALLOWED_ORIGINS;
+        if (envOrigins) {
+            return envOrigins.split(',').map(o => o.trim());
+        }
+        return [
+            'http://localhost:5173',
+            'http://localhost:4300',
+        ];
+    }
+
+    /**
      * Recupera URI servizio Auth
      */
     get authUri(): string {

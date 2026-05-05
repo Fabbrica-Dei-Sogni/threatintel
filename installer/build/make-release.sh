@@ -16,6 +16,9 @@ DEPLOY_PORT=${3:-"3999"}
 DEPLOY_USER=${4:-$(whoami)}
 DEPLOY_ENV=${5:-"production"}
 DEPLOY_DESC=${6:-"Threat Intelligence Logger (Release Bundle)"}
+ALLOWED_ORIGINS=${7:-"http://localhost:5173,http://localhost:4300,https://localhost,http://192.168.0.1:5173,http://192.168.0.1:4300"}
+APP_DOMAIN=${8:-"localhost"}
+API_BASE_URL=${9:-"http://localhost/honeypot/api"}
 
 # Paths
 DEPLOY_PATH="$PROJECT_ROOT/deployments/$SERVICE_NAME"
@@ -77,6 +80,9 @@ if [ -f "$SERVICE_TEMPLATE" ]; then
         -e "s|{{NODE_ENV}}|$DEPLOY_ENV|g" \
         -e "s|{{DESCRIPTION}}|$DEPLOY_DESC|g" \
         -e "s|{{VERSION}}|$VERSION|g" \
+        -e "s|{{ALLOWED_ORIGINS}}|$ALLOWED_ORIGINS|g" \
+        -e "s|{{APP_DOMAIN}}|$APP_DOMAIN|g" \
+        -e "s|{{API_BASE_URL}}|$API_BASE_URL|g" \
         -e "s|{{NODE_PATH}}|$NODE_PATH|g" \
         -e "s|{{NODE_BIN_DIR}}|$NODE_BIN_DIR|g" \
         "$SERVICE_TEMPLATE" > "$DEPLOY_PATH/$SERVICE_NAME.service"

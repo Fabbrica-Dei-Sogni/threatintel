@@ -1,6 +1,9 @@
 import swaggerJsdoc from 'swagger-jsdoc';
 import { Router } from 'express';
 import swaggerUi from 'swagger-ui-express';
+import { appDomain, apiBaseUrl } from './config';
+
+const contactUrl = appDomain === 'localhost' ? 'http://localhost' : `https://${appDomain}`;
 
 const options: swaggerJsdoc.Options = {
   definition: {
@@ -11,13 +14,17 @@ const options: swaggerJsdoc.Options = {
       description: 'Documentazione delle API per il sistema di logging e analisi Threat Intelligence',
       contact: {
         name: 'Alessandro Modica',
-        url: 'https://alessandromodica.com'
+        url: contactUrl
       }
     },
     servers: [
       {
         url: '/honeypot/api',
-        description: 'Server Produzione (Nginx Proxy)'
+        description: 'Server (Relative Path via Nginx)'
+      },
+      {
+        url: apiBaseUrl,
+        description: 'Server (Absolute Path from Config)'
       }
     ],
     components: {

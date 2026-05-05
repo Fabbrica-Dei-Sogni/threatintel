@@ -2,55 +2,61 @@
 
 # Managed-By: threatintel-release-workflow
 
-echo "🗑️  ThreatIntel Release Uninstaller"
-echo "----------------------------------"
+# Questo script disinstalla l'istanza specifica di ThreatIntel.
+# Può essere chiamato direttamente o tramite l'orchestratore globale.
 
-# 1. Scoperta dei servizi gestiti
-MANAGED_SERVICES=$(grep -l "Managed-By: threatintel-release-workflow" /etc/systemd/system/*.service 2>/dev/null | xargs -n1 basename | sort -u)
+SERVICE_NAME=${1:-"$(basename $(pwd))"}
 
-if [ -z "$MANAGED_SERVICES" ]; then
-    echo "ℹ️  Nessun servizio gestito trovato nel sistema."
-    exit 0
-fi
+echo "🗑️  ThreatIntel Atomic Uninstaller: $SERVICE_NAME"
+echo "------------------------------------------------"
 
-if [ -n "$1" ]; then
-    # Se passato come argomento, usalo direttamente
-    SERVICE_TO_REMOVE="$1"
-    # Verifica che sia effettivamente gestito da noi
-    if ! echo "$MANAGED_SERVICES" | grep -q "^$SERVICE_TO_REMOVE$"; then
-        echo "⚠️  Attenzione: Il servizio '$SERVICE_TO_REMOVE' non sembra essere gestito da questo workflow."
-        read -p "Vuoi procedere comunque? [y/N]: " PROCEED
-        if [[ ! "$PROCEED" =~ ^([yY][eE][sS]|[yY])$ ]]; then exit 1; fi
-    fi
-else
-    # Altrimenti mostra lista interattiva
-    echo "Servizi trovati:"
-    select SERVICE in $MANAGED_SERVICES; do
-        if [ -n "$SERVICE" ]; then
-            SERVICE_TO_REMOVE="$SERVICE"
-            break
-        fi
-    done
-fi
-
-if [ -z "$SERVICE_TO_REMOVE" ]; then exit 0; fi
-
-# 2. Rimozione
-echo "🧹 Rimuovendo $SERVICE_TO_REMOVE..."
-
-SERVICE_PATH="/etc/systemd/system/$SERVICE_TO_REMOVE"
+# 1. Systemd Cleanup
+SERVICE_PATH="/etc/systemd/system/$SERVICE_NAME.service"
 
 if [ -L "$SERVICE_PATH" ] || [ -f "$SERVICE_PATH" ]; then
-    sudo systemctl stop "$SERVICE_TO_REMOVE" 2>/dev/null
-    sudo systemctl disable "$SERVICE_TO_REMOVE" 2>/dev/null
+    echo "🛑 Fermando il servizio $SERVICE_NAME..."
+    sudo systemctl stop "$SERVICE_NAME" 2>/dev/null
+    sudo systemctl disable "$SERVICE_NAME" 2>/dev/null
     
-    # Check again because systemctl disable might have already removed the symlink
-    if [ -L "$SERVICE_PATH" ] || [ -f "$SERVICE_PATH" ]; then
-        sudo rm "$SERVICE_PATH"
-    fi
-    
+    echo "🗑️  Rimuovendo file di servizio..."
+    sudo rm -f "$SERVICE_PATH"
     sudo systemctl daemon-reload
-    echo "✅ Servizio $SERVICE_TO_REMOVE rimosso correttamente."
+    echo "✅ Servizio systemd rimosso."
 else
-    echo "⚠️  Il file $SERVICE_PATH non esiste più o è già stato rimosso."
+    echo "ℹ️  Servizio systemd non trovato o già rimosso."
 fi
+
+# 2. Nginx Cleanup
+echo "🧹 Verifico configurazioni Nginx per $SERVICE_NAME..."
+
+NGINX_VHOST_ENABLED="/etc/nginx/sites-enabled/$SERVICE_NAME.conf"
+NGINX_VHOST_AVAILABLE="/etc/nginx/sites-available/$SERVICE_NAME.conf"
+NGINX_GLOBALS="/etc/nginx/conf.d/threatintel_globals_$SERVICE_NAME.conf"
+
+RELOAD_NGINX=false
+
+# Funzione per rimuovere link o file Nginx in modo sicuro
+safe_remove_nginx() {
+    if [ -L "$1" ] || [ -f "$1" ]; then
+        sudo rm -f "$1"
+        echo "🗑️  Rimosso: $1"
+        RELOAD_NGINX=true
+    fi
+}
+
+safe_remove_nginx "$NGINX_VHOST_ENABLED"
+safe_remove_nginx "$NGINX_VHOST_AVAILABLE"
+safe_remove_nginx "$NGINX_GLOBALS"
+
+if [ "$RELOAD_NGINX" = true ]; then
+    if sudo nginx -t 2>/dev/null; then
+        sudo systemctl reload nginx
+        echo "✅ Nginx ricaricato correttamente."
+    else
+        echo "⚠️  Nginx ha errori di configurazione. Controlla manualmente con 'sudo nginx -t'."
+    fi
+else
+    echo "ℹ️  Nessuna configurazione Nginx trovata da rimuovere."
+fi
+
+echo "✨ Disinstallazione di $SERVICE_NAME completata."

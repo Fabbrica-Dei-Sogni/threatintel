@@ -14,7 +14,6 @@ import { logger } from './logger';
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
-import { AnalysisService } from './core/tools/analyze';
 import path from 'path';
 import { port, allowedOrigins } from './core/config';
 import api from './core/endpoint';

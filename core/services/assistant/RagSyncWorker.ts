@@ -1,11 +1,9 @@
 import { injectable, inject } from 'tsyringe';
 import { Logger } from 'winston';
-import { LOGGER_TOKEN, RAG_SYNC_SERVICE_TOKEN } from '../../di/tokens';
 import { RagSyncService } from './RagSyncService';
 import { CampaignService } from '../CampaignService';
-import { ThreatLogService } from '../ThreatLogService';
+
 import { AttackLogService } from '../AttackLogService';
-import { ConfigService } from '../ConfigService';
 import { ILongRunningService, ServiceStatus } from '../../types/lifecycle';
 import { RAG_POLICIES } from './RagPolicies';
 
@@ -22,9 +20,7 @@ export class RagSyncWorker implements ILongRunningService {
         @inject(Tokens.LOGGER_TOKEN) private readonly logger: Logger,
         @inject(Tokens.RAG_SYNC_SERVICE_TOKEN) private readonly ragSync: RagSyncService,
         @inject(Tokens.CAMPAIGN_SERVICE_TOKEN) private readonly campaignService: CampaignService,
-        @inject(Tokens.THREAT_LOG_SERVICE_TOKEN) private readonly threatLogService: ThreatLogService,
-        @inject(Tokens.ATTACK_LOG_SERVICE_TOKEN) private readonly attackLogService: AttackLogService,
-        @inject(Tokens.CONFIG_SERVICE_TOKEN) private readonly configService: ConfigService
+        @inject(Tokens.ATTACK_LOG_SERVICE_TOKEN) private readonly attackLogService: AttackLogService
     ) { }
 
     public async start(): Promise<void> {

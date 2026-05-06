@@ -1,8 +1,7 @@
 import { inject, injectable } from 'tsyringe';
-import { LOGGER_TOKEN } from '../di/tokens';
 import { Logger } from 'winston';
-import Dossier, { IDossier, DossierStatus, IDossierSection } from '../models/DossierSchema';
-import { CreateDossierDTO, UpdateDossierDTO, DossierResponseDTO } from '../models/dto/DossierDTO';
+import Dossier, { IDossier, IDossierSection } from '../models/DossierSchema';
+import { CreateDossierDTO, UpdateDossierDTO } from '../models/dto/DossierDTO';
 import { ReportService } from './ReportService';
 import { SanitizationUtils } from '../utils/SanitizationUtils';
 import { sanitizePage, sanitizePageSize, escapeRegex } from '../utils/queryGuard';

@@ -1,4 +1,4 @@
-import { JobStatus } from '../models/AnalysisJobSchema';
+
 
 export interface IBackgroundJob {
     /**

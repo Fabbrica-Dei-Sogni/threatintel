@@ -1,5 +1,4 @@
 import { inject, injectable } from 'tsyringe';
-import { LOGGER_TOKEN } from '../di/tokens';
 import { Logger } from 'winston';
 import { ThreatLogService } from './ThreatLogService';
 import { AttackLogService } from './AttackLogService';
@@ -172,7 +171,7 @@ export class ReportService {
 
             const replaceTokens = (text: string, d: any) => {
                 if (typeof text !== 'string') return '';
-                return text.replace(/{(\w+)}/g, (match, key) => {
+                return text.replace(/{(\w+)}/g, (_match, key) => {
                     const value = SanitizationUtils.sanitizeRawString(d[key]);
                     return (value !== undefined && value !== null && value !== '') 
                         ? String(value) 

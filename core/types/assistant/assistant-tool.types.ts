@@ -1,6 +1,5 @@
 // core/assistant/types/assistant-tool.types.ts
 
-import { GetAttacksParams, GetCampaignsParams } from "../service-params.types";
 
 export interface SemanticSearchArgs {
   query: string;

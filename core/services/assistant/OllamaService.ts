@@ -1,7 +1,6 @@
 import { injectable, inject } from 'tsyringe';
 import axios from 'axios';
 import { Logger } from 'winston';
-import { LOGGER_TOKEN } from '../../di/tokens';
 import { AppConfigProvider } from '../AppConfigProvider';
 
 import * as Tokens from '../../di/tokens';

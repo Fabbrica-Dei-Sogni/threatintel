@@ -2,7 +2,6 @@ import { Request, Response } from 'express';
 import { inject, singleton } from 'tsyringe';
 import { CowrieService } from '../services/CowrieService';
 import { I18nService } from '../services/I18nService';
-import { LOGGER_TOKEN } from '../di/tokens';
 import { Logger } from 'winston';
 import { Controller, Get, Post } from '../registry/decorators';
 

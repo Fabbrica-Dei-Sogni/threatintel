@@ -1,6 +1,5 @@
 import { injectable, inject } from 'tsyringe';
 import { Logger } from 'winston';
-import { LOGGER_TOKEN, RAG_TRANSLATION_TOKEN, QDRANT_CLIENT_TOKEN, OLLAMA_SERVICE_TOKEN } from '../../di/tokens';
 import { RagTranslationService } from './RagTranslationService';
 import { QdrantClientService } from './QdrantClientService';
 import { OllamaService } from './OllamaService';

@@ -1,7 +1,7 @@
 import { METADATA_KEYS, EndpointMetadata, HttpMethod, Protocol } from './metadata';
 
 function createMappingDecorator(method: HttpMethod | undefined, path: string, protocol: Protocol, middlewares: any[] = []) {
-    return (target: any, propertyKey: string | symbol | any, descriptor?: any) => {
+    return (target: any, propertyKey: string | symbol | any, _descriptor?: any) => {
         const endpoints: EndpointMetadata[] = Reflect.getMetadata(METADATA_KEYS.ENDPOINTS, target.constructor) || [];
         
         endpoints.push({

@@ -1,6 +1,5 @@
 import { injectable, inject } from 'tsyringe';
 import { Logger } from 'winston';
-import { LOGGER_TOKEN } from '../../di/tokens';
 import { IThreatLog } from '../../models/ThreatLogSchema';
 import { IIpDetails } from '../../models/IpDetailsSchema';
 import { IAbuseIpDb } from '../../models/AbuseIpDbSchema';

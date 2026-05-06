@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import { inject, singleton } from 'tsyringe';
 import { AssistantService } from '../services/assistant/AssistantService';
-import { StatusManagerService } from '../services/StatusManagerService';
 import * as Tokens from '../di/tokens';
 import { Logger } from 'winston';
 import { I18nService } from '../services/I18nService';

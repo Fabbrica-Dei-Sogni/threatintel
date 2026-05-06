@@ -1,12 +1,5 @@
 import { injectable, inject } from 'tsyringe';
 import { Logger } from 'winston';
-import {
-    LOGGER_TOKEN,
-    QDRANT_CLIENT_TOKEN,
-    OLLAMA_SERVICE_TOKEN,
-    RAG_SYNC_SERVICE_TOKEN,
-    I18N_TOKEN
-} from '../../di/tokens';
 import { QdrantClientService } from './QdrantClientService';
 import { OllamaService } from './OllamaService';
 import { RagSyncService } from './RagSyncService';
@@ -24,7 +17,6 @@ import {
     RagSourceRef,
     RagBasePayload,
     RAG_SCHEMA_VERSION,
-    RagSourceParams,
     DirectSearchHit,
     SearchResponse
 } from '../../types/assistant/rag.types';

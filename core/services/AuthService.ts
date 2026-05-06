@@ -5,8 +5,6 @@ import { AppConfigProvider } from './AppConfigProvider';
 import * as Tokens from '../di/tokens';
 import { Logger } from 'winston';
 
-const defaultDigitalAuthUri = 'https://localhost:3443/auth/api/v1';
-
 @singleton()
 export class AuthService {
     private instance: any;

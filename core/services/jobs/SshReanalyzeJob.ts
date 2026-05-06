@@ -4,7 +4,7 @@ import { Logger } from 'winston';
 import { IBackgroundJob } from '../../types/jobs';
 import { SshLogService } from '../SshLogService';
 import { ThreatLogService } from '../ThreatLogService';
-import AnalysisJob, { JobStatus } from '../../models/AnalysisJobSchema';
+import AnalysisJob from '../../models/AnalysisJobSchema';
 import { ProtocolType, ThreatIndicator, LogHeaderKey } from '../../types/CoreConstants';
 
 @injectable()

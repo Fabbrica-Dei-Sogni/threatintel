@@ -1,4 +1,3 @@
-import { logger } from '../../logger';
 import axios from 'axios';
 import dotenv from 'dotenv';
 
@@ -242,7 +241,7 @@ export class IpDetailsService {
 
             return savedDoc;
         } catch (error: any) {
-            logger.error(`Errore aggiornamento AbuseIpDb per ${ip}: ${error.message}`);
+            this.logger.error(`Errore aggiornamento AbuseIpDb per ${ip}: ${error.message}`);
             return null;
         }
     }
@@ -252,7 +251,7 @@ export class IpDetailsService {
             const cached = await AbuseIpDb.findOne({ ip });
             return cached;
         } catch (error: any) {
-            logger.error(`Errore recupero cache AbuseIpDb per ${ip}: ${error.message}`);
+            this.logger.error(`Errore recupero cache AbuseIpDb per ${ip}: ${error.message}`);
             return null;
         }
     }
@@ -302,7 +301,7 @@ export class IpDetailsService {
 
             return savedReports;
         } catch (error: any) {
-            logger.error(`Errore aggiornamento AbuseIpDb per ${ip}: ${error.message}`);
+            this.logger.error(`Errore aggiornamento AbuseIpDb per ${ip}: ${error.message}`);
             throw error;
         }
     }
@@ -353,7 +352,7 @@ export class IpDetailsService {
 
             return response.data.data; // array di reports
         } catch (error: any) {
-            logger.error(`Errore chiamata AbuseIPDB reports per IP ${ip}: ${error.message}`);
+            this.logger.error(`Errore chiamata AbuseIPDB reports per IP ${ip}: ${error.message}`);
             throw error;
         }
     }

@@ -1,6 +1,5 @@
 import { inject, singleton } from 'tsyringe';
 import { ThreatLogService } from '../services/ThreatLogService';
-import { LOGGER_TOKEN } from '../di/tokens';
 import { Logger } from 'winston';
 import dotenv from 'dotenv';
 dotenv.config();

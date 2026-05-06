@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { inject, singleton } from 'tsyringe';
 import { DossierService } from '../services/DossierService';
 import * as Tokens from '../di/tokens';
-import { CreateDossierDTO, UpdateDossierDTO } from '../models/dto/DossierDTO';
+import { CreateDossierDTO } from '../models/dto/DossierDTO';
 import { sanitizePage, sanitizePageSize } from '../utils/queryGuard';
 import { Controller, Get, Post, Patch, Delete } from '../registry/decorators';
 import { getComponent } from '../di/container';

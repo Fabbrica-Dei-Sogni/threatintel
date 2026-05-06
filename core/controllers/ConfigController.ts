@@ -36,7 +36,7 @@ export class ConfigController {
      *         description: Elenco configurazioni restituito.
      */
     @Get('/', [auth.hasRole('admin')])
-    async getAllConfigs(req: Request, res: Response): Promise<void> {
+    async getAllConfigs(_req: Request, res: Response): Promise<void> {
         this.logger.info('[ConfigController] Fetching all configurations');
         try {
             const configs = await this.configService.getAllConfigs();

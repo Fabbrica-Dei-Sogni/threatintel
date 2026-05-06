@@ -65,7 +65,7 @@ export const setupSwagger = (router: Router) => {
   }));
   
   // Endpoint per scaricare il JSON raw dello spec (utile per tool esterni)
-  router.get('/api/api-docs.json', (req, res) => {
+  router.get('/api/api-docs.json', (_req, res) => {
     res.setHeader('Content-Type', 'application/json');
     res.send(swaggerSpec);
   });

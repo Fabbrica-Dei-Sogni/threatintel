@@ -1,4 +1,4 @@
-import { inject, singleton, DependencyContainer } from 'tsyringe';
+import { inject, singleton } from 'tsyringe';
 import * as Tokens from '../di/tokens';
 import { Logger } from 'winston';
 import AnalysisJob, { JobStatus, IAnalysisJob } from '../models/AnalysisJobSchema';

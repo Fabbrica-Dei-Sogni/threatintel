@@ -3,7 +3,7 @@ import * as Tokens from '../../di/tokens';
 import { Logger } from 'winston';
 import { IBackgroundJob } from '../../types/jobs';
 import { RagSyncService } from '../assistant/RagSyncService';
-import AnalysisJob, { JobStatus } from '../../models/AnalysisJobSchema';
+import AnalysisJob from '../../models/AnalysisJobSchema';
 
 @injectable()
 export class RagReindexJob implements IBackgroundJob {

@@ -2,13 +2,12 @@ import { singleton, inject } from 'tsyringe';
 import { ConfigService } from './ConfigService';
 import { ConfigKey } from '../types/CoreConstants';
 import * as Tokens from '../di/tokens';
-import { Logger } from 'winston';
+
 import { ConfigDefaults, parseCsv } from '../utils/ConfigUtils';
 
 @singleton()
 export class AppConfigProvider {
     constructor(
-        @inject(Tokens.LOGGER_TOKEN) private readonly logger: Logger,
         @inject(Tokens.CONFIG_SERVICE_TOKEN) private readonly configService: ConfigService
     ) { }
 

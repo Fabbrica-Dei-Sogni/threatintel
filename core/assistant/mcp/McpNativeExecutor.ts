@@ -1,6 +1,5 @@
 import { inject, singleton } from 'tsyringe';
 import { AssistantService } from '../../services/assistant/AssistantService';
-import { ASSISTANT_SERVICE_TOKEN, LOGGER_TOKEN } from '../../di/tokens';
 import { Logger } from 'winston';
 import { ToolRegistry, McpToolDefinition } from '../tools/ToolRegistry';
 import { AssistantToolArgumentsMap, AssistantToolName } from '../../types/assistant/assistant-tool.types';

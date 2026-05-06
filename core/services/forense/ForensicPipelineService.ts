@@ -1,7 +1,7 @@
 
 import dotenv from 'dotenv';
 import { inject, injectable } from 'tsyringe';
-import { LOGGER_TOKEN } from '../../di/tokens';
+
 import { Logger } from 'winston';
 import { ConfigService } from '../ConfigService';
 import { ForensicPipelineBuilder } from './pipeline/ForensicPipelineBuilder';

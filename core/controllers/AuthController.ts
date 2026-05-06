@@ -62,7 +62,7 @@ export class AuthController {
      *         description: Modalità di autenticazione (proxy o locale).
      */
     @Get('/mode')
-    public async getAuthMode(req: Request, res: Response): Promise<void> {
+    public async getAuthMode(_req: Request, res: Response): Promise<void> {
         res.status(200).json({
             allowAnonymous: this.configProvider.allowAnonymous,
             anonymousRole: this.configProvider.anonymousRole

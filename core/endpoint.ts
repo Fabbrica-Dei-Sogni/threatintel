@@ -2,7 +2,6 @@ import express from "express";
 import dotenv from 'dotenv';
 dotenv.config();
 
-import { logger } from '../logger';
 // import ratelimitroutes from './apis/ratelimitroutes'; // [REMOVED]
 // import threatroutes from './apis/threatroutes'; // [REMOVED] - Now handled by RouterHub
 // import campaignroutes from './apis/campaignroutes'; // [REMOVED]

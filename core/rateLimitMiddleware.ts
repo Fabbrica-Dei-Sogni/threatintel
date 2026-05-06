@@ -191,7 +191,7 @@ export class RateLimitMiddleware {
             legacyHeaders: false,
             passOnStoreError: true,
             handler: this.createRateLimitHandler('ddos-protection'),
-            keyGenerator: (req, res) => `ddos:${ipKeyGenerator(req.ip || 'unknown')}`,
+            keyGenerator: (req, _res) => `ddos:${ipKeyGenerator(req.ip || 'unknown')}`,
             skip: (req) => this.isExcluded(req)
         });
     }
@@ -207,7 +207,7 @@ export class RateLimitMiddleware {
             legacyHeaders: false,
             passOnStoreError: true,
             handler: this.createRateLimitHandler('critical-endpoints'),
-            keyGenerator: (req, res) => `critical:${ipKeyGenerator(req.ip || 'unknown')}:${req.path}`,
+            keyGenerator: (req, _res) => `critical:${ipKeyGenerator(req.ip || 'unknown')}:${req.path}`,
             skipSuccessfulRequests: false, // Conta anche richieste "riuscite" per honeypot
             skip: (req) => this.isExcluded(req)
         });
@@ -224,7 +224,7 @@ export class RateLimitMiddleware {
             legacyHeaders: false,
             passOnStoreError: true,
             handler: this.createRateLimitHandler('trap-endpoints'),
-            keyGenerator: (req, res) => `trap:${ipKeyGenerator(req.ip || 'unknown')}`,
+            keyGenerator: (req, _res) => `trap:${ipKeyGenerator(req.ip || 'unknown')}`,
             skip: (req) => this.isExcluded(req)
         });
     }
@@ -240,7 +240,7 @@ export class RateLimitMiddleware {
             legacyHeaders: false,
             passOnStoreError: true,
             handler: this.createRateLimitHandler('application'),
-            keyGenerator: (req, res) => `app:${ipKeyGenerator(req.ip || 'unknown')}`,
+            keyGenerator: (req, _res) => `app:${ipKeyGenerator(req.ip || 'unknown')}`,
             skip: (req) => this.isExcluded(req)
         });
     }

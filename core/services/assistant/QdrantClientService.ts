@@ -1,7 +1,6 @@
 import { injectable, inject } from 'tsyringe';
 import { QdrantClient } from '@qdrant/js-client-rest';
 import { Logger } from 'winston';
-import { LOGGER_TOKEN } from '../../di/tokens';
 import { AppConfigProvider } from '../AppConfigProvider';
 
 import * as Tokens from '../../di/tokens';
@@ -9,14 +8,14 @@ import * as Tokens from '../../di/tokens';
 @injectable()
 export class QdrantClientService {
     private client: QdrantClient;
-    private defaultCollectionName: string;
+
 
     constructor(
         @inject(Tokens.LOGGER_TOKEN) private readonly logger: Logger,
         @inject(Tokens.CONFIG_PROVIDER_TOKEN) private readonly config: AppConfigProvider
     ) {
         this.client = new QdrantClient({ url: this.config.qdrantUrl });
-        this.defaultCollectionName = this.config.ragCollectionName;
+
     }
 
     /**

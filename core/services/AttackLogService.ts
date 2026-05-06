@@ -1,6 +1,5 @@
 import { inject, injectable } from 'tsyringe';
 import { Logger } from 'winston';
-import { LOGGER_TOKEN, EVENT_BUS_TOKEN, FORENSIC_PIPELINE_TOKEN } from '../di/tokens';
 import { EventBus, AppEvents } from './EventBus';
 import { ForensicPipelineService } from './forense/ForensicPipelineService';
 import ThreatLog from '../models/ThreatLogSchema';

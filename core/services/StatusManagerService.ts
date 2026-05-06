@@ -1,6 +1,5 @@
 import { injectable, inject } from 'tsyringe';
 import { Logger } from 'winston';
-import { LOGGER_TOKEN, EVENT_BUS_TOKEN } from '../di/tokens';
 import { EventBus, AppEvents } from './EventBus';
 
 export interface StatusUpdatePayload {

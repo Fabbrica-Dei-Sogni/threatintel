@@ -3,7 +3,6 @@ import { inject, singleton } from 'tsyringe';
 import { AuthService } from '../services/AuthService';
 import { I18nService } from '../services/I18nService';
 import { AppConfigProvider } from '../services/AppConfigProvider';
-import { LOGGER_TOKEN } from '../di/tokens';
 import { Logger } from 'winston';
 
 import * as Tokens from '../di/tokens';

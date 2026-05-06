@@ -1,4 +1,4 @@
-import { inject, singleton, delay } from 'tsyringe';
+import { inject, singleton } from 'tsyringe';
 import * as Tokens from '../di/tokens';
 import { Logger } from 'winston';
 import { ILongRunningService, ServiceStatus } from '../types/lifecycle';
@@ -6,7 +6,7 @@ import { ILongRunningService, ServiceStatus } from '../types/lifecycle';
 @singleton()
 export class LifecycleManager {
     private services: ILongRunningService[] = [];
-    private startupTimeout = 60000; // 60 secondi default timeout per tutto il bootstrap
+
 
     constructor(
         @inject(Tokens.LOGGER_TOKEN) private readonly logger: Logger

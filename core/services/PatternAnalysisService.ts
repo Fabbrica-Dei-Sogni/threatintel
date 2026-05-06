@@ -4,7 +4,6 @@ import { Request } from 'express';
 import { ConfigService } from './ConfigService';
 import { inject, injectable } from 'tsyringe';
 import * as Tokens from '../di/tokens';
-import { LOGGER_TOKEN } from '../di/tokens';
 import { Logger } from 'winston';
 import { ThreatIndicator } from '../types/indicators';
 import { AnalysisResult, GeoLocation } from '../types/threat-log.types';
@@ -169,7 +168,7 @@ export class PatternAnalysisService {
         };
     }
 
-    generateFingerprint(req: any, ip?: string) {
+    generateFingerprint(req: any, _ip?: string) {
         // Compose the attack signature tokens
         // We exclude the IP to allow correlation of distributed attacks
         
@@ -231,7 +230,7 @@ export class PatternAnalysisService {
         return sanitized;
     }
 
-    analyze(fullUrl: string, userAgent: string, bodyStr: string, referer: string, method: string, queryStr: string, requestToAnalyze: any, jndiPayload?: string): AnalysisResult {
+    analyze(fullUrl: string, userAgent: string, bodyStr: string, referer: string, method: string, _queryStr: string, requestToAnalyze: any, jndiPayload?: string): AnalysisResult {
         const indicators: string[] = [];
         let score = 0;
 

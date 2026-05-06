@@ -40,3 +40,6 @@ export const RATE_LIMIT_SERVICE_TOKEN = Symbol("RateLimitService");
 export const RATE_LIMIT_MIDDLEWARE_TOKEN = Symbol("RateLimitMiddleware");
 export const AUTH_MIDDLEWARE_TOKEN = Symbol("AuthMiddleware");
 export const ROUTER_HUB_TOKEN = Symbol("RouterHub");
+export const BACKGROUND_JOB_MANAGER_TOKEN = Symbol("BackgroundJobManager");
+export const SSH_REANALYZE_JOB_TOKEN = Symbol("SshReanalyzeJob");
+export const THREAT_REANALYZE_JOB_TOKEN = Symbol("ThreatReanalyzeJob");

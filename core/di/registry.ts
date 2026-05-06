@@ -42,6 +42,10 @@ import { AuthMiddleware } from "../middlewares/AuthMiddleware";
 import { LifecycleManager } from "../services/LifecycleManager";
 import { RouterHub } from "../registry/RouterHub";
 
+import { BackgroundJobManager } from "../services/BackgroundJobManager";
+import { SshReanalyzeJob } from "../services/jobs/SshReanalyzeJob";
+import { ThreatReanalyzeJob } from "../services/jobs/ThreatReanalyzeJob";
+
 /**
  * Centrally register all components in the DI container.
  * This ensures that metadata is properly captured and dependencies are resolved correctly.
@@ -55,6 +59,11 @@ export function setupContainer(container: DependencyContainer) {
     container.register(Tokens.ROUTER_HUB_TOKEN, { useClass: RouterHub }, { lifecycle: Lifecycle.Singleton });
     container.register(Tokens.RATE_LIMIT_MIDDLEWARE_TOKEN, { useClass: RateLimitMiddleware }, { lifecycle: Lifecycle.Singleton });
     container.register(Tokens.AUTH_MIDDLEWARE_TOKEN, { useClass: AuthMiddleware }, { lifecycle: Lifecycle.Singleton });
+    container.register(Tokens.BACKGROUND_JOB_MANAGER_TOKEN, { useClass: BackgroundJobManager }, { lifecycle: Lifecycle.Singleton });
+
+    // Jobs
+    container.register(Tokens.SSH_REANALYZE_JOB_TOKEN, { useClass: SshReanalyzeJob }, { lifecycle: Lifecycle.Singleton });
+    container.register(Tokens.THREAT_REANALYZE_JOB_TOKEN, { useClass: ThreatReanalyzeJob }, { lifecycle: Lifecycle.Singleton });
 
     // Core Services
     container.register(Tokens.I18N_TOKEN, { useClass: I18nService }, { lifecycle: Lifecycle.Singleton });

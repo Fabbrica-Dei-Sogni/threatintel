@@ -329,6 +329,9 @@ export class ThreatLogService {
         };
     }
 
+    /**
+     * @deprecated Usare BackgroundJobManager con 'threat_reanalyze' per un'esecuzione asincrona.
+     */
     async analyzeLogs({ batchSize = 100, updateDatabase = true }) {
 
         await this.patternAnalysisService.loadConfigFromDB();

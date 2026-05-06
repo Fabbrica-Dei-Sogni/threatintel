@@ -9,7 +9,7 @@
 import { Request, Response } from 'express';
 import { inject, singleton } from 'tsyringe';
 import path from 'path';
-import { LOGGER_TOKEN } from '../di/tokens';
+import * as Tokens from '../di/tokens';
 import { Logger } from 'winston';
 import { Controller, Get, Post, All, Use } from '../registry/decorators';
 import { getComponent } from '../di/container';
@@ -21,7 +21,7 @@ const rateLimit = getComponent(RateLimitMiddleware);
 @Controller('/')
 export class FakeLoginController {
     constructor(
-        @inject(LOGGER_TOKEN) private logger: Logger
+        @inject(Tokens.LOGGER_TOKEN) private logger: Logger
     ) {}
 
     /**
@@ -36,7 +36,7 @@ export class FakeLoginController {
      *         description: Pagina HTML caricata con successo.
      */
     @Get('/', [rateLimit.criticalEndpointsLimiter()])
-    showFakeLogin(req: Request, res: Response): void {
+    showFakeLogin(_req: Request, res: Response): void {
         this.logger.info('[FakeLoginController] External request intercepted: showing fake login page');
         res.status(200).sendFile(path.join(__dirname, '..', 'public', 'fake_login.html'));
     }
@@ -64,7 +64,7 @@ export class FakeLoginController {
      *         description: Reindirizzamento dell'attaccante.
      */
     @Post('/login', [rateLimit.criticalEndpointsLimiter()])
-    handleFakeLogin(req: Request, res: Response): void {
+    handleFakeLogin(_req: Request, res: Response): void {
         this.logger.info('[FakeLoginController] Fake login attempt intercepted');
         // Simulate a delay for realism
         setTimeout(() => {
@@ -95,8 +95,8 @@ export class FakeLoginController {
     }
 
     @Use()
-    handleError(error: any, req: Request, res: Response, next: any): void {
-        this.logger.error('[FakeLoginController] Internal Server Error:', error);
+    handleError(_error: any, _req: Request, res: Response, _next: any): void {
+        this.logger.error('[FakeLoginController] Internal Server Error:', _error);
         res.status(500).send('Errore interno del server');
     }
 }

@@ -89,6 +89,7 @@ const routes: RouteRecordRaw[] = [
             initialPageLogs: route.query.pLogs ? parseInt(route.query.pLogs as string) : 1,
             initialPageEvents: route.query.pEvents ? parseInt(route.query.pEvents as string) : 1,
             initialSearchUrl: typeof route.query.qUrl === 'string' ? route.query.qUrl : '',
+            status: (route.query.status as string) || 'active',
         }),
     },
     { 
@@ -203,7 +204,8 @@ const routes: RouteRecordRaw[] = [
             agoValue: route.query.agoValue ? (route.query.agoValue === 'null' ? null : parseInt(route.query.agoValue as string)) : null,
             agoUnit: route.query.agoUnit || null,
             minScore: route.query.minScore ? parseInt(route.query.minScore as string) : 0,
-            protocol: (route.query.protocol as string) || 'http'
+            protocol: (route.query.protocol as string) || 'http',
+            status: (route.query.status as string) || 'active'
         })
     }
 ];
@@ -227,23 +229,26 @@ router.beforeEach((to, from, next) => {
         const hasQueryParams = Object.keys(to.query).length > 0;
         const savedQuery = searchStore.getQuery(to.name as string);
 
-        // Procediamo al ripristino solo se:
-        // - L'URL attuale non ha parametri
-        // - Abbiamo dei dati salvati
-        // - I dati salvati non sono un oggetto vuoto (per evitare loop infiniti)
         if (!hasQueryParams && savedQuery && Object.keys(savedQuery).length > 0) {
             console.log(`[Router] Ripristino filtri salvati per ${String(to.name)}:`, savedQuery);
             return next({ ...to, query: savedQuery });
         }
     }
-    
-    // Protezione per ADMIN
-    if (to.meta.requiresAdmin && !authStore.isAdmin) {
-        console.warn(`[Router] Accesso negato a ${to.path}: richiesto ruolo admin.`);
+
+    // 2. Se l'utente è autenticato e va verso /login o /register, redirect a Home
+    const isGoingToAuthPage = to.name === 'Login' || to.name === 'Register';
+    if (isGoingToAuthPage && authStore.isAuthenticated) {
+        console.log('[Router] Utente già autenticato, redirect a Home.');
         return next({ name: 'Home' });
     }
 
-    // Protezione generale autenticazione
+    // 3. Protezione per ADMIN: accesso negato → redirect a Login (non a Home)
+    if (to.meta.requiresAdmin && !authStore.isAdmin) {
+        console.warn(`[Router] Accesso negato a ${to.path}: richiesto ruolo admin.`);
+        return next({ name: 'Login', query: { redirect: to.fullPath } });
+    }
+
+    // 4. Protezione generale autenticazione → Login con redirect param
     if (to.meta.requiresAuth && !authStore.isAuthenticated) {
         console.warn(`[Router] Accesso negato a ${to.path}: richiesta autenticazione reale.`);
         return next({ name: 'Login', query: { redirect: to.fullPath } });

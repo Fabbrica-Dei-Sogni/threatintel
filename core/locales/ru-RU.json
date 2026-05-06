@@ -214,7 +214,13 @@
                 "session": "СЕССИЯ",
                 "sessionRef": "SESSION-REF",
                 "subjectIdentified": "СУБЪЕКТ ИДЕНТИФИЦИРОВАН",
-                "subjectIdentityRevealed": "ЛИЧНОСТЬ СУБЪЕКТА РАСКРЫТА - ФОРЕНЗИК-ПРОТОКОЛ [{locale}]"
+                "subjectIdentityRevealed": "ЛИЧНОСТЬ СУБЪЕКТА РАСКРЫТА - ФОРЕНЗИК-ПРОТОКОЛ [{locale}]",
+                "rateBreachTitle": "ДЕТАЛИ НАРУШЕНИЯ ЛИМИТА СКОРОСТИ",
+                "limitType": "ТИП ЛИМИТА",
+                "ip": "IP-АДРЕС",
+                "method": "HTTP-МЕТОД",
+                "path": "ПУТЬ (PATH)",
+                "honeypotId": "ID HONEYPOT"
             },
             "hud": {
                 "attackSummaryTitle": "ТАКТИЧЕСКИЙ HUD: СВОДКА АТАКИ",

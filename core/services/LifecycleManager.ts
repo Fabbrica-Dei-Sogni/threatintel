@@ -5,20 +5,19 @@
  * Licensed under the Business Source License 1.1 (BSL-1.1).
  * See LICENSE.md in the project root for license terms.
  */
-
-import { inject, singleton, delay } from 'tsyringe';
-import { LOGGER_TOKEN } from '../di/tokens';
+import { inject, singleton } from 'tsyringe';
+import * as Tokens from '../di/tokens';
 import { Logger } from 'winston';
 import { ILongRunningService, ServiceStatus } from '../types/lifecycle';
 
 @singleton()
 export class LifecycleManager {
     private services: ILongRunningService[] = [];
-    private startupTimeout = 60000; // 60 secondi default timeout per tutto il bootstrap
+
 
     constructor(
-        @inject(LOGGER_TOKEN) private readonly logger: Logger
-    ) {}
+        @inject(Tokens.LOGGER_TOKEN) private readonly logger: Logger
+    ) { }
 
     /**
      * Registra i servizi da gestire.
@@ -39,7 +38,7 @@ export class LifecycleManager {
         const startPromises = this.services.map(async (service) => {
             try {
                 this.logger.info(`[LifecycleManager] Avvio servizio: ${service.serviceName}...`);
-                
+
                 // Crea una promessa con timeout per l'avvio del singolo servizio
                 await this.withTimeout(
                     service.start(),
@@ -81,15 +80,20 @@ export class LifecycleManager {
         ]).finally(() => clearTimeout(timeoutId));
     }
 
-    public shutdown() {
-        this.logger.info('[LifecycleManager] Spegnimento servizi...');
-        this.services.forEach(s => {
+    public async shutdown() {
+        this.logger.info(`[LifecycleManager] Spegnimento di ${this.services.length} servizi in corso...`);
+
+        const stopPromises = this.services.map(async (s) => {
             try {
-                s.stop();
-                this.logger.info(`[LifecycleManager] Servizio ${s.serviceName} fermato.`);
+                this.logger.info(`[LifecycleManager] Fermando servizio: ${s.serviceName}...`);
+                await s.stop();
+                this.logger.info(`[LifecycleManager] ✅ Servizio ${s.serviceName} fermato.`);
             } catch (err: any) {
-                this.logger.error(`[LifecycleManager] Errore fermando ${s.serviceName}: ${err.message}`);
+                this.logger.error(`[LifecycleManager] ❌ Errore fermando ${s.serviceName}: ${err.message}`);
             }
         });
+
+        await Promise.all(stopPromises);
+        this.logger.info('[LifecycleManager] Spegnimento completato.');
     }
 }

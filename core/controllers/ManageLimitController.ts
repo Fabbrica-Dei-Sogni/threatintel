@@ -9,7 +9,7 @@
 import { Request, Response } from 'express';
 import { inject, singleton } from 'tsyringe';
 import { RateLimitMiddleware } from '../rateLimitMiddleware';
-import { LOGGER_TOKEN } from '../di/tokens';
+import * as Tokens from '../di/tokens';
 import { Logger } from 'winston';
 import { isValidIp } from '../utils/ipValidator';
 import { Controller, Post } from '../registry/decorators';
@@ -18,8 +18,8 @@ import { Controller, Post } from '../registry/decorators';
 @Controller('/api')
 export class ManageLimitController {
     constructor(
-        @inject(LOGGER_TOKEN) private logger: Logger,
-        private rateLimitMiddleware: RateLimitMiddleware
+        @inject(Tokens.LOGGER_TOKEN) private logger: Logger,
+        @inject(Tokens.RATE_LIMIT_MIDDLEWARE_TOKEN) private rateLimitMiddleware: RateLimitMiddleware
     ) { }
 
     /**

@@ -11,41 +11,45 @@
  */
 
 import 'reflect-metadata';
-import { container } from 'tsyringe';
 import mongoose from 'mongoose';
 import { IpDetailsService } from '../IpDetailsService';
 import IpDetails from '../../models/IpDetailsSchema';
 import AbuseIpDb from '../../models/AbuseIpDbSchema';
 import AbuseReport from '../../models/AbuseReportSchema';
 import axios from 'axios';
-import { LOGGER_TOKEN } from '../../di/tokens';
-import { Logger } from 'winston';
+import * as Tokens from '../../di/tokens';
+import { setupContainer } from '../../di/registry';
+import { getComponent, container } from '../../di/container';
 
 // Mock dependencies
 jest.mock('axios');
 jest.mock('whois', () => ({
-    lookup: jest.fn((ip: any, cb: any) => cb(null, 'Mock WHOIS data')),
+    lookup: jest.fn((_ip: any, cb: any) => cb(null, 'Mock WHOIS data')),
 }));
-jest.mock('ipinfo', () => jest.fn((ip: any, opts: any, cb: any) => cb(null, {
+jest.mock('ipinfo', () => jest.fn((ip: any, _opts: any, cb: any) => cb(null, {
     ip: ip,
     city: 'Test City',
     region: 'Test Region',
     country: 'US'
 })));
 jest.mock('ip-range-check', () => jest.fn((ip: string, ranges: string[]) => {
-    if (ranges.includes(ip)) return true;
+    if (ranges && ranges.includes(ip)) return true;
     return false;
 }));
 
 describe('IpDetailsService (DI)', () => {
     let ipDetailsService: IpDetailsService;
     let mockLogger: any;
+    let mockEventBus: any;
 
     beforeAll(async () => {
         const uri = process.env.MONGO_URI_TEST || 'mongodb://127.0.0.1:27017/test';
         if (mongoose.connection.readyState === 0) {
             await mongoose.connect(uri);
         }
+
+        // Initialize DI
+        setupContainer(container);
     });
 
     afterAll(async () => {
@@ -58,26 +62,32 @@ describe('IpDetailsService (DI)', () => {
         await AbuseReport.deleteMany({});
         jest.clearAllMocks();
 
-        // Mock logger
+        // Clear instances to force re-resolution with mocks
+        container.clearInstances();
+
+        // Mock logger and event bus
         mockLogger = {
             info: jest.fn(),
             error: jest.fn(),
             warn: jest.fn(),
             debug: jest.fn()
         };
-
-        // Mock RagSync
-        const mockRagSync = {
-            syncIpDetails: jest.fn().mockResolvedValue(true)
+        mockEventBus = {
+            emit: jest.fn(),
+            on: jest.fn()
         };
 
-        // Create service instance manually with mocked logger and ragSync
-        ipDetailsService = new IpDetailsService(mockLogger as Logger, mockRagSync as any);
+        // Register mocks in the container
+        container.registerInstance(Tokens.LOGGER_TOKEN, mockLogger);
+        container.registerInstance(Tokens.EVENT_BUS_TOKEN, mockEventBus);
+
+        // Resolve service via Token
+        ipDetailsService = getComponent(Tokens.IP_DETAILS_SERVICE_TOKEN);
     });
 
     describe('isIPExcluded', () => {
         test('should return true for excluded IP', () => {
-            // Set excluded IPs
+            // Set excluded IPs manually for test
             (ipDetailsService as any).excludedIPs = ['127.0.0.1'];
             expect(ipDetailsService.isIPExcluded('127.0.0.1')).toBe(true);
         });

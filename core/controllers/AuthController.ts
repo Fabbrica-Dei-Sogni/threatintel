@@ -9,7 +9,8 @@
 import { Request, Response } from 'express';
 import { inject, singleton } from 'tsyringe';
 import { AuthService } from '../services/AuthService';
-import { LOGGER_TOKEN } from '../di/tokens';
+import { AppConfigProvider } from '../services/AppConfigProvider';
+import * as Tokens from '../di/tokens';
 import { Logger } from 'winston';
 import { Controller, Get, Post } from '../registry/decorators';
 
@@ -17,8 +18,9 @@ import { Controller, Get, Post } from '../registry/decorators';
 @Controller('/api/auth')
 export class AuthController {
     constructor(
-        private authService: AuthService,
-        @inject(LOGGER_TOKEN) private logger: Logger
+        @inject(Tokens.AUTH_SERVICE_TOKEN) private readonly authService: AuthService,
+        @inject(Tokens.CONFIG_PROVIDER_TOKEN) private readonly configProvider: AppConfigProvider,
+        @inject(Tokens.LOGGER_TOKEN) private readonly logger: Logger
     ) {}
 
     /**
@@ -68,10 +70,10 @@ export class AuthController {
      *         description: Modalità di autenticazione (proxy o locale).
      */
     @Get('/mode')
-    public async getAuthMode(req: Request, res: Response): Promise<void> {
+    public async getAuthMode(_req: Request, res: Response): Promise<void> {
         res.status(200).json({
-            allowAnonymous: process.env.ALLOW_ANONYMOUS === 'true',
-            anonymousRole: process.env.ANONYMOUS_ROLE || 'viewer'
+            allowAnonymous: this.configProvider.allowAnonymous,
+            anonymousRole: this.configProvider.anonymousRole
         });
     }
 

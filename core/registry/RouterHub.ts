@@ -44,7 +44,7 @@ export class RouterHub {
                 const fullPath = `${basePath}${endpoint.path}`.replace(/\/+/g, '/');
                 const method = endpoint.method!;
                 let handler = (instance as any)[endpoint.handlerName].bind(instance);
-                
+
                 // Se è un error handler (4 argomenti), dobbiamo assicurarci che Express lo riconosca come tale.
                 // Il .bind() preserva la length, ma per sicurezza se la length originale è 4, usiamo un wrapper esplicito.
                 if ((instance as any)[endpoint.handlerName].length === 4) {
@@ -54,16 +54,16 @@ export class RouterHub {
                 const middlewares = endpoint.middlewares || [];
 
                 logger.info(`[RouterHub] Binding ${method.toUpperCase()} ${fullPath} to ${controllerClass.name}.${String(endpoint.handlerName)}`);
-                
+
                 (router as any)[method](fullPath, ...middlewares, handler);
             });
         });
     }
 
-    bindWebSockets(io: any, container: DependencyContainer) {
+    bindWebSockets(_io: any, _container: DependencyContainer) {
         // Logic for socket.io integration in the future
         this.registeredControllers.forEach(controllerClass => {
-            const instance = container.resolve(controllerClass);
+            const _instance = _container.resolve(controllerClass);
             const endpoints: EndpointMetadata[] = Reflect.getMetadata(METADATA_KEYS.ENDPOINTS, controllerClass) || [];
 
             endpoints.filter(e => e.protocol === 'ws').forEach(endpoint => {

@@ -20,7 +20,12 @@ import { nextTick } from 'vue';
 // Mock del router
 vi.mock('../../router', () => ({
   default: {
-    push: vi.fn()
+    push: vi.fn(),
+    currentRoute: {
+      value: {
+        fullPath: '/attacks'
+      }
+    }
   }
 }));
 
@@ -95,4 +100,38 @@ describe('AuthStore', () => {
     expect(store.user.username).toBe('anonymous');
     expect(store.user.roles[0].name).toBe('guest');
   });
+
+  it('handleAuthError: should clear state and redirect to login with redirect param', async () => {
+    const store = useAuthStore();
+    const router = (await import('../../router')).default;
+
+    store.setAuth('expired-token', { username: 'user' });
+    await nextTick();
+
+    store.handleAuthError();
+
+    expect(store.token).toBe(null);
+    expect(store.user).toBe(null);
+    expect(storage.get(StorageNamespace.AUTH)).toBe(null);
+    expect(router.push).toHaveBeenCalledWith({
+      name: 'Login',
+      query: { redirect: '/attacks' }
+    });
+  });
+
+  it('handleAuthError: should NOT redirect if already on login page', async () => {
+    // Override currentRoute to simulate being on /login
+    const router = (await import('../../router')).default;
+    (router.currentRoute as any).value.fullPath = '/login';
+
+    const store = useAuthStore();
+    store.setAuth('expired-token', { username: 'user' });
+    vi.clearAllMocks();
+
+    store.handleAuthError();
+
+    expect(store.token).toBe(null);
+    expect(router.push).not.toHaveBeenCalled();
+  });
 });
+

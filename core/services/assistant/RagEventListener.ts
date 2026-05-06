@@ -1,6 +1,6 @@
 import { injectable, inject } from 'tsyringe';
 import { Logger } from 'winston';
-import { LOGGER_TOKEN, RAG_SYNC_SERVICE_TOKEN, EVENT_BUS_TOKEN } from '../../di/tokens';
+import * as Tokens from '../../di/tokens';
 import { RagSyncService } from './RagSyncService';
 import { EventBus, AppEvents } from '../EventBus';
 import { ILongRunningService, ServiceStatus } from '../../types/lifecycle';
@@ -15,9 +15,9 @@ export class RagEventListener implements ILongRunningService {
     private status: ServiceStatus = ServiceStatus.IDLE;
 
     constructor(
-        @inject(LOGGER_TOKEN) private readonly logger: Logger,
-        @inject(RAG_SYNC_SERVICE_TOKEN) private readonly ragSync: RagSyncService,
-        @inject(EVENT_BUS_TOKEN) private readonly eventBus: EventBus
+        @inject(Tokens.LOGGER_TOKEN) private readonly logger: Logger,
+        @inject(Tokens.RAG_SYNC_SERVICE_TOKEN) private readonly ragSync: RagSyncService,
+        @inject(Tokens.EVENT_BUS_TOKEN) private readonly eventBus: EventBus
     ) {}
 
     public async start(): Promise<void> {

@@ -18,17 +18,21 @@ import { Controller, Get, Post } from '../registry/decorators';
 import { getComponent } from '../di/container';
 import { AuthMiddleware } from '../middlewares/AuthMiddleware';
 import { StatusManagerService } from '../services/StatusManagerService';
+import { BackgroundJobManager } from '../services/BackgroundJobManager';
 
-const auth = getComponent(AuthMiddleware);
+import * as Tokens from '../di/tokens';
+
+const auth = () => getComponent<AuthMiddleware>(Tokens.AUTH_MIDDLEWARE_TOKEN);
 
 @singleton()
 @Controller('/api')
 export class ThreatController {
     constructor(
-        private threatLogService: ThreatLogService,
-        private ipDetailsService: IpDetailsService,
-        @inject(LOGGER_TOKEN) private logger: Logger,
-        private statusManager: StatusManagerService
+        @inject(Tokens.THREAT_LOG_SERVICE_TOKEN) private readonly threatLogService: ThreatLogService,
+        @inject(Tokens.IP_DETAILS_SERVICE_TOKEN) private readonly ipDetailsService: IpDetailsService,
+        @inject(Tokens.LOGGER_TOKEN) private readonly logger: Logger,
+        @inject(Tokens.STATUS_MANAGER_SERVICE_TOKEN) private readonly statusManager: StatusManagerService,
+        @inject(Tokens.BACKGROUND_JOB_MANAGER_TOKEN) private readonly jobManager: BackgroundJobManager
     ) { }
 
     /**
@@ -121,11 +125,12 @@ export class ThreatController {
             if (suspicious === 'true') filters['fingerprint.suspicious'] = true;
             else if (suspicious === 'false') filters['fingerprint.suspicious'] = false;
 
-            const safePage = sanitizePage(page);
-            const safePageSize = sanitizePageSize(pageSize);
-
-            const logs = await this.threatLogService.getLogs({ page: safePage, pageSize: safePageSize, filters });
-            const total = await this.threatLogService.countLogs(filters);
+            const logsParams = {
+                page: sanitizePage(page),
+                pageSize: sanitizePageSize(pageSize),
+                filters
+            };
+            const { logs, total, page: safePage, pageSize: safePageSize } = await this.threatLogService.searchLogs(logsParams);
 
             res.json({ logs, total, page: safePage, pageSize: safePageSize });
         } catch (err: any) {
@@ -392,25 +397,34 @@ export class ThreatController {
      * /reanalyze-all:
      *   post:
      *     tags: [System & Security]
-     *     summary: Ri-analizza tutti i log presenti nel DB (Admin Only)
+     *     summary: Ri-analizza tutti i log presenti nel DB (Asincrono)
      *     security:
      *       - BearerAuth: []
      *     responses:
-     *       200:
-     *         description: Processo avviato.
+     *       202:
+     *         description: Job di ri-analisi avviati.
      */
-    @Post('/reanalyze-all', [auth.hasRole('admin')])
+    @Post('/reanalyze-all', [(req: any, res: any, next: any) => auth().hasRole('admin')(req, res, next)])
     async reanalyzeAll(req: Request, res: Response): Promise<void> {
-        this.logger.info('[ThreatController] Starting full logs reanalysis');
+        this.logger.info('[ThreatController] Starting asynchronous full logs reanalysis');
         try {
             const { batchSize = 100, updateDatabase = true } = req.body;
-            const safeBatchSize = sanitizeLimit(batchSize, 500, 100);
-            const resultHttp = await this.threatLogService.analyzeLogs({ batchSize: safeBatchSize, updateDatabase: updateDatabase === true });            // const resultSsh = await this.sshLogService.analyzeSshLogs(batchSize);
+            const user = (req as any).user?.name || 'admin';
 
-            res.json({ http: resultHttp, ssh: null });
+            // Avviamo entrambi i job in parallelo (in background)
+            const httpJob = await this.jobManager.startJob('threat_reanalyze', { batchSize, updateDatabase }, user);
+            const sshJob = await this.jobManager.startJob('ssh_reanalyze', { batchSize }, user);
+
+            res.status(202).json({ 
+                message: 'Processi di ri-analisi avviati in background',
+                jobs: {
+                    http: { jobId: httpJob.id, status: httpJob.status },
+                    ssh: { jobId: sshJob.id, status: sshJob.status }
+                }
+            });
         } catch (err: any) {
-            this.logger.error('[ThreatController] Error during reanalysis:', err);
-            res.status(err.status || 500).json({ error: 'Errore durante rianalisi di tutti i log', details: err.message });
+            this.logger.error('[ThreatController] Error during reanalysis trigger:', err);
+            res.status(err.status || 500).json({ error: 'Errore durante l\'avvio della rianalisi', details: err.message });
         }
     }
 
@@ -448,7 +462,7 @@ export class ThreatController {
      *       202:
      *         description: Richiesta accettata.
      */
-    @Post('/status', [auth.isAuthenticated()])
+    @Post('/status', [(req: any, res: any, next: any) => auth().isAuthenticated()(req, res, next)])
     async changeStatus(req: Request, res: Response): Promise<void> {
         const { type, id, status, reason = 'manual_update' } = req.body;
         const user = (req as any).user?.name || 'anonymous';
@@ -481,7 +495,7 @@ export class ThreatController {
      *       202:
      *         description: Ripristino avviato.
      */
-    @Post('/restore', [auth.isAuthenticated()])
+    @Post('/restore', [(req: any, res: any, next: any) => auth().isAuthenticated()(req, res, next)])
     async restore(req: Request, res: Response): Promise<void> {
         const { sourceId } = req.body;
         const user = (req as any).user?.name || 'anonymous';

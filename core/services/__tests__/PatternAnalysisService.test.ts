@@ -7,10 +7,11 @@
  */
 
 import 'reflect-metadata';
-import { container } from 'tsyringe';
 import { PatternAnalysisService } from '../PatternAnalysisService';
-import { ConfigService } from '../ConfigService';
-import { LOGGER_TOKEN } from '../../di/tokens';
+
+import * as Tokens from '../../di/tokens';
+import { setupContainer } from '../../di/registry';
+import { getComponent, container } from '../../di/container';
 import { ThreatIndicator } from '../../types/indicators';
 
 describe('PatternAnalysisService', () => {
@@ -19,6 +20,12 @@ describe('PatternAnalysisService', () => {
     let mockConfigService: any;
 
     beforeEach(async () => {
+        // Initialize DI
+        setupContainer(container);
+        
+        // Clear instances
+        container.clearInstances();
+
         mockLogger = {
             info: jest.fn(),
             error: jest.fn(),
@@ -38,11 +45,13 @@ describe('PatternAnalysisService', () => {
             })
         };
 
-        container.clearInstances();
-        container.registerInstance(LOGGER_TOKEN, mockLogger);
-        container.registerInstance(ConfigService, mockConfigService);
+        // Register mocks using Tokens
+        container.registerInstance(Tokens.LOGGER_TOKEN, mockLogger);
+        container.registerInstance(Tokens.CONFIG_SERVICE_TOKEN, mockConfigService);
 
-        service = container.resolve(PatternAnalysisService);
+        // Resolve service via Token
+        service = getComponent(Tokens.PATTERN_ANALYSIS_SERVICE_TOKEN);
+        
         // Wait for initialization
         await (service as any).initialized;
     });

@@ -8,14 +8,14 @@
  */
 import { injectable, inject } from 'tsyringe';
 import { Logger } from 'winston';
-import { LOGGER_TOKEN, RAG_SYNC_SERVICE_TOKEN } from '../../di/tokens';
 import { RagSyncService } from './RagSyncService';
 import { CampaignService } from '../CampaignService';
-import { ThreatLogService } from '../ThreatLogService';
+
 import { AttackLogService } from '../AttackLogService';
-import { ConfigService } from '../ConfigService';
 import { ILongRunningService, ServiceStatus } from '../../types/lifecycle';
 import { RAG_POLICIES } from './RagPolicies';
+
+import * as Tokens from '../../di/tokens';
 
 @injectable()
 export class RagSyncWorker implements ILongRunningService {
@@ -25,12 +25,10 @@ export class RagSyncWorker implements ILongRunningService {
     private isMaterializing: boolean = false;  // ← flag
 
     constructor(
-        @inject(LOGGER_TOKEN) private readonly logger: Logger,
-        @inject(RAG_SYNC_SERVICE_TOKEN) private readonly ragSync: RagSyncService,
-        private readonly campaignService: CampaignService,
-        private readonly threatLogService: ThreatLogService,
-        private readonly attackLogService: AttackLogService,
-        private readonly configService: ConfigService
+        @inject(Tokens.LOGGER_TOKEN) private readonly logger: Logger,
+        @inject(Tokens.RAG_SYNC_SERVICE_TOKEN) private readonly ragSync: RagSyncService,
+        @inject(Tokens.CAMPAIGN_SERVICE_TOKEN) private readonly campaignService: CampaignService,
+        @inject(Tokens.ATTACK_LOG_SERVICE_TOKEN) private readonly attackLogService: AttackLogService
     ) { }
 
     public async start(): Promise<void> {
@@ -139,8 +137,10 @@ export class RagSyncWorker implements ILongRunningService {
 
             this.logger.info(`[${this.serviceName}] Running scheduled materialization...`);
 
-            const aiEnabledConfig = await this.configService.getConfigValue('RAG_AI_SUMMARY_ENABLED');
-            const isAiEnabled = aiEnabledConfig === 'true' || process.env.RAG_AI_SUMMARY_ENABLED === 'true';
+            //TODO: al momento non cè un supporto pieno alle configurazioni rag e di altri aspetti su mongodb
+            //const aiEnabledConfig = await this.configService.getConfigValue('RAG_AI_SUMMARY_ENABLED');
+            //const isAiEnabled = aiEnabledConfig === 'true' || process.env.RAG_AI_SUMMARY_ENABLED === 'true';
+            const isAiEnabled = process.env.RAG_AI_SUMMARY_ENABLED === 'true';
 
             // 1. Materializzazione Campagne
             await this.runCampaignMaterialization(isAiEnabled);

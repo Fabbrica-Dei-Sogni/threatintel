@@ -47,6 +47,12 @@ vi.mock('../../stores/profiles', () => ({
   useProfileStore: vi.fn()
 }));
 
+vi.mock('../../stores/auth', () => ({
+  useAuthStore: vi.fn(() => ({
+    handleAuthError: vi.fn()
+  }))
+}));
+
 describe('API index', () => {
   let mock: MockAdapter;
 
@@ -109,14 +115,17 @@ describe('API index', () => {
   });
 
   it('should handle 401 response interceptor', async () => {
+    const { useAuthStore } = await import('../../stores/auth');
+    const mockHandleAuthError = vi.fn();
+    vi.mocked(useAuthStore).mockReturnValue({ handleAuthError: mockHandleAuthError } as any);
+
     mock.onGet('/logs/1').reply(401);
-    storage.set(StorageNamespace.AUTH, { token: 'token', user: {} });
     
     try {
         await fetchLogById('1');
     } catch (e) {}
     
-    expect(storage.get(StorageNamespace.AUTH)).toBeNull();
+    expect(mockHandleAuthError).toHaveBeenCalled();
   });
 
   it('should handle export dossier', async () => {

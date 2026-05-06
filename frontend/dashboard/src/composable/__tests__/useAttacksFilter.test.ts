@@ -78,7 +78,7 @@ describe('useAttacksFilter', () => {
     vi.mocked(api.fetchAttackSearch).mockResolvedValue({ attacks: [], total: 0 });
 
     const filter = useAttacksFilter(
-      '', 'http', 1, 1, 'ago', 1, 'hours', null, 0, 'h', 0, 'h', null, 20, [1, 2]
+      '', 'http', 1, 1, 'ago', 1, 'hours', null, 0, 'h', 0, 'h', 'active', null, 20, [1, 2]
     );
     await filter.fetchData();
 

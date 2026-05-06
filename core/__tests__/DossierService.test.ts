@@ -58,7 +58,7 @@ describe('DossierService', () => {
                 save: saveSpy
             }));
 
-            const result = await dossierService.createDossier(mockDto as any, 'user1');
+            await dossierService.createDossier(mockDto as any, 'user1');
 
             expect(Dossier).toHaveBeenCalled();
             expect(saveSpy).toHaveBeenCalled();

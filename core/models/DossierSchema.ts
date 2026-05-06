@@ -6,7 +6,7 @@
  * Licensed under the Business Source License 1.1 (BSL-1.1).
  * See root LICENSE.md for core engine licensing details.
  */
-import mongoose, { Document, Model, Schema, Types } from 'mongoose';
+import mongoose, { Document, Model, Schema } from 'mongoose';
 
 export enum DossierStatus {
     DRAFT = 'draft',
@@ -49,16 +49,16 @@ const DossierSchema: Schema = new Schema({
     title: { type: String, required: true, trim: true },
     description: { type: String, trim: true },
     owner: { type: String, index: true },
-    status: { 
-        type: String, 
-        enum: Object.values(DossierStatus), 
+    status: {
+        type: String,
+        enum: Object.values(DossierStatus),
         default: DossierStatus.DRAFT,
-        index: true 
+        index: true
     },
     tags: [{ type: String, index: true }],
     sections: [SectionSchema],
-}, { 
-    timestamps: true 
+}, {
+    timestamps: true
 });
 
 // Indici per ricerche future sui contenuti delle sezioni

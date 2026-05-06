@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { inject, singleton } from 'tsyringe';
 import { AssistantService } from '../services/assistant/AssistantService';
-import { LOGGER_TOKEN, ASSISTANT_SERVICE_TOKEN, I18N_TOKEN, MCP_EXECUTOR_TOKEN } from '../di/tokens';
+import * as Tokens from '../di/tokens';
 import { Logger } from 'winston';
 import { I18nService } from '../services/I18nService';
 import { Controller, Delete, Get, Post } from '../registry/decorators';
@@ -12,7 +12,7 @@ import { McpNativeExecutor } from '../assistant/mcp/McpNativeExecutor';
 import { InitializeResult, JsonRpcError, JsonRpcId, JsonRpcSuccess, ToolsCallParams, ToolsListResult } from '../assistant/types/mcp.types';
 import { ToolRegistry } from '../assistant/tools/ToolRegistry';
 
-const auth = getComponent(AuthMiddleware);
+const auth = () => getComponent<AuthMiddleware>(Tokens.AUTH_MIDDLEWARE_TOKEN);
 
 /**
  * McpProtocolController
@@ -33,10 +33,10 @@ const auth = getComponent(AuthMiddleware);
 @Controller('/api/mcp')
 export class McpProtocolController {
   constructor(
-    @inject(ASSISTANT_SERVICE_TOKEN) private assistant: AssistantService,
-    @inject(LOGGER_TOKEN) private logger: Logger,
-    @inject(I18N_TOKEN) private i18n: I18nService,
-    @inject(MCP_EXECUTOR_TOKEN) private mcpExecutor: McpNativeExecutor
+    @inject(Tokens.ASSISTANT_SERVICE_TOKEN) private assistant: AssistantService,
+    @inject(Tokens.LOGGER_TOKEN) private logger: Logger,
+    @inject(Tokens.I18N_TOKEN) private i18n: I18nService,
+    @inject(Tokens.MCP_EXECUTOR_TOKEN) private mcpExecutor: McpNativeExecutor
   ) { }
 
   /**
@@ -55,7 +55,7 @@ export class McpProtocolController {
    *       405:
    *         description: Metodo GET non supportato per MCP (solo POST).
    */
-  @Get('/', [auth.isAuthenticated()])
+  @Get('/', [(req: any, res: any, next: any) => auth().isAuthenticated()(req, res, next)])
   async mcpGet(req: Request, res: Response): Promise<void> {
     res.setHeader("Allow", "GET, POST, DELETE");
     res.status(405).json({
@@ -78,7 +78,7 @@ export class McpProtocolController {
    *       405:
    *         description: Chiusura sessione MCP non supportata.
    */
-  @Delete('/', [auth.isAuthenticated()])
+  @Delete('/', [(req: any, res: any, next: any) => auth().isAuthenticated()(req, res, next)])
   async mcpDelete(req: Request, res: Response): Promise<void> {
     res.setHeader("Allow", "GET, POST, DELETE");
     res.status(405).json({
@@ -121,7 +121,7 @@ export class McpProtocolController {
    *       500:
    *         description: Errore interno durante la gestione MCP.
    */
-  @Post('/', [auth.isAuthenticated()])
+  @Post('/', [(req: any, res: any, next: any) => auth().isAuthenticated()(req, res, next)])
   async mcpPost(req: Request, res: Response): Promise<void> {
     try {
       const body = req.body;

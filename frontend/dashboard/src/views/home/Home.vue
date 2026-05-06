@@ -703,7 +703,10 @@ const {
   'ago',
   toRef(dashboardState.rankings, 'attackTimeValue'),
   toRef(dashboardState.rankings, 'attackTimeUnit'),
-  null, null, null, null, null, { firstSeen: -1 }, 10,
+  null, null, null, null, null,
+  'active', // initialStatus
+  { firstSeen: -1 }, // initialSortFields
+  10, // initialPageSize
   toRef(dashboardState.rankings, 'dangerLevels')
 )
 
@@ -718,6 +721,7 @@ const {
 } = useLogsFilter(
   '', '',
   toRef(dashboardState.rankings, 'logProtocol'),
+  'active', // initialStatus
   toRef(dashboardState.rankings, 'logPage'),
   { timestamp: -1 }, 10
 )

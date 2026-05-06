@@ -9,60 +9,38 @@
 import rateLimit, { ipKeyGenerator } from 'express-rate-limit';
 import RedisStoreImport from 'rate-limit-redis';
 const RedisStore: any = (RedisStoreImport as any).default || RedisStoreImport;
-import Redis from 'ioredis';
 import dotenv from 'dotenv';
 import { RateLimitService } from './services/RateLimitService';
+import { RedisService } from './services/RedisService';
 import { inject, singleton } from 'tsyringe';
-import { LOGGER_TOKEN } from './di/tokens';
+import { getComponent } from './di/container';
+import { LOGGER_TOKEN, REDIS_SERVICE_TOKEN } from './di/tokens';
 import { Logger } from 'winston';
 
 dotenv.config();
-
-// Configurazione Redis per rate limiting distribuito
-let redisClient: any = null;
-
-if (process.env.REDIS_HOST) {
-    try {
-        redisClient = new (Redis as any)({
-            host: process.env.REDIS_HOST,
-            port: Number(process.env.REDIS_PORT) || 6379,
-            password: process.env.REDIS_PASSWORD,
-            db: Number(process.env.REDIS_DB) || 0,
-            retryDelayOnFailover: 100,
-            enableOfflineQueue: true,
-            maxRetriesPerRequest: 3,
-            lazyConnect: false
-        } as any);
-
-        redisClient.on('connect', () => {
-            console.log('[REDIS] Rate limiting store connected');
-        });
-
-        redisClient.on('error', (err: any) => {
-            console.error('[REDIS] Rate limiting store error:', err.message);
-        });
-    } catch (error) {
-        console.warn('[REDIS] Redis non disponibile, usando memory store per rate limiting');
-        redisClient = null;
-    }
-}
 
 @singleton()
 export class RateLimitMiddleware {
     constructor(
         @inject(LOGGER_TOKEN) private readonly logger: Logger,
+        @inject(REDIS_SERVICE_TOKEN) private readonly redisService: RedisService,
         private readonly rateLimitService: RateLimitService
     ) {}
 
-    public async removeIPFromBlacklist(ip: string) {
-        if (!redisClient) {
+    private getRedisClient() {
+        if (!this.redisService.isReady()) {
             throw new Error('Redis non disponibile');
         }
+        return this.redisService.getClient()!;
+    }
+
+    public async removeIPFromBlacklist(ip: string) {
+        const client = this.getRedisClient();
 
         // Rimozione ip da blacklist redis
-        await redisClient.srem('blacklisted-ips', ip);
-        await redisClient.del(`blacklist:${ip}`);
-        await redisClient.del(`violations:${ip}`);
+        await client.srem('blacklisted-ips', ip);
+        await client.del(`blacklist:${ip}`);
+        await client.del(`violations:${ip}`);
         
         // Pulizia contatori rate limit (pattern matching semplificato o chiavi note)
         const keysToDel = [
@@ -72,25 +50,20 @@ export class RateLimitMiddleware {
         ];
         
         for (const key of keysToDel) {
-            await redisClient.del(key);
+            await client.del(key);
         }
-
-        // Le chiavi 'critical' includono il path, potremmo averne diverse. 
-        // Cerchiamole via pattern se necessario, ma intanto puliamo le principali.
 
         this.logger.info(`[BLACKLIST-REMOVE] IP ${ip} rimosso dalla blacklist e contatori resettati.`);
     }
 
     public async manualBlacklistIP(ip: string) {
-        if (!redisClient) {
-            throw new Error('Redis non disponibile');
-        }
+        const client = this.getRedisClient();
 
         const blacklistDuration = parseInt(process.env.BLACKLIST_DURATION || '7200', 10);
 
         // Aggiunta ip in blacklist redis
-        await redisClient.sadd('blacklisted-ips', ip);
-        await redisClient.setex(`blacklist:${ip}`, blacklistDuration, 'manual-blacklisted');
+        await client.sadd('blacklisted-ips', ip);
+        await client.setex(`blacklist:${ip}`, blacklistDuration, 'manual-blacklisted');
 
         // Log evento su MongoDB
         const eventData = {
@@ -109,12 +82,14 @@ export class RateLimitMiddleware {
 
     // Store configurazione (Redis se disponibile, altrimenti memory)
     private getStore() {
-        if (redisClient) {
-            return new RedisStore({
-                sendCommand: (...args: any[]) => redisClient.call(...args),
-            });
+        if (!this.redisService.isReady()) {
+            return undefined; // Default memory store
         }
-        return undefined; // Default memory store
+
+        const client = this.redisService.getClient()!;
+        return new RedisStore({
+            sendCommand: (...args: any[]) => (client as any).call(...args),
+        });
     }
 
     // Handler personalizzato per eventi di rate limiting
@@ -222,8 +197,9 @@ export class RateLimitMiddleware {
             message: 'DDoS protection activated',
             standardHeaders: true,
             legacyHeaders: false,
+            passOnStoreError: true,
             handler: this.createRateLimitHandler('ddos-protection'),
-            keyGenerator: (req, res) => `ddos:${ipKeyGenerator(req.ip || 'unknown')}`,
+            keyGenerator: (req, _res) => `ddos:${ipKeyGenerator(req.ip || 'unknown')}`,
             skip: (req) => this.isExcluded(req)
         });
     }
@@ -237,8 +213,9 @@ export class RateLimitMiddleware {
             message: 'Critical endpoint rate limit exceeded',
             standardHeaders: true,
             legacyHeaders: false,
+            passOnStoreError: true,
             handler: this.createRateLimitHandler('critical-endpoints'),
-            keyGenerator: (req, res) => `critical:${ipKeyGenerator(req.ip || 'unknown')}:${req.path}`,
+            keyGenerator: (req, _res) => `critical:${ipKeyGenerator(req.ip || 'unknown')}:${req.path}`,
             skipSuccessfulRequests: false, // Conta anche richieste "riuscite" per honeypot
             skip: (req) => this.isExcluded(req)
         });
@@ -253,8 +230,9 @@ export class RateLimitMiddleware {
             message: 'Trap endpoint rate limit exceeded',
             standardHeaders: true,
             legacyHeaders: false,
+            passOnStoreError: true,
             handler: this.createRateLimitHandler('trap-endpoints'),
-            keyGenerator: (req, res) => `trap:${ipKeyGenerator(req.ip || 'unknown')}`,
+            keyGenerator: (req, _res) => `trap:${ipKeyGenerator(req.ip || 'unknown')}`,
             skip: (req) => this.isExcluded(req)
         });
     }
@@ -268,8 +246,9 @@ export class RateLimitMiddleware {
             message: 'Application rate limit exceeded',
             standardHeaders: true,
             legacyHeaders: false,
+            passOnStoreError: true,
             handler: this.createRateLimitHandler('application'),
-            keyGenerator: (req, res) => `app:${ipKeyGenerator(req.ip || 'unknown')}`,
+            keyGenerator: (req, _res) => `app:${ipKeyGenerator(req.ip || 'unknown')}`,
             skip: (req) => this.isExcluded(req)
         });
     }
@@ -297,11 +276,12 @@ export class RateLimitMiddleware {
             }
 
             // 3. Controlla blacklist dinamica
-            if (redisClient) {
+            if (this.redisService.isReady()) {
+                const client = this.redisService.getClient()!;
                 try {
-                    const isBlacklisted = await redisClient.sismember('blacklisted-ips', ip);
+                    const isBlacklisted = await client.sismember('blacklisted-ips', ip);
                     if (isBlacklisted) {
-                        const blacklistTTL = await redisClient.ttl(`blacklist:${ip}`);
+                        const blacklistTTL = await client.ttl(`blacklist:${ip}`);
 
                         this.logger.warn(`[BLACKLISTED] IP ${ip} attempted access to ${pathStr} while blacklisted`);
 
@@ -322,7 +302,8 @@ export class RateLimitMiddleware {
             const originalSend = res.send;
             const self = this;
             res.send = function (data: any) {
-                if (res.statusCode === 429 && redisClient) {
+                if (res.statusCode === 429 && self.redisService.isReady()) {
+                    const client = self.redisService.getClient()!;
                     // Verifica se il path è escluso dal tracking delle violazioni
                     // Escludiamo solo la dashboard configurata e le chiamate API
                     const isWhitelistedPath = (pathStr.includes(dashboardPath) || 
@@ -333,18 +314,18 @@ export class RateLimitMiddleware {
                         (async () => {
                             try {
                                 const violationKey = `violations:${ip}`;
-                                const violations = await redisClient.incr(violationKey);
+                                const violations = await client.incr(violationKey);
 
                                 if (violations === 1) {
-                                    await redisClient.expire(violationKey, 3600); // 1 ora window
+                                    await client.expire(violationKey, 3600); // 1 ora window
                                 }
 
                                 const maxViolations = parseInt(process.env.MAX_VIOLATIONS || '5', 10);
                                 if (violations >= maxViolations) {
                                     // Blacklist temporanea
                                     const blacklistDuration = parseInt(process.env.BLACKLIST_DURATION || '7200', 10);
-                                    await redisClient.sadd('blacklisted-ips', ip);
-                                    await redisClient.setex(`blacklist:${ip}`, blacklistDuration, 'auto-blacklisted');
+                                    await client.sadd('blacklisted-ips', ip);
+                                    await client.setex(`blacklist:${ip}`, blacklistDuration, 'auto-blacklisted');
 
                                     self.logger.error(`[AUTO-BLACKLIST] IP ${ip} blacklisted for ${violations} violations on ${req.path}`);
                                 }
@@ -364,4 +345,19 @@ export class RateLimitMiddleware {
     }
 }
 
-export { redisClient };
+export const redisClient = {
+    get status() { return getComponent<RedisService>(REDIS_SERVICE_TOKEN).isReady() ? 'ready' : 'connecting'; },
+    call: (...args: any[]) => (getComponent<RedisService>(REDIS_SERVICE_TOKEN).getClient() as any)?.call(...args),
+    sadd: (...args: any[]) => (getComponent<RedisService>(REDIS_SERVICE_TOKEN).getClient() as any)?.sadd(...args),
+    setex: (...args: any[]) => (getComponent<RedisService>(REDIS_SERVICE_TOKEN).getClient() as any)?.setex(...args),
+    srem: (...args: any[]) => (getComponent<RedisService>(REDIS_SERVICE_TOKEN).getClient() as any)?.srem(...args),
+    del: (...args: any[]) => (getComponent<RedisService>(REDIS_SERVICE_TOKEN).getClient() as any)?.del(...args),
+    keys: (...args: any[]) => (getComponent<RedisService>(REDIS_SERVICE_TOKEN).getClient() as any)?.keys(...args),
+    scard: (...args: any[]) => (getComponent<RedisService>(REDIS_SERVICE_TOKEN).getClient() as any)?.scard(...args),
+    sismember: (...args: any[]) => (getComponent<RedisService>(REDIS_SERVICE_TOKEN).getClient() as any)?.sismember(...args),
+    ttl: (...args: any[]) => (getComponent<RedisService>(REDIS_SERVICE_TOKEN).getClient() as any)?.ttl(...args),
+    incr: (...args: any[]) => (getComponent<RedisService>(REDIS_SERVICE_TOKEN).getClient() as any)?.incr(...args),
+    expire: (...args: any[]) => (getComponent<RedisService>(REDIS_SERVICE_TOKEN).getClient() as any)?.expire(...args),
+} as any;
+
+export const isRedisRateLimitReady = () => getComponent<RedisService>(REDIS_SERVICE_TOKEN).isReady();

@@ -8,49 +8,60 @@
 import 'reflect-metadata';
 import request from 'supertest';
 import express from 'express';
-import { container } from 'tsyringe';
+import { getComponent, container } from '../../di/container';
+import { setupContainer } from '../../di/registry';
 import { AttackLogController } from '../../controllers/AttackLogController';
-import { AttackLogService } from '../../services/AttackLogService';
-import { LOGGER_TOKEN } from '../../di/tokens';
-import { Logger } from 'winston';
-import { AuthMiddleware } from '../../middlewares/AuthMiddleware';
+import * as Tokens from '../../di/tokens';
+
 import { RouterHub } from '../../registry/RouterHub';
 
 jest.mock('../../middlewares/AuthMiddleware', () => {
     return {
         AuthMiddleware: jest.fn().mockImplementation(() => {
             return {
-                isAuthenticated: jest.fn().mockReturnValue((req: any, res: any, next: any) => next()),
-                isIdentified: jest.fn().mockReturnValue((req: any, res: any, next: any) => next()),
-                hasRole: jest.fn().mockReturnValue((req: any, res: any, next: any) => next()),
+                isAuthenticated: jest.fn().mockReturnValue((_req: any, _res: any, next: any) => next()),
+                isIdentified: jest.fn().mockReturnValue((_req: any, _res: any, next: any) => next()),
+                hasRole: jest.fn().mockReturnValue((_req: any, _res: any, next: any) => next()),
             };
         })
     };
 });
 
-const mockAttackLogService = {
-    getAttacks: jest.fn(),
-    getAttackDetail: jest.fn(),
-    getDistributedAttackDetail: jest.fn(),
-};
-
-const mockLogger = {
-    info: jest.fn(),
-    error: jest.fn(),
-    warn: jest.fn(),
-} as unknown as Logger;
-
-container.register<AttackLogService>(AttackLogService, { useValue: mockAttackLogService as any });
-container.register<Logger>(LOGGER_TOKEN, { useValue: mockLogger });
-
-const app = express();
-app.use(express.json());
-
-const hub = container.resolve(RouterHub);
-hub.register(AttackLogController);
-hub.bindHttp(app, container);
-
 describe('AttackLogController API', () => {
+    let app: express.Express;
+    let mockAttackLogService: any;
+    let mockLogger: any;
+
+    beforeAll(() => {
+        // Initialize DI
+        setupContainer(container);
+        container.clearInstances();
+
+        mockAttackLogService = {
+            getAttacks: jest.fn(),
+            getAttackDetail: jest.fn(),
+            getDistributedAttackDetail: jest.fn(),
+        };
+
+        mockLogger = {
+            info: jest.fn(),
+            error: jest.fn(),
+            warn: jest.fn(),
+            debug: jest.fn(),
+        };
+
+        // Register mocks using Tokens
+        container.registerInstance(Tokens.ATTACK_LOG_SERVICE_TOKEN, mockAttackLogService);
+        container.registerInstance(Tokens.LOGGER_TOKEN, mockLogger);
+
+        app = express();
+        app.use(express.json());
+
+        const hub = getComponent<RouterHub>(Tokens.ROUTER_HUB_TOKEN);
+        hub.register(AttackLogController);
+        hub.bindHttp(app, container);
+    });
+
     beforeEach(() => {
         jest.clearAllMocks();
     });

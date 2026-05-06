@@ -9,11 +9,10 @@
 import { Request, Response } from 'express';
 import { inject, singleton } from 'tsyringe';
 import { AssistantService } from '../services/assistant/AssistantService';
-import { StatusManagerService } from '../services/StatusManagerService';
-import { LOGGER_TOKEN, ASSISTANT_SERVICE_TOKEN, I18N_TOKEN } from '../di/tokens';
+import * as Tokens from '../di/tokens';
 import { Logger } from 'winston';
 import { I18nService } from '../services/I18nService';
-import { Controller, Get, Post } from '../registry/decorators';
+import { Controller, Post } from '../registry/decorators';
 import { getComponent } from '../di/container';
 import { AuthMiddleware } from '../middlewares/AuthMiddleware';
 
@@ -23,9 +22,9 @@ const auth = getComponent(AuthMiddleware);
 @Controller('/api/assistant')
 export class AssistantController {
     constructor(
-        @inject(ASSISTANT_SERVICE_TOKEN) private assistant: AssistantService,
-        @inject(LOGGER_TOKEN) private logger: Logger,
-        @inject(I18N_TOKEN) private i18n: I18nService
+        @inject(Tokens.ASSISTANT_SERVICE_TOKEN) private readonly assistant: AssistantService,
+        @inject(Tokens.LOGGER_TOKEN) private readonly logger: Logger,
+        @inject(Tokens.I18N_TOKEN) private readonly i18n: I18nService
     ) { }
 
     /**
@@ -181,6 +180,90 @@ export class AssistantController {
         } catch (err: any) {
             this.logger.error('[AssistantController] Source Resolution error:', err);
             res.status(500).json({ error: this.i18n.t('errors.rag.resolveError') });
+        }
+    }
+
+    /**
+     * @openapi
+     * /assistant/logs:
+     *   post:
+     *     summary: Ricerca diretta nei log (Tool MCP)
+     *     tags: [AI Assistant & RAG]
+     *     security:
+     *       - BearerAuth: []
+     *     requestBody:
+     *       content:
+     *         application/json:
+     *           schema:
+     *             $ref: '#/components/schemas/SearchLogArgs'
+     *     responses:
+     *       200:
+     *         description: Risultati ricerca log.
+     */
+    @Post('/logs', [auth.isAuthenticated()])
+    async searchLogs(req: Request, res: Response): Promise<void> {
+        try {
+            const results = await this.assistant.searchLogs(req.body);
+            res.json(results);
+        } catch (err: any) {
+            this.logger.error('[AssistantController] SearchLogs error:', err);
+            res.status(500).json({ error: err.message });
+        }
+    }
+
+    /**
+     * @openapi
+     * /assistant/attacks:
+     *   post:
+     *     summary: Ricerca diretta negli attacchi (Tool MCP)
+     *     tags: [AI Assistant & RAG]
+     *     security:
+     *       - BearerAuth: []
+     *     requestBody:
+     *       content:
+     *         application/json:
+     *           schema:
+     *             $ref: '#/components/schemas/SearchAttacksArgs'
+     *     responses:
+     *       200:
+     *         description: Risultati ricerca attacchi.
+     */
+    @Post('/attacks', [auth.isAuthenticated()])
+    async searchAttacks(req: Request, res: Response): Promise<void> {
+        try {
+            const results = await this.assistant.searchAttacks(req.body);
+            res.json(results);
+        } catch (err: any) {
+            this.logger.error('[AssistantController] SearchAttacks error:', err);
+            res.status(500).json({ error: err.message });
+        }
+    }
+
+    /**
+     * @openapi
+     * /assistant/campaigns:
+     *   post:
+     *     summary: Ricerca diretta nelle campagne (Tool MCP)
+     *     tags: [AI Assistant & RAG]
+     *     security:
+     *       - BearerAuth: []
+     *     requestBody:
+     *       content:
+     *         application/json:
+     *           schema:
+     *             $ref: '#/components/schemas/SearchCampaignsArgs'
+     *     responses:
+     *       200:
+     *         description: Risultati ricerca campagne.
+     */
+    @Post('/campaigns', [auth.isAuthenticated()])
+    async searchCampaigns(req: Request, res: Response): Promise<void> {
+        try {
+            const results = await this.assistant.searchCampaigns(req.body);
+            res.json(results);
+        } catch (err: any) {
+            this.logger.error('[AssistantController] SearchCampaigns error:', err);
+            res.status(500).json({ error: err.message });
         }
     }
 

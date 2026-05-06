@@ -7,7 +7,6 @@
  */
 
 import { inject, singleton } from 'tsyringe';
-import { LOGGER_TOKEN } from '../di/tokens';
 import { Logger } from 'winston';
 import { IpDetailsService } from './IpDetailsService';
 import CowrieSession from '../models/CowrieSessionSchema';
@@ -26,6 +25,8 @@ import {
 } from '../utils/queryGuard';
 import { SanitizationUtils } from '../utils/SanitizationUtils';
 
+import * as Tokens from '../di/tokens';
+
 @singleton()
 export class CowrieService implements ILongRunningService {
     public readonly serviceName = 'CowrieService';
@@ -33,8 +34,8 @@ export class CowrieService implements ILongRunningService {
     private enrichmentInterval: NodeJS.Timeout | null = null;
 
     constructor(
-        @inject(LOGGER_TOKEN) private readonly logger: Logger,
-        private readonly ipDetailsService: IpDetailsService
+        @inject(Tokens.LOGGER_TOKEN) private readonly logger: Logger,
+        @inject(Tokens.IP_DETAILS_SERVICE_TOKEN) private readonly ipDetailsService: IpDetailsService
     ) { }
 
     public getStatus(): ServiceStatus {

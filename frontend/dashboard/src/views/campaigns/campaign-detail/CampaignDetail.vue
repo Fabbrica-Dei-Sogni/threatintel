@@ -284,7 +284,8 @@ const props = defineProps({
   protocol: { type: String, default: 'http' },
   timeMode: { type: String, default: 'ago' },
   agoValue: { type: [Number, null], default: null },
-  agoUnit: { type: [String, null], default: null }
+  agoUnit: { type: [String, null], default: null },
+  status: { type: String, default: 'active' }
 });
 
 const { t } = useI18n();
@@ -356,7 +357,8 @@ const triggerLoad = () => {
     protocol: props.protocol,
     timeMode: props.timeMode,
     agoValue: props.agoValue,
-    agoUnit: props.agoUnit
+    agoUnit: props.agoUnit,
+    status: props.status
   });
 };
 
@@ -371,7 +373,8 @@ watch(() => [
   props.protocol,
   props.timeMode,
   props.agoValue,
-  props.agoUnit
+  props.agoUnit,
+  props.status
 ], (newVal, oldVal) => {
   // Se è cambiato l'hash, resettiamo la pagina dei nodi
   if (newVal[0] !== oldVal[0]) {

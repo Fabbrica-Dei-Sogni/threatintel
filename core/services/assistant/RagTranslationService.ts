@@ -8,7 +8,6 @@
  */
 import { injectable, inject } from 'tsyringe';
 import { Logger } from 'winston';
-import { LOGGER_TOKEN } from '../../di/tokens';
 import { IThreatLog } from '../../models/ThreatLogSchema';
 import { IIpDetails } from '../../models/IpDetailsSchema';
 import { IAbuseIpDb } from '../../models/AbuseIpDbSchema';
@@ -17,10 +16,12 @@ import { RAG_TEMPLATES } from './RagTemplates';
 import CampaignDTO from '../../models/dto/CampaignDTO';
 import AttackDTO from '../../models/dto/AttackDTO';
 
+import * as Tokens from '../../di/tokens';
+
 @injectable()
 export class RagTranslationService {
     constructor(
-        @inject(LOGGER_TOKEN) private readonly logger: Logger
+        @inject(Tokens.LOGGER_TOKEN) private readonly logger: Logger
     ) {}
 
     /**

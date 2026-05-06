@@ -13,8 +13,17 @@ WorkingDirectory={{WORKING_DIR}}
 Environment=NODE_ENV={{NODE_ENV}}
 Environment=PORT={{PORT}}
 Environment=VERSION={{VERSION}}
+Environment=ALLOWED_ORIGINS={{ALLOWED_ORIGINS}}
+Environment=APP_DOMAIN={{APP_DOMAIN}}
+Environment=API_BASE_URL={{API_BASE_URL}}
+Environment=APP_ID={{APP_ID}}
+Environment=ALLOW_ANONYMOUS={{ALLOW_ANONYMOUS}}
+Environment=URI_DIGITAL_AUTH={{URI_DIGITAL_AUTH}}
+Environment=NODE_OPTIONS=--openssl-legacy-provider
+Environment=NGINX_LOG_PREFIX=nginx_threat_{{SERVICE_NAME}}:
 # Environment variable to guide geoip-lite to the local data folder
 Environment=GEODATADIR=./data
+Environment=PATH={{NODE_BIN_DIR}}:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 # Database & Infrastructure
 Environment=MONGO_URI=mongodb://intelagent:intelagent@127.0.0.1:17017/threatinteldb
@@ -28,7 +37,7 @@ ExecStartPre=/bin/bash {{WORKING_DIR}}/infra/check-redis.sh
 ExecStartPre=/bin/bash {{WORKING_DIR}}/infra/check-mongodb.sh
 
 # Execution
-ExecStart=/usr/bin/node index.js
+ExecStart={{NODE_PATH}} index.js
 
 Restart=always
 RestartSec=5

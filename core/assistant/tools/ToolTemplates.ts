@@ -51,6 +51,27 @@ export const TOOL_TEMPLATES = {
     }
   },
 
+  SEARCH_LOGS: {
+    NAME: "search_logs",
+    DESCRIPTION:
+      "Ricerca diretta su MongoDB dei log atomici, SENZA passare per Qdrant. " +
+      "Usare quando la domanda riguarda eventi singoli o parametri specifici: 'log dell'IP 1.2.3.4', 'log HTTP delle ultime 2 ore', 'log sospetti con score > 50'. " +
+      "Restituisce una lista di log con resolveRef pronto per resolve_threat_source.",
+    FIELDS: {
+      START_DATE: "Data di inizio in formato ISO8601 (YYYY-MM-DD).",
+      END_DATE: "Data di fine in formato ISO8601 (YYYY-MM-DD).",
+      IP: "Filtra per IP esatto.",
+      URL: "Filtra per URL o parte di esso (es: '/admin', '.php').",
+      PROTOCOL: "Filtra per protocollo: 'http', 'ssh', 'ftp'.",
+      MIN_SCORE: "Score minimo del log (0-100).",
+      LIMIT: "Numero massimo di risultati. Default: 20.",
+      OFFSET: "Numero di risultati da saltare per paginazione.",
+      SORT_BY: "Campo di ordinamento: 'timestamp', 'fingerprint.score'.",
+      SORT_ORDER: "'desc' (default) o 'asc'.",
+      STATUS: "Stato del log: 'active' (default), 'archived', 'deleted'."
+    }
+  },
+
  SEARCH_ATTACKS: {
     NAME: "search_attacks",
     DESCRIPTION:
@@ -60,14 +81,15 @@ export const TOOL_TEMPLATES = {
       "protocol (http, ssh, ftp), dangerScore (1-5), minLogs (soglia minima log per IP). " +
       "Restituisce una lista di attacchi con sourceRef pronto per resolve_threat_source.",
     FIELDS: {
-      DATE_FROM: "Data di inizio in formato ISO8601. Calcolata dinamicamente dall'agente (es: 'ultimi 10 giorni' → now - 10d).",
-      DATE_TO: "Data di fine in formato ISO8601. Default: ora corrente.",
+      DATE_FROM: "Data di inizio in formato ISO8601 (YYYY-MM-DD). Calcolata dinamicamente dall'agente (es: 'ultimi 10 giorni' → now - 10d).",
+      DATE_TO: "Data di fine in formato ISO8601 (YYYY-MM-DD). Default: ora corrente.",
       IP: "Filtra per IP esatto.",
       COUNTRY: "Filtra per paese di origine (codice ISO: CN, RU, US, IT...).",
       PROTOCOL: "Filtra per protocollo: 'http', 'ssh', 'ftp'.",
       DANGER_SCORE: "Filtra per livello di pericolo (1=Critico, 5=Informativo).",
       MIN_LOGS: "Numero minimo di log per considerare un IP come attacco. Default: 10.",
       LIMIT: "Numero massimo di risultati. Default: 20.",
+      OFFSET: "Numero di risultati da saltare per paginazione.",
       SORT_BY: "Campo di ordinamento: 'lastSeen', 'totaleLogs', 'dangerScore', 'averageScore'.",
       SORT_ORDER: "'desc' (default) o 'asc'.",
       STATUS: "Stato del log: 'active' (default), 'archived' (storico/whitelist), 'deleted' (cestino)."
@@ -83,18 +105,29 @@ export const TOOL_TEMPLATES = {
       "minScore (score minimo), minLogsPerIp (log minimi per IP partecipante). " +
       "Restituisce una lista di campagne con sourceRef pronto per resolve_threat_source.",
     FIELDS: {
-      DATE_FROM: "Data di inizio in formato ISO8601.",
-      DATE_TO: "Data di fine in formato ISO8601.",
+      DATE_FROM: "Data di inizio in formato ISO8601 (YYYY-MM-DD).",
+      DATE_TO: "Data di fine in formato ISO8601 (YYYY-MM-DD).",
       PROTOCOL: "Filtra per protocollo: 'http', 'ssh', 'ftp'.",
       MIN_IPS: "Numero minimo di IP coinvolti nella campagna.",
       MIN_SCORE: "Score medio minimo della campagna.",
       MIN_LOGS_PER_IP: "Log minimi per ciascun IP partecipante.",
       LIMIT: "Numero massimo di risultati. Default: 20.",
+      OFFSET: "Numero di risultati da saltare per paginazione.",
       SORT_BY: "Campo di ordinamento: 'lastSeen', 'firstSeen', 'ipCount', 'totaleLogs', 'averageScore'.",
       SORT_ORDER: "'desc' (default) o 'asc'.",
       STATUS: "Stato dei log della campagna: 'active' (default), 'archived', 'deleted'."
     }
+  },
+  GET_STATS: {
+    NAME: "get_stats",
+    DESCRIPTION:
+      "Strumento di analisi aggregata e trend. Da usare quando la domanda riguarda volumi, distribuzioni o classifiche: 'Quali sono i paesi più attivi?', 'Quanti log sospetti oggi?', 'Top 5 indicatori di attacco'. " +
+      "Permette di avere una visione d'insieme su migliaia di log senza scaricarli singolarmente.",
+    FIELDS: {
+      TIMEFRAME: "Periodo di analisi: '24h' (default), '1w', '1m', '1y', 'all'.",
+      MIN_SCORE: "Score minimo per considerare un log come sospetto nelle statistiche. Default: 15.",
+      LIMIT: "Numero di elementi nelle classifiche (Top N). Default: 10.",
+      MIN_LOGS: "Soglia minima di log per IP per essere incluso nelle statistiche. Default: 1."
+    }
   }
-
-
 };

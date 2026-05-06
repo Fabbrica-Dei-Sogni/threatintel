@@ -7,19 +7,20 @@
  */
 
 import { inject, injectable } from 'tsyringe';
-import { LOGGER_TOKEN } from '../di/tokens';
 import { Logger } from 'winston';
-import Dossier, { IDossier, DossierStatus, IDossierSection } from '../models/DossierSchema';
-import { CreateDossierDTO, UpdateDossierDTO, DossierResponseDTO } from '../models/dto/DossierDTO';
+import Dossier, { IDossier, IDossierSection } from '../models/DossierSchema';
+import { CreateDossierDTO, UpdateDossierDTO } from '../models/dto/DossierDTO';
 import { ReportService } from './ReportService';
 import { SanitizationUtils } from '../utils/SanitizationUtils';
 import { sanitizePage, sanitizePageSize, escapeRegex } from '../utils/queryGuard';
 
+import * as Tokens from '../di/tokens';
+
 @injectable()
 export class DossierService {
     constructor(
-        @inject(LOGGER_TOKEN) private readonly logger: Logger,
-        private readonly reportService: ReportService
+        @inject(Tokens.LOGGER_TOKEN) private readonly logger: Logger,
+        @inject(Tokens.REPORT_SERVICE_TOKEN) private readonly reportService: ReportService
     ) { }
 
     /**

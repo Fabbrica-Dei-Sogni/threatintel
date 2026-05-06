@@ -1,67 +1,47 @@
-Documentazione riguardo le configurazioni nginx 
-# Nginx formato json
+# Nginx Configuration for ThreatIntel (Modular Setup)
 
-Per fornire il formato json al logging di nginx si aggiunge la configurazione
+Questa cartella contiene le configurazioni Nginx ottimizzate per il sistema di Threat Intelligence. La configurazione è stata progettata per essere **modulare** e **non invasiva**, permettendo l'installazione senza modificare il file `nginx.conf` originale del sistema.
 
-`threatintel_logging.conf`
+## 🏗️ Architettura dei File
 
-il conf si puo copiare direttamente nella folder
+| File | Destinazione Consigliata | Ruolo |
+| :--- | :--- | :--- |
+| **`threatintel_globals.conf`** | `/etc/nginx/conf.d/` | Definizioni globali: Formato log JSON, Zone di Rate Limiting, Security Headers. |
+| **`threatintel.conf`** | `/etc/nginx/sites-enabled/` | Virtual Host: Multiplexing porte Trap, Proxy verso Node.js (porta 3999). |
 
-`/etc/nginx/conf.d/`
+## 🚀 Installazione Rapida
 
-oppure eseguire un link simbolico al .conf di progetto come primo "setup"
-
-# Nginx Stream Proxy — Porte TCP non-HTTP
-
-Guida per configurare nginx come proxy TCP per protocolli non-HTTP (Telnet, MQTT, ecc.)
-usando il modulo `ngx_stream_module`.
-
----
-
-## Il problema
-
-Il blocco `http {}` di nginx gestisce solo traffico HTTP/HTTPS.
-Per proxare protocolli TCP raw come **Telnet (porta 23)**, **MQTT (1883)**, **Redis (6379)**
-serve il modulo **stream**, che opera a livello TCP/UDP puro.
-
-Update: al momento non e' necessario ascoltare la porta telnet 23 dal proxy in quanto il binding avviene direttamente dentro l'ambiente docker di cowrie.
-Indagare su come fornire al cowrie l'header nginx - richiede un fix ad hoc sul codice cowrie.
-
----
-
-## Installazione modulo dinamico (Debian/Ubuntu)
+Per attivare la configurazione tramite link simbolici (metodo consigliato per mantenere i file sincronizzati con il repository):
 
 ```bash
-sudo apt install libnginx-mod-stream -y
-```
-Il modulo viene installato in ```/usr/lib/nginx/modules/ngx_stream_module.so.```
+# 1. Collega le configurazioni globali (Log format e Rate Limit)
+sudo ln -sf $(pwd)/threatintel_globals.conf /etc/nginx/conf.d/threatintel_globals.conf
 
-Aggiungi questa riga in cima a ```/etc/nginx/nginx.conf```, prima di qualsiasi blocco:
+# 2. Collega il Virtual Host
+sudo ln -sf $(pwd)/threatintel.conf /etc/nginx/sites-available/threatintel.conf
 
-Il blocco stream {} deve stare al livello root, mai dentro http {}:
+# 3. Abilita il sito
+sudo ln -sf /etc/nginx/sites-available/threatintel.conf /etc/nginx/sites-enabled/threatintel.conf
 
-
-```
-load_module modules/ngx_stream_module.so;
-```
-
-```
-stream {
-    include /etc/nginx/stream.d/*.conf;
-}
+# 4. Verifica la sintassi e ricarica
+sudo nginx -t && sudo systemctl reload nginx
 ```
 
-Crea ```/etc/nginx/stream.d/telnet.conf```:
+## 🛡️ Caratteristiche Tecniche
 
-```
-upstream cowrie_telnet {
-    server 127.0.0.1:2323;
-}
+### Honeypot Multiplexing
+Il file `threatintel.conf` è configurato per ascoltare su molteplici porte "trap" (es. 8080, 5000, 7000). Tutto il traffico su queste porte viene inoltrato al backend Node.js.
 
-server {
-    listen 23;
-    proxy_pass cowrie_telnet;
-    proxy_timeout 600s;
-    proxy_connect_timeout 10s;
-}
-```
+### Header `X-Server-Port`
+Viene passato l'header `X-Server-Port $server_port` al backend. Questo permette all'applicazione di identificare su quale porta specifica l'attaccante ha tentato la connessione, informazione fondamentale per l'analisi forense.
+
+### Logging JSON
+I log di accesso vengono scritti in `/var/log/nginx/threatintel_access.log` utilizzando il formato `json_threatintel`. Questo formato strutturato permette al `NginxLogService` di processare le minacce in tempo reale senza errori di parsing.
+
+### Sicurezza
+- **Rate Limiting**: Protezione contro brute-force e DoS tramite zone `general` e `login`.
+- **Hiding**: `server_tokens off` e protezione dei file nascosti (`.env`, `.git`).
+- **Headers**: Inclusione di `X-Frame-Options`, `X-Content-Type-Options` e `Referrer-Policy`.
+
+---
+**Nota**: Assicurarsi che i certificati SSL (se utilizzati) siano presenti nei percorsi specificati nel vhost prima di ricaricare Nginx.

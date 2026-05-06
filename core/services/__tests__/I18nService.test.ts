@@ -7,9 +7,10 @@
  */
 
 import 'reflect-metadata';
-import { container } from 'tsyringe';
+import { getComponent, container } from '../../di/container';
+import { setupContainer } from '../../di/registry';
 import { I18nService } from '../I18nService';
-import { LOGGER_TOKEN } from '../../di/tokens';
+import { LOGGER_TOKEN, I18N_TOKEN } from '../../di/tokens';
 import { Logger } from 'winston';
 
 describe('I18nService', () => {
@@ -17,14 +18,16 @@ describe('I18nService', () => {
     let mockLogger: Partial<Logger>;
 
     beforeEach(() => {
-        container.reset();
+        setupContainer(container);
+        container.clearInstances();
+
         mockLogger = {
             info: jest.fn(),
             error: jest.fn(),
             warn: jest.fn()
         };
         container.registerInstance(LOGGER_TOKEN, mockLogger as Logger);
-        i18nService = container.resolve(I18nService);
+        i18nService = getComponent(I18N_TOKEN);
     });
 
     it('should load locales correctly', () => {

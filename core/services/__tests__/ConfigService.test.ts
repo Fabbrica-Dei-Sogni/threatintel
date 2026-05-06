@@ -11,17 +11,24 @@
  */
 
 import 'reflect-metadata';
-import { container } from 'tsyringe';
 import mongoose from 'mongoose';
 import { ConfigService } from '../ConfigService';
 import ConfigSchema from '../../models/ConfigSchema';
+import * as Tokens from '../../di/tokens';
+import { setupContainer } from '../../di/registry';
+import { getComponent, container } from '../../di/container';
 
 describe('ConfigService (DI)', () => {
     let configService: ConfigService;
 
     beforeAll(async () => {
         const uri = process.env.MONGO_URI_TEST || 'mongodb://127.0.0.1:27017/test';
-        await mongoose.connect(uri);
+        if (mongoose.connection.readyState === 0) {
+            await mongoose.connect(uri);
+        }
+        
+        // Initialize DI
+        setupContainer(container);
     });
 
     afterAll(async () => {
@@ -29,9 +36,8 @@ describe('ConfigService (DI)', () => {
     });
 
     beforeEach(async () => {
-        // Clear container instances and resolve fresh service
-        container.clearInstances();
-        configService = container.resolve(ConfigService);
+        // Resolve service via Token
+        configService = getComponent(Tokens.CONFIG_SERVICE_TOKEN);
 
         // Clear configs before each test
         await ConfigSchema.deleteMany({});

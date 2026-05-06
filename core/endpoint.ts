@@ -10,7 +10,6 @@ import express from "express";
 import dotenv from 'dotenv';
 dotenv.config();
 
-import { logger } from '../logger';
 // import ratelimitroutes from './apis/ratelimitroutes'; // [REMOVED]
 // import threatroutes from './apis/threatroutes'; // [REMOVED] - Now handled by RouterHub
 // import campaignroutes from './apis/campaignroutes'; // [REMOVED]
@@ -34,6 +33,7 @@ import { FakeLoginController } from "./controllers/FakeLoginController";
 import { ReportController } from "./controllers/ReportController";
 import { DossierController } from "./controllers/DossierController";
 import { AuthController } from "./controllers/AuthController";
+import { JobController } from "./controllers/JobController";
 import { AuthMiddleware } from "./middlewares/AuthMiddleware";
 import { AssistantController } from "./controllers/AssistantController";
 import { McpProtocolController } from "./controllers/McpProtocolController";
@@ -61,9 +61,9 @@ routerHub.register(ReportController);
 routerHub.register(DossierController);
 routerHub.register(AuthController);
 routerHub.register(CowrieController);
+routerHub.register(JobController);
 routerHub.register(AssistantController);
-routerHub.register(McpProtocolController);  
-
+routerHub.register(McpProtocolController);
 //XXX: deve essere registrato per ultimo
 routerHub.register(FakeLoginController);
 

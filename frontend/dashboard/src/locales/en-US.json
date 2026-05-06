@@ -35,6 +35,7 @@
         "of": "of",
         "goToPage": "Go to page",
         "show": "Show",
+        "hide": "Hide",
         "sample_url": "Sample URI",
         "duration_label": "Duration",
         "view_details": "View Details",
@@ -865,6 +866,50 @@
             "saveSection": "Save Section",
             "expertMode": "Expert Mode (JSON)",
             "cancel": "Cancel"
+        }
+    },
+    "ops": {
+        "hubTitle": "SYSTEM OPERATIONS HUB",
+        "activeMissions": "ACTIVE MISSIONS",
+        "availableCommands": "AVAILABLE COMMANDS",
+        "activeOps": "ACTIVE OPERATIONS",
+        "noActiveOps": "NO OPERATIONS CURRENTLY IN PROGRESS",
+        "recentLogs": "RECENT LOGS",
+        "terminateMission": "TERMINATE MISSION",
+        "confirmAction": "CONFIRM?",
+        "commands": {
+            "reanalyzeName": "REANALYZE ALL LOGS",
+            "reanalyzeDesc": "Full re-scan of HTTP & SSH traces",
+            "pruningName": "DATABASE CLEANUP",
+            "pruningDesc": "Archive and remove obsolete logs",
+            "ragReindexName": "RAG RE-INDEXING",
+            "ragReindexDesc": "Realigns Qdrant vector memory"
+        },
+        "status": {
+            "pending": "PENDING",
+            "running": "RUNNING",
+            "completed": "COMPLETED",
+            "failed": "FAILED",
+            "cancelled": "CANCELLED"
+        },
+        "activeOps": "ACTIVE OPERATIONS",
+        "noActiveOps": "NO OPERATIONS IN PROGRESS",
+        "recentLogs": "RECENT LOGS",
+        "terminateMission": "TERMINATE MISSION"
+    },
+    "maintenance": {
+        "title": "SYSTEM MAINTENANCE",
+        "pruning": {
+            "title": "Pruning & Retention",
+            "desc": "Manage data lifecycle: automatic archiving and permanent deletion of logs.",
+            "archiveDays": "Days to Archive",
+            "archiveDaysHelp": "Time before an active log becomes Archived",
+            "retentionDays": "Trash Retention (days)",
+            "retentionDaysHelp": "Time before a deleted log is permanently removed",
+            "deletionDays": "Permanent Deletion (days)",
+            "deletionDaysHelp": "Empty archived logs older than this value",
+            "runCleanup": "Run Cleanup",
+            "confirm": "Are you sure you want to proceed with permanent cleanup? This action is irreversible."
         }
     }
 }

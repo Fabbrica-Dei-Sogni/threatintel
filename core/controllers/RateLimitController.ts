@@ -9,16 +9,16 @@
 import { Request, Response } from 'express';
 import { inject, singleton } from 'tsyringe';
 import { RateLimitService } from '../services/RateLimitService';
-import { LOGGER_TOKEN } from '../di/tokens';
+import * as Tokens from '../di/tokens';
 import { Logger } from 'winston';
 import { Controller, Post } from '../registry/decorators';
 
 @singleton()
-@Controller('/api')
+@Controller('/api/ratelimit')
 export class RateLimitController {
     constructor(
-        private rateLimitService: RateLimitService,
-        @inject(LOGGER_TOKEN) private logger: Logger
+        @inject(Tokens.RATE_LIMIT_SERVICE_TOKEN) private rateLimitService: RateLimitService,
+        @inject(Tokens.LOGGER_TOKEN) private logger: Logger
     ) {}
 
     /**
@@ -44,7 +44,7 @@ export class RateLimitController {
      *       200:
      *         description: Risultati ricerca.
      */
-    @Post('/ratelimit/search')
+    @Post('/search')
     async searchRateLimits(req: Request, res: Response): Promise<void> {
         this.logger.info('[RateLimitController] Searching rate limits');
         try {

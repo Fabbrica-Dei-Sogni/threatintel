@@ -17,11 +17,11 @@ import { Logger } from 'winston';
 
 // Mock dependencies
 const mockIpInfo = jest.fn();
-jest.mock('ipinfo', () => (ip: any, opts: any, cb: any) => mockIpInfo(ip, opts, cb));
+jest.mock('ipinfo', () => (ip: any, _opts: any, cb: any) => mockIpInfo(ip, _opts, cb));
 
 jest.mock('axios');
 jest.mock('whois', () => ({
-    lookup: jest.fn((ip: any, cb: any) => cb(null, 'Mock WHOIS data')),
+    lookup: jest.fn((_ip: any, cb: any) => cb(null, 'Mock WHOIS data')),
 }));
 jest.mock('ip-range-check', () => jest.fn(() => false));
 
@@ -80,7 +80,7 @@ describe('IpDetailsService Rate Limit & Retry', () => {
             error: 'Rate limit exceeded'
         };
 
-        mockIpInfo.mockImplementation((ip: any, opts: any, cb: any) => {
+        mockIpInfo.mockImplementation((_ip: any, _opts: any, cb: any) => {
             cb(error, null);
         });
 
@@ -97,7 +97,7 @@ describe('IpDetailsService Rate Limit & Retry', () => {
             error: 'Rate limit exceeded'
         };
 
-        mockIpInfo.mockImplementation((ip: any, opts: any, cb: any) => {
+        mockIpInfo.mockImplementation((_ip: any, _opts: any, cb: any) => {
             cb(null, errorData);
         });
 
@@ -123,7 +123,7 @@ describe('IpDetailsService Rate Limit & Retry', () => {
             enrichedAt: null
         });
 
-        mockIpInfo.mockImplementation((ip: any, opts: any, cb: any) => {
+        mockIpInfo.mockImplementation((ip: any, _opts: any, cb: any) => {
             cb(null, {
                 ip: ip,
                 city: 'New City',
@@ -148,7 +148,7 @@ describe('IpDetailsService Rate Limit & Retry', () => {
             enrichedAt: null
         });
 
-        mockIpInfo.mockImplementation((ip: any, opts: any, cb: any) => {
+        mockIpInfo.mockImplementation((ip: any, _opts: any, cb: any) => {
             cb(null, {
                 ip: ip,
                 city: 'Legacy City',
@@ -172,7 +172,7 @@ describe('IpDetailsService Rate Limit & Retry', () => {
             lastSeenAt: new Date()
         });
 
-        mockIpInfo.mockImplementation((ip: any, opts: any, cb: any) => {
+        mockIpInfo.mockImplementation((_ip: any, _opts: any, cb: any) => {
             cb(null, { city: 'New City Attempt' });
         });
 

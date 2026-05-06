@@ -12,27 +12,22 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 // Bootstrap DI container (side-effect import)
-import "./core/di/container";
+import { coreContainer } from "./core/di/container";
+import { setupContainer } from "./core/di/registry";
+
+// Initialize Registry
+setupContainer(coreContainer);
 
 import { logger } from './logger';
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
-import { AnalysisService } from './core/tools/analyze';
 import path from 'path';
-import { port } from './core/config';
+import { port, allowedOrigins } from './core/config';
 import api from './core/endpoint';
 import { getComponent } from './core/di/container';
-import { SshLogService } from './core/services/SshLogService';
-import { CowrieService } from './core/services/CowrieService';
-import { NginxLogService } from './core/services/NginxLogService';
-import { RagSyncWorker } from './core/services/assistant/RagSyncWorker';
-import { RAG_EVENT_LISTENER_TOKEN, RAG_SYNC_WORKER_TOKEN, STATUS_EVENT_LISTENER_TOKEN, PRUNING_SERVICE_TOKEN } from './core/di/tokens';
-import { RagEventListener } from './core/services/assistant/RagEventListener';
-import { StatusEventListener } from './core/services/StatusEventListener';
-import { PruningService } from './core/services/PruningService';
+import * as Tokens from './core/di/tokens';
 import { ServiceStatus } from './core/types/lifecycle';
-
 import { LifecycleManager } from './core/services/LifecycleManager';
 
 const app = express();
@@ -49,7 +44,7 @@ app.use(helmet({
             styleSrc: ["'self'", "'unsafe-inline'"],
             scriptSrc: ["'self'", "'unsafe-inline'"],
             imgSrc: ["'self'", "data:", "https://validator.swagger.io"],
-            connectSrc: ["'self'", "https://alessandromodica.com", "http://82.112.255.186:5173", "http://82.112.255.186:4300", "http://localhost:4300"]
+            connectSrc: ["'self'", ...allowedOrigins]
         },
     },
     hsts: {
@@ -61,7 +56,7 @@ app.use(helmet({
 
 // Middleware generali
 app.use(cors({
-    origin: ['http://localhost:5173', 'https://alessandromodica.com', 'http://82.112.255.186:5173', 'http://82.112.255.186:4300', 'http://localhost:4300'],
+    origin: allowedOrigins,
     credentials: true,
     exposedHeaders: ['Content-Disposition', 'Content-Length']
 }));
@@ -71,11 +66,11 @@ app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 // Trust proxy per IP reali dietro Nginx
 app.set('trust proxy', true);
 
-//caricamento api del threat intel
+// carichiamo le api del threat intel
 app.use(api);
 
 const PORT = port;
-app.listen(Number(PORT), '0.0.0.0', async () => {
+const server = app.listen(Number(PORT), '0.0.0.0', async () => {
     logger.info(`🚀 Server threat intelligence avviato su porta ${PORT}`);
     logger.info(`📊 Dashboard statistiche: http://localhost:${PORT}/api/stats`);
     logger.info(`🕸️  Landing page: http://localhost:${PORT}/`);
@@ -84,38 +79,47 @@ app.listen(Number(PORT), '0.0.0.0', async () => {
     try {
         const lifecycleManager = getComponent(LifecycleManager);
 
-        // Registrazione servizi
-        lifecycleManager.register(getComponent(SshLogService));
-        lifecycleManager.register(getComponent(NginxLogService));
-        lifecycleManager.register(getComponent(CowrieService));
-        lifecycleManager.register(getComponent(AnalysisService));
+        // Registrazione servizi tramite Token
+        lifecycleManager.register(getComponent(Tokens.SSH_LOG_SERVICE_TOKEN));
+        lifecycleManager.register(getComponent(Tokens.NGINX_LOG_SERVICE_TOKEN));
+        lifecycleManager.register(getComponent(Tokens.COWRIE_SERVICE_TOKEN));
+        lifecycleManager.register(getComponent(Tokens.ANALYSIS_SERVICE_TOKEN));
         
-        // Registrazione RAG Worker
-        lifecycleManager.register(getComponent<RagSyncWorker>(RAG_SYNC_WORKER_TOKEN));
-        
-        // Registrazione RAG Event Listener
-        lifecycleManager.register(getComponent<RagEventListener>(RAG_EVENT_LISTENER_TOKEN));
+        // Registrazione RAG Worker e Listener
+        lifecycleManager.register(getComponent(Tokens.RAG_SYNC_WORKER_TOKEN));
+        lifecycleManager.register(getComponent(Tokens.RAG_EVENT_LISTENER_TOKEN));
 
         // Registrazione Status Event Listener
-        const statusEventListener = getComponent<StatusEventListener>(STATUS_EVENT_LISTENER_TOKEN);
+        const statusEventListener = getComponent(Tokens.STATUS_EVENT_LISTENER_TOKEN);
         lifecycleManager.register({
             serviceName: 'StatusEventListener',
-            start: async () => statusEventListener.start(),
+            start: async () => (statusEventListener as any).start(),
             stop: () => {},
-            getStatus: () => ServiceStatus.RUNNING
-        } as any);
-
-        // Registrazione Pruning Service
-        const pruningService = getComponent<PruningService>(PRUNING_SERVICE_TOKEN);
-        lifecycleManager.register({
-            serviceName: 'PruningService',
-            start: async () => pruningService.start(),
-            stop: () => pruningService.stop(),
             getStatus: () => ServiceStatus.RUNNING
         } as any);
 
         // Avvio sequenza di bootstrap (non blocca l'ascolto del server)
         await lifecycleManager.boot();
+
+        // --- Gestione Graceful Shutdown ---
+        const shutdown = async (signal: string) => {
+            logger.info(`\n[Server] Ricevuto segnale ${signal}. Avvio spegnimento controllato...`);
+            
+            // 1. Ferma l'accettazione di nuove connessioni HTTP
+            server.close(() => {
+                logger.info('[Server] HTTP server chiuso.');
+            });
+
+            // 2. Ferma i servizi in background (es. flush dei buffer)
+            await lifecycleManager.shutdown();
+
+            logger.info('[Server] Shutdown completato. Uscita.');
+            process.exit(0);
+        };
+
+        process.on('SIGTERM', () => shutdown('SIGTERM'));
+        process.on('SIGINT', () => shutdown('SIGINT'));
+
     } catch (err) {
         logger.error('❌ Errore critico durante il bootstrap dei servizi:', err);
     }

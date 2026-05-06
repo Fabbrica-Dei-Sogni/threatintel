@@ -8,7 +8,7 @@
 import { EventEmitter } from 'events';
 import { singleton, inject } from 'tsyringe';
 import { Logger } from 'winston';
-import { LOGGER_TOKEN } from '../di/tokens';
+import * as Tokens from '../di/tokens';
 
 /**
  * Nomi degli eventi supportati dal sistema.
@@ -33,7 +33,7 @@ export class EventBus {
     private emitter: EventEmitter;
 
     constructor(
-        @inject(LOGGER_TOKEN) private readonly logger: Logger
+        @inject(Tokens.LOGGER_TOKEN) private readonly logger: Logger
     ) {
         this.emitter = new EventEmitter();
         // Aumentiamo il limite se necessario, ma per ora il default (10) va bene

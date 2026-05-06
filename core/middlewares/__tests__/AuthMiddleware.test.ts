@@ -15,6 +15,7 @@ describe('AuthMiddleware', () => {
     let mockAuthService: any;
     let mockI18n: any;
     let mockLogger: any;
+    let mockConfigProvider: any;
     let req: Partial<Request>;
     let res: Partial<Response>;
     let next: NextFunction;
@@ -31,7 +32,11 @@ describe('AuthMiddleware', () => {
             warn: jest.fn(),
             error: jest.fn()
         };
-        middleware = new AuthMiddleware(mockAuthService, mockI18n, mockLogger);
+        mockConfigProvider = {
+            allowAnonymous: false,
+            anonymousRole: 'viewer'
+        };
+        middleware = new AuthMiddleware(mockAuthService, mockI18n, mockLogger, mockConfigProvider);
         
         req = {
             headers: {},
@@ -42,8 +47,6 @@ describe('AuthMiddleware', () => {
             json: jest.fn().mockReturnThis()
         };
         next = jest.fn();
-        
-        process.env.ALLOW_ANONYMOUS = 'false';
     });
 
     describe('isAuthenticated', () => {
@@ -54,14 +57,15 @@ describe('AuthMiddleware', () => {
         });
 
         it('should return 401 if token is missing and anonymous is disabled', async () => {
+            mockConfigProvider.allowAnonymous = false;
             await middleware.isAuthenticated()(req as Request, res as Response, next);
             expect(res.status).toHaveBeenCalledWith(401);
             expect(next).not.toHaveBeenCalled();
         });
 
         it('should set anonymous user if token is missing and anonymous is enabled', async () => {
-            process.env.ALLOW_ANONYMOUS = 'true';
-            process.env.ANONYMOUS_ROLE = 'viewer';
+            mockConfigProvider.allowAnonymous = true;
+            mockConfigProvider.anonymousRole = 'viewer';
             await middleware.isAuthenticated()(req as Request, res as Response, next);
             expect((req as any).user.username).toBe('anonymous');
             expect(next).toHaveBeenCalled();
@@ -122,7 +126,7 @@ describe('AuthMiddleware', () => {
         });
 
         it('should return 403 if user is anonymous', async () => {
-            process.env.ALLOW_ANONYMOUS = 'true';
+            mockConfigProvider.allowAnonymous = true;
             // No token provided -> anonymous
             await middleware.isIdentified()(req as Request, res as Response, next);
             expect(res.status).toHaveBeenCalledWith(403);

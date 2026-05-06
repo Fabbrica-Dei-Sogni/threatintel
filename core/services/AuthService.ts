@@ -9,26 +9,32 @@
 import axios from 'axios';
 import https from 'https';
 import { inject, singleton } from 'tsyringe';
-import { LOGGER_TOKEN } from '../di/tokens';
+import { AppConfigProvider } from './AppConfigProvider';
+import * as Tokens from '../di/tokens';
 import { Logger } from 'winston';
-
-const defaultDigitalAuthUri = 'https://alessandromodica.com:3443/auth/api/v1';
 
 @singleton()
 export class AuthService {
-    private instance = axios.create({
-        httpsAgent: new https.Agent({
-            rejectUnauthorized: process.env.AUTH_STRICT_SSL !== 'false'
-        })
-    });
+    private instance: any;
+
+    constructor(
+        @inject(Tokens.LOGGER_TOKEN) private logger: Logger,
+        @inject(Tokens.CONFIG_PROVIDER_TOKEN) private configProvider: AppConfigProvider
+    ) {
+        this.instance = axios.create({
+            httpsAgent: new https.Agent({
+                rejectUnauthorized: this.configProvider.authStrictSsl
+            })
+        });
+    }
 
     // Identificativo univoco di questa istanza dell'applicativo
-    public readonly appId = process.env.APP_ID || process.env.HONEYPOT_INSTANCE_ID || 'threat-intel-01';
-
-    constructor(@inject(LOGGER_TOKEN) private logger: Logger) { }
+    public get appId() {
+        return this.configProvider.appId;
+    }
 
     private getUri() {
-        return process.env.URI_DIGITAL_AUTH || defaultDigitalAuthUri;
+        return this.configProvider.authUri;
     }
 
     public async verify(token: string): Promise<any> {

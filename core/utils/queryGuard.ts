@@ -41,7 +41,7 @@ const THREAT_LOG_FILTER_FIELDS = new Set([
 ]);
 
 const ATTACK_FILTER_FIELDS = new Set([
-    'request.ip', 'request.url', 'request.method', 'geo.country', 'protocol', 'timestamp',
+    'request.ip', 'request.url', 'request.method', 'geo.country', 'country', 'protocol', 'timestamp',
     'dangerLevel', 'fingerprint.hash', 'totaleLogs', 'dangerScore', 'averageScore', 'attackPatterns', 'status'
 ]);
 

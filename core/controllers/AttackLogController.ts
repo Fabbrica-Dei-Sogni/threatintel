@@ -8,17 +8,17 @@
 import { Request, Response } from 'express';
 import { inject, singleton } from 'tsyringe';
 import { AttackLogService } from '../services/AttackLogService';
-import { LOGGER_TOKEN } from '../di/tokens';
+import * as Tokens from '../di/tokens';
 import { Logger } from 'winston';
 import { sanitizePage, sanitizePageSize } from '../utils/queryGuard';
 import { Controller, Post } from '../registry/decorators';
 
 @singleton()
-@Controller('/api')
+@Controller('/api/attack')
 export class AttackLogController {
     constructor(
-        private attackLogService: AttackLogService,
-        @inject(LOGGER_TOKEN) private logger: Logger
+        @inject(Tokens.ATTACK_LOG_SERVICE_TOKEN) private readonly attackLogService: AttackLogService,
+        @inject(Tokens.LOGGER_TOKEN) private readonly logger: Logger
     ) { }
 
     /**
@@ -31,7 +31,7 @@ export class AttackLogController {
      *       200:
      *         description: Elenco attacchi aggregati.
      */
-    @Post('/attack/search')
+    @Post('/search')
     async searchAttacks(req: Request, res: Response): Promise<void> {
         this.logger.info('[AttackLogController] Requesting attack search');
         try {
@@ -67,7 +67,7 @@ export class AttackLogController {
      *       200:
      *         description: Dettagli dell'attacco.
      */
-    @Post('/attack/details')
+    @Post('/details')
     async getAttackDetails(req: Request, res: Response): Promise<void> {
         this.logger.info(`[AttackLogController] Requesting attack details for IP ${req.body.ip}`);
         try {
@@ -107,7 +107,7 @@ export class AttackLogController {
      *       200:
      *         description: Dettagli dell'attacco distribuito.
      */
-    @Post('/attack/distributed')
+    @Post('/distributed')
     async getDistributedAttackDetails(req: Request, res: Response): Promise<void> {
         this.logger.info(`[AttackLogController] Requesting distributed attack details for ${req.body.ipList?.length || 0} IPs`);
         try {

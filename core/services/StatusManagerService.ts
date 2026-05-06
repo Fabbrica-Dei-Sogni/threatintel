@@ -7,7 +7,6 @@
  */
 import { injectable, inject } from 'tsyringe';
 import { Logger } from 'winston';
-import { LOGGER_TOKEN, EVENT_BUS_TOKEN } from '../di/tokens';
 import { EventBus, AppEvents } from './EventBus';
 
 export interface StatusUpdatePayload {
@@ -20,6 +19,8 @@ export interface StatusUpdatePayload {
     };
 }
 
+import * as Tokens from '../di/tokens';
+
 /**
  * StatusManagerService
  * 
@@ -29,8 +30,8 @@ export interface StatusUpdatePayload {
 @injectable()
 export class StatusManagerService {
     constructor(
-        @inject(LOGGER_TOKEN) private readonly logger: Logger,
-        @inject(EVENT_BUS_TOKEN) private readonly eventBus: EventBus
+        @inject(Tokens.LOGGER_TOKEN) private readonly logger: Logger,
+        @inject(Tokens.EVENT_BUS_TOKEN) private readonly eventBus: EventBus
     ) { }
 
     /**

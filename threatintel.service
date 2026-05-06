@@ -1,3 +1,4 @@
+# Configurazione custom per alessandromodica.com
 [Unit]
 Description=Threat Intelligence Logger
 After=network-online.target docker.service
@@ -7,10 +8,21 @@ Wants=network-online.target docker.service
 Type=simple
 User=amodica
 WorkingDirectory=/home/amodica/workspaces/threatintel
-Environment=PATH=/home/amodica/.nvm/versions/node/v24.6.0/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+# Runtime Configuration
 Environment=NODE_ENV=production
-Environment=NODE_OPTIONS=--openssl-legacy-provider
 Environment=PORT=3999
+Environment=VERSION=0.0.1
+Environment=ALLOWED_ORIGINS=http://localhost:5173,https://alessandromodica.com,http://82.112.255.186:5173,http://82.112.255.186:4300,http://localhost:4300
+Environment=APP_DOMAIN=alessandromodica.com
+#Environment=API_BASE_URL=https://alessandromodica.com/honeypot/api
+Environment=NODE_OPTIONS=--openssl-legacy-provider
+#Environment=NGINX_LOG_PREFIX=nginx_threat:
+# Environment variable to guide geoip-lite to the local data folder
+#Environment=GEODATADIR=./data
+Environment=PATH=/home/amodica/.nvm/versions/node/v24.6.0/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+# Database & Infrastructure
 Environment=MONGO_URI=mongodb://intelagent:intelagent@127.0.0.1:17017/threatinteldb
 Environment=REDIS_HOST=127.0.0.1
 Environment=REDIS_PORT=6379

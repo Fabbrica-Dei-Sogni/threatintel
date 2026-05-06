@@ -8,7 +8,7 @@
  */
 import 'reflect-metadata';
 import { ThreatLogger } from '../threatLogger';
-import { Request, Response, NextFunction } from 'express';
+
 import mongoose from 'mongoose';
 
 // Mocks

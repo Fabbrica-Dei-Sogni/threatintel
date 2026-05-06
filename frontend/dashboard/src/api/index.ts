@@ -20,7 +20,7 @@ import type {
     FetchUrisResponse
 } from '../models/CampaignDTO';
 import { useProfileStore } from '../stores/profiles';
-
+import { useAuthStore } from '../stores/auth';
 import { storage, StorageNamespace } from '../utils/storage';
 
 // Funzione helper per ottenere l'URL, con fallback sulla gestione dei profili
@@ -64,7 +64,6 @@ apiClient.interceptors.response.use((response) => {
     return response;
 }, (error) => {
     // 1. Gestione Errore di Rete / Timeout (Nessuna risposta dal server)
-    // Se il server non risponde, è probabile che il profilo attivo (indirizzo IP/Porta) sia errato o offline.
     if (!error.response || error.code === 'ECONNABORTED' || error.message === 'Network Error') {
         try {
             const profileStore = useProfileStore();
@@ -73,27 +72,26 @@ apiClient.interceptors.response.use((response) => {
                 profileStore.setActiveProfile(null);
             }
         } catch (e) {
-            // Silenziamo se Pinia non è pronto, ma logghiamo l'errore originale
             console.error('[apiClient] Errore di rete critico:', error.message);
         }
     }
 
-    // 2. Gestione errori di autorizzazione
+    // 2. Gestione errori di autenticazione/autorizzazione → sempre /login
     if (error.response && [401, 403].includes(error.response.status)) {
-        const currentPath = window.location.pathname;
-        const isAuthPage = currentPath.endsWith('/login') || currentPath.endsWith('/register') || 
-                          currentPath.includes('/auth/login') || currentPath.includes('/auth/register');
-        
-        if (!isAuthPage) {
-            console.warn('[apiClient] Sessione scaduta o permessi insufficienti. Reindirizzamento...');
-            
-            // Pulizia storage (sempre per 401, per 403 solo se non siamo già in login/register)
-            storage.remove(StorageNamespace.AUTH);
-            
-            // Reindirizzamento forzato
-            window.location.href = '/login?redirect=' + encodeURIComponent(currentPath);
+        try {
+            const authStore = useAuthStore();
+            authStore.handleAuthError();
+        } catch (e) {
+            // Fallback sicuro se Pinia non è pronto: redirect diretto a /login
+            console.error('[apiClient] Errore auth, fallback redirect:', e);
+            const currentPath = window.location.pathname;
+            const isAuthPage = ['/login', '/register'].some(p => currentPath.startsWith(p));
+            if (!isAuthPage) {
+                window.location.href = '/login';
+            }
         }
     }
+
     return Promise.reject(error);
 });
 
@@ -589,7 +587,7 @@ export async function fetchCampaigns({
     status = 'active'
 }: FetchCampaignsParams = {}): Promise<FetchCampaignsResponse> {
     try {
-        const response = await apiClient.get('/campaigns', {
+        const response = await apiClient.get('/campaign/search', {
             params: { startTime, endTime, timeMode, agoValue, agoUnit, minIps, minScore, minLogsPerIp, minCorrelations, protocol, page, pageSize, selectedUris, search, status }
         });
         return response.data;
@@ -621,7 +619,7 @@ export async function fetchCampaignDetail({
     status?: string;
 }): Promise<CampaignDetailDTO> {
     try {
-        const response = await apiClient.post('/campaign/details', {
+        const response = await apiClient.post('/campaign/detail', {
             hash,
             ips,
             minLogsPerIp,
@@ -641,7 +639,7 @@ export async function fetchCampaignDetail({
 
 export async function fetchUniqueUris(params: any = {}): Promise<FetchUrisResponse> {
     try {
-        const response = await apiClient.get<FetchUrisResponse>('/campaigns/uris', { params });
+        const response = await apiClient.get<FetchUrisResponse>('/campaign/uris', { params });
         return response.data;
     } catch (error) {
         console.error('[fetchUniqueUris] Error:', error);

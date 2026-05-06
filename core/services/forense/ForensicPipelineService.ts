@@ -9,7 +9,7 @@
 
 import dotenv from 'dotenv';
 import { inject, injectable } from 'tsyringe';
-import { LOGGER_TOKEN } from '../../di/tokens';
+
 import { Logger } from 'winston';
 import { ConfigService } from '../ConfigService';
 import { ForensicPipelineBuilder } from './pipeline/ForensicPipelineBuilder';
@@ -30,6 +30,8 @@ import { TimeConfig } from '../../types/common.types';
 
 dotenv.config();
 
+import * as Tokens from '../../di/tokens';
+
 /**
  * Servizio per la gestione della pipeline di analisi forense.
  */
@@ -42,8 +44,8 @@ export class ForensicPipelineService {
     private initialized: Promise<void>;
 
     constructor(
-        @inject(LOGGER_TOKEN) private readonly logger: Logger,
-        private readonly configService: ConfigService,
+        @inject(Tokens.LOGGER_TOKEN) private readonly logger: Logger,
+        @inject(Tokens.CONFIG_SERVICE_TOKEN) private readonly configService: ConfigService,
     ) {
         this.dangerWeights = {};
         this.tolleranceWeights = {};

@@ -10,17 +10,18 @@ import { Request, Response } from 'express';
 import { inject, singleton } from 'tsyringe';
 import { CowrieService } from '../services/CowrieService';
 import { I18nService } from '../services/I18nService';
-import { LOGGER_TOKEN } from '../di/tokens';
 import { Logger } from 'winston';
 import { Controller, Get, Post } from '../registry/decorators';
+
+import * as Tokens from '../di/tokens';
 
 @singleton()
 @Controller('/api/cowrie')
 export class CowrieController {
     constructor(
-        private cowrieService: CowrieService,
-        private i18n: I18nService,
-        @inject(LOGGER_TOKEN) private logger: Logger
+        @inject(Tokens.COWRIE_SERVICE_TOKEN) private readonly cowrieService: CowrieService,
+        @inject(Tokens.I18N_TOKEN) private readonly i18n: I18nService,
+        @inject(Tokens.LOGGER_TOKEN) private readonly logger: Logger
     ) {}
     
     private getLocale(req: Request): string {

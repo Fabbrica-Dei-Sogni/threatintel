@@ -120,9 +120,9 @@ export function useConfig() {
     }
 
     /**
-     * Esegue la rianalisi di tutti i log
+     * Esegue la rianalisi di tutti i log (Asincrono)
      */
-    async function reanalyzeAll(): Promise<{ analyzed: number, updated: number, errors: number } | null> {
+    async function reanalyzeAll(): Promise<any> {
         saving.value = true;
         error.value = null;
         try {

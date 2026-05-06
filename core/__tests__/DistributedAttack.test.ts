@@ -26,7 +26,7 @@ describe('Distributed Attack Pipeline Test', () => {
     let service: ForensicPipelineService;
 
     beforeEach(async () => {
-        mockConfigService.getConfigValue.mockImplementation((key: string) => {
+        mockConfigService.getConfigValue.mockImplementation((_key: string) => {
             return Promise.resolve(null);
         });
 

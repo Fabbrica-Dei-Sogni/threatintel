@@ -55,7 +55,7 @@ export const RAG_POLICIES = {
             agoValue: 30             // Finestra ridotta a 1 ora per coerenza con gli attacchi
         },
         apiRef: {
-            endpoint: '/api/campaign/details',
+            endpoint: '/api/campaign/detail',
             method: 'POST'
         }
     },
@@ -65,7 +65,7 @@ export const RAG_POLICIES = {
         entityType: 'threat_log',
         minScore: 3,                 // Solo log con score >= 3
         apiRef: {
-            endpoint: '/api/threats/logs/:id',
+            endpoint: '/api/logs/:id',
             method: 'GET'
         }
     },

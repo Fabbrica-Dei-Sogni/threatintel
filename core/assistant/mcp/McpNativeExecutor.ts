@@ -7,10 +7,11 @@
  */
 import { inject, singleton } from 'tsyringe';
 import { AssistantService } from '../../services/assistant/AssistantService';
-import { ASSISTANT_SERVICE_TOKEN, LOGGER_TOKEN } from '../../di/tokens';
 import { Logger } from 'winston';
 import { ToolRegistry, McpToolDefinition } from '../tools/ToolRegistry';
 import { AssistantToolArgumentsMap, AssistantToolName } from '../../types/assistant/assistant-tool.types';
+
+import * as Tokens from '../../di/tokens';
 
 /**
  * McpNativeExecutor
@@ -29,9 +30,9 @@ import { AssistantToolArgumentsMap, AssistantToolName } from '../../types/assist
 @singleton()
 export class McpNativeExecutor {
   constructor(
-    @inject(ASSISTANT_SERVICE_TOKEN) private assistant: AssistantService,
-    @inject(LOGGER_TOKEN) private logger: Logger
-  ) {}
+    @inject(Tokens.ASSISTANT_SERVICE_TOKEN) private assistant: AssistantService,
+    @inject(Tokens.LOGGER_TOKEN) private logger: Logger
+  ) { }
 
   public async executeToolByName(
     toolName: string,
@@ -55,7 +56,7 @@ export class McpNativeExecutor {
     const name = toolName as AssistantToolName;
 
     switch (name) {
-      case 'semantic_search': {
+      case AssistantToolName.SEMANTIC_SEARCH: {
         const sArgs = sanitizedArgs as AssistantToolArgumentsMap['semantic_search'];
         return this.assistant.search(sArgs.query, {
           limit: sArgs.limit,
@@ -66,25 +67,35 @@ export class McpNativeExecutor {
         });
       }
 
-      case 'resolve_threat_source': {
+      case AssistantToolName.RESOLVE_THREAT_SOURCE: {
         const rArgs = sanitizedArgs as AssistantToolArgumentsMap['resolve_threat_source'];
         return this.assistant.resolveSource(rArgs.sourceRef as any);
       }
 
-      case 'ask': {
+      case AssistantToolName.ASK: {
         const aArgs = sanitizedArgs as AssistantToolArgumentsMap['ask'];
         return this.assistant.ask(aArgs.question);
       }
-        
-      case 'search_attacks': {
+
+      case AssistantToolName.SEARCH_LOGS: {
+        const cArgs = sanitizedArgs as AssistantToolArgumentsMap['search_logs'];
+        return this.assistant.searchLogs(cArgs);
+      }
+
+      case AssistantToolName.SEARCH_ATTACKS: {
         const aArgs = sanitizedArgs as AssistantToolArgumentsMap['search_attacks'];
         return this.assistant.searchAttacks(aArgs);
       }
 
-      case 'search_campaigns': {
+      case AssistantToolName.SEARCH_CAMPAIGNS: {
         const cArgs = sanitizedArgs as AssistantToolArgumentsMap['search_campaigns'];
         return this.assistant.searchCampaigns(cArgs);
-      }    
+      }
+      
+      case AssistantToolName.GET_STATS: {
+        const gArgs = sanitizedArgs as AssistantToolArgumentsMap['get_stats'];
+        return this.assistant.getStats(gArgs.timeframe, gArgs.minScore, gArgs.limit, gArgs.minLogs);
+      }
 
       default:
         throw new Error(`Tool ${toolName} logic not implemented in native executor`);

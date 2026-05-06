@@ -7,7 +7,7 @@
  */
 
 import { inject, singleton } from 'tsyringe';
-import { LOGGER_TOKEN } from '../di/tokens';
+import * as Tokens from '../di/tokens';
 import { Logger } from 'winston';
 import { ThreatLogService } from './ThreatLogService';
 import PatternAnalysisService from './PatternAnalysisService';
@@ -31,16 +31,19 @@ const DEFAULT_SUSPICIOUS_PATTERNS = [
 export class NginxLogService extends BaseJournalWatcher {
     public readonly serviceName = 'NginxLogService';
     private suspiciousPatterns: RegExp[] = [];
+    private readonly logPrefix: string;
 
     constructor(
-        @inject(LOGGER_TOKEN) logger: Logger,
-        private readonly threatLogService: ThreatLogService,
-        private readonly patternAnalysisService: PatternAnalysisService,
-        private readonly configProvider: AppConfigProvider,
-        private readonly threatLogFactory: ThreatLogFactory
+        @inject(Tokens.LOGGER_TOKEN) logger: Logger,
+        @inject(Tokens.THREAT_LOG_SERVICE_TOKEN) private readonly threatLogService: ThreatLogService,
+        @inject(Tokens.PATTERN_ANALYSIS_SERVICE_TOKEN) private readonly patternAnalysisService: PatternAnalysisService,
+        @inject(Tokens.CONFIG_PROVIDER_TOKEN) private readonly configProvider: AppConfigProvider,
+        @inject(Tokens.THREAT_LOG_FACTORY_TOKEN) private readonly threatLogFactory: ThreatLogFactory
     ) {
         super(logger);
         this.suspiciousPatterns = [...DEFAULT_SUSPICIOUS_PATTERNS];
+        // Default to 'nginx_threat:' for backward compatibility
+        this.logPrefix = process.env.NGINX_LOG_PREFIX || 'nginx_threat:';
     }
 
     protected getJournalIdentifier(): string[] {
@@ -49,6 +52,7 @@ export class NginxLogService extends BaseJournalWatcher {
 
     async start() {
         this.suspiciousPatterns = await this.buildSuspiciousPatterns();
+        this.logger.info(`[NginxLogService] Avvio monitoraggio con prefisso: "${this.logPrefix}"`);
         await this.backfillLogs('3 hour ago');
         await super.start();
     }
@@ -72,7 +76,7 @@ export class NginxLogService extends BaseJournalWatcher {
 
     protected async processEntry(entry: any) {
         const message = entry.MESSAGE;
-        if (!message || !message.includes('nginx_threat:')) return;
+        if (!message || !message.includes(this.logPrefix)) return;
 
         try {
             const jsonStartIndex = message.indexOf('{');

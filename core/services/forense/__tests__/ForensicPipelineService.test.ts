@@ -7,10 +7,10 @@
  */
 
 import 'reflect-metadata';
-import { container } from 'tsyringe';
 import { ForensicPipelineService } from '../ForensicPipelineService';
-import { ConfigService } from '../../ConfigService';
-import { LOGGER_TOKEN } from '../../../di/tokens';
+import * as Tokens from '../../../di/tokens';
+import { setupContainer } from '../../../di/registry';
+import { getComponent, container } from '../../../di/container';
 
 describe('ForensicPipelineService', () => {
     let service: ForensicPipelineService;
@@ -18,6 +18,10 @@ describe('ForensicPipelineService', () => {
     let mockConfigService: any;
 
     beforeEach(() => {
+        // Initialize DI
+        setupContainer(container);
+        container.clearInstances();
+
         mockLogger = {
             info: jest.fn(),
             error: jest.fn(),
@@ -33,15 +37,14 @@ describe('ForensicPipelineService', () => {
             })
         };
 
-        container.clearInstances();
-        container.registerInstance(LOGGER_TOKEN, mockLogger);
-        container.registerInstance(ConfigService, mockConfigService);
-
-        service = container.resolve(ForensicPipelineService);
+        // Register mocks using Tokens
+        container.registerInstance(Tokens.LOGGER_TOKEN, mockLogger);
+        container.registerInstance(Tokens.CONFIG_SERVICE_TOKEN, mockConfigService);
     });
 
     describe('buildStandardPipeline', () => {
         it('should build a complete pipeline with all stages', async () => {
+            service = getComponent(Tokens.FORENSIC_PIPELINE_TOKEN);
             const mongoFilters = { 'request.ip': '1.1.1.1' };
             const minLogsForAttack = 5;
             const timeConfig = { hours: 24 };
@@ -69,6 +72,7 @@ describe('ForensicPipelineService', () => {
 
         it('should handle missing config values by using defaults', async () => {
             mockConfigService.getConfigValue.mockResolvedValue(null);
+            service = getComponent(Tokens.FORENSIC_PIPELINE_TOKEN);
             
             const pipeline = await service.buildStandardPipeline({}, 10);
             expect(pipeline.length).toBeGreaterThan(0);
@@ -84,7 +88,7 @@ describe('ForensicPipelineService', () => {
             
             // Re-resolve service to trigger constructor logic if I weren't already
             // But _initFromDB is called in constructor
-            const newService = container.resolve(ForensicPipelineService);
+            getComponent(Tokens.FORENSIC_PIPELINE_TOKEN);
             
             // Wait for initialization (it's a private promise, but we can wait a bit or check logger)
             await new Promise(resolve => setTimeout(resolve, 100));

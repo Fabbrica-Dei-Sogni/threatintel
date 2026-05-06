@@ -8,13 +8,6 @@
  */
 import { injectable, inject } from 'tsyringe';
 import { Logger } from 'winston';
-import {
-    LOGGER_TOKEN,
-    QDRANT_CLIENT_TOKEN,
-    OLLAMA_SERVICE_TOKEN,
-    RAG_SYNC_SERVICE_TOKEN,
-    I18N_TOKEN
-} from '../../di/tokens';
 import { QdrantClientService } from './QdrantClientService';
 import { OllamaService } from './OllamaService';
 import { RagSyncService } from './RagSyncService';
@@ -32,26 +25,28 @@ import {
     RagSourceRef,
     RagBasePayload,
     RAG_SCHEMA_VERSION,
-    RagSourceParams,
-    DirectSearchHit
+    DirectSearchHit,
+    SearchResponse
 } from '../../types/assistant/rag.types';
-import { GetAttacksParams, GetCampaignsParams } from '../../types/service-params.types';
-import { SearchAttacksArgs, SearchCampaignsArgs } from 'core/types/assistant/assistant-tool.types';
+import { GetAttacksParams, GetCampaignsParams, GetThreatLogParams } from '../../types/service-params.types';
+import { SearchAttacksArgs, SearchCampaignsArgs, SearchLogArgs } from '../../types/assistant/assistant-tool.types';
 import { RagTranslationService } from './RagTranslationService';
+
+import * as Tokens from '../../di/tokens';
 
 @injectable()
 export class AssistantService {
     constructor(
-        @inject(LOGGER_TOKEN) private readonly logger: Logger,
-        @inject(QDRANT_CLIENT_TOKEN) private readonly qdrant: QdrantClientService,
-        @inject(OLLAMA_SERVICE_TOKEN) private readonly ollama: OllamaService,
-        @inject(RAG_SYNC_SERVICE_TOKEN) private readonly ragSync: RagSyncService,
-        @inject(I18N_TOKEN) private readonly i18n: I18nService,
-        private readonly threatLogService: ThreatLogService,
-        private readonly attackLogService: AttackLogService,
-        private readonly campaignService: CampaignService,
-        private readonly ipDetailsService: IpDetailsService,
-        private readonly ragTranslation: RagTranslationService,  // ← aggiunto
+        @inject(Tokens.LOGGER_TOKEN) private readonly logger: Logger,
+        @inject(Tokens.QDRANT_CLIENT_TOKEN) private readonly qdrant: QdrantClientService,
+        @inject(Tokens.OLLAMA_SERVICE_TOKEN) private readonly ollama: OllamaService,
+        @inject(Tokens.RAG_SYNC_SERVICE_TOKEN) private readonly ragSync: RagSyncService,
+        @inject(Tokens.I18N_TOKEN) private readonly i18n: I18nService,
+        @inject(Tokens.THREAT_LOG_SERVICE_TOKEN) private readonly threatLogService: ThreatLogService,
+        @inject(Tokens.ATTACK_LOG_SERVICE_TOKEN) private readonly attackLogService: AttackLogService,
+        @inject(Tokens.CAMPAIGN_SERVICE_TOKEN) private readonly campaignService: CampaignService,
+        @inject(Tokens.IP_DETAILS_SERVICE_TOKEN) private readonly ipDetailsService: IpDetailsService,
+        @inject(Tokens.RAG_TRANSLATION_TOKEN) private readonly ragTranslation: RagTranslationService,
 
     ) { }
 
@@ -248,9 +243,56 @@ export class AssistantService {
         }
     }
 
-    public async searchAttacks(args: SearchAttacksArgs): Promise<DirectSearchHit[]> {
+    public async searchLogs(args: SearchLogArgs): Promise<SearchResponse<DirectSearchHit>> {
+        const serviceParams: GetThreatLogParams = {
+            pageSize: args.limit || 20,
+            page: (args.offset && args.limit) ? Math.floor(args.offset / args.limit) + 1 : 1,
+            filters: {
+                'request.ip': args.ip,
+                'request.url': args.url,
+                protocol: args.protocol,
+                status: args.status
+            }
+        };
+
+        if (args.startDate || args.endDate) {
+            serviceParams.timeConfig = {
+                startTime: args.startDate instanceof Date ? args.startDate.toISOString() : args.startDate,
+                endTime: args.endDate instanceof Date ? args.endDate.toISOString() : args.endDate
+            };
+        }
+
+        const { logs, total, page, pageSize } = await this.threatLogService.searchLogs(serviceParams);
+
+        return {
+            items: logs.map(log => ({
+                id: log.id,
+                score: 1.0,
+                text: this.ragTranslation.translateThreatLog(log),
+                summary: {
+                    id: log.id,
+                    ip: log.request?.ip,
+                    protocol: log.protocol,
+                    timestamp: log.timestamp,
+                    url: log.request?.url,
+                    score: log.fingerprint?.score
+                },
+                resolveRef: {
+                    endpoint: `/api/logs/${log.id}`,
+                    method: 'GET',
+                    params: { id: log.id, type: 'log' }
+                }
+            })),
+            total,
+            page,
+            pageSize
+        };
+    }
+
+    public async searchAttacks(args: SearchAttacksArgs): Promise<SearchResponse<DirectSearchHit>> {
         const serviceParams: GetAttacksParams = {
             pageSize: args.limit || 20,
+            page: (args.offset && args.limit) ? Math.floor(args.offset / args.limit) + 1 : 1,
             minLogsForAttack: args.minLogs || 10,
             sortFields: args.sortBy ? { [args.sortBy]: args.sortOrder === 'asc' ? 1 : -1 } : { lastSeen: -1 },
             timeConfig: (args.dateFrom || args.dateTo) ? {
@@ -260,7 +302,7 @@ export class AssistantService {
             } : {},
             filters: {
                 'request.ip': args.ip,
-                'geo.country': args.country as any, // Cast temporaneo o aggiunta a interfaccia
+                country: args.country,
                 protocol: args.protocol,
                 dangerScore: args.dangerScore,
                 status: args.status
@@ -268,39 +310,48 @@ export class AssistantService {
         };
 
         const result = await this.attackLogService.getAttacks(serviceParams);
+        const pNum = serviceParams.page || 1;
+        const psNum = serviceParams.pageSize || 20;
 
-        return result.items.map((attack: any) => {
-            const attackIp = attack.ip || attack.request?.ip;
+        return {
+            items: result.items.map((attack: any) => {
+                const attackIp = attack.ip || attack.request?.ip;
 
-            return {
-                id: attackIp,
-                score: attack.dangerScore ?? attack.averageScore ?? 0,
-                text: this.ragTranslation.translateAttack(attack),
-                summary: {
-                    ip: attackIp,
-                    country: attack.geo?.country,
-                    protocol: attack.protocol,
-                    dangerScore: attack.dangerScore,
-                    totaleLogs: attack.totaleLogs,
-                    firstSeen: attack.firstSeen,
-                    lastSeen: attack.lastSeen,
-                    attackPatterns: attack.attackPatterns,
-                },
-                resolveRef: {
-                    endpoint: '/api/attacks/detail',
-                    method: 'GET',
-                    params: {
-                        type: 'attack',
+                return {
+                    id: attackIp,
+                    score: attack.dangerScore ?? attack.averageScore ?? 0,
+                    text: this.ragTranslation.translateAttack(attack),
+                    summary: {
                         ip: attackIp,
-                    } as any,
-                },
-            };
-        });
+                        country: attack.geo?.country,
+                        protocol: attack.protocol,
+                        dangerScore: attack.dangerScore,
+                        totaleLogs: attack.totaleLogs,
+                        firstSeen: attack.firstSeen,
+                        lastSeen: attack.lastSeen,
+                        attackPatterns: attack.attackPatterns,
+                    },
+                    resolveRef: {
+                        endpoint: '/api/attack/details',
+                        method: 'POST',
+                        params: {
+                            type: 'attack',
+                            ip: attackIp,
+                            minLogsForAttack: args.minLogs || 10
+                        } as any,
+                    },
+                };
+            }),
+            total: result.totalCount,
+            page: pNum,
+            pageSize: psNum
+        };
     }
 
-    public async searchCampaigns(args: SearchCampaignsArgs): Promise<DirectSearchHit[]> {
+    public async searchCampaigns(args: SearchCampaignsArgs): Promise<SearchResponse<DirectSearchHit>> {
         const serviceParams: GetCampaignsParams = {
             pageSize: args.limit || 20,
+            page: (args.offset && args.limit) ? Math.floor(args.offset / args.limit) + 1 : 1,
             minIps: args.minIps || 2,
             minScore: args.minScore || 0,
             minLogsPerIp: args.minLogsPerIp || 1,
@@ -311,34 +362,43 @@ export class AssistantService {
                 timeMode: 'range'
             } : {},
             status: args.status
-            // CampaignService.getCampaigns non usa un oggetto 'filters' ma i campi sono diretti
-            // search: args.search // se volessimo mappare anche una ricerca testuale
         };
 
         const result = await this.campaignService.getCampaigns(serviceParams);
 
-        return result.campaigns.map((campaign: any) => ({
-            id: campaign.hash,
-            score: campaign.averageScore ?? 0,
-            text: this.ragTranslation.translateCampaign(campaign),
-            summary: {
-                hash: campaign.hash,
-                ipCount: campaign.ipCount,
-                protocol: campaign.protocol,
-                totaleLogs: campaign.totaleLogs,
-                averageScore: campaign.averageScore,
-                firstSeen: campaign.firstSeen,
-                lastSeen: campaign.lastSeen,
-                attackPatterns: campaign.attackPatterns,
-            },
-            resolveRef: {
-                endpoint: '/api/campaigns/detail',
-                method: 'GET',
-                params: {
-                    type: 'campaign',
+        return {
+            items: result.campaigns.map((campaign: any) => ({
+                id: campaign.hash,
+                score: campaign.averageScore ?? 0,
+                text: this.ragTranslation.translateCampaign(campaign),
+                summary: {
                     hash: campaign.hash,
-                } as any,
-            },
-        }));
+                    ipCount: campaign.ipCount,
+                    protocol: campaign.protocol,
+                    totaleLogs: campaign.totaleLogs,
+                    averageScore: campaign.averageScore,
+                    firstSeen: campaign.firstSeen,
+                    lastSeen: campaign.lastSeen,
+                    attackPatterns: campaign.attackPatterns,
+                },
+                resolveRef: {
+                    endpoint: '/api/campaign/detail',
+                    method: 'POST',
+                    params: {
+                        type: 'campaign',
+                        hash: campaign.hash,
+                        minLogsPerIp: args.minLogsPerIp || 1,
+                        minScore: args.minScore || 0
+                    } as any,
+                },
+            })),
+            total: result.total,
+            page: serviceParams.page || 1,
+            pageSize: serviceParams.pageSize || 20
+        };
+    }
+
+    public async getStats(timeframe?: string, minScore?: number, limit?: number, minLogs?: number): Promise<any> {
+        return this.threatLogService.getStats(timeframe, minScore, limit, minLogs);
     }
 }

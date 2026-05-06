@@ -39,6 +39,8 @@ export type RagTimeConfig = TimeConfig;
 
 export type LogSourceParams = Parameters<ThreatLogService['getLogById']>[0] & { type: 'log' };
 
+export type ThreatLogSearchSourceParams = Parameters<ThreatLogService['searchLogs']>[0] & { type: 'search_logs' };
+
 export type IpDetailsSourceParams = Parameters<IpDetailsService['getIpDetails']>[0] & { type: 'ip_details' };
 
 export type AttackSourceParams = Parameters<AttackLogService['getAttackDetail']>[0] & { type: 'attack' };
@@ -49,7 +51,7 @@ export type AttackSearchSourceParams = Parameters<AttackLogService['getAttacks']
 export type CampaignSearchSourceParams = Parameters<CampaignService['getCampaigns']>[0] & { type: 'search_campaign' };
 
 
-export type RagSourceParams = LogSourceParams | IpDetailsSourceParams | AttackSourceParams | CampaignSourceParams | AttackSearchSourceParams | CampaignSearchSourceParams;
+export type RagSourceParams = LogSourceParams | IpDetailsSourceParams | AttackSourceParams | CampaignSourceParams | AttackSearchSourceParams | CampaignSearchSourceParams | ThreatLogSearchSourceParams;
 
 /**
  * Riferimento alla sorgente originale del dato (API).
@@ -164,4 +166,15 @@ export interface DirectSearchHit {
     text: string;           // narrazione come ora
     summary: Record<string, any>;  // i campi chiave dell'oggetto (ip, paese, score, pattern...)
     resolveRef?: RagSourceRef;     // opzionale: solo se vuoi permettere il drill-down
+}
+
+/**
+ * Risposta standardizzata per le ricerche dirette dell'assistente, 
+ * includendo i metadati di paginazione necessari per l'AI.
+ */
+export interface SearchResponse<T> {
+    items: T[];
+    total: number;
+    page: number;
+    pageSize: number;
 }

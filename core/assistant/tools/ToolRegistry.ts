@@ -160,6 +160,7 @@ const TOOLS: McpToolDefinition[] = [
         dangerScore: { type: 'number',  description: TOOL_TEMPLATES.SEARCH_ATTACKS.FIELDS.DANGER_SCORE },
         minLogs:     { type: 'number',  description: TOOL_TEMPLATES.SEARCH_ATTACKS.FIELDS.MIN_LOGS },
         limit:       { type: 'number',  description: TOOL_TEMPLATES.SEARCH_ATTACKS.FIELDS.LIMIT },
+        offset:      { type: 'number',  description: TOOL_TEMPLATES.SEARCH_ATTACKS.FIELDS.OFFSET },
         sortBy:      { type: 'string',  description: TOOL_TEMPLATES.SEARCH_ATTACKS.FIELDS.SORT_BY },
         sortOrder:   { type: 'string',  enum: ['asc', 'desc'], description: TOOL_TEMPLATES.SEARCH_ATTACKS.FIELDS.SORT_ORDER },
         status:      { type: 'string',  enum: ['active', 'archived', 'deleted'], description: TOOL_TEMPLATES.SEARCH_ATTACKS.FIELDS.STATUS },
@@ -184,6 +185,7 @@ const TOOLS: McpToolDefinition[] = [
         minScore:      { type: 'number',  description: TOOL_TEMPLATES.SEARCH_CAMPAIGNS.FIELDS.MIN_SCORE },
         minLogsPerIp:  { type: 'number',  description: TOOL_TEMPLATES.SEARCH_CAMPAIGNS.FIELDS.MIN_LOGS_PER_IP },
         limit:         { type: 'number',  description: TOOL_TEMPLATES.SEARCH_CAMPAIGNS.FIELDS.LIMIT },
+        offset:        { type: 'number',  description: TOOL_TEMPLATES.SEARCH_CAMPAIGNS.FIELDS.OFFSET },
         sortBy:        { type: 'string',  description: TOOL_TEMPLATES.SEARCH_CAMPAIGNS.FIELDS.SORT_BY },
         sortOrder:     { type: 'string',  enum: ['asc', 'desc'], description: TOOL_TEMPLATES.SEARCH_CAMPAIGNS.FIELDS.SORT_ORDER },
         status:        { type: 'string',  enum: ['active', 'archived', 'deleted'], description: TOOL_TEMPLATES.SEARCH_CAMPAIGNS.FIELDS.STATUS },
@@ -192,7 +194,47 @@ const TOOLS: McpToolDefinition[] = [
     },
     annotations: { title: 'Search Campaigns', readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
     execution: { endpoint: '/assistant/campaigns', method: 'POST' },
-  },  
+  },
+
+  // ── NUOVO: search_logs ────────────────────────────────────────────────────
+  {
+    name: TOOL_TEMPLATES.SEARCH_LOGS.NAME as AssistantToolName,
+    description: TOOL_TEMPLATES.SEARCH_LOGS.DESCRIPTION,
+    inputSchema: {
+      type: 'object',
+      properties: {
+        startDate: { type: 'string', description: TOOL_TEMPLATES.SEARCH_LOGS.FIELDS.START_DATE },
+        endDate: { type: 'string', description: TOOL_TEMPLATES.SEARCH_LOGS.FIELDS.END_DATE },
+        ip: { type: 'string', description: TOOL_TEMPLATES.SEARCH_LOGS.FIELDS.IP },
+        url: { type: 'string', description: TOOL_TEMPLATES.SEARCH_LOGS.FIELDS.URL },
+        protocol: { type: 'string', description: TOOL_TEMPLATES.SEARCH_LOGS.FIELDS.PROTOCOL },
+        minScore: { type: 'number', description: TOOL_TEMPLATES.SEARCH_LOGS.FIELDS.MIN_SCORE },
+        limit: { type: 'number', description: TOOL_TEMPLATES.SEARCH_LOGS.FIELDS.LIMIT },
+        offset: { type: 'number', description: TOOL_TEMPLATES.SEARCH_LOGS.FIELDS.OFFSET },
+        sortBy: { type: 'string', description: TOOL_TEMPLATES.SEARCH_LOGS.FIELDS.SORT_BY },
+        sortOrder: { type: 'string', enum: ['asc', 'desc'], description: TOOL_TEMPLATES.SEARCH_LOGS.FIELDS.SORT_ORDER },
+        status: { type: 'string', enum: ['active', 'archived', 'deleted'], description: TOOL_TEMPLATES.SEARCH_LOGS.FIELDS.STATUS },
+      },
+      required: [],
+    },
+    annotations: { title: 'Search Logs', readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+    execution: { endpoint: '/assistant/logs', method: 'POST' },
+  },
+  {
+    name: TOOL_TEMPLATES.GET_STATS.NAME as AssistantToolName,
+    description: TOOL_TEMPLATES.GET_STATS.DESCRIPTION,
+    inputSchema: {
+      type: 'object',
+      properties: {
+        timeframe: { type: 'string', enum: ['24h', '1w', '1m', '1y', 'all'], description: TOOL_TEMPLATES.GET_STATS.FIELDS.TIMEFRAME },
+        minScore: { type: 'number', description: TOOL_TEMPLATES.GET_STATS.FIELDS.MIN_SCORE },
+        limit: { type: 'number', description: TOOL_TEMPLATES.GET_STATS.FIELDS.LIMIT },
+        minLogs: { type: 'number', description: TOOL_TEMPLATES.GET_STATS.FIELDS.MIN_LOGS },
+      },
+    },
+    annotations: { title: 'Get Stats', readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+    execution: { endpoint: '/assistant/stats', method: 'GET' },
+  },
 ];
 
 /**

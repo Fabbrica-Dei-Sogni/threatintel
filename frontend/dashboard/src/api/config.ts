@@ -13,6 +13,7 @@
 import axios from 'axios';
 import { getApiUrl } from './index';
 import { storage, StorageNamespace } from '../utils/storage';
+import { useAuthStore } from '../stores/auth';
 
 /**
  * API client per la gestione delle configurazioni honeypot
@@ -34,6 +35,26 @@ apiClient.interceptors.request.use((config) => {
 
     return config;
 }, (error) => {
+    return Promise.reject(error);
+});
+
+// Interceptor per gestire errori di autenticazione/autorizzazione → sempre /login
+apiClient.interceptors.response.use((response) => {
+    return response;
+}, (error) => {
+    if (error.response && [401, 403].includes(error.response.status)) {
+        try {
+            const authStore = useAuthStore();
+            authStore.handleAuthError();
+        } catch (e) {
+            console.error('[configApiClient] Errore auth, fallback redirect:', e);
+            const currentPath = window.location.pathname;
+            const isAuthPage = ['/login', '/register'].some(p => currentPath.startsWith(p));
+            if (!isAuthPage) {
+                window.location.href = '/login';
+            }
+        }
+    }
     return Promise.reject(error);
 });
 
@@ -119,21 +140,20 @@ export async function searchConfigs(query: string): Promise<ConfigItem[]> {
 }
 
 /**
- * Avvia la rianalisi di tutti i log esistenti
+ * Avvia la rianalisi di tutti i log esistenti (Asincrono)
  */
-export async function reanalyzeAllLogs(batchSize: number = 200, updateDatabase: boolean = true): Promise<{ analyzed: number, updated: number, errors: number }> {
+export async function reanalyzeAllLogs(batchSize: number = 200, updateDatabase: boolean = true): Promise<{ 
+    message: string, 
+    jobs: { 
+        http: { jobId: string, status: string }, 
+        ssh: { jobId: string, status: string } 
+    } 
+}> {
     try {
-        console.log('[reanalyzeAllLogs] Starting reanalysis of all logs');
+        console.log('[reanalyzeAllLogs] Starting asynchronous reanalysis of all logs');
         const response = await apiClient.post('/reanalyze-all', { batchSize, updateDatabase }, { timeout: 0 });
         console.log('[reanalyzeAllLogs] Response status:', response.status);
-        let data = response.data;
-        //gestione soltanto dei log http, quelli ssh richiede un analisi di performance in piu
-        return {
-            analyzed: data.http.results.processed,
-            updated: data.http.results.updated,
-            errors: data.http.results.errors
-        }
-
+        return response.data;
     } catch (error) {
         console.error('[reanalyzeAllLogs] Error:', error);
         throw error;

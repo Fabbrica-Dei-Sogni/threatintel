@@ -11,30 +11,33 @@ process.env.COMMON_ENDPOINTS = '/wp-login.php,/administrator';
 
 import 'reflect-metadata';
 import request from 'supertest';
-import express, { Request, Response, NextFunction } from 'express';
-import { container } from 'tsyringe';
+import express from 'express';
+import { container, getComponent } from '../../di/container';
+import { setupContainer } from '../../di/registry';
 import { FakeLoginController } from '../FakeLoginController';
-import { RateLimitMiddleware } from '../../rateLimitMiddleware';
-import { RouterHub } from '../../registry/RouterHub';
-import { AuthMiddleware } from '../../middlewares/AuthMiddleware';
+
 import { Logger } from 'winston';
-import { LOGGER_TOKEN } from '../../di/tokens';
+import { LOGGER_TOKEN, ROUTER_HUB_TOKEN } from '../../di/tokens';
+import { RouterHub } from '../../registry/RouterHub';
 import path from 'path';
+
+// Initialize container
+setupContainer(container);
 
 // Mock AuthMiddleware
 jest.mock('../../middlewares/AuthMiddleware', () => {
     return {
         AuthMiddleware: jest.fn().mockImplementation(() => {
             return {
-                isAuthenticated: jest.fn().mockReturnValue((req: any, res: any, next: any) => {
+                isAuthenticated: jest.fn().mockReturnValue((req: any, _res: any, next: any) => {
                     req.user = { username: 'testuser', roles: [{ name: 'admin' }] };
                     next();
                 }),
-                isIdentified: jest.fn().mockReturnValue((req: any, res: any, next: any) => {
+                isIdentified: jest.fn().mockReturnValue((req: any, _res: any, next: any) => {
                     req.user = { username: 'testuser', roles: [{ name: 'admin' }] };
                     next();
                 }),
-                hasRole: jest.fn().mockReturnValue((req: any, res: any, next: any) => {
+                hasRole: jest.fn().mockReturnValue((req: any, _res: any, next: any) => {
                     req.user = { username: 'testuser', roles: [{ name: 'admin' }] };
                     next();
                 }),
@@ -45,7 +48,7 @@ jest.mock('../../middlewares/AuthMiddleware', () => {
 
 // Mock RateLimitMiddleware
 jest.mock('../../rateLimitMiddleware', () => {
-    const bypass = (req: any, res: any, next: any) => next();
+    const bypass = (_req: any, _res: any, next: any) => next();
     return {
         RateLimitMiddleware: jest.fn().mockImplementation(() => {
             return {
@@ -70,14 +73,14 @@ let app: express.Application;
 // Mocking tsyringe container prima di ogni test per garantire l'isolamento
 beforeAll(() => {
     container.clearInstances();
-    container.register<Logger>(LOGGER_TOKEN, { useValue: mockLogger });
+    container.registerInstance(LOGGER_TOKEN, mockLogger);
 
     // Setup Express app
     app = express();
     app.use(express.json());
 
     // Registrazione e bind tramite RouterHub
-    const hub = container.resolve(RouterHub);
+    const hub = getComponent<RouterHub>(ROUTER_HUB_TOKEN);
     hub.register(FakeLoginController);
     hub.bindHttp(app, container);
 });

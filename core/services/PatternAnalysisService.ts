@@ -11,7 +11,7 @@ import dotenv from 'dotenv';
 import { Request } from 'express';
 import { ConfigService } from './ConfigService';
 import { inject, injectable } from 'tsyringe';
-import { LOGGER_TOKEN } from '../di/tokens';
+import * as Tokens from '../di/tokens';
 import { Logger } from 'winston';
 import { ThreatIndicator } from '../types/indicators';
 import { AnalysisResult, GeoLocation } from '../types/threat-log.types';
@@ -37,8 +37,8 @@ export class PatternAnalysisService {
     private initialized: Promise<void>;
 
     constructor(
-        @inject(LOGGER_TOKEN) private readonly logger: Logger,
-        private readonly configService: ConfigService
+        @inject(Tokens.LOGGER_TOKEN) private readonly logger: Logger,
+        @inject(Tokens.CONFIG_SERVICE_TOKEN) private readonly configService: ConfigService
     ) {
 
         //XXX: si imposta la geolocalizzazione sempre attiva. fornire un sistema per parametrizzarlo qualora sia necessario in futuro.
@@ -176,7 +176,7 @@ export class PatternAnalysisService {
         };
     }
 
-    generateFingerprint(req: any, ip?: string) {
+    generateFingerprint(req: any, _ip?: string) {
         // Compose the attack signature tokens
         // We exclude the IP to allow correlation of distributed attacks
         
@@ -238,7 +238,7 @@ export class PatternAnalysisService {
         return sanitized;
     }
 
-    analyze(fullUrl: string, userAgent: string, bodyStr: string, referer: string, method: string, queryStr: string, requestToAnalyze: any, jndiPayload?: string): AnalysisResult {
+    analyze(fullUrl: string, userAgent: string, bodyStr: string, referer: string, method: string, _queryStr: string, requestToAnalyze: any, jndiPayload?: string): AnalysisResult {
         const indicators: string[] = [];
         let score = 0;
 

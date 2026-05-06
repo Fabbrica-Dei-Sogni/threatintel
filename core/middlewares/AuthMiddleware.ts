@@ -10,15 +10,18 @@ import { Request, Response, NextFunction } from 'express';
 import { inject, singleton } from 'tsyringe';
 import { AuthService } from '../services/AuthService';
 import { I18nService } from '../services/I18nService';
-import { LOGGER_TOKEN } from '../di/tokens';
+import { AppConfigProvider } from '../services/AppConfigProvider';
 import { Logger } from 'winston';
+
+import * as Tokens from '../di/tokens';
 
 @singleton()
 export class AuthMiddleware {
     constructor(
-        @inject(AuthService) private authService: AuthService,
-        @inject(I18nService) private i18n: I18nService,
-        @inject(LOGGER_TOKEN) private logger: Logger
+        @inject(Tokens.AUTH_SERVICE_TOKEN) private authService: AuthService,
+        @inject(Tokens.I18N_TOKEN) private i18n: I18nService,
+        @inject(Tokens.LOGGER_TOKEN) private logger: Logger,
+        @inject(Tokens.CONFIG_PROVIDER_TOKEN) private configProvider: AppConfigProvider
     ) {}
     
     private getLocale(req: Request): string {
@@ -35,8 +38,8 @@ export class AuthMiddleware {
                 return next();
             }
 
-            const allowAnonymous = process.env.ALLOW_ANONYMOUS === 'true';
-            const anonymousRole = process.env.ANONYMOUS_ROLE || 'viewer';
+            const allowAnonymous = this.configProvider.allowAnonymous;
+            const anonymousRole = this.configProvider.anonymousRole;
 
             const setAnonymousUser = () => {
                 (req as any).user = {

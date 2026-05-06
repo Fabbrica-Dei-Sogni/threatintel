@@ -35,6 +35,7 @@
         "of": "von",
         "goToPage": "Gehe zu Seite",
         "show": "Anzeigen",
+        "hide": "Ausblenden",
         "sample_url": "Beispiel-URI",
         "duration_label": "Dauer",
         "view_details": "Details anzeigen",
@@ -865,6 +866,46 @@
             "saveSection": "Abschnitt speichern",
             "expertMode": "Expertenmodus (JSON)",
             "cancel": "Abbrechen"
+        }
+    },
+    "ops": {
+        "hubTitle": "SYSTEM-OPERATIONS-HUB",
+        "activeMissions": "AKTIVE MISSIONEN",
+        "availableCommands": "VERFÜGBARE BEFEHLE",
+        "activeOps": "ACTIVE OPERATIONS",
+        "noActiveOps": "NO OPERATIONS IN PROGRESS",
+        "recentLogs": "RECENT LOGS",
+        "terminateMission": "TERMINA MISSIONE",
+        "confirmAction": "BESTÄTIGEN?",
+        "commands": {
+            "reanalyzeName": "ALLE LOGS NEU ANALYSIEREN",
+            "reanalyzeDesc": "Vollständiger Re-Scan von HTTP & SSH Spuren",
+            "pruningName": "DATABASE CLEANUP",
+            "pruningDesc": "Archive and remove obsolete logs",
+            "ragReindexName": "RAG RE-INDIZIERUNG",
+            "ragReindexDesc": "Richtet den Qdrant-Vektorspeicher neu aus"
+        },
+        "status": {
+            "pending": "AUSSTEHEND",
+            "running": "LÄUFT",
+            "completed": "ABGESCHLOSSEN",
+            "failed": "FEHLGESCHLAGEN",
+            "cancelled": "ABGEBROCHEN"
+        }
+    },
+    "maintenance": {
+        "title": "SYSTEM MAINTENANCE",
+        "pruning": {
+            "title": "Pruning & Retention",
+            "desc": "Manage data lifecycle: automatic archiving and permanent deletion of logs.",
+            "archiveDays": "Days to Archive",
+            "archiveDaysHelp": "Time before an active log becomes Archived",
+            "retentionDays": "Trash Retention (days)",
+            "retentionDaysHelp": "Time before a deleted log is permanently removed",
+            "deletionDays": "Permanent Deletion (days)",
+            "deletionDaysHelp": "Empty archived logs older than this value",
+            "runCleanup": "Run Cleanup",
+            "confirm": "Are you sure you want to proceed with permanent cleanup? This action is irreversible."
         }
     }
 }

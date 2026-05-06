@@ -8,12 +8,13 @@
  */
 import { inject, singleton } from 'tsyringe';
 import { ThreatLogService } from '../services/ThreatLogService';
-import { LOGGER_TOKEN } from '../di/tokens';
 import { Logger } from 'winston';
 import dotenv from 'dotenv';
 dotenv.config();
 
 import { ILongRunningService, ServiceStatus } from '../types/lifecycle';
+
+import * as Tokens from '../di/tokens';
 
 @singleton()
 export class AnalysisService implements ILongRunningService {
@@ -23,8 +24,8 @@ export class AnalysisService implements ILongRunningService {
     private intervalId: NodeJS.Timeout | null = null;
 
     constructor(
-        @inject(LOGGER_TOKEN) private readonly logger: Logger,
-        private readonly threatLogService: ThreatLogService
+        @inject(Tokens.LOGGER_TOKEN) private readonly logger: Logger,
+        @inject(Tokens.THREAT_LOG_SERVICE_TOKEN) private readonly threatLogService: ThreatLogService
     ) {
         this.timeoutAnalyze = this.parseInterval(process.env.ANALYZE_INTERVAL || '5m');
     }

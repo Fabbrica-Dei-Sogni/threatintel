@@ -9,26 +9,28 @@
 import 'reflect-metadata';
 import request from 'supertest';
 import express from 'express';
-import { container } from 'tsyringe';
+import { container, getComponent } from '../../di/container';
+import { setupContainer } from '../../di/registry';
 import { DossierController } from '../DossierController';
-import { DossierService } from '../../services/DossierService';
-import { AuthMiddleware } from '../../middlewares/AuthMiddleware';
+
+import * as Tokens from '../../di/tokens';
 import { RouterHub } from '../../registry/RouterHub';
+
 
 // Mock AuthMiddleware
 jest.mock('../../middlewares/AuthMiddleware', () => {
     return {
         AuthMiddleware: jest.fn().mockImplementation(() => {
             return {
-                isAuthenticated: jest.fn().mockReturnValue((req: any, res: any, next: any) => {
+                isAuthenticated: jest.fn().mockReturnValue((req: any, _res: any, next: any) => {
                     req.user = { username: 'testuser', roles: [{ name: 'admin' }] };
                     next();
                 }),
-                isIdentified: jest.fn().mockReturnValue((req: any, res: any, next: any) => {
+                isIdentified: jest.fn().mockReturnValue((req: any, _res: any, next: any) => {
                     req.user = { username: 'testuser', roles: [{ name: 'admin' }] };
                     next();
                 }),
-                hasRole: jest.fn().mockReturnValue((req: any, res: any, next: any) => {
+                hasRole: jest.fn().mockReturnValue((req: any, _res: any, next: any) => {
                     req.user = { username: 'testuser', roles: [{ name: 'admin' }] };
                     next();
                 }),
@@ -37,28 +39,44 @@ jest.mock('../../middlewares/AuthMiddleware', () => {
     };
 });
 
-// Mock del DossierService
-const mockDossierService = {
-    listDossiers: jest.fn(),
-    getDossierById: jest.fn(),
-    createDossier: jest.fn(),
-    updateDossier: jest.fn(),
-    deleteDossier: jest.fn(),
-    generatePdfFromDossier: jest.fn(),
-};
-
-// Mocking container
-container.register<DossierService>(DossierService, { useValue: mockDossierService as any });
-
-const app = express();
-app.use(express.json());
-
-// Registrazione e bind tramite RouterHub
-const hub = container.resolve(RouterHub);
-hub.register(DossierController);
-hub.bindHttp(app, container);
-
 describe('DossierRoutes API', () => {
+    let app: express.Express;
+    let mockDossierService: any;
+    let mockLogger: any;
+
+    beforeAll(() => {
+        // Initialize DI
+        setupContainer(container);
+        container.clearInstances();
+
+        mockDossierService = {
+            listDossiers: jest.fn(),
+            getDossierById: jest.fn(),
+            createDossier: jest.fn(),
+            updateDossier: jest.fn(),
+            deleteDossier: jest.fn(),
+            generatePdfFromDossier: jest.fn(),
+        };
+
+        mockLogger = {
+            info: jest.fn(),
+            error: jest.fn(),
+            warn: jest.fn(),
+            debug: jest.fn()
+        };
+
+        // Register mocks using Tokens
+        container.registerInstance(Tokens.DOSSIER_SERVICE_TOKEN, mockDossierService);
+        container.registerInstance(Tokens.LOGGER_TOKEN, mockLogger);
+
+        app = express();
+        app.use(express.json());
+
+        // Registrazione e bind tramite RouterHub
+        const hub = getComponent<RouterHub>(Tokens.ROUTER_HUB_TOKEN);
+        hub.register(DossierController);
+        hub.bindHttp(app, container);
+    });
 
     beforeEach(() => {
         jest.clearAllMocks();

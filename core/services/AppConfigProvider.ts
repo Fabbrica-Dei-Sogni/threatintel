@@ -9,42 +9,63 @@
 import { singleton, inject } from 'tsyringe';
 import { ConfigService } from './ConfigService';
 import { ConfigKey } from '../types/CoreConstants';
-import { LOGGER_TOKEN } from '../di/tokens';
-import { Logger } from 'winston';
+import * as Tokens from '../di/tokens';
+
+import { ConfigDefaults, parseCsv } from '../utils/ConfigUtils';
 
 @singleton()
 export class AppConfigProvider {
     constructor(
-        @inject(LOGGER_TOKEN) private readonly logger: Logger,
-        private readonly configService: ConfigService
-    ) {}
+        @inject(Tokens.CONFIG_SERVICE_TOKEN) private readonly configService: ConfigService
+    ) { }
 
     /**
-     * Recupera una porta dal .env o default 3000
+     * Recupera una porta dal .env o default
      */
     get port(): string {
-        return process.env.PORT || '3000';
+        return process.env.PORT || ConfigDefaults.PORT;
     }
 
     /**
      * Recupera URI MongoDB dal .env o default
      */
     get mongoUri(): string {
-        return process.env.MONGO_URI || 'mongodb://localhost:17017/threatintel';
+        return process.env.MONGO_URI || ConfigDefaults.MONGO_URI;
+    }
+
+    /**
+     * Recupera il dominio dell'applicazione
+     */
+    get appDomain(): string {
+        return process.env.APP_DOMAIN || ConfigDefaults.APP_DOMAIN;
+    }
+
+    /**
+     * Recupera le origini consentite per CORS e CSP
+     */
+    get allowedOrigins(): string[] {
+        return parseCsv(process.env.ALLOWED_ORIGINS, ConfigDefaults.ALLOWED_ORIGINS);
+    }
+
+    /**
+     * Recupera la lista degli endpoint comuni (trappole) dal .env
+     */
+    get commonEndpoints(): string[] {
+        return parseCsv(process.env.COMMON_ENDPOINTS);
     }
 
     /**
      * Recupera URI servizio Auth
      */
     get authUri(): string {
-        return process.env.URI_DIGITAL_AUTH || 'https://alessandromodica.com:3443/auth/api/v1';
+        return process.env.URI_DIGITAL_AUTH || ConfigDefaults.AUTH_URI;
     }
 
     /**
      * Recupera App ID per il servizio Auth
      */
     get appId(): string {
-        return process.env.APP_ID || process.env.HONEYPOT_INSTANCE_ID || 'threat-intel-01';
+        return process.env.APP_ID || ConfigDefaults.APP_ID;
     }
 
     /**
@@ -55,10 +76,24 @@ export class AppConfigProvider {
     }
 
     /**
+     * Verifica se l'accesso anonimo è consentito
+     */
+    get allowAnonymous(): boolean {
+        return process.env.ALLOW_ANONYMOUS === 'true';
+    }
+
+    /**
+     * Recupera il ruolo per gli utenti anonimi
+     */
+    get anonymousRole(): string {
+        return process.env.ANONYMOUS_ROLE || 'viewer';
+    }
+
+    /**
      * Configurazione Qdrant
      */
     get qdrantUrl(): string {
-        return process.env.QDRANT_URL || 'http://localhost:6333';
+        return process.env.QDRANT_URL || ConfigDefaults.QDRANT_URL;
     }
 
     get ragEnabled(): boolean {
@@ -73,11 +108,15 @@ export class AppConfigProvider {
         return process.env.RAG_LOGS_COLLECTION_NAME || 'threat_logs';
     }
 
+    get ragSchemaVersion(): string {
+        return process.env.RAG_SCHEMA_VERSION || '0.0.1';
+    }
+
     /**
      * Configurazione Ollama
      */
     get ollamaUrl(): string {
-        return process.env.OLLAMA_URL || 'http://localhost:11434';
+        return process.env.OLLAMA_URL || ConfigDefaults.OLLAMA_URL;
     }
 
     get embeddingModel(): string {
@@ -99,12 +138,10 @@ export class AppConfigProvider {
      * Carica i pattern sospetti Nginx
      */
     async getNginxSuspiciousPatterns(): Promise<string[]> {
-        const commonEndpoints = process.env.COMMON_ENDPOINTS || '';
+        const envList = this.commonEndpoints;
         const dbPatterns = await this.getDynamicConfig(ConfigKey.SUSPICIOUS_PATTERNS);
-        
-        const envList = commonEndpoints.split(',').map(e => e.trim()).filter(Boolean);
-        const dbList = dbPatterns ? dbPatterns.split(',').map(e => e.trim()).filter(Boolean) : [];
-        
+        const dbList = parseCsv(dbPatterns || '');
+
         return Array.from(new Set([...envList, ...dbList]));
     }
 }

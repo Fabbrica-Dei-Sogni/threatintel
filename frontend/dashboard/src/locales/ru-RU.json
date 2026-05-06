@@ -31,6 +31,7 @@
         "of": "из",
         "goToPage": "Перейти на страницу",
         "show": "Показать",
+        "hide": "Скрыть",
         "sample_url": "Пример URI",
         "duration_label": "Продолжительность",
         "view_details": "Подробнее",
@@ -863,6 +864,46 @@
             "saveSection": "Сохранить раздел",
             "expertMode": "Режим эксперта (JSON)",
             "cancel": "Отмена"
+        }
+    },
+    "ops": {
+        "hubTitle": "ХАБ СИСТЕМНЫХ ОПЕРАЦИЙ",
+        "activeMissions": "АКТИВНЫЕ МИССИИ",
+        "availableCommands": "ДОСТУПНЫЕ КОМАНДЫ",
+        "activeOps": "ACTIVE OPERATIONS",
+        "noActiveOps": "NO OPERATIONS IN PROGRESS",
+        "recentLogs": "RECENT LOGS",
+        "terminateMission": "TERMINA MISSIONE",
+        "confirmAction": "ПОДТВЕРДИТЬ?",
+        "commands": {
+            "reanalyzeName": "ПЕРЕАНАЛИЗИРОВАТЬ ВСЕ ЛОГИ",
+            "reanalyzeDesc": "Полное сканирование следов HTTP и SSH",
+            "pruningName": "DATABASE CLEANUP",
+            "pruningDesc": "Archive and remove obsolete logs",
+            "ragReindexName": "ПЕРЕИНДЕКСАЦИЯ RAG",
+            "ragReindexDesc": "Перестроение векторной памяти Qdrant"
+        },
+        "status": {
+            "pending": "В ОЖИДАНИИ",
+            "running": "ВЫПОЛНЯЕТСЯ",
+            "completed": "ЗАВЕРШЕНО",
+            "failed": "ОШИБКА",
+            "cancelled": "ОТМЕНЕНО"
+        }
+    },
+    "maintenance": {
+        "title": "SYSTEM MAINTENANCE",
+        "pruning": {
+            "title": "Pruning & Retention",
+            "desc": "Manage data lifecycle: automatic archiving and permanent deletion of logs.",
+            "archiveDays": "Days to Archive",
+            "archiveDaysHelp": "Time before an active log becomes Archived",
+            "retentionDays": "Trash Retention (days)",
+            "retentionDaysHelp": "Time before a deleted log is permanently removed",
+            "deletionDays": "Permanent Deletion (days)",
+            "deletionDaysHelp": "Empty archived logs older than this value",
+            "runCleanup": "Run Cleanup",
+            "confirm": "Are you sure you want to proceed with permanent cleanup? This action is irreversible."
         }
     }
 }

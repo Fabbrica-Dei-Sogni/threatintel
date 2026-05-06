@@ -7,14 +7,12 @@
  * See root LICENSE.md for core engine licensing details.
  */
 import 'reflect-metadata';
-import { container } from 'tsyringe';
-import mongoose from 'mongoose';
+import { getComponent, container } from '../../../di/container';
+import { setupContainer } from '../../../di/registry';
+
 import { RagTranslationService } from '../RagTranslationService';
-import { LOGGER_TOKEN } from '../../../di/tokens';
-import ThreatLog from '../../../models/ThreatLogSchema';
-import IpDetails from '../../../models/IpDetailsSchema';
-import AbuseIpDb from '../../../models/AbuseIpDbSchema';
-import AbuseReport from '../../../models/AbuseReportSchema';
+import { LOGGER_TOKEN, RAG_TRANSLATION_TOKEN } from '../../../di/tokens';
+
 import { performance } from 'perf_hooks';
 
 describe('RagTranslationService Unit Test', () => {
@@ -22,7 +20,9 @@ describe('RagTranslationService Unit Test', () => {
     let mockLogger: any;
 
     beforeEach(() => {
-        container.reset();
+        setupContainer(container);
+        container.clearInstances();
+
         mockLogger = {
             info: jest.fn(),
             error: jest.fn(),
@@ -30,7 +30,7 @@ describe('RagTranslationService Unit Test', () => {
             debug: jest.fn()
         };
         container.registerInstance(LOGGER_TOKEN, mockLogger);
-        service = container.resolve(RagTranslationService);
+        service = getComponent(RAG_TRANSLATION_TOKEN);
     });
 
     describe('Performance and Efficiency', () => {

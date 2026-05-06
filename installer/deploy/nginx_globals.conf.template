@@ -1,0 +1,27 @@
+# ThreatIntel Global Configurations Template for {{SERVICE_NAME}}
+# Spostare in /etc/nginx/conf.d/threatintel_globals_{{SERVICE_NAME}}.conf
+
+# 1. Custom Logging Format (Istanza Specifica)
+# Il prefisso 'nginx_threat_{{SERVICE_NAME}}:' è usato dal backend per filtrare i log nel Journal
+log_format json_{{SERVICE_NAME}} escape=json
+  'nginx_threat_{{SERVICE_NAME}}: {'
+    '"timestamp":"$time_iso8601",'
+    '"ip":"$remote_addr",'
+    '"method":"$request_method",'
+    '"url":"$request_uri",'
+    '"status":"$status",'
+    '"referer":"$http_referer",'
+    '"user_agent":"$http_user_agent",'
+    '"x_forwarded_for":"$http_x_forwarded_for",'
+    '"server_port":"$server_port"'
+  '}';
+
+# 2. Global Rate Limiting Zones (Istanza Specifica)
+limit_req_zone $binary_remote_addr zone=general_{{SERVICE_NAME}}:10m rate=10r/s;
+limit_req_zone $binary_remote_addr zone=login_{{SERVICE_NAME}}:10m rate=1r/s;
+
+# 3. Global Security Headers (Ottimizzati per portabilità)
+add_header X-Frame-Options "SAMEORIGIN" always;
+add_header X-Content-Type-Options "nosniff" always;
+add_header X-XSS-Protection "0" always;
+add_header Referrer-Policy "strict-origin-when-cross-origin" always;

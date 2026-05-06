@@ -12,7 +12,7 @@ import { ConfigService } from '../services/ConfigService';
 import { SshLogService } from '../services/SshLogService';
 import { NginxLogService } from '../services/NginxLogService';
 import { PatternAnalysisService } from '../services/PatternAnalysisService';
-import { LOGGER_TOKEN } from '../di/tokens';
+import * as Tokens from '../di/tokens';
 import { Logger } from 'winston';
 import { Controller, Get, Post, Delete } from '../registry/decorators';
 import { getComponent } from '../di/container';
@@ -21,14 +21,14 @@ import { AuthMiddleware } from '../middlewares/AuthMiddleware';
 const auth = getComponent(AuthMiddleware);
 
 @singleton()
-@Controller('/api')
+@Controller('/api/config')
 export class ConfigController {
     constructor(
-        private configService: ConfigService,
-        private sshLogService: SshLogService,
-        private nginxLogService: NginxLogService,
-        private patternAnalysisService: PatternAnalysisService,
-        @inject(LOGGER_TOKEN) private logger: Logger
+        @inject(Tokens.CONFIG_SERVICE_TOKEN) private readonly configService: ConfigService,
+        @inject(Tokens.SSH_LOG_SERVICE_TOKEN) private readonly sshLogService: SshLogService,
+        @inject(Tokens.NGINX_LOG_SERVICE_TOKEN) private readonly nginxLogService: NginxLogService,
+        @inject(Tokens.PATTERN_ANALYSIS_SERVICE_TOKEN) private readonly patternAnalysisService: PatternAnalysisService,
+        @inject(Tokens.LOGGER_TOKEN) private readonly logger: Logger
     ) {}
 
     /**
@@ -43,8 +43,8 @@ export class ConfigController {
      *       200:
      *         description: Elenco configurazioni restituito.
      */
-    @Get('/config', [auth.hasRole('admin')])
-    async getAllConfigs(req: Request, res: Response): Promise<void> {
+    @Get('/', [auth.hasRole('admin')])
+    async getAllConfigs(_req: Request, res: Response): Promise<void> {
         this.logger.info('[ConfigController] Fetching all configurations');
         try {
             const configs = await this.configService.getAllConfigs();
@@ -78,7 +78,7 @@ export class ConfigController {
      *       200:
      *         description: Configurazione salvata.
      */
-    @Post('/config', [auth.hasRole('admin')])
+    @Post('/', [auth.hasRole('admin')])
     async saveConfig(req: Request, res: Response): Promise<void> {
         const { key, value } = req.body;
         this.logger.info(`[ConfigController] Saving configuration: ${key}`);
@@ -121,7 +121,7 @@ export class ConfigController {
      *       200:
      *         description: Configurazione eliminata.
      */
-    @Delete('/config/:key', [auth.hasRole('admin')])
+    @Delete('/:key', [auth.hasRole('admin')])
     async deleteConfig(req: Request, res: Response): Promise<void> {
         const key = req.params.key as string;
         this.logger.info(`[ConfigController] Deleting configuration: ${key}`);
@@ -160,7 +160,7 @@ export class ConfigController {
      *       200:
      *         description: Risultati della ricerca.
      */
-    @Post('/config/search', [auth.hasRole('admin')])
+    @Post('/search', [auth.hasRole('admin')])
     async searchConfigs(req: Request, res: Response): Promise<void> {
         const { query } = req.body;
         this.logger.info(`[ConfigController] Searching configurations with query: ${query}`);

@@ -7,13 +7,14 @@
  * See root LICENSE.md for core engine licensing details.
  */
 import 'reflect-metadata';
-import { container } from 'tsyringe';
 import mongoose from 'mongoose';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { CampaignService } from '../services/CampaignService';
 import ThreatLog from '../models/ThreatLogSchema';
-import { LOGGER_TOKEN, EVENT_BUS_TOKEN, OLLAMA_SERVICE_TOKEN, RAG_TRANSLATION_TOKEN, FORENSIC_PIPELINE_TOKEN } from '../di/tokens';
-import { ForensicPipelineService } from '../services/forense/ForensicPipelineService';
+import * as Tokens from '../di/tokens';
+import { setupContainer } from '../di/registry';
+import { getComponent, container } from '../di/container';
+
 
 // Mock Logger
 const mockLogger = {
@@ -36,6 +37,22 @@ describe('CampaignService', () => {
         const uri = mongoServer.getUri();
         await mongoose.connect(uri);
 
+        // Initialize DI
+        setupContainer(container);
+    });
+
+    afterAll(async () => {
+        await mongoose.disconnect();
+        await mongoServer.stop();
+    });
+
+    beforeEach(async () => {
+        await ThreatLog.deleteMany({});
+        jest.clearAllMocks();
+
+        // Clear instances
+        container.clearInstances();
+
         const mockEventBus = {
             emit: jest.fn(),
             on: jest.fn(),
@@ -55,14 +72,17 @@ describe('CampaignService', () => {
             getConfigValue: jest.fn().mockResolvedValue(null)
         };
         
-        container.registerInstance(LOGGER_TOKEN, mockLogger);
-        container.registerInstance(EVENT_BUS_TOKEN, mockEventBus);
-        container.registerInstance(OLLAMA_SERVICE_TOKEN, mockOllama);
-        container.registerInstance(RAG_TRANSLATION_TOKEN, mockTranslator);
-        container.registerInstance('ConfigService' as any, mockConfig);
-        container.registerSingleton(FORENSIC_PIPELINE_TOKEN, ForensicPipelineService);
+        // Register mocks using Tokens
+        container.registerInstance(Tokens.LOGGER_TOKEN, mockLogger);
+        container.registerInstance(Tokens.EVENT_BUS_TOKEN, mockEventBus);
+        container.registerInstance(Tokens.OLLAMA_SERVICE_TOKEN, mockOllama);
+        container.registerInstance(Tokens.RAG_TRANSLATION_TOKEN, mockTranslator);
+        container.registerInstance(Tokens.CONFIG_SERVICE_TOKEN, mockConfig);
         
-        service = container.resolve(CampaignService);
+        // ForensicPipelineService is registered as singleton by setupContainer()
+        // but it needs ConfigService mock to be registered BEFORE resolution
+        
+        service = getComponent(Tokens.CAMPAIGN_SERVICE_TOKEN);
     });
 
 

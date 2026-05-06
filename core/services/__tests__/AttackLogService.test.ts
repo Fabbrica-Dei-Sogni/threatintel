@@ -6,21 +6,25 @@
  * See LICENSE.md in the project root for license terms.
  */
 import 'reflect-metadata';
-import { container } from 'tsyringe';
+import { getComponent, container } from '../../di/container';
+import { setupContainer } from '../../di/registry';
 import mongoose from 'mongoose';
 import { AttackLogService } from '../AttackLogService';
 import ThreatLog from '../../models/ThreatLogSchema';
-import { ForensicPipelineService } from '../forense/ForensicPipelineService';
-import { IpDetailsService } from '../IpDetailsService';
-import PatternAnalysisService from '../PatternAnalysisService';
-import { LOGGER_TOKEN, EVENT_BUS_TOKEN, FORENSIC_PIPELINE_TOKEN } from '../../di/tokens';
+
+
+import { 
+    LOGGER_TOKEN, 
+    EVENT_BUS_TOKEN, 
+    FORENSIC_PIPELINE_TOKEN,
+    ATTACK_LOG_SERVICE_TOKEN 
+} from '../../di/tokens';
 
 describe('AttackLogService', () => {
     let service: AttackLogService;
     let mockLogger: any;
     let mockForensicPipelineService: any;
-    let mockIpDetailsService: any;
-    let mockPatternAnalysisService: any;
+
     let mockEventBus: any;
 
     beforeAll(async () => {
@@ -35,6 +39,9 @@ describe('AttackLogService', () => {
     });
 
     beforeEach(async () => {
+        setupContainer(container);
+        container.clearInstances();
+
         await ThreatLog.deleteMany({});
 
         mockLogger = {
@@ -49,16 +56,7 @@ describe('AttackLogService', () => {
             buildDistributedPipeline: jest.fn().mockResolvedValue([])
         };
 
-        mockIpDetailsService = {
-            isIPExcluded: jest.fn().mockReturnValue(false),
-            saveIpDetails: jest.fn().mockResolvedValue(new mongoose.Types.ObjectId())
-        };
 
-        mockPatternAnalysisService = {
-            analyze: jest.fn(),
-            generateFingerprint: jest.fn(),
-            loadConfigFromDB: jest.fn()
-        };
 
         mockEventBus = {
             emit: jest.fn(),
@@ -66,12 +64,11 @@ describe('AttackLogService', () => {
             off: jest.fn()
         };
 
-        container.clearInstances();
         container.registerInstance(LOGGER_TOKEN, mockLogger);
         container.registerInstance(FORENSIC_PIPELINE_TOKEN, mockForensicPipelineService);
         container.registerInstance(EVENT_BUS_TOKEN, mockEventBus);
 
-        service = container.resolve(AttackLogService);
+        service = getComponent(ATTACK_LOG_SERVICE_TOKEN);
     });
 
     describe('getAttacks', () => {

@@ -7,7 +7,6 @@
  */
 // core/assistant/types/assistant-tool.types.ts
 
-import { GetAttacksParams, GetCampaignsParams } from "../service-params.types";
 
 export interface SemanticSearchArgs {
   query: string;
@@ -38,6 +37,22 @@ export interface SearchAttacksArgs {
   dangerScore?: number;
   minLogs?: number;
   limit?: number;
+  offset?: number;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+  status?: 'active' | 'archived' | 'deleted';
+}
+
+export interface SearchLogArgs {
+  ip?: string;
+  url?: string;
+  protocol?: string;
+  startDate?: Date;
+  endDate?: Date;
+  minScore?: number;
+  tags?: string[];
+  limit?: number;
+  offset?: number;
   sortBy?: string;
   sortOrder?: 'asc' | 'desc';
   status?: 'active' | 'archived' | 'deleted';
@@ -51,23 +66,34 @@ export interface SearchCampaignsArgs {
   minScore?: number;
   minLogsPerIp?: number;
   limit?: number;
+  offset?: number;
   sortBy?: string;
   sortOrder?: 'asc' | 'desc';
   status?: 'active' | 'archived' | 'deleted';
 }
 
 
-export type AssistantToolName =
-  | 'semantic_search'
-  | 'resolve_threat_source'
-  | 'ask'
-  | 'search_attacks'     // ← nuovo
-  | 'search_campaigns';  // ← nuovo
+export enum AssistantToolName {
+  SEMANTIC_SEARCH = 'semantic_search',
+  RESOLVE_THREAT_SOURCE = 'resolve_threat_source',
+  ASK = 'ask',
+  SEARCH_LOGS = 'search_logs',
+  SEARCH_ATTACKS = 'search_attacks',
+  SEARCH_CAMPAIGNS = 'search_campaigns',
+  GET_STATS = 'get_stats'
+}
 
 export interface AssistantToolArgumentsMap {
   semantic_search: SemanticSearchArgs;
   resolve_threat_source: ResolveThreatSourceArgs;
   ask: AskArgs;
+  search_logs: SearchLogArgs;     // ← nuovo
   search_attacks: SearchAttacksArgs;     // ← nuovo
   search_campaigns: SearchCampaignsArgs; // ← nuovo  
+  get_stats: {
+    timeframe?: '24h' | '1w' | '1m' | '1y' | 'all';
+    minScore?: number;
+    limit?: number;
+    minLogs?: number;
+  };
 }

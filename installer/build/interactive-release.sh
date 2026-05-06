@@ -7,6 +7,12 @@ DEFAULT_USER=$(whoami)
 DEFAULT_PORT="3999"
 DEFAULT_ENV="production"
 DEFAULT_DESC="Threat Intelligence Logger (Release Bundle)"
+DEFAULT_DOMAIN="localhost"
+DEFAULT_API_BASE="http://localhost/honeypot/api"
+DEFAULT_AUTH_URI="https://localhost:3443/auth/api/v1"
+DEFAULT_ORIGINS="http://localhost:5173,http://localhost:4300,https://localhost,http://192.168.0.1:5173,http://192.168.0.1:4300"
+DEFAULT_APP_ID="honeypot-host-001"
+DEFAULT_ALLOW_ANON="true"
 
 # Get version from package.json
 PKG_VERSION=$(grep '"version":' "$PROJECT_ROOT/package.json" | cut -d'"' -f4)
@@ -36,55 +42,51 @@ DEPLOY_ENV=${DEPLOY_ENV:-$DEFAULT_ENV}
 read -p "📝 Descrizione ($DEFAULT_DESC): " DEPLOY_DESC
 DEPLOY_DESC=${DEPLOY_DESC:-$DEFAULT_DESC}
 
-echo "------------------------------------------------------------"
-echo "✅ Parametri configurati:"
-echo "   - Servizio: $SERVICE_NAME"
-echo "   - Utente:   $DEPLOY_USER"
-echo "   - Porta:    $DEPLOY_PORT"
-echo "   - Env:      $DEPLOY_ENV"
-echo "------------------------------------------------------------"
+read -p "🌐 Dominio Applicazione ($DEFAULT_DOMAIN): " APP_DOMAIN
+APP_DOMAIN=${APP_DOMAIN:-$DEFAULT_DOMAIN}
 
-# 2. Esecuzione Build
-echo "🏗️  Avvio generazione release bundle v$RELEASE_VERSION..."
-# Esegue make-release.sh assicurandosi che la directory corrente sia quella dello script
+read -p "🔗 API Base URL ($DEFAULT_API_BASE): " API_BASE_URL
+API_BASE_URL=${API_BASE_URL:-$DEFAULT_API_BASE}
+
+read -p "🔐 Digital Auth URI ($DEFAULT_AUTH_URI): " URI_DIGITAL_AUTH
+URI_DIGITAL_AUTH=${URI_DIGITAL_AUTH:-$DEFAULT_AUTH_URI}
+
+read -p "🆔 App ID (Identity) ($DEFAULT_APP_ID): " APP_ID
+APP_ID=${APP_ID:-$DEFAULT_APP_ID}
+
+read -p "🔓 Consenti accesso anonimo? ($DEFAULT_ALLOW_ANON): " ALLOW_ANONYMOUS
+ALLOW_ANONYMOUS=${ALLOW_ANONYMOUS:-$DEFAULT_ALLOW_ANON}
+
+echo "🔒 Configurazione Origins (CORS/CSP):"
+echo "Default attuale: $DEFAULT_ORIGINS"
+read -p "Inserisci origini separate da virgola (o INVIO per default): " ALLOWED_ORIGINS
+ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-$DEFAULT_ORIGINS}
+
+echo "------------------------------------------------------------"
+echo "✅ Parametri configurati. Avvio build autonoma..."
+
+# 2. Esecuzione Build Autonoma
+# Passiamo tutti i parametri a make-release.sh
 cd "$(dirname "${BASH_SOURCE[0]}")"
-./make-release.sh "$RELEASE_VERSION"
+./make-release.sh "$RELEASE_VERSION" "$SERVICE_NAME" "$DEPLOY_PORT" "$DEPLOY_USER" "$DEPLOY_ENV" "$DEPLOY_DESC" "$ALLOWED_ORIGINS" "$APP_DOMAIN" "$API_BASE_URL" "$APP_ID" "$ALLOW_ANONYMOUS" "$URI_DIGITAL_AUTH"
+
 if [ $? -ne 0 ]; then
-    echo "❌ Errore durante la build. Esco."
+    echo "❌ Errore durante la build."
     exit 1
 fi
 
-echo "------------------------------------------------------------"
-# 3. Estrazione Bundle (Sempre eseguita)
-echo "📦 Estrazione bundle nella cartella dedicata: deployments/$SERVICE_NAME"
 DEPLOY_PATH="$PROJECT_ROOT/deployments/$SERVICE_NAME"
-mkdir -p "$DEPLOY_PATH"
-
-# Trova l'ultimo tar.gz generato nella cartella artifact
-LATEST_TAR=$(ls -t "$PROJECT_ROOT"/artifact/threatintel-bundle-*.tar.gz 2>/dev/null | head -n 1)
-
-if [ -z "$LATEST_TAR" ]; then
-    echo "❌ Impossibile trovare l'archivio generato in $PROJECT_ROOT/artifact."
-    exit 1
-fi
-
-tar -xzf "$LATEST_TAR" -C "$DEPLOY_PATH"
-echo "✅ Bundle estratto in $DEPLOY_PATH"
 
 echo "------------------------------------------------------------"
-# 4. Registrazione Servizio (Opzionale)
+# 3. Registrazione Servizio (Opzionale)
 read -p "🚀 Vuoi registrare e avviare il servizio systemd ora? [y/N]: " DO_INSTALL
 if [[ "$DO_INSTALL" =~ ^([yY][eE][sS]|[yY])$ ]]; then
     echo "⚙️  Installazione servizio in corso..."
     cd "$DEPLOY_PATH"
-    
-    # Esegue l'installer con i parametri raccolti
-    PORT=$DEPLOY_PORT NODE_ENV=$DEPLOY_ENV DESC="$DEPLOY_DESC" ./install.sh "$SERVICE_NAME" "$DEPLOY_USER"
-    
+    ./install.sh "$SERVICE_NAME"
     echo ""
     echo "✨ Servizio configurato e avviato!"
-    echo "👉 Status: sudo systemctl status $SERVICE_NAME"
 else
     echo "✅ Release preparata in deployments/$SERVICE_NAME."
-    echo "💡 Puoi attivare il servizio in seguito usando scripts/build/deploy-pending.sh"
+    echo "💡 Puoi attivarla in seguito entrando nella cartella ed eseguendo ./install.sh"
 fi

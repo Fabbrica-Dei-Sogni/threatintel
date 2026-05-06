@@ -7,13 +7,17 @@
  */
 
 import 'reflect-metadata';
-import { container } from 'tsyringe';
+import { getComponent, container } from '../../di/container';
+import { setupContainer } from '../../di/registry';
 import { NginxLogService } from '../NginxLogService';
-import { ThreatLogService } from '../ThreatLogService';
-import PatternAnalysisService from '../PatternAnalysisService';
-import { LOGGER_TOKEN } from '../../di/tokens';
-import { AppConfigProvider } from '../AppConfigProvider';
-import { ThreatLogFactory } from '../../utils/ThreatLogFactory';
+import { 
+    LOGGER_TOKEN, 
+    NGINX_LOG_SERVICE_TOKEN,
+    THREAT_LOG_SERVICE_TOKEN,
+    PATTERN_ANALYSIS_SERVICE_TOKEN,
+    CONFIG_PROVIDER_TOKEN,
+    THREAT_LOG_FACTORY_TOKEN
+} from '../../di/tokens';
 import { spawn } from 'child_process';
 import { EventEmitter } from 'events';
 
@@ -31,6 +35,9 @@ describe('NginxLogService', () => {
     let mockThreatLogFactory: any;
 
     beforeEach(() => {
+        setupContainer(container);
+        container.clearInstances();
+
         mockLogger = {
             info: jest.fn(),
             error: jest.fn(),
@@ -68,14 +75,13 @@ describe('NginxLogService', () => {
 
         process.env.COMMON_ENDPOINTS = '/test-endpoint,/malicious';
 
-        container.clearInstances();
         container.registerInstance(LOGGER_TOKEN, mockLogger);
-        container.registerInstance(ThreatLogService, mockThreatLogService);
-        container.registerInstance(PatternAnalysisService, mockPatternAnalysisService);
-        container.registerInstance(AppConfigProvider, mockAppConfigProvider);
-        container.registerInstance(ThreatLogFactory, mockThreatLogFactory);
+        container.registerInstance(THREAT_LOG_SERVICE_TOKEN, mockThreatLogService);
+        container.registerInstance(PATTERN_ANALYSIS_SERVICE_TOKEN, mockPatternAnalysisService);
+        container.registerInstance(CONFIG_PROVIDER_TOKEN, mockAppConfigProvider);
+        container.registerInstance(THREAT_LOG_FACTORY_TOKEN, mockThreatLogFactory);
 
-        service = container.resolve(NginxLogService);
+        service = getComponent(NGINX_LOG_SERVICE_TOKEN);
     });
 
     describe('buildSuspiciousPatterns', () => {

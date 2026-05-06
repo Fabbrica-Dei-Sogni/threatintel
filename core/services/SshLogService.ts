@@ -7,7 +7,7 @@
  */
 
 import { inject, singleton } from 'tsyringe';
-import { LOGGER_TOKEN } from '../di/tokens';
+import * as Tokens from '../di/tokens';
 import { Logger } from 'winston';
 import { ThreatLogService } from './ThreatLogService';
 import { AppConfigProvider } from './AppConfigProvider';
@@ -19,8 +19,8 @@ import { ThreatLogFactory } from '../utils/ThreatLogFactory';
 export class SshLogService extends BaseJournalWatcher {
     public readonly serviceName = 'SshLogService';
     
-    private failedPasswordScore: number = 15;
-    private invalidUserScore: number = 25;
+    public failedPasswordScore: number = 15;
+    public invalidUserScore: number = 25;
     private initialized: Promise<void>;
 
     // Buffer for batching SSH logs
@@ -29,10 +29,10 @@ export class SshLogService extends BaseJournalWatcher {
     private readonly FLUSH_INTERVAL_MS = 60000;
 
     constructor(
-        @inject(LOGGER_TOKEN) logger: Logger,
-        private readonly threatLogService: ThreatLogService,
-        private readonly configProvider: AppConfigProvider,
-        private readonly threatLogFactory: ThreatLogFactory
+        @inject(Tokens.LOGGER_TOKEN) logger: Logger,
+        @inject(Tokens.THREAT_LOG_SERVICE_TOKEN) private readonly threatLogService: ThreatLogService,
+        @inject(Tokens.CONFIG_PROVIDER_TOKEN) private readonly configProvider: AppConfigProvider,
+        @inject(Tokens.THREAT_LOG_FACTORY_TOKEN) private readonly threatLogFactory: ThreatLogFactory
     ) {
         super(logger);
         this.initialized = this.loadConfig();
@@ -66,12 +66,12 @@ export class SshLogService extends BaseJournalWatcher {
         }
     }
 
-    stop() {
+    async stop() {
         super.stop();
         if (this.bufferFlushInterval) {
             clearInterval(this.bufferFlushInterval);
             this.bufferFlushInterval = null;
-            this.flushBuffer();
+            await this.flushBuffer();
         }
     }
 
@@ -174,6 +174,9 @@ export class SshLogService extends BaseJournalWatcher {
         }
     }
 
+    /**
+     * @deprecated Usare BackgroundJobManager con 'ssh_reanalyze' per un'esecuzione asincrona.
+     */
     async analyzeSshLogs(batchSize: number = 100) {
         await this.loadConfig();
         this.logger.info('[SshLogService] Avvio ricalcolo score SSH...');

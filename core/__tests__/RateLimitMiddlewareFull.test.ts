@@ -7,25 +7,10 @@
  * See root LICENSE.md for core engine licensing details.
  */
 import 'reflect-metadata';
-import { RateLimitMiddleware, redisClient } from '../rateLimitMiddleware';
+import { RateLimitMiddleware } from '../rateLimitMiddleware';
 import { RateLimitService } from '../services/RateLimitService';
+import { RedisService } from '../services/RedisService';
 import { Logger } from 'winston';
-
-// Mock di ioredis
-jest.mock('ioredis', () => {
-    return jest.fn().mockImplementation(() => {
-        return {
-            on: jest.fn(),
-            sadd: jest.fn(),
-            setex: jest.fn(),
-            call: jest.fn(),
-            sismember: jest.fn(),
-            ttl: jest.fn(),
-            incr: jest.fn(),
-            expire: jest.fn(),
-        };
-    });
-});
 
 // Mock di rate-limit-redis
 jest.mock('rate-limit-redis', () => {
@@ -43,8 +28,8 @@ jest.mock('express-rate-limit', () => {
     return {
         ...original,
         __esModule: true,
-        default: jest.fn().mockImplementation((options) => {
-            return (req: any, res: any, next: any) => {
+        default: jest.fn().mockImplementation((_options) => {
+            return (_req: any, _res: any, next: any) => {
                 next();
             };
         }),
@@ -56,36 +41,64 @@ describe('RateLimitMiddleware Full Coverage', () => {
     let middleware: RateLimitMiddleware;
     let mockLogger: jest.Mocked<Logger>;
     let mockRateLimitService: jest.Mocked<RateLimitService>;
+    let mockRedisService: jest.Mocked<RedisService>;
+    let mockRedisClient: any;
 
     beforeEach(() => {
         mockLogger = {
             info: jest.fn(),
             error: jest.fn(),
             warn: jest.fn(),
+            debug: jest.fn(),
         } as any;
 
         mockRateLimitService = {
             logEvent: jest.fn().mockResolvedValue({}),
         } as any;
 
-        middleware = new RateLimitMiddleware(mockLogger, mockRateLimitService);
+        mockRedisClient = {
+            sadd: jest.fn(),
+            setex: jest.fn(),
+            srem: jest.fn(),
+            del: jest.fn(),
+            call: jest.fn(),
+            sismember: jest.fn(),
+            ttl: jest.fn(),
+            incr: jest.fn(),
+            expire: jest.fn(),
+            status: 'ready'
+        };
+
+        mockRedisService = {
+            isReady: jest.fn().mockReturnValue(true),
+            getClient: jest.fn().mockReturnValue(mockRedisClient),
+            getState: jest.fn().mockReturnValue('ready'),
+        } as any;
+
+        middleware = new RateLimitMiddleware(mockLogger, mockRedisService, mockRateLimitService);
         jest.clearAllMocks();
     });
 
-    it('should use RedisStore if redisClient is available', () => {
+    it('should use RedisStore if RedisService is ready', () => {
         const store = (middleware as any).getStore();
         expect(store).toBeDefined();
         
-        const mockRedis = redisClient;
         store.sendCommand('TEST');
-        expect(mockRedis.call).toHaveBeenCalledWith('TEST');
+        expect(mockRedisClient.call).toHaveBeenCalledWith('TEST');
+    });
+
+    it('should use memory store if RedisService is not ready', () => {
+        mockRedisService.isReady.mockReturnValue(false);
+
+        const store = (middleware as any).getStore();
+        expect(store).toBeUndefined();
+        expect(mockRedisClient.call).not.toHaveBeenCalled();
     });
 
     describe('violationTracker', () => {
         it('should block blacklisted IPs', async () => {
-            const mockRedis = redisClient as any;
-            mockRedis.sismember.mockResolvedValue(1); 
-            mockRedis.ttl.mockResolvedValue(100);
+            mockRedisClient.sismember.mockResolvedValue(1); 
+            mockRedisClient.ttl.mockResolvedValue(100);
 
             const tracker = middleware.violationTracker();
             const req = { ip: '1.2.3.4' } as any;
@@ -101,8 +114,7 @@ describe('RateLimitMiddleware Full Coverage', () => {
         });
 
         it('should track violations on 429 response', async () => {
-            const mockRedis = redisClient as any;
-            mockRedis.incr.mockResolvedValue(1);
+            mockRedisClient.incr.mockResolvedValue(1);
 
             const tracker = middleware.violationTracker();
             const req = { ip: '1.1.1.1' } as any;
@@ -119,12 +131,11 @@ describe('RateLimitMiddleware Full Coverage', () => {
             // Wait a bit for the async IIFE
             await new Promise(resolve => setTimeout(done => { resolve(done); }, 50));
             
-            expect(mockRedis.incr).toHaveBeenCalledWith('violations:1.1.1.1');
+            expect(mockRedisClient.incr).toHaveBeenCalledWith('violations:1.1.1.1');
         });
 
         it('should auto-blacklist after max violations', async () => {
-            const mockRedis = redisClient as any;
-            mockRedis.incr.mockResolvedValue(10); 
+            mockRedisClient.incr.mockResolvedValue(10); 
             process.env.MAX_VIOLATIONS = '5';
 
             const tracker = middleware.violationTracker();
@@ -136,7 +147,21 @@ describe('RateLimitMiddleware Full Coverage', () => {
 
             await new Promise(resolve => setTimeout(done => { resolve(done); }, 50));
 
-            expect(mockRedis.sadd).toHaveBeenCalledWith('blacklisted-ips', '2.2.2.2');
+            expect(mockRedisClient.sadd).toHaveBeenCalledWith('blacklisted-ips', '2.2.2.2');
+        });
+
+        it('should continue when redis is not ready', async () => {
+            mockRedisService.isReady.mockReturnValue(false);
+
+            const tracker = middleware.violationTracker();
+            const req = { ip: '3.3.3.3', path: '/login' } as any;
+            const res = { status: jest.fn().mockReturnThis(), json: jest.fn() } as any;
+            const next = jest.fn();
+
+            await tracker(req, res, next);
+
+            expect(next).toHaveBeenCalled();
+            expect(mockRedisClient.sismember).not.toHaveBeenCalled();
         });
     });
 

@@ -214,7 +214,13 @@
                 "session": "SESJA",
                 "sessionRef": "SESSION-REF",
                 "subjectIdentified": "PODMIOT ZIDENTYFIKOWANY",
-                "subjectIdentityRevealed": "TOŻSAMOŚĆ PODMIOTU UJAWNIONA - PROTOKÓŁ FORENSYTYCZNY [{locale}]"
+                "subjectIdentityRevealed": "TOŻSAMOŚĆ PODMIOTU UJAWNIONA - PROTOKÓŁ FORENSYTYCZNY [{locale}]",
+                "rateBreachTitle": "SZCZEGÓŁY NARUSZENIA LIMITU SZYBKOŚCI",
+                "limitType": "TYP LIMITU",
+                "ip": "ADRES IP",
+                "method": "METODA HTTP",
+                "path": "ŚCIEŻKA (PATH)",
+                "honeypotId": "ID HONEYPOT"
             },
             "hud": {
                 "attackSummaryTitle": "HUD TAKTYCZNY: PODSUMOWANIE ATAKU",

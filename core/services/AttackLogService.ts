@@ -7,7 +7,6 @@
  */
 import { inject, injectable } from 'tsyringe';
 import { Logger } from 'winston';
-import { LOGGER_TOKEN, EVENT_BUS_TOKEN, FORENSIC_PIPELINE_TOKEN } from '../di/tokens';
 import { EventBus, AppEvents } from './EventBus';
 import { ForensicPipelineService } from './forense/ForensicPipelineService';
 import ThreatLog from '../models/ThreatLogSchema';
@@ -21,12 +20,14 @@ import {
 } from '../utils/queryGuard';
 import { GetAttackDetailParams, GetAttacksParams } from '../types/service-params.types';
 
+import * as Tokens from '../di/tokens';
+
 @injectable()
 export class AttackLogService {
     constructor(
-        @inject(LOGGER_TOKEN) private readonly logger: Logger,
-        @inject(FORENSIC_PIPELINE_TOKEN) private readonly forensicPipelineService: ForensicPipelineService,
-        @inject(EVENT_BUS_TOKEN) private readonly eventBus: EventBus
+        @inject(Tokens.LOGGER_TOKEN) private readonly logger: Logger,
+        @inject(Tokens.FORENSIC_PIPELINE_TOKEN) private readonly forensicPipelineService: ForensicPipelineService,
+        @inject(Tokens.EVENT_BUS_TOKEN) private readonly eventBus: EventBus
     ) { }
 
     /**
@@ -55,11 +56,15 @@ export class AttackLogService {
             }
         }
 
+        const requestedStatus = filters.status || 'active';
+        delete initialFilters.status;
+
         const mongoFilters = this.buildRegExpFilter(initialFilters, FilterAllowedFields.attack);
         const safeSort = sanitizeSortFields(sortFields, SortAllowedFields.attack, { lastSeen: -1 });
         const sortStage = { $sort: safeSort };
 
         const basePipeline = await this.forensicPipelineService.buildStandardPipeline(mongoFilters, minLogsForAttack, timeConfig);
+        basePipeline.push({ $match: { status: requestedStatus } });
 
         if (Object.keys(postAggregationFilters).length > 0) {
             const { dangerLevel, ...otherPostFilters } = postAggregationFilters;
@@ -150,13 +155,15 @@ export class AttackLogService {
             status = 'active'
         } = params;
 
+        const requestedStatus = status || 'active';
+        
         const mongoFilters = this.buildRegExpFilter({
             'request.ip': ip,
-            protocol,
-            status
+            protocol
         }, FilterAllowedFields.attack);
 
         const basePipeline = await this.forensicPipelineService.buildStandardPipeline(mongoFilters, minLogsForAttack, timeConfig);
+        basePipeline.push({ $match: { status: requestedStatus } });
 
         const pipeline = [
             ...basePipeline,
@@ -238,16 +245,16 @@ export class AttackLogService {
 
         if (allowedFields.has('status')) {
             const statusValue = safeFilters.status;
-            if (!statusValue || statusValue === 'active') {
-                mongoFilters.status = { $in: [null, 'active'] };
-            } else {
+            if (statusValue) {
                 mongoFilters.status = statusValue;
             }
             delete safeFilters.status;
         }
 
         for (const [key, value] of Object.entries(safeFilters)) {
-            if (key === 'protocol') {
+            if (key === 'country' || key === 'geo.country') {
+                mongoFilters['geo.country'] = value;
+            } else if (key === 'protocol') {
                 if (value === 'http') {
                     mongoFilters.$or = [
                         { protocol: 'http' },

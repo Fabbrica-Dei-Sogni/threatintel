@@ -165,6 +165,7 @@
             "isWhitelisted": "In Whitelist",
             "hostname": "Hostname / Insegna",
             "firewallBlockTitle": "Intercettazione Firewall (UFW)",
+            "ipWhoisTitle": "Analisi Record Whois (Dati Raw)",
             "telnetSummaryTitle": "Riepilogo Sessione Intercettata",
             "telnetScannerSummaryTitle": "Analisi Forense Scanner",
             "totalScans": "Scansioni Totali Rilevate",

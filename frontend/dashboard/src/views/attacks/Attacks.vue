@@ -337,6 +337,7 @@
                                             agoUnit: attacksState.filters.agoUnit,
                                             minLogsForAttack: attacksState.filters.minLogs,
                                             protocol: attacksState.filters.protocol,
+                                            status: attacksState.filters.status !== 'active' ? attacksState.filters.status : undefined,
                                             dateRange: attacksState.filters.dateRange && (attacksState.filters.dateRange[0] || attacksState.filters.dateRange[1]) ? JSON.stringify(attacksState.filters.dateRange) : undefined
                                         }
                                     }" class="detail-link">
@@ -446,6 +447,7 @@
                                     agoValue: attacksState.filters.agoValue,
                                     agoUnit: attacksState.filters.agoUnit,
                                     minLogsForAttack: attacksState.filters.minLogs,
+                                    status: attacksState.filters.status !== 'active' ? attacksState.filters.status : undefined,
                                     dateRange: attacksState.filters.dateRange && (attacksState.filters.dateRange[0] || attacksState.filters.dateRange[1]) ? JSON.stringify(attacksState.filters.dateRange) : undefined
                                 }
                             }" class="btn-detail">

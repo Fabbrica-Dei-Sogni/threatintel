@@ -214,7 +214,13 @@
                 "session": "SITZUNG",
                 "sessionRef": "SESSION-REF",
                 "subjectIdentified": "SUBJEKT IDENTIFIZIERT",
-                "subjectIdentityRevealed": "SUBJEKTIDENTITÄT OFFENGELEGT - FORENSIK-PROTOKOLL [{locale}]"
+                "subjectIdentityRevealed": "SUBJEKTIDENTITÄT OFFENGELEGT - FORENSIK-PROTOKOLL [{locale}]",
+                "rateBreachTitle": "RATE-LIMIT-VERLETZUNGSDETAIL",
+                "limitType": "LIMIT-TYP",
+                "ip": "IP-ADRESSE",
+                "method": "HTTP-METHODE",
+                "path": "PFAD",
+                "honeypotId": "HONEYPOT-ID"
             },
             "hud": {
                 "attackSummaryTitle": "TAKTISCHES HUD: ANGRIFFS-ZUSAMMENFASSUNG",

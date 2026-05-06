@@ -28,7 +28,7 @@ describe('useLogsFilter', () => {
   });
 
   it('should initialize with provided values', () => {
-    const { filterIp, filterProtocol, page } = useLogsFilter('1.2.3.4', '', 'ssh', 2);
+    const { filterIp, filterProtocol, page } = useLogsFilter('1.2.3.4', '', 'ssh', 'active', 2);
     
     expect(filterIp.value).toBe('1.2.3.4');
     expect(filterProtocol.value).toBe('ssh');
@@ -52,7 +52,8 @@ describe('useLogsFilter', () => {
     expect(api.fetchSearch).toHaveBeenCalledWith(expect.objectContaining({
       page: 1,
       pageSize: 20,
-      filters: { protocol: 'http' }
+      filters: { protocol: 'http', status: 'active' },
+      sortFields: { timestamp: -1 }
     }));
   });
 

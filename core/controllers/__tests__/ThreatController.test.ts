@@ -9,14 +9,13 @@
 import 'reflect-metadata';
 import request from 'supertest';
 import express from 'express';
-import { container } from 'tsyringe';
+import { getComponent, container } from '../../di/container';
 import { ThreatController } from '../../controllers/ThreatController';
-import { ThreatLogService } from '../../services/ThreatLogService';
-import { IpDetailsService } from '../../services/IpDetailsService';
-import { SshLogService } from '../../services/SshLogService';
-import { LOGGER_TOKEN } from '../../di/tokens';
+
+import { LOGGER_TOKEN, ROUTER_HUB_TOKEN, THREAT_LOG_SERVICE_TOKEN, IP_DETAILS_SERVICE_TOKEN, SSH_LOG_SERVICE_TOKEN, BACKGROUND_JOB_MANAGER_TOKEN } from '../../di/tokens';
 import { Logger } from 'winston';
-import { AuthMiddleware } from '../../middlewares/AuthMiddleware';
+
+import { setupContainer } from '../../di/registry';
 import { RouterHub } from '../../registry/RouterHub';
 
 // Mock AuthMiddleware PRIMA di importare il controller se possibile, 
@@ -25,9 +24,9 @@ jest.mock('../../middlewares/AuthMiddleware', () => {
     return {
         AuthMiddleware: jest.fn().mockImplementation(() => {
             return {
-                isAuthenticated: jest.fn().mockReturnValue((req: any, res: any, next: any) => next()),
-                isIdentified: jest.fn().mockReturnValue((req: any, res: any, next: any) => next()),
-                hasRole: jest.fn().mockReturnValue((req: any, res: any, next: any) => next()),
+                isAuthenticated: jest.fn().mockReturnValue((_req: any, _res: any, next: any) => next()),
+                isIdentified: jest.fn().mockReturnValue((_req: any, _res: any, next: any) => next()),
+                hasRole: jest.fn().mockReturnValue((_req: any, _res: any, next: any) => next()),
             };
         })
     };
@@ -63,18 +62,27 @@ const mockLogger = {
     warn: jest.fn(),
 } as unknown as Logger;
 
+const mockJobManager = {
+    startJob: jest.fn(),
+};
+
+// Initialize DI
+setupContainer(container);
+container.clearInstances();
+
 // Iniezione dei mock nel container di tsyringe
-container.register<ThreatLogService>(ThreatLogService, { useValue: mockThreatLogService as any });
-container.register<IpDetailsService>(IpDetailsService, { useValue: mockIpDetailsService as any });
-container.register<SshLogService>(SshLogService, { useValue: mockSshLogService as any });
-container.register<Logger>(LOGGER_TOKEN, { useValue: mockLogger });
+container.registerInstance(THREAT_LOG_SERVICE_TOKEN, mockThreatLogService);
+container.registerInstance(IP_DETAILS_SERVICE_TOKEN, mockIpDetailsService);
+container.registerInstance(SSH_LOG_SERVICE_TOKEN, mockSshLogService);
+container.registerInstance(BACKGROUND_JOB_MANAGER_TOKEN, mockJobManager);
+container.registerInstance(LOGGER_TOKEN, mockLogger);
 
 // Creazione istanza dell'app express
 const app = express();
 app.use(express.json());
 
 // Registrazione e bind tramite RouterHub
-const hub = container.resolve(RouterHub);
+const hub = getComponent<RouterHub>(ROUTER_HUB_TOKEN);
 hub.register(ThreatController);
 hub.bindHttp(app, container);
 
@@ -178,11 +186,13 @@ describe('ThreatRoutes API', () => {
     });
     
     describe('POST /api/reanalyze-all', () => {
-        it('should trigger a full reanalysis of logs', async () => {
-            mockThreatLogService.analyzeLogs.mockResolvedValue({ processed: 10, suspicious: 5 });
+        it('should trigger asynchronous reanalysis jobs', async () => {
+            mockJobManager.startJob.mockResolvedValue({ id: 'job-123', status: 'pending' });
+            
             const response = await request(app).post('/api/reanalyze-all').send({});
-            expect(response.status).toBe(200);
-            expect(response.body.http.processed).toBe(10);
+            expect(response.status).toBe(202);
+            expect(response.body.message).toContain('avviati in background');
+            expect(response.body.jobs.http.jobId).toBe('job-123');
         });
     });
 

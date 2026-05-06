@@ -5,28 +5,22 @@
  * Licensed under the Business Source License 1.1 (BSL-1.1).
  * See LICENSE.md in the project root for license terms.
  */
-
-import { logger } from '../../logger';
-import util from 'util';
 import axios from 'axios';
 import dotenv from 'dotenv';
 
 // Import JS dependencies
-import * as whois from 'whois';
 import ipinfo from 'ipinfo';
 import AbuseReport from '../models/AbuseReportSchema';
 import IpDetails from '../models/IpDetailsSchema';
 import AbuseIpDb from '../models/AbuseIpDbSchema';
 import { AbuseCategoryEnum } from '../models/AbuseCategoryEnum';
 import { inject, injectable } from 'tsyringe';
-import { LOGGER_TOKEN, EVENT_BUS_TOKEN } from '../di/tokens';
+import * as Tokens from '../di/tokens';
 import { Logger } from 'winston';
 import ipRangeCheck from 'ip-range-check';
 import { IpDetailsMapper } from '../models/dto/IpDetailsDTO';
 import { EventBus, AppEvents } from './EventBus';
 import { GetIpDetailsParams } from '../types/service-params.types';
-
-const whoisAsync = util.promisify(whois.lookup);
 
 dotenv.config();
 
@@ -36,8 +30,8 @@ export class IpDetailsService {
     private pendingLookups: Map<string, Promise<any>> = new Map();
 
     constructor(
-        @inject(LOGGER_TOKEN) private readonly logger: Logger,
-        @inject(EVENT_BUS_TOKEN) private readonly eventBus: EventBus
+        @inject(Tokens.LOGGER_TOKEN) private readonly logger: Logger,
+        @inject(Tokens.EVENT_BUS_TOKEN) private readonly eventBus: EventBus
     ) {
         this.excludedIPs = this.parseExcludedIPs();
     }
@@ -107,7 +101,7 @@ export class IpDetailsService {
 
             if (shouldEnrich) {
                 this.logger.info(`[IpDetailsService] Cache scaduta o aggiornamento richiesto per ${ip}. Avvio enrichment...`);
-                
+
                 // 1. AbuseIPDB enrichment
                 const saveAbuseDoc = await this.getAndSaveAbuseIpDb(ip);
                 if (saveAbuseDoc) {
@@ -116,7 +110,7 @@ export class IpDetailsService {
 
                 // 2. IPInfo & Whois enrichment
                 const enrichedData = await this.enrichIpData(ip);
-                
+
                 // Gestione specifica 429: Se ipinfo è fallito per rate limit, non aggiorniamo enrichedAt
                 // in modo da permettere un retry al prossimo avvistamento senza aspettare 24h.
                 const isIpInfoRateLimited = enrichedData.ipinfo && (enrichedData.ipinfo as any).status === 429;
@@ -127,7 +121,7 @@ export class IpDetailsService {
                 if (enrichedData.whois_raw) {
                     ipDetails.whois_raw = enrichedData.whois_raw;
                 }
-                
+
                 if (!isIpInfoRateLimited) {
                     ipDetails.enrichedAt = now;
                 } else {
@@ -138,14 +132,14 @@ export class IpDetailsService {
             await ipDetails.save();
 
             // SYNC TO RAG (Asincrono)
-            this.syncToRag(ipDetails).catch(err => 
+            this.syncToRag(ipDetails).catch(err =>
                 this.logger.error(`[IpDetailsService] Error during RAG sync: ${err}`)
             );
 
             return ipDetails._id;
         } else {
             this.logger.info(`[IpDetailsService] Primo avvistamento per ${ip}. Esecuzione enrichment completo...`);
-            
+
             // Primo enrichment obbligatorio
             const saveAbuseDoc = await this.getAndSaveAbuseIpDb(ip);
             const enrichedData = await this.enrichIpData(ip);
@@ -176,7 +170,7 @@ export class IpDetailsService {
             }
 
             // SYNC TO RAG (Asincrono)
-            this.syncToRag(result).catch(err => 
+            this.syncToRag(result).catch(err =>
                 this.logger.error(`[IpDetailsService] Error during RAG sync: ${err}`)
             );
 
@@ -254,7 +248,7 @@ export class IpDetailsService {
 
             return savedDoc;
         } catch (error: any) {
-            logger.error(`Errore aggiornamento AbuseIpDb per ${ip}: ${error.message}`);
+            this.logger.error(`Errore aggiornamento AbuseIpDb per ${ip}: ${error.message}`);
             return null;
         }
     }
@@ -264,7 +258,7 @@ export class IpDetailsService {
             const cached = await AbuseIpDb.findOne({ ip });
             return cached;
         } catch (error: any) {
-            logger.error(`Errore recupero cache AbuseIpDb per ${ip}: ${error.message}`);
+            this.logger.error(`Errore recupero cache AbuseIpDb per ${ip}: ${error.message}`);
             return null;
         }
     }
@@ -314,7 +308,7 @@ export class IpDetailsService {
 
             return savedReports;
         } catch (error: any) {
-            logger.error(`Errore aggiornamento AbuseIpDb per ${ip}: ${error.message}`);
+            this.logger.error(`Errore aggiornamento AbuseIpDb per ${ip}: ${error.message}`);
             throw error;
         }
     }
@@ -365,7 +359,7 @@ export class IpDetailsService {
 
             return response.data.data; // array di reports
         } catch (error: any) {
-            logger.error(`Errore chiamata AbuseIPDB reports per IP ${ip}: ${error.message}`);
+            this.logger.error(`Errore chiamata AbuseIPDB reports per IP ${ip}: ${error.message}`);
             throw error;
         }
     }
@@ -380,11 +374,7 @@ export class IpDetailsService {
         // Dettaglio da ipinfo (puoi registrarti per key se sfori il free tier)
         const info = await this.ipinfoPromise(ip);
 
-        // Whois con promisify (richiede connessione)
-        let whoisData: any = '';
-        try {
-            whoisData = await whoisAsync(ip);
-        } catch (e) { whoisData = null; }
+        const whoisData = await this.whoisPromise(ip);
 
         return {
             ip,
@@ -392,6 +382,47 @@ export class IpDetailsService {
             whois_raw: whoisData || null,
             enrichedAt: new Date()
         };
+    }
+
+    private whoisPromise(ip: string): Promise<string | null> {
+        return new Promise((resolve) => {
+            this.logger.info(`[IpDetailsService] Avvio lookup WHOIS per ${ip}...`);
+            const timeout = setTimeout(() => {
+                this.logger.warn(`[IpDetailsService] Timeout lookup WHOIS per ${ip}`);
+                resolve(null);
+            }, 5000); // 5 secondi di timeout per whois
+
+            try {
+                const importer = new Function('specifier', 'return import(specifier)') as (specifier: string) => Promise<any>;
+                importer('whois').then(whoisModule => {
+                    const lookup = whoisModule.lookup || whoisModule.default?.lookup;
+
+                    if (typeof lookup !== 'function') {
+                        clearTimeout(timeout);
+                        this.logger.error(`[IpDetailsService] Modulo WHOIS non valido per ${ip}`);
+                        return resolve(null);
+                    }
+
+                    lookup(ip, (err: Error | null, data: string) => {
+                        clearTimeout(timeout);
+                        if (err) {
+                            this.logger.warn(`[IpDetailsService] Fallimento lookup WHOIS per ${ip}:`, err.message);
+                            return resolve(null);
+                        }
+                        this.logger.info(`[IpDetailsService] Lookup WHOIS per ${ip} completato (${data?.length || 0} bytes).`);
+                        resolve(data);
+                    });
+                }).catch(err => {
+                    clearTimeout(timeout);
+                    this.logger.warn(`[IpDetailsService] Errore caricamento modulo WHOIS per ${ip}:`, err.message);
+                    resolve(null);
+                });
+            } catch (err: any) {
+                clearTimeout(timeout);
+                this.logger.warn(`[IpDetailsService] Eccezione lookup WHOIS per ${ip}:`, err.message);
+                resolve(null);
+            }
+        });
     }
 
     private ipinfoPromise(ip: string): Promise<any> {
@@ -433,7 +464,7 @@ export class IpDetailsService {
             // Recupera dati completi per la traduzione semantica
             const abuseData = ipDetails.abuseipdbId ? await AbuseIpDb.findById(ipDetails.abuseipdbId) : null;
             const reports = abuseData ? await AbuseReport.find({ abuseIpDbId: abuseData._id }).sort({ reportedAt: -1 }).limit(20) : [];
-            
+
             // Notifica il sistema RAG via Event Bus
             this.eventBus.emit(AppEvents.IP_DETAILS_UPDATED, { ipDetails, abuseData, reports });
         } catch (error) {

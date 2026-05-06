@@ -8,19 +8,20 @@
 
 import { injectable, inject } from 'tsyringe';
 import { Logger } from 'winston';
-import { LOGGER_TOKEN, EVENT_BUS_TOKEN, FORENSIC_PIPELINE_TOKEN } from '../di/tokens';
 import ThreatLog from '../models/ThreatLogSchema';
 import { calculateCorrelationHubs } from '../utils/CampaignAnalytics';
 import { EventBus, AppEvents } from './EventBus';
 import { GetCampaignDetailParams, GetCampaignsParams } from '../types/service-params.types';
 import { ForensicPipelineService } from './forense/ForensicPipelineService';
 
+import * as Tokens from '../di/tokens';
+
 @injectable()
 export class CampaignService {
     constructor(
-        @inject(LOGGER_TOKEN) private readonly logger: Logger,
-        @inject(EVENT_BUS_TOKEN) private readonly eventBus: EventBus,
-        @inject(FORENSIC_PIPELINE_TOKEN) private readonly forensicPipeline: ForensicPipelineService
+        @inject(Tokens.LOGGER_TOKEN) private readonly logger: Logger,
+        @inject(Tokens.EVENT_BUS_TOKEN) private readonly eventBus: EventBus,
+        @inject(Tokens.FORENSIC_PIPELINE_TOKEN) private readonly forensicPipeline: ForensicPipelineService
     ) { }
 
     /**
@@ -39,12 +40,7 @@ export class CampaignService {
         // 1. Preparazione Filtro Mongo Base (richiesto dall'utente)
         const baseFilters: any = {};
 
-        // Gestione Status con fallback
-        if (!status || status === 'active') {
-            baseFilters.status = { $in: [null, 'active'] };
-        } else {
-            baseFilters.status = status;
-        }
+        const requestedStatus = status || 'active';
 
         if (protocol) {
             if (protocol === 'http') {
@@ -88,8 +84,10 @@ export class CampaignService {
             const globalMinDate = oldestLog?.timestamp || null;
             const globalMaxDate = newestLog?.timestamp || null;
 
-            // 2. Costruzione Pipeline tramite ForensicPipelineService
             const pipeline = await this.forensicPipeline.buildCampaignDiscoveryPipeline(baseFilters, params);
+
+            // Allineamento logica: lo status viene iniettato prima del facet finale
+            pipeline.splice(pipeline.length - 1, 0, { $match: { status: requestedStatus } });
 
             // 3. Esecuzione Aggregazione
             const [result] = await ThreatLog.aggregate(pipeline).allowDiskUse(true);
@@ -160,11 +158,7 @@ export class CampaignService {
         // 1. Preparazione Filtro Mongo Base
         const baseFilters: any = { 'fingerprint.hash': hash };
 
-        if (!status || status === 'active') {
-            baseFilters.status = { $in: [null, 'active'] };
-        } else {
-            baseFilters.status = status;
-        }
+        const requestedStatus = status || 'active';
 
         if (protocol) {
             if (protocol === 'http') {
@@ -175,7 +169,6 @@ export class CampaignService {
         }
 
         try {
-            // 2. Costruzione Pipeline tramite ForensicPipelineService
             const pipeline = await this.forensicPipeline.buildCampaignDetailPipeline(baseFilters, params);
 
             // 3. Esecuzione Aggregazione
@@ -193,7 +186,7 @@ export class CampaignService {
                 firstSeen: meta.clusterFirstSeen,
                 lastSeen: meta.clusterLastSeen,
                 sampleUrl: meta.sampleUrl,
-                status: meta.status,
+                status: requestedStatus,
                 allIps: meta.allIps || [],
                 correlations,
                 nodes: result?.nodes || [],
@@ -224,8 +217,8 @@ export class CampaignService {
         const baseFilters: any = {};
 
         // Gestione Status con fallback
-        if (!status || status === 'active') {
-            baseFilters.status = { $in: [null, 'active'] };
+        if (!status) {
+            baseFilters.status = 'active';
         } else {
             baseFilters.status = status;
         }

@@ -9,77 +9,73 @@
 import 'reflect-metadata';
 import { RateLimitMiddleware } from '../rateLimitMiddleware';
 import { RateLimitService } from '../services/RateLimitService';
+import { RedisService } from '../services/RedisService';
 import { Logger } from 'winston';
-import { Request, Response } from 'express';
-
-// Mock di ioredis
-jest.mock('ioredis', () => {
-    return jest.fn().mockImplementation(() => {
-        return {
-            on: jest.fn(),
-            sadd: jest.fn(),
-            setex: jest.fn(),
-            call: jest.fn(),
-        };
-    });
-});
-
-// Mock di rate-limit-redis
-jest.mock('rate-limit-redis', () => {
-    return jest.fn().mockImplementation(() => {
-        return {};
-    });
-});
-
-// Mock di express-rate-limit
-jest.mock('express-rate-limit', () => {
-    return jest.fn().mockImplementation(() => {
-        return (req: any, res: any, next: any) => next();
-    });
-});
 
 describe('RateLimitMiddleware', () => {
     let middleware: RateLimitMiddleware;
     let mockLogger: jest.Mocked<Logger>;
     let mockRateLimitService: jest.Mocked<RateLimitService>;
+    let mockRedisService: jest.Mocked<RedisService>;
+    let mockRedisClient: any;
 
     beforeEach(() => {
         mockLogger = {
             info: jest.fn(),
             error: jest.fn(),
             warn: jest.fn(),
+            debug: jest.fn(),
         } as any;
 
         mockRateLimitService = {
             logEvent: jest.fn().mockResolvedValue({}),
         } as any;
 
-        middleware = new RateLimitMiddleware(mockLogger, mockRateLimitService);
+        mockRedisClient = {
+            sadd: jest.fn(),
+            setex: jest.fn(),
+            srem: jest.fn(),
+            del: jest.fn(),
+            call: jest.fn(),
+            sismember: jest.fn(),
+            ttl: jest.fn(),
+            incr: jest.fn(),
+            expire: jest.fn(),
+        };
+
+        mockRedisService = {
+            isReady: jest.fn().mockReturnValue(true),
+            getClient: jest.fn().mockReturnValue(mockRedisClient),
+            getState: jest.fn().mockReturnValue('ready'),
+        } as any;
+
+        middleware = new RateLimitMiddleware(mockLogger, mockRedisService, mockRateLimitService);
         jest.clearAllMocks();
     });
 
     describe('manualBlacklistIP', () => {
         it('should throw error if redis is not available', async () => {
-            // Per questo test dobbiamo assicurarci che redisClient sia null
-            // Poiché è una variabile di modulo in rateLimitMiddleware.ts, 
-            // potremmo dover usare un approccio diverso se il mock globale lo inizializza.
-            // In una situazione reale, potremmo iniettare il client redis se l'architettura lo permettesse.
-            
-            // Verifichiamo il comportamento attuale
-            try {
-                await middleware.manualBlacklistIP('1.2.3.4');
-            } catch (error: any) {
-                // Se redisClient è stato inizializzato dal mock di modulo, questo test potrebbe fallire 
-                // a meno che non forziamo redisClient = null (ma è privato nel modulo).
-            }
+            mockRedisService.isReady.mockReturnValue(false);
+
+            await expect(middleware.manualBlacklistIP('1.2.3.4')).rejects.toThrow('Redis non disponibile');
+            expect(mockRedisClient.sadd).not.toHaveBeenCalled();
         });
 
         it('should blacklist IP and log event when redis is available', async () => {
-            // Questo test assume che redis sia "disponibile" grazie al mock di ioredis
-            // Ma dobbiamo accedere al client mockato che è dentro il modulo.
-            
-            // Nota: Data la struttura attuale di rateLimitMiddleware.ts, il test diretto 
-            // di redisClient è difficile senza refactoring.
+            mockRedisService.isReady.mockReturnValue(true);
+
+            await middleware.manualBlacklistIP('1.2.3.4');
+
+            expect(mockRedisClient.sadd).toHaveBeenCalledWith('blacklisted-ips', '1.2.3.4');
+            expect(mockRedisClient.setex).toHaveBeenCalledWith(
+                'blacklist:1.2.3.4',
+                expect.any(Number),
+                'manual-blacklisted'
+            );
+            expect(mockRateLimitService.logEvent).toHaveBeenCalledWith(expect.objectContaining({
+                ip: '1.2.3.4',
+                limitType: 'manual-blacklist'
+            }));
         });
     });
 
@@ -96,6 +92,7 @@ describe('RateLimitMiddleware', () => {
             const res = {
                 status: jest.fn().mockReturnThis(),
                 json: jest.fn().mockReturnThis(),
+                statusMessage: 'Test Status'
             } as any;
 
             process.env.LOG_RATE_LIMIT_EVENTS = 'true';

@@ -9,22 +9,22 @@
 import { Request, Response } from 'express';
 import { inject, singleton } from 'tsyringe';
 import { CampaignService } from '../services/CampaignService';
-import { LOGGER_TOKEN } from '../di/tokens';
+import * as Tokens from '../di/tokens';
 import { Logger } from 'winston';
 import { sanitizeFilters, sanitizePage, sanitizePageSize, FilterAllowedFields } from '../utils/queryGuard';
 import { Controller, Get, Post } from '../registry/decorators';
 
 @singleton()
-@Controller('/api')
+@Controller('/api/campaign')
 export class CampaignController {
     constructor(
-        private campaignService: CampaignService,
-        @inject(LOGGER_TOKEN) private logger: Logger
+        @inject(Tokens.CAMPAIGN_SERVICE_TOKEN) private readonly campaignService: CampaignService,
+        @inject(Tokens.LOGGER_TOKEN) private readonly logger: Logger
     ) { }
 
     /**
      * @openapi
-     * /campaigns:
+     * /campaign/search:
      *   get:
      *     tags: [Campaigns Analysis]
      *     summary: Scopre pattern di attacco (hash) condivisi da più IP
@@ -69,7 +69,7 @@ export class CampaignController {
      *       200:
      *         description: Elenco campagne distribuite trovate.
      */
-    @Get('/campaigns')
+    @Get('/search')
     async getCampaigns(req: Request, res: Response): Promise<void> {
         this.logger.info('[CampaignController] Requesting distributed campaigns discovery');
         try {
@@ -120,7 +120,7 @@ export class CampaignController {
 
     /**
      * @openapi
-     * /campaign/details:
+     * /campaign/detail:
      *   post:
      *     tags: [Campaigns Analysis]
      *     summary: Ottiene dettagli forensi aggregati per una campagna
@@ -142,7 +142,7 @@ export class CampaignController {
      *       200:
      *         description: Dettagli della campagna.
      */
-    @Post('/campaign/details')
+    @Post('/detail')
     async getCampaignDetail(req: Request, res: Response): Promise<void> {
         const hash = req.body.hash;
         this.logger.info(`[CampaignController] Requesting campaign details for hash ${hash}`);
@@ -197,7 +197,7 @@ export class CampaignController {
 
     /**
      * @openapi
-     * /campaigns/uris:
+     * /campaign/uris:
      *   get:
      *     tags: [Campaigns Analysis]
      *     summary: Ottiene gli URI unici (Target URLs) coinvolti nelle campagne
@@ -218,7 +218,7 @@ export class CampaignController {
      *       200:
      *         description: Elenco degli URI con conteggi.
      */
-    @Get('/campaigns/uris')
+    @Get('/uris')
     async getUniqueUris(req: Request, res: Response): Promise<void> {
         this.logger.info('[CampaignController] Requesting unique URIs from campaigns');
         try {

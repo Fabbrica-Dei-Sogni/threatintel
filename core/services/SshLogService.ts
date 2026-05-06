@@ -58,12 +58,12 @@ export class SshLogService extends BaseJournalWatcher {
         }
     }
 
-    stop() {
+    async stop() {
         super.stop();
         if (this.bufferFlushInterval) {
             clearInterval(this.bufferFlushInterval);
             this.bufferFlushInterval = null;
-            this.flushBuffer();
+            await this.flushBuffer();
         }
     }
 

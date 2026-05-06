@@ -73,15 +73,20 @@ export class LifecycleManager {
         ]).finally(() => clearTimeout(timeoutId));
     }
 
-    public shutdown() {
-        this.logger.info('[LifecycleManager] Spegnimento servizi...');
-        this.services.forEach(s => {
+    public async shutdown() {
+        this.logger.info(`[LifecycleManager] Spegnimento di ${this.services.length} servizi in corso...`);
+        
+        const stopPromises = this.services.map(async (s) => {
             try {
-                s.stop();
-                this.logger.info(`[LifecycleManager] Servizio ${s.serviceName} fermato.`);
+                this.logger.info(`[LifecycleManager] Fermando servizio: ${s.serviceName}...`);
+                await s.stop();
+                this.logger.info(`[LifecycleManager] ✅ Servizio ${s.serviceName} fermato.`);
             } catch (err: any) {
-                this.logger.error(`[LifecycleManager] Errore fermando ${s.serviceName}: ${err.message}`);
+                this.logger.error(`[LifecycleManager] ❌ Errore fermando ${s.serviceName}: ${err.message}`);
             }
         });
+
+        await Promise.all(stopPromises);
+        this.logger.info('[LifecycleManager] Spegnimento completato.');
     }
 }

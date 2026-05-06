@@ -9,6 +9,6 @@ export enum ServiceStatus {
 export interface ILongRunningService {
     serviceName: string;
     start(): Promise<void>;
-    stop(): void;
+    stop(): Promise<void> | void;
     getStatus(): ServiceStatus;
 }

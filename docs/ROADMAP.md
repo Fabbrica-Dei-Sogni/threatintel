@@ -13,8 +13,8 @@
 | [M1: TypeScript Migration](#m1-typescript-migration) | ✅ Completed | 🔴 High | 2-3 settimane |
 | [M2: Dependency Injection](#m2-dependency-injection) | ✅ Completed | 🟠 Medium | 1-2 settimane |
 | [M3: Test Suite Expansion](#m3-test-suite-expansion) | ✅ Completed | 🔴 High | 3-4 settimane |
-| [M4: Performance Optimization](#m4-performance-optimization) | 🟢 In Progress (30%) | 🟡 Low | 1 settimana |
-| [M5: Security Enhancements](#m5-security-enhancements) | ⚪ Planned | 🟠 Medium | 1-2 settimane |
+| [M4: Performance & Scalability](#m4-performance--scalability) | 🟢 In Progress (60%) | 🟡 Low | 1-2 settimane |
+| [M5: Security Enhancements](#m5-security-enhancements) | 🟢 In Progress (40%) | 🟠 Medium | 1-2 settimane |
 | [M6: Monitoring & Observability](#m6-monitoring--observability) | ⚪ Planned | 🟡 Low | 1 settimana |
 | [M7: Frontend Enhancements](#m7-frontend-enhancements) | 🟢 In Progress (95%) | 🟠 Medium | 2 settimane |
 | [M8: Log Analysis & Hardening](#m8-log-analysis--hardening) | ✅ Completed | 🔴 High | 1-2 settimane |
@@ -201,71 +201,71 @@
 
 ---
 
-## M4: Performance Optimization
+## M4: Performance & Scalability
 
-**Obiettivo**: Migliorare performance e scalabilità
+**Obiettivo**: Migliorare performance, scalabilità e capacità di ricerca massiva.
 
-**Status**: ⚪ Planned
+**Status**: 🟢 In Progress (60%)
 
 ### Tasks
-- [ ] Profile MongoDB queries (slow queries)
-- [x] Add database indexes where needed (e.g., `lastChecked` in `IpDetails`)
-- [x] Optimize aggregation pipelines in `ForensicService` (See: [Architecture](./forensic-pipeline-architecture.md))
-- [x] Enable MongoDB `allowDiskUse` for complex sorting/aggregation (`c22a9a6`)
-- [x] Enhance IP lookup concurrency and rate limit handling (`647db10`)
-- [ ] Implement query result caching (Redis)
-- [ ] Optimize rate limiter Redis operations
-- [ ] Add database connection pooling optimization
-- [ ] Load testing con k6 or Artillery
+- [x] Database indexes optimization (e.g., `lastChecked` in `IpDetails`)
+- [x] Aggregation pipelines optimization (Forensic V2)
+- [x] Enable MongoDB `allowDiskUse` for complex sorting (`c22a9a6`)
+- [x] Enhance IP lookup concurrency & Rate limit handling (`647db10`)
+- [x] Mission Control (Async Job Management) per operazioni non-blocking
+- [ ] RAG Search Optimization: Indexing e tuning del database vettoriale (Qdrant)
+- [ ] Implement query result caching (Redis) per i cruscotti statistici pesanti
+- [ ] Optimize rate limiter Redis operations (Lua scripting)
+- [ ] Profile MongoDB queries (slow queries profiling)
+- [ ] Load testing con k6 o Artillery
 
 **Metriche target**:
-- Response time API < 200ms (p95)
-- MongoDB query time < 50ms (p95)
+- Latenza RAG Search < 500ms
+- Response time API statistica < 200ms (p95)
 - Throughput > 1000 req/s
 
 ---
 
 ## M5: Security Enhancements
 
-**Obiettivo**: Rafforzare sicurezza applicazione
+**Obiettivo**: Rafforzare la sicurezza e la resilienza del sistema distribuito.
 
-**Status**: ⚪ Planned
+**Status**: 🟢 In Progress (40%)
 
 ### Tasks
-- [ ] Audit dependencies (`npm audit`)
-- [ ] Implement rate limiting per user (oltre a per IP)
-- [ ] Add request signature validation
-- [ ] Enhance CORS policy
-- [ ] Add input sanitization middleware
-- [ ] Implement JWT token rotation
-- [ ] Add security headers (già parzialmente fatto con Helmet)
-- [ ] Secrets management (migrate da .env a vault)
+- [x] Security headers (Helmet) & CORS hardening policy
+- [x] Robust Rate Limiting & Auto-Blacklisting (Redis + MongoDB logging)
+- [x] Mission Control Resilience: Startup cleanup di job "zombie" o orfani
+- [ ] Input sanitization middleware (mongo-sanitize, xss-clean)
+- [ ] Request signature validation tra nodi distribuiti
+- [ ] JWT token rotation & Session management refinement
+- [ ] Transition from plain .env to encrypted secrets or Vault
+- [ ] Audit automatico dipendenze in CI/CD
 
 **Compliance**:
 - OWASP Top 10
-- Best practices Node.js security
+- Node.js Security Best Practices
 
 ---
 
 ## M6: Monitoring & Observability
 
-**Obiettivo**: Migliorare monitoring e debugging
+**Obiettivo**: Garantire visibilità totale sullo stato dei servizi e delle integrazioni (AI, DB).
 
 **Status**: ⚪ Planned
 
 ### Tasks
-- [ ] Integrate Prometheus metrics
-- [ ] Add Grafana dashboards
-- [ ] Implement distributed tracing (Jaeger/OpenTelemetry)
-- [ ] Add structured logging (già fatto con Winston)
-- [ ] Error tracking (Sentry integration)
-- [ ] Health check endpoints
-- [ ] Alerting rules (MongoDB down, Redis down, high error rate)
+- [x] Structured logging con Winston e rotazione log
+- [ ] Unified Health Check API (`/api/health`) con stato di DB, Redis, Qdrant e Ollama
+- [ ] Prometheus metrics integration (`prom-client`) per latenze e tassi d'errore
+- [ ] Grafana Dashboards per system health e performance AI
+- [ ] Error tracking centralizzato (Sentry integration)
+- [ ] Alerting rules (Slack/Email) su fallimenti critici o saturazione risorse
 
 **Benefici**:
-- Visibilità real-time su performance
-- Debug più rapido
-- Alerting proattivo
+- Visibilità real-time su performance AI/RAG
+- Debug rapido di crash silenziosi
+- Alerting proattivo su downtime nodi
 
 ---
 
@@ -372,7 +372,7 @@ Aprile 2026      M6 (Monitoring)
 
 ## 📊 Progress Tracking
 
-**Overall Project Completion**: ~55%
+**Overall Project Completion**: ~62%
 
 | Area | Coverage | Status |
 |------|----------|--------|
@@ -380,10 +380,11 @@ Aprile 2026      M6 (Monitoring)
 | Test Coverage | 80%+ | ✅ |
 | DI Integration | 100% | ✅ |
 | Release System | 100% (Hybrid Bundle + CLI) | ✅ |
-| Performance | Baseline | ⚪ |
-| Security | Baseline | ⚪ |
-| Monitoring | Basic (Winston) | 🟡 |
-| Frontend Enhancements | 95% (I18n + Responsive + UI Alignment + Widgets) | 🟢 |
+| Mission Control (Resilience) | 100% | ✅ |
+| Performance | 60% (optimized pipelines, async jobs) | 🟢 |
+| Security | 40% (headers, rate limits, auto-blacklist) | 🟢 |
+| Monitoring | 20% (Logging ✅, Metrics ⚪) | 🟡 |
+| Frontend Enhancements | 95% (I18n + Responsive + Mission Control) | 🟢 |
 
 ---
 
@@ -432,5 +433,23 @@ Aprile 2026      M6 (Monitoring)
 
 ---
 
-**Ultimo aggiornamento**: 2026-04-19
+## M11: Mission Control & Async Jobs
+
+**Obiettivo**: Implementare un sistema resiliente per la gestione di task asincroni a lunga durata con monitoraggio real-time.
+
+**Status**: ✅ Completed
+
+### Tasks
+- [x] Backend: Implementazione `BackgroundJobManager` con supporto a DI.
+- [x] Backend: Meccanismo di Startup Cleanup per "zombie jobs".
+- [x] Frontend: Creazione del componente `JobMonitor.vue` (Mission Control).
+- [x] Frontend: Migrazione dello stato su Pinia Store per persistenza cross-page.
+- [x] UX: Implementazione toggle per cronologia log e azioni di Purge/Delete.
+- [x] I18n: Supporto multilingua completo per stati e comandi dei job.
+
+**Documentazione**: [Mission Control Walkthrough](./walkthrough-mission-control.md)
+
+---
+
+**Ultimo aggiornamento**: 2026-05-06
 **Prossimo checkpoint**: M4 Performance Profiling & Redis Caching

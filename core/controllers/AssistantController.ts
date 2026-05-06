@@ -4,7 +4,7 @@ import { AssistantService } from '../services/assistant/AssistantService';
 import * as Tokens from '../di/tokens';
 import { Logger } from 'winston';
 import { I18nService } from '../services/I18nService';
-import { Controller, Get, Post } from '../registry/decorators';
+import { Controller, Post } from '../registry/decorators';
 import { getComponent } from '../di/container';
 import { AuthMiddleware } from '../middlewares/AuthMiddleware';
 

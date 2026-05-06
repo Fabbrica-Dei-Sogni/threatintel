@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { inject, singleton } from 'tsyringe';
 import { AuthService } from '../services/AuthService';
 import { AppConfigProvider } from '../services/AppConfigProvider';
-import { LOGGER_TOKEN } from '../di/tokens';
+import * as Tokens from '../di/tokens';
 import { Logger } from 'winston';
 import { Controller, Get, Post } from '../registry/decorators';
 
@@ -10,9 +10,9 @@ import { Controller, Get, Post } from '../registry/decorators';
 @Controller('/api/auth')
 export class AuthController {
     constructor(
-        private authService: AuthService,
-        private configProvider: AppConfigProvider,
-        @inject(LOGGER_TOKEN) private logger: Logger
+        @inject(Tokens.AUTH_SERVICE_TOKEN) private readonly authService: AuthService,
+        @inject(Tokens.CONFIG_PROVIDER_TOKEN) private readonly configProvider: AppConfigProvider,
+        @inject(Tokens.LOGGER_TOKEN) private readonly logger: Logger
     ) {}
 
     /**

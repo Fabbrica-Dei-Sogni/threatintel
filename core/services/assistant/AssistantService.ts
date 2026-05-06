@@ -31,19 +31,21 @@ import { GetAttacksParams, GetCampaignsParams, GetThreatLogParams } from '../../
 import { SearchAttacksArgs, SearchCampaignsArgs, SearchLogArgs } from '../../types/assistant/assistant-tool.types';
 import { RagTranslationService } from './RagTranslationService';
 
+import * as Tokens from '../../di/tokens';
+
 @injectable()
 export class AssistantService {
     constructor(
-        @inject(LOGGER_TOKEN) private readonly logger: Logger,
-        @inject(QDRANT_CLIENT_TOKEN) private readonly qdrant: QdrantClientService,
-        @inject(OLLAMA_SERVICE_TOKEN) private readonly ollama: OllamaService,
-        @inject(RAG_SYNC_SERVICE_TOKEN) private readonly ragSync: RagSyncService,
-        @inject(I18N_TOKEN) private readonly i18n: I18nService,
-        private readonly threatLogService: ThreatLogService,
-        private readonly attackLogService: AttackLogService,
-        private readonly campaignService: CampaignService,
-        private readonly ipDetailsService: IpDetailsService,
-        private readonly ragTranslation: RagTranslationService,  // ← aggiunto
+        @inject(Tokens.LOGGER_TOKEN) private readonly logger: Logger,
+        @inject(Tokens.QDRANT_CLIENT_TOKEN) private readonly qdrant: QdrantClientService,
+        @inject(Tokens.OLLAMA_SERVICE_TOKEN) private readonly ollama: OllamaService,
+        @inject(Tokens.RAG_SYNC_SERVICE_TOKEN) private readonly ragSync: RagSyncService,
+        @inject(Tokens.I18N_TOKEN) private readonly i18n: I18nService,
+        @inject(Tokens.THREAT_LOG_SERVICE_TOKEN) private readonly threatLogService: ThreatLogService,
+        @inject(Tokens.ATTACK_LOG_SERVICE_TOKEN) private readonly attackLogService: AttackLogService,
+        @inject(Tokens.CAMPAIGN_SERVICE_TOKEN) private readonly campaignService: CampaignService,
+        @inject(Tokens.IP_DETAILS_SERVICE_TOKEN) private readonly ipDetailsService: IpDetailsService,
+        @inject(Tokens.RAG_TRANSLATION_TOKEN) private readonly ragTranslation: RagTranslationService,
 
     ) { }
 

@@ -1,17 +1,18 @@
 import { Request, Response } from 'express';
-import { singleton } from 'tsyringe';
+import { inject, singleton } from 'tsyringe';
 import { ReportService, ReportType } from '../services/ReportService';
+import * as Tokens from '../di/tokens';
 import { IDossierSection } from '../models/DossierSchema';
 import { Controller, Get, Post } from '../registry/decorators';
 import { getComponent } from '../di/container';
 import { AuthMiddleware } from '../middlewares/AuthMiddleware';
 
-const auth = getComponent(AuthMiddleware);
+const auth = () => getComponent<AuthMiddleware>(Tokens.AUTH_MIDDLEWARE_TOKEN);
 
 @singleton()
 @Controller('/api/reports')
 export class ReportController {
-    constructor(private readonly reportService: ReportService) { }
+    constructor(@inject(Tokens.REPORT_SERVICE_TOKEN) private readonly reportService: ReportService) { }
 
     private safeFilename(value: string): string {
         return value.replace(/[^a-zA-Z0-9._-]/g, '_').slice(0, 64);
@@ -64,7 +65,7 @@ export class ReportController {
      *       200:
      *         description: Report generato.
      */
-    @Get('/dettaglio', [auth.isIdentified()])
+    @Get('/dettaglio', [(req: any, res: any, next: any) => auth().isIdentified()(req, res, next)])
     async generateDetailReport(req: Request, res: Response) {
         try {
             const { ip, sessionId, type, locale, ipList } = req.query;
@@ -134,7 +135,7 @@ export class ReportController {
      *       200:
      *         description: Report custom generato.
      */
-    @Post('/custom', [auth.isIdentified()])
+    @Post('/custom', [(req: any, res: any, next: any) => auth().isIdentified()(req, res, next)])
     async generateCustomReport(req: Request, res: Response) {
         try {
             const { sections, locale }: { sections: IDossierSection[], locale: string } = req.body;

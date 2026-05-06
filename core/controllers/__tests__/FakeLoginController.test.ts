@@ -4,14 +4,18 @@ process.env.COMMON_ENDPOINTS = '/wp-login.php,/administrator';
 import 'reflect-metadata';
 import request from 'supertest';
 import express, { Request, Response, NextFunction } from 'express';
-import { container } from 'tsyringe';
+import { container, getComponent } from '../../di/container';
+import { setupContainer } from '../../di/registry';
 import { FakeLoginController } from '../FakeLoginController';
 import { RateLimitMiddleware } from '../../rateLimitMiddleware';
-import { RouterHub } from '../../registry/RouterHub';
 import { AuthMiddleware } from '../../middlewares/AuthMiddleware';
 import { Logger } from 'winston';
-import { LOGGER_TOKEN } from '../../di/tokens';
+import { LOGGER_TOKEN, ROUTER_HUB_TOKEN } from '../../di/tokens';
+import { RouterHub } from '../../registry/RouterHub';
 import path from 'path';
+
+// Initialize container
+setupContainer(container);
 
 // Mock AuthMiddleware
 jest.mock('../../middlewares/AuthMiddleware', () => {
@@ -62,14 +66,14 @@ let app: express.Application;
 // Mocking tsyringe container prima di ogni test per garantire l'isolamento
 beforeAll(() => {
     container.clearInstances();
-    container.register<Logger>(LOGGER_TOKEN, { useValue: mockLogger });
+    container.registerInstance(LOGGER_TOKEN, mockLogger);
 
     // Setup Express app
     app = express();
     app.use(express.json());
 
     // Registrazione e bind tramite RouterHub
-    const hub = container.resolve(RouterHub);
+    const hub = getComponent<RouterHub>(ROUTER_HUB_TOKEN);
     hub.register(FakeLoginController);
     hub.bindHttp(app, container);
 });

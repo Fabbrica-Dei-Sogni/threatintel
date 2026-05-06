@@ -1,5 +1,5 @@
 import { injectable, inject } from 'tsyringe';
-import { LOGGER_TOKEN } from '../di/tokens';
+import * as Tokens from '../di/tokens';
 import { Logger } from 'winston';
 import path from 'path';
 import fs from 'fs';
@@ -10,7 +10,7 @@ export class I18nService {
     private defaultLocale = 'it-IT';
     private localesPath = path.join(__dirname, '../locales');
 
-    constructor(@inject(LOGGER_TOKEN) private readonly logger: Logger) {
+    constructor(@inject(Tokens.LOGGER_TOKEN) private readonly logger: Logger) {
         this.loadLocales();
     }
 

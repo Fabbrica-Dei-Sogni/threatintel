@@ -11,16 +11,18 @@ import { getComponent } from '../di/container';
 import { AuthMiddleware } from '../middlewares/AuthMiddleware';
 import { StatusManagerService } from '../services/StatusManagerService';
 
-const auth = getComponent(AuthMiddleware);
+import * as Tokens from '../di/tokens';
+
+const auth = () => getComponent<AuthMiddleware>(Tokens.AUTH_MIDDLEWARE_TOKEN);
 
 @singleton()
 @Controller('/api')
 export class ThreatController {
     constructor(
-        private threatLogService: ThreatLogService,
-        private ipDetailsService: IpDetailsService,
-        @inject(LOGGER_TOKEN) private logger: Logger,
-        private statusManager: StatusManagerService
+        @inject(Tokens.THREAT_LOG_SERVICE_TOKEN) private readonly threatLogService: ThreatLogService,
+        @inject(Tokens.IP_DETAILS_SERVICE_TOKEN) private readonly ipDetailsService: IpDetailsService,
+        @inject(Tokens.LOGGER_TOKEN) private readonly logger: Logger,
+        @inject(Tokens.STATUS_MANAGER_SERVICE_TOKEN) private readonly statusManager: StatusManagerService
     ) { }
 
     /**
@@ -392,7 +394,7 @@ export class ThreatController {
      *       200:
      *         description: Processo avviato.
      */
-    @Post('/reanalyze-all', [auth.hasRole('admin')])
+    @Post('/reanalyze-all', [(req: any, res: any, next: any) => auth().hasRole('admin')(req, res, next)])
     async reanalyzeAll(req: Request, res: Response): Promise<void> {
         this.logger.info('[ThreatController] Starting full logs reanalysis');
         try {
@@ -441,7 +443,7 @@ export class ThreatController {
      *       202:
      *         description: Richiesta accettata.
      */
-    @Post('/status', [auth.isAuthenticated()])
+    @Post('/status', [(req: any, res: any, next: any) => auth().isAuthenticated()(req, res, next)])
     async changeStatus(req: Request, res: Response): Promise<void> {
         const { type, id, status, reason = 'manual_update' } = req.body;
         const user = (req as any).user?.name || 'anonymous';
@@ -474,7 +476,7 @@ export class ThreatController {
      *       202:
      *         description: Ripristino avviato.
      */
-    @Post('/restore', [auth.isAuthenticated()])
+    @Post('/restore', [(req: any, res: any, next: any) => auth().isAuthenticated()(req, res, next)])
     async restore(req: Request, res: Response): Promise<void> {
         const { sourceId } = req.body;
         const user = (req as any).user?.name || 'anonymous';

@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { inject, singleton } from 'tsyringe';
 import path from 'path';
-import { LOGGER_TOKEN } from '../di/tokens';
+import * as Tokens from '../di/tokens';
 import { Logger } from 'winston';
 import { Controller, Get, Post, All, Use } from '../registry/decorators';
 import { getComponent } from '../di/container';
@@ -13,7 +13,7 @@ const rateLimit = getComponent(RateLimitMiddleware);
 @Controller('/')
 export class FakeLoginController {
     constructor(
-        @inject(LOGGER_TOKEN) private logger: Logger
+        @inject(Tokens.LOGGER_TOKEN) private logger: Logger
     ) {}
 
     /**

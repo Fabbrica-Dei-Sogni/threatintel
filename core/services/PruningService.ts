@@ -3,6 +3,8 @@ import { Logger } from 'winston';
 import { LOGGER_TOKEN } from '../di/tokens';
 import ThreatLog from '../models/ThreatLogSchema';
 
+import * as Tokens from '../di/tokens';
+
 /**
  * PruningService
  * 
@@ -18,7 +20,7 @@ export class PruningService {
     private readonly AUTO_ARCHIVE_DAYS = 90;    // Archivia automaticamente dopo 90gg
 
     constructor(
-        @inject(LOGGER_TOKEN) private readonly logger: Logger
+        @inject(Tokens.LOGGER_TOKEN) private readonly logger: Logger
     ) { }
 
     public start(): void {

@@ -5,6 +5,8 @@ import { Logger } from 'winston';
 import { ToolRegistry, McpToolDefinition } from '../tools/ToolRegistry';
 import { AssistantToolArgumentsMap, AssistantToolName } from '../../types/assistant/assistant-tool.types';
 
+import * as Tokens from '../../di/tokens';
+
 /**
  * McpNativeExecutor
  * 
@@ -22,8 +24,8 @@ import { AssistantToolArgumentsMap, AssistantToolName } from '../../types/assist
 @singleton()
 export class McpNativeExecutor {
   constructor(
-    @inject(ASSISTANT_SERVICE_TOKEN) private assistant: AssistantService,
-    @inject(LOGGER_TOKEN) private logger: Logger
+    @inject(Tokens.ASSISTANT_SERVICE_TOKEN) private assistant: AssistantService,
+    @inject(Tokens.LOGGER_TOKEN) private logger: Logger
   ) { }
 
   public async executeToolByName(

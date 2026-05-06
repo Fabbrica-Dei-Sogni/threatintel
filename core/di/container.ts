@@ -1,21 +1,15 @@
 import { container, type InjectionToken } from "tsyringe";
-import { setupContainer } from "./registry";
 
 /**
  * Main DI Container for the Core application.
- * By default, it initializes the registry on first import for backwards compatibility,
- * but it can also be used to manually control initialization in tests.
  */
 export const coreContainer = container;
-
-// Initialize registry automatically for standard application flow
-setupContainer();
 
 /**
  * Type-safe helper to resolve components from the container
  */
 export function getComponent<T>(token: InjectionToken<T>): T {
-    return coreContainer.resolve<T>(token);
+    return coreContainer.resolve<T>(token as any);
 }
 
 /**

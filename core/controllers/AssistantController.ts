@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { inject, singleton } from 'tsyringe';
 import { AssistantService } from '../services/assistant/AssistantService';
 import { StatusManagerService } from '../services/StatusManagerService';
-import { LOGGER_TOKEN, ASSISTANT_SERVICE_TOKEN, I18N_TOKEN } from '../di/tokens';
+import * as Tokens from '../di/tokens';
 import { Logger } from 'winston';
 import { I18nService } from '../services/I18nService';
 import { Controller, Get, Post } from '../registry/decorators';
@@ -15,9 +15,9 @@ const auth = getComponent(AuthMiddleware);
 @Controller('/api/assistant')
 export class AssistantController {
     constructor(
-        @inject(ASSISTANT_SERVICE_TOKEN) private assistant: AssistantService,
-        @inject(LOGGER_TOKEN) private logger: Logger,
-        @inject(I18N_TOKEN) private i18n: I18nService
+        @inject(Tokens.ASSISTANT_SERVICE_TOKEN) private readonly assistant: AssistantService,
+        @inject(Tokens.LOGGER_TOKEN) private readonly logger: Logger,
+        @inject(Tokens.I18N_TOKEN) private readonly i18n: I18nService
     ) { }
 
     /**

@@ -1,5 +1,5 @@
 import { inject, singleton } from 'tsyringe';
-import { LOGGER_TOKEN } from '../di/tokens';
+import * as Tokens from '../di/tokens';
 import { Logger } from 'winston';
 import { ThreatLogService } from './ThreatLogService';
 import { AppConfigProvider } from './AppConfigProvider';
@@ -21,10 +21,10 @@ export class SshLogService extends BaseJournalWatcher {
     private readonly FLUSH_INTERVAL_MS = 60000;
 
     constructor(
-        @inject(LOGGER_TOKEN) logger: Logger,
-        private readonly threatLogService: ThreatLogService,
-        private readonly configProvider: AppConfigProvider,
-        private readonly threatLogFactory: ThreatLogFactory
+        @inject(Tokens.LOGGER_TOKEN) logger: Logger,
+        @inject(Tokens.THREAT_LOG_SERVICE_TOKEN) private readonly threatLogService: ThreatLogService,
+        @inject(Tokens.CONFIG_PROVIDER_TOKEN) private readonly configProvider: AppConfigProvider,
+        @inject(Tokens.THREAT_LOG_FACTORY_TOKEN) private readonly threatLogFactory: ThreatLogFactory
     ) {
         super(logger);
         this.initialized = this.loadConfig();

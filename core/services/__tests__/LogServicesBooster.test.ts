@@ -1,12 +1,13 @@
 import 'reflect-metadata';
-import { container } from 'tsyringe';
 import { SshLogService } from '../SshLogService';
 import { NginxLogService } from '../NginxLogService';
 import { ThreatLogService } from '../ThreatLogService';
 import PatternAnalysisService from '../PatternAnalysisService';
 import { Logger } from 'winston';
 import { ServiceStatus } from '../../types/lifecycle';
-import { LOGGER_TOKEN } from '../../di/tokens';
+import * as Tokens from '../../di/tokens';
+import { setupContainer } from '../../di/registry';
+import { getComponent, container } from '../../di/container';
 import { AppConfigProvider } from '../AppConfigProvider';
 import { ThreatLogFactory } from '../../utils/ThreatLogFactory';
 import { ProtocolType } from '../../types/CoreConstants';
@@ -20,6 +21,9 @@ describe('LogServices Booster - Coverage Expansion', () => {
     let mockThreatLogFactory: any;
 
     beforeEach(() => {
+        // Initialize DI
+        setupContainer(container);
+        
         container.clearInstances();
         mockLogger = {
             info: jest.fn(),
@@ -55,23 +59,24 @@ describe('LogServices Booster - Coverage Expansion', () => {
             }))
         };
 
-        container.registerInstance(LOGGER_TOKEN, mockLogger);
-        container.registerInstance(ThreatLogService, mockThreatLogService);
-        container.registerInstance(PatternAnalysisService, mockPatternAnalysisService);
-        container.registerInstance(AppConfigProvider, mockAppConfigProvider);
-        container.registerInstance(ThreatLogFactory, mockThreatLogFactory);
+        // Register mocks using Tokens
+        container.registerInstance(Tokens.LOGGER_TOKEN, mockLogger);
+        container.registerInstance(Tokens.THREAT_LOG_SERVICE_TOKEN, mockThreatLogService);
+        container.registerInstance(Tokens.PATTERN_ANALYSIS_SERVICE_TOKEN, mockPatternAnalysisService);
+        container.registerInstance(Tokens.CONFIG_PROVIDER_TOKEN, mockAppConfigProvider);
+        container.registerInstance(Tokens.THREAT_LOG_FACTORY_TOKEN, mockThreatLogFactory);
     });
 
     describe('SshLogService Catch Blocks', () => {
         it('should handle loadConfig errors', async () => {
             mockAppConfigProvider.getDynamicConfig.mockRejectedValue(new Error('DB Error'));
-            const service = container.resolve(SshLogService);
+            const service = getComponent(Tokens.SSH_LOG_SERVICE_TOKEN) as SshLogService;
             await (service as any).initialized;
             expect(mockLogger.error).toHaveBeenCalledWith(expect.stringContaining('Errore caricamento configurazioni'));
         });
 
         it('should handle start errors', async () => {
-            const service = container.resolve(SshLogService);
+            const service = getComponent(Tokens.SSH_LOG_SERVICE_TOKEN) as SshLogService;
             // Mock spawn to throw immediately
             const spawn = require('child_process').spawn;
             jest.mock('child_process', () => ({
@@ -88,14 +93,14 @@ describe('LogServices Booster - Coverage Expansion', () => {
         });
 
         it('should handle analyzeSshLogs errors', async () => {
-            const service = container.resolve(SshLogService);
+            const service = getComponent(Tokens.SSH_LOG_SERVICE_TOKEN) as SshLogService;
             mockThreatLogService.countLogs.mockRejectedValue(new Error('Count Error'));
             await expect(service.analyzeSshLogs()).rejects.toThrow('Count Error');
             expect(mockLogger.error).toHaveBeenCalledWith(expect.stringContaining('Errore durante il ricalcolo score SSH'), expect.any(Error));
         });
 
         it('should handle saveAsThreatLog errors', async () => {
-            const service = container.resolve(SshLogService);
+            const service = getComponent(Tokens.SSH_LOG_SERVICE_TOKEN) as SshLogService;
             mockThreatLogService.saveLog.mockRejectedValue(new Error('Save Error'));
             const entry = { ip: '1.2.3.4', user: 'user', type: 'Failed', score: 10, indicators: [], logDate: new Date() };
             await (service as any).saveAsThreatLog(entry, 'msg');
@@ -105,7 +110,7 @@ describe('LogServices Booster - Coverage Expansion', () => {
 
     describe('NginxLogService Catch Blocks', () => {
         it('should handle saveAsThreatLog errors', async () => {
-            const service = container.resolve(NginxLogService);
+            const service = getComponent(Tokens.NGINX_LOG_SERVICE_TOKEN) as NginxLogService;
             mockThreatLogService.saveLog.mockRejectedValue(new Error('Save Error'));
             const data = { ip: '1.2.3.4', method: 'GET', url: '/test', user_agent: 'ua', referer: '', timestamp: new Date().toISOString() };
             await (service as any).saveAsThreatLog(data);
@@ -113,7 +118,7 @@ describe('LogServices Booster - Coverage Expansion', () => {
         });
 
         it('should handle processEntry invalid substrings', async () => {
-            const service = container.resolve(NginxLogService);
+            const service = getComponent(Tokens.NGINX_LOG_SERVICE_TOKEN) as NginxLogService;
             // Case where indexOf('{') is -1
             await (service as any).processEntry({ MESSAGE: 'nginx_threat: invalid message' });
             expect(mockThreatLogService.saveLog).not.toHaveBeenCalled();

@@ -9,6 +9,8 @@ import { ConfigService } from '../ConfigService';
 import { ILongRunningService, ServiceStatus } from '../../types/lifecycle';
 import { RAG_POLICIES } from './RagPolicies';
 
+import * as Tokens from '../../di/tokens';
+
 @injectable()
 export class RagSyncWorker implements ILongRunningService {
     public readonly serviceName = 'RagSyncWorker';
@@ -17,12 +19,12 @@ export class RagSyncWorker implements ILongRunningService {
     private isMaterializing: boolean = false;  // ← flag
 
     constructor(
-        @inject(LOGGER_TOKEN) private readonly logger: Logger,
-        @inject(RAG_SYNC_SERVICE_TOKEN) private readonly ragSync: RagSyncService,
-        private readonly campaignService: CampaignService,
-        private readonly threatLogService: ThreatLogService,
-        private readonly attackLogService: AttackLogService,
-        private readonly configService: ConfigService
+        @inject(Tokens.LOGGER_TOKEN) private readonly logger: Logger,
+        @inject(Tokens.RAG_SYNC_SERVICE_TOKEN) private readonly ragSync: RagSyncService,
+        @inject(Tokens.CAMPAIGN_SERVICE_TOKEN) private readonly campaignService: CampaignService,
+        @inject(Tokens.THREAT_LOG_SERVICE_TOKEN) private readonly threatLogService: ThreatLogService,
+        @inject(Tokens.ATTACK_LOG_SERVICE_TOKEN) private readonly attackLogService: AttackLogService,
+        @inject(Tokens.CONFIG_SERVICE_TOKEN) private readonly configService: ConfigService
     ) { }
 
     public async start(): Promise<void> {

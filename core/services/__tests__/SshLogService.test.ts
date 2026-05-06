@@ -1,12 +1,13 @@
 import 'reflect-metadata';
-import { container } from 'tsyringe';
 import { SshLogService } from '../SshLogService';
 import { ThreatLogService } from '../ThreatLogService';
-import { LOGGER_TOKEN } from '../../di/tokens';
 import { AppConfigProvider } from '../AppConfigProvider';
 import { ThreatLogFactory } from '../../utils/ThreatLogFactory';
 import { spawn } from 'child_process';
 import { EventEmitter } from 'events';
+import * as Tokens from '../../di/tokens';
+import { setupContainer } from '../../di/registry';
+import { getComponent, container } from '../../di/container';
 
 // Mock child_process
 jest.mock('child_process', () => ({
@@ -21,6 +22,12 @@ describe('SshLogService', () => {
     let mockThreatLogFactory: any;
 
     beforeEach(() => {
+        // Initialize DI
+        setupContainer(container);
+        
+        // Clear instances
+        container.clearInstances();
+
         mockLogger = {
             info: jest.fn(),
             error: jest.fn(),
@@ -55,13 +62,13 @@ describe('SshLogService', () => {
             }))
         };
 
-        container.clearInstances();
-        container.registerInstance(LOGGER_TOKEN, mockLogger);
-        container.registerInstance(ThreatLogService, mockThreatLogService);
-        container.registerInstance(AppConfigProvider, mockAppConfigProvider);
-        container.registerInstance(ThreatLogFactory, mockThreatLogFactory);
+        // Register mocks using Tokens
+        container.registerInstance(Tokens.LOGGER_TOKEN, mockLogger);
+        container.registerInstance(Tokens.THREAT_LOG_SERVICE_TOKEN, mockThreatLogService);
+        container.registerInstance(Tokens.CONFIG_PROVIDER_TOKEN, mockAppConfigProvider);
+        container.registerInstance(Tokens.THREAT_LOG_FACTORY_TOKEN, mockThreatLogFactory);
 
-        service = container.resolve(SshLogService);
+        service = getComponent(Tokens.SSH_LOG_SERVICE_TOKEN);
     });
 
     describe('loadConfig', () => {

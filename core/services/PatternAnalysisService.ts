@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import { Request } from 'express';
 import { ConfigService } from './ConfigService';
 import { inject, injectable } from 'tsyringe';
+import * as Tokens from '../di/tokens';
 import { LOGGER_TOKEN } from '../di/tokens';
 import { Logger } from 'winston';
 import { ThreatIndicator } from '../types/indicators';
@@ -29,8 +30,8 @@ export class PatternAnalysisService {
     private initialized: Promise<void>;
 
     constructor(
-        @inject(LOGGER_TOKEN) private readonly logger: Logger,
-        private readonly configService: ConfigService
+        @inject(Tokens.LOGGER_TOKEN) private readonly logger: Logger,
+        @inject(Tokens.CONFIG_SERVICE_TOKEN) private readonly configService: ConfigService
     ) {
 
         //XXX: si imposta la geolocalizzazione sempre attiva. fornire un sistema per parametrizzarlo qualora sia necessario in futuro.

@@ -37,3 +37,6 @@ export const REPORT_SERVICE_TOKEN = Symbol("ReportService");
 export const ATTACK_LOG_SERVICE_TOKEN = Symbol("AttackLogService");
 export const STATUS_MANAGER_SERVICE_TOKEN = Symbol("StatusManagerService");
 export const RATE_LIMIT_SERVICE_TOKEN = Symbol("RateLimitService");
+export const RATE_LIMIT_MIDDLEWARE_TOKEN = Symbol("RateLimitMiddleware");
+export const AUTH_MIDDLEWARE_TOKEN = Symbol("AuthMiddleware");
+export const ROUTER_HUB_TOKEN = Symbol("RouterHub");

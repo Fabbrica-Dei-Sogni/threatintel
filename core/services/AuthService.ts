@@ -2,7 +2,7 @@ import axios from 'axios';
 import https from 'https';
 import { inject, singleton } from 'tsyringe';
 import { AppConfigProvider } from './AppConfigProvider';
-import { LOGGER_TOKEN } from '../di/tokens';
+import * as Tokens from '../di/tokens';
 import { Logger } from 'winston';
 
 const defaultDigitalAuthUri = 'https://localhost:3443/auth/api/v1';
@@ -12,8 +12,8 @@ export class AuthService {
     private instance: any;
 
     constructor(
-        @inject(LOGGER_TOKEN) private logger: Logger,
-        private configProvider: AppConfigProvider
+        @inject(Tokens.LOGGER_TOKEN) private logger: Logger,
+        @inject(Tokens.CONFIG_PROVIDER_TOKEN) private configProvider: AppConfigProvider
     ) {
         this.instance = axios.create({
             httpsAgent: new https.Agent({

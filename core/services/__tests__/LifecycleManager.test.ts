@@ -1,7 +1,8 @@
 import 'reflect-metadata';
-import { container } from 'tsyringe';
+import { getComponent, container } from '../../di/container';
+import { setupContainer } from '../../di/registry';
 import { LifecycleManager } from '../LifecycleManager';
-import { LOGGER_TOKEN } from '../../di/tokens';
+import { LOGGER_TOKEN, LIFECYCLE_MANAGER_TOKEN } from '../../di/tokens';
 import { ServiceStatus } from '../../types/lifecycle';
 
 describe('LifecycleManager', () => {
@@ -9,6 +10,9 @@ describe('LifecycleManager', () => {
     let mockLogger: any;
 
     beforeEach(() => {
+        setupContainer(container);
+        container.clearInstances();
+
         mockLogger = {
             info: jest.fn(),
             error: jest.fn(),
@@ -16,9 +20,8 @@ describe('LifecycleManager', () => {
             warn: jest.fn()
         };
 
-        container.clearInstances();
         container.registerInstance(LOGGER_TOKEN, mockLogger);
-        lifecycleManager = container.resolve(LifecycleManager);
+        lifecycleManager = getComponent(LIFECYCLE_MANAGER_TOKEN);
     });
 
     const createMockService = (name: string, status: ServiceStatus = ServiceStatus.RUNNING) => ({
@@ -94,25 +97,25 @@ describe('LifecycleManager', () => {
     });
 
     describe('shutdown', () => {
-        it('should stop all registered services', () => {
+        it('should stop all registered services', async () => {
             const service1 = createMockService('Service1');
             const service2 = createMockService('Service2');
             lifecycleManager.register(service1 as any);
             lifecycleManager.register(service2 as any);
 
-            lifecycleManager.shutdown();
+            await lifecycleManager.shutdown();
 
             expect(service1.stop).toHaveBeenCalled();
             expect(service2.stop).toHaveBeenCalled();
-            expect(mockLogger.info).toHaveBeenCalledWith(expect.stringContaining('Spegnimento servizi'));
+            expect(mockLogger.info).toHaveBeenCalledWith(expect.stringContaining('Spegnimento di 2 servizi in corso...'));
         });
 
-        it('should handle errors during shutdown gracefully', () => {
+        it('should handle errors during shutdown gracefully', async () => {
             const service = createMockService('ErrorService');
             service.stop.mockImplementation(() => { throw new Error('Stop failed'); });
             
             lifecycleManager.register(service as any);
-            lifecycleManager.shutdown();
+            await lifecycleManager.shutdown();
 
             expect(mockLogger.error).toHaveBeenCalledWith(expect.stringContaining('Errore fermando ErrorService: Stop failed'));
         });

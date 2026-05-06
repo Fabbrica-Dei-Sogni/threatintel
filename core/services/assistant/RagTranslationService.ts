@@ -9,10 +9,12 @@ import { RAG_TEMPLATES } from './RagTemplates';
 import CampaignDTO from '../../models/dto/CampaignDTO';
 import AttackDTO from '../../models/dto/AttackDTO';
 
+import * as Tokens from '../../di/tokens';
+
 @injectable()
 export class RagTranslationService {
     constructor(
-        @inject(LOGGER_TOKEN) private readonly logger: Logger
+        @inject(Tokens.LOGGER_TOKEN) private readonly logger: Logger
     ) {}
 
     /**

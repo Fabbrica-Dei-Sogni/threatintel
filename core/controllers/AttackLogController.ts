@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { inject, singleton } from 'tsyringe';
 import { AttackLogService } from '../services/AttackLogService';
-import { LOGGER_TOKEN } from '../di/tokens';
+import * as Tokens from '../di/tokens';
 import { Logger } from 'winston';
 import { sanitizePage, sanitizePageSize } from '../utils/queryGuard';
 import { Controller, Post } from '../registry/decorators';
@@ -10,8 +10,8 @@ import { Controller, Post } from '../registry/decorators';
 @Controller('/api/attack')
 export class AttackLogController {
     constructor(
-        private attackLogService: AttackLogService,
-        @inject(LOGGER_TOKEN) private logger: Logger
+        @inject(Tokens.ATTACK_LOG_SERVICE_TOKEN) private readonly attackLogService: AttackLogService,
+        @inject(Tokens.LOGGER_TOKEN) private readonly logger: Logger
     ) { }
 
     /**

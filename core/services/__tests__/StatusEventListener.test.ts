@@ -1,10 +1,11 @@
 import 'reflect-metadata';
 import mongoose from 'mongoose';
-import { container } from 'tsyringe';
+import { getComponent, container } from '../../di/container';
+import { setupContainer } from '../../di/registry';
 import { StatusEventListener } from '../StatusEventListener';
 import { EventBus, AppEvents } from '../EventBus';
 import ThreatLog from '../../models/ThreatLogSchema';
-import { LOGGER_TOKEN, EVENT_BUS_TOKEN } from '../../di/tokens';
+import { LOGGER_TOKEN, EVENT_BUS_TOKEN, STATUS_EVENT_LISTENER_TOKEN } from '../../di/tokens';
 import { Logger } from 'winston';
 
 describe('StatusEventListener', () => {
@@ -24,8 +25,10 @@ describe('StatusEventListener', () => {
     });
 
     beforeEach(async () => {
-        await ThreatLog.deleteMany({});
+        setupContainer(container);
         container.clearInstances();
+
+        await ThreatLog.deleteMany({});
         
         logger = {
             info: jest.fn(),
@@ -38,7 +41,7 @@ describe('StatusEventListener', () => {
         container.registerInstance(LOGGER_TOKEN, logger);
         container.registerInstance(EVENT_BUS_TOKEN, eventBus);
         
-        listener = container.resolve(StatusEventListener);
+        listener = getComponent(STATUS_EVENT_LISTENER_TOKEN);
         listener.start();
     });
 

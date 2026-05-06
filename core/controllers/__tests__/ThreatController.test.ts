@@ -1,14 +1,15 @@
 import 'reflect-metadata';
 import request from 'supertest';
 import express from 'express';
-import { container } from 'tsyringe';
+import { getComponent, container } from '../../di/container';
 import { ThreatController } from '../../controllers/ThreatController';
 import { ThreatLogService } from '../../services/ThreatLogService';
 import { IpDetailsService } from '../../services/IpDetailsService';
 import { SshLogService } from '../../services/SshLogService';
-import { LOGGER_TOKEN } from '../../di/tokens';
+import { LOGGER_TOKEN, ROUTER_HUB_TOKEN, THREAT_LOG_SERVICE_TOKEN, IP_DETAILS_SERVICE_TOKEN, SSH_LOG_SERVICE_TOKEN } from '../../di/tokens';
 import { Logger } from 'winston';
 import { AuthMiddleware } from '../../middlewares/AuthMiddleware';
+import { setupContainer } from '../../di/registry';
 import { RouterHub } from '../../registry/RouterHub';
 
 // Mock AuthMiddleware PRIMA di importare il controller se possibile, 
@@ -55,18 +56,22 @@ const mockLogger = {
     warn: jest.fn(),
 } as unknown as Logger;
 
+// Initialize DI
+setupContainer(container);
+container.clearInstances();
+
 // Iniezione dei mock nel container di tsyringe
-container.register<ThreatLogService>(ThreatLogService, { useValue: mockThreatLogService as any });
-container.register<IpDetailsService>(IpDetailsService, { useValue: mockIpDetailsService as any });
-container.register<SshLogService>(SshLogService, { useValue: mockSshLogService as any });
-container.register<Logger>(LOGGER_TOKEN, { useValue: mockLogger });
+container.registerInstance(THREAT_LOG_SERVICE_TOKEN, mockThreatLogService);
+container.registerInstance(IP_DETAILS_SERVICE_TOKEN, mockIpDetailsService);
+container.registerInstance(SSH_LOG_SERVICE_TOKEN, mockSshLogService);
+container.registerInstance(LOGGER_TOKEN, mockLogger);
 
 // Creazione istanza dell'app express
 const app = express();
 app.use(express.json());
 
 // Registrazione e bind tramite RouterHub
-const hub = container.resolve(RouterHub);
+const hub = getComponent<RouterHub>(ROUTER_HUB_TOKEN);
 hub.register(ThreatController);
 hub.bindHttp(app, container);
 

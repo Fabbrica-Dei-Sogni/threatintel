@@ -4,6 +4,8 @@ import { Logger } from 'winston';
 import { LOGGER_TOKEN } from '../../di/tokens';
 import { AppConfigProvider } from '../AppConfigProvider';
 
+import * as Tokens from '../../di/tokens';
+
 @injectable()
 export class OllamaService {
     private baseUrl: string;
@@ -12,8 +14,8 @@ export class OllamaService {
     private timeout: number = 5000; // 5 secondi max per AI operations
 
     constructor(
-        @inject(LOGGER_TOKEN) private readonly logger: Logger,
-        private readonly config: AppConfigProvider
+        @inject(Tokens.LOGGER_TOKEN) private readonly logger: Logger,
+        @inject(Tokens.CONFIG_PROVIDER_TOKEN) private readonly config: AppConfigProvider
     ) {
         this.baseUrl = this.config.ollamaUrl;
         this.embeddingModel = this.config.embeddingModel;

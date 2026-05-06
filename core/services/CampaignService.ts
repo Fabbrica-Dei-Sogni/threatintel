@@ -7,12 +7,14 @@ import { EventBus, AppEvents } from './EventBus';
 import { GetCampaignDetailParams, GetCampaignsParams } from '../types/service-params.types';
 import { ForensicPipelineService } from './forense/ForensicPipelineService';
 
+import * as Tokens from '../di/tokens';
+
 @injectable()
 export class CampaignService {
     constructor(
-        @inject(LOGGER_TOKEN) private readonly logger: Logger,
-        @inject(EVENT_BUS_TOKEN) private readonly eventBus: EventBus,
-        @inject(FORENSIC_PIPELINE_TOKEN) private readonly forensicPipeline: ForensicPipelineService
+        @inject(Tokens.LOGGER_TOKEN) private readonly logger: Logger,
+        @inject(Tokens.EVENT_BUS_TOKEN) private readonly eventBus: EventBus,
+        @inject(Tokens.FORENSIC_PIPELINE_TOKEN) private readonly forensicPipeline: ForensicPipelineService
     ) { }
 
     /**

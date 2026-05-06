@@ -1,8 +1,10 @@
 import 'reflect-metadata';
-import { container } from 'tsyringe';
+import { getComponent, container } from '../../di/container';
+import { setupContainer } from '../../di/registry';
 import mongoose from 'mongoose';
 import { RateLimitService } from '../RateLimitService';
 import RateLimitEvent from '../../models/RateLimitEventSchema';
+import { RATE_LIMIT_SERVICE_TOKEN } from '../../di/tokens';
 
 describe('RateLimitService', () => {
     let service: RateLimitService;
@@ -19,9 +21,11 @@ describe('RateLimitService', () => {
     });
 
     beforeEach(async () => {
-        await RateLimitEvent.deleteMany({});
+        setupContainer(container);
         container.clearInstances();
-        service = container.resolve(RateLimitService);
+
+        await RateLimitEvent.deleteMany({});
+        service = getComponent(RATE_LIMIT_SERVICE_TOKEN);
     });
 
     describe('logEvent', () => {

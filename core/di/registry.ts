@@ -1,4 +1,4 @@
-import { container } from "tsyringe";
+import { DependencyContainer, Lifecycle } from "tsyringe";
 import { Logger } from "winston";
 import logger from "../../logger";
 
@@ -37,53 +37,59 @@ import { ReportService } from "../services/ReportService";
 import { AttackLogService } from "../services/AttackLogService";
 import { StatusManagerService } from "../services/StatusManagerService";
 import { RateLimitService } from "../services/RateLimitService";
+import { RateLimitMiddleware } from "../rateLimitMiddleware";
+import { AuthMiddleware } from "../middlewares/AuthMiddleware";
 import { LifecycleManager } from "../services/LifecycleManager";
+import { RouterHub } from "../registry/RouterHub";
 
 /**
  * Centrally register all components in the DI container.
  * This ensures that metadata is properly captured and dependencies are resolved correctly.
  */
-export function setupContainer() {
+export function setupContainer(container: DependencyContainer) {
     // Infrastructure
     container.registerInstance<Logger>(Tokens.LOGGER_TOKEN, logger);
-    container.registerSingleton(Tokens.LIFECYCLE_MANAGER_TOKEN, LifecycleManager);
-    container.registerSingleton(Tokens.EVENT_BUS_TOKEN, EventBus);
-    container.registerSingleton(Tokens.REDIS_SERVICE_TOKEN, RedisService);
+    container.register(Tokens.LIFECYCLE_MANAGER_TOKEN, { useClass: LifecycleManager }, { lifecycle: Lifecycle.Singleton });
+    container.register(Tokens.EVENT_BUS_TOKEN, { useClass: EventBus }, { lifecycle: Lifecycle.Singleton });
+    container.register(Tokens.REDIS_SERVICE_TOKEN, { useClass: RedisService }, { lifecycle: Lifecycle.Singleton });
+    container.register(Tokens.ROUTER_HUB_TOKEN, { useClass: RouterHub }, { lifecycle: Lifecycle.Singleton });
+    container.register(Tokens.RATE_LIMIT_MIDDLEWARE_TOKEN, { useClass: RateLimitMiddleware }, { lifecycle: Lifecycle.Singleton });
+    container.register(Tokens.AUTH_MIDDLEWARE_TOKEN, { useClass: AuthMiddleware }, { lifecycle: Lifecycle.Singleton });
 
     // Core Services
-    container.registerSingleton(Tokens.I18N_TOKEN, I18nService);
-    container.registerSingleton(Tokens.CONFIG_PROVIDER_TOKEN, AppConfigProvider);
-    container.registerSingleton(Tokens.THREAT_LOG_SERVICE_TOKEN, ThreatLogService);
-    container.registerSingleton(Tokens.IP_DETAILS_SERVICE_TOKEN, IpDetailsService);
-    container.registerSingleton(Tokens.PATTERN_ANALYSIS_SERVICE_TOKEN, PatternAnalysisService);
-    container.registerSingleton(Tokens.THREAT_LOG_FACTORY_TOKEN, ThreatLogFactory);
+    container.register(Tokens.I18N_TOKEN, { useClass: I18nService }, { lifecycle: Lifecycle.Singleton });
+    container.register(Tokens.CONFIG_PROVIDER_TOKEN, { useClass: AppConfigProvider }, { lifecycle: Lifecycle.Singleton });
+    container.register(Tokens.THREAT_LOG_SERVICE_TOKEN, { useClass: ThreatLogService }, { lifecycle: Lifecycle.Singleton });
+    container.register(Tokens.IP_DETAILS_SERVICE_TOKEN, { useClass: IpDetailsService }, { lifecycle: Lifecycle.Singleton });
+    container.register(Tokens.PATTERN_ANALYSIS_SERVICE_TOKEN, { useClass: PatternAnalysisService }, { lifecycle: Lifecycle.Singleton });
+    container.register(Tokens.THREAT_LOG_FACTORY_TOKEN, { useClass: ThreatLogFactory }, { lifecycle: Lifecycle.Singleton });
     
     // Feature Services
-    container.registerSingleton(Tokens.SSH_LOG_SERVICE_TOKEN, SshLogService);
-    container.registerSingleton(Tokens.NGINX_LOG_SERVICE_TOKEN, NginxLogService);
-    container.registerSingleton(Tokens.COWRIE_SERVICE_TOKEN, CowrieService);
-    container.registerSingleton(Tokens.ANALYSIS_SERVICE_TOKEN, AnalysisService);
-    container.registerSingleton(Tokens.AUTH_SERVICE_TOKEN, AuthService);
-    container.registerSingleton(Tokens.CONFIG_SERVICE_TOKEN, ConfigService);
-    container.registerSingleton(Tokens.CAMPAIGN_SERVICE_TOKEN, CampaignService);
-    container.registerSingleton(Tokens.DOSSIER_SERVICE_TOKEN, DossierService);
-    container.registerSingleton(Tokens.REPORT_SERVICE_TOKEN, ReportService);
-    container.registerSingleton(Tokens.ATTACK_LOG_SERVICE_TOKEN, AttackLogService);
-    container.registerSingleton(Tokens.STATUS_MANAGER_SERVICE_TOKEN, StatusManagerService);
-    container.registerSingleton(Tokens.RATE_LIMIT_SERVICE_TOKEN, RateLimitService);
-    container.registerSingleton(Tokens.PRUNING_SERVICE_TOKEN, PruningService);
-    container.registerSingleton(Tokens.STATUS_EVENT_LISTENER_TOKEN, StatusEventListener);
+    container.register(Tokens.SSH_LOG_SERVICE_TOKEN, { useClass: SshLogService }, { lifecycle: Lifecycle.Singleton });
+    container.register(Tokens.NGINX_LOG_SERVICE_TOKEN, { useClass: NginxLogService }, { lifecycle: Lifecycle.Singleton });
+    container.register(Tokens.COWRIE_SERVICE_TOKEN, { useClass: CowrieService }, { lifecycle: Lifecycle.Singleton });
+    container.register(Tokens.ANALYSIS_SERVICE_TOKEN, { useClass: AnalysisService }, { lifecycle: Lifecycle.Singleton });
+    container.register(Tokens.AUTH_SERVICE_TOKEN, { useClass: AuthService }, { lifecycle: Lifecycle.Singleton });
+    container.register(Tokens.CONFIG_SERVICE_TOKEN, { useClass: ConfigService }, { lifecycle: Lifecycle.Singleton });
+    container.register(Tokens.CAMPAIGN_SERVICE_TOKEN, { useClass: CampaignService }, { lifecycle: Lifecycle.Singleton });
+    container.register(Tokens.DOSSIER_SERVICE_TOKEN, { useClass: DossierService }, { lifecycle: Lifecycle.Singleton });
+    container.register(Tokens.REPORT_SERVICE_TOKEN, { useClass: ReportService }, { lifecycle: Lifecycle.Singleton });
+    container.register(Tokens.ATTACK_LOG_SERVICE_TOKEN, { useClass: AttackLogService }, { lifecycle: Lifecycle.Singleton });
+    container.register(Tokens.STATUS_MANAGER_SERVICE_TOKEN, { useClass: StatusManagerService }, { lifecycle: Lifecycle.Singleton });
+    container.register(Tokens.RATE_LIMIT_SERVICE_TOKEN, { useClass: RateLimitService }, { lifecycle: Lifecycle.Singleton });
+    container.register(Tokens.PRUNING_SERVICE_TOKEN, { useClass: PruningService }, { lifecycle: Lifecycle.Singleton });
+    container.register(Tokens.STATUS_EVENT_LISTENER_TOKEN, { useClass: StatusEventListener }, { lifecycle: Lifecycle.Singleton });
 
     // AI & Assistant Services
-    container.registerSingleton(Tokens.RAG_TRANSLATION_TOKEN, RagTranslationService);
-    container.registerSingleton(Tokens.QDRANT_CLIENT_TOKEN, QdrantClientService);
-    container.registerSingleton(Tokens.OLLAMA_SERVICE_TOKEN, OllamaService);
-    container.registerSingleton(Tokens.RAG_SYNC_SERVICE_TOKEN, RagSyncService);
-    container.registerSingleton(Tokens.RAG_SYNC_WORKER_TOKEN, RagSyncWorker);
-    container.registerSingleton(Tokens.ASSISTANT_SERVICE_TOKEN, AssistantService);
-    container.registerSingleton(Tokens.RAG_EVENT_LISTENER_TOKEN, RagEventListener);
-    container.registerSingleton(Tokens.MCP_EXECUTOR_TOKEN, McpNativeExecutor);
-    container.registerSingleton(Tokens.FORENSIC_PIPELINE_TOKEN, ForensicPipelineService);
+    container.register(Tokens.RAG_TRANSLATION_TOKEN, { useClass: RagTranslationService }, { lifecycle: Lifecycle.Singleton });
+    container.register(Tokens.QDRANT_CLIENT_TOKEN, { useClass: QdrantClientService }, { lifecycle: Lifecycle.Singleton });
+    container.register(Tokens.OLLAMA_SERVICE_TOKEN, { useClass: OllamaService }, { lifecycle: Lifecycle.Singleton });
+    container.register(Tokens.RAG_SYNC_SERVICE_TOKEN, { useClass: RagSyncService }, { lifecycle: Lifecycle.Singleton });
+    container.register(Tokens.RAG_SYNC_WORKER_TOKEN, { useClass: RagSyncWorker }, { lifecycle: Lifecycle.Singleton });
+    container.register(Tokens.ASSISTANT_SERVICE_TOKEN, { useClass: AssistantService }, { lifecycle: Lifecycle.Singleton });
+    container.register(Tokens.RAG_EVENT_LISTENER_TOKEN, { useClass: RagEventListener }, { lifecycle: Lifecycle.Singleton });
+    container.register(Tokens.MCP_EXECUTOR_TOKEN, { useClass: McpNativeExecutor }, { lifecycle: Lifecycle.Singleton });
+    container.register(Tokens.FORENSIC_PIPELINE_TOKEN, { useClass: ForensicPipelineService }, { lifecycle: Lifecycle.Singleton });
 
     return container;
 }

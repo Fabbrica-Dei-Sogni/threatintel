@@ -6,13 +6,15 @@ import { AppConfigProvider } from '../services/AppConfigProvider';
 import { LOGGER_TOKEN } from '../di/tokens';
 import { Logger } from 'winston';
 
+import * as Tokens from '../di/tokens';
+
 @singleton()
 export class AuthMiddleware {
     constructor(
-        @inject(AuthService) private authService: AuthService,
-        @inject(I18nService) private i18n: I18nService,
-        @inject(LOGGER_TOKEN) private logger: Logger,
-        private configProvider: AppConfigProvider
+        @inject(Tokens.AUTH_SERVICE_TOKEN) private authService: AuthService,
+        @inject(Tokens.I18N_TOKEN) private i18n: I18nService,
+        @inject(Tokens.LOGGER_TOKEN) private logger: Logger,
+        @inject(Tokens.CONFIG_PROVIDER_TOKEN) private configProvider: AppConfigProvider
     ) {}
     
     private getLocale(req: Request): string {

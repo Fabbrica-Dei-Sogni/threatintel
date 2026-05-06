@@ -1,5 +1,5 @@
 import { inject, singleton } from 'tsyringe';
-import { LOGGER_TOKEN } from '../di/tokens';
+import * as Tokens from '../di/tokens';
 import { Logger } from 'winston';
 import { ThreatLogService } from './ThreatLogService';
 import PatternAnalysisService from './PatternAnalysisService';
@@ -26,11 +26,11 @@ export class NginxLogService extends BaseJournalWatcher {
     private readonly logPrefix: string;
 
     constructor(
-        @inject(LOGGER_TOKEN) logger: Logger,
-        private readonly threatLogService: ThreatLogService,
-        private readonly patternAnalysisService: PatternAnalysisService,
-        private readonly configProvider: AppConfigProvider,
-        private readonly threatLogFactory: ThreatLogFactory
+        @inject(Tokens.LOGGER_TOKEN) logger: Logger,
+        @inject(Tokens.THREAT_LOG_SERVICE_TOKEN) private readonly threatLogService: ThreatLogService,
+        @inject(Tokens.PATTERN_ANALYSIS_SERVICE_TOKEN) private readonly patternAnalysisService: PatternAnalysisService,
+        @inject(Tokens.CONFIG_PROVIDER_TOKEN) private readonly configProvider: AppConfigProvider,
+        @inject(Tokens.THREAT_LOG_FACTORY_TOKEN) private readonly threatLogFactory: ThreatLogFactory
     ) {
         super(logger);
         this.suspiciousPatterns = [...DEFAULT_SUSPICIOUS_PATTERNS];

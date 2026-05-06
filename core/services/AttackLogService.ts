@@ -14,12 +14,14 @@ import {
 } from '../utils/queryGuard';
 import { GetAttackDetailParams, GetAttacksParams } from '../types/service-params.types';
 
+import * as Tokens from '../di/tokens';
+
 @injectable()
 export class AttackLogService {
     constructor(
-        @inject(LOGGER_TOKEN) private readonly logger: Logger,
-        @inject(FORENSIC_PIPELINE_TOKEN) private readonly forensicPipelineService: ForensicPipelineService,
-        @inject(EVENT_BUS_TOKEN) private readonly eventBus: EventBus
+        @inject(Tokens.LOGGER_TOKEN) private readonly logger: Logger,
+        @inject(Tokens.FORENSIC_PIPELINE_TOKEN) private readonly forensicPipelineService: ForensicPipelineService,
+        @inject(Tokens.EVENT_BUS_TOKEN) private readonly eventBus: EventBus
     ) { }
 
     /**

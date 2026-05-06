@@ -1,8 +1,9 @@
 import 'reflect-metadata';
-import { container } from 'tsyringe';
+import { getComponent, container } from '../../../di/container';
+import { setupContainer } from '../../../di/registry';
 import mongoose from 'mongoose';
 import { RagTranslationService } from '../RagTranslationService';
-import { LOGGER_TOKEN } from '../../../di/tokens';
+import { LOGGER_TOKEN, RAG_TRANSLATION_TOKEN } from '../../../di/tokens';
 import ThreatLog from '../../../models/ThreatLogSchema';
 import IpDetails from '../../../models/IpDetailsSchema';
 import AbuseIpDb from '../../../models/AbuseIpDbSchema';
@@ -14,7 +15,9 @@ describe('RagTranslationService Unit Test', () => {
     let mockLogger: any;
 
     beforeEach(() => {
-        container.reset();
+        setupContainer(container);
+        container.clearInstances();
+
         mockLogger = {
             info: jest.fn(),
             error: jest.fn(),
@@ -22,7 +25,7 @@ describe('RagTranslationService Unit Test', () => {
             debug: jest.fn()
         };
         container.registerInstance(LOGGER_TOKEN, mockLogger);
-        service = container.resolve(RagTranslationService);
+        service = getComponent(RAG_TRANSLATION_TOKEN);
     });
 
     describe('Performance and Efficiency', () => {

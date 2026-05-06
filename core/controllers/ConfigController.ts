@@ -4,7 +4,7 @@ import { ConfigService } from '../services/ConfigService';
 import { SshLogService } from '../services/SshLogService';
 import { NginxLogService } from '../services/NginxLogService';
 import { PatternAnalysisService } from '../services/PatternAnalysisService';
-import { LOGGER_TOKEN } from '../di/tokens';
+import * as Tokens from '../di/tokens';
 import { Logger } from 'winston';
 import { Controller, Get, Post, Delete } from '../registry/decorators';
 import { getComponent } from '../di/container';
@@ -16,11 +16,11 @@ const auth = getComponent(AuthMiddleware);
 @Controller('/api/config')
 export class ConfigController {
     constructor(
-        private configService: ConfigService,
-        private sshLogService: SshLogService,
-        private nginxLogService: NginxLogService,
-        private patternAnalysisService: PatternAnalysisService,
-        @inject(LOGGER_TOKEN) private logger: Logger
+        @inject(Tokens.CONFIG_SERVICE_TOKEN) private readonly configService: ConfigService,
+        @inject(Tokens.SSH_LOG_SERVICE_TOKEN) private readonly sshLogService: SshLogService,
+        @inject(Tokens.NGINX_LOG_SERVICE_TOKEN) private readonly nginxLogService: NginxLogService,
+        @inject(Tokens.PATTERN_ANALYSIS_SERVICE_TOKEN) private readonly patternAnalysisService: PatternAnalysisService,
+        @inject(Tokens.LOGGER_TOKEN) private readonly logger: Logger
     ) {}
 
     /**

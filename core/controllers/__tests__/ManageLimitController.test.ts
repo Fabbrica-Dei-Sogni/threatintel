@@ -1,13 +1,12 @@
 import 'reflect-metadata';
 import request from 'supertest';
 import express from 'express';
-import { container } from 'tsyringe';
+import { container, getComponent } from '../../di/container';
+import { setupContainer } from '../../di/registry';
 import { ManageLimitController } from '../ManageLimitController';
-import { RateLimitMiddleware } from '../../rateLimitMiddleware';
-import { RouterHub } from '../../registry/RouterHub';
+import * as Tokens from '../../di/tokens';
 import { Logger } from 'winston';
-import { LOGGER_TOKEN } from '../../di/tokens';
-import { AuthMiddleware } from '../../middlewares/AuthMiddleware';
+import { RouterHub } from '../../registry/RouterHub';
 
 // Mock AuthMiddleware
 jest.mock('../../middlewares/AuthMiddleware', () => {
@@ -22,29 +21,40 @@ jest.mock('../../middlewares/AuthMiddleware', () => {
     };
 });
 
-const mockRateLimitMiddleware = {
-    manualBlacklistIP: jest.fn(),
-    removeIPFromBlacklist: jest.fn(),
-};
-
-const mockLogger = {
-    info: jest.fn(),
-    error: jest.fn(),
-    warn: jest.fn(),
-} as unknown as Logger;
-
-container.register(RateLimitMiddleware, { useValue: mockRateLimitMiddleware as any });
-container.register(LOGGER_TOKEN, { useValue: mockLogger });
-
-const app = express();
-app.use(express.json());
-
-// Registrazione e bind tramite RouterHub
-const hub = container.resolve(RouterHub);
-hub.register(ManageLimitController);
-hub.bindHttp(app, container);
-
 describe('ManageLimitRoutes API', () => {
+    let app: express.Express;
+    let mockRateLimitMiddleware: any;
+    let mockLogger: any;
+
+    beforeAll(() => {
+        // Initialize DI
+        setupContainer(container);
+        container.clearInstances();
+
+        mockRateLimitMiddleware = {
+            manualBlacklistIP: jest.fn(),
+            removeIPFromBlacklist: jest.fn(),
+        };
+
+        mockLogger = {
+            info: jest.fn(),
+            error: jest.fn(),
+            warn: jest.fn(),
+            debug: jest.fn(),
+        };
+
+        // Register mocks using Tokens
+        container.registerInstance(Tokens.RATE_LIMIT_MIDDLEWARE_TOKEN, mockRateLimitMiddleware);
+        container.registerInstance(Tokens.LOGGER_TOKEN, mockLogger);
+
+        app = express();
+        app.use(express.json());
+
+        // Registrazione e bind tramite RouterHub
+        const hub = getComponent<RouterHub>(Tokens.ROUTER_HUB_TOKEN);
+        hub.register(ManageLimitController);
+        hub.bindHttp(app, container);
+    });
 
     beforeEach(() => {
         jest.clearAllMocks();

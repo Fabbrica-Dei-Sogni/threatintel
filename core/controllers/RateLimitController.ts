@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { inject, singleton } from 'tsyringe';
 import { RateLimitService } from '../services/RateLimitService';
-import { LOGGER_TOKEN } from '../di/tokens';
+import * as Tokens from '../di/tokens';
 import { Logger } from 'winston';
 import { Controller, Post } from '../registry/decorators';
 
@@ -9,8 +9,8 @@ import { Controller, Post } from '../registry/decorators';
 @Controller('/api/ratelimit')
 export class RateLimitController {
     constructor(
-        private rateLimitService: RateLimitService,
-        @inject(LOGGER_TOKEN) private logger: Logger
+        @inject(Tokens.RATE_LIMIT_SERVICE_TOKEN) private rateLimitService: RateLimitService,
+        @inject(Tokens.LOGGER_TOKEN) private logger: Logger
     ) {}
 
     /**

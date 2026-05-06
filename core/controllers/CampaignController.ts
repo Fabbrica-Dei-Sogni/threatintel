@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { inject, singleton } from 'tsyringe';
 import { CampaignService } from '../services/CampaignService';
-import { LOGGER_TOKEN } from '../di/tokens';
+import * as Tokens from '../di/tokens';
 import { Logger } from 'winston';
 import { sanitizeFilters, sanitizePage, sanitizePageSize, FilterAllowedFields } from '../utils/queryGuard';
 import { Controller, Get, Post } from '../registry/decorators';
@@ -10,8 +10,8 @@ import { Controller, Get, Post } from '../registry/decorators';
 @Controller('/api/campaign')
 export class CampaignController {
     constructor(
-        private campaignService: CampaignService,
-        @inject(LOGGER_TOKEN) private logger: Logger
+        @inject(Tokens.CAMPAIGN_SERVICE_TOKEN) private readonly campaignService: CampaignService,
+        @inject(Tokens.LOGGER_TOKEN) private readonly logger: Logger
     ) { }
 
     /**

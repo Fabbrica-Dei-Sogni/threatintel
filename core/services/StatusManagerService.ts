@@ -13,6 +13,8 @@ export interface StatusUpdatePayload {
     };
 }
 
+import * as Tokens from '../di/tokens';
+
 /**
  * StatusManagerService
  * 
@@ -22,8 +24,8 @@ export interface StatusUpdatePayload {
 @injectable()
 export class StatusManagerService {
     constructor(
-        @inject(LOGGER_TOKEN) private readonly logger: Logger,
-        @inject(EVENT_BUS_TOKEN) private readonly eventBus: EventBus
+        @inject(Tokens.LOGGER_TOKEN) private readonly logger: Logger,
+        @inject(Tokens.EVENT_BUS_TOKEN) private readonly eventBus: EventBus
     ) { }
 
     /**

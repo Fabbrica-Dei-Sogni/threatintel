@@ -1,7 +1,13 @@
 import 'reflect-metadata';
-import { container } from 'tsyringe';
+import { getComponent, container } from '../../../di/container';
+import { setupContainer } from '../../../di/registry';
 import { RagEventListener } from '../RagEventListener';
-import { LOGGER_TOKEN, EVENT_BUS_TOKEN, RAG_SYNC_SERVICE_TOKEN } from '../../../di/tokens';
+import { 
+    LOGGER_TOKEN, 
+    EVENT_BUS_TOKEN, 
+    RAG_SYNC_SERVICE_TOKEN,
+    RAG_EVENT_LISTENER_TOKEN 
+} from '../../../di/tokens';
 import { AppEvents } from '../../EventBus';
 import { ServiceStatus } from '../../../types/lifecycle';
 
@@ -12,6 +18,9 @@ describe('RagEventListener', () => {
     let mockEventBus: any;
 
     beforeEach(() => {
+        setupContainer(container);
+        container.clearInstances();
+
         mockLogger = {
             info: jest.fn(),
             error: jest.fn(),
@@ -32,12 +41,11 @@ describe('RagEventListener', () => {
             off: jest.fn()
         };
 
-        container.clearInstances();
         container.registerInstance(LOGGER_TOKEN, mockLogger);
         container.registerInstance(RAG_SYNC_SERVICE_TOKEN, mockRagSync);
         container.registerInstance(EVENT_BUS_TOKEN, mockEventBus);
 
-        listener = container.resolve(RagEventListener);
+        listener = getComponent(RAG_EVENT_LISTENER_TOKEN);
     });
 
     it('should register listeners on start', async () => {

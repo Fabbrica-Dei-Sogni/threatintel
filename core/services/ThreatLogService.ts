@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 import ThreatLog, { IThreatLog } from '../models/ThreatLogSchema';
 import PatternAnalysisService from './PatternAnalysisService';
 import { inject, injectable } from 'tsyringe';
-import { LOGGER_TOKEN, EVENT_BUS_TOKEN } from '../di/tokens';
+import * as Tokens from '../di/tokens';
 import { Logger } from 'winston';
 import { IpDetailsService } from './IpDetailsService';
 import { EventBus, AppEvents } from './EventBus';
@@ -28,10 +28,10 @@ export class ThreatLogService {
     //private patternAnalysisService: any;
 
     constructor(
-        @inject(LOGGER_TOKEN) private readonly logger: Logger,
-        private readonly ipDetailsService: IpDetailsService,
-        private readonly patternAnalysisService: PatternAnalysisService,
-        @inject(EVENT_BUS_TOKEN) private readonly eventBus: EventBus
+        @inject(Tokens.LOGGER_TOKEN) private readonly logger: Logger,
+        @inject(Tokens.IP_DETAILS_SERVICE_TOKEN) private readonly ipDetailsService: IpDetailsService,
+        @inject(Tokens.PATTERN_ANALYSIS_SERVICE_TOKEN) private readonly patternAnalysisService: PatternAnalysisService,
+        @inject(Tokens.EVENT_BUS_TOKEN) private readonly eventBus: EventBus
     ) {
         // Parse della variabile di ambiente al costruttore
         //this.patternAnalysisService = new PatternAnalysis({ geoEnabled: true });

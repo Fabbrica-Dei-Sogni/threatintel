@@ -18,6 +18,8 @@ import { AttackLogService } from '../AttackLogService';
 import { CampaignService } from '../CampaignService';
 import { RAG_TEMPLATES } from './RagTemplates';
 
+import * as Tokens from '../../di/tokens';
+
 @injectable()
 export class RagSyncService {
     private isOperational: boolean = false;
@@ -33,13 +35,13 @@ export class RagSyncService {
     private readonly COLL_LOGS: string;
 
     constructor(
-        @inject(LOGGER_TOKEN) private readonly logger: Logger,
-        @inject(RAG_TRANSLATION_TOKEN) private readonly translator: RagTranslationService,
-        @inject(QDRANT_CLIENT_TOKEN) private readonly qdrant: QdrantClientService,
-        @inject(OLLAMA_SERVICE_TOKEN) private readonly ollama: OllamaService,
-        private readonly config: AppConfigProvider,
-        private readonly attackLogService: AttackLogService,
-        private readonly campaignService: CampaignService
+        @inject(Tokens.LOGGER_TOKEN) private readonly logger: Logger,
+        @inject(Tokens.RAG_TRANSLATION_TOKEN) private readonly translator: RagTranslationService,
+        @inject(Tokens.QDRANT_CLIENT_TOKEN) private readonly qdrant: QdrantClientService,
+        @inject(Tokens.OLLAMA_SERVICE_TOKEN) private readonly ollama: OllamaService,
+        @inject(Tokens.CONFIG_PROVIDER_TOKEN) private readonly config: AppConfigProvider,
+        @inject(Tokens.ATTACK_LOG_SERVICE_TOKEN) private readonly attackLogService: AttackLogService,
+        @inject(Tokens.CAMPAIGN_SERVICE_TOKEN) private readonly campaignService: CampaignService
     ) { 
         this.COLL_INTELLIGENCE = this.config.ragCollectionName;
         this.COLL_LOGS = this.config.ragLogsCollectionName;

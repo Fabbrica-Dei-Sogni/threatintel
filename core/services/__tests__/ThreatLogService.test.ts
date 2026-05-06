@@ -1,17 +1,12 @@
 import 'reflect-metadata';
-import { container } from 'tsyringe';
 import mongoose from 'mongoose';
 import { ThreatLogService } from '../ThreatLogService';
 import ThreatLog from '../../models/ThreatLogSchema';
-import { ForensicPipelineService } from '../forense/ForensicPipelineService';
-import { IpDetailsService } from '../IpDetailsService';
-import PatternAnalysisService from '../PatternAnalysisService';
-import { LOGGER_TOKEN, EVENT_BUS_TOKEN, OLLAMA_SERVICE_TOKEN, RAG_TRANSLATION_TOKEN } from '../../di/tokens';
+import * as Tokens from '../../di/tokens';
+import { setupContainer } from '../../di/registry';
+import { getComponent, container } from '../../di/container';
 
 describe('ThreatLogService', () => {
-    console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
-    console.log('!!! RUNNING TEST: ThreatLogService.test.ts    !!!');
-    console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
     let service: ThreatLogService;
     let mockLogger: any;
     let mockForensicPipelineService: any;
@@ -26,6 +21,9 @@ describe('ThreatLogService', () => {
         if (mongoose.connection.readyState === 0) {
             await mongoose.connect(uri);
         }
+        
+        // Initialize DI
+        setupContainer(container);
     });
 
     afterAll(async () => {
@@ -34,6 +32,10 @@ describe('ThreatLogService', () => {
 
     beforeEach(async () => {
         await ThreatLog.deleteMany({});
+        jest.clearAllMocks();
+
+        // Clear instances to force re-resolution with mocks
+        container.clearInstances();
 
         mockLogger = {
             info: jest.fn(),
@@ -41,7 +43,6 @@ describe('ThreatLogService', () => {
             warn: jest.fn(),
             debug: jest.fn()
         };
-
 
         mockForensicPipelineService = {
             buildStandardPipeline: jest.fn().mockResolvedValue([])
@@ -79,16 +80,17 @@ describe('ThreatLogService', () => {
             buildAttackSummaryPrompt: jest.fn().mockReturnValue('Mock Prompt')
         };
 
-        container.clearInstances();
-        container.registerInstance(LOGGER_TOKEN, mockLogger);
-        container.registerInstance(ForensicPipelineService, mockForensicPipelineService);
-        container.registerInstance(IpDetailsService, mockIpDetailsService);
-        container.registerInstance(PatternAnalysisService, mockPatternAnalysisService);
-        container.registerInstance(EVENT_BUS_TOKEN, mockEventBus);
-        container.registerInstance(OLLAMA_SERVICE_TOKEN, mockOllama);
-        container.registerInstance(RAG_TRANSLATION_TOKEN, mockTranslator);
+        // Register mocks in the container
+        container.registerInstance(Tokens.LOGGER_TOKEN, mockLogger);
+        container.registerInstance(Tokens.FORENSIC_PIPELINE_TOKEN, mockForensicPipelineService);
+        container.registerInstance(Tokens.IP_DETAILS_SERVICE_TOKEN, mockIpDetailsService);
+        container.registerInstance(Tokens.PATTERN_ANALYSIS_SERVICE_TOKEN, mockPatternAnalysisService);
+        container.registerInstance(Tokens.EVENT_BUS_TOKEN, mockEventBus);
+        container.registerInstance(Tokens.OLLAMA_SERVICE_TOKEN, mockOllama);
+        container.registerInstance(Tokens.RAG_TRANSLATION_TOKEN, mockTranslator);
 
-        service = container.resolve(ThreatLogService);
+        // Resolve service via Token
+        service = getComponent(Tokens.THREAT_LOG_SERVICE_TOKEN);
     });
 
     describe('saveLog', () => {

@@ -5,6 +5,8 @@ import { EventBus, AppEvents } from './EventBus';
 import ThreatLog from '../models/ThreatLogSchema';
 import { StatusUpdatePayload } from './StatusManagerService';
 
+import * as Tokens from '../di/tokens';
+
 /**
  * StatusEventListener
  * 
@@ -14,8 +16,8 @@ import { StatusUpdatePayload } from './StatusManagerService';
 @injectable()
 export class StatusEventListener {
     constructor(
-        @inject(LOGGER_TOKEN) private readonly logger: Logger,
-        @inject(EVENT_BUS_TOKEN) private readonly eventBus: EventBus
+        @inject(Tokens.LOGGER_TOKEN) private readonly logger: Logger,
+        @inject(Tokens.EVENT_BUS_TOKEN) private readonly eventBus: EventBus
     ) { }
 
     /**

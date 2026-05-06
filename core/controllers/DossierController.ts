@@ -1,18 +1,19 @@
 import { Request, Response } from 'express';
-import { singleton } from 'tsyringe';
+import { inject, singleton } from 'tsyringe';
 import { DossierService } from '../services/DossierService';
+import * as Tokens from '../di/tokens';
 import { CreateDossierDTO, UpdateDossierDTO } from '../models/dto/DossierDTO';
 import { sanitizePage, sanitizePageSize } from '../utils/queryGuard';
 import { Controller, Get, Post, Patch, Delete } from '../registry/decorators';
 import { getComponent } from '../di/container';
 import { AuthMiddleware } from '../middlewares/AuthMiddleware';
 
-const auth = getComponent(AuthMiddleware);
+const auth = () => getComponent<AuthMiddleware>(Tokens.AUTH_MIDDLEWARE_TOKEN);
 
 @singleton()
 @Controller('/api/dossiers')
 export class DossierController {
-    constructor(private readonly dossierService: DossierService) { }
+    constructor(@inject(Tokens.DOSSIER_SERVICE_TOKEN) private readonly dossierService: DossierService) { }
 
     private safeFilename(value: string): string {
         return value.replace(/[^a-zA-Z0-9._-]/g, '_').slice(0, 64);
@@ -56,7 +57,7 @@ export class DossierController {
      *       200:
      *         description: Elenco dossier.
      */
-    @Get('/', [auth.isIdentified()])
+    @Get('/', [(req: any, res: any, next: any) => auth().isIdentified()(req, res, next)])
     async list(req: Request, res: Response) {
         try {
             const user = (req as any).user;
@@ -93,7 +94,7 @@ export class DossierController {
      *       200:
      *         description: Dettaglio dossier.
      */
-    @Get('/:id', [auth.isIdentified()])
+    @Get('/:id', [(req: any, res: any, next: any) => auth().isIdentified()(req, res, next)])
     async getById(req: Request, res: Response) {
         try {
             const id = req.params.id as string;
@@ -139,7 +140,7 @@ export class DossierController {
      *       201:
      *         description: Dossier creato.
      */
-    @Post('/', [auth.isIdentified()])
+    @Post('/', [(req: any, res: any, next: any) => auth().isIdentified()(req, res, next)])
     async create(req: Request, res: Response) {
         try {
             const user = (req as any).user;
@@ -196,7 +197,7 @@ export class DossierController {
      *       200:
      *         description: Dossier aggiornato.
      */
-    @Patch('/:id', [auth.isIdentified()])
+    @Patch('/:id', [(req: any, res: any, next: any) => auth().isIdentified()(req, res, next)])
     async update(req: Request, res: Response) {
         try {
             const user = (req as any).user;
@@ -232,7 +233,7 @@ export class DossierController {
      *       200:
      *         description: Dossier eliminato.
      */
-    @Delete('/:id', [auth.isIdentified()])
+    @Delete('/:id', [(req: any, res: any, next: any) => auth().isIdentified()(req, res, next)])
     async delete(req: Request, res: Response) {
         try {
             const user = (req as any).user;
@@ -285,7 +286,7 @@ export class DossierController {
      *       200:
      *         description: File esportato con successo.
      */
-    @Get('/:id/export', [auth.isIdentified()])
+    @Get('/:id/export', [(req: any, res: any, next: any) => auth().isIdentified()(req, res, next)])
     async export(req: Request, res: Response) {
         try {
             const id = req.params.id as string;

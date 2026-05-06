@@ -1,6 +1,6 @@
 import Redis from 'ioredis';
 import { singleton, inject } from 'tsyringe';
-import { LOGGER_TOKEN } from '../di/tokens';
+import * as Tokens from '../di/tokens';
 import { Logger } from 'winston';
 import dotenv from 'dotenv';
 
@@ -14,7 +14,7 @@ export class RedisService {
     private state: RedisState = 'disabled';
     private fallbackLogged = false;
 
-    constructor(@inject(LOGGER_TOKEN) private readonly logger: Logger) {
+    constructor(@inject(Tokens.LOGGER_TOKEN) private readonly logger: Logger) {
         this.initialize();
     }
 

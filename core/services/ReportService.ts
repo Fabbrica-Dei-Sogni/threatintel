@@ -15,15 +15,17 @@ import { SanitizationUtils } from '../utils/SanitizationUtils';
 
 export type ReportType = 'attack' | 'telnet' | 'ip';
 
+import * as Tokens from '../di/tokens';
+
 @injectable()
 export class ReportService {
     constructor(
-        @inject(LOGGER_TOKEN) private readonly logger: Logger,
-        private readonly threatLogService: ThreatLogService,
-        private readonly attackLogService: AttackLogService,
-        private readonly cowrieService: CowrieService,
-        private readonly ipDetailsService: IpDetailsService,
-        private readonly i18n: I18nService
+        @inject(Tokens.LOGGER_TOKEN) private readonly logger: Logger,
+        @inject(Tokens.THREAT_LOG_SERVICE_TOKEN) private readonly threatLogService: ThreatLogService,
+        @inject(Tokens.ATTACK_LOG_SERVICE_TOKEN) private readonly attackLogService: AttackLogService,
+        @inject(Tokens.COWRIE_SERVICE_TOKEN) private readonly cowrieService: CowrieService,
+        @inject(Tokens.IP_DETAILS_SERVICE_TOKEN) private readonly ipDetailsService: IpDetailsService,
+        @inject(Tokens.I18N_TOKEN) private readonly i18n: I18nService
     ) {}
 
     /**

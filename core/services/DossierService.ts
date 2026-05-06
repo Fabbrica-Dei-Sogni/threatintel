@@ -7,11 +7,13 @@ import { ReportService } from './ReportService';
 import { SanitizationUtils } from '../utils/SanitizationUtils';
 import { sanitizePage, sanitizePageSize, escapeRegex } from '../utils/queryGuard';
 
+import * as Tokens from '../di/tokens';
+
 @injectable()
 export class DossierService {
     constructor(
-        @inject(LOGGER_TOKEN) private readonly logger: Logger,
-        private readonly reportService: ReportService
+        @inject(Tokens.LOGGER_TOKEN) private readonly logger: Logger,
+        @inject(Tokens.REPORT_SERVICE_TOKEN) private readonly reportService: ReportService
     ) { }
 
     /**

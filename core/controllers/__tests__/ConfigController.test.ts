@@ -4,11 +4,26 @@ import request from 'supertest';
 import mongoose from 'mongoose';
 import { ConfigController } from '../ConfigController';
 import Configuration from '../../models/ConfigSchema';
-import { container } from '../../di/container';
+import { container, getComponent } from '../../di/container';
+import { setupContainer } from '../../di/registry';
 import { ConfigService } from '../../services/ConfigService';
 import { SshLogService } from '../../services/SshLogService';
 import { AuthMiddleware } from '../../middlewares/AuthMiddleware';
+import { LOGGER_TOKEN, ROUTER_HUB_TOKEN } from '../../di/tokens';
 import { RouterHub } from '../../registry/RouterHub';
+import { Logger } from 'winston';
+
+// Initialize container
+setupContainer(container);
+container.clearInstances();
+
+const mockLogger = {
+    info: jest.fn(),
+    error: jest.fn(),
+    warn: jest.fn(),
+} as unknown as Logger;
+
+container.registerInstance(LOGGER_TOKEN, mockLogger);
 
 // Mock AuthMiddleware
 jest.mock('../../middlewares/AuthMiddleware', () => {
@@ -44,7 +59,7 @@ describe('ConfigRoutes API', () => {
         app.use(express.json());
 
         // Registra il controller nel RouterHub
-        const hub = container.resolve(RouterHub);
+        const hub = getComponent<RouterHub>(ROUTER_HUB_TOKEN);
         hub.register(ConfigController);
         hub.bindHttp(app, container);
     });

@@ -7,6 +7,8 @@ dotenv.config();
 
 import { ILongRunningService, ServiceStatus } from '../types/lifecycle';
 
+import * as Tokens from '../di/tokens';
+
 @singleton()
 export class AnalysisService implements ILongRunningService {
     public readonly serviceName = 'AnalysisService';
@@ -15,8 +17,8 @@ export class AnalysisService implements ILongRunningService {
     private intervalId: NodeJS.Timeout | null = null;
 
     constructor(
-        @inject(LOGGER_TOKEN) private readonly logger: Logger,
-        private readonly threatLogService: ThreatLogService
+        @inject(Tokens.LOGGER_TOKEN) private readonly logger: Logger,
+        @inject(Tokens.THREAT_LOG_SERVICE_TOKEN) private readonly threatLogService: ThreatLogService
     ) {
         this.timeoutAnalyze = this.parseInterval(process.env.ANALYZE_INTERVAL || '5m');
     }

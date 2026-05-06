@@ -4,7 +4,11 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 // Bootstrap DI container (side-effect import)
-import "./core/di/container";
+import { coreContainer } from "./core/di/container";
+import { setupContainer } from "./core/di/registry";
+
+// Initialize Registry
+setupContainer(coreContainer);
 
 import { logger } from './logger';
 import express from 'express';

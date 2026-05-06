@@ -9,7 +9,7 @@ import IpDetails from '../models/IpDetailsSchema';
 import AbuseIpDb from '../models/AbuseIpDbSchema';
 import { AbuseCategoryEnum } from '../models/AbuseCategoryEnum';
 import { inject, injectable } from 'tsyringe';
-import { LOGGER_TOKEN, EVENT_BUS_TOKEN } from '../di/tokens';
+import * as Tokens from '../di/tokens';
 import { Logger } from 'winston';
 import ipRangeCheck from 'ip-range-check';
 import { IpDetailsMapper } from '../models/dto/IpDetailsDTO';
@@ -24,8 +24,8 @@ export class IpDetailsService {
     private pendingLookups: Map<string, Promise<any>> = new Map();
 
     constructor(
-        @inject(LOGGER_TOKEN) private readonly logger: Logger,
-        @inject(EVENT_BUS_TOKEN) private readonly eventBus: EventBus
+        @inject(Tokens.LOGGER_TOKEN) private readonly logger: Logger,
+        @inject(Tokens.EVENT_BUS_TOKEN) private readonly eventBus: EventBus
     ) {
         this.excludedIPs = this.parseExcludedIPs();
     }

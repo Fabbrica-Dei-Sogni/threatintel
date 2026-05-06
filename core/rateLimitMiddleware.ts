@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import { RateLimitService } from './services/RateLimitService';
 import { RedisService } from './services/RedisService';
 import { inject, singleton } from 'tsyringe';
+import { getComponent } from './di/container';
 import { LOGGER_TOKEN, REDIS_SERVICE_TOKEN } from './di/tokens';
 import { Logger } from 'winston';
 
@@ -336,21 +337,19 @@ export class RateLimitMiddleware {
     }
 }
 
-// Mantieni export per compatibilità (anche se idealmente dovrebbero essere risolti via DI)
-import { container } from './di/container';
 export const redisClient = {
-    get status() { return container.resolve(RedisService).isReady() ? 'ready' : 'connecting'; },
-    call: (...args: any[]) => (container.resolve(RedisService).getClient() as any)?.call(...args),
-    sadd: (...args: any[]) => (container.resolve(RedisService).getClient() as any)?.sadd(...args),
-    setex: (...args: any[]) => (container.resolve(RedisService).getClient() as any)?.setex(...args),
-    srem: (...args: any[]) => (container.resolve(RedisService).getClient() as any)?.srem(...args),
-    del: (...args: any[]) => (container.resolve(RedisService).getClient() as any)?.del(...args),
-    keys: (...args: any[]) => (container.resolve(RedisService).getClient() as any)?.keys(...args),
-    scard: (...args: any[]) => (container.resolve(RedisService).getClient() as any)?.scard(...args),
-    sismember: (...args: any[]) => (container.resolve(RedisService).getClient() as any)?.sismember(...args),
-    ttl: (...args: any[]) => (container.resolve(RedisService).getClient() as any)?.ttl(...args),
-    incr: (...args: any[]) => (container.resolve(RedisService).getClient() as any)?.incr(...args),
-    expire: (...args: any[]) => (container.resolve(RedisService).getClient() as any)?.expire(...args),
+    get status() { return getComponent<RedisService>(REDIS_SERVICE_TOKEN).isReady() ? 'ready' : 'connecting'; },
+    call: (...args: any[]) => (getComponent<RedisService>(REDIS_SERVICE_TOKEN).getClient() as any)?.call(...args),
+    sadd: (...args: any[]) => (getComponent<RedisService>(REDIS_SERVICE_TOKEN).getClient() as any)?.sadd(...args),
+    setex: (...args: any[]) => (getComponent<RedisService>(REDIS_SERVICE_TOKEN).getClient() as any)?.setex(...args),
+    srem: (...args: any[]) => (getComponent<RedisService>(REDIS_SERVICE_TOKEN).getClient() as any)?.srem(...args),
+    del: (...args: any[]) => (getComponent<RedisService>(REDIS_SERVICE_TOKEN).getClient() as any)?.del(...args),
+    keys: (...args: any[]) => (getComponent<RedisService>(REDIS_SERVICE_TOKEN).getClient() as any)?.keys(...args),
+    scard: (...args: any[]) => (getComponent<RedisService>(REDIS_SERVICE_TOKEN).getClient() as any)?.scard(...args),
+    sismember: (...args: any[]) => (getComponent<RedisService>(REDIS_SERVICE_TOKEN).getClient() as any)?.sismember(...args),
+    ttl: (...args: any[]) => (getComponent<RedisService>(REDIS_SERVICE_TOKEN).getClient() as any)?.ttl(...args),
+    incr: (...args: any[]) => (getComponent<RedisService>(REDIS_SERVICE_TOKEN).getClient() as any)?.incr(...args),
+    expire: (...args: any[]) => (getComponent<RedisService>(REDIS_SERVICE_TOKEN).getClient() as any)?.expire(...args),
 } as any;
 
-export const isRedisRateLimitReady = () => container.resolve(RedisService).isReady();
+export const isRedisRateLimitReady = () => getComponent<RedisService>(REDIS_SERVICE_TOKEN).isReady();

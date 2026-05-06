@@ -1,11 +1,12 @@
 import 'reflect-metadata';
 import express from 'express';
 import request from 'supertest';
-import { container } from 'tsyringe';
+import { container, getComponent } from '../../di/container';
+import { setupContainer } from '../../di/registry';
 import { CowrieController } from '../CowrieController';
-import { RouterHub } from '../../registry/RouterHub';
-import { LOGGER_TOKEN } from '../../di/tokens';
+import { LOGGER_TOKEN, ROUTER_HUB_TOKEN } from '../../di/tokens';
 import { AuthMiddleware } from '../../middlewares/AuthMiddleware';
+import { RouterHub } from '../../registry/RouterHub';
 
 // Mock AuthMiddleware
 jest.mock('../../middlewares/AuthMiddleware', () => {
@@ -35,6 +36,9 @@ describe('cowrieroutes', () => {
     let mockCowrieController: any;
 
     beforeEach(() => {
+        setupContainer(container);
+        container.clearInstances();
+
         mockLogger = {
             info: jest.fn(),
             error: jest.fn(),
@@ -47,13 +51,13 @@ describe('cowrieroutes', () => {
             getSessionDetails: jest.fn((req: any, res: any) => res.status(200).json({}))
         };
 
-        container.register<any>(CowrieController, { useValue: mockCowrieController });
-        container.register<any>(LOGGER_TOKEN, { useValue: mockLogger });
+        container.registerInstance(CowrieController, mockCowrieController);
+        container.registerInstance(LOGGER_TOKEN, mockLogger);
 
         app = express();
         app.use(express.json());
         
-        const hub = container.resolve(RouterHub);
+        const hub = getComponent<RouterHub>(ROUTER_HUB_TOKEN);
         hub.register(CowrieController);
         hub.bindHttp(app, container);
     });

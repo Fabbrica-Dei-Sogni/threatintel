@@ -1,13 +1,14 @@
 import 'reflect-metadata';
 import request from 'supertest';
 import express from 'express';
-import { container } from 'tsyringe';
+import { getComponent, container } from '../../di/container';
 import { RateLimitController } from '../RateLimitController';
 import { RateLimitService } from '../../services/RateLimitService';
-import { RouterHub } from '../../registry/RouterHub';
 import { Logger } from 'winston';
-import { LOGGER_TOKEN } from '../../di/tokens';
+import { LOGGER_TOKEN, ROUTER_HUB_TOKEN, RATE_LIMIT_SERVICE_TOKEN } from '../../di/tokens';
 import { AuthMiddleware } from '../../middlewares/AuthMiddleware';
+import { setupContainer } from '../../di/registry';
+import { RouterHub } from '../../registry/RouterHub';
 
 // Mock AuthMiddleware
 jest.mock('../../middlewares/AuthMiddleware', () => {
@@ -33,14 +34,18 @@ const mockLogger = {
     warn: jest.fn(),
 } as unknown as Logger;
 
-container.register(RateLimitService, { useValue: mockRateLimitService as any });
-container.register(LOGGER_TOKEN, { useValue: mockLogger });
+// Initialize DI
+setupContainer(container);
+container.clearInstances();
+
+container.registerInstance(RATE_LIMIT_SERVICE_TOKEN, mockRateLimitService);
+container.registerInstance(LOGGER_TOKEN, mockLogger);
 
 const app = express();
 app.use(express.json());
 
 // Registrazione e bind tramite RouterHub
-const hub = container.resolve(RouterHub);
+const hub = getComponent<RouterHub>(ROUTER_HUB_TOKEN);
 hub.register(RateLimitController);
 hub.bindHttp(app, container);
 

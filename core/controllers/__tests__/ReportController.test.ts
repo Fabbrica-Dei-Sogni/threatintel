@@ -1,10 +1,12 @@
 import 'reflect-metadata';
 import request from 'supertest';
 import express from 'express';
-import { container } from 'tsyringe';
+import { getComponent, container } from '../../di/container';
 import { ReportController } from '../ReportController';
 import { ReportService, ReportType } from '../../services/ReportService';
 import { AuthMiddleware } from '../../middlewares/AuthMiddleware';
+import { ROUTER_HUB_TOKEN, REPORT_SERVICE_TOKEN } from '../../di/tokens';
+import { setupContainer } from '../../di/registry';
 import { RouterHub } from '../../registry/RouterHub';
 
 // Mock AuthMiddleware
@@ -20,6 +22,8 @@ jest.mock('../../middlewares/AuthMiddleware', () => {
     };
 });
 
+import { LOGGER_TOKEN } from '../../di/tokens';
+
 // Mock del ReportService
 const mockReportService = {
     generateDetailReport: jest.fn(),
@@ -28,22 +32,27 @@ const mockReportService = {
     generateTelexReport: jest.fn(),
 };
 
-// Mock AuthMiddleware
-const mockAuthMiddleware = {
-    isIdentified: jest.fn().mockReturnValue((req: any, res: any, next: any) => next()),
-    isAuthenticated: jest.fn().mockReturnValue((req: any, res: any, next: any) => next()),
-    hasRole: jest.fn().mockReturnValue((req: any, res: any, next: any) => next()),
+// Mock Logger
+const mockLogger = {
+    info: jest.fn(),
+    error: jest.fn(),
+    warn: jest.fn(),
+    debug: jest.fn(),
 };
 
+// Initialize DI
+setupContainer(container);
+container.clearInstances();
+
 // Mocking container per iniettare il servizio fittizio
-container.register<ReportService>(ReportService, { useValue: mockReportService as any });
-container.register<AuthMiddleware>(AuthMiddleware, { useValue: mockAuthMiddleware as any });
+container.registerInstance(REPORT_SERVICE_TOKEN, mockReportService);
+container.registerInstance(LOGGER_TOKEN, mockLogger);
 
 const app = express();
 app.use(express.json());
 
 // Registrazione e bind tramite RouterHub
-const hub = container.resolve(RouterHub);
+const hub = getComponent<RouterHub>(ROUTER_HUB_TOKEN);
 hub.register(ReportController);
 hub.bindHttp(app, container);
 

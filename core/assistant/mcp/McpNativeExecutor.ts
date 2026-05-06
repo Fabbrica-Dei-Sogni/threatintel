@@ -50,7 +50,7 @@ export class McpNativeExecutor {
     const name = toolName as AssistantToolName;
 
     switch (name) {
-      case 'semantic_search': {
+      case AssistantToolName.SEMANTIC_SEARCH: {
         const sArgs = sanitizedArgs as AssistantToolArgumentsMap['semantic_search'];
         return this.assistant.search(sArgs.query, {
           limit: sArgs.limit,
@@ -61,29 +61,34 @@ export class McpNativeExecutor {
         });
       }
 
-      case 'resolve_threat_source': {
+      case AssistantToolName.RESOLVE_THREAT_SOURCE: {
         const rArgs = sanitizedArgs as AssistantToolArgumentsMap['resolve_threat_source'];
         return this.assistant.resolveSource(rArgs.sourceRef as any);
       }
 
-      case 'ask': {
+      case AssistantToolName.ASK: {
         const aArgs = sanitizedArgs as AssistantToolArgumentsMap['ask'];
         return this.assistant.ask(aArgs.question);
       }
 
-      case 'search_logs': {
+      case AssistantToolName.SEARCH_LOGS: {
         const cArgs = sanitizedArgs as AssistantToolArgumentsMap['search_logs'];
         return this.assistant.searchLogs(cArgs);
       }
 
-      case 'search_attacks': {
+      case AssistantToolName.SEARCH_ATTACKS: {
         const aArgs = sanitizedArgs as AssistantToolArgumentsMap['search_attacks'];
         return this.assistant.searchAttacks(aArgs);
       }
 
-      case 'search_campaigns': {
+      case AssistantToolName.SEARCH_CAMPAIGNS: {
         const cArgs = sanitizedArgs as AssistantToolArgumentsMap['search_campaigns'];
         return this.assistant.searchCampaigns(cArgs);
+      }
+      
+      case AssistantToolName.GET_STATS: {
+        const gArgs = sanitizedArgs as AssistantToolArgumentsMap['get_stats'];
+        return this.assistant.getStats(gArgs.timeframe, gArgs.minScore, gArgs.limit, gArgs.minLogs);
       }
 
       default:

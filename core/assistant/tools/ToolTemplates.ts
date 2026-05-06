@@ -82,6 +82,7 @@ export const TOOL_TEMPLATES = {
       DANGER_SCORE: "Filtra per livello di pericolo (1=Critico, 5=Informativo).",
       MIN_LOGS: "Numero minimo di log per considerare un IP come attacco. Default: 10.",
       LIMIT: "Numero massimo di risultati. Default: 20.",
+      OFFSET: "Numero di risultati da saltare per paginazione.",
       SORT_BY: "Campo di ordinamento: 'lastSeen', 'totaleLogs', 'dangerScore', 'averageScore'.",
       SORT_ORDER: "'desc' (default) o 'asc'.",
       STATUS: "Stato del log: 'active' (default), 'archived' (storico/whitelist), 'deleted' (cestino)."
@@ -104,11 +105,22 @@ export const TOOL_TEMPLATES = {
       MIN_SCORE: "Score medio minimo della campagna.",
       MIN_LOGS_PER_IP: "Log minimi per ciascun IP partecipante.",
       LIMIT: "Numero massimo di risultati. Default: 20.",
+      OFFSET: "Numero di risultati da saltare per paginazione.",
       SORT_BY: "Campo di ordinamento: 'lastSeen', 'firstSeen', 'ipCount', 'totaleLogs', 'averageScore'.",
       SORT_ORDER: "'desc' (default) o 'asc'.",
       STATUS: "Stato dei log della campagna: 'active' (default), 'archived', 'deleted'."
     }
+  },
+  GET_STATS: {
+    NAME: "get_stats",
+    DESCRIPTION:
+      "Strumento di analisi aggregata e trend. Da usare quando la domanda riguarda volumi, distribuzioni o classifiche: 'Quali sono i paesi più attivi?', 'Quanti log sospetti oggi?', 'Top 5 indicatori di attacco'. " +
+      "Permette di avere una visione d'insieme su migliaia di log senza scaricarli singolarmente.",
+    FIELDS: {
+      TIMEFRAME: "Periodo di analisi: '24h' (default), '1w', '1m', '1y', 'all'.",
+      MIN_SCORE: "Score minimo per considerare un log come sospetto nelle statistiche. Default: 15.",
+      LIMIT: "Numero di elementi nelle classifiche (Top N). Default: 10.",
+      MIN_LOGS: "Soglia minima di log per IP per essere incluso nelle statistiche. Default: 1."
+    }
   }
-
-
 };

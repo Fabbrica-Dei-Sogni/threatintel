@@ -25,7 +25,8 @@ import {
     RagBasePayload,
     RAG_SCHEMA_VERSION,
     RagSourceParams,
-    DirectSearchHit
+    DirectSearchHit,
+    SearchResponse
 } from '../../types/assistant/rag.types';
 import { GetAttacksParams, GetCampaignsParams, GetThreatLogParams } from '../../types/service-params.types';
 import { SearchAttacksArgs, SearchCampaignsArgs, SearchLogArgs } from '../../types/assistant/assistant-tool.types';
@@ -242,7 +243,7 @@ export class AssistantService {
         }
     }
 
-    public async searchLogs(args: SearchLogArgs): Promise<DirectSearchHit[]> {
+    public async searchLogs(args: SearchLogArgs): Promise<SearchResponse<DirectSearchHit>> {
         const serviceParams: GetThreatLogParams = {
             pageSize: args.limit || 20,
             page: (args.offset && args.limit) ? Math.floor(args.offset / args.limit) + 1 : 1,
@@ -261,31 +262,37 @@ export class AssistantService {
             };
         }
 
-        const { logs } = await this.threatLogService.searchLogs(serviceParams);
+        const { logs, total, page, pageSize } = await this.threatLogService.searchLogs(serviceParams);
 
-        return logs.map(log => ({
-            id: log.id,
-            score: 1.0,
-            text: this.ragTranslation.translateThreatLog(log),
-            summary: {
+        return {
+            items: logs.map(log => ({
                 id: log.id,
-                ip: log.request?.ip,
-                protocol: log.protocol,
-                timestamp: log.timestamp,
-                url: log.request?.url,
-                score: log.fingerprint?.score
-            },
-            resolveRef: {
-                endpoint: `/api/logs/${log.id}`,
-                method: 'GET',
-                params: { id: log.id, type: 'log' }
-            }
-        }));
+                score: 1.0,
+                text: this.ragTranslation.translateThreatLog(log),
+                summary: {
+                    id: log.id,
+                    ip: log.request?.ip,
+                    protocol: log.protocol,
+                    timestamp: log.timestamp,
+                    url: log.request?.url,
+                    score: log.fingerprint?.score
+                },
+                resolveRef: {
+                    endpoint: `/api/logs/${log.id}`,
+                    method: 'GET',
+                    params: { id: log.id, type: 'log' }
+                }
+            })),
+            total,
+            page,
+            pageSize
+        };
     }
 
-    public async searchAttacks(args: SearchAttacksArgs): Promise<DirectSearchHit[]> {
+    public async searchAttacks(args: SearchAttacksArgs): Promise<SearchResponse<DirectSearchHit>> {
         const serviceParams: GetAttacksParams = {
             pageSize: args.limit || 20,
+            page: (args.offset && args.limit) ? Math.floor(args.offset / args.limit) + 1 : 1,
             minLogsForAttack: args.minLogs || 10,
             sortFields: args.sortBy ? { [args.sortBy]: args.sortOrder === 'asc' ? 1 : -1 } : { lastSeen: -1 },
             timeConfig: (args.dateFrom || args.dateTo) ? {
@@ -303,40 +310,48 @@ export class AssistantService {
         };
 
         const result = await this.attackLogService.getAttacks(serviceParams);
+        const pNum = serviceParams.page || 1;
+        const psNum = serviceParams.pageSize || 20;
 
-        return result.items.map((attack: any) => {
-            const attackIp = attack.ip || attack.request?.ip;
+        return {
+            items: result.items.map((attack: any) => {
+                const attackIp = attack.ip || attack.request?.ip;
 
-            return {
-                id: attackIp,
-                score: attack.dangerScore ?? attack.averageScore ?? 0,
-                text: this.ragTranslation.translateAttack(attack),
-                summary: {
-                    ip: attackIp,
-                    country: attack.geo?.country,
-                    protocol: attack.protocol,
-                    dangerScore: attack.dangerScore,
-                    totaleLogs: attack.totaleLogs,
-                    firstSeen: attack.firstSeen,
-                    lastSeen: attack.lastSeen,
-                    attackPatterns: attack.attackPatterns,
-                },
-                resolveRef: {
-                    endpoint: '/api/attack/details',
-                    method: 'POST',
-                    params: {
-                        type: 'attack',
+                return {
+                    id: attackIp,
+                    score: attack.dangerScore ?? attack.averageScore ?? 0,
+                    text: this.ragTranslation.translateAttack(attack),
+                    summary: {
                         ip: attackIp,
-                        minLogsForAttack: args.minLogs || 10
-                    } as any,
-                },
-            };
-        });
+                        country: attack.geo?.country,
+                        protocol: attack.protocol,
+                        dangerScore: attack.dangerScore,
+                        totaleLogs: attack.totaleLogs,
+                        firstSeen: attack.firstSeen,
+                        lastSeen: attack.lastSeen,
+                        attackPatterns: attack.attackPatterns,
+                    },
+                    resolveRef: {
+                        endpoint: '/api/attack/details',
+                        method: 'POST',
+                        params: {
+                            type: 'attack',
+                            ip: attackIp,
+                            minLogsForAttack: args.minLogs || 10
+                        } as any,
+                    },
+                };
+            }),
+            total: result.totalCount,
+            page: pNum,
+            pageSize: psNum
+        };
     }
 
-    public async searchCampaigns(args: SearchCampaignsArgs): Promise<DirectSearchHit[]> {
+    public async searchCampaigns(args: SearchCampaignsArgs): Promise<SearchResponse<DirectSearchHit>> {
         const serviceParams: GetCampaignsParams = {
             pageSize: args.limit || 20,
+            page: (args.offset && args.limit) ? Math.floor(args.offset / args.limit) + 1 : 1,
             minIps: args.minIps || 2,
             minScore: args.minScore || 0,
             minLogsPerIp: args.minLogsPerIp || 1,
@@ -347,36 +362,43 @@ export class AssistantService {
                 timeMode: 'range'
             } : {},
             status: args.status
-            // CampaignService.getCampaigns non usa un oggetto 'filters' ma i campi sono diretti
-            // search: args.search // se volessimo mappare anche una ricerca testuale
         };
 
         const result = await this.campaignService.getCampaigns(serviceParams);
 
-        return result.campaigns.map((campaign: any) => ({
-            id: campaign.hash,
-            score: campaign.averageScore ?? 0,
-            text: this.ragTranslation.translateCampaign(campaign),
-            summary: {
-                hash: campaign.hash,
-                ipCount: campaign.ipCount,
-                protocol: campaign.protocol,
-                totaleLogs: campaign.totaleLogs,
-                averageScore: campaign.averageScore,
-                firstSeen: campaign.firstSeen,
-                lastSeen: campaign.lastSeen,
-                attackPatterns: campaign.attackPatterns,
-            },
-            resolveRef: {
-                endpoint: '/api/campaign/detail',
-                method: 'POST',
-                params: {
-                    type: 'campaign',
+        return {
+            items: result.campaigns.map((campaign: any) => ({
+                id: campaign.hash,
+                score: campaign.averageScore ?? 0,
+                text: this.ragTranslation.translateCampaign(campaign),
+                summary: {
                     hash: campaign.hash,
-                    minLogsPerIp: args.minLogsPerIp || 1,
-                    minScore: args.minScore || 0
-                } as any,
-            },
-        }));
+                    ipCount: campaign.ipCount,
+                    protocol: campaign.protocol,
+                    totaleLogs: campaign.totaleLogs,
+                    averageScore: campaign.averageScore,
+                    firstSeen: campaign.firstSeen,
+                    lastSeen: campaign.lastSeen,
+                    attackPatterns: campaign.attackPatterns,
+                },
+                resolveRef: {
+                    endpoint: '/api/campaign/detail',
+                    method: 'POST',
+                    params: {
+                        type: 'campaign',
+                        hash: campaign.hash,
+                        minLogsPerIp: args.minLogsPerIp || 1,
+                        minScore: args.minScore || 0
+                    } as any,
+                },
+            })),
+            total: result.total,
+            page: serviceParams.page || 1,
+            pageSize: serviceParams.pageSize || 20
+        };
+    }
+
+    public async getStats(timeframe?: string, minScore?: number, limit?: number, minLogs?: number): Promise<any> {
+        return this.threatLogService.getStats(timeframe, minScore, limit, minLogs);
     }
 }

@@ -159,3 +159,14 @@ export interface DirectSearchHit {
     summary: Record<string, any>;  // i campi chiave dell'oggetto (ip, paese, score, pattern...)
     resolveRef?: RagSourceRef;     // opzionale: solo se vuoi permettere il drill-down
 }
+
+/**
+ * Risposta standardizzata per le ricerche dirette dell'assistente, 
+ * includendo i metadati di paginazione necessari per l'AI.
+ */
+export interface SearchResponse<T> {
+    items: T[];
+    total: number;
+    page: number;
+    pageSize: number;
+}

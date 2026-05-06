@@ -77,6 +77,7 @@ const routes: RouteRecordRaw[] = [
             initialPageLogs: route.query.pLogs ? parseInt(route.query.pLogs as string) : 1,
             initialPageEvents: route.query.pEvents ? parseInt(route.query.pEvents as string) : 1,
             initialSearchUrl: typeof route.query.qUrl === 'string' ? route.query.qUrl : '',
+            status: (route.query.status as string) || 'active',
         }),
     },
     { 
@@ -191,7 +192,8 @@ const routes: RouteRecordRaw[] = [
             agoValue: route.query.agoValue ? (route.query.agoValue === 'null' ? null : parseInt(route.query.agoValue as string)) : null,
             agoUnit: route.query.agoUnit || null,
             minScore: route.query.minScore ? parseInt(route.query.minScore as string) : 0,
-            protocol: (route.query.protocol as string) || 'http'
+            protocol: (route.query.protocol as string) || 'http',
+            status: (route.query.status as string) || 'active'
         })
     }
 ];

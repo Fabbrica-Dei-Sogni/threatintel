@@ -381,6 +381,10 @@ function goToDetail(hash) {
     protocol: campaignsStore.state.filters.protocol
   };
 
+  if (campaignsStore.state.filters.status && campaignsStore.state.filters.status !== 'active') {
+    query.status = campaignsStore.state.filters.status;
+  }
+
   if (campaignsStore.state.filters.startDate) query.customStartTime = campaignsStore.state.filters.startDate;
   if (campaignsStore.state.filters.endDate) query.customEndTime = campaignsStore.state.filters.endDate;
 

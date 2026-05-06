@@ -34,7 +34,7 @@ describe('Forensic Pipeline Stages', () => {
             const stage = new MatchFilterStage({});
             const pipeline = stage.generate();
             expect(pipeline[0].$match).toEqual({
-                status: { $in: [null, 'active'] }
+                status: 'active'
             });
         });
 
@@ -43,7 +43,7 @@ describe('Forensic Pipeline Stages', () => {
             const pipeline = stage.generate();
             expect(pipeline[0].$match).toEqual({
                 'request.ip': '1.2.3.4',
-                status: { $in: [null, 'active'] }
+                status: 'active'
             });
         });
     });

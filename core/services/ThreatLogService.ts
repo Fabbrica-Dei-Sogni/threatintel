@@ -191,11 +191,11 @@ export class ThreatLogService {
         const andFilters: any[] = [];
         const safeFilters = sanitizeFilters(filters, allowedFields);
 
-        // Gestione speciale dello status con fallback ad active (null/active)
+        // Gestione speciale dello status con fallback ad active
         if (allowedFields.has('status')) {
             const statusValue = safeFilters.status;
-            if (!statusValue || statusValue === 'active') {
-                mongoFilters.status = { $in: [null, 'active'] };
+            if (!statusValue) {
+                mongoFilters.status = 'active';
             } else {
                 mongoFilters.status = statusValue;
             }

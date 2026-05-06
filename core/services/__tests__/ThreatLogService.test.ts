@@ -168,12 +168,12 @@ describe('ThreatLogService', () => {
             // Case 1: status not provided
             const filtersNoStatus = { 'request.ip': '1.1.1.1' };
             const query1 = service.buildRegExpFilter(filtersNoStatus);
-            expect(query1.status).toEqual({ $in: [null, 'active'] });
+            expect(query1.status).toEqual('active');
 
             // Case 2: status explicitely set to active
             const filtersActive = { status: 'active' };
             const query2 = service.buildRegExpFilter(filtersActive);
-            expect(query2.status).toEqual({ $in: [null, 'active'] });
+            expect(query2.status).toEqual('active');
 
             // Case 3: status explicitely set to archived
             const filtersArchived = { status: 'archived' };

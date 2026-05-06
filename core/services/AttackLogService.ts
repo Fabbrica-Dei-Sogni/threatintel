@@ -49,11 +49,15 @@ export class AttackLogService {
             }
         }
 
+        const requestedStatus = filters.status || 'active';
+        delete initialFilters.status;
+
         const mongoFilters = this.buildRegExpFilter(initialFilters, FilterAllowedFields.attack);
         const safeSort = sanitizeSortFields(sortFields, SortAllowedFields.attack, { lastSeen: -1 });
         const sortStage = { $sort: safeSort };
 
         const basePipeline = await this.forensicPipelineService.buildStandardPipeline(mongoFilters, minLogsForAttack, timeConfig);
+        basePipeline.push({ $match: { status: requestedStatus } });
 
         if (Object.keys(postAggregationFilters).length > 0) {
             const { dangerLevel, ...otherPostFilters } = postAggregationFilters;
@@ -144,13 +148,15 @@ export class AttackLogService {
             status = 'active'
         } = params;
 
+        const requestedStatus = status || 'active';
+        
         const mongoFilters = this.buildRegExpFilter({
             'request.ip': ip,
-            protocol,
-            status
+            protocol
         }, FilterAllowedFields.attack);
 
         const basePipeline = await this.forensicPipelineService.buildStandardPipeline(mongoFilters, minLogsForAttack, timeConfig);
+        basePipeline.push({ $match: { status: requestedStatus } });
 
         const pipeline = [
             ...basePipeline,
@@ -232,9 +238,7 @@ export class AttackLogService {
 
         if (allowedFields.has('status')) {
             const statusValue = safeFilters.status;
-            if (!statusValue || statusValue === 'active') {
-                mongoFilters.status = { $in: [null, 'active'] };
-            } else {
+            if (statusValue) {
                 mongoFilters.status = statusValue;
             }
             delete safeFilters.status;

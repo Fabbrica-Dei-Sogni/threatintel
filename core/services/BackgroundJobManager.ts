@@ -11,7 +11,35 @@ export class BackgroundJobManager {
 
     constructor(
         @inject(Tokens.LOGGER_TOKEN) private readonly logger: Logger
-    ) {}
+    ) {
+        // Avviamo la pulizia dei job orfani all'avvio del servizio
+        this.cleanupStaleJobs().catch(err => {
+            this.logger.error('[BackgroundJobManager] Errore durante la pulizia dei job obsoleti:', err);
+        });
+    }
+
+    /**
+     * Identifica i job che risultano "RUNNING" o "PENDING" ma che non possono essere attivi 
+     * (es. a causa di un riavvio forzato del server) e li marca come FAILED.
+     */
+    private async cleanupStaleJobs(): Promise<void> {
+        try {
+            const result = await AnalysisJob.updateMany(
+                { status: { $in: [JobStatus.RUNNING, JobStatus.PENDING] } },
+                { 
+                    status: JobStatus.FAILED, 
+                    error: 'Job interrotto a causa del riavvio del sistema',
+                    completedAt: new Date()
+                }
+            );
+            
+            if (result.modifiedCount > 0) {
+                this.logger.info(`[BackgroundJobManager] Puliti ${result.modifiedCount} job "zombie" rimasti appesi.`);
+            }
+        } catch (err) {
+            this.logger.error('[BackgroundJobManager] Fallimento cleanupStaleJobs:', err);
+        }
+    }
 
     /**
      * Avvia un job in background.
@@ -86,14 +114,40 @@ export class BackgroundJobManager {
     async stopJob(jobId: string): Promise<void> {
         const jobInstance = this.activeJobs.get(jobId);
         if (jobInstance) {
-            await jobInstance.stop();
-            await AnalysisJob.findByIdAndUpdate(jobId, { 
+            try {
+                await jobInstance.stop();
+            } catch (err) {
+                this.logger.error(`[BackgroundJobManager] Errore durante l'arresto dell'istanza job ${jobId}:`, err);
+            }
+            this.activeJobs.delete(jobId);
+        }
+
+        // Aggiorna sempre il database se il job è in uno stato che può essere fermato
+        const result = await AnalysisJob.findOneAndUpdate(
+            { _id: jobId, status: { $in: [JobStatus.RUNNING, JobStatus.PENDING] } },
+            { 
                 status: JobStatus.CANCELLED,
                 completedAt: new Date()
-            });
-            this.activeJobs.delete(jobId);
-            this.logger.info(`[BackgroundJobManager] Job ${jobId} fermato manualmente.`);
+            },
+            { new: true }
+        );
+
+        if (result) {
+            this.logger.info(`[BackgroundJobManager] Job ${jobId} marcato come CANCELLED sul database.`);
+        } else {
+            this.logger.warn(`[BackgroundJobManager] Tentativo di fermare il job ${jobId} fallito o job già terminato.`);
         }
+    }
+
+    /**
+     * Rimuove definitivamente un record di job dal database.
+     */
+    async deleteJob(jobId: string): Promise<void> {
+        // Prima tentiamo di fermarlo se è attivo
+        await this.stopJob(jobId).catch(() => {});
+        
+        await AnalysisJob.findByIdAndDelete(jobId);
+        this.logger.info(`[BackgroundJobManager] Job ${jobId} rimosso definitivamente dal database.`);
     }
 
     async getJobStatus(jobId: string): Promise<IAnalysisJob | null> {

@@ -31,6 +31,7 @@
         "of": "из",
         "goToPage": "Перейти на страницу",
         "show": "Показать",
+        "hide": "Скрыть",
         "sample_url": "Пример URI",
         "duration_label": "Продолжительность",
         "view_details": "Подробнее",
@@ -863,6 +864,29 @@
             "saveSection": "Сохранить раздел",
             "expertMode": "Режим эксперта (JSON)",
             "cancel": "Отмена"
+        }
+    },
+    "ops": {
+        "hubTitle": "ХАБ СИСТЕМНЫХ ОПЕРАЦИЙ",
+        "activeMissions": "АКТИВНЫЕ МИССИИ",
+        "availableCommands": "ДОСТУПНЫЕ КОМАНДЫ",
+        "activeOps": "АКТИВНЫЕ ОПЕРАЦИИ",
+        "noActiveOps": "НЕТ ОПЕРАЦИЙ В ПРОЦЕССЕ",
+        "recentLogs": "ПОСЛЕДНИЕ ЛОГИ",
+        "terminateMission": "ЗАВЕРШИТЬ МИССИЮ",
+        "confirmAction": "ПОДТВЕРДИТЬ?",
+        "commands": {
+            "reanalyzeName": "ПЕРЕАНАЛИЗИРОВАТЬ ВСЕ ЛОГИ",
+            "reanalyzeDesc": "Полное сканирование следов HTTP и SSH",
+            "pruningName": "ОЧИСТКА ДАННЫХ",
+            "pruningDesc": "Удаление устаревших логов (Запланировано)"
+        },
+        "status": {
+            "pending": "В ОЖИДАНИИ",
+            "running": "ВЫПОЛНЯЕТСЯ",
+            "completed": "ЗАВЕРШЕНО",
+            "failed": "ОШИБКА",
+            "cancelled": "ОТМЕНЕНО"
         }
     }
 }

@@ -35,6 +35,7 @@
         "of": "of",
         "goToPage": "Go to page",
         "show": "Show",
+        "hide": "Hide",
         "sample_url": "Sample URI",
         "duration_label": "Duration",
         "view_details": "View Details",
@@ -865,6 +866,29 @@
             "saveSection": "Save Section",
             "expertMode": "Expert Mode (JSON)",
             "cancel": "Cancel"
+        }
+    },
+    "ops": {
+        "hubTitle": "SYSTEM OPERATIONS HUB",
+        "activeMissions": "ACTIVE MISSIONS",
+        "availableCommands": "AVAILABLE COMMANDS",
+        "activeOps": "ACTIVE OPERATIONS",
+        "noActiveOps": "NO OPERATIONS CURRENTLY IN PROGRESS",
+        "recentLogs": "RECENT LOGS",
+        "terminateMission": "TERMINATE MISSION",
+        "confirmAction": "CONFIRM?",
+        "commands": {
+            "reanalyzeName": "REANALYZE ALL LOGS",
+            "reanalyzeDesc": "Full re-scan of HTTP & SSH traces",
+            "pruningName": "DATA PRUNING",
+            "pruningDesc": "Remove obsolete logs (Planned)"
+        },
+        "status": {
+            "pending": "PENDING",
+            "running": "RUNNING",
+            "completed": "COMPLETED",
+            "failed": "FAILED",
+            "cancelled": "CANCELLED"
         }
     }
 }

@@ -12,9 +12,9 @@ describe('Campaigns Store', () => {
 
     it('should initialize with default values', () => {
         const store = useCampaignsStore();
-        expect(store.state.filters.minIps).toBe(2);
+        expect(store.state.filters.minIps).toBe(1);
         expect(store.state.filters.timeMode).toBe('ago');
-        expect(store.state.filters.agoValue).toBe(30);
+        expect(store.state.filters.agoValue).toBe(7);
         expect(store.state.filters.agoUnit).toBe('days');
         expect(store.state.pagination.page).toBe(1);
     });
@@ -29,8 +29,8 @@ describe('Campaigns Store', () => {
 
         store.resetFilters();
 
-        expect(store.state.filters.minIps).toBe(2);
-        expect(store.state.filters.agoValue).toBe(30);
+        expect(store.state.filters.minIps).toBe(1);
+        expect(store.state.filters.agoValue).toBe(7);
         expect(store.state.pagination.page).toBe(1);
     });
 

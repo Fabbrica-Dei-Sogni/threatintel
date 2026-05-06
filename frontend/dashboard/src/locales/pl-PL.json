@@ -35,6 +35,7 @@
         "of": "z",
         "goToPage": "Przejdź do strony",
         "show": "Pokaż",
+        "hide": "Ukryj",
         "sample_url": "Przykładowy URI",
         "duration_label": "Czas trwania",
         "view_details": "Zobacz szczegóły",
@@ -865,6 +866,29 @@
             "saveSection": "Zapisz sekcję",
             "expertMode": "Tryb eksperta (JSON)",
             "cancel": "Anuluj"
+        }
+    },
+    "ops": {
+        "hubTitle": "CENTRUM OPERACJI SYSTEMOWYCH",
+        "activeMissions": "AKTYWNE MISJE",
+        "availableCommands": "DOSTĘPNE POLECENIA",
+        "activeOps": "AKTYWNE OPERACJE",
+        "noActiveOps": "BRAK TRWAJĄCYCH OPERACJI",
+        "recentLogs": "OSTATNIE LOGI",
+        "terminateMission": "ZAKOŃCZ MISJĘ",
+        "confirmAction": "POTWIERDZIĆ?",
+        "commands": {
+            "reanalyzeName": "PONOWNIE ANALIZUJ WSZYSTKIE LOGI",
+            "reanalyzeDesc": "Pełne ponowne skanowanie śladów HTTP i SSH",
+            "pruningName": "CZYSZCZENIE DANYCH",
+            "pruningDesc": "Usuwanie przestarzałych logów (Planowane)"
+        },
+        "status": {
+            "pending": "OCZEKUJĄCE",
+            "running": "W TOKU",
+            "completed": "ZAKOŃCZONE",
+            "failed": "NIEPOWODZENIE",
+            "cancelled": "ANULOWANE"
         }
     }
 }

@@ -71,22 +71,16 @@ describe('API config', () => {
 
   it('should reanalyze all logs', async () => {
     const mockResponse = {
-        http: {
-            results: {
-                processed: 100,
-                updated: 80,
-                errors: 5
-            }
+        message: 'Reanalysis started',
+        jobs: {
+            http: { jobId: 'job123', status: 'pending' },
+            ssh: { jobId: 'job456', status: 'pending' }
         }
     };
     mock.onPost('/reanalyze-all').reply(200, mockResponse);
 
     const result = await reanalyzeAllLogs(100, true);
-    expect(result).toEqual({
-        analyzed: 100,
-        updated: 80,
-        errors: 5
-    });
+    expect(result).toEqual(mockResponse);
   });
 
   it('should handle reanalyzeAllLogs error', async () => {

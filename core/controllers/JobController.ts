@@ -89,4 +89,18 @@ export class JobController {
             res.status(500).json({ error: 'Errore durante l\'arresto del job' });
         }
     }
+
+    /**
+     * Rimuove definitivamente un job.
+     */
+    @Delete('/:id/purge')
+    async purgeJob(req: Request, res: Response): Promise<void> {
+        try {
+            await this.jobManager.deleteJob(req.params.id as string);
+            res.json({ message: 'Job rimosso definitivamente' });
+        } catch (err: any) {
+            this.logger.error('[JobController] Error purging job:', err);
+            res.status(500).json({ error: 'Errore durante la rimozione del job' });
+        }
+    }
 }

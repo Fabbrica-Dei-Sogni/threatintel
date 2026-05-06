@@ -15,22 +15,25 @@
             </template>
         </GlobalHeader>
 
-        <!-- Tactical Toolbar -->
+        <!-- Tactical Toolbar (Search Only) -->
         <div class="forensic-toolbar glass-morphism">
             <div class="search-input-tactical">
                 <span class="search-indicator">🔎</span>
                 <input type="text" v-model="searchQuery" :placeholder="t('config.searchPlaceholder')" />
                 <button v-if="searchQuery" class="clear-input" @click="searchQuery = ''">✕</button>
             </div>
-            <div class="toolbar-actions">
-                <button class="btn btn-tactical-warning reanalyze-btn pulse-glow" @click="handleReanalyze" :disabled="saving">
-                    <span v-if="saving" class="spinner-mini"></span>
-                    <span v-else>🔄</span>
-                    {{ t('config.reanalyzeAll').toUpperCase() }}
-                </button>
-            </div>
         </div>
 
+        <!-- System Operations Hub (Permanent) -->
+        <div class="job-monitor-section">
+            <JobMonitor 
+                :active-jobs="activeJobs" 
+                :history="jobs"
+                @cancel="jobStore.cancelJob" 
+                @purge="handlePurge"
+                @trigger-reanalyze="handleReanalyze"
+            />
+        </div>
         <!-- Content Area -->
         <div class="config-content-scroll scrollable-body">
             <!-- Loading State -->
@@ -99,11 +102,13 @@ import { ref, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useConfig } from '../../composable/useConfig';
+import { useJobStore } from '../../stores/jobs';
 import { useProfileStore } from '../../stores/profiles';
 import { useAuthStore } from '../../stores/auth';
 import { useViewSettingsStore } from '../../stores/viewSettings';
 import { storeToRefs } from 'pinia';
 import ConfigEditor from '../../components/ConfigEditor.vue';
+import JobMonitor from '../../components/forensic/JobMonitor.vue';
 import GlobalHeader from '../../components/GlobalHeader.vue';
 
 const { t } = useI18n();
@@ -113,7 +118,7 @@ const authStore = useAuthStore();
 const viewStore = useViewSettingsStore();
 const { dashboardSkin } = storeToRefs(viewStore);
 
-// Composable per la gestione delle configurazioni
+// Composable per la gestione delle configurazioni e dei job
 const {
     filteredConfigs,
     loading,
@@ -125,6 +130,9 @@ const {
     removeConfig,
     reanalyzeAll
 } = useConfig();
+
+const jobStore = useJobStore();
+const { activeJobs, jobs } = storeToRefs(jobStore);
 
 // Caricamento stati
 const isReanalyzing = ref(false);
@@ -151,17 +159,28 @@ async function handleDelete(key: string) {
 }
 
 async function handleReanalyze() {
-    if (!confirm(t('config.confirmReanalyze'))) return;
+    console.log('[ConfigPage] Reanalyze button clicked');
 
-    isReanalyzing.value = true;
     try {
-        const result = await reanalyzeAll();
-        if (result) {
-            showSuccess(t('config.reanalyzeSuccess', { analyzed: result.analyzed, updated: result.updated, errors: result.errors }));
+        console.log('[ConfigPage] Starting reanalysis...');
+        const result = await reanalyzeAll() as any;
+        console.log('[ConfigPage] Reanalyze response:', result);
+        
+        if (result && result.jobs) {
+            const jobIds = [result.jobs.http.jobId, result.jobs.ssh.jobId];
+            console.log('[ConfigPage] Monitoring jobs:', jobIds);
+            jobStore.monitorJobs(jobIds);
+            showSuccess(t('config.reanalyzeStarted') || 'Rianalisi avviata in background');
+        } else {
+            console.warn('[ConfigPage] No jobs found in response');
         }
-    } finally {
-        isReanalyzing.value = false;
+    } catch (err) {
+        console.error('[ConfigPage] Failed to start reanalysis:', err);
     }
+}
+
+async function handlePurge(jobId: string) {
+    await jobStore.deleteJob(jobId);
 }
 
 function showSuccess(message: string) {
@@ -172,8 +191,14 @@ function showSuccess(message: string) {
 }
 
 // Carica al mount e quando cambia profilo
-onMounted(loadConfigs);
-watch(() => profileStore.activeProfileId, loadConfigs);
+onMounted(() => {
+    loadConfigs();
+    jobStore.loadRecentJobs();
+});
+watch(() => profileStore.activeProfileId, () => {
+    loadConfigs();
+    jobStore.loadRecentJobs();
+});
 </script>
 
 <style scoped src="./ConfigPage.css"></style>

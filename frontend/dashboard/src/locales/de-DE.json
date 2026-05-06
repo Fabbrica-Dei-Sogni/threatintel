@@ -35,6 +35,7 @@
         "of": "von",
         "goToPage": "Gehe zu Seite",
         "show": "Anzeigen",
+        "hide": "Ausblenden",
         "sample_url": "Beispiel-URI",
         "duration_label": "Dauer",
         "view_details": "Details anzeigen",
@@ -865,6 +866,29 @@
             "saveSection": "Abschnitt speichern",
             "expertMode": "Expertenmodus (JSON)",
             "cancel": "Abbrechen"
+        }
+    },
+    "ops": {
+        "hubTitle": "SYSTEM-OPERATIONS-HUB",
+        "activeMissions": "AKTIVE MISSIONEN",
+        "availableCommands": "VERFÜGBARE BEFEHLE",
+        "activeOps": "AKTIVE OPERATIONEN",
+        "noActiveOps": "KEINE OPERATIONEN IN ARBEIT",
+        "recentLogs": "AKTUELLE LOGS",
+        "terminateMission": "MISSION BEENDEN",
+        "confirmAction": "BESTÄTIGEN?",
+        "commands": {
+            "reanalyzeName": "ALLE LOGS NEU ANALYSIEREN",
+            "reanalyzeDesc": "Vollständiger Re-Scan von HTTP & SSH Spuren",
+            "pruningName": "DATENBEREINIGUNG",
+            "pruningDesc": "Veraltete Logs entfernen (Geplant)"
+        },
+        "status": {
+            "pending": "AUSSTEHEND",
+            "running": "LÄUFT",
+            "completed": "ABGESCHLOSSEN",
+            "failed": "FEHLGESCHLAGEN",
+            "cancelled": "ABGEBROCHEN"
         }
     }
 }

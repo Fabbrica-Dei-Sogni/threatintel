@@ -35,6 +35,7 @@
         "of": "di",
         "goToPage": "Vai a pagina",
         "show": "Mostra",
+        "hide": "Nascondi",
         "sample_url": "URI di esempio",
         "duration_label": "Durata",
         "view_details": "Vedi Dettagli",
@@ -582,6 +583,7 @@
         "reanalyzeAll": "Rianalizza Log",
         "confirmReanalyze": "Sei sicuro di voler rianalizzare tutti i log esistenti con la configurazione attuale? Questa operazione potrebbe richiedere tempo.",
         "reanalyzeSuccess": "Rianalisi completata: {analyzed} log analizzati, {updated} aggiornati, {errors} in errore.",
+        "reanalyzeStarted": "Rianalisi avviata in background. Monitora il progresso nel pannello Mission Control.",
         "types": {
             "list": "Lista",
             "keyvalue": "Chiave-Valore",
@@ -864,6 +866,29 @@
             "saveSection": "Salva Sezione",
             "expertMode": "Expert Mode (JSON)",
             "cancel": "Annulla"
+        }
+    },
+    "ops": {
+        "hubTitle": "HUB OPERAZIONI DI SISTEMA",
+        "activeMissions": "MISSIONI ATTIVE",
+        "availableCommands": "COMANDI DISPONIBILI",
+        "activeOps": "OPERAZIONI ATTIVE",
+        "noActiveOps": "NESSUNA OPERAZIONE IN CORSO",
+        "recentLogs": "LOG RECENTI",
+        "terminateMission": "TERMINA MISSIONE",
+        "confirmAction": "CONFERMI?",
+        "commands": {
+            "reanalyzeName": "RIANALIZZA TUTTI I LOG",
+            "reanalyzeDesc": "Scansione completa tracce HTTP & SSH",
+            "pruningName": "PULIZIA DATI",
+            "pruningDesc": "Rimozione log obsoleti (Pianificata)"
+        },
+        "status": {
+            "pending": "IN ATTESA",
+            "running": "IN CORSO",
+            "completed": "COMPLETATO",
+            "failed": "FALLITO",
+            "cancelled": "ANNULLATO"
         }
     }
 }

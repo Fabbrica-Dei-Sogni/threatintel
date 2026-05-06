@@ -107,21 +107,20 @@ export async function searchConfigs(query: string): Promise<ConfigItem[]> {
 }
 
 /**
- * Avvia la rianalisi di tutti i log esistenti
+ * Avvia la rianalisi di tutti i log esistenti (Asincrono)
  */
-export async function reanalyzeAllLogs(batchSize: number = 200, updateDatabase: boolean = true): Promise<{ analyzed: number, updated: number, errors: number }> {
+export async function reanalyzeAllLogs(batchSize: number = 200, updateDatabase: boolean = true): Promise<{ 
+    message: string, 
+    jobs: { 
+        http: { jobId: string, status: string }, 
+        ssh: { jobId: string, status: string } 
+    } 
+}> {
     try {
-        console.log('[reanalyzeAllLogs] Starting reanalysis of all logs');
+        console.log('[reanalyzeAllLogs] Starting asynchronous reanalysis of all logs');
         const response = await apiClient.post('/reanalyze-all', { batchSize, updateDatabase }, { timeout: 0 });
         console.log('[reanalyzeAllLogs] Response status:', response.status);
-        let data = response.data;
-        //gestione soltanto dei log http, quelli ssh richiede un analisi di performance in piu
-        return {
-            analyzed: data.http.results.processed,
-            updated: data.http.results.updated,
-            errors: data.http.results.errors
-        }
-
+        return response.data;
     } catch (error) {
         console.error('[reanalyzeAllLogs] Error:', error);
         throw error;

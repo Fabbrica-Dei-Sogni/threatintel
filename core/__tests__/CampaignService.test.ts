@@ -6,7 +6,7 @@ import ThreatLog from '../models/ThreatLogSchema';
 import * as Tokens from '../di/tokens';
 import { setupContainer } from '../di/registry';
 import { getComponent, container } from '../di/container';
-import { ForensicPipelineService } from '../services/forense/ForensicPipelineService';
+
 
 // Mock Logger
 const mockLogger = {

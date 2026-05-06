@@ -5,16 +5,16 @@ import { getComponent, container } from '../../di/container';
 import { setupContainer } from '../../di/registry';
 import { AttackLogController } from '../../controllers/AttackLogController';
 import * as Tokens from '../../di/tokens';
-import { Logger } from 'winston';
+
 import { RouterHub } from '../../registry/RouterHub';
 
 jest.mock('../../middlewares/AuthMiddleware', () => {
     return {
         AuthMiddleware: jest.fn().mockImplementation(() => {
             return {
-                isAuthenticated: jest.fn().mockReturnValue((req: any, res: any, next: any) => next()),
-                isIdentified: jest.fn().mockReturnValue((req: any, res: any, next: any) => next()),
-                hasRole: jest.fn().mockReturnValue((req: any, res: any, next: any) => next()),
+                isAuthenticated: jest.fn().mockReturnValue((_req: any, _res: any, next: any) => next()),
+                isIdentified: jest.fn().mockReturnValue((_req: any, _res: any, next: any) => next()),
+                hasRole: jest.fn().mockReturnValue((_req: any, _res: any, next: any) => next()),
             };
         })
     };

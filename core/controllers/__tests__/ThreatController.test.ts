@@ -3,12 +3,10 @@ import request from 'supertest';
 import express from 'express';
 import { getComponent, container } from '../../di/container';
 import { ThreatController } from '../../controllers/ThreatController';
-import { ThreatLogService } from '../../services/ThreatLogService';
-import { IpDetailsService } from '../../services/IpDetailsService';
-import { SshLogService } from '../../services/SshLogService';
+
 import { LOGGER_TOKEN, ROUTER_HUB_TOKEN, THREAT_LOG_SERVICE_TOKEN, IP_DETAILS_SERVICE_TOKEN, SSH_LOG_SERVICE_TOKEN, BACKGROUND_JOB_MANAGER_TOKEN } from '../../di/tokens';
 import { Logger } from 'winston';
-import { AuthMiddleware } from '../../middlewares/AuthMiddleware';
+
 import { setupContainer } from '../../di/registry';
 import { RouterHub } from '../../registry/RouterHub';
 
@@ -18,9 +16,9 @@ jest.mock('../../middlewares/AuthMiddleware', () => {
     return {
         AuthMiddleware: jest.fn().mockImplementation(() => {
             return {
-                isAuthenticated: jest.fn().mockReturnValue((req: any, res: any, next: any) => next()),
-                isIdentified: jest.fn().mockReturnValue((req: any, res: any, next: any) => next()),
-                hasRole: jest.fn().mockReturnValue((req: any, res: any, next: any) => next()),
+                isAuthenticated: jest.fn().mockReturnValue((_req: any, _res: any, next: any) => next()),
+                isIdentified: jest.fn().mockReturnValue((_req: any, _res: any, next: any) => next()),
+                hasRole: jest.fn().mockReturnValue((_req: any, _res: any, next: any) => next()),
             };
         })
     };

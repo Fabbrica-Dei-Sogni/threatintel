@@ -3,7 +3,7 @@ import axios from 'axios';
 import { AuthService } from '../AuthService';
 
 jest.mock('axios');
-const mockedAxios = axios as jest.Mocked<typeof axios>;
+
 
 describe('AuthService', () => {
     let service: AuthService;

@@ -16,9 +16,9 @@ import { getComponent, container } from '../../di/container';
 // Mock dependencies
 jest.mock('axios');
 jest.mock('whois', () => ({
-    lookup: jest.fn((ip: any, cb: any) => cb(null, 'Mock WHOIS data')),
+    lookup: jest.fn((_ip: any, cb: any) => cb(null, 'Mock WHOIS data')),
 }));
-jest.mock('ipinfo', () => jest.fn((ip: any, opts: any, cb: any) => cb(null, {
+jest.mock('ipinfo', () => jest.fn((ip: any, _opts: any, cb: any) => cb(null, {
     ip: ip,
     city: 'Test City',
     region: 'Test Region',

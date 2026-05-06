@@ -32,9 +32,9 @@ describe('ReportService', () => {
         jest.clearAllMocks();
         mockLogger = { info: jest.fn(), error: jest.fn() } as any;
         const mockRagSync = {} as any;
-        const mockOllama = {} as any;
-        const mockTranslator = {} as any;
-        const mockConfigService = { getConfigValue: jest.fn().mockResolvedValue(null) } as any;
+        
+        
+
 
         mockThreatLogService = new ThreatLogService(
             mockLogger,

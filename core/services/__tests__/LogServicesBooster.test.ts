@@ -2,16 +2,14 @@ import 'reflect-metadata';
 import { SshLogService } from '../SshLogService';
 import { NginxLogService } from '../NginxLogService';
 import { ThreatLogService } from '../ThreatLogService';
-import PatternAnalysisService from '../PatternAnalysisService';
+
 import { Logger } from 'winston';
 import { ServiceStatus } from '../../types/lifecycle';
 import * as Tokens from '../../di/tokens';
 import { setupContainer } from '../../di/registry';
 import { getComponent, container } from '../../di/container';
-import { AppConfigProvider } from '../AppConfigProvider';
-import { ThreatLogFactory } from '../../utils/ThreatLogFactory';
-import { ProtocolType } from '../../types/CoreConstants';
-import crypto from 'crypto';
+
+
 
 describe('LogServices Booster - Coverage Expansion', () => {
     let mockLogger: jest.Mocked<Logger>;
@@ -78,7 +76,7 @@ describe('LogServices Booster - Coverage Expansion', () => {
         it('should handle start errors', async () => {
             const service = getComponent(Tokens.SSH_LOG_SERVICE_TOKEN) as SshLogService;
             // Mock spawn to throw immediately
-            const spawn = require('child_process').spawn;
+            require('child_process').spawn;
             jest.mock('child_process', () => ({
                 spawn: jest.fn().mockImplementation(() => { throw new Error('Spawn Error'); })
             }));

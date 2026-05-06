@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 import { ForensicPipelineService } from '../services/forense/ForensicPipelineService';
-import { ConfigService } from '../services/ConfigService';
+
 
 // Mock Logger
 const mockLogger = {
@@ -56,7 +56,7 @@ describe('Forensic Pipeline Service Test', () => {
         expect(pipeline.length).toBeGreaterThan(0);
 
         // Check for specific stages presence by basic signature
-        const stages = pipeline.map(s => Object.keys(s)[0]);
+        pipeline.map(s => Object.keys(s)[0]);
         // Typical flow: Match (Time) -> Match (Filters) -> Group -> Lookup -> Match -> ReplaceRoot -> AddFields (Stats) -> AddFields (Scoring)
 
         expect(pipeline[0]).toHaveProperty('$match'); // Time filter

@@ -4,9 +4,8 @@ import { setupContainer } from '../../di/registry';
 import mongoose from 'mongoose';
 import { AttackLogService } from '../AttackLogService';
 import ThreatLog from '../../models/ThreatLogSchema';
-import { ForensicPipelineService } from '../forense/ForensicPipelineService';
-import { IpDetailsService } from '../IpDetailsService';
-import PatternAnalysisService from '../PatternAnalysisService';
+
+
 import { 
     LOGGER_TOKEN, 
     EVENT_BUS_TOKEN, 
@@ -18,8 +17,7 @@ describe('AttackLogService', () => {
     let service: AttackLogService;
     let mockLogger: any;
     let mockForensicPipelineService: any;
-    let mockIpDetailsService: any;
-    let mockPatternAnalysisService: any;
+
     let mockEventBus: any;
 
     beforeAll(async () => {
@@ -51,16 +49,7 @@ describe('AttackLogService', () => {
             buildDistributedPipeline: jest.fn().mockResolvedValue([])
         };
 
-        mockIpDetailsService = {
-            isIPExcluded: jest.fn().mockReturnValue(false),
-            saveIpDetails: jest.fn().mockResolvedValue(new mongoose.Types.ObjectId())
-        };
 
-        mockPatternAnalysisService = {
-            analyze: jest.fn(),
-            generateFingerprint: jest.fn(),
-            loadConfigFromDB: jest.fn()
-        };
 
         mockEventBus = {
             emit: jest.fn(),

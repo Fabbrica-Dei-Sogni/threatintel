@@ -27,7 +27,7 @@ jest.mock('../../models/AnalysisJobSchema', () => ({
 class MockJob implements IBackgroundJob {
     public readonly type = 'mock_job';
     public isStopped = false;
-    async execute(jobId: string, params: any): Promise<void> {
+    async execute(_jobId: string, _params: any): Promise<void> {
         // Simuliamo un'attesa lunga per permettere il test di stop
         while (!this.isStopped) {
             await new Promise(resolve => setTimeout(resolve, 10));
@@ -67,8 +67,8 @@ describe('BackgroundJobManager - Isolation Test', () => {
         // In realtà BackgroundJobManager.startJob chiama runJob asincronamente.
         // Dobbiamo assicurarci di catturare le istanze.
         
-        const job1Doc = await manager.startJob('ssh_reanalyze');
-        const job2Doc = await manager.startJob('ssh_reanalyze');
+        await manager.startJob('ssh_reanalyze');
+        await manager.startJob('ssh_reanalyze');
         
         // Recuperiamo le istanze dalla mappa interna (activeJobs è privata, ma possiamo usare stopJob per testare l'effetto)
         // Ma per un test di isolamento "puro" vogliamo essere sicuri che siano oggetti diversi.

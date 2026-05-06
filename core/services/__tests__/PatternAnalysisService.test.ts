@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 import { PatternAnalysisService } from '../PatternAnalysisService';
-import { ConfigService } from '../ConfigService';
+
 import * as Tokens from '../../di/tokens';
 import { setupContainer } from '../../di/registry';
 import { getComponent, container } from '../../di/container';

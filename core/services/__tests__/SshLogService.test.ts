@@ -1,8 +1,6 @@
 import 'reflect-metadata';
 import { SshLogService } from '../SshLogService';
-import { ThreatLogService } from '../ThreatLogService';
-import { AppConfigProvider } from '../AppConfigProvider';
-import { ThreatLogFactory } from '../../utils/ThreatLogFactory';
+
 import { spawn } from 'child_process';
 import { EventEmitter } from 'events';
 import * as Tokens from '../../di/tokens';

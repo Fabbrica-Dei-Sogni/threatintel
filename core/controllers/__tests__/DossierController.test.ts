@@ -4,25 +4,25 @@ import express from 'express';
 import { container, getComponent } from '../../di/container';
 import { setupContainer } from '../../di/registry';
 import { DossierController } from '../DossierController';
-import { AuthMiddleware } from '../../middlewares/AuthMiddleware';
+
 import * as Tokens from '../../di/tokens';
 import { RouterHub } from '../../registry/RouterHub';
-import { Logger } from 'winston';
+
 
 // Mock AuthMiddleware
 jest.mock('../../middlewares/AuthMiddleware', () => {
     return {
         AuthMiddleware: jest.fn().mockImplementation(() => {
             return {
-                isAuthenticated: jest.fn().mockReturnValue((req: any, res: any, next: any) => {
+                isAuthenticated: jest.fn().mockReturnValue((req: any, _res: any, next: any) => {
                     req.user = { username: 'testuser', roles: [{ name: 'admin' }] };
                     next();
                 }),
-                isIdentified: jest.fn().mockReturnValue((req: any, res: any, next: any) => {
+                isIdentified: jest.fn().mockReturnValue((req: any, _res: any, next: any) => {
                     req.user = { username: 'testuser', roles: [{ name: 'admin' }] };
                     next();
                 }),
-                hasRole: jest.fn().mockReturnValue((req: any, res: any, next: any) => {
+                hasRole: jest.fn().mockReturnValue((req: any, _res: any, next: any) => {
                     req.user = { username: 'testuser', roles: [{ name: 'admin' }] };
                     next();
                 }),

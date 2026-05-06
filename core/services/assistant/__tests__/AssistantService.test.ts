@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 import { AssistantService } from '../AssistantService';
-import { RagValidator } from '../RagValidator';
+
 import { Logger } from 'winston';
 
 describe('AssistantService', () => {

@@ -6,9 +6,7 @@ import { ConfigController } from '../ConfigController';
 import Configuration from '../../models/ConfigSchema';
 import { container, getComponent } from '../../di/container';
 import { setupContainer } from '../../di/registry';
-import { ConfigService } from '../../services/ConfigService';
-import { SshLogService } from '../../services/SshLogService';
-import { AuthMiddleware } from '../../middlewares/AuthMiddleware';
+
 import { LOGGER_TOKEN, ROUTER_HUB_TOKEN } from '../../di/tokens';
 import { RouterHub } from '../../registry/RouterHub';
 import { Logger } from 'winston';
@@ -30,15 +28,15 @@ jest.mock('../../middlewares/AuthMiddleware', () => {
     return {
         AuthMiddleware: jest.fn().mockImplementation(() => {
             return {
-                isAuthenticated: jest.fn().mockReturnValue((req: any, res: any, next: any) => {
+                isAuthenticated: jest.fn().mockReturnValue((req: any, _res: any, next: any) => {
                     req.user = { username: 'testuser', roles: [{ name: 'admin' }] };
                     next();
                 }),
-                isIdentified: jest.fn().mockReturnValue((req: any, res: any, next: any) => {
+                isIdentified: jest.fn().mockReturnValue((req: any, _res: any, next: any) => {
                     req.user = { username: 'testuser', roles: [{ name: 'admin' }] };
                     next();
                 }),
-                hasRole: jest.fn().mockReturnValue((req: any, res: any, next: any) => {
+                hasRole: jest.fn().mockReturnValue((req: any, _res: any, next: any) => {
                     req.user = { username: 'testuser', roles: [{ name: 'admin' }] };
                     next();
                 }),
@@ -49,7 +47,7 @@ jest.mock('../../middlewares/AuthMiddleware', () => {
 
 describe('ConfigRoutes API', () => {
     let app: express.Application;
-    let configController: ConfigController;
+
 
     beforeAll(async () => {
         const uri = process.env.MONGO_URI_TEST || 'mongodb://127.0.0.1:27017/test-routes';

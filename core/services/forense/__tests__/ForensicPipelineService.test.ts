@@ -80,7 +80,7 @@ describe('ForensicPipelineService', () => {
             
             // Re-resolve service to trigger constructor logic if I weren't already
             // But _initFromDB is called in constructor
-            const newService = getComponent(Tokens.FORENSIC_PIPELINE_TOKEN);
+            getComponent(Tokens.FORENSIC_PIPELINE_TOKEN);
             
             // Wait for initialization (it's a private promise, but we can wait a bit or check logger)
             await new Promise(resolve => setTimeout(resolve, 100));

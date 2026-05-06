@@ -1,13 +1,10 @@
 import 'reflect-metadata';
 import { getComponent, container } from '../../../di/container';
 import { setupContainer } from '../../../di/registry';
-import mongoose from 'mongoose';
+
 import { RagTranslationService } from '../RagTranslationService';
 import { LOGGER_TOKEN, RAG_TRANSLATION_TOKEN } from '../../../di/tokens';
-import ThreatLog from '../../../models/ThreatLogSchema';
-import IpDetails from '../../../models/IpDetailsSchema';
-import AbuseIpDb from '../../../models/AbuseIpDbSchema';
-import AbuseReport from '../../../models/AbuseReportSchema';
+
 import { performance } from 'perf_hooks';
 
 describe('RagTranslationService Unit Test', () => {

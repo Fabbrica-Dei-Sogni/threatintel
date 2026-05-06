@@ -20,8 +20,8 @@ jest.mock('express-rate-limit', () => {
     return {
         ...original,
         __esModule: true,
-        default: jest.fn().mockImplementation((options) => {
-            return (req: any, res: any, next: any) => {
+        default: jest.fn().mockImplementation((_options) => {
+            return (_req: any, _res: any, next: any) => {
                 next();
             };
         }),

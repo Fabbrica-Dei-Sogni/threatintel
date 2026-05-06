@@ -3,8 +3,8 @@ import request from 'supertest';
 import express from 'express';
 import { getComponent, container } from '../../di/container';
 import { ReportController } from '../ReportController';
-import { ReportService, ReportType } from '../../services/ReportService';
-import { AuthMiddleware } from '../../middlewares/AuthMiddleware';
+
+
 import { ROUTER_HUB_TOKEN, REPORT_SERVICE_TOKEN } from '../../di/tokens';
 import { setupContainer } from '../../di/registry';
 import { RouterHub } from '../../registry/RouterHub';
@@ -14,9 +14,9 @@ jest.mock('../../middlewares/AuthMiddleware', () => {
     return {
         AuthMiddleware: jest.fn().mockImplementation(() => {
             return {
-                isAuthenticated: jest.fn().mockReturnValue((req: any, res: any, next: any) => next()),
-                isIdentified: jest.fn().mockReturnValue((req: any, res: any, next: any) => next()),
-                hasRole: jest.fn().mockReturnValue((req: any, res: any, next: any) => next()),
+                isAuthenticated: jest.fn().mockReturnValue((_req: any, _res: any, next: any) => next()),
+                isIdentified: jest.fn().mockReturnValue((_req: any, _res: any, next: any) => next()),
+                hasRole: jest.fn().mockReturnValue((_req: any, _res: any, next: any) => next()),
             };
         })
     };

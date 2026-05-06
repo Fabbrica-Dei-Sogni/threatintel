@@ -3,12 +3,11 @@ process.env.COMMON_ENDPOINTS = '/wp-login.php,/administrator';
 
 import 'reflect-metadata';
 import request from 'supertest';
-import express, { Request, Response, NextFunction } from 'express';
+import express from 'express';
 import { container, getComponent } from '../../di/container';
 import { setupContainer } from '../../di/registry';
 import { FakeLoginController } from '../FakeLoginController';
-import { RateLimitMiddleware } from '../../rateLimitMiddleware';
-import { AuthMiddleware } from '../../middlewares/AuthMiddleware';
+
 import { Logger } from 'winston';
 import { LOGGER_TOKEN, ROUTER_HUB_TOKEN } from '../../di/tokens';
 import { RouterHub } from '../../registry/RouterHub';
@@ -22,15 +21,15 @@ jest.mock('../../middlewares/AuthMiddleware', () => {
     return {
         AuthMiddleware: jest.fn().mockImplementation(() => {
             return {
-                isAuthenticated: jest.fn().mockReturnValue((req: any, res: any, next: any) => {
+                isAuthenticated: jest.fn().mockReturnValue((req: any, _res: any, next: any) => {
                     req.user = { username: 'testuser', roles: [{ name: 'admin' }] };
                     next();
                 }),
-                isIdentified: jest.fn().mockReturnValue((req: any, res: any, next: any) => {
+                isIdentified: jest.fn().mockReturnValue((req: any, _res: any, next: any) => {
                     req.user = { username: 'testuser', roles: [{ name: 'admin' }] };
                     next();
                 }),
-                hasRole: jest.fn().mockReturnValue((req: any, res: any, next: any) => {
+                hasRole: jest.fn().mockReturnValue((req: any, _res: any, next: any) => {
                     req.user = { username: 'testuser', roles: [{ name: 'admin' }] };
                     next();
                 }),
@@ -41,7 +40,7 @@ jest.mock('../../middlewares/AuthMiddleware', () => {
 
 // Mock RateLimitMiddleware
 jest.mock('../../rateLimitMiddleware', () => {
-    const bypass = (req: any, res: any, next: any) => next();
+    const bypass = (_req: any, _res: any, next: any) => next();
     return {
         RateLimitMiddleware: jest.fn().mockImplementation(() => {
             return {

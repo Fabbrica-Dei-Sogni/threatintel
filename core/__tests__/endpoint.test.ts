@@ -3,9 +3,9 @@ import express from 'express';
 import request from 'supertest';
 
 // Mocks for all controllers and middlewares
-const mockMiddleware = (req: any, res: any, next: any) => next();
+const mockMiddleware = (_req: any, _res: any, next: any) => next();
 const mockRouter = express.Router();
-mockRouter.get('/test', (req, res) => res.status(200).send('ok'));
+mockRouter.get('/test', (_req, res) => res.status(200).send('ok'));
 
 // [REMOVED] Legacy route factory mocks
 
@@ -25,15 +25,15 @@ const mockRateLimitMiddleware = {
 const mockRouterHub = {
     register: jest.fn(),
     bindHttp: jest.fn((router) => {
-        router.get('/test', (req: any, res: any) => res.status(200).send('ok'));
+        router.get('/test', (_req: any, res: any) => res.status(200).send('ok'));
     })
 };
 
 const mockAuthMiddleware = { 
-    isAuthenticated: jest.fn(() => (req: any, res: any, next: any) => next()),
-    isAuthorized: jest.fn(() => (req: any, res: any, next: any) => next()),
-    hasRole: jest.fn(() => (req: any, res: any, next: any) => next()),
-    isIdentified: jest.fn(() => (req: any, res: any, next: any) => next())
+    isAuthenticated: jest.fn(() => (_req: any, _res: any, next: any) => next()),
+    isAuthorized: jest.fn(() => (_req: any, _res: any, next: any) => next()),
+    hasRole: jest.fn(() => (_req: any, _res: any, next: any) => next()),
+    isIdentified: jest.fn(() => (_req: any, _res: any, next: any) => next())
 };
 
 // Mocking getComponent
@@ -44,7 +44,7 @@ jest.mock('../di/container', () => ({
         if (token && token.name === 'RateLimitMiddleware') return mockRateLimitMiddleware;
         if (token && token.name === 'RouterHub') return mockRouterHub;
         if (token && token.name === 'AuthMiddleware') return mockAuthMiddleware;
-        return (req: any, res: any, next: any) => next(); 
+        return (_req: any, _res: any, next: any) => next(); 
     }),
     container: {
         resolve: jest.fn((token) => {

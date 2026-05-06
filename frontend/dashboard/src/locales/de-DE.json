@@ -872,16 +872,16 @@
         "hubTitle": "SYSTEM-OPERATIONS-HUB",
         "activeMissions": "AKTIVE MISSIONEN",
         "availableCommands": "VERFÜGBARE BEFEHLE",
-        "activeOps": "AKTIVE OPERATIONEN",
-        "noActiveOps": "KEINE OPERATIONEN IN ARBEIT",
-        "recentLogs": "AKTUELLE LOGS",
-        "terminateMission": "MISSION BEENDEN",
+        "activeOps": "ACTIVE OPERATIONS",
+        "noActiveOps": "NO OPERATIONS IN PROGRESS",
+        "recentLogs": "RECENT LOGS",
+        "terminateMission": "TERMINA MISSIONE",
         "confirmAction": "BESTÄTIGEN?",
         "commands": {
             "reanalyzeName": "ALLE LOGS NEU ANALYSIEREN",
             "reanalyzeDesc": "Vollständiger Re-Scan von HTTP & SSH Spuren",
-            "pruningName": "DATENBEREINIGUNG",
-            "pruningDesc": "Veraltete Logs entfernen (Geplant)",
+            "pruningName": "DATABASE CLEANUP",
+            "pruningDesc": "Archive and remove obsolete logs",
             "ragReindexName": "RAG RE-INDIZIERUNG",
             "ragReindexDesc": "Richtet den Qdrant-Vektorspeicher neu aus"
         },
@@ -891,6 +891,21 @@
             "completed": "ABGESCHLOSSEN",
             "failed": "FEHLGESCHLAGEN",
             "cancelled": "ABGEBROCHEN"
+        }
+    },
+    "maintenance": {
+        "title": "SYSTEM MAINTENANCE",
+        "pruning": {
+            "title": "Pruning & Retention",
+            "desc": "Manage data lifecycle: automatic archiving and permanent deletion of logs.",
+            "archiveDays": "Days to Archive",
+            "archiveDaysHelp": "Time before an active log becomes Archived",
+            "retentionDays": "Trash Retention (days)",
+            "retentionDaysHelp": "Time before a deleted log is permanently removed",
+            "deletionDays": "Permanent Deletion (days)",
+            "deletionDaysHelp": "Empty archived logs older than this value",
+            "runCleanup": "Run Cleanup",
+            "confirm": "Are you sure you want to proceed with permanent cleanup? This action is irreversible."
         }
     }
 }

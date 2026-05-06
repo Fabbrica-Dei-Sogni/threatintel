@@ -45,3 +45,4 @@ export const SSH_REANALYZE_JOB_TOKEN = Symbol("SshReanalyzeJob");
 export const THREAT_REANALYZE_JOB_TOKEN = Symbol("ThreatReanalyzeJob");
 export const RAG_REINDEX_JOB_TOKEN = Symbol("RagReindexJob");
 export const REANALYZE_JOB_TOKEN = Symbol("ReanalyzeJob");
+export const PRUNING_JOB_TOKEN = Symbol("PruningJob");

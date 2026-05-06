@@ -870,16 +870,16 @@
         "hubTitle": "ХАБ СИСТЕМНЫХ ОПЕРАЦИЙ",
         "activeMissions": "АКТИВНЫЕ МИССИИ",
         "availableCommands": "ДОСТУПНЫЕ КОМАНДЫ",
-        "activeOps": "АКТИВНЫЕ ОПЕРАЦИИ",
-        "noActiveOps": "НЕТ ОПЕРАЦИЙ В ПРОЦЕССЕ",
-        "recentLogs": "ПОСЛЕДНИЕ ЛОГИ",
-        "terminateMission": "ЗАВЕРШИТЬ МИССИЮ",
+        "activeOps": "ACTIVE OPERATIONS",
+        "noActiveOps": "NO OPERATIONS IN PROGRESS",
+        "recentLogs": "RECENT LOGS",
+        "terminateMission": "TERMINA MISSIONE",
         "confirmAction": "ПОДТВЕРДИТЬ?",
         "commands": {
             "reanalyzeName": "ПЕРЕАНАЛИЗИРОВАТЬ ВСЕ ЛОГИ",
             "reanalyzeDesc": "Полное сканирование следов HTTP и SSH",
-            "pruningName": "ОЧИСТКА ДАННЫХ",
-            "pruningDesc": "Удаление устаревших логов (Запланировано)",
+            "pruningName": "DATABASE CLEANUP",
+            "pruningDesc": "Archive and remove obsolete logs",
             "ragReindexName": "ПЕРЕИНДЕКСАЦИЯ RAG",
             "ragReindexDesc": "Перестроение векторной памяти Qdrant"
         },
@@ -889,6 +889,21 @@
             "completed": "ЗАВЕРШЕНО",
             "failed": "ОШИБКА",
             "cancelled": "ОТМЕНЕНО"
+        }
+    },
+    "maintenance": {
+        "title": "SYSTEM MAINTENANCE",
+        "pruning": {
+            "title": "Pruning & Retention",
+            "desc": "Manage data lifecycle: automatic archiving and permanent deletion of logs.",
+            "archiveDays": "Days to Archive",
+            "archiveDaysHelp": "Time before an active log becomes Archived",
+            "retentionDays": "Trash Retention (days)",
+            "retentionDaysHelp": "Time before a deleted log is permanently removed",
+            "deletionDays": "Permanent Deletion (days)",
+            "deletionDaysHelp": "Empty archived logs older than this value",
+            "runCleanup": "Run Cleanup",
+            "confirm": "Are you sure you want to proceed with permanent cleanup? This action is irreversible."
         }
     }
 }

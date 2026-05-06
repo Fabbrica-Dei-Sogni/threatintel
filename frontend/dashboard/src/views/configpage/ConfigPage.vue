@@ -24,6 +24,73 @@
             </div>
         </div>
 
+        <!-- Maintenance & Pruning Hub -->
+        <div class="maintenance-hub glass-morphism">
+            <div class="maintenance-header">
+                <div class="maintenance-title">
+                    <span class="m-icon">🧹</span>
+                    <h3>{{ t('maintenance.title') }}</h3>
+                </div>
+                <p class="maintenance-desc">{{ t('maintenance.pruning.desc') }}</p>
+                
+                <!-- Log Statistics Dashboard -->
+                <div class="maintenance-stats">
+                    <div class="stat-pill">
+                        <span class="s-label">{{ t('maintenance.pruning.stats.active') }}</span>
+                        <span class="s-value">{{ logStats.active.toLocaleString() }}</span>
+                    </div>
+                    <div class="stat-pill">
+                        <span class="s-label">{{ t('maintenance.pruning.stats.archived') }}</span>
+                        <span class="s-value">{{ logStats.archived.toLocaleString() }}</span>
+                    </div>
+                    <div class="stat-pill">
+                        <span class="s-label">{{ t('maintenance.pruning.stats.trash') }}</span>
+                        <span class="s-value">{{ logStats.deleted.toLocaleString() }}</span>
+                    </div>
+                    <div class="stat-pill warning" v-if="logStats.legacy > 0">
+                        <span class="s-label">{{ t('maintenance.pruning.stats.legacy') }}</span>
+                        <span class="s-value">{{ logStats.legacy.toLocaleString() }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="maintenance-controls" :class="{ 'emergency-mode': pruningParams.resetAllToActive }">
+                <div class="emergency-toggle">
+                    <label class="switch-container">
+                        <input type="checkbox" v-model="pruningParams.resetAllToActive">
+                        <span class="switch-slider"></span>
+                    </label>
+                    <div class="emergency-text">
+                        <span class="e-label">{{ t('maintenance.pruning.emergencyReset') }}</span>
+                        <span class="e-help">{{ t('maintenance.pruning.emergencyResetHelp') }}</span>
+                    </div>
+                </div>
+
+                <template v-if="!pruningParams.resetAllToActive">
+                    <div class="param-input">
+                        <label>{{ t('maintenance.pruning.archiveDays') }}</label>
+                        <input type="number" v-model="pruningParams.archiveDays" min="1" max="365" />
+                        <span class="unit">DAYS</span>
+                    </div>
+                    <div class="param-input">
+                        <label>{{ t('maintenance.pruning.retentionDays') }}</label>
+                        <input type="number" v-model="pruningParams.retentionDays" min="1" max="365" />
+                        <span class="unit">DAYS</span>
+                    </div>
+                    <div class="param-input">
+                        <label>{{ t('maintenance.pruning.deletionDays') }}</label>
+                        <input type="number" v-model="pruningParams.deletionDays" min="1" max="1000" />
+                        <span class="unit">DAYS</span>
+                    </div>
+                </template>
+                
+                <button class="btn-maintenance-run" :class="{ 'btn-emergency': pruningParams.resetAllToActive }" @click="handleRunPruning">
+                    <span class="btn-glow"></span>
+                    {{ t('maintenance.pruning.runCleanup').toUpperCase() }}
+                </button>
+            </div>
+        </div>
+
         <!-- System Operations Hub (Permanent) -->
         <div class="job-monitor-section">
             <JobMonitor 
@@ -35,6 +102,7 @@
                 @trigger-rag-reindex="handleRagReindex"
             />
         </div>
+
         <!-- Content Area -->
         <div class="config-content-scroll scrollable-body">
             <!-- Loading State -->
@@ -88,6 +156,16 @@
                 {{ successMessage }}
             </div>
         </Transition>
+
+        <!-- Tactical Confirmation Modal -->
+        <TacticalModal 
+            :show="showConfirmModal"
+            :title="confirmModalConfig.title"
+            :message="confirmModalConfig.message"
+            :is-danger="confirmModalConfig.isDanger"
+            @confirm="executePendingAction"
+            @cancel="showConfirmModal = false"
+        />
     </div>
     <div v-else class="config-page-view forbidden-view">
         <div class="error-hud card-glass">
@@ -99,7 +177,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, watch, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useConfig } from '../../composable/useConfig';
@@ -111,6 +189,8 @@ import { storeToRefs } from 'pinia';
 import ConfigEditor from '../../components/ConfigEditor.vue';
 import JobMonitor from '../../components/forensic/JobMonitor.vue';
 import GlobalHeader from '../../components/GlobalHeader.vue';
+import TacticalModal from '../../components/TacticalModal.vue';
+import { fetchSearch } from '../../api';
 
 const { t } = useI18n();
 const router = useRouter();
@@ -118,6 +198,15 @@ const profileStore = useProfileStore();
 const authStore = useAuthStore();
 const viewStore = useViewSettingsStore();
 const { dashboardSkin } = storeToRefs(viewStore);
+
+// Stato Modale di Conferma
+const showConfirmModal = ref(false);
+const confirmModalConfig = ref({
+    title: '',
+    message: '',
+    isDanger: false
+});
+let pendingAction: (() => Promise<void>) | null = null;
 
 // Composable per la gestione delle configurazioni e dei job
 const {
@@ -137,6 +226,40 @@ const { activeJobs, jobs } = storeToRefs(jobStore);
 // Caricamento stati
 const isReanalyzing = ref(false);
 const successMessage = ref('');
+
+// Parametri Pruning (Default)
+const pruningParams = ref({
+    archiveDays: 90,
+    retentionDays: 30,
+    deletionDays: 180,
+    resetAllToActive: false
+});
+
+const logStats = ref({
+    active: 0,
+    archived: 0,
+    deleted: 0,
+    legacy: 0
+});
+
+async function fetchLogStats() {
+    try {
+        const [activeRes, archivedRes, deletedRes] = await Promise.all([
+            fetchSearch({ page: 1, pageSize: 1, filters: { status: 'active' }, sortFields: null }),
+            fetchSearch({ page: 1, pageSize: 1, filters: { status: 'archived' }, sortFields: null }),
+            fetchSearch({ page: 1, pageSize: 1, filters: { status: 'deleted' }, sortFields: null })
+        ]);
+
+        logStats.value = {
+            active: activeRes.total || 0,
+            archived: archivedRes.total || 0,
+            deleted: deletedRes.total || 0,
+            legacy: 0
+        };
+    } catch (err) {
+        console.error('[ConfigPage] Failed to fetch log stats via search API:', err);
+    }
+}
 
 // Navigation
 function goBack() {
@@ -159,20 +282,69 @@ async function handleDelete(key: string) {
 }
 
 async function handleReanalyze() {
-    try {
-        await jobStore.runJob('reanalyze', { batchSize: 200 });
-        showSuccess(t('config.reanalyzeStarted') || 'Rianalisi avviata in background');
-    } catch (err) {
-        console.error('[ConfigPage] Failed to start reanalysis:', err);
-    }
+    confirmModalConfig.value = {
+        title: 'RIANALISI COMPLETA',
+        message: 'Questa operazione scansionerà tutti i log HTTP e SSH. Potrebbe richiedere tempo.',
+        isDanger: false
+    };
+    
+    pendingAction = async () => {
+        try {
+            await jobStore.runJob('reanalyze', { batchSize: 200 });
+            showSuccess(t('config.reanalyzeStarted') || 'Rianalisi avviata in background');
+        } catch (err) {
+            console.error('[ConfigPage] Failed to start reanalysis:', err);
+        }
+    };
+    
+    showConfirmModal.value = true;
 }
 
 async function handleRagReindex() {
-    try {
-        await jobStore.runJob('rag_reindex', { batchSize: 50 });
-        showSuccess(t('ops.activeMissions') || 'Re-indicizzazione RAG avviata');
-    } catch (err) {
-        console.error('[ConfigPage] Failed to start RAG reindex:', err);
+    confirmModalConfig.value = {
+        title: 'RE-INDICIZZAZIONE RAG',
+        message: 'Aggiornamento memoria vettoriale Qdrant. I log non indicizzati verranno processati.',
+        isDanger: false
+    };
+    
+    pendingAction = async () => {
+        try {
+            await jobStore.runJob('rag_reindex', { batchSize: 50 });
+            showSuccess(t('ops.activeMissions') || 'Re-indicizzazione RAG avviata');
+        } catch (err) {
+            console.error('[ConfigPage] Failed to start RAG reindex:', err);
+        }
+    };
+    
+    showConfirmModal.value = true;
+}
+
+async function handleRunPruning() {
+    confirmModalConfig.value = {
+        title: pruningParams.value.resetAllToActive ? 'RESET EMERGENZA' : t('maintenance.pruning.title'),
+        message: t('maintenance.pruning.confirm'),
+        isDanger: pruningParams.value.resetAllToActive
+    };
+    
+    pendingAction = async () => {
+        try {
+            await jobStore.runJob('pruning', pruningParams.value);
+            showSuccess(t('ops.activeMissions') || 'Operazione database avviata');
+        } catch (err) {
+            console.error('[ConfigPage] Failed to start pruning:', err);
+        }
+    };
+    
+    showConfirmModal.value = true;
+}
+
+async function executePendingAction() {
+    showConfirmModal.value = false;
+    if (pendingAction) {
+        await pendingAction();
+        pendingAction = null;
+        // Refresh stats after a short delay to allow background job to start/update
+        setTimeout(fetchLogStats, 1000);
     }
 }
 
@@ -191,10 +363,12 @@ function showSuccess(message: string) {
 onMounted(() => {
     loadConfigs();
     jobStore.loadRecentJobs();
+    fetchLogStats();
 });
 watch(() => profileStore.activeProfileId, () => {
     loadConfigs();
     jobStore.loadRecentJobs();
+    fetchLogStats();
 });
 </script>
 

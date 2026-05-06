@@ -880,8 +880,8 @@
         "commands": {
             "reanalyzeName": "RIANALIZZA TUTTI I LOG",
             "reanalyzeDesc": "Scansione completa tracce HTTP & SSH",
-            "pruningName": "PULIZIA DATI",
-            "pruningDesc": "Rimozione log obsoleti (Pianificata)",
+            "pruningName": "PULIZIA DATABASE",
+            "pruningDesc": "Archiviazione e rimozione log obsoleti",
             "ragReindexName": "RE-INDICIZZAZIONE RAG",
             "ragReindexDesc": "Riallinea la memoria vettoriale Qdrant"
         },
@@ -891,6 +891,29 @@
             "completed": "COMPLETATO",
             "failed": "FALLITO",
             "cancelled": "ANNULLATO"
+        }
+    },
+    "maintenance": {
+        "title": "MANUTENZIONE SISTEMA",
+        "pruning": {
+            "title": "Pruning & Retention",
+            "desc": "Gestisci il ciclo di vita dei dati: archiviazione automatica e cancellazione definitiva dei log.",
+            "archiveDays": "Giorni per Archiviazione",
+            "archiveDaysHelp": "Tempo trascorso prima che un log diventi 'Archiviato'",
+            "retentionDays": "Eliminazione Fisica Cestino (giorni)",
+            "retentionDaysHelp": "Rimuove PER SEMPRE dal DB i log nel Cestino più vecchi di questo valore",
+            "deletionDays": "Eliminazione Fisica Archivio (giorni)",
+            "deletionDaysHelp": "Rimuove PER SEMPRE dal DB i log ARCHIVIATI più vecchi di questo valore",
+            "emergencyReset": "Reset di Emergenza",
+            "emergencyResetHelp": "Imposta TUTTI i log (inclusi quelli orfani) a stato 'Attivo'. Da usare con cautela.",
+            "runCleanup": "Esegui Operazione",
+            "confirm": "Sei sicuro di voler procedere? L'operazione influenzerà l'intero database.",
+            "stats": {
+                "active": "Log Attivi",
+                "archived": "Log Archiviati",
+                "trash": "Nel Cestino",
+                "legacy": "Senza Stato (Legacy)"
+            }
         }
     }
 }

@@ -880,8 +880,8 @@
         "commands": {
             "reanalyzeName": "REANALYZE ALL LOGS",
             "reanalyzeDesc": "Full re-scan of HTTP & SSH traces",
-            "pruningName": "DATA PRUNING",
-            "pruningDesc": "Remove obsolete logs (Planned)",
+            "pruningName": "DATABASE CLEANUP",
+            "pruningDesc": "Archive and remove obsolete logs",
             "ragReindexName": "RAG RE-INDEXING",
             "ragReindexDesc": "Realigns Qdrant vector memory"
         },
@@ -891,6 +891,25 @@
             "completed": "COMPLETED",
             "failed": "FAILED",
             "cancelled": "CANCELLED"
+        },
+        "activeOps": "ACTIVE OPERATIONS",
+        "noActiveOps": "NO OPERATIONS IN PROGRESS",
+        "recentLogs": "RECENT LOGS",
+        "terminateMission": "TERMINATE MISSION"
+    },
+    "maintenance": {
+        "title": "SYSTEM MAINTENANCE",
+        "pruning": {
+            "title": "Pruning & Retention",
+            "desc": "Manage data lifecycle: automatic archiving and permanent deletion of logs.",
+            "archiveDays": "Days to Archive",
+            "archiveDaysHelp": "Time before an active log becomes Archived",
+            "retentionDays": "Trash Retention (days)",
+            "retentionDaysHelp": "Time before a deleted log is permanently removed",
+            "deletionDays": "Permanent Deletion (days)",
+            "deletionDaysHelp": "Empty archived logs older than this value",
+            "runCleanup": "Run Cleanup",
+            "confirm": "Are you sure you want to proceed with permanent cleanup? This action is irreversible."
         }
     }
 }

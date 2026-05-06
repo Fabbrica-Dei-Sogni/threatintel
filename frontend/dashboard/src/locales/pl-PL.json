@@ -872,16 +872,16 @@
         "hubTitle": "CENTRUM OPERACJI SYSTEMOWYCH",
         "activeMissions": "AKTYWNE MISJE",
         "availableCommands": "DOSTĘPNE POLECENIA",
-        "activeOps": "AKTYWNE OPERACJE",
-        "noActiveOps": "BRAK TRWAJĄCYCH OPERACJI",
-        "recentLogs": "OSTATNIE LOGI",
-        "terminateMission": "ZAKOŃCZ MISJĘ",
+        "activeOps": "ACTIVE OPERATIONS",
+        "noActiveOps": "NO OPERATIONS IN PROGRESS",
+        "recentLogs": "RECENT LOGS",
+        "terminateMission": "TERMINA MISSIONE",
         "confirmAction": "POTWIERDZIĆ?",
         "commands": {
             "reanalyzeName": "PONOWNIE ANALIZUJ WSZYSTKIE LOGI",
             "reanalyzeDesc": "Pełne ponowne skanowanie śladów HTTP i SSH",
-            "pruningName": "CZYSZCZENIE DANYCH",
-            "pruningDesc": "Usuwanie przestarzałych logów (Planowane)",
+            "pruningName": "DATABASE CLEANUP",
+            "pruningDesc": "Archive and remove obsolete logs",
             "ragReindexName": "REINDEKSACJA RAG",
             "ragReindexDesc": "Wyrównuje pamięć wektorową Qdrant"
         },
@@ -891,6 +891,21 @@
             "completed": "ZAKOŃCZONE",
             "failed": "NIEPOWODZENIE",
             "cancelled": "ANULOWANE"
+        }
+    },
+    "maintenance": {
+        "title": "SYSTEM MAINTENANCE",
+        "pruning": {
+            "title": "Pruning & Retention",
+            "desc": "Manage data lifecycle: automatic archiving and permanent deletion of logs.",
+            "archiveDays": "Days to Archive",
+            "archiveDaysHelp": "Time before an active log becomes Archived",
+            "retentionDays": "Trash Retention (days)",
+            "retentionDaysHelp": "Time before a deleted log is permanently removed",
+            "deletionDays": "Permanent Deletion (days)",
+            "deletionDaysHelp": "Empty archived logs older than this value",
+            "runCleanup": "Run Cleanup",
+            "confirm": "Are you sure you want to proceed with permanent cleanup? This action is irreversible."
         }
     }
 }

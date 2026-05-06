@@ -91,15 +91,6 @@ const server = app.listen(Number(PORT), '0.0.0.0', async () => {
             getStatus: () => ServiceStatus.RUNNING
         } as any);
 
-        // Registrazione Pruning Service
-        const pruningService = getComponent(Tokens.PRUNING_SERVICE_TOKEN);
-        lifecycleManager.register({
-            serviceName: 'PruningService',
-            start: async () => (pruningService as any).start(),
-            stop: () => (pruningService as any).stop(),
-            getStatus: () => ServiceStatus.RUNNING
-        } as any);
-
         // Avvio sequenza di bootstrap (non blocca l'ascolto del server)
         await lifecycleManager.boot();
 

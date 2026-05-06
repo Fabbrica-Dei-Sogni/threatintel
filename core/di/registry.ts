@@ -62,8 +62,8 @@ export function setupContainer(container: DependencyContainer) {
     container.register(Tokens.BACKGROUND_JOB_MANAGER_TOKEN, { useClass: BackgroundJobManager }, { lifecycle: Lifecycle.Singleton });
 
     // Jobs
-    container.register(Tokens.SSH_REANALYZE_JOB_TOKEN, { useClass: SshReanalyzeJob }, { lifecycle: Lifecycle.Singleton });
-    container.register(Tokens.THREAT_REANALYZE_JOB_TOKEN, { useClass: ThreatReanalyzeJob }, { lifecycle: Lifecycle.Singleton });
+    container.register(Tokens.SSH_REANALYZE_JOB_TOKEN, { useClass: SshReanalyzeJob }, { lifecycle: Lifecycle.Transient });
+    container.register(Tokens.THREAT_REANALYZE_JOB_TOKEN, { useClass: ThreatReanalyzeJob }, { lifecycle: Lifecycle.Transient });
 
     // Core Services
     container.register(Tokens.I18N_TOKEN, { useClass: I18nService }, { lifecycle: Lifecycle.Singleton });

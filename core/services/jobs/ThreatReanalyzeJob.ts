@@ -1,4 +1,4 @@
-import { inject, singleton } from 'tsyringe';
+import { inject, injectable } from 'tsyringe';
 import * as Tokens from '../../di/tokens';
 import { Logger } from 'winston';
 import { IBackgroundJob } from '../../types/jobs';
@@ -7,7 +7,7 @@ import { PatternAnalysisService } from '../PatternAnalysisService';
 import AnalysisJob from '../../models/AnalysisJobSchema';
 import ThreatLog from '../../models/ThreatLogSchema';
 
-@singleton()
+@injectable()
 export class ThreatReanalyzeJob implements IBackgroundJob {
     public readonly type = 'threat_reanalyze';
     private isStopped = false;

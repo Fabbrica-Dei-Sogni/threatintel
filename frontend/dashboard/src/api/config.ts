@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { getApiUrl } from './index';
 import { storage, StorageNamespace } from '../utils/storage';
+import { useAuthStore } from '../stores/auth';
 
 /**
  * API client per la gestione delle configurazioni honeypot
@@ -22,6 +23,26 @@ apiClient.interceptors.request.use((config) => {
 
     return config;
 }, (error) => {
+    return Promise.reject(error);
+});
+
+// Interceptor per gestire errori di autenticazione/autorizzazione → sempre /login
+apiClient.interceptors.response.use((response) => {
+    return response;
+}, (error) => {
+    if (error.response && [401, 403].includes(error.response.status)) {
+        try {
+            const authStore = useAuthStore();
+            authStore.handleAuthError();
+        } catch (e) {
+            console.error('[configApiClient] Errore auth, fallback redirect:', e);
+            const currentPath = window.location.pathname;
+            const isAuthPage = ['/login', '/register'].some(p => currentPath.startsWith(p));
+            if (!isAuthPage) {
+                window.location.href = '/login';
+            }
+        }
+    }
     return Promise.reject(error);
 });
 

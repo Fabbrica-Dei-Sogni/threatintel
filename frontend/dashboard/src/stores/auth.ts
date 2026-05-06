@@ -62,6 +62,27 @@ export const useAuthStore = defineStore('auth', () => {
         router.push('/login');
     }
 
+    /**
+     * Gestione centralizzata di qualsiasi errore di autenticazione (401/403).
+     * Pulisce lo stato locale e redirige al login tramite Vue Router.
+     * Evita il redirect se siamo già sulla pagina di login/register.
+     */
+    function handleAuthError(redirectPath?: string) {
+        const currentPath = router.currentRoute.value.fullPath;
+        const isAuthPage = ['/login', '/register'].some(p => currentPath.startsWith(p));
+
+        // Pulizia stato
+        token.value = null;
+        user.value = null;
+        storage.remove(StorageNamespace.AUTH);
+
+        if (!isAuthPage) {
+            const target = redirectPath || currentPath;
+            console.warn(`[AuthStore] Sessione non valida. Redirect a /login (da: ${target})`);
+            router.push({ name: 'Login', query: { redirect: target } });
+        }
+    }
+
     return {
         token,
         user,
@@ -69,6 +90,7 @@ export const useAuthStore = defineStore('auth', () => {
         isAdmin,
         setAuth,
         logout,
+        handleAuthError,
         checkAuthMode
     };
 });

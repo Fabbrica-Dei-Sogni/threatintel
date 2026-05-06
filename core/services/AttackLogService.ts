@@ -242,7 +242,9 @@ export class AttackLogService {
         }
 
         for (const [key, value] of Object.entries(safeFilters)) {
-            if (key === 'protocol') {
+            if (key === 'country' || key === 'geo.country') {
+                mongoFilters['geo.country'] = value;
+            } else if (key === 'protocol') {
                 if (value === 'http') {
                     mongoFilters.$or = [
                         { protocol: 'http' },

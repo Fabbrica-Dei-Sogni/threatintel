@@ -51,6 +51,7 @@ export interface AttackFilter {
     'request.url'?: string;
     'request.method'?: string;
     'geo.country'?: string;
+    country?: string;
     protocol?: string;
     timestamp?: string | any;
     dangerLevel?: string | number | number[];

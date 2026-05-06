@@ -51,8 +51,8 @@ export const TOOL_TEMPLATES = {
       "Usare quando la domanda riguarda eventi singoli o parametri specifici: 'log dell'IP 1.2.3.4', 'log HTTP delle ultime 2 ore', 'log sospetti con score > 50'. " +
       "Restituisce una lista di log con resolveRef pronto per resolve_threat_source.",
     FIELDS: {
-      START_DATE: "Data di inizio in formato ISO8601.",
-      END_DATE: "Data di fine in formato ISO8601.",
+      START_DATE: "Data di inizio in formato ISO8601 (YYYY-MM-DD).",
+      END_DATE: "Data di fine in formato ISO8601 (YYYY-MM-DD).",
       IP: "Filtra per IP esatto.",
       URL: "Filtra per URL o parte di esso (es: '/admin', '.php').",
       PROTOCOL: "Filtra per protocollo: 'http', 'ssh', 'ftp'.",
@@ -74,8 +74,8 @@ export const TOOL_TEMPLATES = {
       "protocol (http, ssh, ftp), dangerScore (1-5), minLogs (soglia minima log per IP). " +
       "Restituisce una lista di attacchi con sourceRef pronto per resolve_threat_source.",
     FIELDS: {
-      DATE_FROM: "Data di inizio in formato ISO8601. Calcolata dinamicamente dall'agente (es: 'ultimi 10 giorni' → now - 10d).",
-      DATE_TO: "Data di fine in formato ISO8601. Default: ora corrente.",
+      DATE_FROM: "Data di inizio in formato ISO8601 (YYYY-MM-DD). Calcolata dinamicamente dall'agente (es: 'ultimi 10 giorni' → now - 10d).",
+      DATE_TO: "Data di fine in formato ISO8601 (YYYY-MM-DD). Default: ora corrente.",
       IP: "Filtra per IP esatto.",
       COUNTRY: "Filtra per paese di origine (codice ISO: CN, RU, US, IT...).",
       PROTOCOL: "Filtra per protocollo: 'http', 'ssh', 'ftp'.",
@@ -97,8 +97,8 @@ export const TOOL_TEMPLATES = {
       "minScore (score minimo), minLogsPerIp (log minimi per IP partecipante). " +
       "Restituisce una lista di campagne con sourceRef pronto per resolve_threat_source.",
     FIELDS: {
-      DATE_FROM: "Data di inizio in formato ISO8601.",
-      DATE_TO: "Data di fine in formato ISO8601.",
+      DATE_FROM: "Data di inizio in formato ISO8601 (YYYY-MM-DD).",
+      DATE_TO: "Data di fine in formato ISO8601 (YYYY-MM-DD).",
       PROTOCOL: "Filtra per protocollo: 'http', 'ssh', 'ftp'.",
       MIN_IPS: "Numero minimo di IP coinvolti nella campagna.",
       MIN_SCORE: "Score medio minimo della campagna.",

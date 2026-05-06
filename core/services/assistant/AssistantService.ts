@@ -295,7 +295,7 @@ export class AssistantService {
             } : {},
             filters: {
                 'request.ip': args.ip,
-                'geo.country': args.country as any, // Cast temporaneo o aggiunta a interfaccia
+                country: args.country,
                 protocol: args.protocol,
                 dangerScore: args.dangerScore,
                 status: args.status

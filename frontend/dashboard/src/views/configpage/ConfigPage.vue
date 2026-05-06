@@ -54,41 +54,85 @@
                 </div>
             </div>
 
-            <div class="maintenance-controls" :class="{ 'emergency-mode': pruningParams.resetAllToActive }">
-                <div class="emergency-toggle">
-                    <label class="switch-container">
-                        <input type="checkbox" v-model="pruningParams.resetAllToActive">
-                        <span class="switch-slider"></span>
-                    </label>
-                    <div class="emergency-text">
-                        <span class="e-label">{{ t('maintenance.pruning.emergencyReset') }}</span>
-                        <span class="e-help">{{ t('maintenance.pruning.emergencyResetHelp') }}</span>
+
+            <div class="maintenance-advanced">
+                <div class="monitor-separator"></div>
+                <div class="commands-grid">
+                    <!-- Pruning Toggle Button -->
+                    <div class="cmd-wrapper" :class="{ 'is-active': showPruningControls }">
+                        <button class="cmd-btn" @click="showPruningControls = !showPruningControls">
+                            <span class="cmd-icon">🗄️</span>
+                            <div class="cmd-text">
+                                <span class="cmd-name">ARCHIVIO & PRUNING LOG</span>
+                                <span class="cmd-desc">Gestione ritenzione e pulizia dati</span>
+                            </div>
+                        </button>
+                    </div>
+
+                    <!-- Reanalyze Command -->
+                    <div class="cmd-wrapper" :class="{ 'is-confirming': confirmingReanalyze }">
+                        <button class="cmd-btn warning" @click="handleReanalyzeClick" :disabled="isAnyReanalyzeRunning">
+                            <span class="cmd-icon">{{ confirmingReanalyze ? '❓' : '🔄' }}</span>
+                            <div class="cmd-text">
+                                <span class="cmd-name">{{ confirmingReanalyze ? t('ops.confirmAction') : t('ops.commands.reanalyzeName') }}</span>
+                                <span class="cmd-desc">{{ t('ops.commands.reanalyzeDesc') }}</span>
+                            </div>
+                        </button>
+                        <button v-if="confirmingReanalyze" class="cancel-cmd" @click="confirmingReanalyze = false">✕</button>
+                    </div>
+
+                    <!-- RAG Reindex Command -->
+                    <div class="cmd-wrapper" :class="{ 'is-confirming': confirmingRagReindex }">
+                        <button class="cmd-btn" @click="handleRagClick" :disabled="isRagReindexRunning">
+                            <span class="cmd-icon">{{ confirmingRagReindex ? '❓' : '🧠' }}</span>
+                            <div class="cmd-text">
+                                <span class="cmd-name">{{ confirmingRagReindex ? t('ops.confirmAction') : t('ops.commands.ragReindexName') }}</span>
+                                <span class="cmd-desc">{{ t('ops.commands.ragReindexDesc') }}</span>
+                            </div>
+                        </button>
+                        <button v-if="confirmingRagReindex" class="cancel-cmd" @click="confirmingRagReindex = false">✕</button>
                     </div>
                 </div>
-
-                <template v-if="!pruningParams.resetAllToActive">
-                    <div class="param-input">
-                        <label>{{ t('maintenance.pruning.archiveDays') }}</label>
-                        <input type="number" v-model="pruningParams.archiveDays" min="1" max="365" />
-                        <span class="unit">DAYS</span>
-                    </div>
-                    <div class="param-input">
-                        <label>{{ t('maintenance.pruning.retentionDays') }}</label>
-                        <input type="number" v-model="pruningParams.retentionDays" min="1" max="365" />
-                        <span class="unit">DAYS</span>
-                    </div>
-                    <div class="param-input">
-                        <label>{{ t('maintenance.pruning.deletionDays') }}</label>
-                        <input type="number" v-model="pruningParams.deletionDays" min="1" max="1000" />
-                        <span class="unit">DAYS</span>
-                    </div>
-                </template>
-                
-                <button class="btn-maintenance-run" :class="{ 'btn-emergency': pruningParams.resetAllToActive }" @click="handleRunPruning">
-                    <span class="btn-glow"></span>
-                    {{ t('maintenance.pruning.runCleanup').toUpperCase() }}
-                </button>
             </div>
+
+            <!-- Expandable Pruning Console (Below Buttons) -->
+            <transition name="expand">
+                <div class="maintenance-controls" v-if="showPruningControls" :class="{ 'emergency-mode': pruningParams.resetAllToActive }">
+                    <div class="emergency-toggle">
+                        <label class="switch-container">
+                            <input type="checkbox" v-model="pruningParams.resetAllToActive">
+                            <span class="switch-slider"></span>
+                        </label>
+                        <div class="emergency-text">
+                            <span class="e-label">{{ t('maintenance.pruning.emergencyReset') }}</span>
+                            <span class="e-help">{{ t('maintenance.pruning.emergencyResetHelp') }}</span>
+                        </div>
+                    </div>
+
+                    <template v-if="!pruningParams.resetAllToActive">
+                        <div class="param-input">
+                            <label>{{ t('maintenance.pruning.archiveDays') }}</label>
+                            <input type="number" v-model="pruningParams.archiveDays" min="1" max="365" />
+                            <span class="unit">DAYS</span>
+                        </div>
+                        <div class="param-input">
+                            <label>{{ t('maintenance.pruning.retentionDays') }}</label>
+                            <input type="number" v-model="pruningParams.retentionDays" min="1" max="365" />
+                            <span class="unit">DAYS</span>
+                        </div>
+                        <div class="param-input">
+                            <label>{{ t('maintenance.pruning.deletionDays') }}</label>
+                            <input type="number" v-model="pruningParams.deletionDays" min="1" max="1000" />
+                            <span class="unit">DAYS</span>
+                        </div>
+                    </template>
+                    
+                    <button class="btn-maintenance-run" :class="{ 'btn-emergency': pruningParams.resetAllToActive }" @click="handleRunPruning">
+                        <span class="btn-glow"></span>
+                        {{ t('maintenance.pruning.runCleanup').toUpperCase() }}
+                    </button>
+                </div>
+            </transition>
         </div>
 
         <!-- System Operations Hub (Permanent) -->
@@ -98,8 +142,6 @@
                 :history="jobs"
                 @cancel="jobStore.cancelJob" 
                 @purge="handlePurge"
-                @trigger-reanalyze="handleReanalyze"
-                @trigger-rag-reindex="handleRagReindex"
             />
         </div>
 
@@ -234,6 +276,44 @@ const pruningParams = ref({
     deletionDays: 180,
     resetAllToActive: false
 });
+
+const showPruningControls = ref(false);
+const confirmingReanalyze = ref(false);
+const confirmingRagReindex = ref(false);
+
+const isAnyReanalyzeRunning = computed(() => {
+    return Object.values(activeJobs.value).some(job => 
+        (job.type === 'threat_reanalyze' || job.type === 'ssh_reanalyze') && 
+        (job.status === 'running' || job.status === 'pending')
+    );
+});
+
+const isRagReindexRunning = computed(() => {
+    return Object.values(activeJobs.value).some(job => 
+        job.type === 'rag_reindex' && 
+        (job.status === 'running' || job.status === 'pending')
+    );
+});
+
+async function handleReanalyzeClick() {
+    if (confirmingReanalyze.value) {
+        await handleReanalyze();
+        confirmingReanalyze.value = false;
+    } else {
+        confirmingReanalyze.value = true;
+        setTimeout(() => { confirmingReanalyze.value = false; }, 5000);
+    }
+}
+
+async function handleRagClick() {
+    if (confirmingRagReindex.value) {
+        await handleRagReindex();
+        confirmingRagReindex.value = false;
+    } else {
+        confirmingRagReindex.value = true;
+        setTimeout(() => { confirmingRagReindex.value = false; }, 5000);
+    }
+}
 
 const logStats = ref({
     active: 0,
@@ -373,3 +453,137 @@ watch(() => profileStore.activeProfileId, () => {
 </script>
 
 <style scoped src="./ConfigPage.css"></style>
+
+<style scoped>
+/* Decoupled Command Grid Styles (Imported from JobMonitor) */
+.commands-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.cmd-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.cmd-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 12px 18px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.cmd-btn:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+}
+
+.cmd-btn.warning:hover:not(:disabled) {
+    border-color: rgba(245, 158, 11, 0.4);
+    background: rgba(245, 158, 11, 0.05);
+}
+
+.cmd-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    filter: grayscale(1);
+}
+
+.cmd-icon {
+    font-size: 1.4rem;
+    min-width: 30px;
+    display: flex;
+    justify-content: center;
+}
+
+.cmd-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.cmd-name {
+    font-weight: 800;
+    font-size: 0.75rem;
+    color: #fff;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.cmd-desc {
+    font-size: 0.6rem;
+    color: #64748b;
+    margin-top: 2px;
+}
+
+.cmd-wrapper.is-confirming .cmd-btn,
+.cmd-wrapper.is-active .cmd-btn {
+    background: rgba(99, 102, 241, 0.1);
+    border-color: #6366f1;
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.2);
+}
+
+.cmd-wrapper.is-confirming .cmd-btn {
+    background: rgba(245, 158, 11, 0.1);
+    border-color: #f59e0b;
+    box-shadow: 0 0 20px rgba(245, 158, 11, 0.2);
+}
+
+.cancel-cmd {
+    position: absolute;
+    right: -8px;
+    top: -8px;
+    width: 22px;
+    height: 22px;
+    background: #1e293b;
+    border: 2px solid #0f172a;
+    border-radius: 50%;
+    color: #94a3b8;
+    font-size: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 5;
+}
+
+.cancel-cmd:hover {
+    background: #ef4444;
+    color: #fff;
+}
+
+.maintenance-advanced {
+    margin-top: 25px;
+}
+
+.monitor-separator {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+    margin-bottom: 20px;
+}
+
+/* Expand Transition */
+.expand-enter-active, .expand-leave-active {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    max-height: 500px;
+    overflow: hidden;
+    opacity: 1;
+}
+
+.expand-enter-from, .expand-leave-to {
+    max-height: 0;
+    opacity: 0;
+    transform: translateY(-10px);
+    margin-top: 0;
+}
+</style>

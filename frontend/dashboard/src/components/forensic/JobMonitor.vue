@@ -11,50 +11,6 @@
             </div>
         </div>
 
-        <!-- Available Commands Section -->
-        <div class="commands-section">
-            <h4 class="section-label">{{ t('ops.availableCommands') }}</h4>
-            <div class="commands-grid">
-                <!-- Reanalyze Command with Inline Confirmation -->
-                <div class="cmd-wrapper" :class="{ 'is-confirming': confirmingReanalyze }">
-                    <button 
-                        class="cmd-btn warning" 
-                        @click="handleTriggerClick"
-                        :disabled="isAnyReanalyzeRunning"
-                    >
-                        <span class="cmd-icon">{{ confirmingReanalyze ? '❓' : '🔄' }}</span>
-                        <div class="cmd-text">
-                            <span class="cmd-name">
-                                {{ confirmingReanalyze ? t('ops.confirmAction') : t('ops.commands.reanalyzeName') }}
-                            </span>
-                            <span class="cmd-desc">{{ t('ops.commands.reanalyzeDesc') }}</span>
-                        </div>
-                    </button>
-                    <button v-if="confirmingReanalyze" class="cancel-cmd" @click="confirmingReanalyze = false">✕</button>
-                </div>
-                
-
-
-                <!-- RAG Reindex Command -->
-                <div class="cmd-wrapper" :class="{ 'is-confirming': confirmingRagReindex }">
-                    <button 
-                        class="cmd-btn" 
-                        @click="handleRagClick"
-                        :disabled="isRagReindexRunning"
-                    >
-                        <span class="cmd-icon">{{ confirmingRagReindex ? '❓' : '🧠' }}</span>
-                        <div class="cmd-text">
-                            <span class="cmd-name">
-                                {{ confirmingRagReindex ? t('ops.confirmAction') : t('ops.commands.ragReindexName') }}
-                            </span>
-                            <span class="cmd-desc">{{ t('ops.commands.ragReindexDesc') }}</span>
-                        </div>
-                    </button>
-                    <button v-if="confirmingRagReindex" class="cancel-cmd" @click="confirmingRagReindex = false">✕</button>
-                </div>
-            </div>
-        </div>
-
         <!-- Active Operations Section -->
         <div class="active-section">
             <h4 class="section-label">{{ t('ops.activeOps') }}</h4>
@@ -133,52 +89,10 @@ const props = defineProps<{
     history?: AnalysisJob[]
 }>();
 
-const emit = defineEmits(['cancel', 'purge', 'trigger-reanalyze', 'trigger-rag-reindex']);
+const emit = defineEmits(['cancel', 'purge']);
 const { t } = useI18n();
 
-const confirmingReanalyze = ref(false);
-const confirmingRagReindex = ref(false);
 const showHistory = ref(false);
-
-function handleTriggerClick() {
-    if (confirmingReanalyze.value) {
-        emit('trigger-reanalyze');
-        confirmingReanalyze.value = false;
-    } else {
-        confirmingReanalyze.value = true;
-        // Auto-reset confirmation after 5 seconds
-        setTimeout(() => {
-            confirmingReanalyze.value = false;
-        }, 5000);
-    }
-}
-
-function handleRagClick() {
-    if (confirmingRagReindex.value) {
-        emit('trigger-rag-reindex');
-        confirmingRagReindex.value = false;
-    } else {
-        confirmingRagReindex.value = true;
-        // Auto-reset confirmation after 5 seconds
-        setTimeout(() => {
-            confirmingRagReindex.value = false;
-        }, 5000);
-    }
-}
-
-const isAnyReanalyzeRunning = computed(() => {
-    return Object.values(props.activeJobs).some(job => 
-        (job.type === 'threat_reanalyze' || job.type === 'ssh_reanalyze') && 
-        (job.status === 'running' || job.status === 'pending')
-    );
-});
-
-const isRagReindexRunning = computed(() => {
-    return Object.values(props.activeJobs).some(job => 
-        job.type === 'rag_reindex' && 
-        (job.status === 'running' || job.status === 'pending')
-    );
-});
 
 function formatDate(dateStr: string) {
     if (!dateStr) return '';

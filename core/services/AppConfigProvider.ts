@@ -10,7 +10,7 @@ export class AppConfigProvider {
     constructor(
         @inject(Tokens.LOGGER_TOKEN) private readonly logger: Logger,
         @inject(Tokens.CONFIG_SERVICE_TOKEN) private readonly configService: ConfigService
-    ) {}
+    ) { }
 
     /**
      * Recupera una porta dal .env o default
@@ -101,6 +101,10 @@ export class AppConfigProvider {
         return process.env.RAG_LOGS_COLLECTION_NAME || 'threat_logs';
     }
 
+    get ragSchemaVersion(): string {
+        return process.env.RAG_SCHEMA_VERSION || '0.0.1';
+    }
+
     /**
      * Configurazione Ollama
      */
@@ -130,7 +134,7 @@ export class AppConfigProvider {
         const envList = this.commonEndpoints;
         const dbPatterns = await this.getDynamicConfig(ConfigKey.SUSPICIOUS_PATTERNS);
         const dbList = parseCsv(dbPatterns || '');
-        
+
         return Array.from(new Set([...envList, ...dbList]));
     }
 }

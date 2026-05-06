@@ -33,14 +33,25 @@
                     <button v-if="confirmingReanalyze" class="cancel-cmd" @click="confirmingReanalyze = false">✕</button>
                 </div>
                 
-                <!-- Placeholder for future jobs -->
-                <button class="cmd-btn disabled" disabled title="Future expansion">
-                    <span class="cmd-icon">🧹</span>
-                    <div class="cmd-text">
-                        <span class="cmd-name">{{ t('ops.commands.pruningName') }}</span>
-                        <span class="cmd-desc">{{ t('ops.commands.pruningDesc') }}</span>
-                    </div>
-                </button>
+
+
+                <!-- RAG Reindex Command -->
+                <div class="cmd-wrapper" :class="{ 'is-confirming': confirmingRagReindex }">
+                    <button 
+                        class="cmd-btn" 
+                        @click="handleRagClick"
+                        :disabled="isRagReindexRunning"
+                    >
+                        <span class="cmd-icon">{{ confirmingRagReindex ? '❓' : '🧠' }}</span>
+                        <div class="cmd-text">
+                            <span class="cmd-name">
+                                {{ confirmingRagReindex ? t('ops.confirmAction') : t('ops.commands.ragReindexName') }}
+                            </span>
+                            <span class="cmd-desc">{{ t('ops.commands.ragReindexDesc') }}</span>
+                        </div>
+                    </button>
+                    <button v-if="confirmingRagReindex" class="cancel-cmd" @click="confirmingRagReindex = false">✕</button>
+                </div>
             </div>
         </div>
 
@@ -122,10 +133,11 @@ const props = defineProps<{
     history?: AnalysisJob[]
 }>();
 
-const emit = defineEmits(['cancel', 'purge', 'trigger-reanalyze']);
+const emit = defineEmits(['cancel', 'purge', 'trigger-reanalyze', 'trigger-rag-reindex']);
 const { t } = useI18n();
 
 const confirmingReanalyze = ref(false);
+const confirmingRagReindex = ref(false);
 const showHistory = ref(false);
 
 function handleTriggerClick() {
@@ -141,9 +153,29 @@ function handleTriggerClick() {
     }
 }
 
+function handleRagClick() {
+    if (confirmingRagReindex.value) {
+        emit('trigger-rag-reindex');
+        confirmingRagReindex.value = false;
+    } else {
+        confirmingRagReindex.value = true;
+        // Auto-reset confirmation after 5 seconds
+        setTimeout(() => {
+            confirmingRagReindex.value = false;
+        }, 5000);
+    }
+}
+
 const isAnyReanalyzeRunning = computed(() => {
     return Object.values(props.activeJobs).some(job => 
         (job.type === 'threat_reanalyze' || job.type === 'ssh_reanalyze') && 
+        (job.status === 'running' || job.status === 'pending')
+    );
+});
+
+const isRagReindexRunning = computed(() => {
+    return Object.values(props.activeJobs).some(job => 
+        job.type === 'rag_reindex' && 
         (job.status === 'running' || job.status === 'pending')
     );
 });

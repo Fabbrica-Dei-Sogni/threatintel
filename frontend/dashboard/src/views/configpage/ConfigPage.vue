@@ -32,6 +32,7 @@
                 @cancel="jobStore.cancelJob" 
                 @purge="handlePurge"
                 @trigger-reanalyze="handleReanalyze"
+                @trigger-rag-reindex="handleRagReindex"
             />
         </div>
         <!-- Content Area -->
@@ -127,8 +128,7 @@ const {
     searchQuery,
     loadConfigs,
     upsertConfig,
-    removeConfig,
-    reanalyzeAll
+    removeConfig
 } = useConfig();
 
 const jobStore = useJobStore();
@@ -159,23 +159,20 @@ async function handleDelete(key: string) {
 }
 
 async function handleReanalyze() {
-    console.log('[ConfigPage] Reanalyze button clicked');
-
     try {
-        console.log('[ConfigPage] Starting reanalysis...');
-        const result = await reanalyzeAll() as any;
-        console.log('[ConfigPage] Reanalyze response:', result);
-        
-        if (result && result.jobs) {
-            const jobIds = [result.jobs.http.jobId, result.jobs.ssh.jobId];
-            console.log('[ConfigPage] Monitoring jobs:', jobIds);
-            jobStore.monitorJobs(jobIds);
-            showSuccess(t('config.reanalyzeStarted') || 'Rianalisi avviata in background');
-        } else {
-            console.warn('[ConfigPage] No jobs found in response');
-        }
+        await jobStore.runJob('reanalyze', { batchSize: 200 });
+        showSuccess(t('config.reanalyzeStarted') || 'Rianalisi avviata in background');
     } catch (err) {
         console.error('[ConfigPage] Failed to start reanalysis:', err);
+    }
+}
+
+async function handleRagReindex() {
+    try {
+        await jobStore.runJob('rag_reindex', { batchSize: 50 });
+        showSuccess(t('ops.activeMissions') || 'Re-indicizzazione RAG avviata');
+    } catch (err) {
+        console.error('[ConfigPage] Failed to start RAG reindex:', err);
     }
 }
 

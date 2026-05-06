@@ -881,7 +881,9 @@
             "reanalyzeName": "ALLE LOGS NEU ANALYSIEREN",
             "reanalyzeDesc": "Vollständiger Re-Scan von HTTP & SSH Spuren",
             "pruningName": "DATENBEREINIGUNG",
-            "pruningDesc": "Veraltete Logs entfernen (Geplant)"
+            "pruningDesc": "Veraltete Logs entfernen (Geplant)",
+            "ragReindexName": "RAG RE-INDIZIERUNG",
+            "ragReindexDesc": "Richtet den Qdrant-Vektorspeicher neu aus"
         },
         "status": {
             "pending": "AUSSTEHEND",

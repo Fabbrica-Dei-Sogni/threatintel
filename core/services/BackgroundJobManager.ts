@@ -162,6 +162,8 @@ export class BackgroundJobManager {
         switch (type) {
             case 'ssh_reanalyze': return Tokens.SSH_REANALYZE_JOB_TOKEN;
             case 'threat_reanalyze': return Tokens.THREAT_REANALYZE_JOB_TOKEN;
+            case 'rag_reindex': return Tokens.RAG_REINDEX_JOB_TOKEN;
+            case 'reanalyze': return Tokens.REANALYZE_JOB_TOKEN;
             default: return null;
         }
     }

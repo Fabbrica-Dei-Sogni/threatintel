@@ -879,7 +879,9 @@
             "reanalyzeName": "ПЕРЕАНАЛИЗИРОВАТЬ ВСЕ ЛОГИ",
             "reanalyzeDesc": "Полное сканирование следов HTTP и SSH",
             "pruningName": "ОЧИСТКА ДАННЫХ",
-            "pruningDesc": "Удаление устаревших логов (Запланировано)"
+            "pruningDesc": "Удаление устаревших логов (Запланировано)",
+            "ragReindexName": "ПЕРЕИНДЕКСАЦИЯ RAG",
+            "ragReindexDesc": "Перестроение векторной памяти Qdrant"
         },
         "status": {
             "pending": "В ОЖИДАНИИ",

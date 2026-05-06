@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, reactive } from 'vue';
-import { fetchJobs, fetchJobStatus, stopJob, purgeJob, type AnalysisJob, JobStatus } from '../api/jobs';
+import { fetchJobs, fetchJobStatus, stopJob, purgeJob, createJob, type AnalysisJob, JobStatus } from '../api/jobs';
 
 export const useJobStore = defineStore('jobs', () => {
     const jobs = ref<AnalysisJob[]>([]);
@@ -118,6 +118,20 @@ export const useJobStore = defineStore('jobs', () => {
         }
     }
 
+    async function runJob(type: string, params: any = {}) {
+        try {
+            const result = await createJob(type, params);
+            if (result && result.jobId) {
+                monitorJobs([result.jobId]);
+                return result;
+            }
+        } catch (err: any) {
+            error.value = `Impossibile avviare il job ${type}`;
+            console.error(`[JobStore] Error triggering job ${type}:`, err);
+            throw err;
+        }
+    }
+
     return {
         jobs,
         activeJobs,
@@ -127,6 +141,7 @@ export const useJobStore = defineStore('jobs', () => {
         cancelJob,
         deleteJob,
         monitorJobs,
-        stopPolling
+        stopPolling,
+        runJob
     };
 });

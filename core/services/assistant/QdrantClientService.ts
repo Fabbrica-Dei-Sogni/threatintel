@@ -157,4 +157,20 @@ export class QdrantClientService {
             this.logger.error(`[Qdrant] Error during delete on ${collectionName}: ${error}`);
         }
     }
+
+    /**
+     * Conta i punti in una collection con supporto ai filtri.
+     */
+    public async countPoints(collectionName: string, filter?: any): Promise<number> {
+        try {
+            const response = await this.client.count(collectionName, {
+                filter,
+                exact: true
+            });
+            return response.count;
+        } catch (error) {
+            this.logger.error(`[Qdrant] Error counting points in ${collectionName}: ${error}`);
+            return 0;
+        }
+    }
 }

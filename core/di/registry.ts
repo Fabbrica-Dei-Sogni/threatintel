@@ -45,6 +45,8 @@ import { RouterHub } from "../registry/RouterHub";
 import { BackgroundJobManager } from "../services/BackgroundJobManager";
 import { SshReanalyzeJob } from "../services/jobs/SshReanalyzeJob";
 import { ThreatReanalyzeJob } from "../services/jobs/ThreatReanalyzeJob";
+import { RagReindexJob } from "../services/jobs/RagReindexJob";
+import { ReanalyzeJob } from "../services/jobs/ReanalyzeJob";
 
 /**
  * Centrally register all components in the DI container.
@@ -64,6 +66,8 @@ export function setupContainer(container: DependencyContainer) {
     // Jobs
     container.register(Tokens.SSH_REANALYZE_JOB_TOKEN, { useClass: SshReanalyzeJob }, { lifecycle: Lifecycle.Transient });
     container.register(Tokens.THREAT_REANALYZE_JOB_TOKEN, { useClass: ThreatReanalyzeJob }, { lifecycle: Lifecycle.Transient });
+    container.register(Tokens.RAG_REINDEX_JOB_TOKEN, { useClass: RagReindexJob }, { lifecycle: Lifecycle.Transient });
+    container.register(Tokens.REANALYZE_JOB_TOKEN, { useClass: ReanalyzeJob }, { lifecycle: Lifecycle.Transient });
 
     // Core Services
     container.register(Tokens.I18N_TOKEN, { useClass: I18nService }, { lifecycle: Lifecycle.Singleton });

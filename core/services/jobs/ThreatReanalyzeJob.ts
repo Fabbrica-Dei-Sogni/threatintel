@@ -94,9 +94,12 @@ export class ThreatReanalyzeJob implements IBackgroundJob {
 
                 const progress = Math.round((processed / total) * 100);
                 await AnalysisJob.findByIdAndUpdate(jobId, {
-                    progress,
-                    'metadata.processed': processed,
-                    'metadata.updated': updated
+                    $set: {
+                        progress,
+                        'metadata.processed': processed,
+                        'metadata.updated': updated,
+                        'metadata.total': total
+                    }
                 });
             }
 

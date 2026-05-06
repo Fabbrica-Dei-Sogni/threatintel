@@ -881,7 +881,9 @@
             "reanalyzeName": "RÉANALYSER TOUS LES LOGS",
             "reanalyzeDesc": "Ré-analyse complète des traces HTTP & SSH",
             "pruningName": "NETTOYAGE DES DONNÉES",
-            "pruningDesc": "Suppression des logs obsolètes (Planifié)"
+            "pruningDesc": "Suppression des logs obsolètes (Planifié)",
+            "ragReindexName": "RÉ-INDEXATION RAG",
+            "ragReindexDesc": "Réaligne la mémoire vectorielle Qdrant"
         },
         "status": {
             "pending": "EN ATTENTE",

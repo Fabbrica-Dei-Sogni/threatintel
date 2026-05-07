@@ -574,10 +574,13 @@ export async function fetchCampaigns({
     minCorrelations = 0,
     status = 'active'
 }: FetchCampaignsParams = {}): Promise<FetchCampaignsResponse> {
+    console.log('[fetchCampaigns] Params:', { startTime, endTime, timeMode, agoValue, agoUnit, minIps, minScore, minLogsPerIp, minCorrelations, protocol, page, pageSize, selectedUris, search, status });
     try {
         const response = await apiClient.get('/campaign/search', {
             params: { startTime, endTime, timeMode, agoValue, agoUnit, minIps, minScore, minLogsPerIp, minCorrelations, protocol, page, pageSize, selectedUris, search, status }
         });
+        console.log('[fetchCampaigns] Response status:', response.status);
+        console.log('[fetchCampaigns] Number of campaigns received:', response.data?.campaigns?.length || 0);
         return response.data;
     } catch (error) {
         console.error('[fetchCampaigns] Error:', error);
@@ -606,6 +609,7 @@ export async function fetchCampaignDetail({
     pageSize?: number;
     status?: string;
 }): Promise<CampaignDetailDTO> {
+    console.log('[fetchCampaignDetail] Params:', { hash, ips, minLogsPerIp, minScore, protocol, timeConfig, page, pageSize, status });
     try {
         const response = await apiClient.post('/campaign/detail', {
             hash,
@@ -618,6 +622,7 @@ export async function fetchCampaignDetail({
             pageSize,
             status
         });
+        console.log('[fetchCampaignDetail] Response status:', response.status);
         return response.data;
     } catch (error) {
         console.error('[fetchCampaignDetail] Error:', error);

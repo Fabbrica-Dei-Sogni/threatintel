@@ -698,7 +698,10 @@ const {
   toRef(dashboardState.rankings, 'dangerLevels')
 )
 
-const recentAttacks = computed(() => attacks.value)
+const recentAttacks = computed(() => dashboardStore.state.recentAttacks)
+watch(attacks, (newVal) => {
+  dashboardStore.state.recentAttacks = [...newVal];
+}, { immediate: true });
 
 const {
   logs,
@@ -714,7 +717,10 @@ const {
   { timestamp: -1 }, 10
 )
 
-const recentLogs = computed(() => logs.value)
+const recentLogs = computed(() => dashboardStore.state.recentLogs)
+watch(logs, (newVal) => {
+  dashboardStore.state.recentLogs = [...newVal];
+}, { immediate: true });
 
 const {
   sessions,
@@ -728,7 +734,10 @@ const {
   toRef(dashboardState.rankings, 'sessionCategory')
 );
 
-const recentSessions = computed(() => sessions.value)
+const recentSessions = computed(() => dashboardStore.state.recentSessions)
+watch(sessions, (newVal) => {
+  dashboardStore.state.recentSessions = [...newVal];
+}, { immediate: true });
 
 // Campagne
 const {

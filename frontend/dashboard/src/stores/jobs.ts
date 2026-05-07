@@ -132,6 +132,25 @@ export const useJobStore = defineStore('jobs', () => {
         }
     }
 
+    function updateJobStatus(jobId: string, updates: Partial<AnalysisJob>) {
+        if (activeJobs[jobId]) {
+            Object.assign(activeJobs[jobId], updates);
+            
+            // Se il job è terminato, lo spostiamo nello storico dopo un po'
+            if (updates.status === JobStatus.COMPLETED || updates.status === JobStatus.FAILED || updates.status === JobStatus.CANCELLED) {
+                setTimeout(() => {
+                    delete activeJobs[jobId];
+                    loadRecentJobs();
+                }, 5000);
+            }
+        } else {
+            // Se non lo stiamo monitorando ma arriva un aggiornamento (es. appena creato), lo aggiungiamo
+            if (updates.status === JobStatus.RUNNING || updates.status === JobStatus.PENDING) {
+                activeJobs[jobId] = { _id: jobId, ...updates } as any;
+            }
+        }
+    }
+
     return {
         jobs,
         activeJobs,
@@ -142,6 +161,7 @@ export const useJobStore = defineStore('jobs', () => {
         deleteJob,
         monitorJobs,
         stopPolling,
-        runJob
+        runJob,
+        updateJobStatus
     };
 });

@@ -247,6 +247,7 @@ import { useJobStore } from '../../stores/jobs';
 import { useProfileStore } from '../../stores/profiles';
 import { useAuthStore } from '../../stores/auth';
 import { useViewSettingsStore } from '../../stores/viewSettings';
+import { useDashboardStore } from '../../stores/dashboard';
 import { storeToRefs } from 'pinia';
 import ConfigEditor from '../../components/ConfigEditor.vue';
 import TacticalEngineHub from '../../components/forensic/TacticalEngineHub.vue';
@@ -303,11 +304,16 @@ const showTacticalTuning = ref(false);
 const confirmingReanalyze = ref(false);
 const confirmingRagReindex = ref(false);
 
+const dashboardStore = useDashboardStore();
+
 const engineStatus = computed(() => {
+    // Se lo store dice che stiamo sincronizzando (via Socket), diamo priorità a quello
+    if (dashboardStore.state.engineStatus === 'SYNCING') return 'SYNCING';
+    
     if (saving.value) return 'TUNING';
     if (loading.value) return 'INITIALIZING';
     if (isAnyReanalyzeRunning.value || isRagReindexRunning.value) return 'SYNCING';
-    return 'OPTIMIZED';
+    return dashboardStore.state.engineStatus || 'OPTIMIZED';
 });
 
 const isAnyReanalyzeRunning = computed(() => {
@@ -472,6 +478,10 @@ function showSuccess(message: string) {
 onMounted(() => {
     loadConfigs();
     jobStore.loadRecentJobs();
+    fetchLogStats();
+});
+
+watch(() => dashboardStore.state.lastSystemUpdate, () => {
     fetchLogStats();
 });
 watch(() => profileStore.activeProfileId, () => {

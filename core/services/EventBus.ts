@@ -14,7 +14,9 @@ export enum AppEvents {
     ATTACK_RESOLVED = 'attack.resolved',
     CAMPAIGN_RESOLVED = 'campaign.resolved',
     LOGS_STATUS_UPDATE_REQUESTED = 'logs.status.update.requested',
-    LOGS_STATUS_UPDATED = 'logs.status.updated'
+    LOGS_STATUS_UPDATED = 'logs.status.updated',
+    JOB_PROGRESS = 'system.job.progress',
+    SYSTEM_STATUS_UPDATED = 'system.status.updated'
 }
 
 /**

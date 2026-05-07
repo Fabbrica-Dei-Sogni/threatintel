@@ -46,3 +46,5 @@ export const THREAT_REANALYZE_JOB_TOKEN = Symbol("ThreatReanalyzeJob");
 export const RAG_REINDEX_JOB_TOKEN = Symbol("RagReindexJob");
 export const REANALYZE_JOB_TOKEN = Symbol("ReanalyzeJob");
 export const PRUNING_JOB_TOKEN = Symbol("PruningJob");
+export const SOCKET_SERVER_HUB_TOKEN = Symbol("SocketServerHub");
+export const SOCKET_EVENT_BRIDGE_TOKEN = Symbol("SocketEventBridge");

@@ -1,9 +1,9 @@
 import axios from 'axios';
 import type { FetchSearchParams } from '../models/LogDTO';
 import type { FetchAttackSearchParams } from '../models/AttackDTO';
-import type { 
-    FetchCampaignsParams, 
-    FetchCampaignsResponse, 
+import type {
+    FetchCampaignsParams,
+    FetchCampaignsResponse,
     CampaignDetailDTO,
     FetchUrisResponse
 } from '../models/CampaignDTO';
@@ -35,13 +35,13 @@ export const apiClient = axios.create({
 // Interceptor per gestire cambiamenti a runtime e iniettare il token
 apiClient.interceptors.request.use((config) => {
     config.baseURL = getApiUrl();
-    
+
     // Recupera il token dal namespace AUTH
-    const auth = storage.get<{token: string}>(StorageNamespace.AUTH);
+    const auth = storage.get<{ token: string }>(StorageNamespace.AUTH);
     if (auth?.token) {
         config.headers.Authorization = `Bearer ${auth.token}`;
     }
-    
+
     return config;
 }, (error) => {
     return Promise.reject(error);
@@ -460,13 +460,13 @@ export async function fetchCustomReport(payload: any, format: string = 'pdf', st
  */
 export async function fetchStats(timeframe: string = '24h', minScore: number = 15, limit: string | number = 10, minLogs: number = 1): Promise<any> {
     try {
-        const response = await apiClient.get('/stats', { 
-            params: { 
-                timeframe, 
-                minScore, 
+        const response = await apiClient.get('/stats', {
+            params: {
+                timeframe,
+                minScore,
                 top: limit,
                 minLogs
-            } 
+            }
         });
         return response.data;
     } catch (error) {
@@ -688,8 +688,8 @@ export async function ask(question: string, options: any = {}): Promise<any> {
         });
         return response.data;
     } catch (error) {
-        console.error('[ask] Error:', error);
-        throw error;
+        console.warn('[ask] Warn:', error);
+        //throw error;
     }
 }
 

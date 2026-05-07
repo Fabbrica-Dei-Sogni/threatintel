@@ -36,12 +36,12 @@ export function useSocket() {
                 error: data.error,
                 type: data.jobName
             });
-            
+
             // Sincronizza anche con lo stato del dashboard se necessario
             if (dashboardStore.updateJobStatus) {
                 dashboardStore.updateJobStatus(data);
             }
-            
+
             // Notifica se un job è completato
             if (data.status === 'completed') {
                 dashboardStore.state.lastSystemUpdate = Date.now();
@@ -63,7 +63,8 @@ export function useSocket() {
         });
 
         // B. Live Intel Stream
-        socketStore.socket.on(SocketEvents.INTEL_ATTACK_DETECTED, (attack: any) => {
+        //solo a scopo dimostrativo per poter gestire notifiche custom
+        /*socketStore.socket.on(SocketEvents.INTEL_ATTACK_DETECTED, (attack: any) => {
             // Aggiungi alla lista dei recenti nella dashboard (se siamo in Home)
             if (dashboardStore.state.recentAttacks) {
                 // Evitiamo duplicati se il polling è attivo
@@ -87,8 +88,8 @@ export function useSocket() {
                     duration: 3000
                 });
             }
-        });
-        
+        });*/
+
         socketStore.socket.on(SocketEvents.INTEL_NEW_LOG, (log: any) => {
             if (dashboardStore.state.recentLogs) {
                 const exists = dashboardStore.state.recentLogs.some((l: any) => l._id === log._id || l.id === log.id);

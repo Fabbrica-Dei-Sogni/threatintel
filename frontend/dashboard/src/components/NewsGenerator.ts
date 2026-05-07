@@ -1,5 +1,4 @@
 import { ask, semanticSearch } from '../api';
-import { translateFromIt } from '../utils/translator';
 
 export interface NewsItem {
   text: string;
@@ -26,8 +25,8 @@ export async function triggerAgenticNews(props: any, currentLocale: string, t: (
 
     const p = flow
       .then(() => {
-        // Notifica di invio completato, ma il risultato arriverà via socket
-        console.debug(`[NewsGenerator] Triggered AI for ${promptKey}`);
+        // Notifica di invio completato (anche se la risposta HTTP arriva dopo 20s, non ci importa bloccare triggerAgenticNews)
+        console.debug(`[NewsGenerator] AI Request finished for ${promptKey}`);
       })
       .catch(err => console.error(`[NewsGenerator] AI Trigger Error for ${promptKey}:`, err));
     promises.push(p);
@@ -76,7 +75,10 @@ export async function triggerAgenticNews(props: any, currentLocale: string, t: (
     }
   }
 
-  await Promise.allSettled(promises);
+  // Non attendiamo il completamento delle promesse (che includono l'ask sincrono dell'LLM)
+  // Questo rende la funzione triggerAgenticNews istantanea per il chiamante.
+  // I risultati arriveranno comunque via Socket.io grazie al bridge del backend.
+  Promise.allSettled(promises);
 }
 
 /**

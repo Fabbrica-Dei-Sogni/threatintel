@@ -77,32 +77,51 @@ const isTyping = ref(false);
 const contentRef = ref(null);
 const aiHeadlines = ref([]); // Reattivo per le news generate dall'AI
 let rotationInterval = null;
+let lastFullTriggerTime = 0;
+const TRIGGER_COOLDOWN_MS = 60000; // Al massimo un giro completo ogni 60 secondi
+let debounceTimer = null;
 
 /**
  * Aggiorna le news utilizzando la logica incubata in NewsGenerator
  * Ora fa solo il trigger, i risultati arrivano via socket.
  */
-const updateNews = async () => {
+const updateNews = async (force = false) => {
   // 1. Fonte principale: Carichiamo subito le news statiche (veloci e affidabili)
   // const staticNews = generateStaticFallback(props, t);
   // aiHeadlines.value = staticNews;
 
+  // 2. Controllo Cooldown per evitare spam di chiamate AI (ask)
+  const now = Date.now();
+  if (!force && (now - lastFullTriggerTime < TRIGGER_COOLDOWN_MS)) {
+    return;
+  }
+
   try {
-    // 2. Fonte a corredo: Triggeriamo la generazione agentica
+    // 3. Fonte a corredo: Triggeriamo la generazione agentica
+    console.debug('[BreakingNews] Triggering Agentic AI Scan...');
+    lastFullTriggerTime = now;
     await triggerAgenticNews(props, locale.value, t);
   } catch (err) {
     console.error('[BreakingNews] Agentic trigger failed:', err);
   }
 };
 
+const debouncedUpdate = () => {
+  if (debounceTimer) clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(() => {
+    updateNews();
+  }, 2000); // Aspettiamo che i dati si stabilizzino per 2 secondi
+};
+
 /**
  * Gestisce l'integrazione con Socket.io per news in tempo reale
  */
 const setupSocketListeners = () => {
-  if (!socketStore.socket) return;
+  const socket = socketStore.socket;
+  if (!socket) return;
 
   // A. Risposte AI in tempo reale (Giro di eventi RAG/Assistant)
-  socketStore.socket.on(SocketEvents.INTEL_AI_RESPONSE, async (data) => {
+  socket.on(SocketEvents.INTEL_AI_RESPONSE, async (data) => {
     if (data.answer) {
       // Se avevamo solo il messaggio di "sistema in attesa", lo puliamo al primo arrivo AI
       const isIdle = aiHeadlines.value.length === 1 && aiHeadlines.value[0].text === t('home.system_idle');
@@ -183,19 +202,27 @@ const cleanupSocketListeners = () => {
   socketStore.socket.off(SocketEvents.INTEL_AI_RESPONSE);
 };
 
+// Monitoriamo la disponibilità del socket (gestisce caricamento ritardato in App.vue)
+watch(() => socketStore.socket, (newSocket) => {
+    if (newSocket) {
+        cleanupSocketListeners();
+        setupSocketListeners();
+    }
+}, { immediate: true });
+
 onMounted(async () => {
-  await updateNews();
-  setupSocketListeners();
+  debouncedUpdate();
   startRotation();
 });
 
 onBeforeUnmount(() => {
   if (rotationInterval) clearInterval(rotationInterval);
+  if (debounceTimer) clearTimeout(debounceTimer);
   cleanupSocketListeners();
 });
 
-watch([() => props.attacks.length, locale], async () => {
-  await updateNews();
+watch([() => props.attacks.length, locale], () => {
+  debouncedUpdate();
   currentHeadlineIndex.value = 0;
   startRotation();
 });

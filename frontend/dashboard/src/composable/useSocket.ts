@@ -23,15 +23,12 @@ export function useSocket() {
 
         // A. Tactical Engine & Job Progress
         socketStore.socket.on(SocketEvents.SYSTEM_STATUS_UPDATE, (status: string) => {
-            console.log('[Socket] Engine Status Update:', status);
             if (dashboardStore.state) {
                 dashboardStore.state.engineStatus = status;
             }
         });
 
         socketStore.socket.on(SocketEvents.SYSTEM_JOB_PROGRESS, (data: any) => {
-            console.log('[Socket] Job Progress:', data);
-            
             // Aggiorna lo store dei job per il monitoraggio in tempo reale
             jobStore.updateJobStatus(data.id, {
                 status: data.status,
@@ -67,8 +64,6 @@ export function useSocket() {
 
         // B. Live Intel Stream
         socketStore.socket.on(SocketEvents.INTEL_ATTACK_DETECTED, (attack: any) => {
-            console.log('[Socket] New Attack Detected:', attack);
-            
             // Aggiungi alla lista dei recenti nella dashboard (se siamo in Home)
             if (dashboardStore.state.recentAttacks) {
                 // Evitiamo duplicati se il polling è attivo
@@ -95,8 +90,6 @@ export function useSocket() {
         });
         
         socketStore.socket.on(SocketEvents.INTEL_NEW_LOG, (log: any) => {
-            console.log('[Socket] New Log Detected:', log);
-            
             if (dashboardStore.state.recentLogs) {
                 const exists = dashboardStore.state.recentLogs.some((l: any) => l._id === log._id || l.id === log.id);
                 if (!exists) {

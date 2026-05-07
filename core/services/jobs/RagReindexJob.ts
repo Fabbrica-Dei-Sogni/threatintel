@@ -22,6 +22,18 @@ export class RagReindexJob implements IBackgroundJob {
         this.logger.info(`[RagReindexJob] Avvio re-indexing RAG per il job ${jobId}...`);
 
         try {
+            // Assicuriamoci che il sistema RAG sia inizializzato e operativo
+            await this.ragSync.initialize();
+            
+            if (!this.ragSync.getStatus().operational) {
+                throw new Error('Il sistema RAG non è operativo. Verificare la connessione con Qdrant.');
+            }
+            
+            // Calcoliamo la soglia temporale una sola volta all'inizio del job
+            // per evitare l'effetto "moving target" durante il processamento
+            const thresholdMs = this.ragSync.getStatus().thresholdDays * 24 * 60 * 60 * 1000;
+            const thresholdDate = new Date(Date.now() - thresholdMs).toISOString();
+
             const collections = [
                 this.ragSync.getStatus().intelligenceCollection,
                 this.ragSync.getStatus().logsCollection
@@ -29,11 +41,11 @@ export class RagReindexJob implements IBackgroundJob {
 
             let totalToProcess = 0;
             for (const collection of collections) {
-                const count = await this.ragSync.countObsoletePoints(collection);
+                const count = await this.ragSync.countObsoletePoints(collection, thresholdDate);
                 totalToProcess += count;
             }
 
-            this.logger.info(`[RagReindexJob] Totale punti obsoleti rilevati: ${totalToProcess}`);
+            this.logger.info(`[RagReindexJob] Totale punti obsoleti rilevati: ${totalToProcess} (Soglia: ${thresholdDate})`);
             
             // Inizializziamo il totale nel database
             await AnalysisJob.findByIdAndUpdate(jobId, {
@@ -51,7 +63,7 @@ export class RagReindexJob implements IBackgroundJob {
 
                 let hasMore = true;
                 while (hasMore && !this.isStopped) {
-                    const result = await this.ragSync.reindexObsoletePoints(collection, batchSize);
+                    const result = await this.ragSync.reindexObsoletePoints(collection, batchSize, thresholdDate);
 
                     totalProcessed += result.processed;
                     totalUpdated += result.updated;
@@ -81,12 +93,31 @@ export class RagReindexJob implements IBackgroundJob {
 
             if (this.isStopped) {
                 this.logger.info(`[RagReindexJob] Job ${jobId} interrotto dall'utente.`);
+                await AnalysisJob.findByIdAndUpdate(jobId, {
+                    $set: { status: 'cancelled' as any }
+                });
             } else {
                 this.logger.info(`[RagReindexJob] Job ${jobId} completato con successo. Processati: ${totalProcessed}, Aggiornati: ${totalUpdated}, Eliminati: ${totalDeleted}`);
+                await AnalysisJob.findByIdAndUpdate(jobId, {
+                    $set: { 
+                        status: 'completed' as any,
+                        progress: 100,
+                        completedAt: new Date()
+                    }
+                });
             }
 
         } catch (err: any) {
             this.logger.error(`[RagReindexJob] Errore critico nel job ${jobId}:`, err);
+            
+            await AnalysisJob.findByIdAndUpdate(jobId, {
+                $set: { 
+                    status: 'failed' as any,
+                    error: err.message,
+                    completedAt: new Date()
+                }
+            });
+
             throw err;
         }
     }

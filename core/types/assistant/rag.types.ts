@@ -14,12 +14,6 @@ import { TimeConfig } from '../common.types';
 export type RagEntityType = 'threat_log' | 'attack_summary' | 'campaign_summary' | 'ip_details';
 
 /**
- * Versione attuale dello schema dei payload RAG.
- * Incrementare questo valore quando si modificano le interfacce dei payload per forzare il re-indexing.
- */
-export const RAG_SCHEMA_VERSION = 4;
-
-/**
  * Configurazione temporale standard per il sistema RAG.
  * Alias di TimeConfig per mantenere compatibilità.
  */
@@ -63,7 +57,6 @@ export interface RagBasePayload {
     text: string;           // La narrazione prodotta dal traduttore o dall'AI
     materializedAt: Date;   // Timestamp di quando il vettore è stato generato
     sourceRef: RagSourceRef; // Link all'API originale
-    schemaVersion: number;   // Versione dello schema per migrazioni future
 }
 
 /**

@@ -3,6 +3,7 @@ import { Logger } from 'winston';
 import { QdrantClientService } from './QdrantClientService';
 import { OllamaService } from './OllamaService';
 import { RagSyncService } from './RagSyncService';
+import { AppConfigProvider } from '../AppConfigProvider';
 import { I18nService } from '../I18nService';
 import { RagValidator } from './RagValidator';
 import { ThreatLogService } from '../ThreatLogService';
@@ -16,7 +17,6 @@ import {
     RagSearchOptions,
     RagSourceRef,
     RagBasePayload,
-    RAG_SCHEMA_VERSION,
     DirectSearchHit,
     SearchResponse
 } from '../../types/assistant/rag.types';
@@ -39,7 +39,7 @@ export class AssistantService {
         @inject(Tokens.CAMPAIGN_SERVICE_TOKEN) private readonly campaignService: CampaignService,
         @inject(Tokens.IP_DETAILS_SERVICE_TOKEN) private readonly ipDetailsService: IpDetailsService,
         @inject(Tokens.RAG_TRANSLATION_TOKEN) private readonly ragTranslation: RagTranslationService,
-
+        @inject(Tokens.CONFIG_PROVIDER_TOKEN) private readonly config: AppConfigProvider
     ) { }
 
     public async search(query: string, options: RagSearchOptions = {}): Promise<RagSearchHit[]> {
@@ -214,13 +214,16 @@ export class AssistantService {
         let offset: any = null;
 
         try {
+            const thresholdMs = this.config.ragReindexThresholdDays * 24 * 60 * 60 * 1000;
+            const thresholdDate = new Date(Date.now() - thresholdMs).toISOString();
+
             do {
                 const result = await this.qdrant.scrollPoints(collectionName, { offset, limit: 100 });
                 totalCount += result.points.length;
 
                 for (const point of result.points) {
                     const payload = point.payload as any;
-                    if (!payload || (payload.schemaVersion || 0) < RAG_SCHEMA_VERSION) {
+                    if (!payload || !payload.materializedAt || payload.materializedAt < thresholdDate) {
                         obsoleteCount++;
                     }
                 }

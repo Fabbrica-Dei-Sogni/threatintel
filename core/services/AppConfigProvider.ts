@@ -100,8 +100,8 @@ export class AppConfigProvider {
         return process.env.RAG_LOGS_COLLECTION_NAME || 'threat_logs';
     }
 
-    get ragSchemaVersion(): string {
-        return process.env.RAG_SCHEMA_VERSION || '0.0.1';
+    get ragReindexThresholdDays(): number {
+        return parseFloat(process.env.RAG_REINDEX_THRESHOLD_DAYS || ConfigDefaults.RAG_REINDEX_THRESHOLD_DAYS);
     }
 
     /**

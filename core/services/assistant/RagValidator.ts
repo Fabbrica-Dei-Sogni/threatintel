@@ -1,4 +1,4 @@
-import { RagSearchOptions, RAG_SCHEMA_VERSION } from '../../types/assistant/rag.types';
+import { RagSearchOptions } from '../../types/assistant/rag.types';
 import { sanitizeFilters, FilterAllowedFields } from '../../utils/queryGuard';
 import { RAG_TEMPLATES } from './RagTemplates';
 
@@ -49,14 +49,6 @@ export class RagValidator {
 
         if (!validTypes.includes(type)) {
             return { valid: false, error: RAG_TEMPLATES.VALIDATION.SOURCE_TYPE_INVALID.replace('{types}', validTypes.join(', ')) };
-        }
-
-        // Verifica versione schema (Fase 2)
-        // Se il riferimento è troppo vecchio, potremmo segnalarlo, 
-        // ma per ora permettiamo la risoluzione per retrocompatibilità "best-effort"
-        const schemaVersion = ref.schemaVersion || 1;
-        if (schemaVersion < RAG_SCHEMA_VERSION) {
-            // Loggare internamente il potenziale drift
         }
 
         let sanitized: any = { ...ref.params };

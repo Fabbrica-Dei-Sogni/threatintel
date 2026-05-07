@@ -57,7 +57,8 @@ describe('RagSyncService', () => {
             mockOllama,
             mockConfig,
             {} as any, // AttackLogService mock
-            {} as any  // CampaignService mock
+            {} as any, // CampaignService mock
+            {} as any  // IpDetailsService mock
         );
 
         // Inizializza per rendere il servizio operativo
@@ -182,7 +183,7 @@ describe('RagSyncService', () => {
 
     it('should skip operations if not operational', async () => {
         mockOllama.checkHealth.mockResolvedValueOnce(false);
-        const degradedService = new RagSyncService(mockLogger, mockTranslator, mockQdrant, mockOllama, mockConfig, {} as any, {} as any);
+        const degradedService = new RagSyncService(mockLogger, mockTranslator, mockQdrant, mockOllama, mockConfig, {} as any, {} as any, {} as any);
         await degradedService.initialize();
 
         expect(degradedService.getStatus().operational).toBe(false);

@@ -97,8 +97,7 @@ const updateNews = async (force = false) => {
     // 3. Fonte a corredo: Triggeriamo la generazione agentica
     console.debug('[BreakingNews] Triggering Agentic AI Scan...');
     lastFullTriggerTime = now;
-    //XXX: commentato per valutarne le performance complessive delle chiamate a searchSemantic e ask che al momento in cui si scrive sono instabili
-    //await triggerAgenticNews(props, locale.value, t);
+    await triggerAgenticNews(props, locale.value, t);
   } catch (err) {
     console.error('[BreakingNews] Agentic trigger failed:', err);
   }

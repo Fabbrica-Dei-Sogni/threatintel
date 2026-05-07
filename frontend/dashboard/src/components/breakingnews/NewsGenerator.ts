@@ -1,4 +1,4 @@
-import { ask, semanticSearch } from '../../api';
+import { triggerAgenticNews as apiTriggerNews } from '../../api';
 
 export interface NewsItem {
   text: string;
@@ -13,20 +13,11 @@ export interface NewsItem {
 export async function triggerAgenticNews(props: any, currentLocale: string, t: (key: string, params?: any) => string): Promise<void> {
   const promises: Promise<void>[] = [];
 
-  const addNewsPromise = (promptKey: string, params: any, meta: any = {}, searchQuery: string | null = null) => {
-    const flow = searchQuery 
-      ? semanticSearch(searchQuery, { limit: 2, scoreThreshold: 0.5 })
-          .then(res => {
-            const context = res.results?.map((h: any) => h.text).join('\n') || '';
-            const prompt = t(`home.breakingNews.prompts.${promptKey}`, { ...params, context, locale: 'it-IT' });
-            return ask(prompt);
-          })
-      : ask(t(`home.breakingNews.prompts.${promptKey}`, { ...params, locale: 'it-IT' }));
-
-    const p = flow
+  const addNewsPromise = (promptKey: string, params: any, _meta: any = {}, searchQuery: string | null = null) => {
+    const p = apiTriggerNews(promptKey, params, currentLocale, searchQuery)
       .then(() => {
-        // Notifica di invio completato (anche se la risposta HTTP arriva dopo 20s, non ci importa bloccare triggerAgenticNews)
-        console.debug(`[NewsGenerator] AI Request finished for ${promptKey}`);
+        // Notifica di invio completato (202 Accepted ricevuto)
+        console.debug(`[NewsGenerator] AI Trigger Accepted for ${promptKey}`);
       })
       .catch(err => console.error(`[NewsGenerator] AI Trigger Error for ${promptKey}:`, err));
     promises.push(p);

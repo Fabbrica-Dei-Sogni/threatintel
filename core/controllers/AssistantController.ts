@@ -299,4 +299,53 @@ export class AssistantController {
             res.status(500).json({ error: 'Errore durante il controllo integrità' });
         }
     }
+
+    /**
+     * @openapi
+     * /assistant/trigger-news:
+     *   post:
+     *     summary: Triggera la generazione di una news agentica (Async)
+     *     description: Avvia il processo di generazione news basato su RAG. Ritorna immediatamente 202.
+     *     tags: [AI Assistant & RAG]
+     *     security:
+     *       - BearerAuth: []
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             required: [promptKey]
+     *             properties:
+     *               promptKey:
+     *                 type: string
+     *               params:
+     *                 type: object
+     *               searchQuery:
+     *                 type: string
+     *               locale:
+     *                 type: string
+     *     responses:
+     *       202:
+     *         description: Richiesta accettata e avviata in background.
+     */
+    @Post('/trigger-news', [auth.isAuthenticated()])
+    async triggerNews(req: Request, res: Response): Promise<void> {
+        const { promptKey, params, searchQuery, locale } = req.body;
+
+        try {
+            if (!promptKey) {
+                res.status(400).json({ error: 'promptKey richiesto' });
+                return;
+            }
+
+            // Avviamo senza attendere la fine
+            this.assistant.triggerAgenticNews(promptKey, params || {}, locale || 'it-IT', searchQuery);
+
+            res.status(202).json({ status: 'Accepted', message: 'News generation started' });
+        } catch (err: any) {
+            this.logger.error('[AssistantController] triggerNews error:', err);
+            res.status(500).json({ error: err.message });
+        }
+    }
 }

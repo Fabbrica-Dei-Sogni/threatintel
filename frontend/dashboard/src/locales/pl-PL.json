@@ -168,13 +168,6 @@
         "telnet": "Telnet",
         "breakingNews": {
             "badge": "Wiadomość z ostatniej chwili",
-            "prompts": {
-                "topCountry": "Na podstawie tego kontekstu technicznego:\n{context}\n\nWygeneruj krótką wiadomość typu flash (maks. 15 słów) podsumowującą złośliwą aktywność z {country}. Bądź agresywny i techniczny.",
-                "lastAttacks": "Na podstawie tych danych:\n{context}\n\nPodsumuj w jednej linii (maks. 12 słów) wtargnięcia wykryte przez węzły {ips}.",
-                "mostActiveSession": "Przeanalizuj tę sesję:\n{context}\n\nKrótko opisz (maks. 15 słów) działania atakującego {ip} ({count} zdarzeń).",
-                "criticalAlert": "PILNE: Przeanalizuj ten krytyczny atak:\n{context}\n\nWygeneruj szybki alert bezpieczeństwa (maks. 12 słów) dla adresu IP {ip}.",
-                "targetDiscovery": "Przeanalizuj wzorzec:\n{context}\n\nWygeneruj wiadomość flash o nietypowym zainteresowaniu punktem końcowym {path}."
-            },
             "topCountry": "Analiza Geopolityczna: {country} jest obecnie najaktywniejszym źródłem skanowania.",
             "mostActiveSession": "Wroga uporczywość: Aktor {ip} osiągnął {count} interaktywnych poleceń.",
             "criticalAlert": "Alert krytyczny: Wykryto wtargnięcie wysokiego ryzyka z adresu {ip}.",

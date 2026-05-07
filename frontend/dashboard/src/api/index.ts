@@ -710,3 +710,21 @@ export async function resolveSource(sourceRef: any): Promise<any> {
         throw error;
     }
 }
+
+/**
+ * Triggera la generazione di news agentiche sul backend (202 Accepted)
+ */
+export async function triggerAgenticNews(promptKey: string, params: any, locale: string, searchQuery?: string | null): Promise<any> {
+    try {
+        const response = await apiClient.post('/assistant/trigger-news', {
+            promptKey,
+            params,
+            locale,
+            searchQuery
+        });
+        return response.data;
+    } catch (error) {
+        console.error('[triggerAgenticNews] Error:', error);
+        throw error;
+    }
+}

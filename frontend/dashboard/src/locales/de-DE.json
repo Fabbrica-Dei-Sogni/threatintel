@@ -168,13 +168,6 @@
         "telnet": "Telnet",
         "breakingNews": {
             "badge": "Eilmeldung",
-            "prompts": {
-                "topCountry": "Basierend auf diesem technischen Kontext:\n{context}\n\nGeneriere eine kurze Eilmeldung (max. 15 Wörter), die die bösartige Aktivität aus {country} zusammenfasst. Sei aggressiv und technisch.",
-                "lastAttacks": "Basierend auf diesen Daten:\n{context}\n\nFasse in einer Zeile (max. 12 Wörter) die von den Knoten {ips} erkannten Einbrüche zusammen.",
-                "mostActiveSession": "Analysiere diese Sitzung:\n{context}\n\nBeschreibe kurz (max. 15 Wörter) die Aktionen des Angreifers {ip} ({count} Ereignisse).",
-                "criticalAlert": "DRINGEND: Analysiere diesen kritischen Angriff:\n{context}\n\nGeneriere einen Blitz-Sicherheitsalarm (max. 12 Wörter) für IP {ip}.",
-                "targetDiscovery": "Analysiere das Muster:\n{context}\n\nGeneriere eine Eilmeldung über das ungewöhnliche Interesse an Endpunkt {path}."
-            },
             "topCountry": "Geopolitische Informationen: {country} ist derzeit die aktivste Scan-Quelle.",
             "mostActiveSession": "Feindliche Persistenz: Akteur {ip} hat {count} interaktive Befehle erreicht.",
             "criticalAlert": "Kritischer Alarm: Hochrisiko-Einbruch von {ip} erkannt.",

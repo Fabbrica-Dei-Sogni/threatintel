@@ -168,13 +168,6 @@
         "telnet": "Telnet",
         "breakingNews": {
             "badge": "Dernière minute",
-            "prompts": {
-                "topCountry": "Basé sur ce contexte technique :\n{context}\n\nGénère une brève actualité flash (max 15 mots) résumant l'activité malveillante en provenance de {country}. Sois agressif et technique.",
-                "lastAttacks": "Basé sur ces données :\n{context}\n\nRésume en une ligne (max 12 mots) les intrusions détectées par les nœuds {ips}.",
-                "mostActiveSession": "Analyse cette session :\n{context}\n\nDécris brièvement (max 15 mots) les actions de l'attaquant {ip} ({count} événements).",
-                "criticalAlert": "URGENT : Analyse cette attaque critique :\n{context}\n\nGénère une alerte de sécurité flash (max 12 mots) pour l'IP {ip}.",
-                "targetDiscovery": "Analyse le pattern :\n{context}\n\nGénère une actualité flash sur l'intérêt inhabituel pour l'endpoint {path}."
-            },
             "topCountry": "Intelligence Géopolitique : {country} est actuellement la source de scans la plus active.",
             "mostActiveSession": "Persistance Hostile : L'acteur {ip} a atteint {count} commandes interactives.",
             "criticalAlert": "Alerte Critique : Incursion à haut risque détectée depuis {ip}.",

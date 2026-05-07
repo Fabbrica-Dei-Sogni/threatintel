@@ -404,6 +404,17 @@
                                 </div>
                             </div>
 
+                            <div class="user-agent-info" v-if="attack.fingerprintAnalysis?.userAgents?.length">
+                                <div class="ua-header">
+                                    <span class="mini-icon">🕵️</span> {{ t('attackDetail.userAgent').toUpperCase() }}
+                                </div>
+                                <div class="ua-content">
+                                    <div v-for="(ua, i) in attack.fingerprintAnalysis.userAgents" :key="i" class="ua-text" :title="ua">
+                                        {{ ua.length > 45 ? ua.substring(0, 45) + '...' : ua }}
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="techniques-area" v-if="attack.attackPatterns?.length">
                                 <div class="tech-tags">
                                     <span v-for="tech in attack.attackPatterns" :key="tech" class="tech-tag">

@@ -278,7 +278,8 @@
         "profileTitle": "Profilo Anomalia",
         "mapTitle": "Mappa Anomalia",
         "radarTitle": "Analisi Radar",
-        "searchUrlPlaceholder": "Filtra per URL..."
+        "searchUrlPlaceholder": "Filtra per URL...",
+        "userAgent": "User Agent"
     },
     "campaigns": {
         "title": "Campagne",

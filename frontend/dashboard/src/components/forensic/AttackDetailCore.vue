@@ -115,6 +115,16 @@
                         <transition name="collapse">
                             <div v-if="toggles.showProfile" class="sub-card-content">
                                 <div class="hud-sub-grid">
+                                    <div class="hud-item" v-if="attack.fingerprintAnalysis?.userAgents?.length" style="grid-column: 1 / -1;">
+                                        <span class="hud-label">
+                                            <span class="mini-icon">🕵️</span> {{ t('attackDetail.userAgent') }}
+                                        </span>
+                                        <div class="hud-content">
+                                            <span v-for="(ua, i) in attack.fingerprintAnalysis.userAgents" :key="i" class="tech-tag" :title="ua" style="font-size: 0.85rem; padding: 4px 12px; margin-top: 4px; display: inline-block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                                {{ ua }}
+                                            </span>
+                                        </div>
+                                    </div>
                                     <div class="hud-item">
                                         <span class="hud-label">
                                             <span class="mini-icon">🛠️</span> {{ t('attackDetail.techniques') }}

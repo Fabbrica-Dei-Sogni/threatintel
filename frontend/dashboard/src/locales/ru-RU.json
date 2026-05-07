@@ -278,7 +278,8 @@
         "profileTitle": "Профиль аномалии",
         "mapTitle": "Карта атак",
         "radarTitle": "Радарный анализ",
-        "searchUrlPlaceholder": "Фильтровать по URL..."
+        "searchUrlPlaceholder": "Фильтровать по URL...",
+        "userAgent": "User Agent"
     },
     "campaigns": {
         "title": "Кампании",

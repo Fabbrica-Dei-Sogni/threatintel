@@ -131,6 +131,7 @@ const loadUris = async () => {
       protocol: props.protocol,
       minIps: props.minIps,
       minScore: props.minScore,
+      search: searchQuery.value,
       ...props.timeConfig
     };
     

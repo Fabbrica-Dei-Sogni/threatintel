@@ -16,7 +16,7 @@ import { translateFromIt } from '../utils/translator';
 export function useSocket() {
     const socketStore = useSocketStore();
     const dashboardStore = useDashboardStore();
-    const attacksStore = useAttacksStore();
+    //const attacksStore = useAttacksStore();
     const jobStore = useJobStore();
     const newsStore = useNewsStore();
     const { t, locale } = useI18n();
@@ -65,6 +65,36 @@ export function useSocket() {
             }
         });
 
+        socketStore.socket.on(SocketEvents.INTEL_NEW_LOG, (log: any) => {
+            if (dashboardStore.state.recentLogs) {
+                const exists = dashboardStore.state.recentLogs.some((l: any) => l._id === log._id || l.id === log.id);
+                if (!exists) {
+                    dashboardStore.state.recentLogs.unshift(log);
+                    if (dashboardStore.state.recentLogs.length > 20) {
+                        dashboardStore.state.recentLogs.pop();
+                    }
+                }
+            }
+        });
+
+        // C. Agentic News Stream
+        socketStore.socket.on(SocketEvents.INTEL_AI_RESPONSE, async (data: any) => {
+            if (data.answer) {
+                try {
+                    // Traducono la risposta AI nella lingua corrente del frontend
+                    const translatedText = await translateFromIt(data.answer, locale.value);
+
+                    newsStore.addHeadline({
+                        text: translatedText,
+                        icon: '🤖',
+                        isLive: true
+                    });
+                } catch (err) {
+                    console.error('[Socket] Translation failed for AI response:', err);
+                }
+            }
+        });
+
         // B. Live Intel Stream
         //solo a scopo dimostrativo per poter gestire notifiche custom
         /*socketStore.socket.on(SocketEvents.INTEL_ATTACK_DETECTED, (attack: any) => {
@@ -92,36 +122,6 @@ export function useSocket() {
                 });
             }
         });*/
-
-        socketStore.socket.on(SocketEvents.INTEL_NEW_LOG, (log: any) => {
-            if (dashboardStore.state.recentLogs) {
-                const exists = dashboardStore.state.recentLogs.some((l: any) => l._id === log._id || l.id === log.id);
-                if (!exists) {
-                    dashboardStore.state.recentLogs.unshift(log);
-                    if (dashboardStore.state.recentLogs.length > 20) {
-                        dashboardStore.state.recentLogs.pop();
-                    }
-                }
-            }
-        });
-
-        // C. Agentic News Stream
-        socketStore.socket.on(SocketEvents.INTEL_AI_RESPONSE, async (data: any) => {
-            if (data.answer) {
-                try {
-                    // Traducono la risposta AI nella lingua corrente del frontend
-                    const translatedText = await translateFromIt(data.answer, locale.value);
-                    
-                    newsStore.addHeadline({
-                        text: translatedText,
-                        icon: '🤖',
-                        isLive: true
-                    });
-                } catch (err) {
-                    console.error('[Socket] Translation failed for AI response:', err);
-                }
-            }
-        });
     };
 
     onMounted(() => {

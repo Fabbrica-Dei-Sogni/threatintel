@@ -87,8 +87,8 @@
                     <label class="cyber-label">{{ t('attacks.timeFilter') }}</label>
                     <div class="time-controls-row">
                         <el-radio-group v-model="attacksState.filters.timeMode" size="small">
-                            <el-radio-button label="ago">{{ t('attacks.last') }}</el-radio-button>
-                            <el-radio-button label="range">{{ t('attacks.range') }}</el-radio-button>
+                            <el-radio-button value="ago">{{ t('attacks.last') }}</el-radio-button>
+                            <el-radio-button value="range">{{ t('attacks.range') }}</el-radio-button>
                         </el-radio-group>
 
                         <div v-if="attacksState.filters.timeMode === 'ago'" class="time-ago-wrapper">

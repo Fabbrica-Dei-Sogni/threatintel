@@ -87,8 +87,8 @@ let debounceTimer = null;
  */
 const updateNews = async (force = false) => {
   // 1. Fonte principale: Carichiamo subito le news statiche (veloci e affidabili)
-  // const staticNews = generateStaticFallback(props, t);
-  // aiHeadlines.value = staticNews;
+  const staticNews = generateStaticFallback(props, t);
+  aiHeadlines.value = staticNews;
 
   // 2. Controllo Cooldown per evitare spam di chiamate AI (ask)
   const now = Date.now();

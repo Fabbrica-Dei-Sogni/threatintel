@@ -53,6 +53,7 @@
         "back": "Retour",
         "id": "ID",
         "timestamp": "Horodatage",
+        "protocol": "Protocole",
         "ip": "IP",
         "copyIp": "Copier l'IP",
         "path": "Chemin",

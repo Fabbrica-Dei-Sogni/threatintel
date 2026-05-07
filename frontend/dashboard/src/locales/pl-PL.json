@@ -53,6 +53,7 @@
         "back": "Wstecz",
         "id": "ID",
         "timestamp": "Znacznik czasu",
+        "protocol": "Protokół",
         "ip": "IP",
         "copyIp": "Kopiuj IP",
         "path": "Ścieżka",

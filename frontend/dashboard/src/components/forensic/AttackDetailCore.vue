@@ -81,6 +81,15 @@
                     <!-- Tactical HUD Container -->
                     <div class="hud-stats-row">
                         <div class="hud-stat-box">
+                            <span class="hud-box-icon">🛰️</span>
+                            <div class="hud-stat-data">
+                                <span class="hud-label">{{ t('common.protocol').toUpperCase() }}</span>
+                                <div class="hud-value" style="margin-top: 5px;">
+                                    <ProtocolBadge :protocol="attack.protocol" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="hud-stat-box">
                             <span class="hud-box-icon">🧾</span>
                             <div class="hud-stat-data">
                                 <span class="hud-label">{{ t('attackDetail.totalLogs') }}</span>
@@ -364,6 +373,7 @@ import GlobalHeader from '../GlobalHeader.vue';
 import ReportActions from '../ReportActions.vue';
 import CyberPager from '../common/CyberPager.vue';
 import DefconIndicator from '../DefconIndicator.vue';
+import ProtocolBadge from '../common/ProtocolBadge.vue';
 import AttackProfileRadar from '../AttackProfileRadar.vue';
 import HexViewer from '../HexViewer.vue';
 import AttackMap from '../AttackMap.vue';

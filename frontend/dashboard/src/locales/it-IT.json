@@ -53,6 +53,7 @@
         "back": "Indietro",
         "id": "ID",
         "timestamp": "Timestamp",
+        "protocol": "Protocollo",
         "ip": "IP",
         "copyIp": "Copia IP",
         "path": "Percorso",

@@ -22,7 +22,10 @@
     <div v-else-if="campaign" class="campaign-detail-container">
       <header class="detail-header">
         <div class="title-section">
-          <span class="hash-title">{{ t('campaigns.patternHash') }}: {{ hash }}</span>
+          <div class="hash-row">
+            <span class="hash-title">{{ t('campaigns.patternHash') }}: {{ hash }}</span>
+            <ProtocolBadge :protocol="protocol" class="header-proto-badge" />
+          </div>
           <div class="target-uri-container" v-if="campaign.sampleUrl">
              <span class="target-label">{{ t('common.sample_url').toUpperCase() }}:</span>
              <span class="target-value">{{ campaign.sampleUrl }}</span>
@@ -256,6 +259,7 @@ import { storeToRefs } from 'pinia';
 import { useViewSettingsStore } from '../../../stores/viewSettings';
 import { useCampaignDetail } from '../../../composable/useCampaignDetail';
 import GlobalHeader from '../../../components/GlobalHeader.vue';
+import ProtocolBadge from '../../../components/common/ProtocolBadge.vue';
 import CyberPager from '../../../components/common/CyberPager.vue';
 import CountryFlag from '../../../components/CountryFlag.vue';
 import CampaignNodesChart from '../../../components/campaigns/CampaignNodesChart.vue';

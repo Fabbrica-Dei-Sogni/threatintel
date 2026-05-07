@@ -217,6 +217,8 @@
         "months": "Miesiące",
         "years": "Lata",
         "filterByIp": "Filtruj według IP...",
+        "searchPlaceholder": "Szukaj wzorców, adresów URL, User Agentów...",
+        "globalSearch": "WYSZUKIWANIE GLOBALNE",
         "clearIpFilter": "Wyczyść filtr IP",
         "copyToFilter": "Skopiuj do filtra IP i wykonaj",
         "noAttacksFound": "Nie znaleziono anomaliaów",

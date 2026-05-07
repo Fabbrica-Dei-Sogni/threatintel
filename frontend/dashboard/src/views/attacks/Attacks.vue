@@ -74,9 +74,9 @@
                 </div>
 
                 <div class="filter-item search-box">
-                    <span class="cyber-label">ANOMALY SEARCH</span>
+                    <span class="cyber-label">{{ $t('attacks.globalSearch') }}</span>
                     <div class="ip-input-wrapper">
-                        <input type="text" v-model="attacksState.filters.attackPatterns" placeholder="Search patterns..." class="ip-input" />
+                        <input type="text" v-model="attacksState.filters.attackPatterns" :placeholder="$t('attacks.searchPlaceholder')" class="ip-input" />
                         <button v-if="attacksState.filters.attackPatterns" @click="attacksState.filters.attackPatterns = ''" class="clear-btn">×</button>
                     </div>
                 </div>

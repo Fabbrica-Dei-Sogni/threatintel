@@ -104,7 +104,11 @@
         "auth_required_desc": "Investigative Dossiers und forensische Berichte sind nur für identifizierte Analysten zugänglich.",
         "reset_layout": "LAYOUT ZURÜCKSETZEN",
         "view_list": "Listenansicht",
-        "view_grid": "Rasteransicht"
+        "view_grid": "Rasteransicht",
+        "collapse": "Einklappen",
+        "expand": "Ausklappen",
+        "refresh": "Aktualisieren",
+        "unknown": "Unbekannt"
     },
     "skin": {
         "classic": "Klassisch",
@@ -164,6 +168,13 @@
         "telnet": "Telnet",
         "breakingNews": {
             "badge": "Eilmeldung",
+            "prompts": {
+                "topCountry": "Basierend auf diesem technischen Kontext:\n{context}\n\nGeneriere eine kurze Eilmeldung (max. 15 Wörter), die die bösartige Aktivität aus {country} zusammenfasst. Sei aggressiv und technisch.",
+                "lastAttacks": "Basierend auf diesen Daten:\n{context}\n\nFasse in einer Zeile (max. 12 Wörter) die von den Knoten {ips} erkannten Einbrüche zusammen.",
+                "mostActiveSession": "Analysiere diese Sitzung:\n{context}\n\nBeschreibe kurz (max. 15 Wörter) die Aktionen des Angreifers {ip} ({count} Ereignisse).",
+                "criticalAlert": "DRINGEND: Analysiere diesen kritischen Angriff:\n{context}\n\nGeneriere einen Blitz-Sicherheitsalarm (max. 12 Wörter) für IP {ip}.",
+                "targetDiscovery": "Analysiere das Muster:\n{context}\n\nGeneriere eine Eilmeldung über das ungewöhnliche Interesse an Endpunkt {path}."
+            },
             "topCountry": "Geopolitische Informationen: {country} ist derzeit die aktivste Scan-Quelle.",
             "mostActiveSession": "Feindliche Persistenz: Akteur {ip} hat {count} interaktive Befehle erreicht.",
             "criticalAlert": "Kritischer Alarm: Hochrisiko-Einbruch von {ip} erkannt.",
@@ -252,7 +263,8 @@
             "attackDuration": "Anomaliesdauer",
             "firstSeen": "Zuerst gesehen",
             "lastSeen": "Zuletzt gesehen"
-        }
+        },
+        "unit": "Einheit"
     },
     "attackDetail": {
         "title": "Anomaliesdetails",
@@ -282,7 +294,8 @@
         "mapTitle": "Anomalieskarte",
         "radarTitle": "Radaranalyse",
         "searchUrlPlaceholder": "Nach URL filtern...",
-        "userAgent": "User Agent"
+        "userAgent": "User Agent",
+        "recentLogs": "Letzte Protokolle"
     },
     "campaigns": {
         "title": "Kampagnen",
@@ -579,6 +592,7 @@
         "noSearchResults": "Keine Ergebnisse für diese Suche",
         "createFirst": "Erste Konfiguration erstellen",
         "retry": "Erneut versuchen",
+        "reanalyzeStarted": "Reanalyse im Hintergrund gestartet. Überwachen Sie den Fortschritt im Mission Control Panel.",
         "configCreated": "Konfiguration erfolgreich erstellt",
         "configSaved": "Konfiguration erfolgreich gespeichert",
         "configDeleted": "Konfiguration erfolgreich gelöscht",
@@ -696,7 +710,7 @@
                 "Kategorien: {categories}",
                 "Berichterstatter: {reporter}",
                 "",
-                "Kommentar:",
+                "Commentar:",
                 "{comment}",
                 "---------------------------------"
             ]
@@ -898,18 +912,29 @@
         }
     },
     "maintenance": {
-        "title": "SYSTEM MAINTENANCE",
+        "title": "WARTUNG DES SYSTEMS",
         "pruning": {
             "title": "Pruning & Retention",
-            "desc": "Manage data lifecycle: automatic archiving and permanent deletion of logs.",
-            "archiveDays": "Days to Archive",
-            "archiveDaysHelp": "Time before an active log becomes Archived",
-            "retentionDays": "Trash Retention (days)",
-            "retentionDaysHelp": "Time before a deleted log is permanently removed",
-            "deletionDays": "Permanent Deletion (days)",
-            "deletionDaysHelp": "Empty archived logs older than this value",
-            "runCleanup": "Run Cleanup",
-            "confirm": "Are you sure you want to proceed with permanent cleanup? This action is irreversible."
-        }
+            "desc": "Datenlebenszyklus verwalten: automatische Archivierung und dauerhafte Löschung von Protokollen.",
+            "archiveDays": "Tage bis zur Archivierung",
+            "archiveDaysHelp": "Zeitspanne, bevor ein Protokoll archiviert wird",
+            "retentionDays": "Aufbewahrung im Papierkorb (Tage)",
+            "retentionDaysHelp": "Zeitspanne, bevor ein gelöschtes Protokoll dauerhaft entfernt wird",
+            "deletionDays": "Dauerhafte Löschung (Tage)",
+            "deletionDaysHelp": "Archivierte Protokolle löschen, die älter als dieser Wert sind",
+            "emergencyReset": "Notfall-Reset",
+            "emergencyResetHelp": "Setzt ALLE Protokolle auf den Status 'Aktiv'. Mit Vorsicht verwenden.",
+            "runCleanup": "Bereinigung ausführen",
+            "confirm": "Sind Sie sicher, dass Sie mit der dauerhaften Bereinigung fortfahren möchten? Diese Aktion ist nicht rückgängig zu machen.",
+            "stats": {
+                "active": "Aktive Protokolle",
+                "archived": "Archivierte Protokolle",
+                "trash": "Im Papierkorb",
+                "legacy": "Legacy (Kein Status)"
+            }
+        },
+        "job_completed": "Auftrag abgeschlossen",
+        "completed_successfully": "erfolgreich abgeschlossen",
+        "job_failed": "Auftrag fehlgeschlagen"
     }
 }

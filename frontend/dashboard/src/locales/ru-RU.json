@@ -104,7 +104,11 @@
         "auth_required_desc": "Следственные досье и судебно-криминалистические отчеты доступны только идентифицированным аналитикам.",
         "reset_layout": "СБРОСИТЬ МАКЕТ",
         "view_list": "Список",
-        "view_grid": "Сетка"
+        "view_grid": "Сетка",
+        "collapse": "Свернуть",
+        "expand": "Развернуть",
+        "refresh": "Обновить",
+        "unknown": "Неизвестно"
     },
     "skin": {
         "classic": "Классический",
@@ -164,6 +168,13 @@
         "telnet": "Telnet",
         "breakingNews": {
             "badge": "Срочные новости",
+            "prompts": {
+                "topCountry": "На основе этого технического контекста:\n{context}\n\nСгенерируйте краткую flash-новость (макс. 15 слов), резюмирующую вредоносную активность из {country}. Будьте агрессивны и техничны.",
+                "lastAttacks": "На основе этих данных:\n{context}\n\nОбобщите в одну строку (макс. 12 слов) вторжения, обнаруженные узлами {ips}.",
+                "mostActiveSession": "Проанализируйте эту сессию:\n{context}\n\nКратко опишите (макс. 15 слов) действия атакующего {ip} ({count} событий).",
+                "criticalAlert": "СРОЧНО: Проанализируйте эту критическую атаку:\n{context}\n\nСгенерируйте быструю тревогу безопасности (макс. 12 слов) для IP {ip}.",
+                "targetDiscovery": "Проанализируйте паттерн:\n{context}\n\nСгенерируйте flash-новость о необычном интересе к эндпоинту {path}."
+            },
             "topCountry": "Геополитическая разведка: {country} в настоящее время является наиболее активным источником сканирования.",
             "mostActiveSession": "Враждебная настойчивость: Актор {ip} достиг {count} интерактивных команд.",
             "criticalAlert": "Критическая тревога: Обнаружено вторжение с высоким уровнем риска из {ip}.",
@@ -252,7 +263,8 @@
             "attackDuration": "Длительность аномалии",
             "firstSeen": "Первое обнаружение",
             "lastSeen": "Последнее обнаружение"
-        }
+        },
+        "unit": "Единица"
     },
     "attackDetail": {
         "title": "Детали аномалии",
@@ -282,7 +294,8 @@
         "mapTitle": "Карта атак",
         "radarTitle": "Радарный анализ",
         "searchUrlPlaceholder": "Фильтровать по URL...",
-        "userAgent": "User Agent"
+        "userAgent": "User Agent",
+        "recentLogs": "Последние логи"
     },
     "campaigns": {
         "title": "Кампании",
@@ -300,6 +313,8 @@
         "discovery": "Обнаружение Кампаний",
         "searchLabel": "Поиск в списке:",
         "searchPlaceholder": "IP, Хэш, Техника...",
+        "filterByUri": "Фильтр по целевому URI",
+        "browseUris": "Просмотр URI",
         "table": {
             "ips": "Задействовано IP",
             "logs": "Всего Логов",
@@ -577,6 +592,7 @@
         "noSearchResults": "Нет результатов для этого поиска",
         "createFirst": "Создать первую конфигурацию",
         "retry": "Повторить",
+        "reanalyzeStarted": "Переанализ запущен в фоновом режиме. Следите за прогрессом в панели Mission Control.",
         "configCreated": "Конфигурация успешно создана",
         "configSaved": "Конфигурация успешно сохранена",
         "configDeleted": "Конфигурация успешно удалена",
@@ -873,7 +889,7 @@
     "ops": {
         "hubTitle": "ХАБ СИСТЕМНЫХ ОПЕРАЦИЙ",
         "activeMissions": "АКТИВНЫЕ МИССИИ",
-        "availableCommands": "ДОСТУПНЫЕ КОМАНДЫ",
+        "availableCommands": "ДОСТЮПНЫЕ КОМАНДЫ",
         "activeOps": "ACTIVE OPERATIONS",
         "noActiveOps": "NO OPERATIONS IN PROGRESS",
         "recentLogs": "RECENT LOGS",
@@ -896,18 +912,29 @@
         }
     },
     "maintenance": {
-        "title": "SYSTEM MAINTENANCE",
+        "title": "ТЕХНИЧЕСКОЕ ОБСЛУЖИВАНИЕ СИСТЕМЫ",
         "pruning": {
-            "title": "Pruning & Retention",
-            "desc": "Manage data lifecycle: automatic archiving and permanent deletion of logs.",
-            "archiveDays": "Days to Archive",
-            "archiveDaysHelp": "Time before an active log becomes Archived",
-            "retentionDays": "Trash Retention (days)",
-            "retentionDaysHelp": "Time before a deleted log is permanently removed",
-            "deletionDays": "Permanent Deletion (days)",
-            "deletionDaysHelp": "Empty archived logs older than this value",
-            "runCleanup": "Run Cleanup",
-            "confirm": "Are you sure you want to proceed with permanent cleanup? This action is irreversible."
-        }
+            "title": "Очистка и Хранение",
+            "desc": "Управление жизненным циклом данных: автоматическое архивирование и окончательное удаление логов.",
+            "archiveDays": "Дней до архивации",
+            "archiveDaysHelp": "Время, по истечении которого активный лог становится архивным",
+            "retentionDays": "Хранение в корзине (дней)",
+            "retentionDaysHelp": "Время до окончательного удаления удаленного лога",
+            "deletionDays": "Окончательное удаление (дней)",
+            "deletionDaysHelp": "Очистить архивные логи старше этого значения",
+            "emergencyReset": "Аварийный сброс",
+            "emergencyResetHelp": "Устанавливает для ВСЕХ логов статус 'Активно'. Используйте с осторожностью.",
+            "runCleanup": "Запустить очистку",
+            "confirm": "Вы уверены, что хотите продолжить окончательную очистку? Это действие необратимо.",
+            "stats": {
+                "active": "Активные логи",
+                "archived": "Архивные логи",
+                "trash": "В корзине",
+                "legacy": "Legacy (Без статуса)"
+            }
+        },
+        "job_completed": "Задание завершено",
+        "completed_successfully": "успешно завершено",
+        "job_failed": "Задание не удалось"
     }
 }

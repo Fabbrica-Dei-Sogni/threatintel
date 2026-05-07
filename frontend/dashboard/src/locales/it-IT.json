@@ -104,7 +104,11 @@
         "auth_required_desc": "I dossier investigativi e i report forensi sono accessibili solo ad analisti identificati.",
         "reset_layout": "RIPRISTINA LAYOUT",
         "view_list": "Vista Lista",
-        "view_grid": "Vista Griglia"
+        "view_grid": "Vista Griglia",
+        "collapse": "Comprimi",
+        "expand": "Espandi",
+        "refresh": "Aggiorna",
+        "unknown": "Sconosciuto"
     },
     "skin": {
         "classic": "Classic",
@@ -259,7 +263,8 @@
             "attackDuration": "Durata Anomalia",
             "firstSeen": "Primo avvistamento",
             "lastSeen": "Ultimo avvistamento"
-        }
+        },
+        "unit": "Unità"
     },
     "attackDetail": {
         "title": "Dettaglio Anomalia",
@@ -289,7 +294,8 @@
         "mapTitle": "Mappa Anomalia",
         "radarTitle": "Analisi Radar",
         "searchUrlPlaceholder": "Filtra per URL...",
-        "userAgent": "User Agent"
+        "userAgent": "User Agent",
+        "recentLogs": "Ultimi Log"
     },
     "campaigns": {
         "title": "Campagne",
@@ -925,6 +931,9 @@
                 "trash": "Nel Cestino",
                 "legacy": "Senza Stato (Legacy)"
             }
-        }
+        },
+        "job_completed": "Operazione Completata",
+        "completed_successfully": "completata con successo",
+        "job_failed": "Operazione Fallita"
     }
 }

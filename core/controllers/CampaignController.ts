@@ -242,6 +242,7 @@ export class CampaignController {
                     agoValue: cleanQuery.agoValue ? parseInt(cleanQuery.agoValue as string) : undefined,
                     agoUnit: cleanQuery.agoUnit as string
                 },
+                search: cleanQuery.search as string,
                 status: cleanQuery.status as string
             });
 

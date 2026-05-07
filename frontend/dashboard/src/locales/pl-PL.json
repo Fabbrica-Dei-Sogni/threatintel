@@ -217,6 +217,8 @@
         "months": "Miesiące",
         "years": "Lata",
         "filterByIp": "Filtruj według IP...",
+        "searchPlaceholder": "Szukaj wzorców, adresów URL, User Agentów...",
+        "globalSearch": "WYSZUKIWANIE GLOBALNE",
         "clearIpFilter": "Wyczyść filtr IP",
         "copyToFilter": "Skopiuj do filtra IP i wykonaj",
         "noAttacksFound": "Nie znaleziono anomaliaów",
@@ -278,7 +280,8 @@
         "profileTitle": "Profil anomaliau",
         "mapTitle": "Mapa Anomaliau",
         "radarTitle": "Analiza Radarowa",
-        "searchUrlPlaceholder": "Filtruj według adresu URL..."
+        "searchUrlPlaceholder": "Filtruj według adresu URL...",
+        "userAgent": "User Agent"
     },
     "campaigns": {
         "title": "Kampanie",

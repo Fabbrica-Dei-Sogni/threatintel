@@ -6,7 +6,7 @@
  * Licensed under the Business Source License 1.1 (BSL-1.1).
  * See root LICENSE.md for core engine licensing details.
  */
-import { RagSearchOptions, RAG_SCHEMA_VERSION } from '../../types/assistant/rag.types';
+import { RagSearchOptions } from '../../types/assistant/rag.types';
 import { sanitizeFilters, FilterAllowedFields } from '../../utils/queryGuard';
 import { RAG_TEMPLATES } from './RagTemplates';
 
@@ -16,7 +16,7 @@ import { RAG_TEMPLATES } from './RagTemplates';
  * Integra la logica di QueryGuard per la sicurezza e la sanitizzazione.
  */
 export class RagValidator {
-    
+
     /**
      * Valida le opzioni di ricerca.
      */
@@ -38,7 +38,7 @@ export class RagValidator {
         }
         return { valid: true };
     }
-    
+
     /**
      * Valida un riferimento sorgente (SourceRef).
      * Applica la sanitizzazione tramite QueryGuard per prevenire injection e ReDoS.
@@ -57,14 +57,6 @@ export class RagValidator {
 
         if (!validTypes.includes(type)) {
             return { valid: false, error: RAG_TEMPLATES.VALIDATION.SOURCE_TYPE_INVALID.replace('{types}', validTypes.join(', ')) };
-        }
-
-        // Verifica versione schema (Fase 2)
-        // Se il riferimento è troppo vecchio, potremmo segnalarlo, 
-        // ma per ora permettiamo la risoluzione per retrocompatibilità "best-effort"
-        const schemaVersion = ref.schemaVersion || 1;
-        if (schemaVersion < RAG_SCHEMA_VERSION) {
-            // Loggare internamente il potenziale drift
         }
 
         let sanitized: any = { ...ref.params };
@@ -90,7 +82,7 @@ export class RagValidator {
             case 'attack':
                 if (!ref.params.ip) return { valid: false, error: RAG_TEMPLATES.VALIDATION.MISSING_IP.replace('{type}', 'attack') };
                 if (typeof ref.params.minLogsForAttack !== 'number') return { valid: false, error: RAG_TEMPLATES.VALIDATION.INVALID_MIN_LOGS };
-                
+
                 // Sanitizzazione tramite QueryGuard (Whitelist degli attacchi)
                 sanitized = {
                     ...sanitizeFilters(ref.params, FilterAllowedFields.attack),
@@ -103,7 +95,7 @@ export class RagValidator {
 
             case 'campaign':
                 if (!ref.params.hash) return { valid: false, error: RAG_TEMPLATES.VALIDATION.MISSING_HASH };
-                
+
                 // Sanitizzazione tramite QueryGuard (Whitelist delle campagne)
                 sanitized = {
                     ...sanitizeFilters(ref.params, FilterAllowedFields.campaign),

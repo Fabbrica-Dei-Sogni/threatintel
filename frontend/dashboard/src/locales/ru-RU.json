@@ -217,6 +217,8 @@
         "months": "Месяцы",
         "years": "Годы",
         "filterByIp": "Фильтр по IP...",
+        "searchPlaceholder": "Поиск паттернов, URL, User Agent...",
+        "globalSearch": "ГЛОБАЛЬНЫЙ ПОИСК",
         "clearIpFilter": "Очистить фильтр IP",
         "copyToFilter": "Скопировать в фильтр IP и выполнить",
         "noAttacksFound": "Атак не найдено",
@@ -278,7 +280,8 @@
         "profileTitle": "Профиль аномалии",
         "mapTitle": "Карта атак",
         "radarTitle": "Радарный анализ",
-        "searchUrlPlaceholder": "Фильтровать по URL..."
+        "searchUrlPlaceholder": "Фильтровать по URL...",
+        "userAgent": "User Agent"
     },
     "campaigns": {
         "title": "Кампании",

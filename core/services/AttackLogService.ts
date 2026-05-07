@@ -15,6 +15,7 @@ import AttackDTO from '../models/dto/AttackDTO';
 import {
     sanitizeSortFields,
     sanitizeFilters,
+    escapeRegex,
     SortAllowedFields,
     FilterAllowedFields
 } from '../utils/queryGuard';
@@ -44,7 +45,7 @@ export class AttackLogService {
         } = params;
         const skip = (page - 1) * pageSize;
 
-        const postAggFields = ['dangerLevel', 'attackPatterns', 'dangerScore', 'averageScore', 'totaleLogs'];
+        const postAggFields = ['dangerLevel', 'attackPatterns', 'dangerScore', 'averageScore', 'totaleLogs', 'request.url'];
         const initialFilters: any = {};
         const postAggregationFilters: any = {};
 
@@ -261,9 +262,27 @@ export class AttackLogService {
                         { protocol: { $exists: false } },
                         { protocol: null }
                     ];
-                } else {
+                } else if (value && value !== 'all') {
                     mongoFilters[key] = value;
                 }
+                // Se è 'all', null o undefined, non applichiamo il filtro protocollo
+            } else if (key === 'attackPatterns' && typeof value === 'string') {
+                // Global Behavioral Search: search in patterns, user agents and URLs
+                const words = value.trim().split(/\s+/).filter(w => w.length > 0);
+                if (words.length > 0) {
+                    words.forEach(w => {
+                        const escapedWord = escapeRegex(w);
+                        andFilters.push({
+                            $or: [
+                                { attackPatterns: { $regex: escapedWord, $options: 'i' } },
+                                { 'fingerprintAnalysis.userAgents': { $regex: escapedWord, $options: 'i' } },
+                                { 'request.url': { $regex: escapedWord, $options: 'i' } },
+                                { 'logsRaggruppati.request.url': { $regex: escapedWord, $options: 'i' } }
+                            ]
+                        });
+                    });
+                }
+                continue;
             } else if (typeof value === 'string') {
                 const words = value.trim().split(/\s+/).filter(w => w.length > 0);
                 if (words.length > 1) {

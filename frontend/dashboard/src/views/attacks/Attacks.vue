@@ -88,9 +88,9 @@
                 </div>
 
                 <div class="filter-item search-box">
-                    <span class="cyber-label">ANOMALY SEARCH</span>
+                    <span class="cyber-label">{{ $t('attacks.globalSearch') }}</span>
                     <div class="ip-input-wrapper">
-                        <input type="text" v-model="attacksState.filters.attackPatterns" placeholder="Search patterns..." class="ip-input" />
+                        <input type="text" v-model="attacksState.filters.attackPatterns" :placeholder="$t('attacks.searchPlaceholder')" class="ip-input" />
                         <button v-if="attacksState.filters.attackPatterns" @click="attacksState.filters.attackPatterns = ''" class="clear-btn">×</button>
                     </div>
                 </div>
@@ -415,6 +415,17 @@
                                 <div class="metric">
                                     <span class="label">{{ t('attacks.table.short.rps') }}</span>
                                     <span class="value">{{ attack.rps }}</span>
+                                </div>
+                            </div>
+
+                            <div class="user-agent-info" v-if="attack.fingerprintAnalysis?.userAgents?.length">
+                                <div class="ua-header">
+                                    <span class="mini-icon">🕵️</span> {{ t('attackDetail.userAgent').toUpperCase() }}
+                                </div>
+                                <div class="ua-content">
+                                    <div v-for="(ua, i) in attack.fingerprintAnalysis.userAgents" :key="i" class="ua-text" :title="ua">
+                                        {{ ua.length > 45 ? ua.substring(0, 45) + '...' : ua }}
+                                    </div>
                                 </div>
                             </div>
 

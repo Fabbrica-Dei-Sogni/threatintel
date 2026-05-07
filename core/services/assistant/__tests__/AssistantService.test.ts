@@ -22,6 +22,7 @@ describe('AssistantService', () => {
     let mockAttackLog: any;
     let mockCampaign: any;
     let mockIpDetails: any;
+    let mockAppConfig: any;
     let mockRagTranslation: any;
 
     beforeEach(() => {
@@ -38,6 +39,7 @@ describe('AssistantService', () => {
         mockAttackLog = { getAttackDetail: jest.fn(), getAttacks: jest.fn() };
         mockCampaign = { getCampaignDetail: jest.fn(), getCampaigns: jest.fn() };
         mockIpDetails = { getIpDetails: jest.fn() };
+        mockAppConfig = { ragReindexThresholdDays: 7 };
         mockRagTranslation = { translateAttack: jest.fn(), translateCampaign: jest.fn() };
 
         service = new AssistantService(
@@ -50,7 +52,8 @@ describe('AssistantService', () => {
             mockAttackLog,
             mockCampaign,
             mockIpDetails,
-            mockRagTranslation
+            mockRagTranslation,
+            mockAppConfig
         );
     });
 

@@ -151,7 +151,8 @@
                         timeMode: 'ago',
                         agoValue: dashboardState.rankings.attackTimeValue,
                         agoUnit: dashboardState.rankings.attackTimeUnit,
-                        minLogsForAttack: dashboardState.rankings.attackMinLogs
+                        minLogsForAttack: dashboardState.rankings.attackMinLogs,
+                        protocol: item.protocol || dashboardState.rankings.attackProtocol
                       }
                     }" class="intel-det-btn" :data-noc-tooltip="t('common.detail')">
                       DET
@@ -495,7 +496,8 @@
                         timeMode: 'ago',
                         agoValue: dashboardState.rankings.campaignTimeValue,
                         agoUnit: dashboardState.rankings.campaignTimeUnit,
-                        protocol: dashboardState.rankings.campaignProtocol
+                        agoUnit: dashboardState.rankings.campaignTimeUnit,
+                        protocol: item.protocol || dashboardState.rankings.campaignProtocol
                       }
                     }" class="intel-det-btn" :data-noc-tooltip="t('common.detail')">
                       DET

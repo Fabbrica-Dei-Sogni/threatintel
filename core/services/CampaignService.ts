@@ -14,6 +14,7 @@ import { EventBus, AppEvents } from './EventBus';
 import { GetCampaignDetailParams, GetCampaignsParams } from '../types/service-params.types';
 import { ForensicPipelineService } from './forense/ForensicPipelineService';
 
+import { escapeRegex } from '../utils/queryGuard';
 import * as Tokens from '../di/tokens';
 
 @injectable()
@@ -107,7 +108,7 @@ export class CampaignService {
 
             // 5. Ordinamento e Paginazione Manuale (post-filtro correlazioni)
             const totalCount = enrichedAndFiltered.length;
-            const sortedData = enrichedAndFiltered.sort((a, b) => {
+            const sortedData = enrichedAndFiltered.sort((a: any, b: any) => {
                 const dateA = new Date(a.firstSeen).getTime();
                 const dateB = new Date(b.firstSeen).getTime();
                 return dateB - dateA || b.ipCount - a.ipCount;
@@ -234,18 +235,8 @@ export class CampaignService {
         if (search) {
             const cleanSearch = search.trim();
             if (cleanSearch.length > 0) {
-                const searchFilter = {
-                    $or: [
-                        { 'request.ip': cleanSearch },
-                        { 'fingerprint.hash': cleanSearch }
-                    ]
-                };
-                if (baseFilters.$or) {
-                    baseFilters.$and = [{ $or: baseFilters.$or }, searchFilter];
-                    delete baseFilters.$or;
-                } else {
-                    baseFilters.$or = searchFilter.$or;
-                }
+                const escapedSearch = escapeRegex(cleanSearch);
+                baseFilters['request.url'] = { $regex: escapedSearch, $options: 'i' };
             }
         }
 

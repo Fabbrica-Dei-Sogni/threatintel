@@ -1,6 +1,6 @@
 .config-page-view {
   min-height: 100vh;
-  padding: 20px 30px;
+  padding: clamp(15px, 3vw, 30px) clamp(10px, 4vw, 40px);
   background-color: #020617;
   display: flex;
   flex-direction: column;
@@ -62,8 +62,8 @@
 
 /* Forensic Toolbar */
 .forensic-toolbar {
-  display: grid;
-  grid-template-columns: 1fr auto;
+  display: flex;
+  flex-wrap: wrap;
   gap: 20px;
   padding: 15px 25px;
   background: rgba(15, 23, 42, 0.6);
@@ -145,7 +145,7 @@
 
 .algorithm-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 380px), 1fr));
   gap: 20px;
   padding-bottom: 50px;
 }
@@ -330,9 +330,14 @@
 }
 
 /* Responsive */
-@media (max-width: 900px) {
-  .algorithm-grid {
+@media (max-width: 1024px) {
+  .maintenance-hub {
     grid-template-columns: 1fr;
+    gap: 30px;
+  }
+  
+  .maintenance-controls {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   }
 }
 
@@ -366,15 +371,20 @@
 }
 /* Maintenance Hub */
 .maintenance-hub {
-  padding: 30px;
+  padding: clamp(20px, 4vw, 30px);
   background: rgba(15, 23, 42, 0.4);
   border-radius: 24px;
   border: 1px solid rgba(255, 255, 255, 0.05);
   margin-bottom: 30px;
-  display: grid;
-  grid-template-columns: 1fr 1.5fr;
-  gap: 40px;
-  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  transition: all 0.3s ease;
+}
+
+.maintenance-hub:hover {
+  background: rgba(15, 23, 42, 0.5);
+  border-color: rgba(99, 102, 241, 0.15);
 }
 
 .maintenance-title {
@@ -403,7 +413,7 @@
 
 .maintenance-controls {
   display: grid;
-  grid-template-columns: repeat(3, 1fr) auto;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
   gap: 20px;
   align-items: flex-end;
 }
@@ -452,7 +462,7 @@
   background: #6366f1;
   color: #fff;
   border: none;
-  padding: 15px 30px;
+  padding: 15px 35px;
   border-radius: 14px;
   font-weight: 900;
   letter-spacing: 2px;
@@ -460,6 +470,11 @@
   overflow: hidden;
   transition: all 0.3s;
   box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3);
+  justify-self: flex-end;
+}
+
+@media (max-width: 600px) {
+  .btn-maintenance-run { width: 100%; }
 }
 
 .btn-maintenance-run:hover {
@@ -483,14 +498,7 @@
 
 @media (max-width: 1200px) {
   .maintenance-hub {
-    grid-template-columns: 1fr;
     gap: 25px;
-  }
-  .maintenance-controls {
-    grid-template-columns: repeat(3, 1fr);
-  }
-  .btn-maintenance-run {
-    grid-column: span 3;
   }
 }
 
@@ -539,12 +547,12 @@
 .emergency-toggle {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: clamp(10px, 3vw, 20px);
   background: rgba(248, 113, 113, 0.05);
   padding: 15px 20px;
   border-radius: 16px;
   border: 1px dashed rgba(248, 113, 113, 0.2);
-  grid-column: span 3;
+  grid-column: 1 / -1;
 }
 
 .emergency-mode {

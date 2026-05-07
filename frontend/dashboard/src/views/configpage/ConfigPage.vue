@@ -106,10 +106,21 @@
                         </button>
                         <button v-if="confirmingRagReindex" class="cancel-cmd" @click="confirmingRagReindex = false">✕</button>
                     </div>
+
+                    <!-- Tactical Engine Tuning Toggle -->
+                    <div class="cmd-wrapper" :class="{ 'is-active': showTacticalTuning }">
+                        <button class="cmd-btn" @click="showTacticalTuning = !showTacticalTuning">
+                            <span class="cmd-icon">📡</span>
+                            <div class="cmd-text">
+                                <span class="cmd-name">TACTICAL ENGINE TUNING</span>
+                                <span class="cmd-desc">Calibrazione parametri e pesi TTP</span>
+                            </div>
+                        </button>
+                    </div>
                 </div>
             </div>
 
-            <!-- Expandable Pruning Console (Below Buttons) -->
+            <!-- Expandable Pruning Console -->
             <transition name="expand">
                 <div class="maintenance-controls" v-if="showPruningControls" :class="{ 'emergency-mode': pruningParams.resetAllToActive }">
                     <div class="emergency-toggle">
@@ -147,6 +158,21 @@
                     </button>
                 </div>
             </transition>
+
+            <!-- Expandable Tactical Engine Hub -->
+            <transition name="expand">
+                <TacticalEngineHub 
+                    v-if="showTacticalTuning"
+                    :configs="filteredConfigs"
+                    :loading="loading"
+                    :saving="saving"
+                    :error="error"
+                    :status="engineStatus"
+                    v-model:search-query="searchQuery"
+                    @save="handleSave"
+                    @retry="loadConfigs"
+                />
+            </transition>
         </div>
 
         <!-- System Operations Hub (Permanent) -->
@@ -159,8 +185,8 @@
             />
         </div>
 
-        <!-- Content Area -->
-        <div class="config-content-scroll scrollable-body">
+        <!-- Content Area (Empty if Tuning is open, otherwise can show other things or be removed) -->
+        <div class="config-content-scroll scrollable-body" v-if="!showTacticalTuning">
             <!-- Loading State -->
             <div v-if="loading" class="loading-hud">
                 <div class="pulse-ring"></div>
@@ -178,12 +204,6 @@
             <div v-else-if="filteredConfigs.length === 0" class="empty-hud card-glass">
                 <span class="empty-icon">📭</span>
                 <p>{{ searchQuery ? t('config.noSearchResults') : t('config.noConfigs') }}</p>
-            </div>
-
-            <!-- Config List Grid -->
-            <div v-else class="algorithm-grid">
-                <ConfigEditor v-for="config in filteredConfigs" :key="config.key" :config-key="config.key"
-                    :model-value="config.value" :saving="saving" @save="handleSave" @delete="handleDelete" />
             </div>
         </div>
 
@@ -243,6 +263,7 @@ import { useAuthStore } from '../../stores/auth';
 import { useViewSettingsStore } from '../../stores/viewSettings';
 import { storeToRefs } from 'pinia';
 import ConfigEditor from '../../components/ConfigEditor.vue';
+import TacticalEngineHub from '../../components/forensic/TacticalEngineHub.vue';
 import JobMonitor from '../../components/forensic/JobMonitor.vue';
 import GlobalHeader from '../../components/GlobalHeader.vue';
 import TacticalModal from '../../components/TacticalModal.vue';
@@ -292,8 +313,16 @@ const pruningParams = ref({
 });
 
 const showPruningControls = ref(false);
+const showTacticalTuning = ref(false);
 const confirmingReanalyze = ref(false);
 const confirmingRagReindex = ref(false);
+
+const engineStatus = computed(() => {
+    if (saving.value) return 'TUNING';
+    if (loading.value) return 'INITIALIZING';
+    if (isAnyReanalyzeRunning.value || isRagReindexRunning.value) return 'SYNCING';
+    return 'OPTIMIZED';
+});
 
 const isAnyReanalyzeRunning = computed(() => {
     return Object.values(activeJobs.value).some(job => 
@@ -472,8 +501,8 @@ watch(() => profileStore.activeProfileId, () => {
 /* Decoupled Command Grid Styles (Imported from JobMonitor) */
 .commands-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 15px;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+    gap: 20px;
     margin-top: 15px;
 }
 
@@ -487,11 +516,11 @@ watch(() => profileStore.activeProfileId, () => {
     flex: 1;
     display: flex;
     align-items: center;
-    gap: 15px;
-    padding: 12px 18px;
+    gap: 20px;
+    padding: 16px 24px;
     background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 16px;
     cursor: pointer;
     text-align: left;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -582,8 +611,8 @@ watch(() => profileStore.activeProfileId, () => {
 
 .monitor-separator {
     height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
-    margin-bottom: 20px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    margin: 10px 0 25px 0;
 }
 
 /* Expand Transition */

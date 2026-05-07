@@ -17,7 +17,8 @@ export const ConfigDefaults = {
         'https://alessandromodica.com',
         'http://82.112.255.186:5173',
         'http://82.112.255.186:4300'
-    ]
+    ],
+    RAG_REINDEX_THRESHOLD_DAYS: '7'
 };
 
 /**

@@ -19,11 +19,12 @@ import { IAbuseReport } from '../../models/AbuseReportSchema';
 import { stringToUuid } from '../../utils/uuid';
 import { RAG_POLICIES } from './RagPolicies';
 import { RagSourceRef, ThreatLogPayload, AttackSummaryPayload, CampaignSummaryPayload, AttackSourceParams, CampaignSourceParams, IpDetailsPayload } from '../../types/assistant/rag.types';
-import { semverToId } from '../../utils/version';
+import { semverToId } from '../../utils/version'; // Rimarrà solo per retrocompatibilità se serve, ma non lo usiamo più
 import AttackDTO from '../../models/dto/AttackDTO';
 import CampaignDTO from '../../models/dto/CampaignDTO';
 import { AttackLogService } from '../AttackLogService';
 import { CampaignService } from '../CampaignService';
+import { IpDetailsService } from '../IpDetailsService';
 import { RAG_TEMPLATES } from './RagTemplates';
 
 import * as Tokens from '../../di/tokens';
@@ -32,7 +33,7 @@ import * as Tokens from '../../di/tokens';
 export class RagSyncService {
     private isOperational: boolean = false;
     private initializationAttempted: boolean = false;
-    
+
     // Configurazione Batching per i Log
     private logBuffer: any[] = [];
     private readonly BATCH_SIZE = 10; // Processiamo 10 log alla volta
@@ -49,8 +50,9 @@ export class RagSyncService {
         @inject(Tokens.OLLAMA_SERVICE_TOKEN) private readonly ollama: OllamaService,
         @inject(Tokens.CONFIG_PROVIDER_TOKEN) private readonly config: AppConfigProvider,
         @inject(Tokens.ATTACK_LOG_SERVICE_TOKEN) private readonly attackLogService: AttackLogService,
-        @inject(Tokens.CAMPAIGN_SERVICE_TOKEN) private readonly campaignService: CampaignService
-    ) { 
+        @inject(Tokens.CAMPAIGN_SERVICE_TOKEN) private readonly campaignService: CampaignService,
+        @inject(Tokens.IP_DETAILS_SERVICE_TOKEN) private readonly ipDetailsService: IpDetailsService
+    ) {
         this.COLL_INTELLIGENCE = this.config.ragCollectionName;
         this.COLL_LOGS = this.config.ragLogsCollectionName;
     }
@@ -90,58 +92,67 @@ export class RagSyncService {
         }
     }
 
-    /**
-     * Conta quanti punti in una collection hanno uno schema obsoleto.
-     */
-    public async countObsoletePoints(collectionName: string): Promise<number> {
+    public async countObsoletePoints(collectionName: string, customThresholdDate?: string): Promise<number> {
         if (!this.checkOperational()) return 0;
-        
+
         try {
-            const currentVersionId = semverToId(this.config.ragSchemaVersion);
+            // Se non fornita, calcoliamo la soglia in base alla configurazione attuale
+            const thresholdDate = customThresholdDate || new Date(Date.now() - (this.config.ragReindexThresholdDays * 24 * 60 * 60 * 1000)).toISOString();
+
             const filter = {
-                must: [
+                should: [
                     {
-                        key: "schemaVersion",
-                        range: { lt: currentVersionId }
+                        key: "materializedAt",
+                        range: { lt: thresholdDate }
+                    },
+                    {
+                        is_empty: {
+                            key: "materializedAt"
+                        }
                     }
                 ]
             };
-            return await this.qdrant.countPoints(collectionName, filter);
+
+            const count = await this.qdrant.countPoints(collectionName, filter);
+            this.logger.info(`[RagSync] Found ${count} obsolete points in ${collectionName} with threshold ${thresholdDate}`);
+            return count;
         } catch (error) {
             this.logger.error(`[RagSync] Error counting obsolete points: ${error.message}`);
-            return 0;
+            throw error;
         }
     }
 
-    /**
-     * Identifica i punti con schema obsoleto e tenta di ri-materializzarli.
-     * @param collectionName Nome della collection
-     * @param limit Massimo numero di punti da processare per ciclo
-     */
-    public async reindexObsoletePoints(collectionName: string, limit: number = 20): Promise<{ processed: number, updated: number, deleted: number }> {
+    public async reindexObsoletePoints(collectionName: string, limit: number = 20, customThresholdDate?: string): Promise<{ processed: number, updated: number, deleted: number }> {
         if (!this.checkOperational()) return { processed: 0, updated: 0, deleted: 0 };
 
         this.logger.info(`[RagSync] Starting re-indexing check for obsolete points in ${collectionName}...`);
         let stats = { processed: 0, updated: 0, deleted: 0 };
 
         try {
-            // Filtro Qdrant per trovare versioni inferiori alla corrente
-            const currentVersionId = semverToId(this.config.ragSchemaVersion);
+            // Se non fornita, calcoliamo la soglia in base alla configurazione attuale
+            const thresholdDate = customThresholdDate || new Date(Date.now() - (this.config.ragReindexThresholdDays * 24 * 60 * 60 * 1000)).toISOString();
+
             const filter = {
-                must: [
+                should: [
                     {
-                        key: "schemaVersion",
-                        range: { lt: currentVersionId }
+                        key: "materializedAt",
+                        range: { lt: thresholdDate }
+                    },
+                    {
+                        is_empty: {
+                            key: "materializedAt"
+                        }
                     }
                 ]
             };
 
-            const result = await this.qdrant.scrollPoints(collectionName, { 
-                filter, 
-                limit 
+            const result = await this.qdrant.scrollPoints(collectionName, {
+                filter,
+                limit
             });
 
             stats.processed = result.points.length;
+            this.logger.info(`[RagSync] Scrolled ${stats.processed} points for re-indexing in ${collectionName} (Older than ${thresholdDate})`);
 
             for (const point of result.points) {
                 const payload = point.payload as any;
@@ -156,7 +167,7 @@ export class RagSyncService {
 
                 try {
                     this.logger.debug(`[RagSync] Re-indexing point ${point.id} of type ${payload.type}...`);
-                    
+
                     // Invochiamo il dispatcher di materializzazione in base al tipo
                     // Invochiamo il dispatcher di materializzazione in base al tipo
                     let reindexed = false;
@@ -168,7 +179,7 @@ export class RagSyncService {
                             await this.qdrant.deletePoint(collectionName, point.id);
                             pruned = true;
                             break;
-                        
+
                         case 'attack_summary':
                             const ip = payload.ip || payload.sourceRef.params?.ip;
                             if (ip) {
@@ -186,6 +197,17 @@ export class RagSyncService {
                                 const freshCampaign = await this.campaignService.getCampaignDetail(payload.sourceRef.params);
                                 if (freshCampaign) {
                                     await this.materializeCampaign(freshCampaign as any);
+                                    reindexed = true;
+                                }
+                            }
+                            break;
+
+                        case 'ip_details':
+                            const targetIp = payload.ip || payload.sourceRef.params?.ip;
+                            if (targetIp) {
+                                const fullIpData = await this.ipDetailsService.getIpDetails({ ip: targetIp });
+                                if (fullIpData) {
+                                    await this.syncIpDetails(fullIpData.ipDetails as any, null, fullIpData.abuseReports);
                                     reindexed = true;
                                 }
                             }
@@ -217,7 +239,7 @@ export class RagSyncService {
             return stats;
         } catch (error) {
             this.logger.error(`[RagSync] Error during re-indexing obsolete points: ${error.message}`);
-            return stats;
+            throw error;
         }
     }
 
@@ -226,7 +248,7 @@ export class RagSyncService {
      */
     private async flushLogBuffer() {
         if (this.logBuffer.length === 0) return;
-        
+
         if (this.batchTimer) {
             clearTimeout(this.batchTimer);
             this.batchTimer = null;
@@ -242,21 +264,22 @@ export class RagSyncService {
             for (const log of logsToProcess) {
                 const narrative = this.translator.translateThreatLog(log);
                 const vector = await this.ollama.getEmbedding(narrative);
-                
+
+                const logId = log._id ? log._id.toString() : stringToUuid(`log-${log.timestamp}-${log.request?.ip}`);
+
                 const payload: ThreatLogPayload = {
                     type: 'threat_log',
                     status: log.status,
-                    mongoId: log._id.toString(),
+                    mongoId: logId,
                     ip: log.request?.ip || 'N/A',
                     timestamp: log.timestamp,
                     score: log.fingerprint?.score || 0,
                     text: narrative,
                     materializedAt: new Date(),
-                    schemaVersion: semverToId(this.config.ragSchemaVersion),
                     sourceRef: {
-                        endpoint: RAG_POLICIES.LOGS.apiRef.endpoint.replace(':id', log._id.toString()),
+                        endpoint: RAG_POLICIES.LOGS.apiRef.endpoint.replace(':id', logId),
                         method: RAG_POLICIES.LOGS.apiRef.method,
-                        params: { type: 'log', id: log._id.toString() }
+                        params: { type: 'log', id: logId }
                     },
                     // Campi DTO estesi
                     protocol: log.protocol,
@@ -270,7 +293,7 @@ export class RagSyncService {
                 };
 
                 points.push({
-                    id: stringToUuid(log._id.toString()),
+                    id: stringToUuid(logId),
                     vector: vector,
                     payload
                 });
@@ -300,14 +323,16 @@ export class RagSyncService {
             const vector = await this.ollama.getEmbedding(narrative);
 
             // 3. Upsert su Qdrant
+            const rawId = ipDetails._id || (ipDetails as any).id;
+            const stringId = rawId ? rawId.toString() : stringToUuid(`ip-${ipDetails.ip}`);
+
             const payload: IpDetailsPayload = {
                 type: 'ip_details',
-                mongoId: ipDetails._id.toString(),
+                mongoId: stringId,
                 ip: ipDetails.ip,
                 lastSeen: ipDetails.lastSeenAt,
                 text: narrative,
                 materializedAt: new Date(),
-                schemaVersion: semverToId(this.config.ragSchemaVersion),
                 sourceRef: {
                     endpoint: RAG_POLICIES.IP_DETAILS.apiRef.endpoint,
                     method: RAG_POLICIES.IP_DETAILS.apiRef.method,
@@ -324,7 +349,7 @@ export class RagSyncService {
             };
 
             await this.qdrant.upsertPoints(this.COLL_INTELLIGENCE, [{
-                id: stringToUuid(ipDetails._id.toString()),
+                id: stringToUuid(stringId),
                 vector: vector,
                 payload
             }]);
@@ -340,7 +365,7 @@ export class RagSyncService {
     public async materializeCampaign(campaign: CampaignDTO, options: { isAiEnabled?: boolean } = {}) {
         try {
             this.logger.debug(`[RagSync] Materializing summary for campaign: ${campaign.hash}`);
-            
+
             // 1. Narrazione Tecnica (Deterministica)
             const technicalNarrative = this.translator.translateCampaign(campaign);
             let finalContent = technicalNarrative;
@@ -358,24 +383,24 @@ export class RagSyncService {
                     this.logger.warn(`[RagSync] AI Generation failed for campaign ${campaign.hash}, falling back to technical data: ${aiErr.message}`);
                 }
             }
-            
+
             // 3. Embedding
             const vector = await this.ollama.getEmbedding(finalContent);
-            
+
             // 4. Source Reference per la tracciabilità agentica
             const bufferMs = 60 * 60 * 1000; // 1 ora di buffer per garantire inclusione
-            
+
             const firstSeenDate = campaign.firstSeen ? new Date(campaign.firstSeen) : null;
             const lastSeenDate = campaign.lastSeen ? new Date(campaign.lastSeen) : null;
-            
-            const startTime = (firstSeenDate && !isNaN(firstSeenDate.getTime())) 
-                ? new Date(firstSeenDate.getTime() - bufferMs).toISOString() 
+
+            const startTime = (firstSeenDate && !isNaN(firstSeenDate.getTime()))
+                ? new Date(firstSeenDate.getTime() - bufferMs).toISOString()
                 : undefined;
-            const endTime = (lastSeenDate && !isNaN(lastSeenDate.getTime())) 
-                ? new Date(lastSeenDate.getTime() + bufferMs).toISOString() 
+            const endTime = (lastSeenDate && !isNaN(lastSeenDate.getTime()))
+                ? new Date(lastSeenDate.getTime() + bufferMs).toISOString()
                 : undefined;
 
-            const params: CampaignSourceParams = { 
+            const params: CampaignSourceParams = {
                 type: 'campaign',
                 hash: campaign.hash,
                 minScore: RAG_POLICIES.CAMPAIGNS.minScore,
@@ -393,7 +418,7 @@ export class RagSyncService {
                 method: RAG_POLICIES.CAMPAIGNS.apiRef.method,
                 params
             };
-            
+
             await this.syncCampaignSummary(campaign, finalContent, vector, sourceRef);
             return true;
         } catch (error) {
@@ -434,18 +459,18 @@ export class RagSyncService {
 
             // 4. Source Reference per la tracciabilità agentica
             const bufferMs = 60 * 60 * 1000; // 1 ora di buffer
-            
+
             const firstSeenDate = attack.firstSeen ? new Date(attack.firstSeen) : null;
             const lastSeenDate = attack.lastSeen ? new Date(attack.lastSeen) : null;
 
-            const startTime = (firstSeenDate && !isNaN(firstSeenDate.getTime())) 
-                ? new Date(firstSeenDate.getTime() - bufferMs).toISOString() 
+            const startTime = (firstSeenDate && !isNaN(firstSeenDate.getTime()))
+                ? new Date(firstSeenDate.getTime() - bufferMs).toISOString()
                 : undefined;
-            const endTime = (lastSeenDate && !isNaN(lastSeenDate.getTime())) 
-                ? new Date(lastSeenDate.getTime() + bufferMs).toISOString() 
+            const endTime = (lastSeenDate && !isNaN(lastSeenDate.getTime()))
+                ? new Date(lastSeenDate.getTime() + bufferMs).toISOString()
                 : undefined;
 
-            const params: AttackSourceParams = { 
+            const params: AttackSourceParams = {
                 type: 'attack',
                 ip: ip,
                 minLogsForAttack: RAG_POLICIES.ATTACKS.minLogs,
@@ -489,12 +514,11 @@ export class RagSyncService {
                 protocols: campaign.protocols || [],
                 text: aiSummary,
                 materializedAt: new Date(),
-                schemaVersion: semverToId(this.config.ragSchemaVersion),
                 status: campaign.status,
                 sourceRef: sourceRef || {
                     endpoint: RAG_POLICIES.CAMPAIGNS.apiRef.endpoint,
                     method: RAG_POLICIES.CAMPAIGNS.apiRef.method,
-                    params: { 
+                    params: {
                         type: 'campaign',
                         hash: campaign.hash,
                         minScore: RAG_POLICIES.CAMPAIGNS.minScore,
@@ -502,11 +526,11 @@ export class RagSyncService {
                         protocol: campaign.protocols?.length === 1 ? campaign.protocols[0] : null,
                         timeConfig: {
                             timeMode: (campaign.firstSeen && campaign.lastSeen) ? 'range' : 'ago',
-                            startTime: (campaign.firstSeen && !isNaN(new Date(campaign.firstSeen).getTime())) 
-                                ? new Date(new Date(campaign.firstSeen).getTime() - 3600000).toISOString() 
+                            startTime: (campaign.firstSeen && !isNaN(new Date(campaign.firstSeen).getTime()))
+                                ? new Date(new Date(campaign.firstSeen).getTime() - 3600000).toISOString()
                                 : undefined,
-                            endTime: (campaign.lastSeen && !isNaN(new Date(campaign.lastSeen).getTime())) 
-                                ? new Date(new Date(campaign.lastSeen).getTime() + 3600000).toISOString() 
+                            endTime: (campaign.lastSeen && !isNaN(new Date(campaign.lastSeen).getTime()))
+                                ? new Date(new Date(campaign.lastSeen).getTime() + 3600000).toISOString()
                                 : undefined
                         } as any
                     }
@@ -546,22 +570,21 @@ export class RagSyncService {
                 averageScore: attack.averageScore || 0,
                 text: aiSummary,
                 materializedAt: new Date(),
-                schemaVersion: semverToId(this.config.ragSchemaVersion),
                 status: attack.status,
                 sourceRef: sourceRef || {
                     endpoint: RAG_POLICIES.ATTACKS.apiRef.endpoint,
                     method: RAG_POLICIES.ATTACKS.apiRef.method,
-                    params: { 
+                    params: {
                         type: 'attack',
                         ip: ip as string,
                         minLogsForAttack: RAG_POLICIES.ATTACKS.minLogs,
                         timeConfig: {
                             timeMode: (attack.firstSeen && attack.lastSeen) ? 'range' : 'ago',
-                            startTime: (attack.firstSeen && !isNaN(new Date(attack.firstSeen).getTime())) 
-                                ? new Date(new Date(attack.firstSeen).getTime() - 3600000).toISOString() 
+                            startTime: (attack.firstSeen && !isNaN(new Date(attack.firstSeen).getTime()))
+                                ? new Date(new Date(attack.firstSeen).getTime() - 3600000).toISOString()
                                 : undefined,
-                            endTime: (attack.lastSeen && !isNaN(new Date(attack.lastSeen).getTime())) 
-                                ? new Date(new Date(attack.lastSeen).getTime() + 3600000).toISOString() 
+                            endTime: (attack.lastSeen && !isNaN(new Date(attack.lastSeen).getTime()))
+                                ? new Date(new Date(attack.lastSeen).getTime() + 3600000).toISOString()
                                 : undefined
                         } as any
                     }
@@ -613,8 +636,15 @@ export class RagSyncService {
 
     private checkOperational(): boolean {
         if (!this.config.ragEnabled) return false;
-        if (!this.initializationAttempted) return false;
-        return this.isOperational;
+        if (!this.initializationAttempted) {
+            this.logger.warn('[RagSync] System not operational: initialization not attempted yet.');
+            return false;
+        }
+        if (!this.isOperational) {
+            this.logger.warn('[RagSync] System not operational: initialization failed or connection lost.');
+            return false;
+        }
+        return true;
     }
 
     private handleOperationError(operation: string, error: any) {
@@ -628,7 +658,8 @@ export class RagSyncService {
             initializationAttempted: this.initializationAttempted,
             enabled: this.config.ragEnabled,
             intelligenceCollection: this.COLL_INTELLIGENCE,
-            logsCollection: this.COLL_LOGS
+            logsCollection: this.COLL_LOGS,
+            thresholdDays: this.config.ragReindexThresholdDays
         };
     }
 

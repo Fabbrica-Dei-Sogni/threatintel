@@ -39,6 +39,7 @@
               :placeholder="t('common.search').toUpperCase() + '...'" 
               class="cyber-input-mini"
             />
+            <button v-if="searchQuery" class="clear-search-btn" @click="searchQuery = ''">×</button>
           </div>
           <div class="sort-controls">
             <button 
@@ -145,6 +146,7 @@ const loadUris = async () => {
       protocol: props.protocol,
       minIps: props.minIps,
       minScore: props.minScore,
+      search: searchQuery.value,
       ...props.timeConfig
     };
     
@@ -297,6 +299,28 @@ function clearUris() {
 .cyber-input-mini:focus {
   border-color: #00FF41;
   background: rgba(0, 0, 0, 0.6);
+}
+
+.clear-search-btn {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: #00FF41;
+  font-size: 1rem;
+  cursor: pointer;
+  opacity: 0.5;
+  transition: opacity 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.clear-search-btn:hover {
+  opacity: 1;
+  text-shadow: 0 0 8px #00FF41;
 }
 
 .sort-controls {

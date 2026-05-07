@@ -217,6 +217,8 @@
         "months": "Months",
         "years": "Years",
         "filterByIp": "Filter by IP...",
+        "searchPlaceholder": "Search patterns, URLs, User Agents...",
+        "globalSearch": "GLOBAL SEARCH",
         "clearIpFilter": "Clear IP filter",
         "copyToFilter": "Copy to IP filter and execute",
         "noAttacksFound": "No anomalies found",
@@ -278,7 +280,8 @@
         "profileTitle": "Anomaly Profile",
         "mapTitle": "Anomaly Map",
         "radarTitle": "Radar Analysis",
-        "searchUrlPlaceholder": "Filter by URL..."
+        "searchUrlPlaceholder": "Filter by URL...",
+        "userAgent": "User Agent"
     },
     "campaigns": {
         "title": "Campaigns",

@@ -17,6 +17,7 @@ export interface IpDetailsDTO {
     ipinfo: Record<string, any> | null;
     whois_raw: string | null;
     abuseipdbId?: any;
+    id?: string;
 }
 
 export class IpDetailsMapper {
@@ -30,7 +31,8 @@ export class IpDetailsMapper {
             enrichedAt: obj.enrichedAt,
             ipinfo: obj.ipinfo,
             whois_raw: SanitizationUtils.sanitizeRawString(obj.whois_raw),
-            abuseipdbId: obj.abuseipdbId
+            abuseipdbId: obj.abuseipdbId,
+            id: obj._id?.toString()
         };
     }
 }

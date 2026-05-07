@@ -29,7 +29,7 @@ export const getApiUrl = (): string => {
 
 export const apiClient = axios.create({
     baseURL: getApiUrl(),
-    timeout: 30000,
+    timeout: 90000, // Aumentato a 90s per gestire i tempi di risposta dell'AI su VPS
 });
 
 // Interceptor per gestire cambiamenti a runtime e iniettare il token

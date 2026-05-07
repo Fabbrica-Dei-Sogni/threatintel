@@ -29,6 +29,7 @@ export class DistributedGroupingStage implements PipelineStage {
                                 method: '$request.method',
                                 url: '$request.url',
                                 ip: '$request.ip',
+                                userAgent: '$request.userAgent',
                                 headers: '$request.headers',
                                 body: '$request.body',
                                 query: '$request.query'

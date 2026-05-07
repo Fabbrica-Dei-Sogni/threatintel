@@ -32,7 +32,7 @@ export class FingerprintAnalysisStage implements PipelineStage {
                                             $map: {
                                                 input: '$logsRaggruppati',
                                                 as: 'log',
-                                                in: { $ifNull: ['$$log.request.headers.user-agent', 'unknown'] }
+                                                in: { $ifNull: ['$$log.request.userAgent', 'unknown'] }
                                             }
                                         },
                                         [] // $setUnion richiede array di arrays

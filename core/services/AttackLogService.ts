@@ -255,9 +255,10 @@ export class AttackLogService {
                         { protocol: { $exists: false } },
                         { protocol: null }
                     ];
-                } else {
+                } else if (value && value !== 'all') {
                     mongoFilters[key] = value;
                 }
+                // Se è 'all', null o undefined, non applichiamo il filtro protocollo
             } else if (key === 'attackPatterns' && typeof value === 'string') {
                 // Global Behavioral Search: search in patterns, user agents and URLs
                 const words = value.trim().split(/\s+/).filter(w => w.length > 0);

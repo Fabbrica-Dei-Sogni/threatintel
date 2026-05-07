@@ -5,6 +5,7 @@ import { useAttacksStore } from '../stores/attacks';
 import { useJobStore } from '../stores/jobs';
 import { ElNotification } from 'element-plus';
 import { useI18n } from 'vue-i18n';
+import { SocketEvents } from '../models/SocketEvents';
 
 /**
  * useSocket - Composable per gestire gli eventi real-time globali.
@@ -21,14 +22,14 @@ export function useSocket() {
         if (!socketStore.socket) return;
 
         // A. Tactical Engine & Job Progress
-        socketStore.socket.on('system:status_update', (status: string) => {
+        socketStore.socket.on(SocketEvents.SYSTEM_STATUS_UPDATE, (status: string) => {
             console.log('[Socket] Engine Status Update:', status);
             if (dashboardStore.state) {
                 dashboardStore.state.engineStatus = status;
             }
         });
 
-        socketStore.socket.on('system:job_progress', (data: any) => {
+        socketStore.socket.on(SocketEvents.SYSTEM_JOB_PROGRESS, (data: any) => {
             console.log('[Socket] Job Progress:', data);
             
             // Aggiorna lo store dei job per il monitoraggio in tempo reale
@@ -65,7 +66,7 @@ export function useSocket() {
         });
 
         // B. Live Intel Stream
-        socketStore.socket.on('intel:attack_detected', (attack: any) => {
+        socketStore.socket.on(SocketEvents.INTEL_ATTACK_DETECTED, (attack: any) => {
             console.log('[Socket] New Attack Detected:', attack);
             
             // Aggiungi alla lista dei recenti nella dashboard (se siamo in Home)
@@ -93,7 +94,7 @@ export function useSocket() {
             }
         });
         
-        socketStore.socket.on('intel:new_log', (log: any) => {
+        socketStore.socket.on(SocketEvents.INTEL_NEW_LOG, (log: any) => {
             console.log('[Socket] New Log Detected:', log);
             
             if (dashboardStore.state.recentLogs) {

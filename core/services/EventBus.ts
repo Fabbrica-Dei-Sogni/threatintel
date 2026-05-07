@@ -16,7 +16,8 @@ export enum AppEvents {
     LOGS_STATUS_UPDATE_REQUESTED = 'logs.status.update.requested',
     LOGS_STATUS_UPDATED = 'logs.status.updated',
     JOB_PROGRESS = 'system.job.progress',
-    SYSTEM_STATUS_UPDATED = 'system.status.updated'
+    SYSTEM_STATUS_UPDATED = 'system.status.updated',
+    AI_RESPONSE_GENERATED = 'ai.response.generated'
 }
 
 /**

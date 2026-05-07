@@ -8,10 +8,10 @@ export interface NewsItem {
 }
 
 /**
- * Logica agentica per la generazione di news basata su dati real-time e RAG.
+ * Triggera la generazione agentica delle news basata su dati real-time e RAG.
+ * Non restituisce i risultati direttamente, poiché questi verranno ricevuti via Socket.io.
  */
-export async function generateAgenticNews(props: any, currentLocale: string, t: (key: string, params?: any) => string): Promise<NewsItem[]> {
-  const list: NewsItem[] = [];
+export async function triggerAgenticNews(props: any, currentLocale: string, t: (key: string, params?: any) => string): Promise<void> {
   const promises: Promise<void>[] = [];
 
   const addNewsPromise = (promptKey: string, params: any, meta: any = {}, searchQuery: string | null = null) => {
@@ -25,14 +25,11 @@ export async function generateAgenticNews(props: any, currentLocale: string, t: 
       : ask(t(`home.breakingNews.prompts.${promptKey}`, { ...params, locale: 'it-IT' }));
 
     const p = flow
-      .then(async (res: any) => {
-        const rawText = res.answer || res.response || '';
-        if (rawText) {
-          const translatedText = await translateFromIt(rawText, currentLocale);
-          list.push({ text: translatedText, ...meta });
-        }
+      .then(() => {
+        // Notifica di invio completato, ma il risultato arriverà via socket
+        console.debug(`[NewsGenerator] Triggered AI for ${promptKey}`);
       })
-      .catch(err => console.error(`[NewsGenerator] AI Error for ${promptKey}:`, err));
+      .catch(err => console.error(`[NewsGenerator] AI Trigger Error for ${promptKey}:`, err));
     promises.push(p);
   };
 
@@ -80,7 +77,6 @@ export async function generateAgenticNews(props: any, currentLocale: string, t: 
   }
 
   await Promise.allSettled(promises);
-  return list;
 }
 
 /**

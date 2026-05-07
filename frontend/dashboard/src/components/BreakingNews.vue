@@ -39,7 +39,10 @@
 import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import CountryFlag from './CountryFlag.vue';
-import { generateAgenticNews, generateStaticFallback } from './NewsGenerator';
+import { triggerAgenticNews, generateStaticFallback } from './NewsGenerator';
+import { translateFromIt } from '../utils/translator';
+import { useSocketStore } from '../stores/socket';
+import { SocketEvents } from '../models/SocketEvents';
 
 const props = defineProps({
   attacks: {
@@ -66,6 +69,7 @@ const props = defineProps({
 });
 
 const { t, locale } = useI18n();
+const socketStore = useSocketStore();
 
 const currentHeadlineIndex = ref(0);
 const typedText = ref('');
@@ -76,31 +80,63 @@ let rotationInterval = null;
 
 /**
  * Aggiorna le news utilizzando la logica incubata in NewsGenerator
+ * Ora fa solo il trigger, i risultati arrivano via socket.
  */
 const updateNews = async () => {
   // 1. Fonte principale: Carichiamo subito le news statiche (veloci e affidabili)
-  const staticNews = generateStaticFallback(props, t);
-  aiHeadlines.value = staticNews;
+  // const staticNews = generateStaticFallback(props, t);
+  // aiHeadlines.value = staticNews;
 
   try {
-    // 2. Fonte a corredo: Avviamo la generazione agentica in background
-    const agenticList = await generateAgenticNews(props, locale.value, t);
-    
-    if (agenticList.length > 0) {
-      // Se avevamo solo il messaggio di "sistema in attesa", lo sostituiamo con le news reali
-      const isIdle = staticNews.length === 1 && staticNews[0].text === t('home.system_idle');
+    // 2. Fonte a corredo: Triggeriamo la generazione agentica
+    await triggerAgenticNews(props, locale.value, t);
+  } catch (err) {
+    console.error('[BreakingNews] Agentic trigger failed:', err);
+  }
+};
+
+/**
+ * Gestisce l'integrazione con Socket.io per news in tempo reale
+ */
+const setupSocketListeners = () => {
+  if (!socketStore.socket) return;
+
+  // A. Risposte AI in tempo reale (Giro di eventi RAG/Assistant)
+  socketStore.socket.on(SocketEvents.INTEL_AI_RESPONSE, async (data) => {
+    if (data.answer) {
+      // Se avevamo solo il messaggio di "sistema in attesa", lo puliamo al primo arrivo AI
+      const isIdle = aiHeadlines.value.length === 1 && aiHeadlines.value[0].text === t('home.system_idle');
       
-      if (isIdle) {
-        aiHeadlines.value = agenticList;
-      } else {
-        // Altrimenti aggiungiamo le news AI a corredo di quelle statiche
-        aiHeadlines.value = [...staticNews, ...agenticList];
+      try {
+          // Traducono la risposta AI nella lingua corrente del frontend
+          const translatedText = await translateFromIt(data.answer, locale.value);
+          
+          const newsItem = { 
+            text: translatedText, 
+            icon: '🤖',
+            isLive: true 
+          };
+
+          if (isIdle) {
+            aiHeadlines.value = [newsItem];
+          } else {
+            // Aggiungiamo in testa per dare visibilità immediata, evitando duplicati esatti
+            const exists = aiHeadlines.value.some(h => h.text === translatedText);
+            if (!exists) {
+                aiHeadlines.value = [newsItem, ...aiHeadlines.value].slice(0, 15);
+            }
+          }
+          
+          // Se siamo in typewriter e abbiamo appena ricevuto una news, forziamo la visualizzazione
+          if (props.mode === 'typewriter' && aiHeadlines.value.length === 1) {
+             currentHeadlineIndex.value = 0;
+             typeText(newsItem.text);
+          }
+      } catch (err) {
+          console.error('[BreakingNews] Translation failed for AI response:', err);
       }
     }
-  } catch (err) {
-    console.error('[BreakingNews] Agentic supplement failed:', err);
-    // In caso di errore, restano visibili le news statiche già caricate
-  }
+  });
 };
 
 const headlines = computed(() => aiHeadlines.value.length > 0 ? aiHeadlines.value : [{ text: t('common.loading'), icon: '⏳' }]);
@@ -142,13 +178,20 @@ const startRotation = () => {
   }, 7000);
 };
 
+const cleanupSocketListeners = () => {
+  if (!socketStore.socket) return;
+  socketStore.socket.off(SocketEvents.INTEL_AI_RESPONSE);
+};
+
 onMounted(async () => {
   await updateNews();
+  setupSocketListeners();
   startRotation();
 });
 
 onBeforeUnmount(() => {
   if (rotationInterval) clearInterval(rotationInterval);
+  cleanupSocketListeners();
 });
 
 watch([() => props.attacks.length, locale], async () => {

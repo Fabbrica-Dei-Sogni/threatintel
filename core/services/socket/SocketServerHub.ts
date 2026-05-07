@@ -4,6 +4,7 @@ import { inject, singleton } from "tsyringe";
 import { Logger } from "winston";
 import * as Tokens from "../../di/tokens";
 import { allowedOrigins } from "../../config";
+import { SocketEvents } from "../../types/SocketEvents";
 
 /**
  * SocketServerHub - Gestore dell'infrastruttura Socket.io.
@@ -61,8 +62,8 @@ export class SocketServerHub {
             });
 
             // Endpoint di ping per debug
-            socket.on("ping:check", () => {
-                socket.emit("pong:check", { timestamp: new Date().toISOString() });
+            socket.on(SocketEvents.PING_CHECK, () => {
+                socket.emit(SocketEvents.PONG_CHECK, { timestamp: new Date().toISOString() });
             });
         });
     }

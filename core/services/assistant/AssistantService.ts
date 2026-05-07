@@ -10,6 +10,7 @@ import { ThreatLogService } from '../ThreatLogService';
 import { AttackLogService } from '../AttackLogService';
 import { CampaignService } from '../CampaignService';
 import { IpDetailsService } from '../IpDetailsService';
+import { EventBus, AppEvents } from '../EventBus';
 import { RAG_TEMPLATES } from './RagTemplates';
 import {
     RagSearchHit,
@@ -39,6 +40,7 @@ export class AssistantService {
         @inject(Tokens.CAMPAIGN_SERVICE_TOKEN) private readonly campaignService: CampaignService,
         @inject(Tokens.IP_DETAILS_SERVICE_TOKEN) private readonly ipDetailsService: IpDetailsService,
         @inject(Tokens.RAG_TRANSLATION_TOKEN) private readonly ragTranslation: RagTranslationService,
+        @inject(Tokens.EVENT_BUS_TOKEN) private readonly eventBus: EventBus,
         @inject(Tokens.CONFIG_PROVIDER_TOKEN) private readonly config: AppConfigProvider
     ) { }
 
@@ -156,11 +158,16 @@ export class AssistantService {
 
         const answer = await this.ollama.generate(prompt);
 
-        return {
+        const response = {
             question,
             answer,
             sources: hits
         };
+
+        // Emettiamo l'evento asincrono via EventBus per il bridge socket
+        this.eventBus.emit(AppEvents.AI_RESPONSE_GENERATED, response);
+
+        return response;
     }
 
     /**

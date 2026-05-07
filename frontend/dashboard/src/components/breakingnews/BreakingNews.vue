@@ -40,9 +40,7 @@ import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import CountryFlag from '../CountryFlag.vue';
 import { triggerAgenticNews, generateStaticFallback } from './NewsGenerator';
-import { translateFromIt } from '../../utils/translator';
-import { useSocketStore } from '../../stores/socket';
-import { SocketEvents } from '../../models/SocketEvents';
+import { useNewsStore } from '../../stores/news';
 
 const props = defineProps({
   attacks: {
@@ -69,13 +67,12 @@ const props = defineProps({
 });
 
 const { t, locale } = useI18n();
-const socketStore = useSocketStore();
+const newsStore = useNewsStore();
 
 const currentHeadlineIndex = ref(0);
 const typedText = ref('');
 const isTyping = ref(false);
 const contentRef = ref(null);
-const aiHeadlines = ref([]); // Reattivo per le news generate dall'AI
 let rotationInterval = null;
 let lastFullTriggerTime = 0;
 const TRIGGER_COOLDOWN_MS = 60000; // Al massimo un giro completo ogni 60 secondi
@@ -88,7 +85,7 @@ let debounceTimer = null;
 const updateNews = async (force = false) => {
   // 1. Fonte principale: Carichiamo subito le news statiche (veloci e affidabili)
   const staticNews = generateStaticFallback(props, t);
-  aiHeadlines.value = staticNews;
+  newsStore.setHeadlines(staticNews);
 
   // 2. Controllo Cooldown per evitare spam di chiamate AI (ask)
   const now = Date.now();
@@ -114,52 +111,9 @@ const debouncedUpdate = () => {
   }, 2000); // Aspettiamo che i dati si stabilizzino per 2 secondi
 };
 
-/**
- * Gestisce l'integrazione con Socket.io per news in tempo reale
- */
-const setupSocketListeners = () => {
-  const socket = socketStore.socket;
-  if (!socket) return;
+// Gestione integrazione socket spostata in useSocket.ts
 
-  // A. Risposte AI in tempo reale (Giro di eventi RAG/Assistant)
-  socket.on(SocketEvents.INTEL_AI_RESPONSE, async (data) => {
-    if (data.answer) {
-      // Se avevamo solo il messaggio di "sistema in attesa", lo puliamo al primo arrivo AI
-      const isIdle = aiHeadlines.value.length === 1 && aiHeadlines.value[0].text === t('home.system_idle');
-
-      try {
-        // Traducono la risposta AI nella lingua corrente del frontend
-        const translatedText = await translateFromIt(data.answer, locale.value);
-
-        const newsItem = {
-          text: translatedText,
-          icon: '🤖',
-          isLive: true
-        };
-
-        if (isIdle) {
-          aiHeadlines.value = [newsItem];
-        } else {
-          // Aggiungiamo in testa per dare visibilità immediata, evitando duplicati esatti
-          const exists = aiHeadlines.value.some(h => h.text === translatedText);
-          if (!exists) {
-            aiHeadlines.value = [newsItem, ...aiHeadlines.value].slice(0, 15);
-          }
-        }
-
-        // Se siamo in typewriter e abbiamo appena ricevuto una news, forziamo la visualizzazione
-        if (props.mode === 'typewriter' && aiHeadlines.value.length === 1) {
-          currentHeadlineIndex.value = 0;
-          typeText(newsItem.text);
-        }
-      } catch (err) {
-        console.error('[BreakingNews] Translation failed for AI response:', err);
-      }
-    }
-  });
-};
-
-const headlines = computed(() => aiHeadlines.value.length > 0 ? aiHeadlines.value : [{ text: t('common.loading'), icon: '⏳' }]);
+const headlines = computed(() => newsStore.aiHeadlines.length > 0 ? newsStore.aiHeadlines : [{ text: t('common.loading'), icon: '⏳' }]);
 const doubleHeadlines = computed(() => [...headlines.value, ...headlines.value]);
 const currentHeadline = computed(() => headlines.value[currentHeadlineIndex.value]);
 
@@ -198,18 +152,7 @@ const startRotation = () => {
   }, 7000);
 };
 
-const cleanupSocketListeners = () => {
-  if (!socketStore.socket) return;
-  socketStore.socket.off(SocketEvents.INTEL_AI_RESPONSE);
-};
-
-// Monitoriamo la disponibilità del socket (gestisce caricamento ritardato in App.vue)
-watch(() => socketStore.socket, (newSocket) => {
-  if (newSocket) {
-    cleanupSocketListeners();
-    setupSocketListeners();
-  }
-}, { immediate: true });
+// Watcher rimosso: la sottoscrizione ai socket è ora gestita globalmente
 
 onMounted(async () => {
   debouncedUpdate();
@@ -219,13 +162,18 @@ onMounted(async () => {
 onBeforeUnmount(() => {
   if (rotationInterval) clearInterval(rotationInterval);
   if (debounceTimer) clearTimeout(debounceTimer);
-  cleanupSocketListeners();
 });
 
-watch([() => props.attacks.length, locale], () => {
-  debouncedUpdate();
-  currentHeadlineIndex.value = 0;
-  startRotation();
+watch([() => props.attacks.length, locale, () => newsStore.aiHeadlines.length], ([attLen, loc, newsLen], [oldAttLen, oldLoc, oldNewsLen]) => {
+  if (attLen !== oldAttLen || loc !== oldLoc) {
+    debouncedUpdate();
+  }
+  
+  // Se arrivano news live e siamo in typewriter, resettiamo per mostrarle
+  if (newsLen > oldNewsLen && props.mode === 'typewriter') {
+    currentHeadlineIndex.value = 0;
+    startRotation();
+  }
 });
 </script>
 

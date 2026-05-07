@@ -6,6 +6,8 @@ import { useJobStore } from '../stores/jobs';
 import { ElNotification } from 'element-plus';
 import { useI18n } from 'vue-i18n';
 import { SocketEvents } from '../models/SocketEvents';
+import { useNewsStore } from '../stores/news';
+import { translateFromIt } from '../utils/translator';
 
 /**
  * useSocket - Composable per gestire gli eventi real-time globali.
@@ -16,7 +18,8 @@ export function useSocket() {
     const dashboardStore = useDashboardStore();
     const attacksStore = useAttacksStore();
     const jobStore = useJobStore();
-    const { t } = useI18n();
+    const newsStore = useNewsStore();
+    const { t, locale } = useI18n();
 
     const setupListeners = () => {
         if (!socketStore.socket) return;
@@ -98,6 +101,24 @@ export function useSocket() {
                     if (dashboardStore.state.recentLogs.length > 20) {
                         dashboardStore.state.recentLogs.pop();
                     }
+                }
+            }
+        });
+
+        // C. Agentic News Stream
+        socketStore.socket.on(SocketEvents.INTEL_AI_RESPONSE, async (data: any) => {
+            if (data.answer) {
+                try {
+                    // Traducono la risposta AI nella lingua corrente del frontend
+                    const translatedText = await translateFromIt(data.answer, locale.value);
+                    
+                    newsStore.addHeadline({
+                        text: translatedText,
+                        icon: '🤖',
+                        isLive: true
+                    });
+                } catch (err) {
+                    console.error('[Socket] Translation failed for AI response:', err);
                 }
             }
         });

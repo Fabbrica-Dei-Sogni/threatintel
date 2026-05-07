@@ -65,6 +65,14 @@ export interface SearchCampaignsArgs {
   status?: 'active' | 'archived' | 'deleted';
 }
 
+export interface SearchGetStatsArgs {
+  timeframe?: '24h' | '1w' | '1m' | '1y' | 'all';
+  minScore?: number;
+  limit?: number;
+  minLogs?: number;
+}
+
+
 
 export enum AssistantToolName {
   SEMANTIC_SEARCH = 'semantic_search',
@@ -83,10 +91,5 @@ export interface AssistantToolArgumentsMap {
   search_logs: SearchLogArgs;     // ← nuovo
   search_attacks: SearchAttacksArgs;     // ← nuovo
   search_campaigns: SearchCampaignsArgs; // ← nuovo  
-  get_stats: {
-    timeframe?: '24h' | '1w' | '1m' | '1y' | 'all';
-    minScore?: number;
-    limit?: number;
-    minLogs?: number;
-  };
+  get_stats: SearchGetStatsArgs;
 }

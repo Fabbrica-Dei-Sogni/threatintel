@@ -458,8 +458,8 @@ watch(() => profileStore.activeProfileId, () => {
 /* Decoupled Command Grid Styles (Imported from JobMonitor) */
 .commands-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 15px;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+    gap: 20px;
     margin-top: 15px;
 }
 
@@ -473,11 +473,11 @@ watch(() => profileStore.activeProfileId, () => {
     flex: 1;
     display: flex;
     align-items: center;
-    gap: 15px;
-    padding: 12px 18px;
+    gap: 20px;
+    padding: 16px 24px;
     background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 16px;
     cursor: pointer;
     text-align: left;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -568,8 +568,8 @@ watch(() => profileStore.activeProfileId, () => {
 
 .monitor-separator {
     height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
-    margin-bottom: 20px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    margin: 10px 0 25px 0;
 }
 
 /* Expand Transition */

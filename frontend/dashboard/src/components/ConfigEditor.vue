@@ -11,11 +11,8 @@
         <button class="action-icon-btn edit-btn" @click="startEdit" :title="$t('common.edit')">
           <span>📝</span>
         </button>
-        <button class="action-icon-btn delete-btn" @click="confirmDelete" :title="$t('common.delete')">
-          <span>🗑️</span>
-        </button>
-        <div class="expansion-indicator">
-          <span class="chevron">{{ isExpanded ? '▲' : '▼' }}</span>
+        <div class="expansion-indicator" :class="{ 'is-open': isExpanded }" @click="toggleExpanded" :title="isExpanded ? $t('common.collapse') : $t('common.expand')">
+          <span class="chevron">▼</span>
         </div>
       </div>
     </div>
@@ -100,20 +97,6 @@
         </div>
       </template>
     </div>
-
-    <!-- Confirmation Dialog (Still Modal as it is a Critical Action) -->
-    <div v-if="showDeleteConfirm" class="tactical-modal-overlay" @click.self="showDeleteConfirm = false">
-      <div class="delete-dialog card-glass">
-        <h3 class="error-accent">{{ $t('config.confirmDeleteTitle').toUpperCase() }}</h3>
-        <p class="dialog-msg">{{ $t('config.confirmDeleteMessage', { key: configKey }) }}</p>
-        <div class="dialog-actions-tactical">
-          <button class="btn btn-ghost-hud" @click="showDeleteConfirm = false">{{ $t('common.cancel').toUpperCase() }}</button>
-          <button class="btn btn-danger-hud" @click="executeDelete" :disabled="saving">
-            {{ (saving ? $t('common.loading') : $t('common.delete')).toUpperCase() }}
-          </button>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -138,7 +121,6 @@ const emit = defineEmits<{
 // State
 const isExpanded = ref(false);
 const isEditing = ref(false);
-const showDeleteConfirm = ref(false);
 
 // Edit state per lista
 const editTags = ref<string[]>([]);
@@ -271,15 +253,6 @@ function saveEdit() {
   emit('save', props.configKey, newValue);
   isEditing.value = false;
 }
-
-function confirmDelete() {
-  showDeleteConfirm.value = true;
-}
-
-function executeDelete() {
-  emit('delete', props.configKey);
-  showDeleteConfirm.value = false;
-}
 </script>
 
 <style scoped>
@@ -289,15 +262,16 @@ function executeDelete() {
   border-radius: 16px;
   margin-bottom: 15px;
   overflow: hidden;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   position: relative;
+  will-change: transform, box-shadow;
 }
 
 .algorithm-module:hover {
-  border-color: rgba(99, 102, 241, 0.3);
-  background: rgba(15, 23, 42, 0.6);
-  transform: translateY(-2px);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  border-color: rgba(99, 102, 241, 0.4);
+  background: rgba(15, 23, 42, 0.65);
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(99, 102, 241, 0.1);
 }
 
 .algorithm-module.is-expanded {
@@ -359,12 +333,13 @@ function executeDelete() {
 
 .action-icon-btn {
   background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  padding: 8px;
-  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
   cursor: pointer;
-  font-size: 0.9rem;
-  transition: all 0.2s;
+  font-size: 0.95rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -379,9 +354,39 @@ function executeDelete() {
 .delete-btn:hover { border-color: #f87171; }
 
 .expansion-indicator {
-  margin-left: 5px;
-  color: #64748b;
-  font-size: 0.7rem;
+  margin-left: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.expansion-indicator:hover {
+  background: rgba(99, 102, 241, 0.15);
+  border-color: rgba(99, 102, 241, 0.4);
+  color: #fff;
+}
+
+.expansion-indicator.is-open {
+  background: rgba(99, 102, 241, 0.2);
+  border-color: #6366f1;
+  color: #fff;
+  box-shadow: 0 0 15px rgba(99, 102, 241, 0.2);
+}
+
+.chevron {
+  font-size: 0.9rem;
+  transition: transform 0.3s ease;
+}
+
+.expansion-indicator.is-open .chevron {
+  transform: rotate(180deg);
 }
 
 /* Inline Editor Hud */
@@ -592,7 +597,7 @@ function executeDelete() {
 
 .tactical-kv-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 160px), 1fr));
   gap: 12px;
 }
 
@@ -716,5 +721,7 @@ function executeDelete() {
   .kv-sep { display: none; }
   .module-header { padding: 15px; }
   .module-content { padding: 0 15px 15px 15px; }
+  .tactical-add-row, .kv-add-tactical { flex-wrap: wrap; }
+  .tactical-add-row input, .kv-add-tactical input { width: 100%; }
 }
 </style>

@@ -680,6 +680,19 @@ export async function semanticSearch(query: string, options: any = {}): Promise<
     }
 }
 
+export async function ask(question: string, options: any = {}): Promise<any> {
+    try {
+        const response = await apiClient.post('/assistant/ask', {
+            question,
+            ...options
+        });
+        return response.data;
+    } catch (error) {
+        console.error('[ask] Error:', error);
+        throw error;
+    }
+}
+
 /**
  * Risolve un riferimento sorgente per ottenere i dati tecnici
  */

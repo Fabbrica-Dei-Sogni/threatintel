@@ -39,6 +39,7 @@
 import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import CountryFlag from './CountryFlag.vue';
+import { generateAgenticNews, generateStaticFallback } from './NewsGenerator';
 
 const props = defineProps({
   attacks: {
@@ -64,95 +65,51 @@ const props = defineProps({
   }
 });
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 
 const currentHeadlineIndex = ref(0);
 const typedText = ref('');
 const isTyping = ref(false);
 const contentRef = ref(null);
+const aiHeadlines = ref([]); // Reattivo per le news generate dall'AI
 let rotationInterval = null;
 
 /**
- * Helper to format IP with ISP if available
+ * Aggiorna le news utilizzando la logica incubata in NewsGenerator
  */
-const formatIpWithIsp = (ip, ipDetails) => {
-  const isp = ipDetails?.ipinfo?.org || ipDetails?.isp || ipDetails?.ipinfo?.isp;
-  if (isp) {
-    // Clean some common ISP prefixes/suffixes if needed (optional)
-    const cleanIsp = isp.replace(/^AS\d+\s+/, '');
-    return `${ip} (${cleanIsp})`;
+const updateNews = async () => {
+  // 1. Fonte principale: Carichiamo subito le news statiche (veloci e affidabili)
+  const staticNews = generateStaticFallback(props, t);
+  aiHeadlines.value = staticNews;
+
+  try {
+    // 2. Fonte a corredo: Avviamo la generazione agentica in background
+    const agenticList = await generateAgenticNews(props, locale.value, t);
+    
+    if (agenticList.length > 0) {
+      // Se avevamo solo il messaggio di "sistema in attesa", lo sostituiamo con le news reali
+      const isIdle = staticNews.length === 1 && staticNews[0].text === t('home.system_idle');
+      
+      if (isIdle) {
+        aiHeadlines.value = agenticList;
+      } else {
+        // Altrimenti aggiungiamo le news AI a corredo di quelle statiche
+        aiHeadlines.value = [...staticNews, ...agenticList];
+      }
+    }
+  } catch (err) {
+    console.error('[BreakingNews] Agentic supplement failed:', err);
+    // In caso di errore, restano visibili le news statiche già caricate
   }
-  return ip;
 };
 
-const headlines = computed(() => {
-  const list = [];
-
-  // 1. Geopolitical Narrative
-  if (props.attacks.length > 0) {
-    const countries = props.attacks.map(a => a.ipDetails?.ipinfo?.country || a.ipDetails?.country).filter(Boolean);
-    if (countries.length > 0) {
-      const counts = countries.reduce((acc, c) => ({ ...acc, [c]: (acc[c] || 0) + 1 }), {});
-      const topCountry = Object.keys(counts).reduce((a, b) => counts[a] > counts[b] ? a : b);
-      list.push({ text: t('home.breakingNews.topCountry', { country: topCountry }), countryCode: topCountry });
-    }
-  }
-
-  // 2. Recent Attack IPs
-  if (props.attacks.length >= 3) {
-    const formattedIps = props.attacks.slice(0, 3).map(a => formatIpWithIsp(a.request?.ip, a.ipDetails)).join(', ');
-    list.push({ text: t('home.breakingNews.lastAttacks', { ips: formattedIps }), icon: '🛰️' });
-  }
-
-  // 3. Persistent Actor Intelligence (Sessions)
-  if (props.sessions.length > 0) {
-    const mostActive = [...props.sessions].sort((a, b) => (b.eventCount || 0) - (a.eventCount || 0))[0];
-    if (mostActive && (mostActive.eventCount || 0) > 2) {
-      const formattedActor = formatIpWithIsp(mostActive.src_ip, mostActive.ipDetailsId);
-      list.push({
-        text: t('home.breakingNews.mostActiveSession', { ip: formattedActor, count: mostActive.eventCount || 0 }),
-        icon: '📟',
-        countryCode: mostActive.ipDetailsId?.ipinfo?.country || mostActive.ipDetailsId?.country
-      });
-    }
-  }
-
-  // 4. Recent Session IPs
-  if (props.sessions.length >= 3) {
-    const formattedIps = props.sessions.slice(0, 3).map(s => formatIpWithIsp(s.src_ip, s.ipDetailsId)).join(', ');
-    list.push({ text: t('home.breakingNews.lastSessions', { ips: formattedIps }), icon: '📟' });
-  }
-
-  // 5. Critical Incursion Alert
-  if (props.attacks.length > 0) {
-    const critical = props.attacks.find(a => a.dangerLevel >= 4);
-    if (critical) {
-      const formattedIp = formatIpWithIsp(critical.request?.ip, critical.ipDetails);
-      list.push({ text: t('home.breakingNews.criticalAlert', { ip: formattedIp }), icon: '⚠️' });
-    }
-  }
-
-  // 6. Emerging Traffic Pattern
-  if (props.logs.length > 0) {
-    const specificUrls = props.logs.map(l => l.request?.url).filter(u => u && u !== '/' && u !== '\\');
-    if (specificUrls.length > 0) {
-      const counts = specificUrls.reduce((acc, u) => ({ ...acc, [u]: (acc[u] || 0) + 1 }), {});
-      const topUrl = Object.keys(counts).reduce((a, b) => counts[a] > counts[b] ? a : b);
-      list.push({ text: t('home.breakingNews.targetDiscovery', { path: topUrl }), icon: '🔍' });
-    }
-  }
-
-  if (list.length === 0) list.push({ text: t('common.noDataFound'), icon: '⏸️' });
-  return list;
-});
-
+const headlines = computed(() => aiHeadlines.value.length > 0 ? aiHeadlines.value : [{ text: t('common.loading'), icon: '⏳' }]);
 const doubleHeadlines = computed(() => [...headlines.value, ...headlines.value]);
 const currentHeadline = computed(() => headlines.value[currentHeadlineIndex.value]);
 
-// Calculate animation duration based on content length for the ticker
 const trackStyle = computed(() => {
   if (props.mode !== 'ticker') return {};
-  const duration = headlines.value.length * 15; // 15s per set of headlines
+  const duration = headlines.value.length * 15;
   return {
     animationDuration: `${duration}s`
   };
@@ -171,16 +128,22 @@ const typeText = async (text) => {
 
 const startRotation = () => {
   if (rotationInterval) clearInterval(rotationInterval);
-  if (props.mode === 'ticker') return; // Ticker uses CSS animation
+  if (props.mode === 'ticker') return;
 
-  typeText(currentHeadline.value.text);
-  rotationInterval = setInterval(() => {
-    currentHeadlineIndex.value = (currentHeadlineIndex.value + 1) % headlines.value.length;
+  if (currentHeadline.value) {
     typeText(currentHeadline.value.text);
+  }
+  
+  rotationInterval = setInterval(() => {
+    if (headlines.value.length > 0) {
+      currentHeadlineIndex.value = (currentHeadlineIndex.value + 1) % headlines.value.length;
+      typeText(currentHeadline.value.text);
+    }
   }, 7000);
 };
 
-onMounted(() => {
+onMounted(async () => {
+  await updateNews();
   startRotation();
 });
 
@@ -188,7 +151,8 @@ onBeforeUnmount(() => {
   if (rotationInterval) clearInterval(rotationInterval);
 });
 
-watch(() => props.attacks.length, () => {
+watch([() => props.attacks.length, locale], async () => {
+  await updateNews();
   currentHeadlineIndex.value = 0;
   startRotation();
 });
@@ -238,7 +202,6 @@ watch(() => props.attacks.length, () => {
   align-items: center;
 }
 
-/* TICKER TRACK: The key to seamless loop */
 .ticker-track {
   display: flex;
   align-items: center;
@@ -250,7 +213,7 @@ watch(() => props.attacks.length, () => {
 
 @keyframes ticker-scroll {
   0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); } /* Stop at half because we doubled the content */
+  100% { transform: translateX(-50%); }
 }
 
 .ticker-item {
@@ -335,7 +298,6 @@ watch(() => props.attacks.length, () => {
 .fade-news-enter-from { opacity: 0; transform: translateY(10px); }
 .fade-news-leave-to { opacity: 0; transform: translateY(-10px); }
 
-/* Visibility for Header Mode */
 .breaking-news-container:not(.is-active) {
   opacity: 0;
   transform: translateY(-20px);

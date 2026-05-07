@@ -119,6 +119,14 @@ export class AppConfigProvider {
         return process.env.SUMMARY_MODEL || 'gemma';
     }
 
+    get ollamaEmbeddingTimeout(): number {
+        return parseInt(process.env.OLLAMA_EMBEDDING_TIMEOUT || ConfigDefaults.OLLAMA_EMBEDDING_TIMEOUT, 10);
+    }
+
+    get ollamaGenerateTimeout(): number {
+        return parseInt(process.env.OLLAMA_GENERATE_TIMEOUT || ConfigDefaults.OLLAMA_GENERATE_TIMEOUT, 10);
+    }
+
     /**
      * Esempi di recupero parametri dinamici da Database tramite ConfigService
      */

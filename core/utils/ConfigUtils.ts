@@ -18,7 +18,9 @@ export const ConfigDefaults = {
         'http://82.112.255.186:5173',
         'http://82.112.255.186:4300'
     ],
-    RAG_REINDEX_THRESHOLD_DAYS: '7'
+    RAG_REINDEX_THRESHOLD_DAYS: '7',
+    OLLAMA_EMBEDDING_TIMEOUT: '30000',
+    OLLAMA_GENERATE_TIMEOUT: '60000'
 };
 
 /**

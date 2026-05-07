@@ -12,6 +12,9 @@ export class OllamaService {
     private summaryModel: string;
     private embeddingTimeout: number;
     private generateTimeout: number;
+    private numPredict: number;
+    private temperature: number;
+    private topP: number;
 
     constructor(
         @inject(Tokens.LOGGER_TOKEN) private readonly logger: Logger,
@@ -22,6 +25,9 @@ export class OllamaService {
         this.summaryModel = this.config.summaryModel;
         this.embeddingTimeout = this.config.ollamaEmbeddingTimeout;
         this.generateTimeout = this.config.ollamaGenerateTimeout;
+        this.numPredict = this.config.ollamaNumPredict;
+        this.temperature = this.config.ollamaTemperature;
+        this.topP = this.config.ollamaTopP;
     }
 
     /**
@@ -59,7 +65,12 @@ export class OllamaService {
             const response = await axios.post(`${this.baseUrl}/api/generate`, {
                 model: this.summaryModel,
                 prompt: prompt,
-                stream: false
+                stream: false,
+                options: {
+                    num_predict: this.numPredict,
+                    temperature: this.temperature,
+                    top_p: this.topP
+                }
             }, { timeout: this.generateTimeout });
 
             if (response.data && response.data.response) {

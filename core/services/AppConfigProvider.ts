@@ -127,6 +127,18 @@ export class AppConfigProvider {
         return parseInt(process.env.OLLAMA_GENERATE_TIMEOUT || ConfigDefaults.OLLAMA_GENERATE_TIMEOUT, 10);
     }
 
+    get ollamaNumPredict(): number {
+        return parseInt(process.env.OLLAMA_NUM_PREDICT || ConfigDefaults.OLLAMA_NUM_PREDICT, 10);
+    }
+
+    get ollamaTemperature(): number {
+        return parseFloat(process.env.OLLAMA_TEMPERATURE || ConfigDefaults.OLLAMA_TEMPERATURE);
+    }
+
+    get ollamaTopP(): number {
+        return parseFloat(process.env.OLLAMA_TOP_P || ConfigDefaults.OLLAMA_TOP_P);
+    }
+
     /**
      * Esempi di recupero parametri dinamici da Database tramite ConfigService
      */

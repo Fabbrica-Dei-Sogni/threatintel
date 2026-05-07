@@ -100,7 +100,7 @@ export class CampaignService {
 
             // 5. Ordinamento e Paginazione Manuale (post-filtro correlazioni)
             const totalCount = enrichedAndFiltered.length;
-            const sortedData = enrichedAndFiltered.sort((a, b) => {
+            const sortedData = enrichedAndFiltered.sort((a: any, b: any) => {
                 const dateA = new Date(a.firstSeen).getTime();
                 const dateB = new Date(b.firstSeen).getTime();
                 return dateB - dateA || b.ipCount - a.ipCount;

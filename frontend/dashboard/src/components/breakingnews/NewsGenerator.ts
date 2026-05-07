@@ -1,4 +1,4 @@
-import { ask, semanticSearch } from '../api';
+import { ask, semanticSearch } from '../../api';
 
 export interface NewsItem {
   text: string;

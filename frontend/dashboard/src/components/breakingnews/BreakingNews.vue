@@ -38,11 +38,11 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import CountryFlag from './CountryFlag.vue';
+import CountryFlag from '../CountryFlag.vue';
 import { triggerAgenticNews, generateStaticFallback } from './NewsGenerator';
-import { translateFromIt } from '../utils/translator';
-import { useSocketStore } from '../stores/socket';
-import { SocketEvents } from '../models/SocketEvents';
+import { translateFromIt } from '../../utils/translator';
+import { useSocketStore } from '../../stores/socket';
+import { SocketEvents } from '../../models/SocketEvents';
 
 const props = defineProps({
   attacks: {

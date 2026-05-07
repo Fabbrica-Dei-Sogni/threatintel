@@ -4,7 +4,7 @@
       <span class="pulse-dot"></span>
       {{ t('home.breakingNews.badge') }}
     </div>
-    
+
     <div class="news-content" ref="contentRef">
       <!-- TYPEWRITER MODE: Single Headline Rotation -->
       <transition v-if="mode === 'typewriter'" name="fade-news" mode="out-in">
@@ -100,7 +100,8 @@ const updateNews = async (force = false) => {
     // 3. Fonte a corredo: Triggeriamo la generazione agentica
     console.debug('[BreakingNews] Triggering Agentic AI Scan...');
     lastFullTriggerTime = now;
-    await triggerAgenticNews(props, locale.value, t);
+    //XXX: commentato per valutarne le performance complessive delle chiamate a searchSemantic e ask che al momento in cui si scrive sono instabili
+    //await triggerAgenticNews(props, locale.value, t);
   } catch (err) {
     console.error('[BreakingNews] Agentic trigger failed:', err);
   }
@@ -125,34 +126,34 @@ const setupSocketListeners = () => {
     if (data.answer) {
       // Se avevamo solo il messaggio di "sistema in attesa", lo puliamo al primo arrivo AI
       const isIdle = aiHeadlines.value.length === 1 && aiHeadlines.value[0].text === t('home.system_idle');
-      
-      try {
-          // Traducono la risposta AI nella lingua corrente del frontend
-          const translatedText = await translateFromIt(data.answer, locale.value);
-          
-          const newsItem = { 
-            text: translatedText, 
-            icon: '🤖',
-            isLive: true 
-          };
 
-          if (isIdle) {
-            aiHeadlines.value = [newsItem];
-          } else {
-            // Aggiungiamo in testa per dare visibilità immediata, evitando duplicati esatti
-            const exists = aiHeadlines.value.some(h => h.text === translatedText);
-            if (!exists) {
-                aiHeadlines.value = [newsItem, ...aiHeadlines.value].slice(0, 15);
-            }
+      try {
+        // Traducono la risposta AI nella lingua corrente del frontend
+        const translatedText = await translateFromIt(data.answer, locale.value);
+
+        const newsItem = {
+          text: translatedText,
+          icon: '🤖',
+          isLive: true
+        };
+
+        if (isIdle) {
+          aiHeadlines.value = [newsItem];
+        } else {
+          // Aggiungiamo in testa per dare visibilità immediata, evitando duplicati esatti
+          const exists = aiHeadlines.value.some(h => h.text === translatedText);
+          if (!exists) {
+            aiHeadlines.value = [newsItem, ...aiHeadlines.value].slice(0, 15);
           }
-          
-          // Se siamo in typewriter e abbiamo appena ricevuto una news, forziamo la visualizzazione
-          if (props.mode === 'typewriter' && aiHeadlines.value.length === 1) {
-             currentHeadlineIndex.value = 0;
-             typeText(newsItem.text);
-          }
+        }
+
+        // Se siamo in typewriter e abbiamo appena ricevuto una news, forziamo la visualizzazione
+        if (props.mode === 'typewriter' && aiHeadlines.value.length === 1) {
+          currentHeadlineIndex.value = 0;
+          typeText(newsItem.text);
+        }
       } catch (err) {
-          console.error('[BreakingNews] Translation failed for AI response:', err);
+        console.error('[BreakingNews] Translation failed for AI response:', err);
       }
     }
   });
@@ -188,7 +189,7 @@ const startRotation = () => {
   if (currentHeadline.value) {
     typeText(currentHeadline.value.text);
   }
-  
+
   rotationInterval = setInterval(() => {
     if (headlines.value.length > 0) {
       currentHeadlineIndex.value = (currentHeadlineIndex.value + 1) % headlines.value.length;
@@ -204,10 +205,10 @@ const cleanupSocketListeners = () => {
 
 // Monitoriamo la disponibilità del socket (gestisce caricamento ritardato in App.vue)
 watch(() => socketStore.socket, (newSocket) => {
-    if (newSocket) {
-        cleanupSocketListeners();
-        setupSocketListeners();
-    }
+  if (newSocket) {
+    cleanupSocketListeners();
+    setupSocketListeners();
+  }
 }, { immediate: true });
 
 onMounted(async () => {
@@ -282,8 +283,13 @@ watch([() => props.attacks.length, locale], () => {
 }
 
 @keyframes ticker-scroll {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
 }
 
 .ticker-item {
@@ -319,7 +325,7 @@ watch([() => props.attacks.length, locale], () => {
   gap: 6px;
   white-space: nowrap;
   flex-shrink: 0;
-  box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
 }
 
 .pulse-dot {
@@ -351,13 +357,27 @@ watch([() => props.attacks.length, locale], () => {
 }
 
 @keyframes pulse {
-  from { transform: scale(0.8); opacity: 0.5; }
-  to { transform: scale(1.2); opacity: 1; }
+  from {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+
+  to {
+    transform: scale(1.2);
+    opacity: 1;
+  }
 }
 
 @keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0;
+  }
 }
 
 .fade-news-enter-active,
@@ -365,8 +385,15 @@ watch([() => props.attacks.length, locale], () => {
   transition: all 0.3s ease;
 }
 
-.fade-news-enter-from { opacity: 0; transform: translateY(10px); }
-.fade-news-leave-to { opacity: 0; transform: translateY(-10px); }
+.fade-news-enter-from {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.fade-news-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+}
 
 .breaking-news-container:not(.is-active) {
   opacity: 0;
@@ -378,10 +405,12 @@ watch([() => props.attacks.length, locale], () => {
   .headline-text {
     font-size: 0.8rem;
   }
+
   .news-badge {
     font-size: 0.65rem;
     padding: 2px 6px;
   }
+
   .breaking-news-container {
     gap: 10px;
   }

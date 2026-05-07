@@ -52,10 +52,12 @@ export class SocketServerHub {
         if (!this.io) return;
 
         this.io.on("connection", (socket) => {
-            this.logger.info(`[SocketServerHub] Client connesso: ${socket.id}`);
+            const clientCount = this.io?.engine.clientsCount;
+            this.logger.info(`[SocketServerHub] Client connesso: ${socket.id}. Totale client: ${clientCount}`);
 
             socket.on("disconnect", (reason) => {
-                this.logger.info(`[SocketServerHub] Client disconnesso: ${socket.id} (Ragione: ${reason})`);
+                const remainingClients = this.io?.engine.clientsCount;
+                this.logger.info(`[SocketServerHub] Client disconnesso: ${socket.id} (Ragione: ${reason}). Rimasti: ${remainingClients}`);
             });
 
             // Endpoint di ping per debug

@@ -11,7 +11,11 @@ export const useSocketStore = defineStore('socket', () => {
         if (socket.value) return;
 
         // In produzione l'URL è lo stesso del frontend o definito in env
-        const apiBaseUrl = import.meta.env.VITE_API_URL || window.location.origin;
+        let apiBaseUrl = import.meta.env.VITE_APP_API_URL || window.location.origin;
+        
+        // Se l'URL finisce con /api, lo rimuoviamo per la connessione socket 
+        // perché socket.io aggiunge il suo /socket.io di default
+        apiBaseUrl = apiBaseUrl.replace(/\/api$/, '');
         
         socket.value = io(apiBaseUrl, {
             withCredentials: true,

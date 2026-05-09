@@ -47,6 +47,8 @@ args:
   NPM_REGISTRY_URI: ${NPM_REGISTRY_URI:-http://alessandromodica.com:8081/repository/npm-all/}
 ```
 
+Nota: e' stato impostato l'uri di nexus a https://alessandromodica.com/nexus
+
 ### Modifica `Dockerfile.release`
 Dato che il pacchetto pubblicato contiene già la cartella `dist/` compilata, non è necessario (né consigliato) rieseguire il build dentro il container. Questo evita errori come "sh: vue-tsc: not found" dovuti alla mancanza di devDependencies.
 

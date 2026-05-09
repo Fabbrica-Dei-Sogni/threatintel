@@ -10,7 +10,7 @@ services:
       dockerfile: ./Dockerfile.release
       args:
         NPM_VERSION: ${NPM_VERSION:-0.1.8}
-        NPM_REGISTRY_URI: ${NPM_REGISTRY_URI:-http://alessandromodica.com:8081/repository/npm-all/}
+        NPM_REGISTRY_URI: ${NPM_REGISTRY_URI:-https://alessandromodica.com/nexus/repository/npm-all/}
         # Variabili Vite iniettate al build time
         VITE_APP_TITLE: ${VITE_APP_TITLE:-"Threat Intel Dashboard"}
         VITE_APP_VERSION: ${VITE_APP_VERSION:-"0.1.8"}

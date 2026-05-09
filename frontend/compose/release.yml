@@ -20,11 +20,3 @@ services:
         VITE_HONEYPOT_NAME: ${VITE_HONEYPOT_NAME:-"Honeypot (Paris)"}
     ports:
       - "127.0.0.1:8190:80"
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    networks:
-      - network-threat-intel
-
-networks:
-  network-threat-intel:
-    driver: bridge

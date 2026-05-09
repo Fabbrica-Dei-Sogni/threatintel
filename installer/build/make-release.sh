@@ -1,223 +1,69 @@
 #!/bin/bash
 
-# Configuration
-# Robustly find the project root regardless of where the script is called from
+# ThreatIntel - Generic Release Builder
+# Questo script viene eseguito dallo SVILUPPATORE per creare il pacchetto di distribuzione.
+
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../" && pwd)"
 INSTALLER_DIR="$PROJECT_ROOT/installer"
 BUILD_TMP="$PROJECT_ROOT/.build_tmp"
 
-# --- Parameters & Defaults ---
-# Get version from package.json
-PKG_VERSION=$(grep '"version":' "$PROJECT_ROOT/package.json" | cut -d'"' -f4)
-VERSION=${1:-${PKG_VERSION:-"0.0.1"}}
-
+# Parametri base
+VERSION=${1:-"1.0.0"}
 SERVICE_NAME=${2:-"threatintel-release"}
-DEPLOY_PORT=${3:-"3999"}
-DEPLOY_USER=${4:-$(whoami)}
-DEPLOY_ENV=${5:-"production"}
-DEPLOY_DESC=${6:-"Threat Intelligence Logger (Release Bundle)"}
-ALLOWED_ORIGINS=${7:-"http://localhost:5173,http://localhost:4300,https://localhost,http://192.168.0.1:5173,http://192.168.0.1:4300"}
-APP_DOMAIN=${8:-"localhost"}
-API_BASE_URL=${9:-"http://localhost/honeypot/api"}
-APP_ID=${10:-"honeypot-host-001"}
-ALLOW_ANONYMOUS=${11:-"true"}
-URI_DIGITAL_AUTH=${12:-"https://localhost:3443/auth/api/v1"}
-QDRANT_URL=${13:-"http://127.0.0.1:6333"}
-RAG_COLLECTION_NAME=${14:-"threat_intelligence"}
-RAG_LOGS_COLLECTION_NAME=${15:-"threat_logs"}
-APP_BASE_PATH=${16:-""}
-REDIS_PASSWORD=${17:-"!!!HoneyPotRedis!!!"}
-COWRIE_TELNET_PORT=${18:-"23"}
-
-# Normalize base path (ensure starts with / if not empty, or leave empty for root)
-if [[ -n "$APP_BASE_PATH" && "$APP_BASE_PATH" != /* ]]; then
-    APP_BASE_PATH="/$APP_BASE_PATH"
-fi
-# Remove trailing slash
-APP_BASE_PATH=${APP_BASE_PATH%/}
-
-# Paths
 DEPLOY_PATH="$PROJECT_ROOT/deployments/$SERVICE_NAME"
 ARTIFACT_NAME="threatintel-bundle-$SERVICE_NAME-v$VERSION.tar.gz"
 
-echo "🚀 Starting Autonomous Build - Version: $VERSION"
-echo "📛 Service Name: $SERVICE_NAME"
-echo "📍 Destination: $DEPLOY_PATH"
-echo "🔗 Base Path: ${APP_BASE_PATH:-/}"
-echo "🔑 Redis Password: ${REDIS_PASSWORD}"
-echo "📡 Honeypot Ports: TELNET=$COWRIE_TELNET_PORT"
+echo "🚀 Building Release v$VERSION for $SERVICE_NAME..."
 
-# ... (omitted cleanup and assembling for brevity in replacement chunk)
-# 1. Cleanup
-echo "🧹 Cleaning up old build data..."
+# 1. Cleanup & Setup
 rm -rf "$DEPLOY_PATH" "$BUILD_TMP"
-mkdir -p "$DEPLOY_PATH" "$BUILD_TMP"
+mkdir -p "$DEPLOY_PATH/data" "$DEPLOY_PATH/infra" "$DEPLOY_PATH/proxy" "$DEPLOY_PATH/mongo-init" "$DEPLOY_PATH/cowrie/etc"
+mkdir -p "$BUILD_TMP"
 
-# 2. Build Single-File Bundle
-echo "🏗️  Bundling with @vercel/ncc..."
+# 2. Compilazione
+echo "🏗️  Bundling code with ncc..."
 npx -y @vercel/ncc build "$PROJECT_ROOT/server.ts" -o "$BUILD_TMP"
 if [ $? -ne 0 ]; then
-    echo "❌ Bundling failed."
+    echo "❌ Errore durante la compilazione con ncc."
     exit 1
 fi
 
-# 3. Assemble Release Artifact in deployments/
-echo "📦 Assembling artifacts in $DEPLOY_PATH..."
-
-# A. The Bundle & Version
 cp "$BUILD_TMP/index.js" "$DEPLOY_PATH/"
 echo "$VERSION" > "$DEPLOY_PATH/VERSION"
 
-# B. GeoIP Data
-echo "🌍 Copying GeoIP databases..."
-mkdir -p "$DEPLOY_PATH/data"
-cp "$PROJECT_ROOT"/node_modules/geoip-lite/data/*.dat "$DEPLOY_PATH/data/" 2>/dev/null || echo "⚠️  GeoIP data not found, skipping."
+# 3. Copia Asset statici (GeoIP)
+echo "🌍 Adding GeoIP data..."
+cp "$PROJECT_ROOT"/node_modules/geoip-lite/data/*.dat "$DEPLOY_PATH/data/" 2>/dev/null
 
-# C. Infrastructure Scripts
-echo "🔧 Adding infra scripts..."
-mkdir -p "$DEPLOY_PATH/infra"
-cp "$PROJECT_ROOT/redis/check-redis.sh" "$DEPLOY_PATH/infra/" 2>/dev/null || true
-cp "$PROJECT_ROOT/mongodb/check-mongodb.sh" "$DEPLOY_PATH/infra/" 2>/dev/null || true
-cp "$PROJECT_ROOT/qdrant/check-qdrant.sh" "$DEPLOY_PATH/infra/" 2>/dev/null || true
-
-# D. Infrastructure Orchestration (Production)
-echo "🐳 Adding Docker infrastructure bundle..."
-cp "$INSTALLER_DIR/deploy/docker-compose.infra.yml" "$DEPLOY_PATH/"
-cp "$INSTALLER_DIR/deploy/env.template" "$DEPLOY_PATH/"
-
-# Copy config templates and init scripts for Docker
-mkdir -p "$DEPLOY_PATH/mongo-init"
-cp -r "$PROJECT_ROOT/mongodb/mongo-init/"* "$DEPLOY_PATH/mongo-init/" 2>/dev/null || true
-
-mkdir -p "$DEPLOY_PATH/cowrie/etc"
-cp -r "$PROJECT_ROOT/cowrie/etc/"* "$DEPLOY_PATH/cowrie/etc/" 2>/dev/null || true
-
-# E. Environment & Setup
+# 4. Copia Script e Template (Agnostici)
+echo "📦 Adding templates and installer..."
 cp "$INSTALLER_DIR/deploy/install.sh" "$DEPLOY_PATH/"
 cp "$INSTALLER_DIR/deploy/uninstall.sh" "$DEPLOY_PATH/"
-chmod +x "$DEPLOY_PATH/install.sh" "$DEPLOY_PATH/uninstall.sh"
+cp "$INSTALLER_DIR/deploy/docker-compose.infra.yml" "$DEPLOY_PATH/"
+cp "$INSTALLER_DIR/deploy/env.template" "$DEPLOY_PATH/"
+cp "$INSTALLER_DIR/deploy/threatintel.service.template" "$DEPLOY_PATH/"
+cp "$INSTALLER_DIR/deploy/nginx_vhost.conf.template" "$DEPLOY_PATH/proxy/"
+cp "$INSTALLER_DIR/deploy/nginx_globals.conf.template" "$DEPLOY_PATH/proxy/"
 
-# E. Templates & Parameter Substitution (The "Sed" Phase)
-echo "⚙️  Resolving templates with provided parameters..."
+# Script infra
+cp "$PROJECT_ROOT/redis/check-redis.sh" "$DEPLOY_PATH/infra/"
+cp "$PROJECT_ROOT/mongodb/check-mongodb.sh" "$DEPLOY_PATH/infra/"
+cp "$PROJECT_ROOT/qdrant/check-qdrant.sh" "$DEPLOY_PATH/infra/"
+cp -r "$PROJECT_ROOT/mongodb/mongo-init/"* "$DEPLOY_PATH/mongo-init/"
+cp -r "$PROJECT_ROOT/cowrie/etc/"* "$DEPLOY_PATH/cowrie/etc/"
 
-# Resolve Systemd Service
-NODE_PATH=$(which node)
-NODE_BIN_DIR=$(dirname "$NODE_PATH")
-SERVICE_TEMPLATE="$INSTALLER_DIR/deploy/threatintel.service.template"
+chmod +x "$DEPLOY_PATH/install.sh" "$DEPLOY_PATH/uninstall.sh" "$DEPLOY_PATH/infra/"*.sh
 
-if [ -f "$SERVICE_TEMPLATE" ]; then
-    sed -e "s|{{WORKING_DIR}}|$DEPLOY_PATH|g" \
-        -e "s|{{USER}}|$DEPLOY_USER|g" \
-        -e "s|{{SERVICE_NAME}}|$SERVICE_NAME|g" \
-        -e "s|{{PORT}}|$DEPLOY_PORT|g" \
-        -e "s|{{NODE_ENV}}|$DEPLOY_ENV|g" \
-        -e "s|{{DESCRIPTION}}|$DEPLOY_DESC|g" \
-        -e "s|{{VERSION}}|$VERSION|g" \
-        -e "s|{{ALLOWED_ORIGINS}}|$ALLOWED_ORIGINS|g" \
-        -e "s|{{APP_DOMAIN}}|$APP_DOMAIN|g" \
-        -e "s|{{API_BASE_URL}}|$API_BASE_URL|g" \
-        -e "s|{{APP_ID}}|$APP_ID|g" \
-        -e "s|{{ALLOW_ANONYMOUS}}|$ALLOW_ANONYMOUS|g" \
-        -e "s|{{URI_DIGITAL_AUTH}}|$URI_DIGITAL_AUTH|g" \
-        -e "s|{{NODE_PATH}}|$NODE_PATH|g" \
-        -e "s|{{NODE_BIN_DIR}}|$NODE_BIN_DIR|g" \
-        -e "s|{{QDRANT_URL}}|$QDRANT_URL|g" \
-        -e "s|{{RAG_COLLECTION_NAME}}|$RAG_COLLECTION_NAME|g" \
-        -e "s|{{RAG_LOGS_COLLECTION_NAME}}|$RAG_LOGS_COLLECTION_NAME|g" \
-        -e "s|{{REDIS_PASSWORD}}|$REDIS_PASSWORD|g" \
-        -e "s|{{MONGO_APP_USER}}|intelagent|g" \
-        -e "s|{{MONGO_APP_PWD}}|intelagent|g" \
-        -e "s|{{MONGO_APP_DB}}|threatinteldb|g" \
-        "$SERVICE_TEMPLATE" > "$DEPLOY_PATH/$SERVICE_NAME.service"
-fi
-
-# Resolve Installation Script Defaults
-INSTALL_SCRIPT="$DEPLOY_PATH/install.sh"
-if [ -f "$INSTALL_SCRIPT" ]; then
-    TELNET_BIND="$COWRIE_TELNET_PORT:2223"
-
-    # Iniezione diretta dei valori come stringhe fisse per evitare espansioni di shell ambigue
-    sed -i -e "s|\${REDIS_PASSWORD:-.*}|$REDIS_PASSWORD|g" \
-           -e "s|\${COWRIE_TELNET_BIND:-.*}|$TELNET_BIND|g" \
-           "$INSTALL_SCRIPT"
-fi
-
-# Resolve Nginx Configurations
-mkdir -p "$DEPLOY_PATH/proxy"
-# ... (omitted)
-
-# Resolve Infrastructure Orchestration Defaults
-INFRA_COMPOSE="$DEPLOY_PATH/docker-compose.infra.yml"
-if [ -f "$INFRA_COMPOSE" ]; then
-    sed -i -e "s|\${REDIS_PASSWORD:-.*}|$REDIS_PASSWORD|g" \
-           -e "s|\${COWRIE_TELNET_BIND:-.*}|$TELNET_BIND|g" \
-           "$INFRA_COMPOSE"
-fi
-
-echo "✅ Resolved all templates and scripts."
-
-# Resolve Nginx Configurations
-mkdir -p "$DEPLOY_PATH/proxy"
-NGINX_GLOBALS_TMP="$INSTALLER_DIR/deploy/nginx_globals.conf.template"
-NGINX_VHOST_TMP="$INSTALLER_DIR/deploy/nginx_vhost.conf.template"
-
-if [ -f "$NGINX_GLOBALS_TMP" ]; then
-    sed -e "s|{{SERVICE_NAME}}|$SERVICE_NAME|g" "$NGINX_GLOBALS_TMP" > "$DEPLOY_PATH/proxy/threatintel_globals_$SERVICE_NAME.conf"
-    echo "✅ Created: proxy/threatintel_globals_$SERVICE_NAME.conf"
-fi
-
-if [ -f "$NGINX_VHOST_TMP" ]; then
-    sed -e "s|{{SERVICE_NAME}}|$SERVICE_NAME|g" \
-        -e "s|{{PORT}}|$DEPLOY_PORT|g" \
-        -e "s|{{APP_DOMAIN}}|$APP_DOMAIN|g" \
-        -e "s|{{API_BASE_URL}}|$API_BASE_URL|g" \
-        -e "s|{{APP_BASE_PATH}}|$APP_BASE_PATH|g" \
-        "$NGINX_VHOST_TMP" > "$DEPLOY_PATH/proxy/$SERVICE_NAME.conf"
-    echo "✅ Created: proxy/$SERVICE_NAME.conf"
-fi
-
-# Resolve Environment File (.env) directly during build
-ENV_TEMPLATE="$INSTALLER_DIR/deploy/env.template"
-if [ -f "$ENV_TEMPLATE" ]; then
-    echo "📝 Generating final .env in $DEPLOY_PATH..."
-    sed -e "s|{{STORAGE_ROOT}}|$DEPLOY_PATH/storage|g" \
-        -e "s|{{PORT}}|$DEPLOY_PORT|g" \
-        -e "s|{{APP_DOMAIN}}|$APP_DOMAIN|g" \
-        -e "s|{{ALLOWED_ORIGINS}}|$ALLOWED_ORIGINS|g" \
-        -e "s|{{VERSION}}|$VERSION|g" \
-        -e "s|{{APP_ID}}|$APP_ID|g" \
-        -e "s|{{MONGO_ROOT_USER}}|admin|g" \
-        -e "s|{{MONGO_ROOT_PWD}}|!!!AdminMongo!!!|g" \
-        -e "s|{{MONGO_APP_USER}}|intelagent|g" \
-        -e "s|{{MONGO_APP_PWD}}|intelagent|g" \
-        -e "s|{{MONGO_APP_DB}}|threatinteldb|g" \
-        -e "s|{{REDIS_PASSWORD}}|$REDIS_PASSWORD|g" \
-        -e "s|{{RAG_COLLECTION_NAME}}|$RAG_COLLECTION_NAME|g" \
-        -e "s|{{RAG_LOGS_COLLECTION_NAME}}|$RAG_LOGS_COLLECTION_NAME|g" \
-        -e "s|{{RAG_ENABLED}}|true|g" \
-        -e "s|{{OLLAMA_URL}}|http://82.112.255.186:11434|g" \
-        -e "s|{{SUMMARY_MODEL}}|gemma3:1b|g" \
-        -e "s|{{URI_DIGITAL_AUTH}}|$URI_DIGITAL_AUTH|g" \
-        -e "s|{{ALLOW_ANONYMOUS}}|$ALLOW_ANONYMOUS|g" \
-        "$ENV_TEMPLATE" > "$DEPLOY_PATH/.env"
-    
-    # Aggiunta porte Cowrie (per coerenza con l'installer)
-    echo "COWRIE_TELNET_BIND=$COWRIE_TELNET_PORT:2223" >> "$DEPLOY_PATH/.env"
-    echo "✅ Created: .env"
-fi
-
-# 4. Final Archive
+# 5. Creazione Archivio
 echo "🗜️  Creating archive: $ARTIFACT_NAME..."
 mkdir -p "$PROJECT_ROOT/artifact"
 cd "$DEPLOY_PATH"
 tar -czf "$PROJECT_ROOT/artifact/$ARTIFACT_NAME" .
 cd "$PROJECT_ROOT"
 
-# Cleanup temp build files
 rm -rf "$BUILD_TMP"
-
 echo "------------------------------------------------------------"
-echo "✅ Success! Deployment ready in: deployments/$SERVICE_NAME"
-echo "📦 Archive created in: artifact/$ARTIFACT_NAME"
+echo "✅ Release v$VERSION pronta in deployments/$SERVICE_NAME"
+echo "📦 Archivio disponibile in artifact/$ARTIFACT_NAME"
+echo "💡 Per installare: copia la cartella sul server e lancia ./install.sh"
 echo "------------------------------------------------------------"
-ls -F "$DEPLOY_PATH"

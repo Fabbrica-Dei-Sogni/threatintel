@@ -37,7 +37,6 @@ done
 if [ -z "$SELECTED_DIR" ]; then exit 0; fi
 
 # 2. Avvio Installazione
-echo "🚀 Avvio installazione per: $SELECTED_DIR"
 cd "$PROJECT_ROOT/deployments/$SELECTED_DIR"
 
 if [ ! -f "./install.sh" ]; then

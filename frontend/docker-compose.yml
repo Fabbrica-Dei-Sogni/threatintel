@@ -5,6 +5,7 @@ services:
     build:
       context: ./dashboard
       args:
+        NPM_VERSION: ${NPM_VERSION:-0.1.10}
         VITE_APP_API_URL: "https://alessandromodica.com/honeypot/api"
         VITE_HONEYPOT_LOCATION_LAT: "48.8566"
         VITE_HONEYPOT_LOCATION_LON: "2.3522"

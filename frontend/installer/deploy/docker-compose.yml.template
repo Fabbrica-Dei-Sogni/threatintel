@@ -14,7 +14,8 @@ services:
       - VITE_HONEYPOT_LOCATION_LAT={{HP_LAT}}
       - VITE_HONEYPOT_LOCATION_LON={{HP_LON}}
       - VITE_HONEYPOT_NAME={{HP_NAME}}
-      - VITE_CHAINPROMPT_API_URL={{API_URL}}
+      - VITE_CHAINPROMPT_API_URL={{CHAINPROMPT_API_URL}}
+      - VITE_APP_API_URL={{API_URL}}
     ports:
       - "127.0.0.1:{{PORT}}:80"
     restart: unless-stopped

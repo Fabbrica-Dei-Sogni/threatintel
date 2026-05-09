@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import { io, Socket } from 'socket.io-client';
+import { getEnv } from '../config';
 
 export const useSocketStore = defineStore('socket', () => {
     const socket = ref<Socket | null>(null);
@@ -16,7 +17,7 @@ export const useSocketStore = defineStore('socket', () => {
 
         // Determinazione URL e Origin per Socket.io
         // Supporta configurazioni VITE_APP_API_URL esterne o fallback su window.location
-        let fullUrl = import.meta.env.VITE_APP_API_URL || window.location.origin;
+        let fullUrl = getEnv('VITE_APP_API_URL') || window.location.origin;
         
         // Rimuoviamo il suffix /api se presente: socket.io gestisce il proprio path separatamente
         fullUrl = fullUrl.replace(/\/api$/, '');

@@ -10,6 +10,7 @@ import type {
 import { useProfileStore } from '../stores/profiles';
 import { useAuthStore } from '../stores/auth';
 import { storage, StorageNamespace } from '../utils/storage';
+import { getEnv } from '../config';
 
 // Funzione helper per ottenere l'URL, con fallback sulla gestione dei profili
 export const getApiUrl = (): string => {
@@ -24,7 +25,7 @@ export const getApiUrl = (): string => {
     }
     // Fallback prioritario al localStorage (via HP_API namespace se migrato) o ENV
     const savedApi = storage.get<string>(StorageNamespace.API);
-    return savedApi || import.meta.env.VITE_APP_API_URL || `${import.meta.env.BASE_URL}api`.replace(/\/+$/, '');
+    return savedApi || getEnv('VITE_APP_API_URL') || `${import.meta.env.BASE_URL}api`.replace(/\/+$/, '');
 };
 
 export const apiClient = axios.create({
@@ -646,7 +647,7 @@ export async function fetchUniqueUris(params: any = {}): Promise<FetchUrisRespon
 // ==========================
 
 export const getChainPromptUrl = (): string => {
-    return import.meta.env.VITE_CHAINPROMPT_API_URL || 'http://localhost:5000/api';
+    return getEnv('VITE_CHAINPROMPT_API_URL') || 'http://localhost:5000/api';
 };
 
 /**

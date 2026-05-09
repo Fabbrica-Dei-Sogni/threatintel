@@ -37,7 +37,7 @@ RUN npm install honeypot-dashboard@$NPM_VERSION --registry=$NPM_REGISTRY_URI
 RUN cp -fr /usr/app/node_modules/honeypot-dashboard/* /usr/app/
 
 # Eseguo il build per generare la cartella dist
-RUN npm run build
+#RUN npm run build
 
 # Stage 2: Runtime Nginx
 FROM nginx:stable-alpine

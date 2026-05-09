@@ -5,6 +5,8 @@ services:
     image: dashboard-honeypot:${IMG_VERSION:-latest}
     container_name: dashboard-honeypot
     restart: unless-stopped
+    env_file:
+      - ../dashboard/.env    
     build:
       context: ../
       dockerfile: ./Dockerfile.release
@@ -20,9 +22,9 @@ services:
         VITE_HONEYPOT_NAME: ${VITE_HONEYPOT_NAME:-Honeypot (Paris)}
     environment:
       # Override a Runtime (opzionale, se non presenti usa i valori sopra del build)
-      - VITE_APP_TITLE=${VITE_APP_TITLE:-Threat Intel Dashboard - Production}
+      #- VITE_APP_TITLE=${VITE_APP_TITLE:-Threat Intel Dashboard - Production}
       - VITE_APP_VERSION=${NPM_VERSION}
-      - VITE_APP_BASE_PATH=${VITE_APP_BASE_PATH:-/honeypot/}
-      - VITE_HONEYPOT_NAME=${VITE_HONEYPOT_NAME:-Honeypot (Paris)}
+      #- VITE_APP_BASE_PATH=${VITE_APP_BASE_PATH:-/honeypot/}
+      #- VITE_HONEYPOT_NAME=${VITE_HONEYPOT_NAME:-Honeypot (Paris)}
     ports:
       - "8190:80"

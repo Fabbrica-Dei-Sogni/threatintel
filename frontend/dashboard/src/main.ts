@@ -21,9 +21,14 @@ registerSW({
     }
 });
 
-// Log della versione per verifica build
+import { getEnv } from './config';
+
+// Imposta il titolo del documento
+document.title = getEnv('VITE_APP_TITLE');
+
+// Log della versione per verifica build (usa getEnv per supportare override runtime)
 console.log(
-    `%c ${import.meta.env.VITE_APP_TITLE} %c v${import.meta.env.VITE_APP_VERSION} `,
+    `%c ${getEnv('VITE_APP_TITLE')} %c v${getEnv('VITE_APP_VERSION')} `,
     'background: #222; color: #bada55; padding: 2px 5px; border-radius: 3px 0 0 3px;',
     'background: #bada55; color: #222; padding: 2px 5px; border-radius: 0 3px 3px 0; font-weight: bold;'
 );

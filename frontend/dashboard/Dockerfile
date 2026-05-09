@@ -30,11 +30,20 @@ RUN npm run build
 # Stage runtime - serve files statici con nginx
 FROM nginx:stable-alpine
 
+# Installiamo envsubst per alpine
+RUN apk add --no-cache gettext
+
 COPY --from=build /app/dist /usr/share/nginx/html
+
+# Copio il template della configurazione e lo script di entrypoint
+COPY config.js.template /usr/share/nginx/html/config.js.template
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
 # Nginx config con SPA fallback
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
 
+ENTRYPOINT ["/entrypoint.sh"]
 CMD ["nginx", "-g", "daemon off;"]

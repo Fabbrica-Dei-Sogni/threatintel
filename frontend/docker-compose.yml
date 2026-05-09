@@ -9,6 +9,11 @@ services:
         VITE_HONEYPOT_LOCATION_LAT: "48.8566"
         VITE_HONEYPOT_LOCATION_LON: "2.3522"
         VITE_HONEYPOT_NAME: "Honeypot (Paris)"
+    environment:
+      - VITE_APP_TITLE=${VITE_APP_TITLE:-Threat Intel Dashboard (Legacy)}
+      - VITE_APP_BASE_PATH=${VITE_APP_BASE_PATH:-/honeypot/}
+      - VITE_HONEYPOT_NAME=${VITE_HONEYPOT_NAME}
+      - VITE_APP_VERSION=${NPM_VERSION:-0.1.10}
     ports:
       - "127.0.0.1:8180:80"
     restart: unless-stopped

@@ -31,10 +31,16 @@ Environment=REDIS_HOST=127.0.0.1
 Environment=REDIS_PORT=6379
 Environment=REDIS_PASSWORD=!!!HoneyPotRedis!!!
 Environment=REDIS_DB=0
+Environment=QDRANT_URL={{QDRANT_URL}}
+Environment=RAG_COLLECTION_NAME={{RAG_COLLECTION_NAME}}
+Environment=RAG_LOGS_COLLECTION_NAME={{RAG_LOGS_COLLECTION_NAME}}
+Environment=OLLAMA_URL={{OLLAMA_URL}}
+Environment=RAG_ENABLED={{RAG_ENABLED}}
 
 # Health Checks
 ExecStartPre=/bin/bash {{WORKING_DIR}}/infra/check-redis.sh
 ExecStartPre=/bin/bash {{WORKING_DIR}}/infra/check-mongodb.sh
+ExecStartPre=/bin/bash {{WORKING_DIR}}/infra/check-qdrant.sh
 
 # Execution
 ExecStart={{NODE_PATH}} index.js

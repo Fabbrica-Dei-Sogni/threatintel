@@ -28,8 +28,14 @@ Environment=REDIS_HOST=127.0.0.1
 Environment=REDIS_PORT=6379
 Environment=REDIS_PASSWORD=!!!HoneyPotRedis!!!
 Environment=REDIS_DB=0
+Environment=QDRANT_URL=http://127.0.0.1:6333
+Environment=RAG_COLLECTION_NAME=threat_intelligence
+Environment=RAG_LOGS_COLLECTION_NAME=threat_logs
+Environment=OLLAMA_URL=http://82.112.255.186:11434
+Environment=RAG_ENABLED=true
 ExecStartPre=/bin/bash /home/amodica/workspaces/threatintel/redis/check-redis.sh
 ExecStartPre=/bin/bash /home/amodica/workspaces/threatintel/mongodb/check-mongodb.sh
+ExecStartPre=/bin/bash /home/amodica/workspaces/threatintel/qdrant/check-qdrant.sh
 ExecStart=npm run start
 Restart=always
 RestartSec=5

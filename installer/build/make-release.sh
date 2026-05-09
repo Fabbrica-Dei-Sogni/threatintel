@@ -22,6 +22,11 @@ API_BASE_URL=${9:-"http://localhost/honeypot/api"}
 APP_ID=${10:-"honeypot-host-001"}
 ALLOW_ANONYMOUS=${11:-"true"}
 URI_DIGITAL_AUTH=${12:-"https://localhost:3443/auth/api/v1"}
+QDRANT_URL=${13:-"http://127.0.0.1:6333"}
+OLLAMA_URL=${14:-"http://82.112.255.186:11434"}
+RAG_ENABLED=${15:-"true"}
+RAG_COLLECTION_NAME=${16:-"threat_intelligence"}
+RAG_LOGS_COLLECTION_NAME=${17:-"threat_logs"}
 
 # Paths
 DEPLOY_PATH="$PROJECT_ROOT/deployments/$SERVICE_NAME"
@@ -61,6 +66,7 @@ echo "🔧 Adding infra scripts..."
 mkdir -p "$DEPLOY_PATH/infra"
 cp "$PROJECT_ROOT/redis/check-redis.sh" "$DEPLOY_PATH/infra/" 2>/dev/null || true
 cp "$PROJECT_ROOT/mongodb/check-mongodb.sh" "$DEPLOY_PATH/infra/" 2>/dev/null || true
+cp "$PROJECT_ROOT/qdrant/check-qdrant.sh" "$DEPLOY_PATH/infra/" 2>/dev/null || true
 
 # D. Environment & Setup
 cp "$INSTALLER_DIR/deploy/install.sh" "$DEPLOY_PATH/"
@@ -91,6 +97,11 @@ if [ -f "$SERVICE_TEMPLATE" ]; then
         -e "s|{{URI_DIGITAL_AUTH}}|$URI_DIGITAL_AUTH|g" \
         -e "s|{{NODE_PATH}}|$NODE_PATH|g" \
         -e "s|{{NODE_BIN_DIR}}|$NODE_BIN_DIR|g" \
+        -e "s|{{QDRANT_URL}}|$QDRANT_URL|g" \
+        -e "s|{{OLLAMA_URL}}|$OLLAMA_URL|g" \
+        -e "s|{{RAG_ENABLED}}|$RAG_ENABLED|g" \
+        -e "s|{{RAG_COLLECTION_NAME}}|$RAG_COLLECTION_NAME|g" \
+        -e "s|{{RAG_LOGS_COLLECTION_NAME}}|$RAG_LOGS_COLLECTION_NAME|g" \
         "$SERVICE_TEMPLATE" > "$DEPLOY_PATH/$SERVICE_NAME.service"
     echo "✅ Created: $SERVICE_NAME.service"
 fi

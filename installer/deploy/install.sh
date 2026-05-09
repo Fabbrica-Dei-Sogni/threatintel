@@ -25,7 +25,7 @@ if [ ! -f "$WORKING_DIR/.env" ]; then
     DEFAULT_DOMAIN="localhost"
     DEFAULT_PORT="3999"
     DEFAULT_USER=$(whoami)
-    DEFAULT_AUTH_URI="https://localhost:3443/auth/api/v1"
+    DEFAULT_AUTH_URI="https://alessandromodica.com:3443/auth/api/v1"
     DEFAULT_DESC="Threat Intelligence Logger - $SERVICE_NAME"
     
     read -p "📛 Nome del Servizio [$SERVICE_NAME]: " NEW_SERVICE_NAME
@@ -52,7 +52,7 @@ if [ ! -f "$WORKING_DIR/.env" ]; then
     read -p "🌐 Porta locale del servizio ($DEFAULT_PORT): " DEPLOY_PORT
     DEPLOY_PORT=${DEPLOY_PORT:-$DEFAULT_PORT}
 
-    read -p "🔐 Digital Auth URI ($DEFAULT_AUTH_URI): " URI_DIGITAL_AUTH
+    read -p "🔐 Digital Auth IdP URI ($DEFAULT_AUTH_URI): " URI_DIGITAL_AUTH
     URI_DIGITAL_AUTH=${URI_DIGITAL_AUTH:-$DEFAULT_AUTH_URI}
 
     echo "🔐 SICUREZZA"
@@ -63,6 +63,14 @@ if [ ! -f "$WORKING_DIR/.env" ]; then
     read -p "📡 Porta Honeypot TELNET (Default: 23): " TELNET_P
     TELNET_P=${TELNET_P:-"23"}
     
+    # Calcolo APP_ID dinamico per l'installer
+    CLEAN_DOMAIN=$(echo "$APP_DOMAIN" | sed -e 's|https://||g' -e 's|http://||g' -e 's|/.*||g')
+    [ -z "$CLEAN_DOMAIN" ] && CLEAN_DOMAIN="localhost"
+    DEFAULT_APP_ID="com.$CLEAN_DOMAIN.$SERVICE_NAME"
+    
+    read -p "🆔 Application ID [$DEFAULT_APP_ID]: " APP_ID
+    APP_ID=${APP_ID:-$DEFAULT_APP_ID}
+
     echo "------------------------------------------------------------"
 
     # Generazione .env dal template
@@ -73,7 +81,7 @@ if [ ! -f "$WORKING_DIR/.env" ]; then
             -e "s|{{APP_DOMAIN}}|$APP_DOMAIN|g" \
             -e "s|{{ALLOWED_ORIGINS}}|*|g" \
             -e "s|{{VERSION}}|$(cat VERSION 2>/dev/null || echo '1.0.0')|g" \
-            -e "s|{{APP_ID}}|app-$SERVICE_NAME-id|g" \
+            -e "s|{{APP_ID}}|$APP_ID|g" \
             -e "s|{{MONGO_ROOT_USER}}|admin|g" \
             -e "s|{{MONGO_ROOT_PWD}}|!!!AdminMongo!!!|g" \
             -e "s|{{MONGO_APP_USER}}|intelagent|g" \
@@ -110,7 +118,7 @@ if [ ! -f "$WORKING_DIR/.env" ]; then
             -e "s|{{ALLOWED_ORIGINS}}|*|g" \
             -e "s|{{APP_DOMAIN}}|$APP_DOMAIN|g" \
             -e "s|{{API_BASE_URL}}|$API_BASE_URL|g" \
-            -e "s|{{APP_ID}}|app-$SERVICE_NAME-id|g" \
+            -e "s|{{APP_ID}}|$APP_ID|g" \
             -e "s|{{ALLOW_ANONYMOUS}}|true|g" \
             -e "s|{{URI_DIGITAL_AUTH}}|$URI_DIGITAL_AUTH|g" \
             -e "s|{{NODE_PATH}}|$NODE_PATH|g" \

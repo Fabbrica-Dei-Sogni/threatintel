@@ -43,6 +43,12 @@ apiClient.interceptors.request.use((config) => {
         config.headers.Authorization = `Bearer ${auth.token}`;
     }
 
+    // Iniezione Application ID per IAM Digital Auth (Reverse Domain Name standard)
+    const appId = getEnv('APP_ID');
+    if (appId) {
+        config.headers['x-app-id'] = appId;
+    }
+
     return config;
 }, (error) => {
     return Promise.reject(error);

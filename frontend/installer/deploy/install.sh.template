@@ -14,7 +14,7 @@ echo "📝 Configurazione parametri (premi INVIO per i default):"
 echo "------------------------------------------------------------"
 
 DEFAULT_TITLE="Threat Intel Dashboard"
-DEFAULT_BASE_PATH="/honeypot/"
+DEFAULT_BASE_PATH="/"
 DEFAULT_PORT="8180"
 DEFAULT_HP_NAME="Heartquarter"
 DEFAULT_REGISTRY="https://alessandromodica.com/nexus/repository/npm-all/"
@@ -49,6 +49,14 @@ HP_LAT=${HP_LAT:-"48.8566"}
 read -p "📍 Longitudine [2.3522]: " HP_LON
 HP_LON=${HP_LON:-"2.3522"}
 
+# Calcolo APP_ID dinamico per l'installer
+CLEAN_DOMAIN=$(echo "$API_URL" | sed -e 's|https://||g' -e 's|http://||g' -e 's|/.*||g')
+[ -z "$CLEAN_DOMAIN" ] && CLEAN_DOMAIN="localhost"
+DEFAULT_APP_ID="com.$CLEAN_DOMAIN.threatintel-frontend"
+
+read -p "🆔 Application ID [$DEFAULT_APP_ID]: " APP_ID
+APP_ID=${APP_ID:-$DEFAULT_APP_ID}
+
 echo "------------------------------------------------------------"
 
 # 2. Generazione del file .env (utile per persistenza e Vite locale)
@@ -63,6 +71,7 @@ VITE_API_TIMEOUT=30000
 VITE_CHAINPROMPT_API_URL=$CHAINPROMPT_API_URL
 VITE_APP_API_URL=$API_URL
 VITE_APP_BASE_PATH=$APP_BASE_PATH
+APP_ID=$APP_ID
 VITE_HONEYPOT_NAME=$HP_NAME
 VITE_HONEYPOT_LOCATION_LAT=$HP_LAT
 VITE_HONEYPOT_LOCATION_LON=$HP_LON
@@ -81,6 +90,7 @@ if [ -f "docker-compose.yml.template" ]; then
         -e "s|{{HP_LON}}|$HP_LON|g" \
         -e "s|{{CHAINPROMPT_API_URL}}|$CHAINPROMPT_API_URL|g" \
         -e "s|{{API_URL}}|$API_URL|g" \
+        -e "s|{{APP_ID}}|$APP_ID|g" \
         "docker-compose.yml.template" > "docker-compose.yml"
 fi
 

@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  # --- MongoDB: Primary Data Store ---
+  mongodb-threatintel:
+    image: mongo:4.4.6
+    container_name: mongodb-threatintel
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:17017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PWD:-cambiapwd}
+      MONGO_INITDB_DATABASE: admin
+      # App database initialization
+      MONGODB_USERNAME: ${MONGO_APP_USER:-intelagent}
+      MONGODB_PASSWORD: ${MONGO_APP_PWD:-intelagent}
+      MONGODB_DATABASE: ${MONGO_APP_DB:-threatinteldb}
+    volumes:
+      - ${STORAGE_ROOT}/mongodb:/data/db
+      - ./mongo-init:/docker-entrypoint-initdb.d:ro
+    networks:
+      - network-threatintel
+
+  # --- Redis: Rate Limiting & Cache ---
+  redis-threatintel:
+    image: redis:6.2-alpine
+    container_name: redis-threatintel
+    restart: unless-stopped
+    command: redis-server --requirepass ${REDIS_PASSWORD:-!!!HoneyPotRedis!!!}
+    ports:
+      - "127.0.0.1:6379:6379"
+    volumes:
+      - ${STORAGE_ROOT}/redis:/data
+    networks:
+      - network-threatintel
+
+  # --- Qdrant: Vector Database (RAG) ---
+  qdrant-threatintel:
+    image: qdrant/qdrant:latest
+    container_name: qdrant-threatintel
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:6333:6333"
+    volumes:
+      - ${STORAGE_ROOT}/qdrant:/qdrant/storage
+    networks:
+      - network-threatintel
+
+  # --- Cowrie: SSH/Telnet Honeypot ---
+  cowrie-honeypot:
+    image: cowrie/cowrie:latest
+    container_name: cowrie-honeypot
+    restart: unless-stopped
+    ports:
+      - "${COWRIE_TELNET_BIND:-23:2223}"
+    volumes:
+      - ${STORAGE_ROOT}/cowrie/log:/cowrie/cowrie-git/var/log/cowrie
+      - ${STORAGE_ROOT}/cowrie/downloads:/cowrie/cowrie-git/var/lib/cowrie/downloads
+      - ./cowrie/etc/cowrie.cfg:/cowrie/cowrie-git/etc/cowrie.cfg:ro
+      - ./cowrie/etc/userdb.txt:/cowrie/cowrie-git/etc/userdb.txt:ro
+    networks:
+      - network-threatintel
+
+networks:
+  network-threatintel:
+    driver: bridge
+    name: threatintel-prod-network

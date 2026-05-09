@@ -25,6 +25,16 @@ URI_DIGITAL_AUTH=${12:-"https://localhost:3443/auth/api/v1"}
 QDRANT_URL=${13:-"http://127.0.0.1:6333"}
 RAG_COLLECTION_NAME=${14:-"threat_intelligence"}
 RAG_LOGS_COLLECTION_NAME=${15:-"threat_logs"}
+APP_BASE_PATH=${16:-""}
+REDIS_PASSWORD=${17:-"!!!HoneyPotRedis!!!"}
+COWRIE_TELNET_PORT=${18:-"23"}
+
+# Normalize base path (ensure starts with / if not empty, or leave empty for root)
+if [[ -n "$APP_BASE_PATH" && "$APP_BASE_PATH" != /* ]]; then
+    APP_BASE_PATH="/$APP_BASE_PATH"
+fi
+# Remove trailing slash
+APP_BASE_PATH=${APP_BASE_PATH%/}
 
 # Paths
 DEPLOY_PATH="$PROJECT_ROOT/deployments/$SERVICE_NAME"
@@ -33,7 +43,11 @@ ARTIFACT_NAME="threatintel-bundle-$SERVICE_NAME-v$VERSION.tar.gz"
 echo "🚀 Starting Autonomous Build - Version: $VERSION"
 echo "📛 Service Name: $SERVICE_NAME"
 echo "📍 Destination: $DEPLOY_PATH"
+echo "🔗 Base Path: ${APP_BASE_PATH:-/}"
+echo "🔑 Redis Password: ${REDIS_PASSWORD}"
+echo "📡 Honeypot Ports: TELNET=$COWRIE_TELNET_PORT"
 
+# ... (omitted cleanup and assembling for brevity in replacement chunk)
 # 1. Cleanup
 echo "🧹 Cleaning up old build data..."
 rm -rf "$DEPLOY_PATH" "$BUILD_TMP"
@@ -66,7 +80,19 @@ cp "$PROJECT_ROOT/redis/check-redis.sh" "$DEPLOY_PATH/infra/" 2>/dev/null || tru
 cp "$PROJECT_ROOT/mongodb/check-mongodb.sh" "$DEPLOY_PATH/infra/" 2>/dev/null || true
 cp "$PROJECT_ROOT/qdrant/check-qdrant.sh" "$DEPLOY_PATH/infra/" 2>/dev/null || true
 
-# D. Environment & Setup
+# D. Infrastructure Orchestration (Production)
+echo "🐳 Adding Docker infrastructure bundle..."
+cp "$INSTALLER_DIR/deploy/docker-compose.infra.yml" "$DEPLOY_PATH/"
+cp "$INSTALLER_DIR/deploy/env.template" "$DEPLOY_PATH/"
+
+# Copy config templates and init scripts for Docker
+mkdir -p "$DEPLOY_PATH/mongo-init"
+cp -r "$PROJECT_ROOT/mongodb/mongo-init/"* "$DEPLOY_PATH/mongo-init/" 2>/dev/null || true
+
+mkdir -p "$DEPLOY_PATH/cowrie/etc"
+cp -r "$PROJECT_ROOT/cowrie/etc/"* "$DEPLOY_PATH/cowrie/etc/" 2>/dev/null || true
+
+# E. Environment & Setup
 cp "$INSTALLER_DIR/deploy/install.sh" "$DEPLOY_PATH/"
 cp "$INSTALLER_DIR/deploy/uninstall.sh" "$DEPLOY_PATH/"
 chmod +x "$DEPLOY_PATH/install.sh" "$DEPLOY_PATH/uninstall.sh"
@@ -98,9 +124,37 @@ if [ -f "$SERVICE_TEMPLATE" ]; then
         -e "s|{{QDRANT_URL}}|$QDRANT_URL|g" \
         -e "s|{{RAG_COLLECTION_NAME}}|$RAG_COLLECTION_NAME|g" \
         -e "s|{{RAG_LOGS_COLLECTION_NAME}}|$RAG_LOGS_COLLECTION_NAME|g" \
+        -e "s|{{REDIS_PASSWORD}}|$REDIS_PASSWORD|g" \
+        -e "s|{{MONGO_APP_USER}}|intelagent|g" \
+        -e "s|{{MONGO_APP_PWD}}|intelagent|g" \
+        -e "s|{{MONGO_APP_DB}}|threatinteldb|g" \
         "$SERVICE_TEMPLATE" > "$DEPLOY_PATH/$SERVICE_NAME.service"
-    echo "✅ Created: $SERVICE_NAME.service"
 fi
+
+# Resolve Installation Script Defaults
+INSTALL_SCRIPT="$DEPLOY_PATH/install.sh"
+if [ -f "$INSTALL_SCRIPT" ]; then
+    TELNET_BIND="$COWRIE_TELNET_PORT:2223"
+
+    # Iniezione diretta dei valori come stringhe fisse per evitare espansioni di shell ambigue
+    sed -i -e "s|\${REDIS_PASSWORD:-.*}|$REDIS_PASSWORD|g" \
+           -e "s|\${COWRIE_TELNET_BIND:-.*}|$TELNET_BIND|g" \
+           "$INSTALL_SCRIPT"
+fi
+
+# Resolve Nginx Configurations
+mkdir -p "$DEPLOY_PATH/proxy"
+# ... (omitted)
+
+# Resolve Infrastructure Orchestration Defaults
+INFRA_COMPOSE="$DEPLOY_PATH/docker-compose.infra.yml"
+if [ -f "$INFRA_COMPOSE" ]; then
+    sed -i -e "s|\${REDIS_PASSWORD:-.*}|$REDIS_PASSWORD|g" \
+           -e "s|\${COWRIE_TELNET_BIND:-.*}|$TELNET_BIND|g" \
+           "$INFRA_COMPOSE"
+fi
+
+echo "✅ Resolved all templates and scripts."
 
 # Resolve Nginx Configurations
 mkdir -p "$DEPLOY_PATH/proxy"
@@ -115,8 +169,41 @@ fi
 if [ -f "$NGINX_VHOST_TMP" ]; then
     sed -e "s|{{SERVICE_NAME}}|$SERVICE_NAME|g" \
         -e "s|{{PORT}}|$DEPLOY_PORT|g" \
+        -e "s|{{APP_DOMAIN}}|$APP_DOMAIN|g" \
+        -e "s|{{API_BASE_URL}}|$API_BASE_URL|g" \
+        -e "s|{{APP_BASE_PATH}}|$APP_BASE_PATH|g" \
         "$NGINX_VHOST_TMP" > "$DEPLOY_PATH/proxy/$SERVICE_NAME.conf"
     echo "✅ Created: proxy/$SERVICE_NAME.conf"
+fi
+
+# Resolve Environment File (.env) directly during build
+ENV_TEMPLATE="$INSTALLER_DIR/deploy/env.template"
+if [ -f "$ENV_TEMPLATE" ]; then
+    echo "📝 Generating final .env in $DEPLOY_PATH..."
+    sed -e "s|{{STORAGE_ROOT}}|$DEPLOY_PATH/storage|g" \
+        -e "s|{{PORT}}|$DEPLOY_PORT|g" \
+        -e "s|{{APP_DOMAIN}}|$APP_DOMAIN|g" \
+        -e "s|{{ALLOWED_ORIGINS}}|$ALLOWED_ORIGINS|g" \
+        -e "s|{{VERSION}}|$VERSION|g" \
+        -e "s|{{APP_ID}}|$APP_ID|g" \
+        -e "s|{{MONGO_ROOT_USER}}|admin|g" \
+        -e "s|{{MONGO_ROOT_PWD}}|!!!AdminMongo!!!|g" \
+        -e "s|{{MONGO_APP_USER}}|intelagent|g" \
+        -e "s|{{MONGO_APP_PWD}}|intelagent|g" \
+        -e "s|{{MONGO_APP_DB}}|threatinteldb|g" \
+        -e "s|{{REDIS_PASSWORD}}|$REDIS_PASSWORD|g" \
+        -e "s|{{RAG_COLLECTION_NAME}}|$RAG_COLLECTION_NAME|g" \
+        -e "s|{{RAG_LOGS_COLLECTION_NAME}}|$RAG_LOGS_COLLECTION_NAME|g" \
+        -e "s|{{RAG_ENABLED}}|true|g" \
+        -e "s|{{OLLAMA_URL}}|http://82.112.255.186:11434|g" \
+        -e "s|{{SUMMARY_MODEL}}|gemma3:1b|g" \
+        -e "s|{{URI_DIGITAL_AUTH}}|$URI_DIGITAL_AUTH|g" \
+        -e "s|{{ALLOW_ANONYMOUS}}|$ALLOW_ANONYMOUS|g" \
+        "$ENV_TEMPLATE" > "$DEPLOY_PATH/.env"
+    
+    # Aggiunta porte Cowrie (per coerenza con l'installer)
+    echo "COWRIE_TELNET_BIND=$COWRIE_TELNET_PORT:2223" >> "$DEPLOY_PATH/.env"
+    echo "✅ Created: .env"
 fi
 
 # 4. Final Archive

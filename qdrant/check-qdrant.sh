@@ -27,7 +27,7 @@ echo "❌ Qdrant non disponibile dopo $MAX_WAIT secondi"
 echo "🚀 Tentativo avvio automatico Qdrant..."
 
 if [ -f "$SCRIPT_DIR/docker-compose.yml" ]; then
-    cd "$SCRIPT_DIR" && docker-compose up -d qdrant-threatintel
+    cd "$SCRIPT_DIR" && docker compose up -d qdrant-threatintel
     
     sleep 5
 

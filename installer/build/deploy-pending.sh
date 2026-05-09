@@ -48,4 +48,9 @@ fi
 # Chiede conferma parametri minimi o usa i default nell'install.sh
 ./install.sh "$SELECTED_DIR"
 
-echo "✨ Deployment completato!"
+if [ $? -eq 0 ]; then
+    echo "✨ Deployment completato!"
+else
+    echo "❌ Errore durante l'installazione di $SELECTED_DIR."
+    exit 1
+fi

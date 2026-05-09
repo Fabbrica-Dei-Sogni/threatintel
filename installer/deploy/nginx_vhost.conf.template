@@ -1,95 +1,90 @@
 # ThreatIntel Virtual Host Configuration Template for {{SERVICE_NAME}}
-# Spostare in /etc/nginx/sites-available/{{SERVICE_NAME}}.conf e creare symlink in sites-enabled
+# Destinazione: /etc/nginx/sites-available/{{SERVICE_NAME}}.conf
 
 server {
     listen 80;
     listen [::]:80;
     
-    # Porte Traps
+    # Porte Traps (Raccolta dati grezzi)
     listen 8080;
     listen 8000;
     listen 5000;
     listen 4200;
     listen 7000;
 
-    server_name _; 
+    server_name {{APP_DOMAIN}}; 
 
-    # Security Headers (Specifici per istanza per evitare conflitti globali)
+    # Security Headers
     add_header X-Frame-Options "SAMEORIGIN" always;
     add_header X-Content-Type-Options "nosniff" always;
     add_header X-XSS-Protection "0" always;
     add_header Referrer-Policy "strict-origin-when-cross-origin" always;
 
-    # Access Log in formato JSON specifico per questa istanza
+    # Logs
     access_log /var/log/nginx/{{SERVICE_NAME}}_access.log json_{{SERVICE_NAME}};
     error_log /var/log/nginx/{{SERVICE_NAME}}_error.log warn;
 
-    # Rate limiting specifico per questa istanza
-    limit_req zone=general_{{SERVICE_NAME}} burst=20 nodelay;
-
-    # Blocha User Agents sospetti
-    if ($http_user_agent ~* (sqlmap|nikto|nmap|masscan|netsparker)) {
-        return 444;
-    }
-
-    # Location principale - Proxy verso il backend Node.js
-    location / {
-        proxy_pass http://127.0.0.1:{{PORT}};
+    # 1. API & Backend (con prefisso custom)
+    location {{APP_BASE_PATH}}/api/ {
+        proxy_pass http://127.0.0.1:{{PORT}}/api/;
         
-        proxy_set_header X-Server-Port $server_port;
+        # Gestione dei redirect interni (fondamentale per Swagger)
+        proxy_redirect /api/ {{APP_BASE_PATH}}/api/;
+        proxy_redirect http://127.0.0.1:{{PORT}}/api/ {{API_BASE_URL}}/;
+
+        proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_set_header Host $host;
+    }
 
+    # 2. Supporto Socket.io (Real-time Events)
+    location /socket.io/ {
+        proxy_pass http://127.0.0.1:{{PORT}}/socket.io/;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "Upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+            
+        # Aumenta i timeout per evitare disconnessioni frequenti
+        proxy_read_timeout 86400;
+    }
+
+    # 3. Altre location del backend (es. auth o landing se non in sottocartella)
+    location {{APP_BASE_PATH}}/ {
+        proxy_pass http://127.0.0.1:{{PORT}}/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection 'upgrade';
-        
         proxy_cache_bypass $http_upgrade;
-    }
-
-    # Endpoint Sensibile: Login (Protezione rinforzata)
-    location /login {
-        limit_req zone=login_{{SERVICE_NAME}} burst=3 nodelay;
-        proxy_pass http://127.0.0.1:{{PORT}};
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_set_header Host $host;
-    }
-
-    # API stats con restrizioni severe
-    location /api/ {
-        allow 127.0.0.1;
-        allow ::1;
-        deny all;
-        
-        proxy_pass http://127.0.0.1:{{PORT}};
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
     }
 
     # Protezione file sensibili
     location ~ /\. { deny all; access_log off; log_not_found off; }
 }
 
-# Honeypot SSL Traps (Esempio)
+# --- Honeypot SSL Traps (Esempio) ---
 # NOTA: Per abilitare queste trappole SSL, è necessario:
 # 1. Ottenere dei certificati (es. tramite Certbot) per il proprio dominio.
 # 2. Decommentare le righe 'listen' e le direttive 'ssl_certificate'.
-# 3. Sostituire 'example.com' con il proprio dominio.
+# 3. Sostituire {{APP_DOMAIN}} con il proprio dominio se diverso.
 
 server {
     # listen 8443 ssl;
     # listen 9443 ssl;
     # listen 10443 ssl;
-    server_name example.com;
+    server_name {{APP_DOMAIN}};
 
-    # ssl_certificate /etc/letsencrypt/live/example.com/fullchain.pem;
-    # ssl_certificate_key /etc/letsencrypt/live/example.com/privkey.pem;
+    # ssl_certificate /etc/letsencrypt/live/{{APP_DOMAIN}}/fullchain.pem;
+    # ssl_certificate_key /etc/letsencrypt/live/{{APP_DOMAIN}}/privkey.pem;
     # include /etc/letsencrypt/options-ssl-nginx.conf;
     # ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
 
@@ -105,13 +100,13 @@ server {
     }
 }
 
-# Secure Proxy for other services (fallback/example)
+# --- Secure Proxy for other services (fallback/example) ---
 server {
     # listen 5543 ssl;
-    server_name example.com;
+    server_name {{APP_DOMAIN}};
 
-    # ssl_certificate /etc/letsencrypt/live/example.com/fullchain.pem;
-    # ssl_certificate_key /etc/letsencrypt/live/example.com/privkey.pem;
+    # ssl_certificate /etc/letsencrypt/live/{{APP_DOMAIN}}/fullchain.pem;
+    # ssl_certificate_key /etc/letsencrypt/live/{{APP_DOMAIN}}/privkey.pem;
 
     location / {
         proxy_pass http://localhost:5540/;

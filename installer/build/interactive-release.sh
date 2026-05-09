@@ -45,14 +45,37 @@ DEPLOY_ENV=${DEPLOY_ENV:-$DEFAULT_ENV}
 read -p "📝 Descrizione ($DEFAULT_DESC): " DEPLOY_DESC
 DEPLOY_DESC=${DEPLOY_DESC:-$DEFAULT_DESC}
 
+read -p "🔐 Digital Auth URI ($DEFAULT_AUTH_URI): " URI_DIGITAL_AUTH
+URI_DIGITAL_AUTH=${URI_DIGITAL_AUTH:-$DEFAULT_AUTH_URI}
+
 read -p "🌐 Dominio Applicazione ($DEFAULT_DOMAIN): " APP_DOMAIN
 APP_DOMAIN=${APP_DOMAIN:-$DEFAULT_DOMAIN}
 
-read -p "🔗 API Base URL ($DEFAULT_API_BASE): " API_BASE_URL
-API_BASE_URL=${API_BASE_URL:-$DEFAULT_API_BASE}
+read -p "📂 Base Path (es. /honeypot) [INVIO per root /]: " APP_BASE_PATH
+APP_BASE_PATH=${APP_BASE_PATH:-""}
 
-read -p "🔐 Digital Auth URI ($DEFAULT_AUTH_URI): " URI_DIGITAL_AUTH
-URI_DIGITAL_AUTH=${URI_DIGITAL_AUTH:-$DEFAULT_AUTH_URI}
+# Costruzione dinamica del default API Base URL basato su dominio e path
+# Se il path non inizia con /, lo aggiungiamo
+CLEAN_BASE_PATH=$APP_BASE_PATH
+if [[ -n "$CLEAN_BASE_PATH" && "$CLEAN_BASE_PATH" != /* ]]; then
+    CLEAN_BASE_PATH="/$CLEAN_BASE_PATH"
+fi
+CLEAN_BASE_PATH=${CLEAN_BASE_PATH%/} # Rimuove slash finale se presente
+
+DYNAMIC_API_BASE="https://$APP_DOMAIN$CLEAN_BASE_PATH/api"
+
+read -p "🔗 API Base URL ($DYNAMIC_API_BASE): " API_BASE_URL
+API_BASE_URL=${API_BASE_URL:-$DYNAMIC_API_BASE}
+
+echo "------------------------------------------------------------"
+echo "🔐 CONFIGURAZIONE SICUREZZA & INFRASTRUTTURA"
+read -sp "🔑 Password per Redis (INVIO per default): " REDIS_PWD
+echo "" # Aggiunge una riga dopo l'input nascosto
+REDIS_PWD=${REDIS_PWD:-"!!!HoneyPotRedis!!!"}
+
+read -p "📡 Porta Honeypot TELNET (Default: 23): " TELNET_P
+TELNET_P=${TELNET_P:-"23"}
+echo "------------------------------------------------------------"
 
 read -p "🆔 App ID (Identity) ($DYNAMIC_APP_ID): " APP_ID
 APP_ID=${APP_ID:-$DYNAMIC_APP_ID}
@@ -71,7 +94,7 @@ echo "✅ Parametri configurati. Avvio build autonoma..."
 # 2. Esecuzione Build Autonoma
 # Passiamo tutti i parametri a make-release.sh
 cd "$(dirname "${BASH_SOURCE[0]}")"
-./make-release.sh "$RELEASE_VERSION" "$SERVICE_NAME" "$DEPLOY_PORT" "$DEPLOY_USER" "$DEPLOY_ENV" "$DEPLOY_DESC" "$ALLOWED_ORIGINS" "$APP_DOMAIN" "$API_BASE_URL" "$APP_ID" "$ALLOW_ANONYMOUS" "$URI_DIGITAL_AUTH"
+./make-release.sh "$RELEASE_VERSION" "$SERVICE_NAME" "$DEPLOY_PORT" "$DEPLOY_USER" "$DEPLOY_ENV" "$DEPLOY_DESC" "$ALLOWED_ORIGINS" "$APP_DOMAIN" "$API_BASE_URL" "$APP_ID" "$ALLOW_ANONYMOUS" "$URI_DIGITAL_AUTH" "" "" "" "$APP_BASE_PATH" "$REDIS_PWD" "$TELNET_P"
 
 if [ $? -ne 0 ]; then
     echo "❌ Errore durante la build."

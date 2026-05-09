@@ -26,10 +26,10 @@ Environment=GEODATADIR=./data
 Environment=PATH={{NODE_BIN_DIR}}:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 # Database & Infrastructure
-Environment=MONGO_URI=mongodb://intelagent:intelagent@127.0.0.1:17017/threatinteldb
+Environment=MONGO_URI=mongodb://{{MONGO_APP_USER}}:{{MONGO_APP_PWD}}@127.0.0.1:17017/{{MONGO_APP_DB}}
 Environment=REDIS_HOST=127.0.0.1
 Environment=REDIS_PORT=6379
-Environment=REDIS_PASSWORD=!!!HoneyPotRedis!!!
+Environment=REDIS_PASSWORD={{REDIS_PASSWORD}}
 Environment=REDIS_DB=0
 Environment=QDRANT_URL={{QDRANT_URL}}
 Environment=RAG_COLLECTION_NAME={{RAG_COLLECTION_NAME}}

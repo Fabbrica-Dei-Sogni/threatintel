@@ -4,11 +4,12 @@
 # Questo script viene eseguito sulla macchina di destinazione dal cliente.
 
 WORKING_DIR=$(pwd)
-SERVICE_NAME=$1
+SERVICE_NAME=${1:-"$(basename $(pwd))"}
 
-if [ -z "$SERVICE_NAME" ]; then
-    echo "❌ Errore: Devi specificare il nome del servizio."
-    echo "Esempio: ./install.sh threatintel-prod"
+# Evitiamo nomi generici se lanciato per errore da cartelle comuni o non idonee
+if [ -z "$SERVICE_NAME" ] || [ "$SERVICE_NAME" = "deploy" ] || [ "$SERVICE_NAME" = "installer" ] || [ "$SERVICE_NAME" = "." ]; then
+    echo "❌ Errore: Nome servizio '$SERVICE_NAME' non valido o mancante."
+    echo "Specificalo esplicitamente: ./install.sh mio-servizio"
     exit 1
 fi
 

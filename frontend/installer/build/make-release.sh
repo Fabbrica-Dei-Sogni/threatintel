@@ -33,6 +33,8 @@ echo "🛠️  Preparazione script di installazione..."
 cp "$DEPLOY_TEMPLATES/install.sh.template" "$BUILD_DIR/install.sh"
 cp "$DEPLOY_TEMPLATES/uninstall.sh.template" "$BUILD_DIR/uninstall.sh"
 cp "$DEPLOY_TEMPLATES/docker-compose.yml.template" "$BUILD_DIR/"
+cp "$DASHBOARD_SRC/entrypoint.sh" "$BUILD_DIR/"
+cp "$DASHBOARD_SRC/config.js.template" "$BUILD_DIR/"
 
 chmod +x "$BUILD_DIR/install.sh" "$BUILD_DIR/uninstall.sh"
 

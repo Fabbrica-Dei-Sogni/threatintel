@@ -19,6 +19,8 @@ DEFAULT_PORT="8180"
 DEFAULT_HP_NAME="Honeypot (Location)"
 DEFAULT_REGISTRY="https://alessandromodica.com/nexus/repository/npm-all/"
 
+DEFAULT_CHAINPROMPT_API_URL="http://localhost:5000/api"
+
 read -p "📛 Titolo Applicazione [$DEFAULT_TITLE]: " APP_TITLE
 APP_TITLE=${APP_TITLE:-$DEFAULT_TITLE}
 
@@ -26,6 +28,9 @@ read -p "📂 Base Path (es. /honeypot/) [$DEFAULT_BASE_PATH]: " APP_BASE_PATH
 APP_BASE_PATH=${APP_BASE_PATH:-$DEFAULT_BASE_PATH}
 [[ $APP_BASE_PATH != /* ]] && APP_BASE_PATH="/$APP_BASE_PATH"
 [[ $APP_BASE_PATH != */ ]] && APP_BASE_PATH="$APP_BASE_PATH/"
+
+read -p "🔗 ChainPrompt API URL [$DEFAULT_CHAINPROMPT_API_URL]: " CHAINPROMPT_API_URL
+CHAINPROMPT_API_URL=${CHAINPROMPT_API_URL:-$DEFAULT_CHAINPROMPT_API_URL}
 
 read -p "🌐 Porta locale del servizio [$DEFAULT_PORT]: " DEPLOY_PORT
 DEPLOY_PORT=${DEPLOY_PORT:-$DEFAULT_PORT}
@@ -53,7 +58,7 @@ VITE_APP_TITLE=$APP_TITLE
 VITE_APP_VERSION=$VERSION
 VITE_WELCOME_PATH=/welcome
 VITE_API_TIMEOUT=30000
-VITE_CHAINPROMPT_API_URL=http://localhost:5000/api
+VITE_CHAINPROMPT_API_URL=$CHAINPROMPT_API_URL
 VITE_APP_BASE_PATH=$APP_BASE_PATH
 VITE_HONEYPOT_NAME=$HP_NAME
 VITE_HONEYPOT_LOCATION_LAT=$HP_LAT
@@ -71,6 +76,7 @@ if [ -f "docker-compose.yml.template" ]; then
         -e "s|{{HP_NAME}}|$HP_NAME|g" \
         -e "s|{{HP_LAT}}|$HP_LAT|g" \
         -e "s|{{HP_LON}}|$HP_LON|g" \
+        -e "s|{{API_URL}}|$API_URL|g" \
         "docker-compose.yml.template" > "docker-compose.yml"
 fi
 

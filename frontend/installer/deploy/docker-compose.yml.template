@@ -7,11 +7,14 @@ services:
       args:
         NPM_VERSION: {{VERSION}}
         NPM_REGISTRY_URI: {{NPM_REGISTRY_URI}}
-        VITE_APP_TITLE: "{{APP_TITLE}}"
-        VITE_APP_BASE_PATH: "{{APP_BASE_PATH}}"
-        VITE_HONEYPOT_LOCATION_LAT: "{{HP_LAT}}"
-        VITE_HONEYPOT_LOCATION_LON: "{{HP_LON}}"
-        VITE_HONEYPOT_NAME: "{{HP_NAME}}"
+    environment:
+      - VITE_APP_TITLE={{APP_TITLE}}
+      - VITE_APP_BASE_PATH={{APP_BASE_PATH}}
+      - VITE_APP_VERSION={{VERSION}}
+      - VITE_HONEYPOT_LOCATION_LAT={{HP_LAT}}
+      - VITE_HONEYPOT_LOCATION_LON={{HP_LON}}
+      - VITE_HONEYPOT_NAME={{HP_NAME}}
+      - VITE_CHAINPROMPT_API_URL={{API_URL}}
     ports:
       - "127.0.0.1:{{PORT}}:80"
     restart: unless-stopped

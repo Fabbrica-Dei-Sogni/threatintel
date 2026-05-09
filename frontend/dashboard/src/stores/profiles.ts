@@ -10,7 +10,7 @@ export const useProfileStore = defineStore('profiles', () => {
     const defaultProfile: HoneypotProfile = {
         id: 'default',
         name: import.meta.env.VITE_HONEYPOT_NAME || 'Default Honeypot',
-        apiUrl: localStorage.getItem('api_url') || import.meta.env.VITE_APP_API_URL || 'https://alessandromodica.com/honeypot/api',
+        apiUrl: localStorage.getItem('api_url') || import.meta.env.VITE_APP_API_URL || `${window.location.origin}${import.meta.env.BASE_URL}api`.replace(/\/+$/, ''),
         lat: Number(import.meta.env.VITE_HONEYPOT_LOCATION_LAT) || 48.8566,
         lon: Number(import.meta.env.VITE_HONEYPOT_LOCATION_LON) || 2.3522
     };

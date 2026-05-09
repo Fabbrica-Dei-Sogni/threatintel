@@ -2,7 +2,7 @@
 import axios from 'axios';
 import type { AxiosResponse } from 'axios';
 
-const baseURL: string = import.meta.env.VITE_APP_API_URL || '/honeypot/api';
+const baseURL: string = import.meta.env.VITE_APP_API_URL || `${import.meta.env.BASE_URL}api`.replace(/\/+$/, '');
 
 export const apiClient = axios.create({
     baseURL,

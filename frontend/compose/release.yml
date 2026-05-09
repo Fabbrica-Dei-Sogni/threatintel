@@ -13,8 +13,7 @@ services:
         NPM_REGISTRY_URI: ${NPM_REGISTRY_URI:-https://alessandromodica.com/nexus/repository/npm-all/}
         # Variabili Vite iniettate al build time
         VITE_APP_TITLE: ${VITE_APP_TITLE:-"Threat Intel Dashboard"}
-        VITE_APP_API_URL: ${VITE_APP_API_URL:-"/honeypot/api"}
-        VITE_WELCOME_PATH: ${VITE_WELCOME_PATH:-"/honeypot/welcome"}
+        VITE_WELCOME_PATH: ${VITE_WELCOME_PATH:-"/welcome"}
         VITE_API_TIMEOUT: ${VITE_API_TIMEOUT:-"30000"}
         VITE_HONEYPOT_LOCATION_LAT: ${VITE_HONEYPOT_LOCATION_LAT:-"48.8566"}
         VITE_HONEYPOT_LOCATION_LON: ${VITE_HONEYPOT_LOCATION_LON:-"2.3522"}

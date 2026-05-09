@@ -24,7 +24,7 @@ export const getApiUrl = (): string => {
     }
     // Fallback prioritario al localStorage (via HP_API namespace se migrato) o ENV
     const savedApi = storage.get<string>(StorageNamespace.API);
-    return savedApi || import.meta.env.VITE_APP_API_URL || '/honeypot/api';
+    return savedApi || import.meta.env.VITE_APP_API_URL || `${import.meta.env.BASE_URL}api`.replace(/\/+$/, '');
 };
 
 export const apiClient = axios.create({
@@ -73,9 +73,9 @@ apiClient.interceptors.response.use((response) => {
             // Fallback sicuro se Pinia non è pronto: redirect diretto a /login
             console.error('[apiClient] Errore auth, fallback redirect:', e);
             const currentPath = window.location.pathname;
-            const isAuthPage = ['/login', '/register'].some(p => currentPath.startsWith(p));
+            const isAuthPage = [`${import.meta.env.BASE_URL}login`, `${import.meta.env.BASE_URL}register`].some(p => currentPath.includes(p));
             if (!isAuthPage) {
-                window.location.href = '/login';
+                window.location.href = `${import.meta.env.BASE_URL}login`.replace(/\/+$/, '');
             }
         }
     }

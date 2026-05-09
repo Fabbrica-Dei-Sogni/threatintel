@@ -43,7 +43,7 @@ Punta l'argomento `NPM_REGISTRY_URI` al nuovo gruppo:
 
 ```yaml
 args:
-  NPM_VERSION: ${NPM_VERSION_FRONTEND:-0.1.8}
+  NPM_VERSION: ${NPM_VERSION:-0.1.8}
   NPM_REGISTRY_URI: ${NPM_REGISTRY_URI:-http://alessandromodica.com:8081/repository/npm-all/}
 ```
 

@@ -1,6 +1,6 @@
 {
     "name": "honeypot-dashboard",
-    "version": "0.1.4",
+    "version": "0.1.5",
     "publishConfig": {
         "registry": "http://alessandromodica.com:8081/repository/npm-cloud-pubblico/"
     },
@@ -13,8 +13,8 @@
         "type-check:all": "vue-tsc --noEmit",
         "test": "vitest",
         "test:coverage": "vitest run --coverage",
-        "release": "npm version $npm_config_versione -m 'Rilasciata una nuova release frontend' && git push",
-        "patch": "npm version patch -m 'Rilasciata una nuova patch frontend' && git push"
+        "release": "npm version $npm_config_versione -m 'v%s' && git add package.json package-lock.json && git commit -m 'v%s' --allow-empty && git push --follow-tags",
+        "patch": "npm version patch -m 'v%s' && git add package.json package-lock.json && (git diff --staged --quiet || git commit -m 'v%s') && git push --follow-tags"
     },
     "dependencies": {
         "axios": ">=1.15.0",

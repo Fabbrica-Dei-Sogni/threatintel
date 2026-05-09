@@ -33,51 +33,53 @@ import { RateLimitMiddleware } from "./rateLimitMiddleware";
 import { setupSwagger } from "./swagger";
 import { RouterHub } from "./registry/RouterHub";
 
-// Instantiate controllers via DI container
-const authMiddleware = getComponent(AuthMiddleware);
+/**
+ * Factory function to setup the API router.
+ * We use a function to defer component resolution until the DI container is fully initialized.
+ */
+export default function setupApi() {
+    const authMiddleware = getComponent(AuthMiddleware);
+    const threatLogger = getComponent(ThreatLogger);
+    const rateLimitMiddleware = getComponent(RateLimitMiddleware);
+    const routerHub = getComponent(RouterHub);
 
-const threatLogger = getComponent(ThreatLogger);
-const rateLimitMiddleware = getComponent(RateLimitMiddleware);
-const routerHub = getComponent(RouterHub);
+    const router = express.Router();
 
-const router = express.Router();
+    // Register controllers with RouterHub
+    routerHub.register(ThreatController);
+    routerHub.register(AttackLogController);
+    routerHub.register(CampaignController);
+    routerHub.register(ConfigController);
+    routerHub.register(RateLimitController);
+    routerHub.register(ManageLimitController);
+    routerHub.register(ReportController);
+    routerHub.register(DossierController);
+    routerHub.register(AuthController);
+    routerHub.register(CowrieController);
+    routerHub.register(JobController);
+    routerHub.register(AssistantController);
+    routerHub.register(McpProtocolController);
+    
+    // NOTE: FakeLoginController must be registered last as it contains catch-all '*' routes
+    routerHub.register(FakeLoginController);
 
-// [NEW] Register controllers with RouterHub
-routerHub.register(ThreatController);
-routerHub.register(AttackLogController);
-routerHub.register(CampaignController);
-routerHub.register(ConfigController);
-routerHub.register(RateLimitController);
-routerHub.register(ManageLimitController);
-routerHub.register(ReportController);
-routerHub.register(DossierController);
-routerHub.register(AuthController);
-routerHub.register(CowrieController);
-routerHub.register(JobController);
-routerHub.register(AssistantController);
-routerHub.register(McpProtocolController);
-//XXX: deve essere registrato per ultimo
-routerHub.register(FakeLoginController);
+    // Configuration of Threat Logger
+    // IMPORTANT: The threat logging middleware must be FIRST
+    router.use(threatLogger.middleware());
 
-// Configurazione Threat Logger
-// **IMPORTANTE: Il middleware di threat logging deve essere PRIMO**
-router.use(threatLogger.middleware());
+    // Security & DDoS protection alignment
+    router.use(rateLimitMiddleware.violationTracker());
+    router.use(rateLimitMiddleware.ddosProtectionLimiter());
+    router.use(rateLimitMiddleware.applicationLimiter());
 
-// Allineamento Sicurezza DDoS Globale (Copertura Frontend + Honeypot)
-router.use(rateLimitMiddleware.violationTracker());
-router.use(rateLimitMiddleware.ddosProtectionLimiter());
-router.use(rateLimitMiddleware.applicationLimiter());
+    // Integration of Swagger Documentation (OpenAPI)
+    setupSwagger(router);
 
-// Proxy Auth Reale (Pubblico)
-// router.use('/api', authroutes(authController)); // [REMOVED]
+    // Global API Protection
+    router.use('/api', authMiddleware.isAuthenticated());
 
-// Integrazione Documentazione Swagger (OpenAPI) - PUBBLICA (Visualizzazione consentita a tutti)
-setupSwagger(router);
+    // Bind decorated routes to the router
+    routerHub.bindHttp(router, container);
 
-// Protezione Globale API (Escluso le trap e l'auth che passano prima in questo file)
-router.use('/api', authMiddleware.isAuthenticated());
-
-// [NEW] Bind decorated routes (ThreatController, etc.)
-routerHub.bindHttp(router, container);
-
-export default router;
+    return router;
+}

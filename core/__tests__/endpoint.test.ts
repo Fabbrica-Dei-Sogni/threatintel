@@ -64,10 +64,11 @@ describe('Endpoint Router Rate Limits', () => {
 
     beforeAll(() => {
         try {
-            // Import after mocks are set
-            endpointRouter = require('../endpoint').default;
+            // Import the factory and call it
+            const setupApi = require('../endpoint').default;
+            endpointRouter = setupApi();
         } catch (e) {
-            // Se fallisce ancora, forniamo un router vuoto per non bloccare la suite
+            // Fallback to empty router
             endpointRouter = express.Router();
         }
     });

@@ -16,7 +16,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import path from 'path';
 import { port, allowedOrigins } from './core/config';
-import api from './core/endpoint';
+import setupApi from './core/endpoint';
 import { getComponent } from './core/di/container';
 import * as Tokens from './core/di/tokens';
 import { ServiceStatus } from './core/types/lifecycle';
@@ -60,7 +60,7 @@ app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 app.set('trust proxy', true);
 
 // carichiamo le api del threat intel
-app.use(api);
+app.use(setupApi());
 
 const PORT = port;
 const server = app.listen(Number(PORT), '0.0.0.0', async () => {

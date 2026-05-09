@@ -10,7 +10,7 @@ import { Controller, Get, Post, Delete } from '../registry/decorators';
 import { getComponent } from '../di/container';
 import { AuthMiddleware } from '../middlewares/AuthMiddleware';
 
-const auth = getComponent(AuthMiddleware);
+const auth = () => getComponent<AuthMiddleware>(Tokens.AUTH_MIDDLEWARE_TOKEN);
 
 @singleton()
 @Controller('/api/config')
@@ -35,7 +35,7 @@ export class ConfigController {
      *       200:
      *         description: Elenco configurazioni restituito.
      */
-    @Get('/', [auth.hasRole('admin')])
+    @Get('/', [(req: any, res: any, next: any) => auth().hasRole('admin')(req, res, next)])
     async getAllConfigs(_req: Request, res: Response): Promise<void> {
         this.logger.info('[ConfigController] Fetching all configurations');
         try {
@@ -70,7 +70,7 @@ export class ConfigController {
      *       200:
      *         description: Configurazione salvata.
      */
-    @Post('/', [auth.hasRole('admin')])
+    @Post('/', [(req: any, res: any, next: any) => auth().hasRole('admin')(req, res, next)])
     async saveConfig(req: Request, res: Response): Promise<void> {
         const { key, value } = req.body;
         this.logger.info(`[ConfigController] Saving configuration: ${key}`);
@@ -113,7 +113,7 @@ export class ConfigController {
      *       200:
      *         description: Configurazione eliminata.
      */
-    @Delete('/:key', [auth.hasRole('admin')])
+    @Delete('/:key', [(req: any, res: any, next: any) => auth().hasRole('admin')(req, res, next)])
     async deleteConfig(req: Request, res: Response): Promise<void> {
         const key = req.params.key as string;
         this.logger.info(`[ConfigController] Deleting configuration: ${key}`);
@@ -152,7 +152,7 @@ export class ConfigController {
      *       200:
      *         description: Risultati della ricerca.
      */
-    @Post('/search', [auth.hasRole('admin')])
+    @Post('/search', [(req: any, res: any, next: any) => auth().hasRole('admin')(req, res, next)])
     async searchConfigs(req: Request, res: Response): Promise<void> {
         const { query } = req.body;
         this.logger.info(`[ConfigController] Searching configurations with query: ${query}`);

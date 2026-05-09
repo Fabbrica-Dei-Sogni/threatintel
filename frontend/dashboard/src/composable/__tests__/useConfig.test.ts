@@ -123,8 +123,14 @@ describe('useConfig', () => {
   });
 
   it('should reanalyze all logs', async () => {
-    const mockResult = { analyzed: 10, updated: 5, errors: 0 };
-    vi.mocked(configApi.reanalyzeAllLogs).mockResolvedValue(mockResult);
+    const mockResult = { 
+      message: 'Reanalysis started', 
+      jobs: { 
+        http: { jobId: '123', status: 'pending' },
+        ssh: { jobId: '456', status: 'pending' }
+      }
+    };
+    vi.mocked(configApi.reanalyzeAllLogs).mockResolvedValue(mockResult as any);
     const { reanalyzeAll, saving } = useConfig();
 
     const result = await reanalyzeAll();

@@ -70,6 +70,10 @@ if [[ "$DO_NGINX" =~ ^([yY][eE][sS]|[yY])$ ]]; then
             echo "✅ Nginx configurato e ricaricato."
         else
             echo "❌ Errore critico nella configurazione Nginx. Operazione annullata."
+            echo "🧹 Rimuovo i link configurati per evitare stati corrotti..."
+            sudo rm -f "/etc/nginx/conf.d/threatintel_globals_$SERVICE_NAME.conf" 2>/dev/null
+            sudo rm -f "/etc/nginx/sites-enabled/$SERVICE_NAME.conf" 2>/dev/null
+            sudo rm -f "/etc/nginx/sites-available/$SERVICE_NAME.conf" 2>/dev/null
             exit 1
         fi
     fi

@@ -1,0 +1,16 @@
+#!/bin/bash
+
+echo "🗑️  Rimozione Threat Intelligence Frontend..."
+
+docker compose down
+
+if [ $? -eq 0 ]; then
+    echo "✅ Container rimossi correttamente."
+    read -p "Vuoi rimuovere anche i file di configurazione (.env, docker-compose.yml)? [y/N]: " REMOVE_FILES
+    if [[ "$REMOVE_FILES" =~ ^[Yy]$ ]]; then
+        rm -f .env docker-compose.yml
+        echo "🧹 File rimossi."
+    fi
+else
+    echo "❌ Errore durante la rimozione."
+fi

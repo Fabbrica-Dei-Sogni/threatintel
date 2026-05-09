@@ -1,0 +1,89 @@
+#!/bin/bash
+
+# ThreatIntel Frontend - Interactive Installer (Nexus Version)
+# Questo script configura l'ambiente e avvia il Docker scaricando da Nexus.
+
+echo "🚀 Installatore Threat Intelligence Frontend (Nexus)"
+echo "============================================================"
+
+# Directory di lavoro
+WORKING_DIR=$(pwd)
+
+# 1. Wizard di Configurazione
+echo "📝 Configurazione parametri (premi INVIO per i default):"
+echo "------------------------------------------------------------"
+
+DEFAULT_TITLE="Threat Intel Dashboard"
+DEFAULT_BASE_PATH="/honeypot/"
+DEFAULT_PORT="8180"
+DEFAULT_HP_NAME="Honeypot (Location)"
+DEFAULT_REGISTRY="https://alessandromodica.com/nexus/repository/npm-all/"
+
+read -p "📛 Titolo Applicazione [$DEFAULT_TITLE]: " APP_TITLE
+APP_TITLE=${APP_TITLE:-$DEFAULT_TITLE}
+
+read -p "📂 Base Path (es. /honeypot/) [$DEFAULT_BASE_PATH]: " APP_BASE_PATH
+APP_BASE_PATH=${APP_BASE_PATH:-$DEFAULT_BASE_PATH}
+[[ $APP_BASE_PATH != /* ]] && APP_BASE_PATH="/$APP_BASE_PATH"
+[[ $APP_BASE_PATH != */ ]] && APP_BASE_PATH="$APP_BASE_PATH/"
+
+read -p "🌐 Porta locale del servizio [$DEFAULT_PORT]: " DEPLOY_PORT
+DEPLOY_PORT=${DEPLOY_PORT:-$DEFAULT_PORT}
+
+read -p "📦 Nexus Registry URI [$DEFAULT_REGISTRY]: " NPM_REGISTRY_URI
+NPM_REGISTRY_URI=${NPM_REGISTRY_URI:-$DEFAULT_REGISTRY}
+
+read -p "📡 Nome del sensore [$DEFAULT_HP_NAME]: " HP_NAME
+HP_NAME=${HP_NAME:-$DEFAULT_HP_NAME}
+
+read -p "📍 Latitudine [48.8566]: " HP_LAT
+HP_LAT=${HP_LAT:-"48.8566"}
+
+read -p "📍 Longitudine [2.3522]: " HP_LON
+HP_LON=${HP_LON:-"2.3522"}
+
+echo "------------------------------------------------------------"
+
+# 2. Generazione del file .env (utile per persistenza e Vite locale)
+echo "⚙️  Generazione file .env..."
+VERSION=$(cat VERSION 2>/dev/null || echo "0.1.10")
+
+cat > ".env" <<EOF
+VITE_APP_TITLE=$APP_TITLE
+VITE_APP_VERSION=$VERSION
+VITE_WELCOME_PATH=/welcome
+VITE_API_TIMEOUT=30000
+VITE_CHAINPROMPT_API_URL=http://localhost:5000/api
+VITE_APP_BASE_PATH=$APP_BASE_PATH
+VITE_HONEYPOT_NAME=$HP_NAME
+VITE_HONEYPOT_LOCATION_LAT=$HP_LAT
+VITE_HONEYPOT_LOCATION_LON=$HP_LON
+EOF
+
+# 3. Generazione docker-compose.yml dal template
+echo "⚙️  Generazione docker-compose.yml..."
+if [ -f "docker-compose.yml.template" ]; then
+    sed -e "s|{{PORT}}|$DEPLOY_PORT|g" \
+        -e "s|{{VERSION}}|$VERSION|g" \
+        -e "s|{{NPM_REGISTRY_URI}}|$NPM_REGISTRY_URI|g" \
+        -e "s|{{APP_TITLE}}|$APP_TITLE|g" \
+        -e "s|{{APP_BASE_PATH}}|$APP_BASE_PATH|g" \
+        -e "s|{{HP_NAME}}|$HP_NAME|g" \
+        -e "s|{{HP_LAT}}|$HP_LAT|g" \
+        -e "s|{{HP_LON}}|$HP_LON|g" \
+        "docker-compose.yml.template" > "docker-compose.yml"
+fi
+
+# 4. Avvio Docker
+echo "🚀 Avvio dei container (scaricamento da Nexus in corso)..."
+docker compose up -d --build
+
+if [ $? -eq 0 ]; then
+    echo "============================================================"
+    echo "✨ Installazione completata per $APP_TITLE!"
+    echo "🌐 Accessibile su: http://localhost:$DEPLOY_PORT$APP_BASE_PATH"
+    echo "============================================================"
+else
+    echo "❌ Errore durante l'avvio."
+    exit 1
+fi

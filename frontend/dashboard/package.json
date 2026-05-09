@@ -17,7 +17,7 @@
         "patch": "npm version patch -m 'v%s' && git add package.json package-lock.json && (git diff --staged --quiet || git commit -m \"Rilasciata una nuova patch frontend v$(node -p \"require('./package.json').version\")\") && git push --follow-tags"
     },
     "dependencies": {
-        "axios": ">=1.15.0",
+        "axios": "^1.7.7",
         "chart.js": "^4.4.0",
         "chartjs-adapter-dayjs-4": "^1.0.4",
         "dayjs": "^1.11.9",

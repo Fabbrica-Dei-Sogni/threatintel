@@ -18,10 +18,10 @@ export const useSocketStore = defineStore('socket', () => {
         // Determinazione URL e Origin per Socket.io
         // Supporta configurazioni VITE_APP_API_URL esterne o fallback su window.location
         let fullUrl = getEnv('VITE_APP_API_URL') || window.location.origin;
-        
+
         // Rimuoviamo il suffix /api se presente: socket.io gestisce il proprio path separatamente
         fullUrl = fullUrl.replace(/\/api$/, '');
-        
+
         let origin = '';
         try {
             // Estraiamo solo l'ORIGIN per evitare errori di namespace su subpath complessi
@@ -30,7 +30,7 @@ export const useSocketStore = defineStore('socket', () => {
 
             socket.value = io(origin, {
                 // Utilizziamo il path standard configurato su Nginx/Backend
-                path: '/socket.io/',
+                path: (getEnv('VITE_APP_BASE_PATH') || '/') + 'socket.io/',
                 withCredentials: true,
                 reconnectionAttempts: 10,
                 reconnectionDelay: 5000,
@@ -39,7 +39,7 @@ export const useSocketStore = defineStore('socket', () => {
         } catch (e) {
             console.error('[Socket] Origin parsing failed, falling back to window.location.origin');
             socket.value = io(window.location.origin, {
-                path: '/socket.io/',
+                path: (getEnv('VITE_APP_BASE_PATH') || '/') + 'socket.io/',
                 withCredentials: true,
                 transports: ['websocket', 'polling']
             });

@@ -128,7 +128,7 @@ server {
     #}    
 
     # Supporto Socket.io per ThreatIntel
-    location /socket.io/ {
+    location {{APP_BASE_PATH}}/socket.io/ {
         proxy_pass http://localhost:{{PORT}}/socket.io/;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;

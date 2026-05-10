@@ -15,6 +15,9 @@ fi
 PENDING_DEPLOYS=""
 cd "$PROJECT_ROOT/deployments"
 for dir in */; do
+    # Verifica che la directory esista davvero e non sia il glob vuoto "*"
+    [ -d "$dir" ] || continue
+
     dir=${dir%/} # Rimuove lo slash finale
     if [ ! -f "/etc/systemd/system/$dir.service" ]; then
         PENDING_DEPLOYS="$PENDING_DEPLOYS $dir"

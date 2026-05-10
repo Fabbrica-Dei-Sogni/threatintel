@@ -96,10 +96,11 @@ server {
     listen 443 ssl;
     server_name {{APP_DOMAIN}};
 
-    ssl_certificate /etc/letsencrypt/live/{{APP_DOMAIN}}/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/{{APP_DOMAIN}}/privkey.pem;
-    include /etc/letsencrypt/options-ssl-nginx.conf;
-    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+    #Scommentare con certificati buoni dopo aver definito i certificati SSL
+    #ssl_certificate /etc/letsencrypt/live/{{APP_DOMAIN}}/fullchain.pem;
+    #ssl_certificate_key /etc/letsencrypt/live/{{APP_DOMAIN}}/privkey.pem;
+    #include /etc/letsencrypt/options-ssl-nginx.conf;
+    #ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
 
     # API ThreatIntel
     location {{API_BASE_URL}}/ {

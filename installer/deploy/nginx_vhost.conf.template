@@ -1,5 +1,5 @@
 # ThreatIntel Virtual Host Configuration Template for {{SERVICE_NAME}}
-# Destinazione: /etc/nginx/sites-available/{{SERVICE_NAME}}.conf
+# Destinazione: /etc/nginx/sites-enabled/{{SERVICE_NAME}}.conf
 
 server {
     listen 80;
@@ -14,79 +14,71 @@ server {
 
     server_name {{APP_DOMAIN}}; 
 
-    # Security Headers
-    add_header X-Frame-Options "SAMEORIGIN" always;
-    add_header X-Content-Type-Options "nosniff" always;
-    add_header X-XSS-Protection "0" always;
-    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
-
-    # Logs
+    # Access Log in formato JSON per il servizio di analisi (Definito in globals)
     access_log /var/log/nginx/{{SERVICE_NAME}}_access.log json_{{SERVICE_NAME}};
     error_log /var/log/nginx/{{SERVICE_NAME}}_error.log warn;
 
-    # 1. API & Backend (con prefisso custom)
-    location {{APP_BASE_PATH}}/api/ {
-        proxy_pass http://127.0.0.1:{{PORT}}/api/;
-        
-        # Gestione dei redirect interni (fondamentale per Swagger)
-        proxy_redirect /api/ {{APP_BASE_PATH}}/api/;
-        proxy_redirect http://127.0.0.1:{{PORT}}/api/ {{API_BASE_URL}}/;
+    # Rate limiting (Zone definite in globals)
+    limit_req zone=general_{{SERVICE_NAME}} burst=20 nodelay;
 
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
+    # Blocco User Agents sospetti
+    if ($http_user_agent ~* (sqlmap|nikto|nmap|masscan|netsparker)) {
+        return 444;
     }
 
-    # 2. Supporto Socket.io (Real-time Events)
-    location /socket.io/ {
-        proxy_pass http://127.0.0.1:{{PORT}}/socket.io/;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection "Upgrade";
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-            
-        # Aumenta i timeout per evitare disconnessioni frequenti
-        proxy_read_timeout 86400;
-    }
+    # 1. Gateway Principale (Honeypot Trap Catch-all)
+    location / {
+        proxy_pass http://127.0.0.1:{{PORT}};
 
-    # 3. Altre location del backend (es. auth o landing se non in sottocartella)
-    location {{APP_BASE_PATH}}/ {
-        proxy_pass http://127.0.0.1:{{PORT}}/;
-        proxy_set_header Host $host;
+        # Header fondamentali per l'Honeypot
+        proxy_set_header X-Server-Port $server_port; # CRUCIALE: Dice al backend su che porta è entrato l'attaccante
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
-        
+        proxy_set_header Host $host;
+
+        # WebSocket support
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection 'upgrade';
         proxy_cache_bypass $http_upgrade;
     }
 
+    # 2. Endpoint Sensibile: Login (Protezione rinforzata)
+    location /login {
+        limit_req zone=login_{{SERVICE_NAME}} burst=3 nodelay;
+        proxy_pass http://127.0.0.1:{{PORT}};
+        proxy_set_header X-Server-Port $server_port;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Host $host;
+    }
+
+    # 3. API backend (Uso interno/Localhost)
+    location /api/ {
+        allow 127.0.0.1;
+        allow ::1;
+        deny all;
+
+        proxy_pass http://127.0.0.1:{{PORT}};
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Server-Port $server_port;
+    }
+
     # Protezione file sensibili
     location ~ /\. { deny all; access_log off; log_not_found off; }
 }
 
-# --- Honeypot SSL Traps (Esempio) ---
-# NOTA: Per abilitare queste trappole SSL, è necessario:
-# 1. Ottenere dei certificati (es. tramite Certbot) per il proprio dominio.
-# 2. Decommentare le righe 'listen' e le direttive 'ssl_certificate'.
-# 3. Sostituire {{APP_DOMAIN}} con il proprio dominio se diverso.
-
+# --- Honeypot SSL Traps ---
 server {
-    # listen 8443 ssl;
-    # listen 9443 ssl;
-    # listen 10443 ssl;
+     listen 8443 ssl;
+     listen 9443 ssl;
+     listen 10443 ssl;
     server_name {{APP_DOMAIN}};
-
-    # ssl_certificate /etc/letsencrypt/live/{{APP_DOMAIN}}/fullchain.pem;
-    # ssl_certificate_key /etc/letsencrypt/live/{{APP_DOMAIN}}/privkey.pem;
-    # include /etc/letsencrypt/options-ssl-nginx.conf;
-    # ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
 
     access_log /var/log/nginx/{{SERVICE_NAME}}_access.log json_{{SERVICE_NAME}};
 
@@ -100,22 +92,59 @@ server {
     }
 }
 
-# --- Secure Proxy for other services (fallback/example) ---
 server {
-    # listen 5543 ssl;
+    listen 443 ssl;
     server_name {{APP_DOMAIN}};
 
-    # ssl_certificate /etc/letsencrypt/live/{{APP_DOMAIN}}/fullchain.pem;
-    # ssl_certificate_key /etc/letsencrypt/live/{{APP_DOMAIN}}/privkey.pem;
+    ssl_certificate /etc/letsencrypt/live/{{APP_DOMAIN}}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/{{APP_DOMAIN}}/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
 
-    location / {
-        proxy_pass http://localhost:5540/;
+    # API ThreatIntel
+    location {{API_BASE_URL}}/ {
+        proxy_pass http://localhost:{{PORT}}/api/;
+        
+        # Gestione dei redirect interni (fondamentale per Swagger)
+        proxy_redirect /api/ {{API_BASE_URL}}/;
+        proxy_redirect http://localhost:{{PORT}}/api/ https://{{APP_DOMAIN}}{{API_BASE_URL}}/;
+
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
+    }
 
-        proxy_ssl_verify off;
-        proxy_ssl_server_name on;
-    }    
+    # Frontend HUD
+    # regola da scommentare qualora il frontend e' stato installato sullo stesso host del backend
+
+    #location {{APP_BASE_PATH}}/ {
+    #    proxy_pass http://localhost:{{PORT_FRONTEND}}/;
+    #    proxy_set_header Host $host;
+    #    proxy_set_header X-Real-IP $remote_addr;
+    #    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    #    proxy_set_header X-Forwarded-Proto $scheme;
+    #    try_files $uri $uri/ {{APP_BASE_PATH}}/index.html;
+    #}    
+
+    # Supporto Socket.io per ThreatIntel
+    location /socket.io/ {
+        proxy_pass http://localhost:{{PORT}}/socket.io/;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "Upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+            
+        # Opzionale: aumenta i timeout per evitare disconnessioni frequenti
+        proxy_read_timeout 86400;
+    }
+
+    # Forza trailing slash per le chiamate API dirette (es. api-docs)
+    rewrite ^{{API_BASE_URL}}$ {{API_BASE_URL}} permanent;
+
+    # Streaming log JSON verso syslog per threat intel (solo URI sospetti filtrati sul backend)
+    access_log syslog:server=unix:/dev/log,tag=nginx_threat json_{{SERVICE_NAME}};
 }

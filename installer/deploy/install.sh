@@ -66,6 +66,11 @@ if [ ! -f "$WORKING_DIR/.env" ]; then
         DYNAMIC_API_BASE="https://$APP_DOMAIN$CLEAN_BASE_PATH/api"
         read -p "🔗 API Base URL ($DYNAMIC_API_BASE): " API_BASE_URL
         API_BASE_URL=${API_BASE_URL:-$DYNAMIC_API_BASE}
+        
+        # Estrazione Path Relativo per Nginx (Biunivocità)
+        API_REL_PATH=$(echo "$API_BASE_URL" | sed -E 's|https?://[^/]+||')
+        [ -z "$API_REL_PATH" ] && API_REL_PATH="/"
+        API_REL_PATH=${API_REL_PATH%/} # Rimuove slash finale se presente
         echo ""
 
         echo "📂 INFRASTRUTTURA"
@@ -205,18 +210,26 @@ if [ ! -f "$WORKING_DIR/.env" ]; then
     fi
 
     # Generazione configurazione Nginx
-    if [ -f "proxy/$SERVICE_NAME.conf.template" ] || [ -f "proxy/nginx_vhost.conf.template" ]; then
+    if [ -f "proxy/nginx_vhost.conf.template" ]; then
         echo "⚙️  Generazione configurazione Nginx..."
         mkdir -p proxy
-        VHOST_TMP=$(ls proxy/*.conf.template 2>/dev/null | head -n 1)
-        [ -z "$VHOST_TMP" ] && VHOST_TMP="proxy/nginx_vhost.conf.template"
+        VHOST_TMP="proxy/nginx_vhost.conf.template"
         
         sed -e "s|{{SERVICE_NAME}}|$SERVICE_NAME|g" \
             -e "s|{{PORT}}|$DEPLOY_PORT|g" \
             -e "s|{{APP_DOMAIN}}|$APP_DOMAIN|g" \
             -e "s|{{API_BASE_URL}}|$API_BASE_URL|g" \
+            -e "s|{{API_BASE_PATH}}|$API_REL_PATH|g" \
             -e "s|{{APP_BASE_PATH}}|$CLEAN_BASE_PATH|g" \
             "$VHOST_TMP" > "proxy/$SERVICE_NAME.conf"
+
+        # Generazione Globali (Logging JSON)
+        GLOBALS_TMP="proxy/nginx_globals.conf.template"
+        if [ -f "$GLOBALS_TMP" ]; then
+            echo "⚙️  Generazione globali Nginx (Logging JSON)..."
+            sed -e "s|{{SERVICE_NAME}}|$SERVICE_NAME|g" \
+                "$GLOBALS_TMP" > "proxy/threatintel_globals_$SERVICE_NAME.conf"
+        fi
     fi
 fi
 
@@ -257,11 +270,21 @@ fi
 
 # 4. Configurazione Nginx (se installato)
 if command -v nginx > /dev/null 2>&1 || [ -x /usr/sbin/nginx ]; then
-    NGINX_CONF="/etc/nginx/sites-available/$SERVICE_NAME.conf"
+    NGINX_VHOST_ENABLED="/etc/nginx/sites-enabled/$SERVICE_NAME.conf"
+    NGINX_GLOBALS_CONF="/etc/nginx/conf.d/threatintel_globals_$SERVICE_NAME.conf"
+    
     if [ -f "proxy/$SERVICE_NAME.conf" ]; then
-        echo "⚙️  Configuring Nginx proxy..."
-        sudo cp "proxy/$SERVICE_NAME.conf" "$NGINX_CONF"
-        sudo ln -sf "$NGINX_CONF" /etc/nginx/sites-enabled/
+        echo "⚙️  Configuring Nginx proxy (via symbolic links)..."
+        
+        # 1. Link per i Globali (Logging JSON)
+        if [ -f "proxy/threatintel_globals_$SERVICE_NAME.conf" ]; then
+            sudo ln -sf "$WORKING_DIR/proxy/threatintel_globals_$SERVICE_NAME.conf" "$NGINX_GLOBALS_CONF"
+        fi
+
+        # 2. Link per il Vhost
+        sudo ln -sf "$WORKING_DIR/proxy/$SERVICE_NAME.conf" "$NGINX_VHOST_ENABLED"
+        
+        # Verifica e ricarica
         sudo nginx -t && sudo systemctl reload nginx
     fi
 else

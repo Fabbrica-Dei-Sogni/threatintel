@@ -171,6 +171,9 @@ if [ "$RUN_WIZARD" = true ]; then
         
         read -p "🆔 Application ID [$DEFAULT_APP_ID]: " APP_ID
         APP_ID=${APP_ID:-$DEFAULT_APP_ID}
+
+        read -p "🛡️  AbuseIPDB API Key [YOUR_API_KEY_HERE]: " ABUSEIPDB_KEY
+        ABUSEIPDB_KEY=${ABUSEIPDB_KEY:-"YOUR_API_KEY_HERE"}
         echo ""
 
         echo "🕸️  HONEYPOTS & TRAPS"
@@ -254,6 +257,8 @@ if [ "$RUN_WIZARD" = true ]; then
             -e "s|{{EMBEDDING_MODEL}}|$EMBEDDING_MODEL|g" \
             -e "s|{{URI_DIGITAL_AUTH}}|$URI_DIGITAL_AUTH|g" \
             -e "s|{{ALLOW_ANONYMOUS}}|true|g" \
+            -e "s|{{HONEYPOT_DASHBOARD_PATH}}|$CLEAN_BASE_PATH|g" \
+            -e "s|{{ABUSEIPDB_KEY}}|$ABUSEIPDB_KEY|g" \
             -e "s|{{SERVICE_NAME}}|$SERVICE_NAME|g" \
             "env.template" > ".env"
         

@@ -29,7 +29,9 @@ APP_BASE_PATH=${APP_BASE_PATH:-$DEFAULT_BASE_PATH}
 [[ $APP_BASE_PATH != /* ]] && APP_BASE_PATH="/$APP_BASE_PATH"
 [[ $APP_BASE_PATH != */ ]] && APP_BASE_PATH="$APP_BASE_PATH/"
 
-read -p "🔗 API URL (lascia vuoto per rilevamento automatico) []: " API_URL
+# Calcolo anteprima URL per aiutare l'utente
+PREVIEW_URL="https://your-domain.com${APP_BASE_PATH}api"
+read -p "🔗 API URL (Anteprima: $PREVIEW_URL) [Rilevamento automatico]: " API_URL
 API_URL=${API_URL:-""}
 
 CHAINPROMPT_API_URL=$DEFAULT_CHAINPROMPT_API_URL

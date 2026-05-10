@@ -2,12 +2,12 @@
 # Includi questo file nel blocco server { listen 443; ... } di alessandromodica.com
 
 # 1. API backend
-location {{API_BASE_URL}}/ {
+location {{APP_BASE_PATH}}/api/ {
     proxy_pass http://localhost:{{PORT}}/api/;
     
     # Gestione dei redirect interni (fondamentale per Swagger)
-    proxy_redirect /api/ {{API_BASE_URL}}/;
-    proxy_redirect http://localhost:{{PORT}}/api/ https://{{APP_DOMAIN}}{{API_BASE_URL}}/;
+    proxy_redirect /api/ {{APP_BASE_PATH}}/api/;
+    proxy_redirect http://localhost:{{PORT}}/api/ https://{{APP_DOMAIN}}{{APP_BASE_PATH}}/api/;
 
     proxy_set_header Host $host;
     proxy_set_header X-Real-IP $remote_addr;
@@ -30,17 +30,20 @@ location {{APP_BASE_PATH}}/socket.io/ {
 }
 
 # 3. Forza trailing slash per le chiamate API dirette (es. api-docs)
-rewrite ^{{API_BASE_URL}}$ {{API_BASE_URL}}/ permanent;
+rewrite ^{{APP_BASE_PATH}}/api$ {{APP_BASE_PATH}}/api/ permanent;
 
-# 4. Frontend HUD (Opzionale: scommentare se il frontend è sullo stesso host del backend)
-#location {{APP_BASE_PATH}}/ {
-#    proxy_pass http://localhost:{{PORT_FRONTEND}}/;
-#    proxy_set_header Host $host;
-#    proxy_set_header X-Real-IP $remote_addr;
-#    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-#    proxy_set_header X-Forwarded-Proto $scheme;
-#    try_files $uri $uri/ {{APP_BASE_PATH}}/index.html;
-#}
+# 4. Frontend HUD (Scommentato per default per integrazione locale)
+location {{APP_BASE_PATH}}/ {
+    
+    #scommentare per definire la porta su cui gira il frontend
+    #proxy_pass http://localhost:{{PORT_FRONTEND}}/;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    
+    #try_files $uri $uri/ {{APP_BASE_PATH}}/index.html;
+}
 
 # Streaming log JSON verso syslog per threat intel
-access_log syslog:server=unix:/dev/log,tag=nginx_threat json_{{SERVICE_NAME}};
+#access_log syslog:server=unix:/dev/log,tag=nginx_threat json_{{SERVICE_NAME}};

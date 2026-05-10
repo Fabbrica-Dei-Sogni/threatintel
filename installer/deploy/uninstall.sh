@@ -59,4 +59,16 @@ else
     echo "ℹ️  Nessuna configurazione Nginx trovata da rimuovere."
 fi
 
+# 3. Docker Infrastructure Cleanup
+if [ -f "docker-compose.infra.yml" ]; then
+    echo "🐳 Verifico infrastruttura Docker..."
+    if docker compose -f docker-compose.infra.yml ps --format json | grep -q '"State":'; then
+        echo "🛑 Fermando e rimuovendo container e volumi Docker..."
+        docker compose -f docker-compose.infra.yml down -v
+        echo "✅ Infrastruttura Docker rimossa (volumi inclusi)."
+    else
+        echo "ℹ️  Nessun container Docker attivo trovato per questa release."
+    fi
+fi
+
 echo "✨ Disinstallazione di $SERVICE_NAME completata."

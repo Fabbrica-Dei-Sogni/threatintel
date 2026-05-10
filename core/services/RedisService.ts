@@ -50,7 +50,7 @@ export class RedisService {
                 enableOfflineQueue: false,
                 maxRetriesPerRequest: 1,
                 lazyConnect: true,
-                retryStrategy: (times: number) => Math.min(times * 100, 1000)
+                retryStrategy: (times: number) => Math.min(times * this.config.redisRetryDelayMs, this.config.redisMaxRetryDelayMs)
             });
 
             this.client.on('ready', () => {

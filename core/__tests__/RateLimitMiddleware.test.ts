@@ -1,5 +1,6 @@
 import 'reflect-metadata';
 import { RateLimitMiddleware } from '../rateLimitMiddleware';
+import { createMockConfigProvider } from './TestUtils';
 import { RateLimitService } from '../services/RateLimitService';
 import { RedisService } from '../services/RedisService';
 import { Logger } from 'winston';
@@ -41,7 +42,7 @@ describe('RateLimitMiddleware', () => {
             getState: jest.fn().mockReturnValue('ready'),
         } as any;
 
-        middleware = new RateLimitMiddleware(mockLogger, mockRedisService, mockRateLimitService);
+        middleware = new RateLimitMiddleware(mockLogger, mockRedisService, createMockConfigProvider(), mockRateLimitService);
         jest.clearAllMocks();
     });
 

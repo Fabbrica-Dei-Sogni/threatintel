@@ -1,0 +1,385 @@
+[
+  {
+    "key": "PORT",
+    "defaultValue": "3999",
+    "description": "Porta locale del servizio backend",
+    "group": "App",
+    "prompt": "Porta locale del servizio",
+    "icon": "🌐"
+  },
+  {
+    "key": "APP_DOMAIN",
+    "defaultValue": "localhost",
+    "description": "Dominio o IP pubblico dell'applicazione",
+    "group": "App",
+    "prompt": "Dominio Applicazione",
+    "icon": "🌐"
+  },
+  {
+    "key": "APP_BASE_PATH",
+    "defaultValue": "",
+    "description": "Base path dell'applicazione (es. /honeypot)",
+    "group": "App",
+    "prompt": "Base Path (es. /honeypot) [INVIO per root /]",
+    "icon": "📂"
+  },
+  {
+    "key": "API_BASE_URL",
+    "defaultValue": "",
+    "description": "URL completo delle API (calcolato automaticamente se vuoto)",
+    "group": "App"
+  },
+  {
+    "key": "ALLOWED_ORIGINS",
+    "defaultValue": "*",
+    "description": "CORS: Origini permesse (separate da virgola)",
+    "group": "App",
+    "prompt": "Allowed Origins",
+    "icon": "🛡️"
+  },
+  {
+    "key": "APP_ID",
+    "defaultValue": "honeypot-host-001",
+    "description": "Identificativo univoco dell'istanza",
+    "group": "App",
+    "prompt": "Application ID",
+    "icon": "🆔"
+  },
+  {
+    "key": "VERSION",
+    "defaultValue": "1.0.0",
+    "description": "Versione dell'applicazione",
+    "group": "App"
+  },
+  {
+    "key": "LOG_LEVEL",
+    "defaultValue": "info",
+    "description": "Livello di logging (debug, info, warn, error)",
+    "group": "App"
+  },
+  {
+    "key": "STORAGE_ROOT",
+    "defaultValue": "$WORKING_DIR/storage",
+    "description": "Percorso root per i volumi persistenti (MongoDB, Redis, Log)",
+    "group": "Infrastructure",
+    "prompt": "Percorso Storage Locale",
+    "icon": "📂"
+  },
+  {
+    "key": "MONGO_URI",
+    "defaultValue": "mongodb://intelagent:intelagent@localhost:17017/threatinteldb",
+    "description": "URI completo di connessione a MongoDB",
+    "group": "Database"
+  },
+  {
+    "key": "REDIS_HOST",
+    "defaultValue": "127.0.0.1",
+    "description": "Host Redis per Rate Limiting e Cache",
+    "group": "Redis"
+  },
+  {
+    "key": "REDIS_PORT",
+    "defaultValue": "6379",
+    "description": "Porta Redis",
+    "group": "Redis"
+  },
+  {
+    "key": "REDIS_PASSWORD",
+    "defaultValue": "!!!HoneyPotRedis!!!",
+    "description": "Password Redis",
+    "group": "Redis",
+    "isSecret": true,
+    "prompt": "Password per Redis",
+    "icon": "🔑"
+  },
+  {
+    "key": "REDIS_DB",
+    "defaultValue": "0",
+    "description": "DB Index Redis",
+    "group": "Redis"
+  },
+  {
+    "key": "REDIS_CONNECT_TIMEOUT_MS",
+    "defaultValue": "2000",
+    "description": "Timeout per la connessione iniziale a Redis (ms)",
+    "group": "Redis"
+  },
+  {
+    "key": "REDIS_COMMAND_TIMEOUT_MS",
+    "defaultValue": "2000",
+    "description": "Timeout per i singoli comandi Redis (ms)",
+    "group": "Redis"
+  },
+  {
+    "key": "REDIS_RETRY_DELAY_MS",
+    "defaultValue": "500",
+    "description": "Ritardo base tra i tentativi di riconnessione Redis (ms)",
+    "group": "Redis"
+  },
+  {
+    "key": "REDIS_MAX_RETRY_DELAY_MS",
+    "defaultValue": "5000",
+    "description": "Ritardo massimo tra i tentativi di riconnessione Redis (ms)",
+    "group": "Redis"
+  },
+  {
+    "key": "RAG_ENABLED",
+    "defaultValue": "true",
+    "description": "Abilita/Disabilita l'integrazione RAG con Qdrant",
+    "group": "AI"
+  },
+  {
+    "key": "OLLAMA_URL",
+    "defaultValue": "http://localhost:11434",
+    "description": "URL del servizio Ollama",
+    "group": "AI",
+    "prompt": "Ollama URI",
+    "icon": "🔗"
+  },
+  {
+    "key": "SUMMARY_MODEL",
+    "defaultValue": "gemma3:1b",
+    "description": "Modello Ollama per le sintesi testuali",
+    "group": "AI",
+    "prompt": "Summary Model",
+    "icon": "🧠"
+  },
+  {
+    "key": "EMBEDDING_MODEL",
+    "defaultValue": "nomic-embed-text",
+    "description": "Modello Ollama per i vettori (embeddings)",
+    "group": "AI",
+    "prompt": "Embedding Model",
+    "icon": "🔡"
+  },
+  {
+    "key": "RAG_AI_SUMMARY_ENABLED",
+    "defaultValue": "true",
+    "description": "Abilita la generazione di riassunti AI durante la materializzazione RAG",
+    "group": "AI"
+  },
+  {
+    "key": "QDRANT_URL",
+    "defaultValue": "http://127.0.0.1:6333",
+    "description": "URL del database vettoriale Qdrant",
+    "group": "AI"
+  },
+  {
+    "key": "EXCLUDED_IPS",
+    "defaultValue": "127.0.0.1,::1,localhost",
+    "description": "IP o range CIDR da non loggare mai (whitelist)",
+    "group": "Security"
+  },
+  {
+    "key": "ABUSEIPDB_KEY",
+    "defaultValue": "",
+    "description": "API Key per AbuseIPDB enrichment",
+    "group": "Security",
+    "isSecret": true
+  },
+  {
+    "key": "IPINFO_TOKEN",
+    "defaultValue": "",
+    "description": "Token per IPInfo.io enrichment",
+    "group": "Security",
+    "isSecret": true
+  },
+  {
+    "key": "IP_CACHE_MAX_AGE_HOURS",
+    "defaultValue": "24",
+    "description": "Ore di validità della cache dei dettagli IP",
+    "group": "Security"
+  },
+  {
+    "key": "HONEYPOT_INSTANCE_ID",
+    "defaultValue": "honeypot-host-001",
+    "description": "Identificativo dell'istanza usato dal Rate Limiter Redis",
+    "group": "Security",
+    "prompt": "Honeypot Instance ID",
+    "icon": "📡"
+  },
+  {
+    "key": "TELNET_P",
+    "defaultValue": "23",
+    "description": "Porta pubblica per l'honeypot Telnet",
+    "group": "Security",
+    "prompt": "Porta Honeypot TELNET",
+    "icon": "📡"
+  },
+  {
+    "key": "URI_DIGITAL_AUTH",
+    "defaultValue": "https://alessandromodica.com:3443/auth/api/v1",
+    "description": "Endpoint IdP per l'autenticazione centralizzata",
+    "group": "Auth",
+    "prompt": "Digital Auth IdP URI",
+    "icon": "🔐"
+  },
+  {
+    "key": "ALLOW_ANONYMOUS",
+    "defaultValue": "true",
+    "description": "Permette l'accesso in sola lettura senza login",
+    "group": "Auth"
+  },
+  {
+    "key": "ANONYMOUS_ROLE",
+    "defaultValue": "viewer",
+    "description": "Ruolo assegnato agli utenti non autenticati",
+    "group": "Auth"
+  },
+  {
+    "key": "AUTH_STRICT_SSL",
+    "defaultValue": "true",
+    "description": "Verifica rigorosa del certificato SSL per l'IdP",
+    "group": "Auth"
+  },
+  {
+    "key": "DDOS_WINDOW_MS",
+    "defaultValue": "60000",
+    "description": "Finestra temporale per protezione DDoS (ms)",
+    "group": "Security"
+  },
+  {
+    "key": "DDOS_MAX_REQUESTS",
+    "defaultValue": "100",
+    "description": "Max richieste in finestra DDoS",
+    "group": "Security"
+  },
+  {
+    "key": "MAX_VIOLATIONS",
+    "defaultValue": "5",
+    "description": "Numero massimo di violazioni prima della blacklist",
+    "group": "Security"
+  },
+  {
+    "key": "BLACKLIST_DURATION",
+    "defaultValue": "7200",
+    "description": "Durata della blacklist automatica (secondi)",
+    "group": "Security"
+  },
+  {
+    "key": "LOG_RATE_LIMIT_EVENTS",
+    "defaultValue": "true",
+    "description": "Abilita il logging degli eventi di rate limiting su MongoDB",
+    "group": "Security"
+  },
+  {
+    "key": "HONEYPOT_DASHBOARD_PATH",
+    "defaultValue": "/honeypot",
+    "description": "Percorso della dashboard (escluso dai rate limit)",
+    "group": "App"
+  },
+  {
+    "key": "CRITICAL_WINDOW_MS",
+    "defaultValue": "900000",
+    "description": "Finestra temporale per endpoint critici (ms)",
+    "group": "Security"
+  },
+  {
+    "key": "CRITICAL_MAX_REQUESTS",
+    "defaultValue": "20",
+    "description": "Max richieste in finestra endpoint critici",
+    "group": "Security"
+  },
+  {
+    "key": "TRAP_WINDOW_MS",
+    "defaultValue": "300000",
+    "description": "Finestra temporale per endpoint trappola (ms)",
+    "group": "Security"
+  },
+  {
+    "key": "TRAP_MAX_REQUESTS",
+    "defaultValue": "50",
+    "description": "Max richieste in finestra endpoint trappola",
+    "group": "Security"
+  },
+  {
+    "key": "APP_WINDOW_MS",
+    "defaultValue": "60000",
+    "description": "Finestra temporale per applicazione globale (ms)",
+    "group": "Security"
+  },
+  {
+    "key": "APP_MAX_REQUESTS",
+    "defaultValue": "200",
+    "description": "Max richieste in finestra applicazione globale",
+    "group": "Security"
+  },
+  {
+    "key": "PRUNING_INTERVAL",
+    "defaultValue": "24h",
+    "description": "Frequenza con cui viene eseguita la pulizia automatica dei log",
+    "group": "Maintenance"
+  },
+  {
+    "key": "PRUNING_MAX_DAYS_THREAT_LOGS",
+    "defaultValue": "30",
+    "description": "Giorni di conservazione per i Threat Logs",
+    "group": "Maintenance"
+  },
+  {
+    "key": "PRUNING_MAX_DAYS_SSH_LOGS",
+    "defaultValue": "60",
+    "description": "Giorni di conservazione per gli SSH Logs",
+    "group": "Maintenance"
+  },
+  {
+    "key": "PRUNING_MAX_DAYS_NGINX_LOGS",
+    "defaultValue": "15",
+    "description": "Giorni di conservazione per i log Nginx processati",
+    "group": "Maintenance"
+  },
+  {
+    "key": "PRUNING_MAX_DAYS_ATTACK_LOGS",
+    "defaultValue": "90",
+    "description": "Giorni di conservazione per i log aggregati degli attacchi",
+    "group": "Maintenance"
+  },
+  {
+    "key": "DANGER_WEIGHT_RPSNORM",
+    "defaultValue": "0.18",
+    "description": "Peso per Requests Per Second nell'analisi del rischio",
+    "group": "Forensics"
+  },
+  {
+    "key": "DANGER_WEIGHT_DURNORM",
+    "defaultValue": "0.12",
+    "description": "Peso per la durata dell'attacco nell'analisi del rischio",
+    "group": "Forensics"
+  },
+  {
+    "key": "DANGER_WEIGHT_SCORENORM",
+    "defaultValue": "0.50",
+    "description": "Peso per lo score euristico nell'analisi del rischio",
+    "group": "Forensics"
+  },
+  {
+    "key": "DANGER_WEIGHT_UNIQUETECHNORM",
+    "defaultValue": "0.20",
+    "description": "Peso per tecniche uniche nell'analisi del rischio",
+    "group": "Forensics"
+  },
+  {
+    "key": "DANGER_WEIGHT_DISTRIBUTED",
+    "defaultValue": "0.15",
+    "description": "Peso per attacchi distribuiti nell'analisi del rischio",
+    "group": "Forensics"
+  },
+  {
+    "key": "ANALYZE_INTERVAL",
+    "defaultValue": "5m",
+    "description": "Intervallo per l'analisi periodica dei log e pattern discovery",
+    "group": "Analysis"
+  },
+  {
+    "key": "NGINX_LOG_PREFIX",
+    "defaultValue": "nginx_threat:",
+    "description": "Prefisso per identificare i log di minaccia in Journald/Syslog",
+    "group": "Analysis"
+  },
+  {
+    "key": "COMMON_ENDPOINTS",
+    "defaultValue": "/admin,/wp-admin,/phpmyadmin",
+    "description": "Lista di endpoint sensibili da monitorare (trappole)",
+    "group": "Security"
+  }
+]

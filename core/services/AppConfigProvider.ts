@@ -2,8 +2,8 @@ import { singleton, inject } from 'tsyringe';
 import { ConfigService } from './ConfigService';
 import { ConfigKey } from '../types/CoreConstants';
 import * as Tokens from '../di/tokens';
-
-import { ConfigDefaults, parseCsv } from '../utils/ConfigUtils';
+import { CONFIG_MANIFEST } from '../config/ConfigManifest';
+import { parseCsv } from '../utils/ConfigHelpers';
 
 @singleton()
 export class AppConfigProvider {
@@ -12,222 +12,332 @@ export class AppConfigProvider {
     ) { }
 
     /**
+     * Helper per recuperare un parametro dal manifest
+     */
+    private getParam(key: string): string {
+        const param = CONFIG_MANIFEST.find(p => p.key === key);
+        
+        // 1. Cerca la chiave principale nel .env (process.env)
+        if (process.env[key] !== undefined && process.env[key] !== null) {
+            return process.env[key]!;
+        }
+
+        // 2. Fallback sul default del manifest
+        return param?.defaultValue || '';
+    }
+
+    /**
+     * Helper per recuperare un parametro CSV dal manifest
+     */
+    private getCsvParam(key: string): string[] {
+        const param = CONFIG_MANIFEST.find(p => p.key === key);
+        
+        // 1. Cerca la chiave principale nel .env
+        const value = process.env[key];
+
+        const defaultValueStr = param?.defaultValue || '';
+        const defaultList = parseCsv(defaultValueStr);
+        
+        return parseCsv(value, defaultList);
+    }
+
+    /**
      * Recupera una porta dal .env o default
      */
     get port(): string {
-        return process.env.PORT || ConfigDefaults.PORT;
+        return this.getParam('PORT');
     }
 
     /**
      * Recupera URI MongoDB dal .env o default
      */
     get mongoUri(): string {
-        return process.env.MONGO_URI || ConfigDefaults.MONGO_URI;
+        return this.getParam('MONGO_URI');
     }
 
     /**
      * Recupera il dominio dell'applicazione
      */
     get appDomain(): string {
-        return process.env.APP_DOMAIN || ConfigDefaults.APP_DOMAIN;
+        return this.getParam('APP_DOMAIN');
     }
 
     /**
      * Recupera le origini consentite per CORS e CSP
      */
     get allowedOrigins(): string[] {
-        return parseCsv(process.env.ALLOWED_ORIGINS, ConfigDefaults.ALLOWED_ORIGINS);
+        return this.getCsvParam('ALLOWED_ORIGINS');
+    }
+
+    /**
+     * Percorso root dello storage
+     */
+    get storageRoot(): string {
+        return this.getParam('STORAGE_ROOT');
+    }
+
+    /**
+     * Versione dell'applicazione
+     */
+    get version(): string {
+        return this.getParam('VERSION');
     }
 
     /**
      * Recupera la lista degli endpoint comuni (trappole) dal .env
      */
     get commonEndpoints(): string[] {
-        return parseCsv(process.env.COMMON_ENDPOINTS);
+        return this.getCsvParam('COMMON_ENDPOINTS');
     }
 
     /**
      * Recupera URI servizio Auth
      */
     get authUri(): string {
-        return process.env.URI_DIGITAL_AUTH || ConfigDefaults.AUTH_URI;
+        return this.getParam('URI_DIGITAL_AUTH');
     }
 
     /**
      * Recupera App ID per il servizio Auth
      */
     get appId(): string {
-        return process.env.APP_ID || ConfigDefaults.APP_ID;
+        return this.getParam('APP_ID');
+    }
+
+    /**
+     * Identificativo istanza per Rate Limiter
+     */
+    get honeypotInstanceId(): string {
+        return this.getParam('HONEYPOT_INSTANCE_ID');
     }
 
     /**
      * Verifica se SSL strict è abilitato per l'Auth
      */
     get authStrictSsl(): boolean {
-        return process.env.AUTH_STRICT_SSL !== 'false';
+        return this.getParam('AUTH_STRICT_SSL') !== 'false';
     }
 
     /**
      * Verifica se l'accesso anonimo è consentito
      */
     get allowAnonymous(): boolean {
-        return process.env.ALLOW_ANONYMOUS === 'true';
+        return this.getParam('ALLOW_ANONYMOUS') === 'true';
     }
 
     /**
      * Recupera il ruolo per gli utenti anonimi
      */
     get anonymousRole(): string {
-        return process.env.ANONYMOUS_ROLE || 'viewer';
+        return this.getParam('ANONYMOUS_ROLE');
     }
 
     /**
      * Configurazione Qdrant
      */
     get qdrantUrl(): string {
-        return process.env.QDRANT_URL || ConfigDefaults.QDRANT_URL;
+        return this.getParam('QDRANT_URL');
     }
 
     get ragEnabled(): boolean {
-        return process.env.RAG_ENABLED !== 'false';
+        return this.getParam('RAG_ENABLED') !== 'false';
     }
 
     get ragCollectionName(): string {
-        return process.env.RAG_COLLECTION_NAME || 'threat_intelligence';
+        return this.getParam('RAG_COLLECTION_NAME');
     }
 
     get ragLogsCollectionName(): string {
-        return process.env.RAG_LOGS_COLLECTION_NAME || 'threat_logs';
+        return this.getParam('RAG_LOGS_COLLECTION_NAME');
     }
 
     get ragAiSummaryEnabled(): boolean {
-        return process.env.RAG_AI_SUMMARY_ENABLED === 'true';
+        return this.getParam('RAG_AI_SUMMARY_ENABLED') === 'true';
     }
 
     get ragReindexThresholdDays(): number {
-        return parseFloat(process.env.RAG_REINDEX_THRESHOLD_DAYS || ConfigDefaults.RAG_REINDEX_THRESHOLD_DAYS);
+        return parseFloat(this.getParam('RAG_REINDEX_THRESHOLD_DAYS'));
     }
 
     /**
      * Configurazione Ollama
      */
     get ollamaUrl(): string {
-        return process.env.OLLAMA_URL || ConfigDefaults.OLLAMA_URL;
+        return this.getParam('OLLAMA_URL');
     }
 
     get embeddingModel(): string {
-        return process.env.EMBEDDING_MODEL || 'nomic-embed-text';
+        return this.getParam('EMBEDDING_MODEL');
     }
 
     get summaryModel(): string {
-        return process.env.SUMMARY_MODEL || 'gemma';
+        return this.getParam('SUMMARY_MODEL');
     }
 
     get ollamaEmbeddingTimeout(): number {
-        return parseInt(process.env.OLLAMA_EMBEDDING_TIMEOUT || ConfigDefaults.OLLAMA_EMBEDDING_TIMEOUT, 10);
+        return parseInt(this.getParam('OLLAMA_EMBEDDING_TIMEOUT'), 10);
     }
 
     get ollamaGenerateTimeout(): number {
-        return parseInt(process.env.OLLAMA_GENERATE_TIMEOUT || ConfigDefaults.OLLAMA_GENERATE_TIMEOUT, 10);
+        return parseInt(this.getParam('OLLAMA_GENERATE_TIMEOUT'), 10);
     }
 
     get ollamaNumPredict(): number {
-        return parseInt(process.env.OLLAMA_NUM_PREDICT || ConfigDefaults.OLLAMA_NUM_PREDICT, 10);
+        return parseInt(this.getParam('OLLAMA_NUM_PREDICT'), 10);
     }
 
     get ollamaTemperature(): number {
-        return parseFloat(process.env.OLLAMA_TEMPERATURE || ConfigDefaults.OLLAMA_TEMPERATURE);
+        return parseFloat(this.getParam('OLLAMA_TEMPERATURE'));
     }
 
     get ollamaTopP(): number {
-        return parseFloat(process.env.OLLAMA_TOP_P || ConfigDefaults.OLLAMA_TOP_P);
+        return parseFloat(this.getParam('OLLAMA_TOP_P'));
     }
 
     /**
      * Configurazione IP Details e Cache
      */
     get excludedIps(): string[] {
-        return parseCsv(process.env.EXCLUDED_IPS, ['127.0.0.1', '::1', 'localhost']);
+        return this.getCsvParam('EXCLUDED_IPS');
     }
 
     get ipCacheMaxAgeHours(): number {
-        return parseInt(process.env.IP_CACHE_MAX_AGE_HOURS || ConfigDefaults.IP_CACHE_MAX_AGE_HOURS, 10);
+        return parseInt(this.getParam('IP_CACHE_MAX_AGE_HOURS'), 10);
     }
 
     get abuseIpDbKey(): string | undefined {
-        return process.env.ABUSEIPDB_KEY;
+        return this.getParam('ABUSEIPDB_KEY') || undefined;
     }
 
     get ipInfoToken(): string | undefined {
-        return process.env.IPINFO_TOKEN;
+        return this.getParam('IPINFO_TOKEN') || undefined;
     }
 
     /**
      * Configurazione Log Prefix
      */
     get nginxLogPrefix(): string {
-        return process.env.NGINX_LOG_PREFIX || 'nginx_threat:';
+        return this.getParam('NGINX_LOG_PREFIX');
     }
 
     /**
      * Configurazione Analisi Periodica
      */
     get analyzeInterval(): string {
-        return process.env.ANALYZE_INTERVAL || '5m';
+        return this.getParam('ANALYZE_INTERVAL');
     }
 
     /**
      * Configurazione Redis
      */
     get redisHost(): string | undefined {
-        return process.env.REDIS_HOST || ConfigDefaults.REDIS_HOST;
+        return this.getParam('REDIS_HOST');
     }
 
     get redisPort(): number {
-        return parseInt(process.env.REDIS_PORT || ConfigDefaults.REDIS_PORT, 10);
+        return parseInt(this.getParam('REDIS_PORT'), 10);
     }
 
     get redisPassword(): string | undefined {
-        return process.env.REDIS_PASSWORD;
+        return this.getParam('REDIS_PASSWORD') || undefined;
     }
 
     get redisDb(): number {
-        return parseInt(process.env.REDIS_DB || ConfigDefaults.REDIS_DB, 10);
+        return parseInt(this.getParam('REDIS_DB'), 10);
     }
 
     get redisConnectTimeoutMs(): number {
-        return parseInt(process.env.REDIS_CONNECT_TIMEOUT_MS || ConfigDefaults.REDIS_CONNECT_TIMEOUT_MS, 10);
+        return parseInt(this.getParam('REDIS_CONNECT_TIMEOUT_MS'), 10);
     }
 
     get redisCommandTimeoutMs(): number {
-        return parseInt(process.env.REDIS_COMMAND_TIMEOUT_MS || ConfigDefaults.REDIS_COMMAND_TIMEOUT_MS, 10);
+        return parseInt(this.getParam('REDIS_COMMAND_TIMEOUT_MS'), 10);
+    }
+
+    get redisRetryDelayMs(): number {
+        return parseInt(this.getParam('REDIS_RETRY_DELAY_MS'), 10);
+    }
+
+    get redisMaxRetryDelayMs(): number {
+        return parseInt(this.getParam('REDIS_MAX_RETRY_DELAY_MS'), 10);
     }
 
     get redisAutoConnectInTest(): boolean {
-        return process.env.REDIS_RATE_LIMIT_AUTO_CONNECT_IN_TEST === 'true';
+        return this.getParam('REDIS_RATE_LIMIT_AUTO_CONNECT_IN_TEST') === 'true';
+    }
+
+    /**
+     * Configurazione Rate Limiting & Blacklist
+     */
+    get ddosWindowMs(): number {
+        return parseInt(this.getParam('DDOS_WINDOW_MS'), 10);
+    }
+
+    get ddosMaxRequests(): number {
+        return parseInt(this.getParam('DDOS_MAX_REQUESTS'), 10);
+    }
+
+    get maxViolations(): number {
+        return parseInt(this.getParam('MAX_VIOLATIONS'), 10);
+    }
+
+    get blacklistDuration(): number {
+        return parseInt(this.getParam('BLACKLIST_DURATION'), 10);
+    }
+
+    get logRateLimitEvents(): boolean {
+        return this.getParam('LOG_RATE_LIMIT_EVENTS') === 'true';
+    }
+
+    get dashboardPath(): string {
+        return (this.getParam('HONEYPOT_DASHBOARD_PATH') || '/honeypot').toLowerCase();
+    }
+
+    get criticalWindowMs(): number {
+        return parseInt(this.getParam('CRITICAL_WINDOW_MS'), 10);
+    }
+
+    get criticalMaxRequests(): number {
+        return parseInt(this.getParam('CRITICAL_MAX_REQUESTS'), 10);
+    }
+
+    get trapWindowMs(): number {
+        return parseInt(this.getParam('TRAP_WINDOW_MS'), 10);
+    }
+
+    get trapMaxRequests(): number {
+        return parseInt(this.getParam('TRAP_MAX_REQUESTS'), 10);
+    }
+
+    get appWindowMs(): number {
+        return parseInt(this.getParam('APP_WINDOW_MS'), 10);
+    }
+
+    get appMaxRequests(): number {
+        return parseInt(this.getParam('APP_MAX_REQUESTS'), 10);
     }
 
     /**
      * Configurazione Danger Weights (Analisi Forense)
      */
     get dangerWeightRpsNorm(): number {
-        return parseFloat(process.env.DANGER_WEIGHT_RPSNORM || ConfigDefaults.DANGER_WEIGHT_RPSNORM);
+        return parseFloat(this.getParam('DANGER_WEIGHT_RPSNORM'));
     }
 
     get dangerWeightDurNorm(): number {
-        return parseFloat(process.env.DANGER_WEIGHT_DURNORM || ConfigDefaults.DANGER_WEIGHT_DURNORM);
+        return parseFloat(this.getParam('DANGER_WEIGHT_DURNORM'));
     }
 
     get dangerWeightScoreNorm(): number {
-        return parseFloat(process.env.DANGER_WEIGHT_SCORENORM || ConfigDefaults.DANGER_WEIGHT_SCORENORM);
+        return parseFloat(this.getParam('DANGER_WEIGHT_SCORENORM'));
     }
 
     get dangerWeightUniqueTechNorm(): number {
-        return parseFloat(process.env.DANGER_WEIGHT_UNIQUETECHNORM || ConfigDefaults.DANGER_WEIGHT_UNIQUETECHNORM);
+        return parseFloat(this.getParam('DANGER_WEIGHT_UNIQUETECHNORM'));
     }
 
     get dangerWeightDistributed(): number {
-        return parseFloat(process.env.DANGER_WEIGHT_DISTRIBUTED || ConfigDefaults.DANGER_WEIGHT_DISTRIBUTED);
+        return parseFloat(this.getParam('DANGER_WEIGHT_DISTRIBUTED'));
     }
 
     /**

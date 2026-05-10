@@ -16,7 +16,7 @@ run_config_wizard() {
         export API_BASE_URL=""
         export ALLOWED_ORIGINS="*"
         export APP_ID="honeypot-host-001"
-        export VERSION="1.0.0"
+        export VERSION="1.0.1"
         export LOG_LEVEL="info"
         export STORAGE_ROOT="$WORKING_DIR/storage"
         export MONGO_URI="mongodb://intelagent:intelagent@localhost:17017/threatinteldb"

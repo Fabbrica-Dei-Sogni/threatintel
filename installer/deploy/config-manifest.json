@@ -47,7 +47,7 @@
   },
   {
     "key": "VERSION",
-    "defaultValue": "1.0.0",
+    "defaultValue": "1.0.1",
     "description": "Versione dell'applicazione",
     "group": "App"
   },

@@ -43,6 +43,7 @@ cp "$INSTALLER_DIR/deploy/docker-compose.infra.yml.template" "$DEPLOY_PATH/"
 cp "$INSTALLER_DIR/deploy/env.template" "$DEPLOY_PATH/"
 cp "$INSTALLER_DIR/deploy/threatintel.service.template" "$DEPLOY_PATH/"
 cp "$INSTALLER_DIR/deploy/nginx_vhost.conf.template" "$DEPLOY_PATH/proxy/"
+cp "$INSTALLER_DIR/deploy/nginx_locations.conf.template" "$DEPLOY_PATH/proxy/"
 cp "$INSTALLER_DIR/deploy/nginx_globals.conf.template" "$DEPLOY_PATH/proxy/"
 
 # Script infra

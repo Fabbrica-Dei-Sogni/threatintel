@@ -254,6 +254,7 @@ if [ "$RUN_WIZARD" = true ]; then
             -e "s|{{EMBEDDING_MODEL}}|$EMBEDDING_MODEL|g" \
             -e "s|{{URI_DIGITAL_AUTH}}|$URI_DIGITAL_AUTH|g" \
             -e "s|{{ALLOW_ANONYMOUS}}|true|g" \
+            -e "s|{{SERVICE_NAME}}|$SERVICE_NAME|g" \
             "env.template" > ".env"
         
         echo "COWRIE_TELNET_BIND=$TELNET_P:2223" >> ".env"
@@ -311,6 +312,19 @@ if [ "$RUN_WIZARD" = true ]; then
             -e "s|{{API_BASE_PATH}}|$API_REL_PATH|g" \
             -e "s|{{APP_BASE_PATH}}|$CLEAN_BASE_PATH|g" \
             "$VHOST_TMP" > "proxy/$SERVICE_NAME.conf"
+
+        # Generazione Snippet Location (per inclusione manuale)
+        LOC_TMP="proxy/nginx_locations.conf.template"
+        if [ -f "$LOC_TMP" ]; then
+            echo "⚙️  Generazione snippet location Nginx..."
+            sed -e "s|{{SERVICE_NAME}}|$SERVICE_NAME|g" \
+                -e "s|{{PORT}}|$DEPLOY_PORT|g" \
+                -e "s|{{APP_DOMAIN}}|$APP_DOMAIN|g" \
+                -e "s|{{API_BASE_URL}}|$API_BASE_URL|g" \
+                -e "s|{{API_BASE_PATH}}|$API_REL_PATH|g" \
+                -e "s|{{APP_BASE_PATH}}|$CLEAN_BASE_PATH|g" \
+                "$LOC_TMP" > "proxy/${SERVICE_NAME}_locations.conf"
+        fi
 
         # Generazione Globali (Logging JSON)
         GLOBALS_TMP="proxy/nginx_globals.conf.template"

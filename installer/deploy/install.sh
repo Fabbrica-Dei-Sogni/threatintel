@@ -16,15 +16,57 @@ fi
 echo "🚀 Avvio installazione per: $SERVICE_NAME"
 echo "============================================================"
 
-# 1. Wizard di Configurazione (se .env manca)
-if [ ! -f "$WORKING_DIR/.env" ]; then
+# 1. Wizard di Configurazione
+RUN_WIZARD=true
+if [ -f "$WORKING_DIR/.env" ]; then
+    echo "ℹ️  Configurazione esistente rilevata (.env)."
+    read -p "🔄 Vuoi eseguire nuovamente il wizard di configurazione (RESET AI DEFAULT)? (y/n) [n]: " REWIZARD
+    if [[ ! "$REWIZARD" =~ ^[Yy]$ ]]; then
+        RUN_WIZARD=false
+        echo "✅ Utilizzo le impostazioni esistenti."
+        
+        # Funzione helper per caricare variabili dal .env in modo robusto
+        get_env_val() {
+            grep "^$1=" .env | cut -d'=' -f2- | sed -e 's/^"//' -e 's/"$//' -e "s/^'//" -e "s/'$//"
+        }
+
+        # Caricamento variabili (Mapping esatto tra nomi .env e nomi script)
+        APP_DOMAIN=$(get_env_val "APP_DOMAIN")
+        DEPLOY_PORT=$(get_env_val "PORT")
+        API_BASE_URL=$(get_env_val "API_BASE_URL")
+        APP_STORAGE=$(get_env_val "STORAGE_ROOT")
+        MONGO_PORT=$(get_env_val "MONGO_PORT")
+        REDIS_PORT=$(get_env_val "REDIS_PORT")
+        REDIS_PWD=$(get_env_val "REDIS_PASSWORD")
+        QDRANT_PORT=$(get_env_val "QDRANT_PORT")
+        APP_ID=$(get_env_val "APP_ID")
+        ALLOWED_ORIGINS=$(get_env_val "ALLOWED_ORIGINS")
+        URI_DIGITAL_AUTH=$(get_env_val "URI_DIGITAL_AUTH")
+        
+        # Per Cowrie Telnet port
+        COWRIE_BIND=$(get_env_val "COWRIE_TELNET_BIND")
+        TELNET_P=$(echo "$COWRIE_BIND" | cut -d':' -f1)
+        [ -z "$TELNET_P" ] && TELNET_P="23"
+        
+        # Caricamento descrizione dal file di servizio se esiste
+        SERVICE_DESC=$(grep "Description=" "/etc/systemd/system/$SERVICE_NAME.service" 2>/dev/null | cut -d'=' -f2)
+        [ -z "$SERVICE_DESC" ] && SERVICE_DESC="Threat Intelligence Logger - $SERVICE_NAME"
+        
+        # Rigenerazione path relativi per Nginx
+        API_REL_PATH=$(echo "$API_BASE_URL" | sed -E 's|https?://[^/]+||')
+        [ -z "$API_REL_PATH" ] && API_REL_PATH="/"
+        API_REL_PATH=${API_REL_PATH%/}
+    fi
+fi
+
+if [ "$RUN_WIZARD" = true ]; then
     CONFIRMED=false
     
     while [ "$CONFIRMED" = false ]; do
-        echo "📝 Configurazione iniziale rilevata. Rispondi alle seguenti domande:"
+        echo "📝 Configurazione del servizio (Default di fabbrica). Rispondi alle seguenti domande:"
         echo "------------------------------------------------------------"
         
-        # Defaults (vengono resettati se l'utente sceglie di rifare il wizard)
+        # Factory Defaults
         DEFAULT_DOMAIN="localhost"
         DEFAULT_PORT="3999"
         DEFAULT_USER=$(whoami)
@@ -76,6 +118,15 @@ if [ ! -f "$WORKING_DIR/.env" ]; then
         echo "📂 INFRASTRUTTURA"
         read -p "📂 Percorso Storage Locale [$DEFAULT_STORAGE]: " APP_STORAGE
         APP_STORAGE=${APP_STORAGE:-$DEFAULT_STORAGE}
+
+        read -p "🍃 Porta MongoDB [17017]: " MONGO_PORT
+        MONGO_PORT=${MONGO_PORT:-17017}
+
+        read -p "🚩 Porta Redis [6379]: " REDIS_PORT
+        REDIS_PORT=${REDIS_PORT:-6379}
+
+        read -p "💎 Porta Qdrant [6333]: " QDRANT_PORT
+        QDRANT_PORT=${QDRANT_PORT:-6333}
         echo ""
 
         echo "🔐 SICUREZZA"
@@ -126,6 +177,7 @@ if [ ! -f "$WORKING_DIR/.env" ]; then
         echo "  API URL:       $API_BASE_URL"
         echo "  Allowed Org:   $ALLOWED_ORIGINS"
         echo "  Storage Path:  $APP_STORAGE"
+        echo "  Infra Ports:   Mongo:$MONGO_PORT, Redis:$REDIS_PORT, Qdrant:$QDRANT_PORT"
         echo "  Honeypot Port: $TELNET_P"
         echo "  AI URL:        $OLLAMA_URL"
         echo "  AI Models:     $SUMMARY_MODEL / $EMBEDDING_MODEL"
@@ -159,7 +211,10 @@ if [ ! -f "$WORKING_DIR/.env" ]; then
             -e "s|{{MONGO_APP_USER}}|intelagent|g" \
             -e "s|{{MONGO_APP_PWD}}|intelagent|g" \
             -e "s|{{MONGO_APP_DB}}|threatinteldb|g" \
+            -e "s|{{MONGO_PORT}}|$MONGO_PORT|g" \
+            -e "s|{{REDIS_PORT}}|$REDIS_PORT|g" \
             -e "s|{{REDIS_PASSWORD}}|$REDIS_PWD|g" \
+            -e "s|{{QDRANT_PORT}}|$QDRANT_PORT|g" \
             -e "s|{{RAG_COLLECTION_NAME}}|threat_intelligence|g" \
             -e "s|{{RAG_LOGS_COLLECTION_NAME}}|threat_logs|g" \
             -e "s|{{RAG_ENABLED}}|true|g" \
@@ -200,7 +255,10 @@ if [ ! -f "$WORKING_DIR/.env" ]; then
             -e "s|{{MONGO_APP_USER}}|intelagent|g" \
             -e "s|{{MONGO_APP_PWD}}|intelagent|g" \
             -e "s|{{MONGO_APP_DB}}|threatinteldb|g" \
-            -e "s|{{QDRANT_URL}}|http://127.0.0.1:6333|g" \
+            -e "s|{{MONGO_PORT}}|$MONGO_PORT|g" \
+            -e "s|{{REDIS_PORT}}|$REDIS_PORT|g" \
+            -e "s|{{QDRANT_PORT}}|$QDRANT_PORT|g" \
+            -e "s|{{QDRANT_URL}}|http://127.0.0.1:$QDRANT_PORT|g" \
             -e "s|{{RAG_COLLECTION_NAME}}|threat_intelligence|g" \
             -e "s|{{RAG_LOGS_COLLECTION_NAME}}|threat_logs|g" \
             -e "s|{{OLLAMA_URL}}|$OLLAMA_URL|g" \
@@ -237,14 +295,34 @@ fi
 echo "🔍 Checking Docker infrastructure..."
 INFRA_COMPOSE="docker-compose.infra.yml"
 
+# Generazione Docker Compose Dinamico dal Template
+if [ -f "docker-compose.infra.yml.template" ]; then
+    echo "⚙️  Generazione Docker Compose dinamico..."
+    sed -e "s|{{SERVICE_NAME}}|$SERVICE_NAME|g" \
+        -e "s|{{MONGO_PORT}}|$MONGO_PORT|g" \
+        -e "s|{{REDIS_PORT}}|$REDIS_PORT|g" \
+        -e "s|{{QDRANT_PORT}}|$QDRANT_PORT|g" \
+        -e "s|{{TELNET_PORT}}|$TELNET_P|g" \
+        "docker-compose.infra.yml.template" > "$INFRA_COMPOSE"
+fi
+
 if [ -f "$INFRA_COMPOSE" ]; then
-    # Verifica se l'infrastruttura è già attiva (Adaptive Mode)
-    SHARED_INFRA_RUNNING=$(docker ps --format '{{.Names}}' | grep -E "mongodb-threatintel|redis-threatintel|qdrant-threatintel" | wc -l)
+    # Verifica se l'infrastruttura è già attiva per questo specifico servizio
+    # Usiamo il nome del container dinamico per il check
+    SPECIFIC_INFRA_RUNNING=$(docker ps --format '{{.Names}}' | grep "mongodb-$SERVICE_NAME" | wc -l)
     
-    if [ "$SHARED_INFRA_RUNNING" -ge 2 ]; then
-        echo "ℹ️  Shared infrastructure detected and running. Skipping Docker provisioning."
+    if [ "$SPECIFIC_INFRA_RUNNING" -ge 1 ]; then
+        echo "ℹ️  Dedicated infrastructure for $SERVICE_NAME detected and running."
     else
-        echo "🚀 Starting Docker containers..."
+        echo "🚀 Preparing Docker infrastructure for $SERVICE_NAME..."
+        
+        # Cleanup preventivo per evitare conflitti di nomi orfani o reti
+        echo "🧹 Checking for orphan containers or network conflicts..."
+        docker compose -p "$SERVICE_NAME" -f "$INFRA_COMPOSE" down --remove-orphans >/dev/null 2>&1
+        
+        # Rimozione forzata di eventuali container rimasti con lo stesso nome (Docker bug safety)
+        docker rm -f "mongodb-$SERVICE_NAME" "redis-$SERVICE_NAME" "qdrant-$SERVICE_NAME" "cowrie-$SERVICE_NAME" >/dev/null 2>&1
+
         # Carichiamo STORAGE_ROOT dal .env
         EXPORT_STORAGE=$(grep "STORAGE_ROOT=" .env | cut -d'=' -f2)
         export STORAGE_ROOT=${EXPORT_STORAGE:-$WORKING_DIR/storage}
@@ -254,7 +332,9 @@ if [ -f "$INFRA_COMPOSE" ]; then
         export REDIS_PASSWORD=$(grep "REDIS_PASSWORD=" .env | cut -d'=' -f2)
 
         mkdir -p "$STORAGE_ROOT/mongodb" "$STORAGE_ROOT/redis" "$STORAGE_ROOT/qdrant" "$STORAGE_ROOT/cowrie/log" "$STORAGE_ROOT/cowrie/downloads"
-        docker compose -f "$INFRA_COMPOSE" up -d
+        
+        echo "🚀 Starting Docker containers..."
+        docker compose -p "$SERVICE_NAME" -f "$INFRA_COMPOSE" up -d
         if [ $? -ne 0 ]; then echo "❌ Failed to start Docker containers."; exit 1; fi
     fi
 fi

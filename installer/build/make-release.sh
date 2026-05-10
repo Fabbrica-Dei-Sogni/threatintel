@@ -39,16 +39,16 @@ cp "$PROJECT_ROOT"/node_modules/geoip-lite/data/*.dat "$DEPLOY_PATH/data/" 2>/de
 echo "📦 Adding templates and installer..."
 cp "$INSTALLER_DIR/deploy/install.sh" "$DEPLOY_PATH/"
 cp "$INSTALLER_DIR/deploy/uninstall.sh" "$DEPLOY_PATH/"
-cp "$INSTALLER_DIR/deploy/docker-compose.infra.yml" "$DEPLOY_PATH/"
+cp "$INSTALLER_DIR/deploy/docker-compose.infra.yml.template" "$DEPLOY_PATH/"
 cp "$INSTALLER_DIR/deploy/env.template" "$DEPLOY_PATH/"
 cp "$INSTALLER_DIR/deploy/threatintel.service.template" "$DEPLOY_PATH/"
 cp "$INSTALLER_DIR/deploy/nginx_vhost.conf.template" "$DEPLOY_PATH/proxy/"
 cp "$INSTALLER_DIR/deploy/nginx_globals.conf.template" "$DEPLOY_PATH/proxy/"
 
 # Script infra
-cp "$PROJECT_ROOT/redis/check-redis.sh" "$DEPLOY_PATH/infra/"
-cp "$PROJECT_ROOT/mongodb/check-mongodb.sh" "$DEPLOY_PATH/infra/"
-cp "$PROJECT_ROOT/qdrant/check-qdrant.sh" "$DEPLOY_PATH/infra/"
+cp "$INSTALLER_DIR/infra/check-redis.sh" "$DEPLOY_PATH/infra/"
+cp "$INSTALLER_DIR/infra/check-mongodb.sh" "$DEPLOY_PATH/infra/"
+cp "$INSTALLER_DIR/infra/check-qdrant.sh" "$DEPLOY_PATH/infra/"
 cp -r "$PROJECT_ROOT/mongodb/mongo-init/"* "$DEPLOY_PATH/mongo-init/"
 cp -r "$PROJECT_ROOT/cowrie/etc/"* "$DEPLOY_PATH/cowrie/etc/"
 

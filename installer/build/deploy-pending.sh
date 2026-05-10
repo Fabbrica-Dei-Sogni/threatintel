@@ -7,8 +7,8 @@ echo "🔍 [Deploy Pending] Analisi cartelle deployments/..."
 echo "------------------------------------------------------------"
 
 # 1. Scansione directory in deployments/
-if [ ! -d "$PROJECT_ROOT/deployments" ]; then
-    echo "ℹ️  Nessun deployment trovato."
+if [ ! -d "$PROJECT_ROOT/deployments" ] || [ -z "$(ls -A "$PROJECT_ROOT/deployments" 2>/dev/null)" ]; then
+    echo "ℹ️  Nessun deployment trovato nella cartella deployments/."
     exit 0
 fi
 

@@ -3,7 +3,7 @@
 # ThreatIntel Frontend - Interactive Installer (Nexus Version)
 # Questo script configura l'ambiente e avvia il Docker scaricando da Nexus.
 
-echo "🚀 Installatore Threat Intelligence Frontend (Nexus)"
+echo "🚀 Installazione Dashboard Threat Intelligence "
 echo "============================================================"
 
 # Directory di lavoro
@@ -62,6 +62,7 @@ echo "------------------------------------------------------------"
 # 2. Generazione del file .env (utile per persistenza e Vite locale)
 echo "⚙️  Generazione file .env..."
 VERSION=$(cat VERSION 2>/dev/null || echo "0.1.10")
+SERVICE_NAME="{{SERVICE_NAME}}" # Pre-configurato al momento della release
 
 cat > ".env" <<EOF
 VITE_APP_TITLE=$APP_TITLE
@@ -75,6 +76,7 @@ APP_ID=$APP_ID
 VITE_HONEYPOT_NAME=$HP_NAME
 VITE_HONEYPOT_LOCATION_LAT=$HP_LAT
 VITE_HONEYPOT_LOCATION_LON=$HP_LON
+COMPOSE_PROJECT_NAME=$SERVICE_NAME
 EOF
 
 # 3. Generazione docker-compose.yml dal template
@@ -82,15 +84,8 @@ echo "⚙️  Generazione docker-compose.yml..."
 if [ -f "docker-compose.yml.template" ]; then
     sed -e "s|{{PORT}}|$DEPLOY_PORT|g" \
         -e "s|{{VERSION}}|$VERSION|g" \
+        -e "s|{{SERVICE_NAME}}|$SERVICE_NAME|g" \
         -e "s|{{NPM_REGISTRY_URI}}|$NPM_REGISTRY_URI|g" \
-        -e "s|{{APP_TITLE}}|$APP_TITLE|g" \
-        -e "s|{{APP_BASE_PATH}}|$APP_BASE_PATH|g" \
-        -e "s|{{HP_NAME}}|$HP_NAME|g" \
-        -e "s|{{HP_LAT}}|$HP_LAT|g" \
-        -e "s|{{HP_LON}}|$HP_LON|g" \
-        -e "s|{{CHAINPROMPT_API_URL}}|$CHAINPROMPT_API_URL|g" \
-        -e "s|{{API_URL}}|$API_URL|g" \
-        -e "s|{{APP_ID}}|$APP_ID|g" \
         "docker-compose.yml.template" > "docker-compose.yml"
 fi
 

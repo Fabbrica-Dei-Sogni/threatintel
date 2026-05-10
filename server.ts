@@ -24,11 +24,12 @@ import cors from 'cors';
 import helmet from 'helmet';
 import path from 'path';
 import { port, allowedOrigins } from './core/config';
-import api from './core/endpoint';
+import setupApi from './core/endpoint';
 import { getComponent } from './core/di/container';
 import * as Tokens from './core/di/tokens';
 import { ServiceStatus } from './core/types/lifecycle';
 import { LifecycleManager } from './core/services/LifecycleManager';
+import { SocketServerHub } from './core/services/socket/SocketServerHub';
 
 const app = express();
 
@@ -67,11 +68,16 @@ app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 app.set('trust proxy', true);
 
 // carichiamo le api del threat intel
-app.use(api);
+app.use(setupApi());
 
 const PORT = port;
 const server = app.listen(Number(PORT), '0.0.0.0', async () => {
     logger.info(`🚀 Server threat intelligence avviato su porta ${PORT}`);
+    
+    // Inizializzazione Socket.io
+    const socketHub = getComponent(Tokens.SOCKET_SERVER_HUB_TOKEN) as SocketServerHub;
+    socketHub.initialize(server);
+    
     logger.info(`📊 Dashboard statistiche: http://localhost:${PORT}/api/stats`);
     logger.info(`🕸️  Landing page: http://localhost:${PORT}/`);
 
@@ -98,6 +104,15 @@ const server = app.listen(Number(PORT), '0.0.0.0', async () => {
             getStatus: () => ServiceStatus.RUNNING
         } as any);
 
+        // Registrazione Socket Event Bridge
+        const socketEventBridge = getComponent(Tokens.SOCKET_EVENT_BRIDGE_TOKEN);
+        lifecycleManager.register({
+            serviceName: 'SocketEventBridge',
+            start: async () => (socketEventBridge as any).initialize(),
+            stop: () => {},
+            getStatus: () => ServiceStatus.RUNNING
+        } as any);
+
         // Avvio sequenza di bootstrap (non blocca l'ascolto del server)
         await lifecycleManager.boot();
 
@@ -112,6 +127,10 @@ const server = app.listen(Number(PORT), '0.0.0.0', async () => {
 
             // 2. Ferma i servizi in background (es. flush dei buffer)
             await lifecycleManager.shutdown();
+
+            // 3. Ferma Socket.io
+            const socketHub = getComponent(Tokens.SOCKET_SERVER_HUB_TOKEN) as SocketServerHub;
+            await socketHub.shutdown();
 
             logger.info('[Server] Shutdown completato. Uscita.');
             process.exit(0);

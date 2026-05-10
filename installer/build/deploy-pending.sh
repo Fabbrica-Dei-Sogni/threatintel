@@ -7,14 +7,17 @@ echo "🔍 [Deploy Pending] Analisi cartelle deployments/..."
 echo "------------------------------------------------------------"
 
 # 1. Scansione directory in deployments/
-if [ ! -d "$PROJECT_ROOT/deployments" ]; then
-    echo "ℹ️  Nessun deployment trovato."
+if [ ! -d "$PROJECT_ROOT/deployments" ] || [ -z "$(ls -A "$PROJECT_ROOT/deployments" 2>/dev/null)" ]; then
+    echo "ℹ️  Nessun deployment trovato nella cartella deployments/."
     exit 0
 fi
 
 PENDING_DEPLOYS=""
 cd "$PROJECT_ROOT/deployments"
 for dir in */; do
+    # Verifica che la directory esista davvero e non sia il glob vuoto "*"
+    [ -d "$dir" ] || continue
+
     dir=${dir%/} # Rimuove lo slash finale
     if [ ! -f "/etc/systemd/system/$dir.service" ]; then
         PENDING_DEPLOYS="$PENDING_DEPLOYS $dir"
@@ -27,8 +30,11 @@ if [ -z "$PENDING_DEPLOYS" ]; then
 fi
 
 echo "Deployments trovati ma NON ancora installati come servizi:"
-select DEPLOY in $PENDING_DEPLOYS; do
-    if [ -n "$DEPLOY" ]; then
+select DEPLOY in $PENDING_DEPLOYS "Annulla (Torna al Menu)"; do
+    if [ "$DEPLOY" == "Annulla (Torna al Menu)" ]; then
+        echo "🔙 Ritorno al menu principale..."
+        exit 0
+    elif [ -n "$DEPLOY" ]; then
         SELECTED_DIR="$DEPLOY"
         break
     fi
@@ -37,7 +43,6 @@ done
 if [ -z "$SELECTED_DIR" ]; then exit 0; fi
 
 # 2. Avvio Installazione
-echo "🚀 Avvio installazione per: $SELECTED_DIR"
 cd "$PROJECT_ROOT/deployments/$SELECTED_DIR"
 
 if [ ! -f "./install.sh" ]; then
@@ -48,4 +53,9 @@ fi
 # Chiede conferma parametri minimi o usa i default nell'install.sh
 ./install.sh "$SELECTED_DIR"
 
-echo "✨ Deployment completato!"
+if [ $? -eq 0 ]; then
+    echo "✨ Deployment completato!"
+else
+    echo "❌ Errore durante l'installazione di $SELECTED_DIR."
+    exit 1
+fi

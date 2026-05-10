@@ -77,6 +77,7 @@ import { useI18n } from 'vue-i18n';
 import GlobalHeader from '../../../components/GlobalHeader.vue';
 import { useViewSettingsStore } from '../../../stores/viewSettings';
 import { storeToRefs } from 'pinia';
+import { getEnv } from '../../../config';
 
 const { t } = useI18n();
 const router = useRouter();
@@ -98,7 +99,7 @@ async function onSubmit() {
             username: username.value,
             email: email.value,
             password: password.value,
-            redirectUrl: window.location.origin + import.meta.env.VITE_WELCOME_PATH
+            redirectUrl: window.location.origin + getEnv('VITE_WELCOME_PATH')
         });
         router.push('/login');
     } catch (err: any) {

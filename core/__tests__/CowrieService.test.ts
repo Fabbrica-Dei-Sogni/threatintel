@@ -9,6 +9,7 @@
 import 'reflect-metadata';
 import { CowrieService } from '../services/CowrieService';
 import { IpDetailsService } from '../services/IpDetailsService';
+import { createMockConfigProvider } from './TestUtils';
 import CowrieSession from '../models/CowrieSessionSchema';
 import CowrieEvent from '../models/CowrieEventSchema';
 import CowrieAuth from '../models/CowrieAuthSchema';
@@ -92,10 +93,6 @@ describe('CowrieService', () => {
                 totalCount: 0
             });
         });
-    });
-
-    describe('getSessions()', () => {
-        // ... (previous tests)
     });
 
     describe('countSessions()', () => {

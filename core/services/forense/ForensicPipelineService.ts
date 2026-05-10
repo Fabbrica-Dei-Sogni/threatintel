@@ -7,11 +7,11 @@
  */
 
 
-import dotenv from 'dotenv';
 import { inject, injectable } from 'tsyringe';
 
 import { Logger } from 'winston';
 import { ConfigService } from '../ConfigService';
+import { AppConfigProvider } from '../AppConfigProvider';
 import { ForensicPipelineBuilder } from './pipeline/ForensicPipelineBuilder';
 import { TimeFilterStage } from './pipeline/stages/TimeFilterStage';
 import { MatchFilterStage } from './pipeline/stages/MatchFilterStage';
@@ -27,8 +27,6 @@ import { CampaignDetailGroupingStage } from './pipeline/stages/CampaignDetailGro
 import { CampaignFacetStage } from './pipeline/stages/CampaignFacetStage';
 
 import { TimeConfig } from '../../types/common.types';
-
-dotenv.config();
 
 import * as Tokens from '../../di/tokens';
 
@@ -46,6 +44,7 @@ export class ForensicPipelineService {
     constructor(
         @inject(Tokens.LOGGER_TOKEN) private readonly logger: Logger,
         @inject(Tokens.CONFIG_SERVICE_TOKEN) private readonly configService: ConfigService,
+        @inject(Tokens.CONFIG_PROVIDER_TOKEN) private readonly config: AppConfigProvider,
     ) {
         this.dangerWeights = {};
         this.tolleranceWeights = {};
@@ -71,6 +70,17 @@ export class ForensicPipelineService {
             // Parsing logic (duplicata dal servizio originale per isolamento)
             this.dangerWeights = this.parseConfig(dangerWeightStr);
             this.tolleranceWeights = this.parseConfig(tolleranceWeightStr);
+
+            // Se mancano i pesi da DB, usiamo quelli da configurazione (AppConfigProvider) come fallback
+            if (Object.keys(this.dangerWeights).length === 0) {
+                this.dangerWeights = {
+                    RPSNORM: this.config.dangerWeightRpsNorm,
+                    DURNORM: this.config.dangerWeightDurNorm,
+                    SCORENORM: this.config.dangerWeightScoreNorm,
+                    UNIQUETECHNORM: this.config.dangerWeightUniqueTechNorm,
+                    DISTRIBUTED: this.config.dangerWeightDistributed
+                };
+            }
 
             // Parsing Liste (CSV based)
             this.suspiciousPatterns = suspPatternsStr ? suspPatternsStr.split(',').map((s: string) => s.trim()).filter(Boolean) : [];

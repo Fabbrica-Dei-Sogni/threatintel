@@ -16,7 +16,7 @@ import { Controller, Post } from '../registry/decorators';
 import { getComponent } from '../di/container';
 import { AuthMiddleware } from '../middlewares/AuthMiddleware';
 
-const auth = getComponent(AuthMiddleware);
+const auth = () => getComponent<AuthMiddleware>(Tokens.AUTH_MIDDLEWARE_TOKEN);
 
 @singleton()
 @Controller('/api/assistant')
@@ -68,7 +68,7 @@ export class AssistantController {
      *       500:
      *         description: Errore interno durante la ricerca vettoriale.
      */
-    @Post('/search', [auth.isAuthenticated()])
+    @Post('/search', [(req: any, res: any, next: any) => auth().isAuthenticated()(req, res, next)])
     async search(req: Request, res: Response): Promise<void> {
         const { query, limit, scoreThreshold, type } = req.body;
 
@@ -118,7 +118,7 @@ export class AssistantController {
      *       500:
      *         description: Errore durante la generazione della risposta AI.
      */
-    @Post('/ask', [auth.isAuthenticated()])
+    @Post('/ask', [(req: any, res: any, next: any) => auth().isAuthenticated()(req, res, next)])
     async ask(req: Request, res: Response): Promise<void> {
         const { question } = req.body;
 
@@ -162,7 +162,7 @@ export class AssistantController {
      *       404:
      *         description: Riferimento non trovato.
      */
-    @Post('/resolve', [auth.isAuthenticated()])
+    @Post('/resolve', [(req: any, res: any, next: any) => auth().isAuthenticated()(req, res, next)])
     async resolve(req: Request, res: Response): Promise<void> {
         const { sourceRef } = req.body;
 
@@ -200,7 +200,7 @@ export class AssistantController {
      *       200:
      *         description: Risultati ricerca log.
      */
-    @Post('/logs', [auth.isAuthenticated()])
+    @Post('/logs', [(req: any, res: any, next: any) => auth().isAuthenticated()(req, res, next)])
     async searchLogs(req: Request, res: Response): Promise<void> {
         try {
             const results = await this.assistant.searchLogs(req.body);
@@ -228,7 +228,7 @@ export class AssistantController {
      *       200:
      *         description: Risultati ricerca attacchi.
      */
-    @Post('/attacks', [auth.isAuthenticated()])
+    @Post('/attacks', [(req: any, res: any, next: any) => auth().isAuthenticated()(req, res, next)])
     async searchAttacks(req: Request, res: Response): Promise<void> {
         try {
             const results = await this.assistant.searchAttacks(req.body);
@@ -256,7 +256,7 @@ export class AssistantController {
      *       200:
      *         description: Risultati ricerca campagne.
      */
-    @Post('/campaigns', [auth.isAuthenticated()])
+    @Post('/campaigns', [(req: any, res: any, next: any) => auth().isAuthenticated()(req, res, next)])
     async searchCampaigns(req: Request, res: Response): Promise<void> {
         try {
             const results = await this.assistant.searchCampaigns(req.body);
@@ -291,7 +291,7 @@ export class AssistantController {
      *       403:
      *         description: Permessi insufficienti (Richiesto ruolo admin).
      */
-    @Post('/integrity-check', [auth.hasRole('admin')])
+    @Post('/integrity-check', [(req: any, res: any, next: any) => auth().hasRole('admin')(req, res, next)])
     async checkIntegrity(req: Request, res: Response): Promise<void> {
         const { collection } = req.body;
         try {
@@ -305,6 +305,55 @@ export class AssistantController {
         } catch (err: any) {
             this.logger.error('[AssistantController] Integrity check error:', err);
             res.status(500).json({ error: 'Errore durante il controllo integrità' });
+        }
+    }
+
+    /**
+     * @openapi
+     * /assistant/trigger-news:
+     *   post:
+     *     summary: Triggera la generazione di una news agentica (Async)
+     *     description: Avvia il processo di generazione news basato su RAG. Ritorna immediatamente 202.
+     *     tags: [AI Assistant & RAG]
+     *     security:
+     *       - BearerAuth: []
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             required: [promptKey]
+     *             properties:
+     *               promptKey:
+     *                 type: string
+     *               params:
+     *                 type: object
+     *               searchQuery:
+     *                 type: string
+     *               locale:
+     *                 type: string
+     *     responses:
+     *       202:
+     *         description: Richiesta accettata e avviata in background.
+     */
+    @Post('/trigger-news', [(req: any, res: any, next: any) => auth().isAuthenticated()(req, res, next)])
+    async triggerNews(req: Request, res: Response): Promise<void> {
+        const { promptKey, params, searchQuery, locale } = req.body;
+
+        try {
+            if (!promptKey) {
+                res.status(400).json({ error: 'promptKey richiesto' });
+                return;
+            }
+
+            // Avviamo senza attendere la fine
+            this.assistant.triggerAgenticNews(promptKey, params || {}, locale || 'it-IT', searchQuery);
+
+            res.status(202).json({ status: 'Accepted', message: 'News generation started' });
+        } catch (err: any) {
+            this.logger.error('[AssistantController] triggerNews error:', err);
+            res.status(500).json({ error: err.message });
         }
     }
 }

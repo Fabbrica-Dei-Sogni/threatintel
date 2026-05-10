@@ -43,7 +43,7 @@ export class NginxLogService extends BaseJournalWatcher {
         super(logger);
         this.suspiciousPatterns = [...DEFAULT_SUSPICIOUS_PATTERNS];
         // Default to 'nginx_threat:' for backward compatibility
-        this.logPrefix = process.env.NGINX_LOG_PREFIX || 'nginx_threat:';
+        this.logPrefix = this.configProvider.nginxLogPrefix;
     }
 
     protected getJournalIdentifier(): string[] {

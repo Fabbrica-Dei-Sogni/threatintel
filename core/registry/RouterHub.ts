@@ -59,17 +59,4 @@ export class RouterHub {
             });
         });
     }
-
-    bindWebSockets(_io: any, _container: DependencyContainer) {
-        // Logic for socket.io integration in the future
-        this.registeredControllers.forEach(controllerClass => {
-            const _instance = _container.resolve(controllerClass);
-            const endpoints: EndpointMetadata[] = Reflect.getMetadata(METADATA_KEYS.ENDPOINTS, controllerClass) || [];
-
-            endpoints.filter(e => e.protocol === 'ws').forEach(endpoint => {
-                logger.info(`[RouterHub] Found WS Event ${endpoint.path} on ${controllerClass.name}`);
-                // Implementation will follow when socket.io is added
-            });
-        });
-    }
 }

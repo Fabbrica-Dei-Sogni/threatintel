@@ -4,13 +4,15 @@ import { Logger } from 'winston';
 import AnalysisJob, { JobStatus, IAnalysisJob } from '../models/AnalysisJobSchema';
 import { IBackgroundJob } from '../types/jobs';
 import { container } from '../di/container';
+import { EventBus, AppEvents } from './EventBus';
 
 @singleton()
 export class BackgroundJobManager {
     private activeJobs: Map<string, IBackgroundJob> = new Map();
 
     constructor(
-        @inject(Tokens.LOGGER_TOKEN) private readonly logger: Logger
+        @inject(Tokens.LOGGER_TOKEN) private readonly logger: Logger,
+        @inject(Tokens.EVENT_BUS_TOKEN) private readonly eventBus: EventBus
     ) {
         // Avviamo la pulizia dei job orfani all'avvio del servizio
         this.cleanupStaleJobs().catch(err => {
@@ -78,6 +80,16 @@ export class BackgroundJobManager {
             this.logger.error(`[BackgroundJobManager] Errore critico nel job ${jobDoc.id}:`, err);
         });
 
+        // Notifica inizio job
+        this.eventBus.emit(AppEvents.JOB_PROGRESS, {
+            id: jobDoc.id,
+            jobName: type,
+            status: 'started',
+            progress: 0
+        });
+
+        this.eventBus.emit(AppEvents.SYSTEM_STATUS_UPDATED, 'SYNCING');
+
         return jobDoc;
     }
 
@@ -98,6 +110,13 @@ export class BackgroundJobManager {
                 progress: 100
             });
             
+            // Notifica completamento
+            this.eventBus.emit(AppEvents.JOB_PROGRESS, {
+                id: jobId,
+                status: 'completed',
+                progress: 100
+            });
+
             this.logger.info(`[BackgroundJobManager] Job ${jobId} completato con successo.`);
         } catch (err: any) {
             this.logger.error(`[BackgroundJobManager] Job ${jobId} fallito:`, err);
@@ -106,8 +125,18 @@ export class BackgroundJobManager {
                 completedAt: new Date(),
                 error: err.message
             });
+
+            // Notifica fallimento
+            this.eventBus.emit(AppEvents.JOB_PROGRESS, {
+                id: jobId,
+                status: 'failed',
+                error: err.message
+            });
         } finally {
             this.activeJobs.delete(jobId);
+            if (this.activeJobs.size === 0) {
+                this.eventBus.emit(AppEvents.SYSTEM_STATUS_UPDATED, 'OPTIMIZED');
+            }
         }
     }
 

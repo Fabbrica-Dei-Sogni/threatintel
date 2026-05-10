@@ -18,7 +18,11 @@ export class OllamaService {
     private baseUrl: string;
     private embeddingModel: string;
     private summaryModel: string;
-    private timeout: number = 5000; // 5 secondi max per AI operations
+    private embeddingTimeout: number;
+    private generateTimeout: number;
+    private numPredict: number;
+    private temperature: number;
+    private topP: number;
 
     constructor(
         @inject(Tokens.LOGGER_TOKEN) private readonly logger: Logger,
@@ -27,6 +31,11 @@ export class OllamaService {
         this.baseUrl = this.config.ollamaUrl;
         this.embeddingModel = this.config.embeddingModel;
         this.summaryModel = this.config.summaryModel;
+        this.embeddingTimeout = this.config.ollamaEmbeddingTimeout;
+        this.generateTimeout = this.config.ollamaGenerateTimeout;
+        this.numPredict = this.config.ollamaNumPredict;
+        this.temperature = this.config.ollamaTemperature;
+        this.topP = this.config.ollamaTopP;
     }
 
     /**
@@ -40,7 +49,7 @@ export class OllamaService {
             const response = await axios.post(`${this.baseUrl}/api/embeddings`, {
                 model: this.embeddingModel,
                 prompt: text
-            }, { timeout: this.timeout });
+            }, { timeout: this.embeddingTimeout });
 
             if (response.data && response.data.embedding) {
                 this.logger.debug(`[Ollama] Successfully received embedding (Size: ${response.data.embedding.length})`);
@@ -64,8 +73,13 @@ export class OllamaService {
             const response = await axios.post(`${this.baseUrl}/api/generate`, {
                 model: this.summaryModel,
                 prompt: prompt,
-                stream: false
-            }, { timeout: 15000 }); // Più tempo per la generazione (15s)
+                stream: false,
+                options: {
+                    num_predict: this.numPredict,
+                    temperature: this.temperature,
+                    top_p: this.topP
+                }
+            }, { timeout: this.generateTimeout });
 
             if (response.data && response.data.response) {
                 this.logger.debug(`[Ollama] Generation successful (Response length: ${response.data.response.length})`);

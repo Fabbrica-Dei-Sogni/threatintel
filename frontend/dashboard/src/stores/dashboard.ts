@@ -38,6 +38,12 @@ export interface DashboardState {
     rankings: DashboardRankingsState;
     activeWidgets: string[];
     showTicker: boolean;
+    engineStatus: string;
+    activeJobs: any[];
+    recentAttacks: any[];
+    recentLogs: any[];
+    recentSessions: any[];
+    lastSystemUpdate: number;
 }
 
 // Default dello stato per il cruscotto
@@ -62,7 +68,13 @@ const DEFAULT_STATE: DashboardState = {
         campaignMinLogsPerIp: 1
     },
     activeWidgets: [],
-    showTicker: true
+    showTicker: true,
+    engineStatus: 'OPTIMIZED',
+    activeJobs: [],
+    recentAttacks: [],
+    recentLogs: [],
+    recentSessions: [],
+    lastSystemUpdate: 0
 };
 
 export const useDashboardStore = defineStore('dashboard', () => {
@@ -156,8 +168,22 @@ export const useDashboardStore = defineStore('dashboard', () => {
         state.rankings.campaignPage = 1;
     }
 
+    function updateJobStatus(jobData: any) {
+        const index = state.activeJobs.findIndex(j => j.id === jobData.id);
+        if (index === -1) {
+            state.activeJobs.push(jobData);
+        } else {
+            if (jobData.status === 'completed' || jobData.status === 'failed') {
+                state.activeJobs.splice(index, 1);
+            } else {
+                state.activeJobs[index] = { ...state.activeJobs[index], ...jobData };
+            }
+        }
+    }
+
     return {
         state,
+        rankings: state.rankings, // Shortcut per l'accesso diretto
         resetToDefaults,
         resetAttacks,
         resetLogs,
@@ -165,6 +191,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
         toggleWidget,
         isWidgetActive,
         toggleDefconLevel,
-        resetCampaigns
+        resetCampaigns,
+        updateJobStatus
     };
 });

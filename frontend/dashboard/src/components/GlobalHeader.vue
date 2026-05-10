@@ -44,6 +44,7 @@ import { useViewSettingsStore } from '../stores/viewSettings';
 import { storeToRefs } from 'pinia';
 import LanguageSwitcher from './LanguageSwitcher.vue';
 import SkinSwitcher from './SkinSwitcher.vue';
+import { getEnv } from '../config';
 
 const props = defineProps({
     context: {
@@ -60,7 +61,7 @@ const router = useRouter();
 const viewStore = useViewSettingsStore();
 const { dashboardSkin } = storeToRefs(viewStore);
 
-const version = import.meta.env.VITE_APP_VERSION || '0.1.0';
+const version = getEnv('VITE_APP_VERSION') || '0.1.0';
 
 const skinClass = computed(() => `skin-${dashboardSkin.value}`);
 const contextClass = computed(() => `context-${props.context}`);

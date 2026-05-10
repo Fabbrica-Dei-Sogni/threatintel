@@ -1,11 +1,11 @@
 {
     "name": "honeypot-dashboard",
-    "version": "1.0.0",
+    "version": "0.1.13",
     "description": "ThreatIntel Reference Implementation Dashboard (Vue.js)",
     "author": "Alessandro Modica",
     "license": "BSL-1.1",
     "publishConfig": {
-        "registry": "http://alessandromodica.com:8081/repository/npm-cloud-pubblico/"
+        "registry": "https://alessandromodica.com/nexus/repository/npm-cloud-pubblico/"
     },
     "scripts": {
         "dev": "vite --config vite.config.ts --host",
@@ -16,18 +16,18 @@
         "type-check:all": "vue-tsc --noEmit",
         "test": "vitest",
         "test:coverage": "vitest run --coverage",
-        "release": "npm version $npm_config_versione -m 'Rilasciata una nuova release frontend' && git push",
-        "patch": "npm version patch -m 'Rilasciata una nuova patch frontend' && git push"
+        "release": "npm version $npm_config_versione -m 'v%s' && git add package.json package-lock.json && git commit -m \"Rilasciata una nuova release frontend v$(node -p \"require('./package.json').version\")\" --allow-empty && git push --follow-tags",
+        "patch": "npm version patch -m 'v%s' && git add package.json package-lock.json && (git diff --staged --quiet || git commit -m \"Rilasciata una nuova patch frontend v$(node -p \"require('./package.json').version\")\") && git push --follow-tags"
     },
-
     "dependencies": {
-        "axios": ">=1.15.0",
+        "axios": "^1.7.7",
         "chart.js": "^4.4.0",
         "chartjs-adapter-dayjs-4": "^1.0.4",
         "dayjs": "^1.11.9",
         "element-plus": "^2.11.2",
         "leaflet": "^1.9.4",
         "pinia": "^2.1.4",
+        "socket.io-client": "^4.8.3",
         "vue": "^3.3.4",
         "vue-chartjs": "^5.1.1",
         "vue-i18n": "^10.0.8",
@@ -36,6 +36,7 @@
     "devDependencies": {
         "@types/leaflet": "^1.9.21",
         "@types/node": "^24.5.2",
+        "@types/socket.io-client": "^1.4.36",
         "@vitejs/plugin-vue": "^6.0.1",
         "@vitest/coverage-v8": "^4.1.5",
         "@vue/test-utils": "^2.4.6",

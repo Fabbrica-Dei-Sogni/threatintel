@@ -10,6 +10,7 @@ User={{USER}}
 WorkingDirectory={{WORKING_DIR}}
 
 # Runtime Configuration
+Environment=SERVICE_NAME={{SERVICE_NAME}}
 Environment=NODE_ENV={{NODE_ENV}}
 Environment=PORT={{PORT}}
 Environment=VERSION={{VERSION}}
@@ -19,6 +20,9 @@ Environment=API_BASE_URL={{API_BASE_URL}}
 Environment=APP_ID={{APP_ID}}
 Environment=ALLOW_ANONYMOUS={{ALLOW_ANONYMOUS}}
 Environment=URI_DIGITAL_AUTH={{URI_DIGITAL_AUTH}}
+Environment=MONGO_PORT={{MONGO_PORT}}
+Environment=REDIS_PORT={{REDIS_PORT}}
+Environment=QDRANT_PORT={{QDRANT_PORT}}
 Environment=NODE_OPTIONS=--openssl-legacy-provider
 Environment=NGINX_LOG_PREFIX=nginx_threat_{{SERVICE_NAME}}:
 # Environment variable to guide geoip-lite to the local data folder
@@ -26,15 +30,22 @@ Environment=GEODATADIR=./data
 Environment=PATH={{NODE_BIN_DIR}}:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 # Database & Infrastructure
-Environment=MONGO_URI=mongodb://intelagent:intelagent@127.0.0.1:17017/threatinteldb
+Environment=MONGO_URI=mongodb://{{MONGO_APP_USER}}:{{MONGO_APP_PWD}}@127.0.0.1:{{MONGO_PORT}}/{{MONGO_APP_DB}}
 Environment=REDIS_HOST=127.0.0.1
-Environment=REDIS_PORT=6379
-Environment=REDIS_PASSWORD=!!!HoneyPotRedis!!!
+Environment=REDIS_PORT={{REDIS_PORT}}
+Environment=REDIS_PASSWORD={{REDIS_PASSWORD}}
 Environment=REDIS_DB=0
+Environment=QDRANT_URL={{QDRANT_URL}}
+Environment=RAG_COLLECTION_NAME={{RAG_COLLECTION_NAME}}
+Environment=RAG_LOGS_COLLECTION_NAME={{RAG_LOGS_COLLECTION_NAME}}
+Environment=OLLAMA_URL={{OLLAMA_URL}}
+Environment=SUMMARY_MODEL={{SUMMARY_MODEL}}
+Environment=EMBEDDING_MODEL={{EMBEDDING_MODEL}}
 
 # Health Checks
 ExecStartPre=/bin/bash {{WORKING_DIR}}/infra/check-redis.sh
 ExecStartPre=/bin/bash {{WORKING_DIR}}/infra/check-mongodb.sh
+ExecStartPre=/bin/bash {{WORKING_DIR}}/infra/check-qdrant.sh
 
 # Execution
 ExecStart={{NODE_PATH}} index.js

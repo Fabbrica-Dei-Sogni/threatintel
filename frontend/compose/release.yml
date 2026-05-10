@@ -5,28 +5,26 @@ services:
     image: dashboard-honeypot:${IMG_VERSION:-latest}
     container_name: dashboard-honeypot
     restart: unless-stopped
+    env_file:
+      - ../dashboard/.env    
     build:
       context: ../
       dockerfile: ./Dockerfile.release
       args:
-        NPM_VERSION: ${NPM_VERSION_FRONTEND:-0.1.1}
-        NPM_REGISTRY_URI: ${NPM_REGISTRY_URI:-http://alessandromodica.com:8081/repository/npm-cloud-pubblico/}
-        # Variabili Vite iniettate al build time
-        VITE_APP_TITLE: ${VITE_APP_TITLE:-"Threat Intel Dashboard"}
-        VITE_APP_VERSION: ${VITE_APP_VERSION:-"0.1.1"}
-        VITE_APP_API_URL: ${VITE_APP_API_URL:-"/honeypot/api"}
-        VITE_WELCOME_PATH: ${VITE_WELCOME_PATH:-"/honeypot/welcome"}
+        NPM_VERSION: ${NPM_VERSION:-0.1.9}
+        NPM_REGISTRY_URI: ${NPM_REGISTRY_URI:-https://alessandromodica.com/nexus/repository/npm-all/}
+        # Variabili Vite iniettate al build time (Default)
+        VITE_APP_TITLE: ${VITE_APP_TITLE:-Threat Intel Dashboard - Production}
+        VITE_WELCOME_PATH: ${VITE_WELCOME_PATH:-"/welcome"}
         VITE_API_TIMEOUT: ${VITE_API_TIMEOUT:-"30000"}
-        VITE_HONEYPOT_LOCATION_LAT: ${VITE_HONEYPOT_LOCATION_LAT:-"48.8566"}
-        VITE_HONEYPOT_LOCATION_LON: ${VITE_HONEYPOT_LOCATION_LON:-"2.3522"}
-        VITE_HONEYPOT_NAME: ${VITE_HONEYPOT_NAME:-"Honeypot (Paris)"}
+        VITE_HONEYPOT_LOCATION_LAT: ${VITE_HONEYPOT_LOCATION_LAT:-48.8566}
+        VITE_HONEYPOT_LOCATION_LON: ${VITE_HONEYPOT_LOCATION_LON:-2.3522}
+        VITE_HONEYPOT_NAME: ${VITE_HONEYPOT_NAME:-Honeypot (Paris)}
+    environment:
+      # Override a Runtime (opzionale, se non presenti usa i valori sopra del build)
+      #- VITE_APP_TITLE=${VITE_APP_TITLE:-Threat Intel Dashboard - Production}
+      - VITE_APP_VERSION=${NPM_VERSION}
+      #- VITE_APP_BASE_PATH=${VITE_APP_BASE_PATH:-/honeypot/}
+      #- VITE_HONEYPOT_NAME=${VITE_HONEYPOT_NAME:-Honeypot (Paris)}
     ports:
-      - "127.0.0.1:8180:80"
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    networks:
-      - network-threat-intel
-
-networks:
-  network-threat-intel:
-    driver: bridge
+      - "8190:80"

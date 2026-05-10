@@ -75,14 +75,27 @@
     }
 }
 
+.hash-row {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 0.5rem;
+    flex-wrap: wrap;
+}
+
 .hash-title {
     font-family: 'JetBrains Mono', monospace;
     color: var(--theme-primary, #00FF41);
     font-size: 0.9rem;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0;
     display: block;
     opacity: 0.8;
     word-break: break-all;
+}
+
+.header-proto-badge {
+    transform: scale(0.9);
+    transform-origin: left center;
 }
 
 .target-uri-container {

@@ -86,6 +86,15 @@
                                     <div class="hud-value">{{ formatDate(log.timestamp) }}</div>
                                 </div>
                             </div>
+                            <div class="hud-stat-box">
+                                <span class="hud-box-icon">🛰️</span>
+                                <div class="hud-stat-data">
+                                    <span class="hud-label">{{ t('common.protocol').toUpperCase() }}</span>
+                                    <div class="hud-value" style="margin-top: 5px;">
+                                        <ProtocolBadge :protocol="log.protocol" />
+                                    </div>
+                                </div>
+                            </div>
                             <div v-if="log.metadata?.eventCount > 1" class="hud-stat-box">
                                 <span class="hud-box-icon">📊</span>
                                 <div class="hud-stat-data">
@@ -226,6 +235,7 @@ import dayjs from 'dayjs'
 import { fetchLogById } from '../../api/index'
 import { useI18n } from 'vue-i18n'
 import HexViewer from '../../components/HexViewer.vue';
+import ProtocolBadge from '../../components/common/ProtocolBadge.vue';
 import { useClipboard } from '../../composable/useClipboard';
 import GlobalHeader from '../../components/GlobalHeader.vue';
 import CountryFlag from '../../components/CountryFlag.vue';

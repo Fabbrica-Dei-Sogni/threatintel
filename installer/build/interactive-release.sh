@@ -1,92 +1,30 @@
 #!/bin/bash
 
-# Configuration
+# ThreatIntel - Developer Release Wizard
+# Usato dall'azienda per preparare un pacchetto di distribuzione.
+
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../" && pwd)"
-DEFAULT_SERVICE="threatintel-release"
-DEFAULT_USER=$(whoami)
-DEFAULT_PORT="3999"
-DEFAULT_ENV="production"
-DEFAULT_DESC="Threat Intelligence Logger (Release Bundle)"
-DEFAULT_DOMAIN="localhost"
-DEFAULT_API_BASE="http://localhost/honeypot/api"
-DEFAULT_AUTH_URI="https://localhost:3443/auth/api/v1"
-DEFAULT_ORIGINS="http://localhost:5173,http://localhost:4300,https://localhost,http://192.168.0.1:5173,http://192.168.0.1:4300"
-DEFAULT_APP_ID="honeypot-host-001"
-DEFAULT_ALLOW_ANON="true"
-
-# Get version from package.json
+DEFAULT_SERVICE="threatintel-$(date +%Y%m%d)"
 PKG_VERSION=$(grep '"version":' "$PROJECT_ROOT/package.json" | cut -d'"' -f4)
-DEFAULT_VERSION=${PKG_VERSION:-"0.0.1"}
+DEFAULT_VERSION=${PKG_VERSION:-"1.0.0"}
 
-echo "🚀 [Interactive Release] Benvenuto nel generatore di release."
-echo "Premi INVIO per accettare il valore di default tra parentesi."
+echo "🏗️  [Release Wizard] Preparazione pacchetto di distribuzione"
 echo "------------------------------------------------------------"
 
-# 0. Versione
 read -p "🏷️  Versione della Release ($DEFAULT_VERSION): " RELEASE_VERSION
 RELEASE_VERSION=${RELEASE_VERSION:-$DEFAULT_VERSION}
 
-# 1. Interazione con l'utente
-read -p "📛 Nome del Servizio ($DEFAULT_SERVICE): " SERVICE_NAME
+read -p "📂 Nome del pacchetto/servizio ($DEFAULT_SERVICE): " SERVICE_NAME
 SERVICE_NAME=${SERVICE_NAME:-$DEFAULT_SERVICE}
 
-read -p "👤 Utente Linux ($DEFAULT_USER): " DEPLOY_USER
-DEPLOY_USER=${DEPLOY_USER:-$DEFAULT_USER}
-
-read -p "🌐 Porta ($DEFAULT_PORT): " DEPLOY_PORT
-DEPLOY_PORT=${DEPLOY_PORT:-$DEFAULT_PORT}
-
-read -p "🌍 NODE_ENV ($DEFAULT_ENV): " DEPLOY_ENV
-DEPLOY_ENV=${DEPLOY_ENV:-$DEFAULT_ENV}
-
-read -p "📝 Descrizione ($DEFAULT_DESC): " DEPLOY_DESC
-DEPLOY_DESC=${DEPLOY_DESC:-$DEFAULT_DESC}
-
-read -p "🌐 Dominio Applicazione ($DEFAULT_DOMAIN): " APP_DOMAIN
-APP_DOMAIN=${APP_DOMAIN:-$DEFAULT_DOMAIN}
-
-read -p "🔗 API Base URL ($DEFAULT_API_BASE): " API_BASE_URL
-API_BASE_URL=${API_BASE_URL:-$DEFAULT_API_BASE}
-
-read -p "🔐 Digital Auth URI ($DEFAULT_AUTH_URI): " URI_DIGITAL_AUTH
-URI_DIGITAL_AUTH=${URI_DIGITAL_AUTH:-$DEFAULT_AUTH_URI}
-
-read -p "🆔 App ID (Identity) ($DEFAULT_APP_ID): " APP_ID
-APP_ID=${APP_ID:-$DEFAULT_APP_ID}
-
-read -p "🔓 Consenti accesso anonimo? ($DEFAULT_ALLOW_ANON): " ALLOW_ANONYMOUS
-ALLOW_ANONYMOUS=${ALLOW_ANONYMOUS:-$DEFAULT_ALLOW_ANON}
-
-echo "🔒 Configurazione Origins (CORS/CSP):"
-echo "Default attuale: $DEFAULT_ORIGINS"
-read -p "Inserisci origini separate da virgola (o INVIO per default): " ALLOWED_ORIGINS
-ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-$DEFAULT_ORIGINS}
-
 echo "------------------------------------------------------------"
-echo "✅ Parametri configurati. Avvio build autonoma..."
+echo "⚙️  Avvio build del pacchetto agnostico..."
 
-# 2. Esecuzione Build Autonoma
-# Passiamo tutti i parametri a make-release.sh
 cd "$(dirname "${BASH_SOURCE[0]}")"
-./make-release.sh "$RELEASE_VERSION" "$SERVICE_NAME" "$DEPLOY_PORT" "$DEPLOY_USER" "$DEPLOY_ENV" "$DEPLOY_DESC" "$ALLOWED_ORIGINS" "$APP_DOMAIN" "$API_BASE_URL" "$APP_ID" "$ALLOW_ANONYMOUS" "$URI_DIGITAL_AUTH"
+./make-release.sh "$RELEASE_VERSION" "$SERVICE_NAME"
 
-if [ $? -ne 0 ]; then
-    echo "❌ Errore durante la build."
-    exit 1
-fi
-
-DEPLOY_PATH="$PROJECT_ROOT/deployments/$SERVICE_NAME"
-
-echo "------------------------------------------------------------"
-# 3. Registrazione Servizio (Opzionale)
-read -p "🚀 Vuoi registrare e avviare il servizio systemd ora? [y/N]: " DO_INSTALL
-if [[ "$DO_INSTALL" =~ ^([yY][eE][sS]|[yY])$ ]]; then
-    echo "⚙️  Installazione servizio in corso..."
-    cd "$DEPLOY_PATH"
-    ./install.sh "$SERVICE_NAME"
-    echo ""
-    echo "✨ Servizio configurato e avviato!"
-else
-    echo "✅ Release preparata in deployments/$SERVICE_NAME."
-    echo "💡 Puoi attivarla in seguito entrando nella cartella ed eseguendo ./install.sh"
+if [ $? -eq 0 ]; then
+    echo "✅ Pacchetto pronto."
+    echo "📦 Puoi trovare il tar.gz nella cartella 'artifact/'"
+    echo "🚀 Invia questo pacchetto al cliente. L'utente dovrà solo lanciare ./install.sh"
 fi

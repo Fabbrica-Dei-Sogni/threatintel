@@ -17,6 +17,7 @@ import { I18nService } from '../services/I18nService';
 import { Logger } from 'winston';
 import * as ejs from 'ejs';
 import puppeteer from 'puppeteer';
+import { createMockConfigProvider } from './TestUtils';
 
 // Mock delle dipendenze
 jest.mock('ejs');
@@ -39,16 +40,15 @@ describe('ReportService', () => {
     beforeEach(() => {
         jest.clearAllMocks();
         mockLogger = { info: jest.fn(), error: jest.fn() } as any;
-        const mockRagSync = {} as any;
+        const mockConfigProvider = createMockConfigProvider();
+        const mockEventBus = { emit: jest.fn() } as any;
         
-        
-
-
         mockThreatLogService = new ThreatLogService(
             mockLogger,
             {} as any,
             {} as any,
-            {} as any
+            {} as any,
+            mockEventBus
         ) as any;
         mockAttackLogService = new AttackLogService(
             mockLogger,
@@ -56,7 +56,7 @@ describe('ReportService', () => {
             {} as any
         ) as any;
         mockCowrieService = new CowrieService(mockLogger, {} as any) as any;
-        mockIpDetailsService = new IpDetailsService(mockLogger, mockRagSync) as any;
+        mockIpDetailsService = new IpDetailsService(mockLogger, mockEventBus, mockConfigProvider) as any;
 
         mockI18nService = {
             t: jest.fn().mockImplementation((key) => key),

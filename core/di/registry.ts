@@ -26,6 +26,7 @@ import { NginxLogService } from "../services/NginxLogService";
 import { CowrieService } from "../services/CowrieService";
 import { AnalysisService } from "../tools/analyze";
 import { ThreatLogService } from "../services/ThreatLogService";
+import { ThreatAnalyticsService } from "../services/ThreatAnalyticsService";
 import { PatternAnalysisService } from "../services/PatternAnalysisService";
 import { ThreatLogFactory } from "../utils/ThreatLogFactory";
 import { IpDetailsService } from "../services/IpDetailsService";
@@ -48,6 +49,8 @@ import { ThreatReanalyzeJob } from "../services/jobs/ThreatReanalyzeJob";
 import { RagReindexJob } from "../services/jobs/RagReindexJob";
 import { ReanalyzeJob } from "../services/jobs/ReanalyzeJob";
 import { PruningJob } from "../services/jobs/PruningJob";
+import { SocketServerHub } from "../services/socket/SocketServerHub";
+import { SocketEventBridge } from "../services/socket/SocketEventBridge";
 
 /**
  * Centrally register all components in the DI container.
@@ -63,6 +66,8 @@ export function setupContainer(container: DependencyContainer) {
     container.register(Tokens.RATE_LIMIT_MIDDLEWARE_TOKEN, { useClass: RateLimitMiddleware }, { lifecycle: Lifecycle.Singleton });
     container.register(Tokens.AUTH_MIDDLEWARE_TOKEN, { useClass: AuthMiddleware }, { lifecycle: Lifecycle.Singleton });
     container.register(Tokens.BACKGROUND_JOB_MANAGER_TOKEN, { useClass: BackgroundJobManager }, { lifecycle: Lifecycle.Singleton });
+    container.register(Tokens.SOCKET_SERVER_HUB_TOKEN, { useClass: SocketServerHub }, { lifecycle: Lifecycle.Singleton });
+    container.register(Tokens.SOCKET_EVENT_BRIDGE_TOKEN, { useClass: SocketEventBridge }, { lifecycle: Lifecycle.Singleton });
 
     // Jobs
     container.register(Tokens.SSH_REANALYZE_JOB_TOKEN, { useClass: SshReanalyzeJob }, { lifecycle: Lifecycle.Transient });
@@ -75,6 +80,7 @@ export function setupContainer(container: DependencyContainer) {
     container.register(Tokens.I18N_TOKEN, { useClass: I18nService }, { lifecycle: Lifecycle.Singleton });
     container.register(Tokens.CONFIG_PROVIDER_TOKEN, { useClass: AppConfigProvider }, { lifecycle: Lifecycle.Singleton });
     container.register(Tokens.THREAT_LOG_SERVICE_TOKEN, { useClass: ThreatLogService }, { lifecycle: Lifecycle.Singleton });
+    container.register(Tokens.THREAT_ANALYTICS_SERVICE_TOKEN, { useClass: ThreatAnalyticsService }, { lifecycle: Lifecycle.Singleton });
     container.register(Tokens.IP_DETAILS_SERVICE_TOKEN, { useClass: IpDetailsService }, { lifecycle: Lifecycle.Singleton });
     container.register(Tokens.PATTERN_ANALYSIS_SERVICE_TOKEN, { useClass: PatternAnalysisService }, { lifecycle: Lifecycle.Singleton });
     container.register(Tokens.THREAT_LOG_FACTORY_TOKEN, { useClass: ThreatLogFactory }, { lifecycle: Lifecycle.Singleton });

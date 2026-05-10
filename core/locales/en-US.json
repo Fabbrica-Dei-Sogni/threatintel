@@ -370,5 +370,14 @@
             "missingSourceRef": "SourceRef missing",
             "invalidSourceType": "Unsupported source type"
         }
+    },
+    "breakingNews": {
+        "prompts": {
+            "topCountry": "Based on this technical context:\n{context}\n\nGenerate a short flash news (max 15 words) summarizing the malicious activity from {country}. Be aggressive and technical.",
+            "lastAttacks": "Based on this data:\n{context}\n\nSummarize in one line (max 12 words) the intrusions detected from nodes {ips}.",
+            "mostActiveSession": "Analyze this session:\n{context}\n\nBriefly describe (max 15 words) the actions of attacker {ip} ({count} events).",
+            "criticalAlert": "URGENT: Analyze this critical attack:\n{context}\n\nGenerate a flash security alert (max 12 words) for IP {ip}.",
+            "targetDiscovery": "Analyze the pattern:\n{context}\n\nGenerate flash news about the unusual interest in endpoint {path}."
+        }
     }
 }

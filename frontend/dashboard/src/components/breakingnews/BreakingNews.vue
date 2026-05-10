@@ -18,7 +18,7 @@
       <span class="pulse-dot"></span>
       {{ t('home.breakingNews.badge') }}
     </div>
-    
+
     <div class="news-content" ref="contentRef">
       <!-- TYPEWRITER MODE: Single Headline Rotation -->
       <transition v-if="mode === 'typewriter'" name="fade-news" mode="out-in">
@@ -52,7 +52,9 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import CountryFlag from './CountryFlag.vue';
+import CountryFlag from '../CountryFlag.vue';
+import { triggerAgenticNews, generateStaticFallback } from './NewsGenerator';
+import { useNewsStore } from '../../stores/news';
 
 const props = defineProps({
   attacks: {
@@ -78,95 +80,59 @@ const props = defineProps({
   }
 });
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
+const newsStore = useNewsStore();
 
 const currentHeadlineIndex = ref(0);
 const typedText = ref('');
 const isTyping = ref(false);
 const contentRef = ref(null);
 let rotationInterval = null;
+let lastFullTriggerTime = 0;
+const TRIGGER_COOLDOWN_MS = 60000; // Al massimo un giro completo ogni 60 secondi
+let debounceTimer = null;
 
 /**
- * Helper to format IP with ISP if available
+ * Aggiorna le news utilizzando la logica incubata in NewsGenerator
+ * Ora fa solo il trigger, i risultati arrivano via socket.
  */
-const formatIpWithIsp = (ip, ipDetails) => {
-  const isp = ipDetails?.ipinfo?.org || ipDetails?.isp || ipDetails?.ipinfo?.isp;
-  if (isp) {
-    // Clean some common ISP prefixes/suffixes if needed (optional)
-    const cleanIsp = isp.replace(/^AS\d+\s+/, '');
-    return `${ip} (${cleanIsp})`;
+const updateNews = async (force = false) => {
+  // 1. Fonte principale: Carichiamo subito le news statiche (veloci e affidabili)
+  const staticNews = generateStaticFallback(props, t);
+  newsStore.setHeadlines(staticNews);
+
+  // 2. Controllo Cooldown per evitare spam di chiamate AI (ask)
+  const now = Date.now();
+  if (!force && (now - lastFullTriggerTime < TRIGGER_COOLDOWN_MS)) {
+    return;
   }
-  return ip;
+
+  try {
+    // 3. Fonte a corredo: Triggeriamo la generazione agentica
+    console.debug('[BreakingNews] Triggering Agentic AI Scan...');
+    lastFullTriggerTime = now;
+    await triggerAgenticNews(props, locale.value, t);
+  } catch (err) {
+    console.error('[BreakingNews] Agentic trigger failed:', err);
+  }
 };
 
-const headlines = computed(() => {
-  const list = [];
+const debouncedUpdate = () => {
+  if (debounceTimer) clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(() => {
+    updateNews();
+  }, 2000); // Aspettiamo che i dati si stabilizzino per 2 secondi
+};
 
-  // 1. Geopolitical Narrative
-  if (props.attacks.length > 0) {
-    const countries = props.attacks.map(a => a.ipDetails?.ipinfo?.country || a.ipDetails?.country).filter(Boolean);
-    if (countries.length > 0) {
-      const counts = countries.reduce((acc, c) => ({ ...acc, [c]: (acc[c] || 0) + 1 }), {});
-      const topCountry = Object.keys(counts).reduce((a, b) => counts[a] > counts[b] ? a : b);
-      list.push({ text: t('home.breakingNews.topCountry', { country: topCountry }), countryCode: topCountry });
-    }
-  }
+// Gestione integrazione socket spostata in useSocket.ts
 
-  // 2. Recent Attack IPs
-  if (props.attacks.length >= 3) {
-    const formattedIps = props.attacks.slice(0, 3).map(a => formatIpWithIsp(a.request?.ip, a.ipDetails)).join(', ');
-    list.push({ text: t('home.breakingNews.lastAttacks', { ips: formattedIps }), icon: '🛰️' });
-  }
-
-  // 3. Persistent Actor Intelligence (Sessions)
-  if (props.sessions.length > 0) {
-    const mostActive = [...props.sessions].sort((a, b) => (b.eventCount || 0) - (a.eventCount || 0))[0];
-    if (mostActive && (mostActive.eventCount || 0) > 2) {
-      const formattedActor = formatIpWithIsp(mostActive.src_ip, mostActive.ipDetailsId);
-      list.push({
-        text: t('home.breakingNews.mostActiveSession', { ip: formattedActor, count: mostActive.eventCount || 0 }),
-        icon: '📟',
-        countryCode: mostActive.ipDetailsId?.ipinfo?.country || mostActive.ipDetailsId?.country
-      });
-    }
-  }
-
-  // 4. Recent Session IPs
-  if (props.sessions.length >= 3) {
-    const formattedIps = props.sessions.slice(0, 3).map(s => formatIpWithIsp(s.src_ip, s.ipDetailsId)).join(', ');
-    list.push({ text: t('home.breakingNews.lastSessions', { ips: formattedIps }), icon: '📟' });
-  }
-
-  // 5. Critical Incursion Alert
-  if (props.attacks.length > 0) {
-    const critical = props.attacks.find(a => a.dangerLevel >= 4);
-    if (critical) {
-      const formattedIp = formatIpWithIsp(critical.request?.ip, critical.ipDetails);
-      list.push({ text: t('home.breakingNews.criticalAlert', { ip: formattedIp }), icon: '⚠️' });
-    }
-  }
-
-  // 6. Emerging Traffic Pattern
-  if (props.logs.length > 0) {
-    const specificUrls = props.logs.map(l => l.request?.url).filter(u => u && u !== '/' && u !== '\\');
-    if (specificUrls.length > 0) {
-      const counts = specificUrls.reduce((acc, u) => ({ ...acc, [u]: (acc[u] || 0) + 1 }), {});
-      const topUrl = Object.keys(counts).reduce((a, b) => counts[a] > counts[b] ? a : b);
-      list.push({ text: t('home.breakingNews.targetDiscovery', { path: topUrl }), icon: '🔍' });
-    }
-  }
-
-  if (list.length === 0) list.push({ text: t('common.noDataFound'), icon: '⏸️' });
-  return list;
-});
-
+const headlines = computed(() => newsStore.aiHeadlines.length > 0 ? newsStore.aiHeadlines : [{ text: t('common.loading'), icon: '⏳' }]);
 const doubleHeadlines = computed(() => [...headlines.value, ...headlines.value]);
 const currentHeadline = computed(() => headlines.value[currentHeadlineIndex.value]);
 
-// Calculate animation duration based on content length for the ticker
 const trackStyle = computed(() => {
   if (props.mode !== 'ticker') return {};
-  const duration = headlines.value.length * 15; // 15s per set of headlines
+  const duration = headlines.value.length * 15;
   return {
     animationDuration: `${duration}s`
   };
@@ -185,26 +151,42 @@ const typeText = async (text) => {
 
 const startRotation = () => {
   if (rotationInterval) clearInterval(rotationInterval);
-  if (props.mode === 'ticker') return; // Ticker uses CSS animation
+  if (props.mode === 'ticker') return;
 
-  typeText(currentHeadline.value.text);
-  rotationInterval = setInterval(() => {
-    currentHeadlineIndex.value = (currentHeadlineIndex.value + 1) % headlines.value.length;
+  if (currentHeadline.value) {
     typeText(currentHeadline.value.text);
+  }
+
+  rotationInterval = setInterval(() => {
+    if (headlines.value.length > 0) {
+      currentHeadlineIndex.value = (currentHeadlineIndex.value + 1) % headlines.value.length;
+      typeText(currentHeadline.value.text);
+    }
   }, 7000);
 };
 
-onMounted(() => {
+// Watcher rimosso: la sottoscrizione ai socket è ora gestita globalmente
+
+onMounted(async () => {
+  debouncedUpdate();
   startRotation();
 });
 
 onBeforeUnmount(() => {
   if (rotationInterval) clearInterval(rotationInterval);
+  if (debounceTimer) clearTimeout(debounceTimer);
 });
 
-watch(() => props.attacks.length, () => {
-  currentHeadlineIndex.value = 0;
-  startRotation();
+watch([() => props.attacks.length, locale, () => newsStore.aiHeadlines.length], ([attLen, loc, newsLen], [oldAttLen, oldLoc, oldNewsLen]) => {
+  if (attLen !== oldAttLen || loc !== oldLoc) {
+    debouncedUpdate();
+  }
+  
+  // Se arrivano news live e siamo in typewriter, resettiamo per mostrarle
+  if (newsLen > oldNewsLen && props.mode === 'typewriter') {
+    currentHeadlineIndex.value = 0;
+    startRotation();
+  }
 });
 </script>
 
@@ -252,7 +234,6 @@ watch(() => props.attacks.length, () => {
   align-items: center;
 }
 
-/* TICKER TRACK: The key to seamless loop */
 .ticker-track {
   display: flex;
   align-items: center;
@@ -263,8 +244,13 @@ watch(() => props.attacks.length, () => {
 }
 
 @keyframes ticker-scroll {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); } /* Stop at half because we doubled the content */
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
 }
 
 .ticker-item {
@@ -300,7 +286,7 @@ watch(() => props.attacks.length, () => {
   gap: 6px;
   white-space: nowrap;
   flex-shrink: 0;
-  box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
 }
 
 .pulse-dot {
@@ -332,13 +318,27 @@ watch(() => props.attacks.length, () => {
 }
 
 @keyframes pulse {
-  from { transform: scale(0.8); opacity: 0.5; }
-  to { transform: scale(1.2); opacity: 1; }
+  from {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+
+  to {
+    transform: scale(1.2);
+    opacity: 1;
+  }
 }
 
 @keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0;
+  }
 }
 
 .fade-news-enter-active,
@@ -346,10 +346,16 @@ watch(() => props.attacks.length, () => {
   transition: all 0.3s ease;
 }
 
-.fade-news-enter-from { opacity: 0; transform: translateY(10px); }
-.fade-news-leave-to { opacity: 0; transform: translateY(-10px); }
+.fade-news-enter-from {
+  opacity: 0;
+  transform: translateY(10px);
+}
 
-/* Visibility for Header Mode */
+.fade-news-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
 .breaking-news-container:not(.is-active) {
   opacity: 0;
   transform: translateY(-20px);
@@ -360,10 +366,12 @@ watch(() => props.attacks.length, () => {
   .headline-text {
     font-size: 0.8rem;
   }
+
   .news-badge {
     font-size: 0.65rem;
     padding: 2px 6px;
   }
+
   .breaking-news-container {
     gap: 10px;
   }

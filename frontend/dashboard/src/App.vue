@@ -71,13 +71,16 @@ import DossierToggle from './components/DossierToggle.vue';
 import GlobalNavMenu from './components/GlobalNavMenu.vue';
 import { useDossierStore } from './stores/dossier';
 import { useAuthStore } from './stores/auth';
+import { useSocket } from './composable/useSocket';
+import { getEnv } from './config';
 
 const { t } = useI18n();
 const route = useRoute();
 const dossierStore = useDossierStore();
 const authStore = useAuthStore();
+useSocket();
 
-const appVersion = import.meta.env.VITE_APP_VERSION || '1.0.0';
+const appVersion = getEnv('VITE_APP_VERSION') || '1.0.0';
 const isAuthPage = computed(() => route.path === '/login' || route.path === '/register');
 
 onMounted(() => {

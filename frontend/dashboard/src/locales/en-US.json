@@ -53,6 +53,7 @@
         "back": "Back",
         "id": "ID",
         "timestamp": "Timestamp",
+        "protocol": "Protocol",
         "ip": "IP",
         "copyIp": "Copy IP",
         "path": "Path",
@@ -103,7 +104,11 @@
         "auth_required_desc": "Investigative dossiers and forensic reports are only accessible to identified analysts.",
         "reset_layout": "RESET LAYOUT",
         "view_list": "List View",
-        "view_grid": "Grid View"
+        "view_grid": "Grid View",
+        "collapse": "Collapse",
+        "expand": "Expand",
+        "refresh": "Refresh",
+        "unknown": "Unknown"
     },
     "skin": {
         "classic": "Classic",
@@ -251,7 +256,8 @@
             "attackDuration": "Anomaly Duration",
             "firstSeen": "First seen",
             "lastSeen": "Last seen"
-        }
+        },
+        "unit": "Unit"
     },
     "attackDetail": {
         "title": "Anomaly Detail",
@@ -281,7 +287,8 @@
         "mapTitle": "Anomaly Map",
         "radarTitle": "Radar Analysis",
         "searchUrlPlaceholder": "Filter by URL...",
-        "userAgent": "User Agent"
+        "userAgent": "User Agent",
+        "recentLogs": "Recent Logs"
     },
     "campaigns": {
         "title": "Campaigns",
@@ -578,6 +585,7 @@
         "noSearchResults": "No results for this search",
         "createFirst": "Create first configuration",
         "retry": "Retry",
+        "reanalyzeStarted": "Reanalysis started in background. Monitor progress in the Mission Control panel.",
         "configCreated": "Configuration created successfully",
         "configSaved": "Configuration saved successfully",
         "configDeleted": "Configuration deleted successfully",
@@ -894,11 +902,7 @@
             "completed": "COMPLETED",
             "failed": "FAILED",
             "cancelled": "CANCELLED"
-        },
-        "activeOps": "ACTIVE OPERATIONS",
-        "noActiveOps": "NO OPERATIONS IN PROGRESS",
-        "recentLogs": "RECENT LOGS",
-        "terminateMission": "TERMINATE MISSION"
+        }
     },
     "maintenance": {
         "title": "SYSTEM MAINTENANCE",
@@ -911,8 +915,19 @@
             "retentionDaysHelp": "Time before a deleted log is permanently removed",
             "deletionDays": "Permanent Deletion (days)",
             "deletionDaysHelp": "Empty archived logs older than this value",
+            "emergencyReset": "Emergency Reset",
+            "emergencyResetHelp": "Sets ALL logs (including orphans) to 'Active' status. Use with caution.",
             "runCleanup": "Run Cleanup",
-            "confirm": "Are you sure you want to proceed with permanent cleanup? This action is irreversible."
-        }
+            "confirm": "Are you sure you want to proceed with permanent cleanup? This action is irreversible.",
+            "stats": {
+                "active": "Active Logs",
+                "archived": "Archived Logs",
+                "trash": "In Trash",
+                "legacy": "Legacy (No Status)"
+            }
+        },
+        "job_completed": "Job Completed",
+        "completed_successfully": "completed successfully",
+        "job_failed": "Job Failed"
     }
 }

@@ -370,5 +370,14 @@
             "missingSourceRef": "SourceRef mancante",
             "invalidSourceType": "Tipo di sorgente non supportato"
         }
+    },
+    "breakingNews": {
+        "prompts": {
+            "topCountry": "In base a questo contesto tecnico:\n{context}\n\nGenera una breve notizia flash (max 15 parole) che riassuma l'attività malevola proveniente da {country}. Sii aggressivo e tecnico.",
+            "lastAttacks": "In base a questi dati:\n{context}\n\nRiassumi in una riga (max 12 parole) le intrusioni rilevate dai nodi {ips}.",
+            "mostActiveSession": "Analizza questa sessione:\n{context}\n\nDescrivi brevemente (max 15 parole) le azioni dell'attaccante {ip} ({count} eventi).",
+            "criticalAlert": "URGENTE: Analizza questo attacco critico:\n{context}\n\nGenera un avviso di sicurezza lampo (max 12 parole) per l'IP {ip}.",
+            "targetDiscovery": "Analizza il pattern:\n{context}\n\nGenera una notizia flash sull'interesse anomalo per l'endpoint {path}."
+        }
     }
 }

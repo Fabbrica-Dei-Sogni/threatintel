@@ -210,8 +210,10 @@ const routes: RouteRecordRaw[] = [
     }
 ];
 
+import { getEnv } from '../config';
+
 const router = createRouter({
-    history: createWebHistory(import.meta.env.BASE_URL),
+    history: createWebHistory(getEnv('VITE_APP_BASE_PATH') || import.meta.env.BASE_URL),
     routes,
 });
 

@@ -61,7 +61,8 @@ describe('NginxLogService', () => {
         
         mockAppConfigProvider = {
             getNginxSuspiciousPatterns: jest.fn().mockResolvedValue(['/test-endpoint', '/malicious']),
-            getDynamicConfig: jest.fn().mockResolvedValue(null)
+            getDynamicConfig: jest.fn().mockResolvedValue(null),
+            nginxLogPrefix: 'nginx_threat:'
         };
 
         mockThreatLogFactory = {

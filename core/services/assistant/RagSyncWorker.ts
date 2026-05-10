@@ -10,6 +10,7 @@ import { injectable, inject } from 'tsyringe';
 import { Logger } from 'winston';
 import { RagSyncService } from './RagSyncService';
 import { CampaignService } from '../CampaignService';
+import { AppConfigProvider } from '../AppConfigProvider';
 
 import { AttackLogService } from '../AttackLogService';
 import { ILongRunningService, ServiceStatus } from '../../types/lifecycle';
@@ -28,7 +29,8 @@ export class RagSyncWorker implements ILongRunningService {
         @inject(Tokens.LOGGER_TOKEN) private readonly logger: Logger,
         @inject(Tokens.RAG_SYNC_SERVICE_TOKEN) private readonly ragSync: RagSyncService,
         @inject(Tokens.CAMPAIGN_SERVICE_TOKEN) private readonly campaignService: CampaignService,
-        @inject(Tokens.ATTACK_LOG_SERVICE_TOKEN) private readonly attackLogService: AttackLogService
+        @inject(Tokens.ATTACK_LOG_SERVICE_TOKEN) private readonly attackLogService: AttackLogService,
+        @inject(Tokens.CONFIG_PROVIDER_TOKEN) private readonly config: AppConfigProvider
     ) { }
 
     public async start(): Promise<void> {
@@ -139,8 +141,8 @@ export class RagSyncWorker implements ILongRunningService {
 
             //TODO: al momento non cè un supporto pieno alle configurazioni rag e di altri aspetti su mongodb
             //const aiEnabledConfig = await this.configService.getConfigValue('RAG_AI_SUMMARY_ENABLED');
-            //const isAiEnabled = aiEnabledConfig === 'true' || process.env.RAG_AI_SUMMARY_ENABLED === 'true';
-            const isAiEnabled = process.env.RAG_AI_SUMMARY_ENABLED === 'true';
+            //const isAiEnabled = aiEnabledConfig === 'true' || this.config.ragAiSummaryEnabled;
+            const isAiEnabled = this.config.ragAiSummaryEnabled;
 
             // 1. Materializzazione Campagne
             await this.runCampaignMaterialization(isAiEnabled);

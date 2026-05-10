@@ -24,6 +24,7 @@ describe('AssistantService', () => {
     let mockIpDetails: any;
     let mockAppConfig: any;
     let mockRagTranslation: any;
+    let mockEventBus: any;
 
     beforeEach(() => {
         mockLogger = { info: jest.fn(), error: jest.fn(), debug: jest.fn(), warn: jest.fn() } as any;
@@ -41,6 +42,7 @@ describe('AssistantService', () => {
         mockIpDetails = { getIpDetails: jest.fn() };
         mockAppConfig = { ragReindexThresholdDays: 7 };
         mockRagTranslation = { translateAttack: jest.fn(), translateCampaign: jest.fn() };
+        mockEventBus = { emit: jest.fn() };
 
         service = new AssistantService(
             mockLogger,
@@ -53,6 +55,7 @@ describe('AssistantService', () => {
             mockCampaign,
             mockIpDetails,
             mockRagTranslation,
+            mockEventBus,
             mockAppConfig
         );
     });

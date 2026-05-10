@@ -15,7 +15,7 @@ import { Controller, Get, Post, All, Use } from '../registry/decorators';
 import { getComponent } from '../di/container';
 import { RateLimitMiddleware } from '../rateLimitMiddleware';
 
-const rateLimit = getComponent(RateLimitMiddleware);
+const rateLimit = () => getComponent<RateLimitMiddleware>(Tokens.RATE_LIMIT_MIDDLEWARE_TOKEN);
 
 @singleton()
 @Controller('/')
@@ -35,7 +35,7 @@ export class FakeLoginController {
      *       200:
      *         description: Pagina HTML caricata con successo.
      */
-    @Get('/', [rateLimit.criticalEndpointsLimiter()])
+    @Get('/', [(req: any, res: any, next: any) => rateLimit().criticalEndpointsLimiter()(req, res, next)])
     showFakeLogin(_req: Request, res: Response): void {
         this.logger.info('[FakeLoginController] External request intercepted: showing fake login page');
         res.status(200).sendFile(path.join(__dirname, '..', 'public', 'fake_login.html'));
@@ -63,7 +63,7 @@ export class FakeLoginController {
      *       302:
      *         description: Reindirizzamento dell'attaccante.
      */
-    @Post('/login', [rateLimit.criticalEndpointsLimiter()])
+    @Post('/login', [(req: any, res: any, next: any) => rateLimit().criticalEndpointsLimiter()(req, res, next)])
     handleFakeLogin(_req: Request, res: Response): void {
         this.logger.info('[FakeLoginController] Fake login attempt intercepted');
         // Simulate a delay for realism
@@ -108,5 +108,5 @@ const commonEndpoints = (process.env.COMMON_ENDPOINTS || '')
     .filter(Boolean);
 
 commonEndpoints.forEach(endpoint => {
-    All(endpoint, [rateLimit.trapEndpointsLimiter()])(FakeLoginController.prototype, 'handleTrap');
+    All(endpoint, [(req: any, res: any, next: any) => rateLimit().trapEndpointsLimiter()(req, res, next)])(FakeLoginController.prototype, 'handleTrap');
 });

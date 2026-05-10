@@ -53,6 +53,7 @@
         "back": "Retour",
         "id": "ID",
         "timestamp": "Horodatage",
+        "protocol": "Protocole",
         "ip": "IP",
         "copyIp": "Copier l'IP",
         "path": "Chemin",
@@ -103,7 +104,11 @@
         "auth_required_desc": "Les dossiers d'investigation et les rapports médico-légaux sont réservés aux analystes identifiés.",
         "reset_layout": "RÉINITIALISER LA MISE EN PAGE",
         "view_list": "Vue Liste",
-        "view_grid": "Vue Grille"
+        "view_grid": "Vue Grille",
+        "collapse": "Réduire",
+        "expand": "Développer",
+        "refresh": "Actualiser",
+        "unknown": "Inconnu"
     },
     "skin": {
         "classic": "Classique",
@@ -251,7 +256,8 @@
             "attackDuration": "Durée de l'anomalie",
             "firstSeen": "Premier vu",
             "lastSeen": "Dernier vu"
-        }
+        },
+        "unit": "Unité"
     },
     "attackDetail": {
         "title": "Détail de l'anomalie",
@@ -281,7 +287,8 @@
         "mapTitle": "Carte d'Anomalie",
         "radarTitle": "Analyse Radar",
         "searchUrlPlaceholder": "Filtrer par URL...",
-        "userAgent": "User Agent"
+        "userAgent": "User Agent",
+        "recentLogs": "Derniers logs"
     },
     "campaigns": {
         "title": "Campagnes",
@@ -578,6 +585,7 @@
         "noSearchResults": "Aucun résultat pour cette recherche",
         "createFirst": "Créer la première configuration",
         "retry": "Réessayer",
+        "reanalyzeStarted": "Réanalyse lancée en arrière-plan. Surveillez la progression dans le panneau Mission Control.",
         "configCreated": "Configuration créée avec succès",
         "configSaved": "Configuration enregistrée avec succès",
         "configDeleted": "Configuration supprimée avec succès",
@@ -897,18 +905,29 @@
         }
     },
     "maintenance": {
-        "title": "SYSTEM MAINTENANCE",
+        "title": "MAINTENANCE DU SYSTÈME",
         "pruning": {
-            "title": "Pruning & Retention",
-            "desc": "Manage data lifecycle: automatic archiving and permanent deletion of logs.",
-            "archiveDays": "Days to Archive",
-            "archiveDaysHelp": "Time before an active log becomes Archived",
-            "retentionDays": "Trash Retention (days)",
-            "retentionDaysHelp": "Time before a deleted log is permanently removed",
-            "deletionDays": "Permanent Deletion (days)",
-            "deletionDaysHelp": "Empty archived logs older than this value",
-            "runCleanup": "Run Cleanup",
-            "confirm": "Are you sure you want to proceed with permanent cleanup? This action is irreversible."
-        }
+            "title": "Élagage & Rétention",
+            "desc": "Gérer le cycle de vie des données : archivage automatique et suppression permanente des logs.",
+            "archiveDays": "Jours avant Archivage",
+            "archiveDaysHelp": "Temps avant qu'un log actif ne soit archivé",
+            "retentionDays": "Rétention Corbeille (jours)",
+            "retentionDaysHelp": "Temps avant qu'un log supprimé ne soit définitivement retiré",
+            "deletionDays": "Suppression Permanente (jours)",
+            "deletionDaysHelp": "Vider les logs archivés plus anciens que cette valeur",
+            "emergencyReset": "Réinitialisation d'Urgence",
+            "emergencyResetHelp": "Définit TOUS les logs sur le statut 'Actif'. À utiliser avec prudence.",
+            "runCleanup": "Lancer le Nettoyage",
+            "confirm": "Êtes-vous sûr de vouloir procéder au nettoyage permanent ? Cette action est irréversible.",
+            "stats": {
+                "active": "Logs Actifs",
+                "archived": "Logs Archivés",
+                "trash": "Dans la Corbeille",
+                "legacy": "Hérités (Sans Statut)"
+            }
+        },
+        "job_completed": "Travail terminé",
+        "completed_successfully": "terminé avec succès",
+        "job_failed": "Travail échoué"
     }
 }

@@ -8,6 +8,7 @@
  */
 import { inject, singleton } from 'tsyringe';
 import { ThreatLogService } from '../services/ThreatLogService';
+import { AppConfigProvider } from '../services/AppConfigProvider';
 import { Logger } from 'winston';
 import dotenv from 'dotenv';
 dotenv.config();
@@ -25,9 +26,10 @@ export class AnalysisService implements ILongRunningService {
 
     constructor(
         @inject(Tokens.LOGGER_TOKEN) private readonly logger: Logger,
-        @inject(Tokens.THREAT_LOG_SERVICE_TOKEN) private readonly threatLogService: ThreatLogService
+        @inject(Tokens.THREAT_LOG_SERVICE_TOKEN) private readonly threatLogService: ThreatLogService,
+        @inject(Tokens.CONFIG_PROVIDER_TOKEN) private readonly config: AppConfigProvider
     ) {
-        this.timeoutAnalyze = this.parseInterval(process.env.ANALYZE_INTERVAL || '5m');
+        this.timeoutAnalyze = this.parseInterval(this.config.analyzeInterval);
     }
 
     public getStatus(): ServiceStatus {

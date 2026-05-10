@@ -13,15 +13,16 @@
 import axios from 'axios';
 import type { FetchSearchParams } from '../models/LogDTO';
 import type { FetchAttackSearchParams } from '../models/AttackDTO';
-import type { 
-    FetchCampaignsParams, 
-    FetchCampaignsResponse, 
+import type {
+    FetchCampaignsParams,
+    FetchCampaignsResponse,
     CampaignDetailDTO,
     FetchUrisResponse
 } from '../models/CampaignDTO';
 import { useProfileStore } from '../stores/profiles';
 import { useAuthStore } from '../stores/auth';
 import { storage, StorageNamespace } from '../utils/storage';
+import { getEnv } from '../config';
 
 // Funzione helper per ottenere l'URL, con fallback sulla gestione dei profili
 export const getApiUrl = (): string => {
@@ -36,24 +37,30 @@ export const getApiUrl = (): string => {
     }
     // Fallback prioritario al localStorage (via HP_API namespace se migrato) o ENV
     const savedApi = storage.get<string>(StorageNamespace.API);
-    return savedApi || import.meta.env.VITE_APP_API_URL || '/honeypot/api';
+    return savedApi || getEnv('VITE_APP_API_URL') || `${import.meta.env.BASE_URL}api`.replace(/\/+$/, '');
 };
 
 export const apiClient = axios.create({
     baseURL: getApiUrl(),
-    timeout: 30000,
+    timeout: 90000, // Aumentato a 90s per gestire i tempi di risposta dell'AI su VPS
 });
 
 // Interceptor per gestire cambiamenti a runtime e iniettare il token
 apiClient.interceptors.request.use((config) => {
     config.baseURL = getApiUrl();
-    
+
     // Recupera il token dal namespace AUTH
-    const auth = storage.get<{token: string}>(StorageNamespace.AUTH);
+    const auth = storage.get<{ token: string }>(StorageNamespace.AUTH);
     if (auth?.token) {
         config.headers.Authorization = `Bearer ${auth.token}`;
     }
-    
+
+    // Iniezione Application ID per IAM Digital Auth (Reverse Domain Name standard)
+    const appId = getEnv('APP_ID');
+    if (appId) {
+        config.headers['x-app-id'] = appId;
+    }
+
     return config;
 }, (error) => {
     return Promise.reject(error);
@@ -85,9 +92,9 @@ apiClient.interceptors.response.use((response) => {
             // Fallback sicuro se Pinia non è pronto: redirect diretto a /login
             console.error('[apiClient] Errore auth, fallback redirect:', e);
             const currentPath = window.location.pathname;
-            const isAuthPage = ['/login', '/register'].some(p => currentPath.startsWith(p));
+            const isAuthPage = [`${import.meta.env.BASE_URL}login`, `${import.meta.env.BASE_URL}register`].some(p => currentPath.includes(p));
             if (!isAuthPage) {
-                window.location.href = '/login';
+                window.location.href = `${import.meta.env.BASE_URL}login`.replace(/\/+$/, '');
             }
         }
     }
@@ -472,13 +479,13 @@ export async function fetchCustomReport(payload: any, format: string = 'pdf', st
  */
 export async function fetchStats(timeframe: string = '24h', minScore: number = 15, limit: string | number = 10, minLogs: number = 1): Promise<any> {
     try {
-        const response = await apiClient.get('/stats', { 
-            params: { 
-                timeframe, 
-                minScore, 
+        const response = await apiClient.get('/stats', {
+            params: {
+                timeframe,
+                minScore,
                 top: limit,
                 minLogs
-            } 
+            }
         });
         return response.data;
     } catch (error) {
@@ -586,10 +593,13 @@ export async function fetchCampaigns({
     minCorrelations = 0,
     status = 'active'
 }: FetchCampaignsParams = {}): Promise<FetchCampaignsResponse> {
+    console.log('[fetchCampaigns] Params:', { startTime, endTime, timeMode, agoValue, agoUnit, minIps, minScore, minLogsPerIp, minCorrelations, protocol, page, pageSize, selectedUris, search, status });
     try {
         const response = await apiClient.get('/campaign/search', {
             params: { startTime, endTime, timeMode, agoValue, agoUnit, minIps, minScore, minLogsPerIp, minCorrelations, protocol, page, pageSize, selectedUris, search, status }
         });
+        console.log('[fetchCampaigns] Response status:', response.status);
+        console.log('[fetchCampaigns] Number of campaigns received:', response.data?.campaigns?.length || 0);
         return response.data;
     } catch (error) {
         console.error('[fetchCampaigns] Error:', error);
@@ -618,6 +628,7 @@ export async function fetchCampaignDetail({
     pageSize?: number;
     status?: string;
 }): Promise<CampaignDetailDTO> {
+    console.log('[fetchCampaignDetail] Params:', { hash, ips, minLogsPerIp, minScore, protocol, timeConfig, page, pageSize, status });
     try {
         const response = await apiClient.post('/campaign/detail', {
             hash,
@@ -630,6 +641,7 @@ export async function fetchCampaignDetail({
             pageSize,
             status
         });
+        console.log('[fetchCampaignDetail] Response status:', response.status);
         return response.data;
     } catch (error) {
         console.error('[fetchCampaignDetail] Error:', error);
@@ -653,7 +665,7 @@ export async function fetchUniqueUris(params: any = {}): Promise<FetchUrisRespon
 // ==========================
 
 export const getChainPromptUrl = (): string => {
-    return import.meta.env.VITE_CHAINPROMPT_API_URL || 'http://localhost:5000/api';
+    return getEnv('VITE_CHAINPROMPT_API_URL') || 'http://localhost:5000/api';
 };
 
 /**
@@ -692,6 +704,19 @@ export async function semanticSearch(query: string, options: any = {}): Promise<
     }
 }
 
+export async function ask(question: string, options: any = {}): Promise<any> {
+    try {
+        const response = await apiClient.post('/assistant/ask', {
+            question,
+            ...options
+        });
+        return response.data;
+    } catch (error) {
+        console.warn('[ask] Warn:', error);
+        //throw error;
+    }
+}
+
 /**
  * Risolve un riferimento sorgente per ottenere i dati tecnici
  */
@@ -701,6 +726,24 @@ export async function resolveSource(sourceRef: any): Promise<any> {
         return response.data;
     } catch (error) {
         console.error('[resolveSource] Error:', error);
+        throw error;
+    }
+}
+
+/**
+ * Triggera la generazione di news agentiche sul backend (202 Accepted)
+ */
+export async function triggerAgenticNews(promptKey: string, params: any, locale: string, searchQuery?: string | null): Promise<any> {
+    try {
+        const response = await apiClient.post('/assistant/trigger-news', {
+            promptKey,
+            params,
+            locale,
+            searchQuery
+        });
+        return response.data;
+    } catch (error) {
+        console.error('[triggerAgenticNews] Error:', error);
         throw error;
     }
 }

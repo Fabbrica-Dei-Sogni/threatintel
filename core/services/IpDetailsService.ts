@@ -20,6 +20,7 @@ import { Logger } from 'winston';
 import ipRangeCheck from 'ip-range-check';
 import { IpDetailsMapper } from '../models/dto/IpDetailsDTO';
 import { EventBus, AppEvents } from './EventBus';
+import { AppConfigProvider } from './AppConfigProvider';
 import { GetIpDetailsParams } from '../types/service-params.types';
 
 dotenv.config();
@@ -31,27 +32,9 @@ export class IpDetailsService {
 
     constructor(
         @inject(Tokens.LOGGER_TOKEN) private readonly logger: Logger,
-        @inject(Tokens.EVENT_BUS_TOKEN) private readonly eventBus: EventBus
-    ) {
-        this.excludedIPs = this.parseExcludedIPs();
-    }
-
-    /**
-     * Parsa la variabile EXCLUDED_IPS dal .env
-     * @returns {string[]} Array di IP e range CIDR da escludere
-     */
-    parseExcludedIPs(): string[] {
-        const excludedIPsEnv = process.env.EXCLUDED_IPS;
-        if (!excludedIPsEnv) {
-            // Default se non specificato
-            return ['127.0.0.1', '::1', 'localhost'];
-        }
-
-        return excludedIPsEnv
-            .split(',')
-            .map(ip => ip.trim())
-            .filter(ip => ip.length > 0);
-    }
+        @inject(Tokens.EVENT_BUS_TOKEN) private readonly eventBus: EventBus,
+        @inject(Tokens.CONFIG_PROVIDER_TOKEN) private readonly config: AppConfigProvider
+    ) { }
 
     /**
      * Verifica se un IP deve essere escluso dal salvataggio
@@ -62,7 +45,7 @@ export class IpDetailsService {
         if (!ip) return true;
 
         // Usa ip-range-check per verificare se l'IP è in uno dei range esclusi
-        return ipRangeCheck(ip, this.excludedIPs);
+        return ipRangeCheck(ip, this.config.excludedIps);
     }
 
     async saveIpDetails(ip: string) {
@@ -88,7 +71,7 @@ export class IpDetailsService {
         const now = new Date();
 
         // Configurazione caching
-        const maxAgeHours = parseInt(process.env.IP_CACHE_MAX_AGE_HOURS || '24', 10);
+        const maxAgeHours = this.config.ipCacheMaxAgeHours;
         const maxAgeMs = maxAgeHours * 60 * 60 * 1000;
 
         // Verifica se i dati sono scaduti o mancanti
@@ -320,11 +303,16 @@ export class IpDetailsService {
      * @returns 
      */
     async enrichWithAbuse(ip: string) {
+        const apiKey = this.config.abuseIpDbKey;
+        if (!apiKey) {
+            this.logger.warn('[IpDetailsService] ABUSEIPDB_KEY not configured');
+            return null;
+        }
 
         try {
             // Solo se non già controllato o se score ancora assente
             const data = await axios.get("https://api.abuseipdb.com/api/v2/check", {
-                headers: { Key: process.env.ABUSEIPDB_KEY, Accept: "application/json" },
+                headers: { Key: apiKey, Accept: "application/json" },
                 params: { ipAddress: ip, maxAgeInDays: 30 }
             });
             return {
@@ -346,9 +334,15 @@ export class IpDetailsService {
 
 
     async getAbuseReportsFromApi(ip: string, maxAgeInDays = 1, perPage = 10, page = 1) {
+        const apiKey = this.config.abuseIpDbKey;
+        if (!apiKey) {
+            this.logger.warn('[IpDetailsService] ABUSEIPDB_KEY not configured');
+            throw new Error('ABUSEIPDB_KEY not configured');
+        }
+
         try {
             const response = await axios.get('https://api.abuseipdb.com/api/v2/reports', {
-                headers: { Key: process.env.ABUSEIPDB_KEY, Accept: "application/json" },
+                headers: { Key: apiKey, Accept: "application/json" },
                 params: {
                     ipAddress: ip,
                     maxAgeInDays,  // intervallo massimo supportato
@@ -429,7 +423,7 @@ export class IpDetailsService {
         return new Promise((resolve) => {
             this.logger.debug(`[IpDetailsService] Avvio lookup ipinfo per: ${ip}`);
 
-            const token = process.env.IPINFO_TOKEN;
+            const token = this.config.ipInfoToken;
             const options = token ? { token: token } : {};
 
             ipinfo(ip, options, (err: any, data: any) => {

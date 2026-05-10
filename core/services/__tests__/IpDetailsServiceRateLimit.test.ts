@@ -10,6 +10,7 @@
 import 'reflect-metadata';
 import mongoose from 'mongoose';
 import { IpDetailsService } from '../IpDetailsService';
+import { createMockConfigProvider } from '../../__tests__/TestUtils';
 import IpDetails from '../../models/IpDetailsSchema';
 import AbuseIpDb from '../../models/AbuseIpDbSchema';
 import AbuseReport from '../../models/AbuseReportSchema';
@@ -71,7 +72,7 @@ describe('IpDetailsService Rate Limit & Retry', () => {
         };
 
         // Create service instance manually with mocked logger and eventBus
-        ipDetailsService = new IpDetailsService(mockLogger as Logger, mockEventBus as any);
+        ipDetailsService = new IpDetailsService(mockLogger as Logger, mockEventBus as any, createMockConfigProvider());
     });
 
     test('should handle 429 Rate Limit error from ipinfo (err arg) by returning the error object', async () => {

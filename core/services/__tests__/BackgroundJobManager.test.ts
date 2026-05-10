@@ -46,9 +46,18 @@ describe('BackgroundJobManager - Isolation Test', () => {
         warn: jest.fn()
     };
 
+    const mockEventBus = {
+        emit: jest.fn(),
+        on: jest.fn(),
+        off: jest.fn()
+    };
+
     beforeAll(() => {
         // Registriamo il logger
         container.registerInstance(Tokens.LOGGER_TOKEN, mockLogger as any);
+        
+        // Registriamo l'EventBus
+        container.registerInstance(Tokens.EVENT_BUS_TOKEN, mockEventBus as any);
         
         // Registriamo il MockJob come Transient
         container.register(Tokens.SSH_REANALYZE_JOB_TOKEN, { useClass: MockJob }, { lifecycle: Lifecycle.Transient });

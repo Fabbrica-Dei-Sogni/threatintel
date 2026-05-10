@@ -101,8 +101,8 @@
                     <label class="cyber-label">{{ t('attacks.timeFilter') }}</label>
                     <div class="time-controls-row">
                         <el-radio-group v-model="attacksState.filters.timeMode" size="small">
-                            <el-radio-button label="ago">{{ t('attacks.last') }}</el-radio-button>
-                            <el-radio-button label="range">{{ t('attacks.range') }}</el-radio-button>
+                            <el-radio-button value="ago">{{ t('attacks.last') }}</el-radio-button>
+                            <el-radio-button value="range">{{ t('attacks.range') }}</el-radio-button>
                         </el-radio-group>
 
                         <div v-if="attacksState.filters.timeMode === 'ago'" class="time-ago-wrapper">
@@ -336,7 +336,7 @@
                                             agoValue: attacksState.filters.agoValue,
                                             agoUnit: attacksState.filters.agoUnit,
                                             minLogsForAttack: attacksState.filters.minLogs,
-                                            protocol: attacksState.filters.protocol,
+                                            protocol: attack.protocol || attacksState.filters.protocol,
                                             status: attacksState.filters.status !== 'active' ? attacksState.filters.status : undefined,
                                             dateRange: attacksState.filters.dateRange && (attacksState.filters.dateRange[0] || attacksState.filters.dateRange[1]) ? JSON.stringify(attacksState.filters.dateRange) : undefined
                                         }
@@ -458,6 +458,7 @@
                                     agoValue: attacksState.filters.agoValue,
                                     agoUnit: attacksState.filters.agoUnit,
                                     minLogsForAttack: attacksState.filters.minLogs,
+                                    protocol: attack.protocol || attacksState.filters.protocol,
                                     status: attacksState.filters.status !== 'active' ? attacksState.filters.status : undefined,
                                     dateRange: attacksState.filters.dateRange && (attacksState.filters.dateRange[0] || attacksState.filters.dateRange[1]) ? JSON.stringify(attacksState.filters.dateRange) : undefined
                                 }

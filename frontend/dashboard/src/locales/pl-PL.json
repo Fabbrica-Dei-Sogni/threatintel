@@ -53,6 +53,7 @@
         "back": "Wstecz",
         "id": "ID",
         "timestamp": "Znacznik czasu",
+        "protocol": "Protokół",
         "ip": "IP",
         "copyIp": "Kopiuj IP",
         "path": "Ścieżka",
@@ -103,7 +104,11 @@
         "auth_required_desc": "Akta dochodzeniowe i raporty kryminalistyczne są dostępne wyłącznie dla zidentyfikowanych analityków.",
         "reset_layout": "RESETUJ UKŁAD",
         "view_list": "Widok Listy",
-        "view_grid": "Widok Siatki"
+        "view_grid": "Widok Siatki",
+        "collapse": "Zwiń",
+        "expand": "Rozwiń",
+        "refresh": "Odśwież",
+        "unknown": "Nieznany"
     },
     "skin": {
         "classic": "Klasyczny",
@@ -251,7 +256,8 @@
             "attackDuration": "Czas trwania anomaliau",
             "firstSeen": "Pierwsze wykrycie",
             "lastSeen": "Ostatnie wykrycie"
-        }
+        },
+        "unit": "Jednostka"
     },
     "attackDetail": {
         "title": "Szczegóły anomaliau",
@@ -281,7 +287,8 @@
         "mapTitle": "Mapa Anomaliau",
         "radarTitle": "Analiza Radarowa",
         "searchUrlPlaceholder": "Filtruj według adresu URL...",
-        "userAgent": "User Agent"
+        "userAgent": "User Agent",
+        "recentLogs": "Ostatnie logi"
     },
     "campaigns": {
         "title": "Kampanie",
@@ -298,7 +305,7 @@
         "patternHash": "Hash Wzorca",
         "discovery": "Odkrywanie Kampanii",
         "searchLabel": "Szukaj na liście:",
-        "searchPlaceholder": "IP, Hash, Technika...",
+        "searchPlaceholder": "IP, Hash, Technique...",
         "filterByUri": "Filtruj wg docelowego URI",
         "browseUris": "Przeglądaj URI",
         "table": {
@@ -578,6 +585,7 @@
         "noSearchResults": "Brak wyników dla tego wyszukiwania",
         "createFirst": "Utwórz pierwszą konfigurację",
         "retry": "Ponów",
+        "reanalyzeStarted": "Ponowna analiza uruchomiona w tle. Monitoruj postępy w panelu Mission Control.",
         "configCreated": "Konfiguracja utworzona pomyślnie",
         "configSaved": "Konfiguracja zapisana pomyślnie",
         "configDeleted": "Konfiguracja usunięta pomyślnie",
@@ -622,7 +630,7 @@
                 "all": "Wszystkie sesje",
                 "scanner": "Skanery",
                 "scannerDesc": "Sesje z 0 zdarzeniami (Anomaliaujący skanujący)",
-                "interaction": "Interakcje",
+                "interaction": "Interactions",
                 "interactionDesc": "Sesje z co najmniej jednym zarejestrowanym zdarzeniem"
             }
         },
@@ -897,18 +905,29 @@
         }
     },
     "maintenance": {
-        "title": "SYSTEM MAINTENANCE",
+        "title": "KONSERWACJA SYSTEMU",
         "pruning": {
-            "title": "Pruning & Retention",
-            "desc": "Manage data lifecycle: automatic archiving and permanent deletion of logs.",
-            "archiveDays": "Days to Archive",
-            "archiveDaysHelp": "Time before an active log becomes Archived",
-            "retentionDays": "Trash Retention (days)",
-            "retentionDaysHelp": "Time before a deleted log is permanently removed",
-            "deletionDays": "Permanent Deletion (days)",
-            "deletionDaysHelp": "Empty archived logs older than this value",
-            "runCleanup": "Run Cleanup",
-            "confirm": "Are you sure you want to proceed with permanent cleanup? This action is irreversible."
-        }
+            "title": "Czyszczenie i Retencja",
+            "desc": "Zarządzaj cyklem życia danych: automatyczna archiwizacja i trwałe usuwanie logów.",
+            "archiveDays": "Dni do archiwizacji",
+            "archiveDaysHelp": "Czas, po którym aktywny log zostanie zarchiwizowany",
+            "retentionDays": "Retencja w koszu (dni)",
+            "retentionDaysHelp": "Czas, po którym usunięty log zostanie trwale usunięty",
+            "deletionDays": "Trwałe usuwanie (dni)",
+            "deletionDaysHelp": "Usuń zarchiwizowane logi starsze niż ta wartość",
+            "emergencyReset": "Reset awaryjny",
+            "emergencyResetHelp": "Ustawia WSZYSTKIE logi na status 'Aktywny'. Używaj z ostrożnością.",
+            "runCleanup": "Uruchom czyszczenie",
+            "confirm": "Czy na pewno chcesz kontynuować trwałe czyszczenie? Ta akcja jest nieodwracalna.",
+            "stats": {
+                "active": "Aktywne logi",
+                "archived": "Zarchiwizowane logi",
+                "trash": "W koszu",
+                "legacy": "Legacy (Brak statusu)"
+            }
+        },
+        "job_completed": "Zadanie ukończone",
+        "completed_successfully": "ukończone pomyślnie",
+        "job_failed": "Zadanie nie powiodło się"
     }
 }

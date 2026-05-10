@@ -21,7 +21,7 @@ done
 echo "❌ Redis non disponibile dopo $MAX_WAIT secondi"
 echo "🚀 Tentativo avvio automatico Redis..."
 
-cd /opt/honeypot/docker && docker-compose up -d redis-ratelimit
+cd /opt/honeypot/docker && docker compose up -d redis-ratelimit
 
 sleep 5
 

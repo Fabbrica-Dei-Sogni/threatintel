@@ -100,6 +100,10 @@ export class AppConfigProvider {
         return process.env.RAG_LOGS_COLLECTION_NAME || 'threat_logs';
     }
 
+    get ragAiSummaryEnabled(): boolean {
+        return process.env.RAG_AI_SUMMARY_ENABLED === 'true';
+    }
+
     get ragReindexThresholdDays(): number {
         return parseFloat(process.env.RAG_REINDEX_THRESHOLD_DAYS || ConfigDefaults.RAG_REINDEX_THRESHOLD_DAYS);
     }
@@ -137,6 +141,93 @@ export class AppConfigProvider {
 
     get ollamaTopP(): number {
         return parseFloat(process.env.OLLAMA_TOP_P || ConfigDefaults.OLLAMA_TOP_P);
+    }
+
+    /**
+     * Configurazione IP Details e Cache
+     */
+    get excludedIps(): string[] {
+        return parseCsv(process.env.EXCLUDED_IPS, ['127.0.0.1', '::1', 'localhost']);
+    }
+
+    get ipCacheMaxAgeHours(): number {
+        return parseInt(process.env.IP_CACHE_MAX_AGE_HOURS || ConfigDefaults.IP_CACHE_MAX_AGE_HOURS, 10);
+    }
+
+    get abuseIpDbKey(): string | undefined {
+        return process.env.ABUSEIPDB_KEY;
+    }
+
+    get ipInfoToken(): string | undefined {
+        return process.env.IPINFO_TOKEN;
+    }
+
+    /**
+     * Configurazione Log Prefix
+     */
+    get nginxLogPrefix(): string {
+        return process.env.NGINX_LOG_PREFIX || 'nginx_threat:';
+    }
+
+    /**
+     * Configurazione Analisi Periodica
+     */
+    get analyzeInterval(): string {
+        return process.env.ANALYZE_INTERVAL || '5m';
+    }
+
+    /**
+     * Configurazione Redis
+     */
+    get redisHost(): string | undefined {
+        return process.env.REDIS_HOST || ConfigDefaults.REDIS_HOST;
+    }
+
+    get redisPort(): number {
+        return parseInt(process.env.REDIS_PORT || ConfigDefaults.REDIS_PORT, 10);
+    }
+
+    get redisPassword(): string | undefined {
+        return process.env.REDIS_PASSWORD;
+    }
+
+    get redisDb(): number {
+        return parseInt(process.env.REDIS_DB || ConfigDefaults.REDIS_DB, 10);
+    }
+
+    get redisConnectTimeoutMs(): number {
+        return parseInt(process.env.REDIS_CONNECT_TIMEOUT_MS || ConfigDefaults.REDIS_CONNECT_TIMEOUT_MS, 10);
+    }
+
+    get redisCommandTimeoutMs(): number {
+        return parseInt(process.env.REDIS_COMMAND_TIMEOUT_MS || ConfigDefaults.REDIS_COMMAND_TIMEOUT_MS, 10);
+    }
+
+    get redisAutoConnectInTest(): boolean {
+        return process.env.REDIS_RATE_LIMIT_AUTO_CONNECT_IN_TEST === 'true';
+    }
+
+    /**
+     * Configurazione Danger Weights (Analisi Forense)
+     */
+    get dangerWeightRpsNorm(): number {
+        return parseFloat(process.env.DANGER_WEIGHT_RPSNORM || ConfigDefaults.DANGER_WEIGHT_RPSNORM);
+    }
+
+    get dangerWeightDurNorm(): number {
+        return parseFloat(process.env.DANGER_WEIGHT_DURNORM || ConfigDefaults.DANGER_WEIGHT_DURNORM);
+    }
+
+    get dangerWeightScoreNorm(): number {
+        return parseFloat(process.env.DANGER_WEIGHT_SCORENORM || ConfigDefaults.DANGER_WEIGHT_SCORENORM);
+    }
+
+    get dangerWeightUniqueTechNorm(): number {
+        return parseFloat(process.env.DANGER_WEIGHT_UNIQUETECHNORM || ConfigDefaults.DANGER_WEIGHT_UNIQUETECHNORM);
+    }
+
+    get dangerWeightDistributed(): number {
+        return parseFloat(process.env.DANGER_WEIGHT_DISTRIBUTED || ConfigDefaults.DANGER_WEIGHT_DISTRIBUTED);
     }
 
     /**

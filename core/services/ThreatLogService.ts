@@ -6,6 +6,7 @@ import { inject, injectable } from 'tsyringe';
 import * as Tokens from '../di/tokens';
 import { Logger } from 'winston';
 import { IpDetailsService } from './IpDetailsService';
+import { ThreatAnalyticsService } from './ThreatAnalyticsService';
 import { EventBus, AppEvents } from './EventBus';
 import { LogFilters } from '../types/threat-log.types';
 import { Types } from 'mongoose';
@@ -31,6 +32,7 @@ export class ThreatLogService {
         @inject(Tokens.LOGGER_TOKEN) private readonly logger: Logger,
         @inject(Tokens.IP_DETAILS_SERVICE_TOKEN) private readonly ipDetailsService: IpDetailsService,
         @inject(Tokens.PATTERN_ANALYSIS_SERVICE_TOKEN) private readonly patternAnalysisService: PatternAnalysisService,
+        @inject(Tokens.THREAT_ANALYTICS_SERVICE_TOKEN) private readonly analyticsService: ThreatAnalyticsService,
         @inject(Tokens.EVENT_BUS_TOKEN) private readonly eventBus: EventBus
     ) {
         // Parse della variabile di ambiente al costruttore
@@ -512,161 +514,12 @@ export class ThreatLogService {
         return { message: 'Rianalisi di tutti i log completata', results };
     }
 
-    private getTimeframeHours(timeframe: string): number {
-        switch (timeframe) {
-            case '1w': return 168;
-            case '1m': return 720;
-            case '1y': return 8760;
-            case '24h':
-            default: return 24;
-        }
-    }
-
     async getStats(timeframe = '24h', minScore = 15, limit = 10, minLogs = 1) {
-        let timeframeMatch: any = {};
-
-        if (timeframe !== 'all') {
-            const hours = this.getTimeframeHours(timeframe);
-            const since = new Date(Date.now() - hours * 60 * 60 * 1000);
-            timeframeMatch.timestamp = { $gte: since };
-            this.logger.info(`[ThreatLogService] Calculating stats for timeframe: ${timeframe} (since: ${since.toISOString()}) with minScore: ${minScore}, minLogs: ${minLogs}, limit: ${limit}`);
-        } else {
-            this.logger.info(`[ThreatLogService] Calculating stats for ALL TIME with minScore: ${minScore}, minLogs: ${minLogs}, limit: ${limit}`);
-        }
-
-        const effectiveLimit = limit > 0 ? limit : 1000;
-
-        // Pipeline definitiva: separa il traffico globale dall'analisi delle minacce filtrata
-        const results = await ThreatLog.aggregate([
-            { $match: timeframeMatch },
-            {
-                $facet: {
-                    // 1. Traffico Totale e Distribuzione Score (UNFILTERED)
-                    global: [
-                        {
-                            $group: {
-                                _id: null,
-                                totalTraffic: { $sum: 1 },
-                                min: { $min: "$fingerprint.score" },
-                                max: { $max: "$fingerprint.score" },
-                                avg: { $avg: "$fingerprint.score" }
-                            }
-                        }
-                    ],
-                    // 2. Conteggio Minacce Attenzionate (FILTERED BY minLogs)
-                    threatsCount: [
-                        {
-                            $group: {
-                                _id: "$request.ip",
-                                count: { $sum: 1 },
-                                isSuspicious: {
-                                    $max: {
-                                        $cond: [
-                                            { $and: [{ $eq: ['$fingerprint.suspicious', true] }, { $gte: ['$fingerprint.score', minScore] }] },
-                                            1, 0
-                                        ]
-                                    }
-                                }
-                            }
-                        },
-                        { $match: { count: { $gte: minLogs }, isSuspicious: 1 } },
-                        { $count: "count" }
-                    ],
-                    // 3. Top Paesi (FILTERED BY minLogs)
-                    topCountries: [
-                        {
-                            $group: {
-                                _id: "$request.ip",
-                                count: { $sum: 1 },
-                                country: { $first: "$geo.country" },
-                                isSuspicious: {
-                                    $max: {
-                                        $cond: [
-                                            { $and: [{ $eq: ['$fingerprint.suspicious', true] }, { $gte: ['$fingerprint.score', minScore] }] },
-                                            1, 0
-                                        ]
-                                    }
-                                }
-                            }
-                        },
-                        { $match: { count: { $gte: minLogs }, isSuspicious: 1, country: { $exists: true, $ne: null } } },
-                        { $group: { _id: "$country", count: { $sum: 1 } } },
-                        { $sort: { count: -1 } },
-                        { $limit: effectiveLimit }
-                    ],
-                    // 4. Top Indicators (FILTERED BY minLogs)
-                    topIndicators: [
-                        {
-                            $group: {
-                                _id: "$request.ip",
-                                count: { $sum: 1 },
-                                indicators: { $addToSet: "$fingerprint.indicators" },
-                                isSuspicious: {
-                                    $max: {
-                                        $cond: [
-                                            { $and: [{ $eq: ['$fingerprint.suspicious', true] }, { $gte: ['$fingerprint.score', minScore] }] },
-                                            1, 0
-                                        ]
-                                    }
-                                }
-                            }
-                        },
-                        { $match: { count: { $gte: minLogs }, isSuspicious: 1 } },
-                        { $unwind: "$indicators" },
-                        { $unwind: "$indicators" },
-                        { $group: { _id: { ip: "$_id", ind: "$indicators" } } },
-                        { $group: { _id: "$_id.ind", count: { $sum: 1 } } },
-                        { $sort: { count: -1 } },
-                        { $limit: effectiveLimit }
-                    ],
-                    // 5. Nodi Unici (FILTERED BY minLogs)
-                    uniqueIPs: [
-                        { $group: { _id: "$request.ip", count: { $sum: 1 } } },
-                        { $match: { count: { $gte: minLogs } } },
-                        { $group: { _id: null, ips: { $push: "$_id" } } }
-                    ]
-                }
-            }
-        ]);
-
-        const facet = results[0];
-        const global = facet.global[0] || { totalTraffic: 0, min: 0, max: 100, avg: 15 };
-        const threats = facet.threatsCount[0] || { count: 0 };
-
-        const countriesMap: Record<string, number> = {};
-        (facet.topCountries || []).forEach((c: any) => { countriesMap[c._id] = c.count; });
-
-        const indicatorsMap: Record<string, number> = {};
-        (facet.topIndicators || []).forEach((i: any) => { indicatorsMap[i._id] = i.count; });
-
-        return {
-            totalRequests: global.totalTraffic,
-            suspiciousRequests: threats.count,
-            topCountries: countriesMap,
-            topIndicators: indicatorsMap,
-            uniqueIPs: facet.uniqueIPs[0]?.ips || [],
-            scoreDistribution: { min: global.min, max: global.max, avg: global.avg }
-        };
+        return this.analyticsService.getStats(timeframe, minScore, limit, minLogs);
     }
-
 
     async getTopThreats(limit = 10, timeframe = '24h', minScore = 15) {
-        let query: any = { 'fingerprint.suspicious': true };
-
-        if (timeframe !== 'all') {
-            const hours = this.getTimeframeHours(timeframe);
-            const since = new Date(Date.now() - hours * 60 * 60 * 1000);
-            query.timestamp = { $gte: since };
-        }
-
-        if (minScore > 0) {
-            query['fingerprint.score'] = { $gte: minScore };
-        }
-
-        return await ThreatLog.find(query)
-            .sort({ timestamp: -1 })
-            .limit(limit)
-            .select('request.ip request.url fingerprint.score fingerprint.indicators geo.country timestamp');
+        return this.analyticsService.getTopThreats(limit, timeframe, minScore);
     }
 }
 

@@ -26,6 +26,7 @@ import { NginxLogService } from "../services/NginxLogService";
 import { CowrieService } from "../services/CowrieService";
 import { AnalysisService } from "../tools/analyze";
 import { ThreatLogService } from "../services/ThreatLogService";
+import { ThreatAnalyticsService } from "../services/ThreatAnalyticsService";
 import { PatternAnalysisService } from "../services/PatternAnalysisService";
 import { ThreatLogFactory } from "../utils/ThreatLogFactory";
 import { IpDetailsService } from "../services/IpDetailsService";
@@ -79,6 +80,7 @@ export function setupContainer(container: DependencyContainer) {
     container.register(Tokens.I18N_TOKEN, { useClass: I18nService }, { lifecycle: Lifecycle.Singleton });
     container.register(Tokens.CONFIG_PROVIDER_TOKEN, { useClass: AppConfigProvider }, { lifecycle: Lifecycle.Singleton });
     container.register(Tokens.THREAT_LOG_SERVICE_TOKEN, { useClass: ThreatLogService }, { lifecycle: Lifecycle.Singleton });
+    container.register(Tokens.THREAT_ANALYTICS_SERVICE_TOKEN, { useClass: ThreatAnalyticsService }, { lifecycle: Lifecycle.Singleton });
     container.register(Tokens.IP_DETAILS_SERVICE_TOKEN, { useClass: IpDetailsService }, { lifecycle: Lifecycle.Singleton });
     container.register(Tokens.PATTERN_ANALYSIS_SERVICE_TOKEN, { useClass: PatternAnalysisService }, { lifecycle: Lifecycle.Singleton });
     container.register(Tokens.THREAT_LOG_FACTORY_TOKEN, { useClass: ThreatLogFactory }, { lifecycle: Lifecycle.Singleton });

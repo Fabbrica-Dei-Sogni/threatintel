@@ -2,6 +2,7 @@ import Redis from 'ioredis';
 import { singleton, inject } from 'tsyringe';
 import * as Tokens from '../di/tokens';
 import { Logger } from 'winston';
+import { AppConfigProvider } from './AppConfigProvider';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -14,25 +15,28 @@ export class RedisService {
     private state: RedisState = 'disabled';
     private fallbackLogged = false;
 
-    constructor(@inject(Tokens.LOGGER_TOKEN) private readonly logger: Logger) {
+    constructor(
+        @inject(Tokens.LOGGER_TOKEN) private readonly logger: Logger,
+        @inject(Tokens.CONFIG_PROVIDER_TOKEN) private readonly config: AppConfigProvider
+    ) {
         this.initialize();
     }
 
     private initialize() {
-        const host = process.env.REDIS_HOST;
+        const host = this.config.redisHost;
         if (!host) {
             this.state = 'disabled';
             return;
         }
 
-        const port = Number(process.env.REDIS_PORT) || 6379;
-        const password = process.env.REDIS_PASSWORD;
-        const db = Number(process.env.REDIS_DB) || 0;
-        const connectTimeout = parseInt(process.env.REDIS_CONNECT_TIMEOUT_MS || '500', 10);
-        const commandTimeout = parseInt(process.env.REDIS_COMMAND_TIMEOUT_MS || '500', 10);
+        const port = this.config.redisPort;
+        const password = this.config.redisPassword;
+        const db = this.config.redisDb;
+        const connectTimeout = this.config.redisConnectTimeoutMs;
+        const commandTimeout = this.config.redisCommandTimeoutMs;
         
         // In test mode, we might want to avoid auto-connecting unless specified
-        const shouldAutoConnect = process.env.NODE_ENV !== 'test' || process.env.REDIS_RATE_LIMIT_AUTO_CONNECT_IN_TEST === 'true';
+        const shouldAutoConnect = process.env.NODE_ENV !== 'test' || this.config.redisAutoConnectInTest;
 
         try {
             this.state = 'connecting';

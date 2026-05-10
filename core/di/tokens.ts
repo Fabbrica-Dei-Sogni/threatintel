@@ -26,6 +26,7 @@ export const NGINX_LOG_SERVICE_TOKEN = Symbol("NginxLogService");
 export const COWRIE_SERVICE_TOKEN = Symbol("CowrieService");
 export const ANALYSIS_SERVICE_TOKEN = Symbol("AnalysisService");
 export const THREAT_LOG_SERVICE_TOKEN = Symbol("ThreatLogService");
+export const THREAT_ANALYTICS_SERVICE_TOKEN = Symbol("ThreatAnalyticsService");
 export const PATTERN_ANALYSIS_SERVICE_TOKEN = Symbol("PatternAnalysisService");
 export const THREAT_LOG_FACTORY_TOKEN = Symbol("ThreatLogFactory");
 export const IP_DETAILS_SERVICE_TOKEN = Symbol("IpDetailsService");

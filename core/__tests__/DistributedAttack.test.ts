@@ -1,5 +1,6 @@
 import 'reflect-metadata';
 import { ForensicPipelineService } from '../services/forense/ForensicPipelineService';
+import { createMockConfigProvider } from './TestUtils';
 
 // Mock Logger
 const mockLogger = {
@@ -18,11 +19,12 @@ describe('Distributed Attack Pipeline Test', () => {
     let service: ForensicPipelineService;
 
     beforeEach(async () => {
+        const mockConfigProvider = createMockConfigProvider();
         mockConfigService.getConfigValue.mockImplementation((_key: string) => {
             return Promise.resolve(null);
         });
 
-        service = new ForensicPipelineService(mockLogger, mockConfigService);
+        service = new ForensicPipelineService(mockLogger, mockConfigService, mockConfigProvider);
         await (service as any).initialized;
     });
 

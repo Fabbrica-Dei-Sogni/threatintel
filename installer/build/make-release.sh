@@ -31,9 +31,13 @@ fi
 cp "$BUILD_TMP/index.js" "$DEPLOY_PATH/"
 echo "$VERSION" > "$DEPLOY_PATH/VERSION"
 
-# 3. Copia Asset statici (GeoIP)
+# 3. Copia Asset statici (GeoIP & Swagger)
 echo "🌍 Adding GeoIP data..."
 cp "$PROJECT_ROOT"/node_modules/geoip-lite/data/*.dat "$DEPLOY_PATH/data/" 2>/dev/null
+
+echo "📚 Adding Swagger UI assets for ncc bundle..."
+mkdir -p "$DEPLOY_PATH/public/swagger"
+cp -r "$PROJECT_ROOT/node_modules/swagger-ui-dist/"* "$DEPLOY_PATH/public/swagger/"
 
 # 4. Copia Script e Template (Agnostici)
 echo "📦 Adding templates and installer..."

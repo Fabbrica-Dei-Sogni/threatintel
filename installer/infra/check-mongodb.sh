@@ -8,9 +8,8 @@ CONTAINER_NAME="mongodb-$NAME"
 
 echo "🔍 [Installer] Verifica container MongoDB: $CONTAINER_NAME"
 
-docker ps --filter "name=$CONTAINER_NAME" --filter "status=running" | grep "$CONTAINER_NAME" >/dev/null
-
-if [ $? -eq 0 ]; then
+# Check se il container è running (filtro esatto)
+if [ $(docker ps -q --filter "name=^/$CONTAINER_NAME$" --filter "status=running" | wc -l) -eq 1 ]; then
   echo "✅ MongoDB container is running"
   exit 0
 else

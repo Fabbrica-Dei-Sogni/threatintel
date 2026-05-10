@@ -27,8 +27,11 @@ if [ -z "$PENDING_DEPLOYS" ]; then
 fi
 
 echo "Deployments trovati ma NON ancora installati come servizi:"
-select DEPLOY in $PENDING_DEPLOYS; do
-    if [ -n "$DEPLOY" ]; then
+select DEPLOY in $PENDING_DEPLOYS "Annulla (Torna al Menu)"; do
+    if [ "$DEPLOY" == "Annulla (Torna al Menu)" ]; then
+        echo "🔙 Ritorno al menu principale..."
+        exit 0
+    elif [ -n "$DEPLOY" ]; then
         SELECTED_DIR="$DEPLOY"
         break
     fi

@@ -27,8 +27,11 @@ if [ -n "$1" ]; then
     SERVICE_TO_REMOVE="$1"
 else
     echo "Seleziona il servizio da rimuovere:"
-    select SERVICE in $MANAGED_SERVICES; do
-        if [ -n "$SERVICE" ]; then
+    select SERVICE in $MANAGED_SERVICES "Annulla (Torna al Menu)"; do
+        if [ "$SERVICE" == "Annulla (Torna al Menu)" ]; then
+            echo "🔙 Ritorno al menu principale..."
+            exit 0
+        elif [ -n "$SERVICE" ]; then
             SERVICE_TO_REMOVE="$SERVICE"
             break
         fi

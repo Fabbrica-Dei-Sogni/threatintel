@@ -6,6 +6,25 @@
 WORKING_DIR=$(pwd)
 SERVICE_NAME=${1:-"$(basename $(pwd))"}
 
+# --- Helper Functions ---
+
+# Verifica se una porta è occupata (TCP o UDP)
+check_port() {
+    local port=$1
+    if ss -tulpn | grep -q ":$port " ; then
+        return 1 # Occupata
+    else
+        return 0 # Libera
+    fi
+}
+
+# Funzione helper per caricare variabili dal .env in modo robusto
+get_env_val() {
+    grep "^$1=" .env 2>/dev/null | cut -d'=' -f2- | sed -e 's/^"//' -e 's/"$//' -e "s/^'//" -e "s/'$//"
+}
+
+# --- Main Logic ---
+
 # Evitiamo nomi generici se lanciato per errore da cartelle comuni o non idonee
 if [ -z "$SERVICE_NAME" ] || [ "$SERVICE_NAME" = "deploy" ] || [ "$SERVICE_NAME" = "installer" ] || [ "$SERVICE_NAME" = "." ]; then
     echo "❌ Errore: Nome servizio '$SERVICE_NAME' non valido o mancante."
@@ -25,11 +44,6 @@ if [ -f "$WORKING_DIR/.env" ]; then
         RUN_WIZARD=false
         echo "✅ Utilizzo le impostazioni esistenti."
         
-        # Funzione helper per caricare variabili dal .env in modo robusto
-        get_env_val() {
-            grep "^$1=" .env | cut -d'=' -f2- | sed -e 's/^"//' -e 's/"$//' -e "s/^'//" -e "s/'$//"
-        }
-
         # Caricamento variabili (Mapping esatto tra nomi .env e nomi script)
         APP_DOMAIN=$(get_env_val "APP_DOMAIN")
         DEPLOY_PORT=$(get_env_val "PORT")
@@ -94,8 +108,11 @@ if [ "$RUN_WIZARD" = true ]; then
         read -p "🛡️  Allowed Origins [$DEFAULT_ALLOWED_ORIGINS]: " ALLOWED_ORIGINS
         ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-$DEFAULT_ALLOWED_ORIGINS}
 
-        read -p "🌐 Porta locale del servizio [$DEFAULT_PORT]: " DEPLOY_PORT
-        DEPLOY_PORT=${DEPLOY_PORT:-$DEFAULT_PORT}
+        while true; do
+            read -p "🌐 Porta locale del servizio [$DEFAULT_PORT]: " DEPLOY_PORT
+            DEPLOY_PORT=${DEPLOY_PORT:-$DEFAULT_PORT}
+            if check_port "$DEPLOY_PORT"; then break; else echo "⚠️  Porta $DEPLOY_PORT già in uso! Scegline un'altra."; fi
+        done
 
         read -p "📂 Base Path (es. /honeypot) [INVIO per root /]: " APP_BASE_PATH
         APP_BASE_PATH=${APP_BASE_PATH:-""}
@@ -116,17 +133,27 @@ if [ "$RUN_WIZARD" = true ]; then
         echo ""
 
         echo "📂 INFRASTRUTTURA"
+        DEFAULT_STORAGE="$WORKING_DIR/storage"
         read -p "📂 Percorso Storage Locale [$DEFAULT_STORAGE]: " APP_STORAGE
         APP_STORAGE=${APP_STORAGE:-$DEFAULT_STORAGE}
 
-        read -p "🍃 Porta MongoDB [17017]: " MONGO_PORT
-        MONGO_PORT=${MONGO_PORT:-17017}
+        while true; do
+            read -p "🍃 Porta MongoDB [17017]: " MONGO_PORT
+            MONGO_PORT=${MONGO_PORT:-17017}
+            if check_port "$MONGO_PORT"; then break; else echo "⚠️  Porta $MONGO_PORT già in uso! Scegline un'altra."; fi
+        done
 
-        read -p "🚩 Porta Redis [6379]: " REDIS_PORT
-        REDIS_PORT=${REDIS_PORT:-6379}
+        while true; do
+            read -p "🚩 Porta Redis [6379]: " REDIS_PORT
+            REDIS_PORT=${REDIS_PORT:-6379}
+            if check_port "$REDIS_PORT"; then break; else echo "⚠️  Porta $REDIS_PORT già in uso! Scegline un'altra."; fi
+        done
 
-        read -p "💎 Porta Qdrant [6333]: " QDRANT_PORT
-        QDRANT_PORT=${QDRANT_PORT:-6333}
+        while true; do
+            read -p "💎 Porta Qdrant [6333]: " QDRANT_PORT
+            QDRANT_PORT=${QDRANT_PORT:-6333}
+            if check_port "$QDRANT_PORT"; then break; else echo "⚠️  Porta $QDRANT_PORT già in uso! Scegline un'altra."; fi
+        done
         echo ""
 
         echo "🔐 SICUREZZA"
@@ -147,8 +174,11 @@ if [ "$RUN_WIZARD" = true ]; then
         echo ""
 
         echo "🕸️  HONEYPOTS & TRAPS"
-        read -p "📡 Porta Honeypot TELNET [$DEFAULT_TELNET_P]: " TELNET_P
-        TELNET_P=${TELNET_P:-$DEFAULT_TELNET_P}
+        while true; do
+            read -p "📡 Porta Honeypot TELNET [$DEFAULT_TELNET_P]: " TELNET_P
+            TELNET_P=${TELNET_P:-$DEFAULT_TELNET_P}
+            if check_port "$TELNET_P"; then break; else echo "⚠️  Porta $TELNET_P già in uso! Scegline un'altra."; fi
+        done
         echo ""
 
         echo "🤖 INTELLIGENZA ARTIFICIALE (Ollama)"
@@ -206,6 +236,7 @@ if [ "$RUN_WIZARD" = true ]; then
             -e "s|{{ALLOWED_ORIGINS}}|$ALLOWED_ORIGINS|g" \
             -e "s|{{VERSION}}|$(cat VERSION 2>/dev/null || echo '1.0.0')|g" \
             -e "s|{{APP_ID}}|$APP_ID|g" \
+            -e "s|{{SERVICE_NAME}}|$SERVICE_NAME|g" \
             -e "s|{{MONGO_ROOT_USER}}|admin|g" \
             -e "s|{{MONGO_ROOT_PWD}}|!!!AdminMongo!!!|g" \
             -e "s|{{MONGO_APP_USER}}|intelagent|g" \
@@ -293,7 +324,7 @@ fi
 
 # 2. Requisiti & Infrastruttura Docker
 echo "🔍 Checking Docker infrastructure..."
-INFRA_COMPOSE="docker-compose.infra.yml"
+INFRA_COMPOSE="docker-compose.yml"
 
 # Generazione Docker Compose Dinamico dal Template
 if [ -f "docker-compose.infra.yml.template" ]; then
@@ -308,8 +339,8 @@ fi
 
 if [ -f "$INFRA_COMPOSE" ]; then
     # Verifica se l'infrastruttura è già attiva per questo specifico servizio
-    # Usiamo il nome del container dinamico per il check
-    SPECIFIC_INFRA_RUNNING=$(docker ps --format '{{.Names}}' | grep "mongodb-$SERVICE_NAME" | wc -l)
+    # Usiamo un filtro esatto per il nome del container
+    SPECIFIC_INFRA_RUNNING=$(docker ps -q --filter "name=^/mongodb-$SERVICE_NAME$" | wc -l)
     
     if [ "$SPECIFIC_INFRA_RUNNING" -ge 1 ]; then
         echo "ℹ️  Dedicated infrastructure for $SERVICE_NAME detected and running."
@@ -318,7 +349,7 @@ if [ -f "$INFRA_COMPOSE" ]; then
         
         # Cleanup preventivo per evitare conflitti di nomi orfani o reti
         echo "🧹 Checking for orphan containers or network conflicts..."
-        docker compose -p "$SERVICE_NAME" -f "$INFRA_COMPOSE" down --remove-orphans >/dev/null 2>&1
+        docker compose down --remove-orphans >/dev/null 2>&1
         
         # Rimozione forzata di eventuali container rimasti con lo stesso nome (Docker bug safety)
         docker rm -f "mongodb-$SERVICE_NAME" "redis-$SERVICE_NAME" "qdrant-$SERVICE_NAME" "cowrie-$SERVICE_NAME" >/dev/null 2>&1
@@ -334,7 +365,7 @@ if [ -f "$INFRA_COMPOSE" ]; then
         mkdir -p "$STORAGE_ROOT/mongodb" "$STORAGE_ROOT/redis" "$STORAGE_ROOT/qdrant" "$STORAGE_ROOT/cowrie/log" "$STORAGE_ROOT/cowrie/downloads"
         
         echo "🚀 Starting Docker containers..."
-        docker compose -p "$SERVICE_NAME" -f "$INFRA_COMPOSE" up -d
+        docker compose up -d
         if [ $? -ne 0 ]; then echo "❌ Failed to start Docker containers."; exit 1; fi
     fi
 fi

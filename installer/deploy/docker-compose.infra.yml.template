@@ -1,4 +1,3 @@
-name: "threatintel-infra-{{SERVICE_NAME}}"
 
 services:
   # --- MongoDB: Primary Data Store ---
@@ -65,4 +64,3 @@ services:
 networks:
   network-{{SERVICE_NAME}}:
     driver: bridge
-

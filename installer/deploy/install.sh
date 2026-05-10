@@ -18,68 +18,135 @@ echo "============================================================"
 
 # 1. Wizard di Configurazione (se .env manca)
 if [ ! -f "$WORKING_DIR/.env" ]; then
-    echo "📝 Configurazione iniziale rilevata. Rispondi alle seguenti domande:"
-    echo "------------------------------------------------------------"
+    CONFIRMED=false
     
-    # Defaults
-    DEFAULT_DOMAIN="localhost"
-    DEFAULT_PORT="3999"
-    DEFAULT_USER=$(whoami)
-    DEFAULT_AUTH_URI="https://alessandromodica.com:3443/auth/api/v1"
-    DEFAULT_DESC="Threat Intelligence Logger - $SERVICE_NAME"
-    
-    read -p "📛 Nome del Servizio [$SERVICE_NAME]: " NEW_SERVICE_NAME
-    SERVICE_NAME=${NEW_SERVICE_NAME:-$SERVICE_NAME}
+    while [ "$CONFIRMED" = false ]; do
+        echo "📝 Configurazione iniziale rilevata. Rispondi alle seguenti domande:"
+        echo "------------------------------------------------------------"
+        
+        # Defaults (vengono resettati se l'utente sceglie di rifare il wizard)
+        DEFAULT_DOMAIN="localhost"
+        DEFAULT_PORT="3999"
+        DEFAULT_USER=$(whoami)
+        DEFAULT_AUTH_URI="https://alessandromodica.com:3443/auth/api/v1"
+        DEFAULT_DESC="Threat Intelligence Logger - $SERVICE_NAME"
+        DEFAULT_OLLAMA_URL="http://82.112.255.186:11434"
+        DEFAULT_SUMMARY_MODEL="gemma3:1b"
+        DEFAULT_EMBEDDING_MODEL="nomic-embed-text"
+        DEFAULT_STORAGE="$WORKING_DIR/storage"
+        DEFAULT_ALLOWED_ORIGINS="*"
+        DEFAULT_TELNET_P="23"
+        
+        echo "📦 INFORMAZIONI GENERALI"
+        read -p "📛 Nome del Servizio [$SERVICE_NAME]: " NEW_SERVICE_NAME
+        SERVICE_NAME=${NEW_SERVICE_NAME:-$SERVICE_NAME}
 
-    read -p "📝 Descrizione del Servizio [$DEFAULT_DESC]: " SERVICE_DESC
-    SERVICE_DESC=${SERVICE_DESC:-$DEFAULT_DESC}
-    
-    read -p "🌐 Dominio Applicazione ($DEFAULT_DOMAIN): " APP_DOMAIN
-    APP_DOMAIN=${APP_DOMAIN:-$DEFAULT_DOMAIN}
+        read -p "📝 Descrizione del Servizio [$DEFAULT_DESC]: " SERVICE_DESC
+        SERVICE_DESC=${SERVICE_DESC:-$DEFAULT_DESC}
+        echo ""
 
-    read -p "📂 Base Path (es. /honeypot) [INVIO per root /]: " APP_BASE_PATH
-    APP_BASE_PATH=${APP_BASE_PATH:-""}
+        echo "🌐 RETE E ACCESSO"
+        read -p "🌐 Dominio Applicazione [$DEFAULT_DOMAIN]: " APP_DOMAIN
+        APP_DOMAIN=${APP_DOMAIN:-$DEFAULT_DOMAIN}
 
-    # Normalizzazione Base Path
-    CLEAN_BASE_PATH=$APP_BASE_PATH
-    if [[ -n "$CLEAN_BASE_PATH" && "$CLEAN_BASE_PATH" != /* ]]; then CLEAN_BASE_PATH="/$CLEAN_BASE_PATH"; fi
-    CLEAN_BASE_PATH=${CLEAN_BASE_PATH%/}
+        read -p "🛡️  Allowed Origins [$DEFAULT_ALLOWED_ORIGINS]: " ALLOWED_ORIGINS
+        ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-$DEFAULT_ALLOWED_ORIGINS}
 
-    DYNAMIC_API_BASE="https://$APP_DOMAIN$CLEAN_BASE_PATH/api"
-    read -p "🔗 API Base URL ($DYNAMIC_API_BASE): " API_BASE_URL
-    API_BASE_URL=${API_BASE_URL:-$DYNAMIC_API_BASE}
+        read -p "🌐 Porta locale del servizio [$DEFAULT_PORT]: " DEPLOY_PORT
+        DEPLOY_PORT=${DEPLOY_PORT:-$DEFAULT_PORT}
 
-    read -p "🌐 Porta locale del servizio ($DEFAULT_PORT): " DEPLOY_PORT
-    DEPLOY_PORT=${DEPLOY_PORT:-$DEFAULT_PORT}
+        read -p "📂 Base Path (es. /honeypot) [INVIO per root /]: " APP_BASE_PATH
+        APP_BASE_PATH=${APP_BASE_PATH:-""}
 
-    read -p "🔐 Digital Auth IdP URI ($DEFAULT_AUTH_URI): " URI_DIGITAL_AUTH
-    URI_DIGITAL_AUTH=${URI_DIGITAL_AUTH:-$DEFAULT_AUTH_URI}
+        # Normalizzazione Base Path
+        CLEAN_BASE_PATH=$APP_BASE_PATH
+        if [[ -n "$CLEAN_BASE_PATH" && "$CLEAN_BASE_PATH" != /* ]]; then CLEAN_BASE_PATH="/$CLEAN_BASE_PATH"; fi
+        CLEAN_BASE_PATH=${CLEAN_BASE_PATH%/}
 
-    echo "🔐 SICUREZZA"
-    read -sp "🔑 Password per Redis (INVIO per default): " REDIS_PWD
-    echo ""
-    REDIS_PWD=${REDIS_PWD:-"!!!HoneyPotRedis!!!"}
+        DYNAMIC_API_BASE="https://$APP_DOMAIN$CLEAN_BASE_PATH/api"
+        read -p "🔗 API Base URL ($DYNAMIC_API_BASE): " API_BASE_URL
+        API_BASE_URL=${API_BASE_URL:-$DYNAMIC_API_BASE}
+        echo ""
 
-    read -p "📡 Porta Honeypot TELNET (Default: 23): " TELNET_P
-    TELNET_P=${TELNET_P:-"23"}
-    
-    # Calcolo APP_ID dinamico per l'installer
-    CLEAN_DOMAIN=$(echo "$APP_DOMAIN" | sed -e 's|https://||g' -e 's|http://||g' -e 's|/.*||g')
-    [ -z "$CLEAN_DOMAIN" ] && CLEAN_DOMAIN="localhost"
-    DEFAULT_APP_ID="com.$CLEAN_DOMAIN.$SERVICE_NAME"
-    
-    read -p "🆔 Application ID [$DEFAULT_APP_ID]: " APP_ID
-    APP_ID=${APP_ID:-$DEFAULT_APP_ID}
+        echo "📂 INFRASTRUTTURA"
+        read -p "📂 Percorso Storage Locale [$DEFAULT_STORAGE]: " APP_STORAGE
+        APP_STORAGE=${APP_STORAGE:-$DEFAULT_STORAGE}
+        echo ""
 
-    echo "------------------------------------------------------------"
+        echo "🔐 SICUREZZA"
+        read -p "🔐 Digital Auth IdP URI [$DEFAULT_AUTH_URI]: " URI_DIGITAL_AUTH
+        URI_DIGITAL_AUTH=${URI_DIGITAL_AUTH:-$DEFAULT_AUTH_URI}
+
+        read -sp "🔑 Password per Redis (INVIO per default): " REDIS_PWD
+        echo ""
+        REDIS_PWD=${REDIS_PWD:-"!!!HoneyPotRedis!!!"}
+
+        # Calcolo APP_ID dinamico per l'installer
+        CLEAN_DOMAIN=$(echo "$APP_DOMAIN" | sed -e 's|https://||g' -e 's|http://||g' -e 's|/.*||g')
+        [ -z "$CLEAN_DOMAIN" ] && CLEAN_DOMAIN="localhost"
+        DEFAULT_APP_ID="com.$CLEAN_DOMAIN.$SERVICE_NAME"
+        
+        read -p "🆔 Application ID [$DEFAULT_APP_ID]: " APP_ID
+        APP_ID=${APP_ID:-$DEFAULT_APP_ID}
+        echo ""
+
+        echo "🕸️  HONEYPOTS & TRAPS"
+        read -p "📡 Porta Honeypot TELNET [$DEFAULT_TELNET_P]: " TELNET_P
+        TELNET_P=${TELNET_P:-$DEFAULT_TELNET_P}
+        echo ""
+
+        echo "🤖 INTELLIGENZA ARTIFICIALE (Ollama)"
+        # Suggerimento dinamico per Ollama: se localhost usa l'IP specifico, altrimenti segue il dominio app
+        if [ "$APP_DOMAIN" = "localhost" ]; then
+            SUGGESTED_OLLAMA="http://82.112.255.186:11434"
+        else
+            SUGGESTED_OLLAMA="http://$APP_DOMAIN:11434"
+        fi
+
+        read -p "🔗 Ollama URI [$SUGGESTED_OLLAMA]: " OLLAMA_URL
+        OLLAMA_URL=${OLLAMA_URL:-$SUGGESTED_OLLAMA}
+
+        read -p "🧠 Summary Model [$DEFAULT_SUMMARY_MODEL]: " SUMMARY_MODEL
+        SUMMARY_MODEL=${SUMMARY_MODEL:-$DEFAULT_SUMMARY_MODEL}
+
+        read -p "🔡 Embedding Model [$DEFAULT_EMBEDDING_MODEL]: " EMBEDDING_MODEL
+        EMBEDDING_MODEL=${EMBEDDING_MODEL:-$DEFAULT_EMBEDDING_MODEL}
+
+        echo ""
+        echo "🧐 RIEPILOGO CONFIGURAZIONE:"
+        echo "------------------------------------------------------------"
+        echo "  Servizio:      $SERVICE_NAME ($SERVICE_DESC)"
+        echo "  Dominio/Porta: $APP_DOMAIN ($DEPLOY_PORT)"
+        echo "  Base Path:     ${CLEAN_BASE_PATH:-/}"
+        echo "  API URL:       $API_BASE_URL"
+        echo "  Allowed Org:   $ALLOWED_ORIGINS"
+        echo "  Storage Path:  $APP_STORAGE"
+        echo "  Honeypot Port: $TELNET_P"
+        echo "  AI URL:        $OLLAMA_URL"
+        echo "  AI Models:     $SUMMARY_MODEL / $EMBEDDING_MODEL"
+        echo "------------------------------------------------------------"
+        
+        read -p "✅ Le impostazioni sono corrette? (y/n): " CONFIRM_CHOICE
+        if [[ "$CONFIRM_CHOICE" =~ ^[Yy]$ ]]; then
+            CONFIRMED=true
+        else
+            read -p "Rifare da zero (r) o Uscire (q)? [r]: " FAIL_CHOICE
+            if [ "$FAIL_CHOICE" = "q" ]; then
+                echo "❌ Installazione annullata."
+                exit 0
+            fi
+            echo "🔄 Riavvio wizard (i valori sono stati resettati ai default)..."
+            echo ""
+        fi
+    done
 
     # Generazione .env dal template
     if [ -f "env.template" ]; then
         echo "⚙️  Generazione file .env..."
-        sed -e "s|{{STORAGE_ROOT}}|$WORKING_DIR/storage|g" \
+        sed -e "s|{{STORAGE_ROOT}}|$APP_STORAGE|g" \
             -e "s|{{PORT}}|$DEPLOY_PORT|g" \
             -e "s|{{APP_DOMAIN}}|$APP_DOMAIN|g" \
-            -e "s|{{ALLOWED_ORIGINS}}|*|g" \
+            -e "s|{{ALLOWED_ORIGINS}}|$ALLOWED_ORIGINS|g" \
             -e "s|{{VERSION}}|$(cat VERSION 2>/dev/null || echo '1.0.0')|g" \
             -e "s|{{APP_ID}}|$APP_ID|g" \
             -e "s|{{MONGO_ROOT_USER}}|admin|g" \
@@ -91,8 +158,9 @@ if [ ! -f "$WORKING_DIR/.env" ]; then
             -e "s|{{RAG_COLLECTION_NAME}}|threat_intelligence|g" \
             -e "s|{{RAG_LOGS_COLLECTION_NAME}}|threat_logs|g" \
             -e "s|{{RAG_ENABLED}}|true|g" \
-            -e "s|{{OLLAMA_URL}}|http://82.112.255.186:11434|g" \
-            -e "s|{{SUMMARY_MODEL}}|gemma3:1b|g" \
+            -e "s|{{OLLAMA_URL}}|$OLLAMA_URL|g" \
+            -e "s|{{SUMMARY_MODEL}}|$SUMMARY_MODEL|g" \
+            -e "s|{{EMBEDDING_MODEL}}|$EMBEDDING_MODEL|g" \
             -e "s|{{URI_DIGITAL_AUTH}}|$URI_DIGITAL_AUTH|g" \
             -e "s|{{ALLOW_ANONYMOUS}}|true|g" \
             "env.template" > ".env"
@@ -115,7 +183,7 @@ if [ ! -f "$WORKING_DIR/.env" ]; then
             -e "s|{{NODE_ENV}}|production|g" \
             -e "s|{{DESCRIPTION}}|$SERVICE_DESC|g" \
             -e "s|{{VERSION}}|$(cat VERSION 2>/dev/null || echo '1.0.0')|g" \
-            -e "s|{{ALLOWED_ORIGINS}}|*|g" \
+            -e "s|{{ALLOWED_ORIGINS}}|$ALLOWED_ORIGINS|g" \
             -e "s|{{APP_DOMAIN}}|$APP_DOMAIN|g" \
             -e "s|{{API_BASE_URL}}|$API_BASE_URL|g" \
             -e "s|{{APP_ID}}|$APP_ID|g" \
@@ -130,6 +198,9 @@ if [ ! -f "$WORKING_DIR/.env" ]; then
             -e "s|{{QDRANT_URL}}|http://127.0.0.1:6333|g" \
             -e "s|{{RAG_COLLECTION_NAME}}|threat_intelligence|g" \
             -e "s|{{RAG_LOGS_COLLECTION_NAME}}|threat_logs|g" \
+            -e "s|{{OLLAMA_URL}}|$OLLAMA_URL|g" \
+            -e "s|{{SUMMARY_MODEL}}|$SUMMARY_MODEL|g" \
+            -e "s|{{EMBEDDING_MODEL}}|$EMBEDDING_MODEL|g" \
             "$TEMPLATE" > "$SERVICE_NAME.service"
     fi
 

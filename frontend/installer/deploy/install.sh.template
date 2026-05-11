@@ -9,6 +9,16 @@ echo "============================================================"
 # Directory di lavoro
 WORKING_DIR=$(pwd)
 
+# --- Helper Functions ---
+check_port() {
+    local port=$1
+    if ss -tulpn | grep -q ":$port " ; then
+        return 1 # Occupata
+    else
+        return 0 # Libera
+    fi
+}
+
 # 1. Wizard di Configurazione
 echo "📝 Configurazione parametri (premi INVIO per i default):"
 echo "------------------------------------------------------------"
@@ -36,8 +46,11 @@ API_URL=${API_URL:-""}
 
 CHAINPROMPT_API_URL=$DEFAULT_CHAINPROMPT_API_URL
 
-read -p "🌐 Porta locale del servizio [$DEFAULT_PORT]: " DEPLOY_PORT
-DEPLOY_PORT=${DEPLOY_PORT:-$DEFAULT_PORT}
+while true; do
+    read -p "🌐 Porta locale del servizio [$DEFAULT_PORT]: " DEPLOY_PORT
+    DEPLOY_PORT=${DEPLOY_PORT:-$DEFAULT_PORT}
+    if check_port "$DEPLOY_PORT"; then break; else echo "⚠️  Porta $DEPLOY_PORT già in uso! Scegline un'altra."; fi
+done
 
 read -p "📦 Nexus Registry URI [$DEFAULT_REGISTRY]: " NPM_REGISTRY_URI
 NPM_REGISTRY_URI=${NPM_REGISTRY_URI:-$DEFAULT_REGISTRY}
@@ -74,10 +87,10 @@ VITE_API_TIMEOUT=30000
 VITE_CHAINPROMPT_API_URL=$CHAINPROMPT_API_URL
 VITE_APP_API_URL=$API_URL
 VITE_APP_BASE_PATH=$APP_BASE_PATH
-APP_ID=$APP_ID
 VITE_HONEYPOT_NAME=$HP_NAME
 VITE_HONEYPOT_LOCATION_LAT=$HP_LAT
 VITE_HONEYPOT_LOCATION_LON=$HP_LON
+APP_ID=$APP_ID
 COMPOSE_PROJECT_NAME=$SERVICE_NAME
 EOF
 

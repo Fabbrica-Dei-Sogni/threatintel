@@ -28,9 +28,12 @@ export const useSocketStore = defineStore('socket', () => {
             const urlObj = new URL(fullUrl.startsWith('http') ? fullUrl : window.location.origin + fullUrl);
             origin = urlObj.origin;
 
+            const basePath = getEnv('VITE_APP_BASE_PATH') || '/';
+            const normalizedPath = (basePath.endsWith('/') ? basePath : basePath + '/') + 'socket.io/';
+
             socket.value = io(origin, {
                 // Utilizziamo il path standard configurato su Nginx/Backend
-                path: (getEnv('VITE_APP_BASE_PATH') || '/') + 'socket.io/',
+                path: normalizedPath,
                 withCredentials: true,
                 reconnectionAttempts: 10,
                 reconnectionDelay: 5000,

@@ -8,7 +8,8 @@ INSTALLER_DIR="$PROJECT_ROOT/installer"
 BUILD_TMP="$PROJECT_ROOT/.build_tmp"
 
 # Parametri base
-VERSION=${1:-"1.0.0"}
+PACKAGE_VERSION=$(grep '"version":' "$PROJECT_ROOT/package.json" | head -n 1 | cut -d'"' -f4)
+VERSION=${1:-$PACKAGE_VERSION}
 SERVICE_NAME=${2:-"threatintel-release"}
 DEPLOY_PATH="$PROJECT_ROOT/deployments/$SERVICE_NAME"
 ARTIFACT_NAME="threatintel-bundle-$SERVICE_NAME-v$VERSION.tar.gz"

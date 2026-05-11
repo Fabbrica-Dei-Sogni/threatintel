@@ -23,6 +23,65 @@ get_env_val() {
     grep "^$1=" .env 2>/dev/null | cut -d'=' -f2- | sed -e 's/^"//' -e 's/"$//' -e "s/^'//" -e "s/'$//"
 }
 
+# Genera una password casuale alfanumerica
+generate_password() {
+    tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 24
+}
+
+# Pre-flight checks per garantire che l'ambiente sia idoneo
+pre_flight_checks() {
+    echo "🔍 Esecuzione controlli preliminari (Pre-flight checks)..."
+    local errors=0
+
+    # 1. Verifica Sistema Operativo
+    if [[ "$OSTYPE" != "linux-gnu"* ]]; then
+        echo "❌ Errore: Questo installer supporta solo sistemi Linux."
+        errors=$((errors + 1))
+    fi
+
+    # 2. Verifica privilegi sudo (tentativo non interattivo)
+    if ! sudo -v &>/dev/null && ! sudo -n true 2>/dev/null; then
+        echo "⚠️  Nota: L'installazione richiederà privilegi di 'sudo' per configurare Systemd e Nginx."
+    fi
+
+    # 3. Verifica Dipendenze Software
+    declare -a deps=("docker" "node")
+    for dep in "${deps[@]}"; do
+        if ! command -v "$dep" &> /dev/null; then
+            echo "❌ Errore: Comando '$dep' non trovato. Installalo prima di procedere."
+            errors=$((errors + 1))
+        fi
+    done
+
+    # 4. Verifica Docker Compose (v2 plugin o v1 standalone)
+    if ! docker compose version &> /dev/null && ! command -v docker-compose &> /dev/null; then
+        echo "❌ Errore: Docker Compose non trovato. È necessario per gestire l'infrastruttura (Mongo/Redis/Qdrant)."
+        errors=$((errors + 1))
+    fi
+
+    # 5. Verifica Nginx
+    if ! command -v nginx &> /dev/null && [ ! -x /usr/sbin/nginx ]; then
+        echo "⚠️  Avviso: Nginx non trovato. L'esposizione del servizio tramite Reverse Proxy non sarà configurata automaticamente."
+    fi
+
+    # 6. Verifica Risorse Hardware (RAM minima consigliata 1GB)
+    if command -v free &> /dev/null; then
+        local total_mem=$(free -m | awk '/^Mem:/{print $2}')
+        if [ "$total_mem" -lt 1024 ]; then
+            echo "⚠️  Avviso: Rilevata memoria RAM inferiore a 1024MB ($total_mem MB)."
+            echo "   L'esecuzione di MongoDB, Qdrant e i moduli AI potrebbe causare instabilità."
+        fi
+    fi
+
+    if [ "$errors" -gt 0 ]; then
+        echo -e "\n🛑 L'installazione è stata interrotta a causa di $errors errore/i bloccante/i."
+        echo "Risolvi le dipendenze mancanti e riprova."
+        exit 1
+    fi
+    echo "✅ Controlli preliminari superati."
+    echo ""
+}
+
 # --- Main Logic ---
 
 # Evitiamo nomi generici se lanciato per errore da cartelle comuni o non idonee
@@ -31,6 +90,9 @@ if [ -z "$SERVICE_NAME" ] || [ "$SERVICE_NAME" = "deploy" ] || [ "$SERVICE_NAME"
     echo "Specificalo esplicitamente: ./install.sh mio-servizio"
     exit 1
 fi
+
+# Esecuzione controlli prima di iniziare
+pre_flight_checks
 
 echo "🚀 Avvio installazione per: $SERVICE_NAME"
 echo "============================================================"
@@ -50,6 +112,8 @@ if [ -f "$WORKING_DIR/.env" ]; then
         API_BASE_URL=$(get_env_val "API_BASE_URL")
         APP_STORAGE=$(get_env_val "STORAGE_ROOT")
         MONGO_PORT=$(get_env_val "MONGO_PORT")
+        MONGO_ROOT_PWD=$(get_env_val "MONGO_ROOT_PWD")
+        MONGO_APP_PWD=$(get_env_val "MONGO_APP_PWD")
         REDIS_PORT=$(get_env_val "REDIS_PORT")
         REDIS_PWD=$(get_env_val "REDIS_PASSWORD")
         QDRANT_PORT=$(get_env_val "QDRANT_PORT")
@@ -156,13 +220,27 @@ if [ "$RUN_WIZARD" = true ]; then
         done
         echo ""
 
-        echo "🔐 SICUREZZA"
+        echo "🔐 SICUREZZA & PASSWORD"
         read -p "🔐 Digital Auth IdP URI [$DEFAULT_AUTH_URI]: " URI_DIGITAL_AUTH
         URI_DIGITAL_AUTH=${URI_DIGITAL_AUTH:-$DEFAULT_AUTH_URI}
 
-        read -sp "🔑 Password per Redis (INVIO per default): " REDIS_PWD
-        echo ""
-        REDIS_PWD=${REDIS_PWD:-"!!!HoneyPotRedis!!!"}
+        read -p "🔑 Password per Redis [INVIO per generare casuale]: " REDIS_PWD
+        if [ -z "$REDIS_PWD" ]; then
+            REDIS_PWD=$(generate_password)
+            echo "   ✅ Generata password casuale per Redis."
+        fi
+
+        read -p "🍃 Password ROOT per MongoDB [INVIO per generare casuale]: " MONGO_ROOT_PWD
+        if [ -z "$MONGO_ROOT_PWD" ]; then
+            MONGO_ROOT_PWD=$(generate_password)
+            echo "   ✅ Generata password casuale ROOT per MongoDB."
+        fi
+
+        read -p "🍃 Password APP per MongoDB [INVIO per generare casuale]: " MONGO_APP_PWD
+        if [ -z "$MONGO_APP_PWD" ]; then
+            MONGO_APP_PWD=$(generate_password)
+            echo "   ✅ Generata password casuale APP per MongoDB."
+        fi
 
         # Calcolo APP_ID dinamico per l'installer
         CLEAN_DOMAIN=$(echo "$APP_DOMAIN" | sed -e 's|https://||g' -e 's|http://||g' -e 's|/.*||g')
@@ -214,6 +292,7 @@ if [ "$RUN_WIZARD" = true ]; then
         echo "  Honeypot Port: $TELNET_P"
         echo "  AI URL:        $OLLAMA_URL"
         echo "  AI Models:     $SUMMARY_MODEL / $EMBEDDING_MODEL"
+        echo "  Passwords:     Configurate (Redis & MongoDB)"
         echo "------------------------------------------------------------"
         
         read -p "✅ Le impostazioni sono corrette? (y/n): " CONFIRM_CHOICE
@@ -241,9 +320,9 @@ if [ "$RUN_WIZARD" = true ]; then
             -e "s|{{APP_ID}}|$APP_ID|g" \
             -e "s|{{SERVICE_NAME}}|$SERVICE_NAME|g" \
             -e "s|{{MONGO_ROOT_USER}}|admin|g" \
-            -e "s|{{MONGO_ROOT_PWD}}|!!!AdminMongo!!!|g" \
+            -e "s|{{MONGO_ROOT_PWD}}|$MONGO_ROOT_PWD|g" \
             -e "s|{{MONGO_APP_USER}}|intelagent|g" \
-            -e "s|{{MONGO_APP_PWD}}|intelagent|g" \
+            -e "s|{{MONGO_APP_PWD}}|$MONGO_APP_PWD|g" \
             -e "s|{{MONGO_APP_DB}}|threatinteldb|g" \
             -e "s|{{MONGO_PORT}}|$MONGO_PORT|g" \
             -e "s|{{REDIS_PORT}}|$REDIS_PORT|g" \
@@ -263,6 +342,8 @@ if [ "$RUN_WIZARD" = true ]; then
             "env.template" > ".env"
         
         echo "COWRIE_TELNET_BIND=$TELNET_P:2223" >> ".env"
+        chmod 600 ".env"
+        echo "🔒 Permessi file .env impostati a 600 (User Isolation)."
     fi
 
     # Generazione file di servizio Systemd (se il template esiste)
@@ -290,7 +371,7 @@ if [ "$RUN_WIZARD" = true ]; then
             -e "s|{{NODE_BIN_DIR}}|$NODE_BIN_DIR|g" \
             -e "s|{{REDIS_PASSWORD}}|$REDIS_PWD|g" \
             -e "s|{{MONGO_APP_USER}}|intelagent|g" \
-            -e "s|{{MONGO_APP_PWD}}|intelagent|g" \
+            -e "s|{{MONGO_APP_PWD}}|$MONGO_APP_PWD|g" \
             -e "s|{{MONGO_APP_DB}}|threatinteldb|g" \
             -e "s|{{MONGO_PORT}}|$MONGO_PORT|g" \
             -e "s|{{REDIS_PORT}}|$REDIS_PORT|g" \
@@ -302,6 +383,7 @@ if [ "$RUN_WIZARD" = true ]; then
             -e "s|{{SUMMARY_MODEL}}|$SUMMARY_MODEL|g" \
             -e "s|{{EMBEDDING_MODEL}}|$EMBEDDING_MODEL|g" \
             "$TEMPLATE" > "$SERVICE_NAME.service"
+        chmod 644 "$SERVICE_NAME.service"
     fi
 
     # Generazione configurazione Nginx
@@ -382,6 +464,8 @@ if [ -f "$INFRA_COMPOSE" ]; then
         export REDIS_PASSWORD=$(grep "REDIS_PASSWORD=" .env | cut -d'=' -f2)
 
         mkdir -p "$STORAGE_ROOT/mongodb" "$STORAGE_ROOT/redis" "$STORAGE_ROOT/qdrant" "$STORAGE_ROOT/cowrie/log" "$STORAGE_ROOT/cowrie/downloads"
+        chmod 700 "$STORAGE_ROOT" "$STORAGE_ROOT"/* 2>/dev/null
+        echo "🔒 Permessi cartelle storage impostati a 700 (User Isolation)."
         
         echo "🚀 Starting Docker containers..."
         docker compose up -d

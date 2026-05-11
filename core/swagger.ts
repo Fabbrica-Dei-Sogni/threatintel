@@ -2,7 +2,7 @@ import swaggerJsdoc from 'swagger-jsdoc';
 import { Router } from 'express';
 import express from 'express';
 import swaggerUi from 'swagger-ui-express';
-import { appDomain, apiBaseUrl } from './config';
+import { appDomain, apiBaseUrl, appBasePath } from './config';
 import path from 'path';
 import fs from 'fs';
 
@@ -22,7 +22,7 @@ const options: swaggerJsdoc.Options = {
     },
     servers: [
       {
-        url: '/honeypot/api',
+        url: appBasePath + '/api',
         description: 'Server (Relative Path via Nginx)'
       },
       {
@@ -61,7 +61,7 @@ export const swaggerSpec = swaggerJsdoc(options);
 
 export const setupSwagger = (router: Router) => {
   let assetsPath: string;
-  
+
   try {
     // In sviluppo, cerchiamo nel node_modules
     const { getAbsoluteFSPath } = require('swagger-ui-dist');
@@ -88,8 +88,8 @@ export const setupSwagger = (router: Router) => {
     },
     // Utilizziamo i file caricati staticamente
     customJs: [
-        './swagger-ui-bundle.js',
-        './swagger-ui-standalone-preset.js'
+      './swagger-ui-bundle.js',
+      './swagger-ui-standalone-preset.js'
     ],
     customCssUrl: './swagger-ui.css'
   });
@@ -123,7 +123,7 @@ export const setupSwagger = (router: Router) => {
       };
     `);
   });
-  
+
   // Endpoint per scaricare il JSON raw dello spec (utile per tool esterni)
   router.get('/api/api-docs.json', (_req, res) => {
     res.setHeader('Content-Type', 'application/json');

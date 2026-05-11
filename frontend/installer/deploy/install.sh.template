@@ -56,7 +56,7 @@ CLEAN_DOMAIN=$(echo "$API_URL" | sed -e 's|https://||g' -e 's|http://||g' -e 's|
 [ -z "$CLEAN_DOMAIN" ] && CLEAN_DOMAIN="localhost"
 DEFAULT_APP_ID="com.$CLEAN_DOMAIN.threatintel-frontend"
 
-read -p "🆔 Application ID [$DEFAULT_APP_ID]: " APP_ID
+read -p "🆔 Application ID [Indica quello definito sul service backend]: " APP_ID
 APP_ID=${APP_ID:-$DEFAULT_APP_ID}
 
 echo "------------------------------------------------------------"

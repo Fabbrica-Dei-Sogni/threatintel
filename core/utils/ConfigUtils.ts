@@ -7,6 +7,7 @@ export const ConfigDefaults = {
     PORT: '3000',
     MONGO_URI: 'mongodb://localhost:17017/threatintel',
     APP_DOMAIN: 'localhost',
+    APP_BASE_PATH: '/honeypot',
     AUTH_URI: 'https://localhost:3443/auth/api/v1',
     APP_ID: 'honeypot-host-001',
     QDRANT_URL: 'http://localhost:6333',
@@ -63,8 +64,10 @@ export const getAppFullUrl = (domain: string, protocol?: string): string => {
 /**
  * Compone l'URL base delle API
  */
-export const getApiBaseUrl = (domain: string, port: string, envApiBase?: string): string => {
+export const getApiBaseUrl = (domain: string, port: string, envApiBase?: string, appBasePath?: string): string => {
     if (envApiBase) return envApiBase;
     const protocol = getAppProtocol(domain);
-    return `${protocol}://${domain}:${port}/honeypot/api`;
+    // Se la base path è "/", non aggiungiamo nulla per evitare doppi slash (es. http://localhost:3000//api)
+    const basePath = appBasePath === '/' ? '' : (appBasePath || '');
+    return `${protocol}://${domain}:${port}${basePath}/api`;
 };

@@ -179,14 +179,20 @@ if [ "$RUN_WIZARD" = true ]; then
         done
 
         read -p "📂 Base Path (es. /honeypot) [INVIO per root /]: " APP_BASE_PATH
-        APP_BASE_PATH=${APP_BASE_PATH:-""}
+        APP_BASE_PATH=${APP_BASE_PATH:-"/"}
 
         # Normalizzazione Base Path
         CLEAN_BASE_PATH=$APP_BASE_PATH
-        if [[ -n "$CLEAN_BASE_PATH" && "$CLEAN_BASE_PATH" != /* ]]; then CLEAN_BASE_PATH="/$CLEAN_BASE_PATH"; fi
-        CLEAN_BASE_PATH=${CLEAN_BASE_PATH%/}
+        if [[ "$CLEAN_BASE_PATH" != /* ]]; then CLEAN_BASE_PATH="/$CLEAN_BASE_PATH"; fi
+        # Rimuove slash finale solo se non è l'unico carattere (evita che / diventi stringa vuota)
+        if [[ ${#CLEAN_BASE_PATH} -gt 1 ]]; then CLEAN_BASE_PATH=${CLEAN_BASE_PATH%/}; fi
 
-        DYNAMIC_API_BASE="https://$APP_DOMAIN$CLEAN_BASE_PATH/api"
+        # Calcolo API_BASE_URL evitando doppi slash se CLEAN_BASE_PATH è /
+        if [ "$CLEAN_BASE_PATH" = "/" ]; then
+            DYNAMIC_API_BASE="https://$APP_DOMAIN/api"
+        else
+            DYNAMIC_API_BASE="https://$APP_DOMAIN$CLEAN_BASE_PATH/api"
+        fi
         read -p "🔗 API Base URL ($DYNAMIC_API_BASE): " API_BASE_URL
         API_BASE_URL=${API_BASE_URL:-$DYNAMIC_API_BASE}
         
@@ -336,8 +342,9 @@ if [ "$RUN_WIZARD" = true ]; then
             -e "s|{{EMBEDDING_MODEL}}|$EMBEDDING_MODEL|g" \
             -e "s|{{URI_DIGITAL_AUTH}}|$URI_DIGITAL_AUTH|g" \
             -e "s|{{ALLOW_ANONYMOUS}}|true|g" \
-            -e "s|{{HONEYPOT_DASHBOARD_PATH}}|$CLEAN_BASE_PATH|g" \
+            -e "s|{{APP_BASE_PATH}}|$CLEAN_BASE_PATH|g" \
             -e "s|{{ABUSEIPDB_KEY}}|$ABUSEIPDB_KEY|g" \
+            -e "s|{{API_BASE_URL}}|$API_BASE_URL|g" \
             -e "s|{{SERVICE_NAME}}|$SERVICE_NAME|g" \
             "env.template" > ".env"
         
@@ -365,6 +372,7 @@ if [ "$RUN_WIZARD" = true ]; then
             -e "s|{{APP_DOMAIN}}|$APP_DOMAIN|g" \
             -e "s|{{API_BASE_URL}}|$API_BASE_URL|g" \
             -e "s|{{APP_ID}}|$APP_ID|g" \
+            -e "s|{{APP_BASE_PATH}}|$CLEAN_BASE_PATH|g" \
             -e "s|{{ALLOW_ANONYMOUS}}|true|g" \
             -e "s|{{URI_DIGITAL_AUTH}}|$URI_DIGITAL_AUTH|g" \
             -e "s|{{NODE_PATH}}|$NODE_PATH|g" \

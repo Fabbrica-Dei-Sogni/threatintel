@@ -1,13 +1,13 @@
 # --- ThreatIntel Locations Snippet for {{SERVICE_NAME}} ---
-# Includi questo file nel blocco server { listen 443; ... } di alessandromodica.com
+# Includi questo file nel blocco server { listen 443; ... } di {{APP_DOMAIN}}
 
 # 1. API backend
-location {{APP_BASE_PATH}}/api/ {
+location {{API_BASE_PATH}}/ {
     proxy_pass http://localhost:{{PORT}}/api/;
     
     # Gestione dei redirect interni (fondamentale per Swagger)
-    proxy_redirect /api/ {{APP_BASE_PATH}}/api/;
-    proxy_redirect http://localhost:{{PORT}}/api/ https://{{APP_DOMAIN}}{{APP_BASE_PATH}}/api/;
+    proxy_redirect /api/ {{API_BASE_PATH}}/;
+    proxy_redirect http://localhost:{{PORT}}/api/ {{API_BASE_URL}}/;
 
     proxy_set_header Host $host;
     proxy_set_header X-Real-IP $remote_addr;
@@ -30,7 +30,7 @@ location {{APP_BASE_PATH}}/socket.io/ {
 }
 
 # 3. Forza trailing slash per le chiamate API dirette (es. api-docs)
-rewrite ^{{APP_BASE_PATH}}/api$ {{APP_BASE_PATH}}/api/ permanent;
+rewrite ^{{API_BASE_PATH}}$ {{API_BASE_PATH}}/ permanent;
 
 # 4. Frontend HUD (Scommentato per default per integrazione locale)
 location {{APP_BASE_PATH}}/ {

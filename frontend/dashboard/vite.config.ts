@@ -4,10 +4,12 @@ import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig(({ mode }) => {
     const env = loadEnv(mode, process.cwd(), '');
-    const basePath = env.VITE_APP_BASE_PATH || '/honeypot/';
+    // Usiamo './' per rendere gli asset relativi e portabili su qualsiasi APP_BASE_PATH
+    const base = './';
+    const runtimeBasePath = env.VITE_APP_BASE_PATH || '/honeypot/';
 
     return {
-        base: basePath,
+        base: base,
         plugins: [
             vue(),
             VitePWA({
@@ -21,8 +23,8 @@ export default defineConfig(({ mode }) => {
                     theme_color: '#1a1a1a',
                     background_color: '#1a1a1a',
                     display: 'standalone',
-                    scope: basePath,
-                    start_url: basePath,
+                    scope: './',
+                    start_url: './',
                     orientation: 'any',
                     icons: [
                         {
@@ -47,7 +49,7 @@ export default defineConfig(({ mode }) => {
                 },
                 workbox: {
                     // Impedisce al Service Worker di gestire rotte esterne alla app Vue (API)
-                    navigateFallbackDenylist: [new RegExp(`^${basePath.replace(/\//g, '\\/')}api`)]
+                    navigateFallbackDenylist: [new RegExp(`^${runtimeBasePath.replace(/\//g, '\\/')}api`)]
                 }
             })
         ],

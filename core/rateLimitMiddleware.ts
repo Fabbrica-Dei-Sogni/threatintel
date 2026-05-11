@@ -17,7 +17,7 @@ export class RateLimitMiddleware {
         @inject(LOGGER_TOKEN) private readonly logger: Logger,
         @inject(REDIS_SERVICE_TOKEN) private readonly redisService: RedisService,
         private readonly rateLimitService: RateLimitService
-    ) {}
+    ) { }
 
     private getRedisClient() {
         if (!this.redisService.isReady()) {
@@ -33,14 +33,14 @@ export class RateLimitMiddleware {
         await client.srem('blacklisted-ips', ip);
         await client.del(`blacklist:${ip}`);
         await client.del(`violations:${ip}`);
-        
+
         // Pulizia contatori rate limit (pattern matching semplificato o chiavi note)
         const keysToDel = [
             `ddos:${ip}`,
             `app:${ip}`,
             `trap:${ip}`
         ];
-        
+
         for (const key of keysToDel) {
             await client.del(key);
         }
@@ -128,10 +128,16 @@ export class RateLimitMiddleware {
     // Helper per verificare se un IP è escluso (whitelist)
     private isExcluded(req: any): boolean {
         // Logica specifica richiesta dall'utente: skip se naviga alla location della dashboard configurata
-        const dashboardPath = (process.env.HONEYPOT_DASHBOARD_PATH || '/honeypot').toLowerCase();
+        const dashboardPath = (process.env.APP_BASE_PATH || '/honeypot').toLowerCase();
         const pathStr = (req.originalUrl || req.path || '').toLowerCase();
-        
-        if (pathStr.includes(dashboardPath) || pathStr.startsWith('/api/')) {
+
+        // Se la dashboard è in root (/), whitelisti solo la home. 
+        // Se è in una sottocartella, whitelisti tutto ciò che inizia con quel path.
+        const isDashboardRequest = dashboardPath === '/' 
+            ? (pathStr === '/' || pathStr === '') 
+            : pathStr.startsWith(dashboardPath);
+
+        if (isDashboardRequest || pathStr.startsWith('/api/')) {
             this.logger.debug(`[WHITELIST-BYPASS] IP ${req.ip} allowed for path: ${pathStr}`);
             return true;
         }
@@ -251,12 +257,16 @@ export class RateLimitMiddleware {
             const ip = req.ip;
 
             // 1. PRIORITÀ ASSOLUTA: Bypass per navigazione protetta (Dashboard e API)
-            const dashboardPath = (process.env.HONEYPOT_DASHBOARD_PATH || '/honeypot').toLowerCase();
+            const dashboardPath = (process.env.APP_BASE_PATH || '/honeypot').toLowerCase();
             const pathStr = (req.originalUrl || req.path || req.url || '').toLowerCase();
-            
-            if (pathStr.includes(dashboardPath) || pathStr.startsWith('/api/')) {
+
+            const isDashboardRequest = dashboardPath === '/' 
+                ? (pathStr === '/' || pathStr === '') 
+                : pathStr.startsWith(dashboardPath);
+
+            if (isDashboardRequest || pathStr.startsWith('/api/')) {
                 // Log solo per dashboard per non intasare i log
-                if (pathStr.includes(dashboardPath)) {
+                if (isDashboardRequest) {
                     console.log(`[DEBUG-BYPASS] IP ${ip} sta accedendo a dashboard configurata: ${pathStr} - BYPASS ATTIVATO`);
                 }
                 return next();
@@ -298,8 +308,10 @@ export class RateLimitMiddleware {
                     const client = self.redisService.getClient()!;
                     // Verifica se il path è escluso dal tracking delle violazioni
                     // Escludiamo solo la dashboard configurata e le chiamate API
-                    const isWhitelistedPath = (pathStr.includes(dashboardPath) || 
-                                              pathStr.startsWith('/api/'));
+                    const isDashboardRequest = dashboardPath === '/' 
+                        ? (pathStr === '/' || pathStr === '') 
+                        : pathStr.startsWith(dashboardPath);
+                    const isWhitelistedPath = (isDashboardRequest || pathStr.startsWith('/api/'));
 
                     if (!isWhitelistedPath) {
                         // Traccia violazione per blacklist automatica

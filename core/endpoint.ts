@@ -1,6 +1,5 @@
 import express from "express";
-import dotenv from 'dotenv';
-dotenv.config();
+import * as Tokens from './di/tokens';
 
 // import ratelimitroutes from './apis/ratelimitroutes'; // [REMOVED]
 // import threatroutes from './apis/threatroutes'; // [REMOVED] - Now handled by RouterHub
@@ -73,7 +72,8 @@ export default function setupApi() {
     router.use(rateLimitMiddleware.applicationLimiter());
 
     // Integration of Swagger Documentation (OpenAPI)
-    setupSwagger(router);
+    const config = getComponent(Tokens.CONFIG_PROVIDER_TOKEN);
+    setupSwagger(router, config as any);
 
     // Global API Protection
     router.use('/api', authMiddleware.isAuthenticated());

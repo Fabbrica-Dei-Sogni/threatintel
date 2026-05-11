@@ -3,9 +3,6 @@ import { singleton, inject } from 'tsyringe';
 import * as Tokens from '../di/tokens';
 import { Logger } from 'winston';
 import { AppConfigProvider } from './AppConfigProvider';
-import dotenv from 'dotenv';
-
-dotenv.config();
 
 export type RedisState = 'disabled' | 'connecting' | 'ready' | 'unavailable';
 
@@ -36,7 +33,7 @@ export class RedisService {
         const commandTimeout = this.config.redisCommandTimeoutMs;
         
         // In test mode, we might want to avoid auto-connecting unless specified
-        const shouldAutoConnect = process.env.NODE_ENV !== 'test' || this.config.redisAutoConnectInTest;
+        const shouldAutoConnect = !this.config.isTest || this.config.redisAutoConnectInTest;
 
         try {
             this.state = 'connecting';

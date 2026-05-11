@@ -15,13 +15,17 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import path from 'path';
-import { port, allowedOrigins } from './core/config';
 import setupApi from './core/endpoint';
 import { getComponent } from './core/di/container';
 import * as Tokens from './core/di/tokens';
 import { ServiceStatus } from './core/types/lifecycle';
 import { LifecycleManager } from './core/services/LifecycleManager';
 import { SocketServerHub } from './core/services/socket/SocketServerHub';
+import { AppConfigProvider } from './core/services/AppConfigProvider';
+import { DatabaseService } from './core/services/DatabaseService';
+
+const config = getComponent(Tokens.CONFIG_PROVIDER_TOKEN) as AppConfigProvider;
+const dbService = getComponent(Tokens.DATABASE_SERVICE_TOKEN) as DatabaseService;
 
 const app = express();
 
@@ -37,7 +41,7 @@ app.use(helmet({
             styleSrc: ["'self'", "'unsafe-inline'"],
             scriptSrc: ["'self'", "'unsafe-inline'"],
             imgSrc: ["'self'", "data:", "https://validator.swagger.io"],
-            connectSrc: ["'self'", ...allowedOrigins]
+            connectSrc: ["'self'", ...config.allowedOrigins]
         },
     },
     hsts: {
@@ -49,7 +53,7 @@ app.use(helmet({
 
 // Middleware generali
 app.use(cors({
-    origin: allowedOrigins,
+    origin: config.allowedOrigins,
     credentials: true,
     exposedHeaders: ['Content-Disposition', 'Content-Length']
 }));
@@ -62,9 +66,16 @@ app.set('trust proxy', true);
 // carichiamo le api del threat intel
 app.use(setupApi());
 
-const PORT = port;
+const PORT = config.port;
 const server = app.listen(Number(PORT), '0.0.0.0', async () => {
     logger.info(`🚀 Server threat intelligence avviato su porta ${PORT}`);
+
+    // Inizializzazione Database
+    try {
+        await dbService.connect();
+    } catch (err) {
+        logger.error('❌ Fallita connessione iniziale al database. Il servizio potrebbe non funzionare correttamente.');
+    }
     
     // Inizializzazione Socket.io
     const socketHub = getComponent(Tokens.SOCKET_SERVER_HUB_TOKEN) as SocketServerHub;
@@ -119,6 +130,9 @@ const server = app.listen(Number(PORT), '0.0.0.0', async () => {
 
             // 2. Ferma i servizi in background (es. flush dei buffer)
             await lifecycleManager.shutdown();
+
+            // 3. Ferma la connessione al database
+            await dbService.disconnect();
 
             // 3. Ferma Socket.io
             const socketHub = getComponent(Tokens.SOCKET_SERVER_HUB_TOKEN) as SocketServerHub;

@@ -1,61 +1,42 @@
 import mongoose from 'mongoose';
 import crypto from 'crypto';
-import dotenv from 'dotenv';
-import PatternAnalysisService from './services/PatternAnalysisService';
 import net from 'net';
 import { Request, Response, NextFunction } from 'express';
+import PatternAnalysisService from './services/PatternAnalysisService';
 import { ThreatLogService } from './services/ThreatLogService';
 import { SanitizationUtils } from './utils/SanitizationUtils';
-import { mongoUri } from './config';
 import { inject, singleton } from 'tsyringe';
-import { LOGGER_TOKEN } from './di/tokens';
+import * as Tokens from './di/tokens';
 import { Logger } from 'winston';
-dotenv.config();
+import { AppConfigProvider } from './services/AppConfigProvider';
 
 type AnyReq = Request & { jndiPayload?: any; sessionID?: string };
 
 @singleton()
 export class ThreatLogger {
 
-    //TODO: rendere parametrizzabile questo set di configurazione per il threat logger
-    config = {
-        patternAnalysisInstance: null as any,
-        mongoUri: mongoUri,
-        enabled: true,
-        geoEnabled: true,
-        maxBodySize: 1024 // KB
-    };
-
     patternAnalysisInstance: any;
-    mongoUri: string;
-    enabled: boolean;
-    geoEnabled: boolean;
-    maxBodySize: number;
+    mongoUri: string = '';
+    enabled: boolean = true;
+    geoEnabled: boolean = true;
+    maxBodySize: number = 1024;
 
     constructor(
-        @inject(LOGGER_TOKEN) private readonly logger: Logger,
+        @inject(Tokens.LOGGER_TOKEN) private readonly logger: Logger,
+        @inject(Tokens.CONFIG_PROVIDER_TOKEN) private readonly configProvider: AppConfigProvider,
         private readonly threatLogService: ThreatLogService,
         private readonly patternAnalysisService: PatternAnalysisService,
     ) {
 
         this.patternAnalysisInstance = this.patternAnalysisService;
-        this.mongoUri = this.config.mongoUri || 'mongodb://localhost:27017/threatintel';
-        this.enabled = this.config.enabled !== false;
-        this.geoEnabled = this.config.geoEnabled !== false;
-        this.maxBodySize = this.config.maxBodySize || 1024; // KB
+        this.mongoUri = this.configProvider.mongoUri;
+        this.enabled = true; // Potremmo aggiungere un getter nel provider se necessario
+        this.geoEnabled = true;
+        this.maxBodySize = 1024; // KB
 
-        this.initDatabase();
         this.logger.info('[ThreatLogger] Inizializzato');
     }
 
-    async initDatabase() {
-        try {
-            await mongoose.connect(this.mongoUri as string);
-            console.log('[ThreatLogger] Connesso a MongoDB');
-        } catch (error: any) {
-            console.error('[ThreatLogger] Errore connessione MongoDB:', error);
-        }
-    }
 
     public middleware() {
         return async (req: AnyReq, res: Response, next: NextFunction) => {

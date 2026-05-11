@@ -31,6 +31,7 @@ import { PatternAnalysisService } from "../services/PatternAnalysisService";
 import { ThreatLogFactory } from "../utils/ThreatLogFactory";
 import { IpDetailsService } from "../services/IpDetailsService";
 import { AuthService } from "../services/AuthService";
+import { DatabaseService } from "../services/DatabaseService";
 import { ConfigService } from "../services/ConfigService";
 import { CampaignService } from "../services/CampaignService";
 import { DossierService } from "../services/DossierService";
@@ -79,6 +80,9 @@ export function setupContainer(container: DependencyContainer) {
     // Core Services
     container.register(Tokens.I18N_TOKEN, { useClass: I18nService }, { lifecycle: Lifecycle.Singleton });
     container.register(Tokens.CONFIG_PROVIDER_TOKEN, { useClass: AppConfigProvider }, { lifecycle: Lifecycle.Singleton });
+    container.register(Tokens.DATABASE_SERVICE_TOKEN, { useClass: DatabaseService }, { lifecycle: Lifecycle.Singleton });
+    
+    // Services
     container.register(Tokens.THREAT_LOG_SERVICE_TOKEN, { useClass: ThreatLogService }, { lifecycle: Lifecycle.Singleton });
     container.register(Tokens.THREAT_ANALYTICS_SERVICE_TOKEN, { useClass: ThreatAnalyticsService }, { lifecycle: Lifecycle.Singleton });
     container.register(Tokens.IP_DETAILS_SERVICE_TOKEN, { useClass: IpDetailsService }, { lifecycle: Lifecycle.Singleton });

@@ -12,6 +12,25 @@ export class AppConfigProvider {
     ) { }
 
     /**
+     * Informazioni sull'ambiente
+     */
+    get nodeEnv(): string {
+        return process.env.NODE_ENV || 'development';
+    }
+
+    get isProduction(): boolean {
+        return this.nodeEnv === 'production';
+    }
+
+    get isTest(): boolean {
+        return this.nodeEnv === 'test';
+    }
+
+    get isDevelopment(): boolean {
+        return this.nodeEnv === 'development';
+    }
+
+    /**
      * Recupera una porta dal .env o default
      */
     get port(): string {
@@ -33,10 +52,25 @@ export class AppConfigProvider {
     }
 
     /**
+     * Recupera la base path dell'applicazione (es. /honeypot)
+     */
+    get appBasePath(): string {
+        return process.env.APP_BASE_PATH !== undefined ? process.env.APP_BASE_PATH : ConfigDefaults.APP_BASE_PATH;
+    }
+
+    /**
      * Recupera le origini consentite per CORS e CSP
      */
     get allowedOrigins(): string[] {
         return parseCsv(process.env.ALLOWED_ORIGINS, ConfigDefaults.ALLOWED_ORIGINS);
+    }
+
+    /**
+     * Calcola l'URL base delle API
+     */
+    get apiBaseUrl(): string {
+        const { getApiBaseUrl } = require('../utils/ConfigUtils');
+        return getApiBaseUrl(this.appDomain, this.port, process.env.API_BASE_URL, this.appBasePath);
     }
 
     /**

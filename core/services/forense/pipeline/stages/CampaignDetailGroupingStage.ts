@@ -25,6 +25,7 @@ export class CampaignDetailGroupingStage implements PipelineStage {
                     lastSeen: { $max: '$timestamp' },
                     allIndicators: { $push: '$fingerprint.indicators' },
                     sampleUrl: { $first: '$request.url' },
+                    collectedUserAgents: { $addToSet: '$request.userAgent' },
                     status: { $first: '$status' }
                 }
             },
@@ -40,6 +41,9 @@ export class CampaignDetailGroupingStage implements PipelineStage {
                     sampleUrl: 1,
                     status: 1,
                     averageScore: { $divide: ['$sumScore', '$totaleLogs'] },
+                    fingerprintAnalysis: {
+                        userAgents: '$collectedUserAgents'
+                    },
                     attackPatterns: {
                         $reduce: {
                             input: '$allIndicators',

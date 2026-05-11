@@ -59,8 +59,18 @@
           <span class="cyber-label">URL PATH</span>
           <div class="ip-input-wrapper">
             <input v-model="filterUrl" :placeholder="t('threatLogs.filterByUrl')" class="ip-input" type="text" />
-            <button v-if="filterUrl" @click="clearUrlFilter" class="clear-btn" :title="t('threatLogs.clearUrlFilter')"
+            <button v-if="filterUrl" @click="filterUrl = ''" class="clear-btn" :title="t('threatLogs.clearUrlFilter')"
               type="button" aria-label="Clear URL filter">
+              ✕
+            </button>
+          </div>
+        </div>
+
+        <div class="filter-item search-box">
+          <span class="cyber-label">USER AGENT</span>
+          <div class="ip-input-wrapper">
+            <input v-model="filterUserAgent" :placeholder="t('threatLogs.filterByUA')" class="ip-input" type="text" />
+            <button v-if="filterUserAgent" @click="filterUserAgent = ''" class="clear-btn" type="button" aria-label="Clear UA filter">
               ✕
             </button>
           </div>
@@ -240,7 +250,8 @@ const props = defineProps({
   initialUrl: String,
   initialProtocol: String,
   initialPage: Number,
-  initialSortFields: Object
+  initialSortFields: Object,
+  initialUserAgent: String
 });
 
 // State
@@ -256,6 +267,7 @@ onMounted(() => {
   if (props.initialProtocol !== undefined) logsState.filters.protocol = props.initialProtocol || 'http';
   if (props.initialPage !== undefined) logsState.pagination.page = props.initialPage || 1;
   if (props.initialSortFields !== undefined) logsState.sort.fields = props.initialSortFields || { timestamp: -1 };
+  if (props.initialUserAgent !== undefined) logsState.filters.userAgent = props.initialUserAgent || '';
 });
 
 const {
@@ -263,6 +275,7 @@ const {
   filterUrl,
   filterProtocol,
   filterStatus,
+  filterUserAgent,
   sortFields,
   page,
   logs,
@@ -279,6 +292,7 @@ const {
   toRef(logsState.filters, 'url'),
   toRef(logsState.filters, 'protocol'),
   toRef(logsState.filters, 'status'),
+  toRef(logsState.filters, 'userAgent'),
   toRef(logsState.pagination, 'page'),
   toRef(logsState.sort, 'fields'),
   toRef(logsState.pagination, 'pageSize')
@@ -340,7 +354,7 @@ watch(() => props.initialPage,       (v) => { page.value           = v ?? 1; });
 watch(() => props.initialSortFields, (v) => { sortFields.value     = v ?? {}; }, { deep: true });
 
 // Sincronizzazione Ref -> URL query
-watch([filterIp, filterUrl, filterProtocol, filterStatus, page, sortFields], ([newIp, newUrl, newProto, newStatus, newPage, newSortFields]) => {
+watch([filterIp, filterUrl, filterProtocol, filterStatus, filterUserAgent, page, sortFields], ([newIp, newUrl, newProto, newStatus, newUA, newPage, newSortFields]) => {
   router.replace({
     name: 'ThreatLogs',
     query: {
@@ -348,6 +362,7 @@ watch([filterIp, filterUrl, filterProtocol, filterStatus, page, sortFields], ([n
       url: newUrl || undefined,
       protocol: newProto !== 'http' ? newProto : undefined,
       status: newStatus !== 'active' ? newStatus : undefined,
+      userAgent: newUA || undefined,
       page: newPage > 1 ? newPage : undefined,
       sortFields: newSortFields && Object.keys(newSortFields).length > 0 ? JSON.stringify(newSortFields) : undefined
     },

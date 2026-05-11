@@ -33,7 +33,7 @@ const THREAT_LOG_FILTER_FIELDS = new Set([
 ]);
 
 const ATTACK_FILTER_FIELDS = new Set([
-    'request.ip', 'request.url', 'request.method', 'geo.country', 'country', 'protocol', 'timestamp',
+    'request.ip', 'request.url', 'request.method', 'request.userAgent', 'geo.country', 'country', 'protocol', 'timestamp',
     'dangerLevel', 'fingerprint.hash', 'totaleLogs', 'dangerScore', 'averageScore', 'attackPatterns', 'status'
 ]);
 
@@ -42,7 +42,7 @@ const COWRIE_SESSION_FILTER_FIELDS = new Set([
 ]);
 
 const CAMPAIGN_FILTER_FIELDS = new Set([
-    'minIps', 'minScore', 'minLogsPerIp', 'minCorrelations', 'protocol', 'startTime', 'endTime', 'page', 'pageSize', 'timeMode', 'agoValue', 'agoUnit', 'selectedUris', 'search', 'status'
+    'minIps', 'minScore', 'minLogsPerIp', 'minCorrelations', 'protocol', 'startTime', 'endTime', 'page', 'pageSize', 'timeMode', 'agoValue', 'agoUnit', 'selectedUris', 'search', 'userAgent', 'status'
 ]);
 
 const CAMPAIGN_SORT_FIELDS = new Set([

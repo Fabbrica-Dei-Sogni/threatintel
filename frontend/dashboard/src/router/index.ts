@@ -27,6 +27,7 @@ const routes: RouteRecordRaw[] = [
             initialProtocol: route.query.protocol,
             initialPage: route.query.page ? parseInt(route.query.page as string) : undefined,
             initialSortFields: route.query.sortFields ? JSON.parse(route.query.sortFields as string) : undefined,
+            initialUserAgent: route.query.userAgent as string,
         }),
     },
     {
@@ -59,6 +60,7 @@ const routes: RouteRecordRaw[] = [
             initAgoUnit: route.query.agoUnit,
             initDateRange: route.query.dateRange ? JSON.parse(route.query.dateRange as string) : undefined,
             initialSortFields: route.query.sortFields ? JSON.parse(route.query.sortFields as string) : undefined,
+            initialUserAgent: route.query.userAgent as string,
         }),
     },
     {
@@ -179,6 +181,7 @@ const routes: RouteRecordRaw[] = [
             initAgoUnit: route.query.agoUnit,
             initialUris: route.query.uris,
             initialMinCorrelations: route.query.minCorrelations ? parseInt(route.query.minCorrelations as string) : undefined,
+            initialUserAgent: route.query.userAgent as string,
         })
     },
     {

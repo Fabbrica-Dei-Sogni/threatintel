@@ -57,6 +57,11 @@ export class CampaignController {
      *         schema:
      *           type: string
      *           default: ''
+     *       - name: userAgent
+     *         in: query
+     *         schema:
+     *           type: string
+     *           default: ''
      *     responses:
      *       200:
      *         description: Elenco campagne distribuite trovate.
@@ -96,6 +101,7 @@ export class CampaignController {
                     ? cleanQuery.selectedUris 
                     : (cleanQuery.selectedUris ? [cleanQuery.selectedUris as string] : []),
                 search: cleanQuery.search as string,
+                userAgent: cleanQuery.userAgent as string,
                 status: cleanQuery.status as string
             });
 
@@ -172,6 +178,7 @@ export class CampaignController {
                 timeConfig: safeTimeConfig,
                 page: pageNum,
                 pageSize: pageSizeNum,
+                userAgent: cleanBody.userAgent as string || req.body.userAgent as string,
                 status: cleanBody.status as string || req.body.status
             });
 
@@ -235,6 +242,7 @@ export class CampaignController {
                     agoUnit: cleanQuery.agoUnit as string
                 },
                 search: cleanQuery.search as string,
+                userAgent: cleanQuery.userAgent as string,
                 status: cleanQuery.status as string
             });
 

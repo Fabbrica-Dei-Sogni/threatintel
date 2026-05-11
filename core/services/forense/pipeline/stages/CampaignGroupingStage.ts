@@ -22,6 +22,7 @@ export class CampaignGroupingStage implements PipelineStage {
                     lastSeen: { $max: '$timestamp' },
                     sampleUrl: { $first: '$request.url' },
                     protocols: { $addToSet: '$protocol' },
+                    userAgentsPerIp: { $addToSet: '$request.userAgent' },
                     status: { $first: '$status' }
                 }
             },
@@ -46,6 +47,7 @@ export class CampaignGroupingStage implements PipelineStage {
                     allIndicators: { $push: '$indicatorsPerIp' },
                     timeInfo: { $push: { ip: '$_id.ip', firstSeen: '$firstSeen', lastSeen: '$lastSeen' } },
                     allProtocols: { $push: '$protocols' },
+                    allUserAgents: { $push: '$userAgentsPerIp' },
                     status: { $first: '$status' }
                 }
             },
@@ -62,6 +64,15 @@ export class CampaignGroupingStage implements PipelineStage {
                     status: 1,
                     averageScore: { $divide: ['$sumScore', '$totaleLogs'] },
                     timeInfo: 1,
+                    fingerprintAnalysis: {
+                        userAgents: {
+                            $reduce: {
+                                input: '$allUserAgents',
+                                initialValue: [],
+                                in: { $setUnion: ['$$value', '$$this'] }
+                            }
+                        }
+                    },
                     protocols: {
                         $reduce: {
                             input: '$allProtocols',

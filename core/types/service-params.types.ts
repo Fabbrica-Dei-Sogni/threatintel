@@ -79,6 +79,7 @@ export interface CampaignFilter {
     agoUnit?: string;
     selectedUris?: string[];
     search?: string;
+    userAgent?: string;
     status?: string;
 }
 
@@ -105,6 +106,7 @@ export interface GetCampaignDetailParams {
     timeConfig?: TimeConfig;
     page?: number;
     pageSize?: number;
+    userAgent?: string;
     status?: string;
 }
 

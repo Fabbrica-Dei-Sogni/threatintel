@@ -222,6 +222,7 @@
         "months": "Miesiące",
         "years": "Lata",
         "filterByIp": "Filtruj według IP...",
+        "filterByUA": "Filtruj według User Agent...",
         "searchPlaceholder": "Szukaj wzorców, adresów URL, User Agentów...",
         "globalSearch": "WYSZUKIWANIE GLOBALNE",
         "clearIpFilter": "Wyczyść filtr IP",
@@ -307,6 +308,7 @@
         "searchLabel": "Szukaj na liście:",
         "searchPlaceholder": "IP, Hash, Technique...",
         "filterByUri": "Filtruj wg docelowego URI",
+        "filterByUA": "Filtruj wg User Agent...",
         "browseUris": "Przeglądaj URI",
         "table": {
             "ips": "Zaangażowane IP",
@@ -419,6 +421,7 @@
         "attacks": "Anomalie",
         "filterByIp": "Filtruj według IP...",
         "filterByUrl": "Filtruj według URL...",
+        "filterByUA": "Filtruj według User Agent...",
         "clearIpFilter": "Wyczyść filtr IP",
         "clearUrlFilter": "Wyczyść filtr URL",
         "noLogsFound": "Nie znaleziono dzienników",

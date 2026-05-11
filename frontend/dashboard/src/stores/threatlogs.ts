@@ -9,6 +9,7 @@ export interface ThreatLogsState {
         url: string;
         protocol: string;
         status: string;
+        userAgent: string;
     };
     pagination: {
         page: number;
@@ -27,7 +28,8 @@ const DEFAULT_STATE: ThreatLogsState = {
         ip: '',
         url: '',
         protocol: 'http',
-        status: 'active'
+        status: 'active',
+        userAgent: ''
     },
     pagination: {
         page: 1,

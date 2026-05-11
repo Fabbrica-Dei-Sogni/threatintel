@@ -76,6 +76,14 @@
               </button>
             </div>
           </div>
+
+          <div class="filter-group">
+            <label class="cyber-label">USER AGENT</label>
+            <div class="input-wrapper">
+              <input type="text" v-model="campaignsStore.state.filters.userAgent" :placeholder="t('campaigns.filterByUA')" class="input-cyber" />
+              <button v-if="campaignsStore.state.filters.userAgent" @click="campaignsStore.state.filters.userAgent = ''" class="clear-btn">×</button>
+            </div>
+          </div>
         </div>
 
         <div class="filter-row dynamic-filters" v-if="campaignsStore.state.metadata.maxIpCount > 0 || campaignsStore.state.metadata.maxScore > 0">
@@ -241,7 +249,8 @@ const props = defineProps({
   initAgoValue: Number,
   initAgoUnit: String,
   initialUris: String, // Comma separated string from query
-  initialMinCorrelations: Number
+  initialMinCorrelations: Number,
+  initialUserAgent: String
 });
 
 const { t } = useI18n();
@@ -262,6 +271,7 @@ onMounted(() => {
   if (props.initialUris) campaignsStore.state.filters.selectedUris = props.initialUris.split(',');
   if (props.initialMinCorrelations !== undefined) campaignsStore.state.filters.minCorrelations = props.initialMinCorrelations;
   if (props.status !== undefined) campaignsStore.state.filters.status = props.status;
+  if (props.initialUserAgent !== undefined) campaignsStore.state.filters.userAgent = props.initialUserAgent;
 });
 
 watch(
@@ -276,9 +286,10 @@ watch(
     () => campaignsStore.state.filters.agoValue,
     () => campaignsStore.state.filters.agoUnit,
     () => campaignsStore.state.filters.selectedUris,
-    () => campaignsStore.state.filters.minCorrelations
+    () => campaignsStore.state.filters.minCorrelations,
+    () => campaignsStore.state.filters.userAgent
   ],
-  ([page, minIps, minScore, minLogsPerIp, protocol, status, timeMode, agoValue, agoUnit, uris, minCorrelations]) => {
+  ([page, minIps, minScore, minLogsPerIp, protocol, status, timeMode, agoValue, agoUnit, uris, minCorrelations, userAgent]) => {
     const query = {};
     if (page > 1) query.page = page;
     if (minIps > 1) query.minIps = minIps;
@@ -291,6 +302,7 @@ watch(
     if (agoUnit && agoUnit !== 'days') query.agoUnit = agoUnit;
     if (uris && uris.length > 0) query.uris = uris.join(',');
     if (minCorrelations > 0) query.minCorrelations = minCorrelations;
+    if (userAgent) query.userAgent = userAgent;
 
     router.replace({ name: 'Campaigns', query }).catch(() => {});
   },
@@ -329,6 +341,7 @@ const {
   toRef(campaignsStore.state.filters, 'endDate'),
   toRef(campaignsStore.state.filters, 'selectedUris'),
   toRef(campaignsStore.state.filters, 'search'),
+  toRef(campaignsStore.state.filters, 'userAgent'),
   toRef(campaignsStore.state.filters, 'minCorrelations'),
   toRef(campaignsStore.state.filters, 'status')
 );

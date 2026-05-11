@@ -280,7 +280,8 @@ export class RagSyncService {
                     request: {
                         method: log.request?.method,
                         url: log.request?.url,
-                        ip: log.request?.ip
+                        ip: log.request?.ip,
+                        userAgent: log.request?.userAgent
                     }
                 };
 
@@ -398,6 +399,7 @@ export class RagSyncService {
                 minScore: RAG_POLICIES.CAMPAIGNS.minScore,
                 minLogsPerIp: RAG_POLICIES.CAMPAIGNS.minLogsPerIp,
                 protocol: campaign.protocols?.length === 1 ? campaign.protocols[0] : null,
+                userAgent: campaign.fingerprintAnalysis?.userAgents?.[0],
                 timeConfig: {
                     timeMode: 'range',
                     startTime,
@@ -466,6 +468,7 @@ export class RagSyncService {
                 type: 'attack',
                 ip: ip,
                 minLogsForAttack: RAG_POLICIES.ATTACKS.minLogs,
+                userAgent: attack.fingerprintAnalysis?.userAgents?.[0] || attack.request?.userAgent,
                 timeConfig: {
                     timeMode: (startTime && endTime) ? 'range' : 'ago',
                     startTime,
@@ -504,6 +507,7 @@ export class RagSyncService {
                 ipCount: campaign.ipCount,
                 topIps: campaign.topIps || [],
                 protocols: campaign.protocols || [],
+                userAgents: campaign.fingerprintAnalysis?.userAgents || [],
                 text: aiSummary,
                 materializedAt: new Date(),
                 status: campaign.status,
@@ -516,6 +520,7 @@ export class RagSyncService {
                         minScore: RAG_POLICIES.CAMPAIGNS.minScore,
                         minLogsPerIp: RAG_POLICIES.CAMPAIGNS.minLogsPerIp,
                         protocol: campaign.protocols?.length === 1 ? campaign.protocols[0] : null,
+                        userAgent: campaign.fingerprintAnalysis?.userAgents?.[0],
                         timeConfig: {
                             timeMode: (campaign.firstSeen && campaign.lastSeen) ? 'range' : 'ago',
                             startTime: (campaign.firstSeen && !isNaN(new Date(campaign.firstSeen).getTime()))
@@ -570,6 +575,7 @@ export class RagSyncService {
                         type: 'attack',
                         ip: ip as string,
                         minLogsForAttack: RAG_POLICIES.ATTACKS.minLogs,
+                        userAgent: attack.fingerprintAnalysis?.userAgents?.[0] || attack.request?.userAgent,
                         timeConfig: {
                             timeMode: (attack.firstSeen && attack.lastSeen) ? 'range' : 'ago',
                             startTime: (attack.firstSeen && !isNaN(new Date(attack.firstSeen).getTime()))

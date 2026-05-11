@@ -252,6 +252,7 @@ export class AssistantService {
             filters: {
                 'request.ip': args.ip,
                 'request.url': args.url,
+                'request.userAgent': args.userAgent,
                 protocol: args.protocol,
                 status: args.status
             }
@@ -304,6 +305,7 @@ export class AssistantService {
             } : {},
             filters: {
                 'request.ip': args.ip,
+                'request.userAgent': args.userAgent,
                 country: args.country,
                 protocol: args.protocol,
                 dangerScore: args.dangerScore,
@@ -339,7 +341,8 @@ export class AssistantService {
                         params: {
                             type: 'attack',
                             ip: attackIp,
-                            minLogsForAttack: args.minLogs || 10
+                            minLogsForAttack: args.minLogs || 10,
+                            userAgent: args.userAgent || attack.fingerprintAnalysis?.userAgents?.[0] || attack.request?.userAgent
                         } as any,
                     },
                 };
@@ -363,6 +366,7 @@ export class AssistantService {
                 endTime: args.dateTo,
                 timeMode: 'range'
             } : {},
+            userAgent: args.userAgent,
             status: args.status
         };
 
@@ -390,7 +394,8 @@ export class AssistantService {
                         type: 'campaign',
                         hash: campaign.hash,
                         minLogsPerIp: args.minLogsPerIp || 1,
-                        minScore: args.minScore || 0
+                        minScore: args.minScore || 0,
+                        userAgent: args.userAgent || campaign.fingerprintAnalysis?.userAgents?.[0]
                     } as any,
                 },
             })),

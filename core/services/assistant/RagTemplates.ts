@@ -3,7 +3,7 @@
  */
 export const RAG_TEMPLATES = {
     NARRATIVES: {
-        THREAT_LOG_BASE: "In data {timestamp}, è stata registrata un'attività di minaccia dall'indirizzo IP {ip} (Origine: {geoInfo}). L'attacco ha utilizzato il protocollo {protocol} tramite metodo {method} sull'URL {url}. Score evento: {score}/100. Indicatori rilevati: {indicators}. {context}. Il log e' in stato {status}",
+        THREAT_LOG_BASE: "In data {timestamp}, è stata registrata un'attività di minaccia dall'indirizzo IP {ip} (Origine: {geoInfo}). L'attacco ha utilizzato il protocollo {protocol} tramite metodo {method} sull'URL {url}. User-Agent rilevato: {userAgent}. Score evento: {score}/100. Indicatori rilevati: {indicators}. {context}. Il log e' in stato {status}",
         SUSPICIOUS_YES: "L'attività è stata contrassegnata come sospetta dal fingerprinting.",
         JNDI_ALERT: "Attenzione: è stato rilevato un payload JNDI malevolo nel traffico: \"{payload}\".",
         SSH_CONTEXT: "L'attività riguarda tentativi di accesso non autorizzati tramite protocollo SSH, suggerendo attacchi brute-force o tentativi di credential stuffing.",
@@ -11,8 +11,8 @@ export const RAG_TEMPLATES = {
         IP_DETAILS_BASE: "Profilo Intelligence IP {ip}. Localizzazione: {geo}. ISP: {isp}. Reputazione AbuseIPDB: {abuseScore}/100 con {totalReports} segnalazioni totali. Analisi report recenti:\n{reports}",
         TOR_NODE_INFO: "L'indirizzo IP è noto per essere un nodo di uscita TOR, aumentando il rischio di anonimato malevolo.",
 
-        ATTACK_SUMMARY_BASE: "Analisi tecnica dell'attaccante {ip} {geoInfo}. Livello di pericolo {dangerLevel} con intensità {intensity}. Attività rilevata dal {firstSeen} al {lastSeen} (durata: {duration}) per un totale di {totaleLogs} richieste su protocollo {protocol}. Score medio di pericolosità: {averageScore}/100. ISP rilevato: {isp}. Pattern comportamentali: {patterns}. Indicatori tecnici rilevati: {indicators}. Target primario: {sampleUrl}. {context}",
-        CAMPAIGN_SUMMARY_BASE: "Rilevata Campagna di Attacco Distribuita (Hash: {hash}). La campagna coinvolge {ipCount} indirizzi IP unici e presenta {correlations} hub di correlazione temporale. Volume totale di traffico: {totaleLogs} log. Prima apparizione: {firstSeen}, Ultima apparizione: {lastSeen}. Score medio della campagna: {averageScore}/100. Pattern di attacco: {patterns}. Esempio di URL target: {sampleUrl}."
+        ATTACK_SUMMARY_BASE: "Analisi tecnica dell'attaccante {ip} {geoInfo}. Livello di pericolo {dangerLevel} con intensità {intensity}. Attività rilevata dal {firstSeen} al {lastSeen} (durata: {duration}) per un totale di {totaleLogs} richieste su protocollo {protocol}. User-Agent utilizzati: {userAgents}. Score medio di pericolosità: {averageScore}/100. ISP rilevato: {isp}. Pattern comportamentali: {patterns}. Indicatori tecnici rilevati: {indicators}. Target primario: {sampleUrl}. {context}",
+        CAMPAIGN_SUMMARY_BASE: "Rilevata Campagna di Attacco Distribuita (Hash: {hash}). La campagna coinvolge {ipCount} indirizzi IP unici e presenta {correlations} hub di correlazione temporale. Volume totale di traffico: {totaleLogs} log. User-Agent coinvolti: {userAgents}. Prima apparizione: {firstSeen}, Ultima apparizione: {lastSeen}. Score medio della campagna: {averageScore}/100. Pattern di attacco: {patterns}. Esempio di URL target: {sampleUrl}."
     },
     PROMPTS: {
         // Prompt per la generazione di riassunti tramite AI

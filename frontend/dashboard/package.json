@@ -14,7 +14,7 @@
         "test": "vitest",
         "test:coverage": "vitest run --coverage",
         "release": "npm version ${npm_config_versione} -m \"Rilasciata una nuova release frontend v%s\" && git push --follow-tags",
-        "patch": "npm version patch -m \"Rilasciata una nuova patch frontend v%s\" && git push --follow-tags"
+        "patch": "npm version patch -m 'v%s' && git add package.json package-lock.json && (git diff --staged --quiet || git commit -m \"Rilasciata una nuova patch frontend v$(node -p \"require('./package.json').version\")\") && git push --follow-tags"
     },
     "dependencies": {
         "axios": "^1.7.7",

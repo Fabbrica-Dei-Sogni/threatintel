@@ -4,7 +4,8 @@
 # Usato dall'azienda per preparare un pacchetto di distribuzione.
 
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../" && pwd)"
-DEFAULT_SERVICE="threatintel-$(date +%Y%m%d)"
+#DEFAULT_SERVICE="threatintel-$(date +%Y%m%d)"
+DEFAULT_SERVICE="threatintel-release"
 PKG_VERSION=$(grep '"version":' "$PROJECT_ROOT/package.json" | cut -d'"' -f4)
 DEFAULT_VERSION=${PKG_VERSION:-"1.0.0"}
 

@@ -1,6 +1,6 @@
 {
     "name": "honeypot-dashboard",
-    "version": "0.1.19",
+    "version": "1.0.0",
     "publishConfig": {
         "registry": "https://alessandromodica.com/nexus/repository/npm-cloud-pubblico/"
     },

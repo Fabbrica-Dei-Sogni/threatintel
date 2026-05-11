@@ -76,6 +76,13 @@ onMounted(() => {
     (window as any).isPwaInstalled = true;
   }
 
+  // Verifica se l'evento è già stato catturato da index.html
+  if ((window as any).deferredPwaPrompt) {
+    console.debug('[PWA] Recupero prompt salvato da index.html');
+    window.dispatchEvent(new CustomEvent('pwa-prompt-available'));
+  }
+
+  // Listener per nuovi eventi (nel caso scattino dopo il mount)
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     (window as any).deferredPwaPrompt = e;

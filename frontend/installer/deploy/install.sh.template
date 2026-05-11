@@ -27,6 +27,7 @@ DEFAULT_TITLE="Threat Intel Dashboard"
 DEFAULT_BASE_PATH="/"
 DEFAULT_PORT="8180"
 DEFAULT_HP_NAME="Heartquarter"
+DEFAULT_DOMAIN="localhost"
 DEFAULT_REGISTRY="https://alessandromodica.com/nexus/repository/npm-all/"
 
 DEFAULT_CHAINPROMPT_API_URL="http://localhost:5000/api"
@@ -39,10 +40,17 @@ APP_BASE_PATH=${APP_BASE_PATH:-$DEFAULT_BASE_PATH}
 [[ $APP_BASE_PATH != /* ]] && APP_BASE_PATH="/$APP_BASE_PATH"
 [[ $APP_BASE_PATH != */ ]] && APP_BASE_PATH="$APP_BASE_PATH/"
 
-# Calcolo anteprima URL per aiutare l'utente
-PREVIEW_URL="https://your-domain.com${APP_BASE_PATH}api"
-read -p "🔗 API URL (Anteprima: $PREVIEW_URL) [Rilevamento automatico]: " API_URL
-API_URL=${API_URL:-""}
+read -p "🌐 Dominio Applicazione [$DEFAULT_DOMAIN]: " APP_DOMAIN
+APP_DOMAIN=${APP_DOMAIN:-$DEFAULT_DOMAIN}
+
+# Calcolo anteprima URL reale
+CLEAN_BASE=$APP_BASE_PATH
+# Assicuriamoci che finisca con / per il calcolo
+[[ $CLEAN_BASE != */ ]] && CLEAN_BASE="$CLEAN_BASE/"
+
+PREVIEW_URL="https://$APP_DOMAIN${CLEAN_BASE}api"
+read -p "🔗 API URL (Default: $PREVIEW_URL): " API_URL
+API_URL=${API_URL:-$PREVIEW_URL}
 
 CHAINPROMPT_API_URL=$DEFAULT_CHAINPROMPT_API_URL
 
@@ -80,6 +88,7 @@ VERSION=$(cat VERSION 2>/dev/null || echo "0.1.10")
 SERVICE_NAME="[[SERVICE_NAME]]" # Pre-configurato al momento della release
 
 cat > ".env" <<EOF
+VITE_APP_DOMAIN=$APP_DOMAIN
 VITE_APP_TITLE=$APP_TITLE
 VITE_APP_VERSION=$VERSION
 VITE_WELCOME_PATH=/welcome

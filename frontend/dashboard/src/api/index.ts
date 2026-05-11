@@ -10,7 +10,7 @@ import type {
 import { useProfileStore } from '../stores/profiles';
 import { useAuthStore } from '../stores/auth';
 import { storage, StorageNamespace } from '../utils/storage';
-import { getEnv } from '../config';
+import { getEnv, getContextApiUrl } from '../config';
 
 // Funzione helper per ottenere l'URL, con fallback sulla gestione dei profili
 export const getApiUrl = (): string => {
@@ -23,9 +23,13 @@ export const getApiUrl = (): string => {
     } catch (e) {
         // Silenziamo l'errore se Pinia non è ancora pronto
     }
+    
     // Fallback prioritario al localStorage (via HP_API namespace se migrato) o ENV
     const savedApi = storage.get<string>(StorageNamespace.API);
-    return savedApi || getEnv('VITE_APP_API_URL') || `${import.meta.env.BASE_URL}api`.replace(/\/+$/, '');
+    if (savedApi) return savedApi;
+
+    // Usiamo la logica context-aware definita in config.ts
+    return getContextApiUrl();
 };
 
 export const apiClient = axios.create({

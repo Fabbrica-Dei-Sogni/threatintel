@@ -93,8 +93,10 @@ export class FakeLoginController {
     }
 }
 
+import { ConfigDefaults } from '../utils/ConfigUtils';
+
 // Applicazione dinamica dei decoratori per i COMMON_ENDPOINTS
-const commonEndpoints = (process.env.COMMON_ENDPOINTS || '')
+const commonEndpoints = (process.env.COMMON_ENDPOINTS || ConfigDefaults.COMMON_ENDPOINTS)
     .split(',')
     .map(e => e.trim())
     .filter(Boolean);

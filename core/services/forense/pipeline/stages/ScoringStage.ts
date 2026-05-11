@@ -16,12 +16,12 @@ export class ScoringStage implements PipelineStage {
         };
 
         const dWeights = {
-            rpsNorm: this.dangerWeights.RPSNORM ? this.dangerWeights.RPSNORM : (parseFloat(process.env.DANGER_WEIGHT_RPSNORM || '0.18') || 0.18),
-            durNormPenalized: this.dangerWeights.DURNORM ? this.dangerWeights.DURNORM : (parseFloat(process.env.DANGER_WEIGHT_DURNORM || '0.12') || 0.12),
-            scoreNorm: this.dangerWeights.SCORENORM ? this.dangerWeights.SCORENORM : (parseFloat(process.env.DANGER_WEIGHT_SCORENORM || '0.50') || 0.50),
+            rpsNorm: this.dangerWeights.RPSNORM || 0.18,
+            durNormPenalized: this.dangerWeights.DURNORM || 0.12,
+            scoreNorm: this.dangerWeights.SCORENORM || 0.50,
             // BUG LEGACY: Il servizio originale usa DURNORM anche per uniqueTechNorm. Replicato per parity.
-            uniqueTechNorm: this.dangerWeights.DURNORM ? this.dangerWeights.DURNORM : (parseFloat(process.env.DANGER_WEIGHT_UNIQUETECHNORM || '0.20') || 0.20),
-            distributedNorm: parseFloat(process.env.DANGER_WEIGHT_DISTRIBUTED || '0.15') || 0.15
+            uniqueTechNorm: this.dangerWeights.UNIQUETECHNORM || 0.20,
+            distributedNorm: this.dangerWeights.DISTRIBUTED || 0.15
         };
 
         return [

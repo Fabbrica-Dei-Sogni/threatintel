@@ -10,11 +10,13 @@ import * as Tokens from '../../di/tokens';
 import { setupContainer } from '../../di/registry';
 import { getComponent, container } from '../../di/container';
 
+import { ConfigDefaults } from '../../utils/ConfigUtils';
+
 describe('ConfigService (DI)', () => {
     let configService: ConfigService;
 
     beforeAll(async () => {
-        const uri = (process.env.MONGO_URI_TEST || 'mongodb://127.0.0.1:27017/test') + '-config-service';
+        const uri = (process.env.MONGO_URI_TEST || ConfigDefaults.MONGO_URI_TEST) + '-config-service';
         if (mongoose.connection.readyState === 0) {
             await mongoose.connect(uri);
         }

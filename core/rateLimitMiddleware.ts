@@ -1,21 +1,20 @@
 import rateLimit, { ipKeyGenerator } from 'express-rate-limit';
 import RedisStoreImport from 'rate-limit-redis';
 const RedisStore: any = (RedisStoreImport as any).default || RedisStoreImport;
-import dotenv from 'dotenv';
 import { RateLimitService } from './services/RateLimitService';
 import { RedisService } from './services/RedisService';
+import { AppConfigProvider } from './services/AppConfigProvider';
 import { inject, singleton } from 'tsyringe';
 import { getComponent } from './di/container';
-import { LOGGER_TOKEN, REDIS_SERVICE_TOKEN } from './di/tokens';
+import { LOGGER_TOKEN, REDIS_SERVICE_TOKEN, CONFIG_PROVIDER_TOKEN } from './di/tokens';
 import { Logger } from 'winston';
-
-dotenv.config();
 
 @singleton()
 export class RateLimitMiddleware {
     constructor(
         @inject(LOGGER_TOKEN) private readonly logger: Logger,
         @inject(REDIS_SERVICE_TOKEN) private readonly redisService: RedisService,
+        @inject(CONFIG_PROVIDER_TOKEN) private readonly config: AppConfigProvider,
         private readonly rateLimitService: RateLimitService
     ) { }
 
@@ -51,7 +50,7 @@ export class RateLimitMiddleware {
     public async manualBlacklistIP(ip: string) {
         const client = this.getRedisClient();
 
-        const blacklistDuration = parseInt(process.env.BLACKLIST_DURATION || '7200', 10);
+        const blacklistDuration = this.config.blacklistDuration;
 
         // Aggiunta ip in blacklist redis
         await client.sadd('blacklisted-ips', ip);
@@ -65,7 +64,7 @@ export class RateLimitMiddleware {
             method: 'POST',
             timestamp: new Date().toISOString(),
             message: `IP manualmente inserito in blacklist per ${blacklistDuration} secondi`,
-            honeypotId: process.env.HONEYPOT_INSTANCE_ID
+            honeypotId: this.config.honeypotInstanceId
         };
 
         await this.rateLimitService.logEvent(eventData);
@@ -100,7 +99,7 @@ export class RateLimitMiddleware {
 
             const eventData = {
                 ...logData,
-                honeypotId: process.env.HONEYPOT_INSTANCE_ID,
+                honeypotId: this.config.honeypotInstanceId,
                 message: res.statusMessage || 'Rate limit event'
             };
 
@@ -109,7 +108,7 @@ export class RateLimitMiddleware {
             });
 
             // Log dell'evento prima di bloccare
-            if (process.env.LOG_RATE_LIMIT_EVENTS === 'true') {
+            if (this.config.logRateLimitEvents) {
                 this.logger.warn(`[RATE-LIMIT-${limitType.toUpperCase()}] ${req.ip} blocked on ${req.path}`, logData);
             }
 
@@ -120,7 +119,7 @@ export class RateLimitMiddleware {
                 message: 'Troppo veloce, amico! Rallenta un po\'...',
                 retryAfter: res.getHeader && res.getHeader('Retry-After'),
                 timestamp: new Date().toISOString(),
-                honeypotId: process.env.HONEYPOT_INSTANCE_ID
+                honeypotId: this.config.honeypotInstanceId
             });
         };
     }
@@ -128,7 +127,7 @@ export class RateLimitMiddleware {
     // Helper per verificare se un IP è escluso (whitelist)
     private isExcluded(req: any): boolean {
         // Logica specifica richiesta dall'utente: skip se naviga alla location della dashboard configurata
-        const dashboardPath = (process.env.APP_BASE_PATH || '/honeypot').toLowerCase();
+        const dashboardPath = this.config.appBasePath.toLowerCase();
         const pathStr = (req.originalUrl || req.path || '').toLowerCase();
 
         // Se la dashboard è in root (/), whitelisti solo la home. 
@@ -142,7 +141,7 @@ export class RateLimitMiddleware {
             return true;
         }
 
-        const excludedIPs = (process.env.EXCLUDED_IPS || '').split(',').map((ip) => ip.trim()).filter(Boolean);
+        const excludedIPs = this.config.excludedIps;
         const clientIp = req.ip || 'unknown';
 
         if (excludedIPs.includes(clientIp)) {
@@ -190,8 +189,8 @@ export class RateLimitMiddleware {
     public ddosProtectionLimiter() {
         return rateLimit({
             store: this.getStore(),
-            windowMs: parseInt(process.env.DDOS_WINDOW_MS || '60000', 10),
-            max: parseInt(process.env.DDOS_MAX_REQUESTS || '100', 10),
+            windowMs: this.config.ddosWindowMs,
+            max: this.config.ddosMaxRequests,
             message: 'DDoS protection activated',
             standardHeaders: true,
             legacyHeaders: false,
@@ -206,8 +205,8 @@ export class RateLimitMiddleware {
     public criticalEndpointsLimiter() {
         return rateLimit({
             store: this.getStore(),
-            windowMs: parseInt(process.env.CRITICAL_WINDOW_MS || '900000', 10), // 15 minuti
-            max: parseInt(process.env.CRITICAL_MAX_REQUESTS || '20', 10),
+            windowMs: this.config.criticalWindowMs,
+            max: this.config.criticalMaxRequests,
             message: 'Critical endpoint rate limit exceeded',
             standardHeaders: true,
             legacyHeaders: false,
@@ -223,8 +222,8 @@ export class RateLimitMiddleware {
     public trapEndpointsLimiter() {
         return rateLimit({
             store: this.getStore(),
-            windowMs: parseInt(process.env.TRAP_WINDOW_MS || '300000', 10), // 5 minuti
-            max: parseInt(process.env.TRAP_MAX_REQUESTS || '50', 10),
+            windowMs: this.config.trapWindowMs,
+            max: this.config.trapMaxRequests,
             message: 'Trap endpoint rate limit exceeded',
             standardHeaders: true,
             legacyHeaders: false,
@@ -239,8 +238,8 @@ export class RateLimitMiddleware {
     public applicationLimiter() {
         return rateLimit({
             store: this.getStore(),
-            windowMs: parseInt(process.env.APP_WINDOW_MS || '60000', 10), // 1 minuto
-            max: parseInt(process.env.APP_MAX_REQUESTS || '200', 10),
+            windowMs: this.config.appWindowMs,
+            max: this.config.appMaxRequests,
             message: 'Application rate limit exceeded',
             standardHeaders: true,
             legacyHeaders: false,
@@ -257,7 +256,7 @@ export class RateLimitMiddleware {
             const ip = req.ip;
 
             // 1. PRIORITÀ ASSOLUTA: Bypass per navigazione protetta (Dashboard e API)
-            const dashboardPath = (process.env.APP_BASE_PATH || '/honeypot').toLowerCase();
+            const dashboardPath = this.config.appBasePath.toLowerCase();
             const pathStr = (req.originalUrl || req.path || req.url || '').toLowerCase();
 
             const isDashboardRequest = dashboardPath === '/' 
@@ -291,7 +290,7 @@ export class RateLimitMiddleware {
                             error: 'IP temporarily blacklisted',
                             reason: 'Repeated rate limit violations',
                             unblockIn: blacklistTTL > 0 ? `${blacklistTTL} seconds` : 'soon',
-                            honeypotId: process.env.HONEYPOT_INSTANCE_ID,
+                            honeypotId: this.config.honeypotInstanceId,
                             debugPath: pathStr // Ti aggiungo questo per capire cosa vede il server
                         });
                     }
@@ -324,10 +323,10 @@ export class RateLimitMiddleware {
                                     await client.expire(violationKey, 3600); // 1 ora window
                                 }
 
-                                const maxViolations = parseInt(process.env.MAX_VIOLATIONS || '5', 10);
+                                const maxViolations = self.config.maxViolations;
                                 if (violations >= maxViolations) {
                                     // Blacklist temporanea
-                                    const blacklistDuration = parseInt(process.env.BLACKLIST_DURATION || '7200', 10);
+                                    const blacklistDuration = self.config.blacklistDuration;
                                     await client.sadd('blacklisted-ips', ip);
                                     await client.setex(`blacklist:${ip}`, blacklistDuration, 'auto-blacklisted');
 

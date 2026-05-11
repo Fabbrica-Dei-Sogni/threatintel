@@ -4,6 +4,7 @@
 
 import 'reflect-metadata';
 import mongoose from 'mongoose';
+import { ConfigDefaults } from '../../utils/ConfigUtils';
 import { IpDetailsService } from '../IpDetailsService';
 import IpDetails from '../../models/IpDetailsSchema';
 import AbuseIpDb from '../../models/AbuseIpDbSchema';
@@ -35,7 +36,7 @@ describe('IpDetailsService (DI)', () => {
     let mockEventBus: any;
 
     beforeAll(async () => {
-        const uri = process.env.MONGO_URI_TEST || 'mongodb://127.0.0.1:27017/test';
+        const uri = process.env.MONGO_URI_TEST || ConfigDefaults.MONGO_URI_TEST;
         if (mongoose.connection.readyState === 0) {
             await mongoose.connect(uri);
         }

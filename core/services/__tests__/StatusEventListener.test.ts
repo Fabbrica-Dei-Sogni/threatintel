@@ -8,13 +8,15 @@ import ThreatLog from '../../models/ThreatLogSchema';
 import { LOGGER_TOKEN, EVENT_BUS_TOKEN, STATUS_EVENT_LISTENER_TOKEN } from '../../di/tokens';
 import { Logger } from 'winston';
 
+import { ConfigDefaults } from '../../utils/ConfigUtils';
+
 describe('StatusEventListener', () => {
     let listener: StatusEventListener;
     let eventBus: EventBus;
     let logger: jest.Mocked<Logger>;
 
     beforeAll(async () => {
-        const uri = process.env.MONGO_URI_TEST || 'mongodb://127.0.0.1:27017/threatintel_test';
+        const uri = process.env.MONGO_URI_TEST || ConfigDefaults.MONGO_URI_TEST;
         if (mongoose.connection.readyState === 0) {
             await mongoose.connect(uri);
         }

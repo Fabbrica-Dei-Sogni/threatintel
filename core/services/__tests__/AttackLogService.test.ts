@@ -2,6 +2,7 @@ import 'reflect-metadata';
 import { getComponent, container } from '../../di/container';
 import { setupContainer } from '../../di/registry';
 import mongoose from 'mongoose';
+import { ConfigDefaults } from '../../utils/ConfigUtils';
 import { AttackLogService } from '../AttackLogService';
 import ThreatLog from '../../models/ThreatLogSchema';
 
@@ -21,7 +22,7 @@ describe('AttackLogService', () => {
     let mockEventBus: any;
 
     beforeAll(async () => {
-        const uri = process.env.MONGO_URI_TEST || 'mongodb://127.0.0.1:27017/threatintel_test';
+        const uri = process.env.MONGO_URI_TEST || ConfigDefaults.MONGO_URI_TEST;
         if (mongoose.connection.readyState === 0) {
             await mongoose.connect(uri);
         }
@@ -84,7 +85,7 @@ describe('AttackLogService', () => {
             await service.getAttacks(params);
 
             const [firstCall] = mockForensicPipelineService.buildStandardPipeline.mock.calls;
-            expect(firstCall[0]).toMatchObject({ 'request.ip': { $regex: '1.2.3.4', $options: 'i' } });
+            expect(firstCall[0]).toMatchObject({ 'request.ip': { $regex: '1\\.2\\.3\\.4', $options: 'i' } });
             expect(firstCall[1]).toBe(5);
             expect(firstCall[2]).toEqual({});
             

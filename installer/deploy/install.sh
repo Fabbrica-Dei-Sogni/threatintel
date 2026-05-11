@@ -256,6 +256,7 @@ if [ "$RUN_WIZARD" = true ]; then
         
         read -p "🆔 Application ID [$DEFAULT_APP_ID]: " APP_ID
         APP_ID=${APP_ID:-$DEFAULT_APP_ID}
+        echo "   ⚠️  IMPORTANTE: Questo ID deve essere riportato IDENTICO nell'installer del frontend."
 
         read -p "🛡️  AbuseIPDB API Key [YOUR_API_KEY_HERE]: " ABUSEIPDB_KEY
         ABUSEIPDB_KEY=${ABUSEIPDB_KEY:-"YOUR_API_KEY_HERE"}
@@ -285,6 +286,24 @@ if [ "$RUN_WIZARD" = true ]; then
 
         read -p "🔡 Embedding Model [$DEFAULT_EMBEDDING_MODEL]: " EMBEDDING_MODEL
         EMBEDDING_MODEL=${EMBEDDING_MODEL:-$DEFAULT_EMBEDDING_MODEL}
+        echo ""
+
+        echo "🖥️  INTEGRAZIONE DASHBOARD (Frontend)"
+        read -p "🖥️  Userai la dashboard su questo stesso host? (y/n) [n]: " DASHBOARD_SAME_HOST
+        if [[ "$DASHBOARD_SAME_HOST" =~ ^[Yy]$ ]]; then
+            while true; do
+                read -p "🌐 Porta locale della dashboard [8180]: " PORT_FRONTEND
+                PORT_FRONTEND=${PORT_FRONTEND:-8180}
+                if check_port "$PORT_FRONTEND"; then
+                    echo "   ⚠️  IMPORTANTE: Ricordati di usare la porta $PORT_FRONTEND nell'installer del frontend!"
+                    break
+                else
+                    echo "⚠️  Porta $PORT_FRONTEND già in uso! Scegline un'altra."
+                fi
+            done
+        else
+            PORT_FRONTEND=""
+        fi
 
         echo ""
         echo "🧐 RIEPILOGO CONFIGURAZIONE:"
@@ -299,6 +318,11 @@ if [ "$RUN_WIZARD" = true ]; then
         echo "  Honeypot Port: $TELNET_P"
         echo "  AI URL:        $OLLAMA_URL"
         echo "  AI Models:     $SUMMARY_MODEL / $EMBEDDING_MODEL"
+        if [ -n "$PORT_FRONTEND" ]; then
+            echo "  Dashboard:     Configurata su porta $PORT_FRONTEND"
+        else
+            echo "  Dashboard:     Non configurata su questo host"
+        fi
         echo "  Passwords:     Configurate (Redis & MongoDB)"
         echo "------------------------------------------------------------"
         
@@ -420,6 +444,11 @@ if [ "$RUN_WIZARD" = true ]; then
                 -e "s|{{API_BASE_PATH}}|$API_REL_PATH|g" \
                 -e "s|{{APP_BASE_PATH}}|$CLEAN_BASE_PATH|g" \
                 "$LOC_TMP" > "proxy/${SERVICE_NAME}_locations.conf"
+            
+            # Se la porta frontend è definita, scommentiamo la riga e iniettiamo la porta
+            if [ -n "$PORT_FRONTEND" ]; then
+                sed -i "s|#proxy_pass http://localhost:{{PORT_FRONTEND}}/;|proxy_pass http://localhost:$PORT_FRONTEND/;|g" "proxy/${SERVICE_NAME}_locations.conf"
+            fi
         fi
 
         # Generazione Globali (Logging JSON)
@@ -476,6 +505,19 @@ if [ -f "$INFRA_COMPOSE" ]; then
         chmod 700 "$STORAGE_ROOT" "$STORAGE_ROOT"/* 2>/dev/null
         echo "🔒 Permessi cartelle storage impostati a 700 (User Isolation)."
         
+        # Iniezione password nei file di inizializzazione (Step critico per allineamento credenziali)
+        if [ -f "mongo-init/init.js" ]; then
+            echo "⚙️  Allineamento credenziali MongoDB (init.js)..."
+            sed -i "s|\[\[MONGO_ROOT_PWD\]\]|$MONGO_ROOT_PWD|g" "mongo-init/init.js"
+            sed -i "s|\[\[MONGO_APP_PWD\]\]|$MONGO_APP_PWD|g" "mongo-init/init.js"
+        fi
+        
+        if [ -f "cowrie/etc/cowrie.cfg" ]; then
+            echo "⚙️  Allineamento credenziali e hostname Cowrie (cowrie.cfg)..."
+            sed -i "s|\[\[MONGO_APP_PWD\]\]|$MONGO_APP_PWD|g" "cowrie/etc/cowrie.cfg"
+            sed -i "s|\[\[SERVICE_NAME\]\]|$SERVICE_NAME|g" "cowrie/etc/cowrie.cfg"
+        fi
+
         echo "🚀 Starting Docker containers..."
         docker compose up -d
         if [ $? -ne 0 ]; then echo "❌ Failed to start Docker containers."; exit 1; fi

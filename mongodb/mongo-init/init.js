@@ -1,13 +1,13 @@
 db = db.getSiblingDB("admin");
 // move to the admin db - always created in Mongo
-db.auth("admin", "cambiapwd");
+db.auth("admin", "[[MONGO_ROOT_PWD]]");
 // log as root admin if you decided to authenticate in your docker-compose file...
 
 // create and move to your new database
 db = db.getSiblingDB("threatinteldb");
 db.createUser({
   user: "intelagent",
-  pwd: "intelagent",
+  pwd: "[[MONGO_APP_PWD]]",
   roles: [
     {
       role: "dbOwner",

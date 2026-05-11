@@ -12,7 +12,8 @@ WORKING_DIR=$(pwd)
 # --- Helper Functions ---
 check_port() {
     local port=$1
-    if ss -tulpn | grep -q ":$port " ; then
+    # Prova sia con ss che con un tentativo di connessione diretta
+    if ss -tulpn | grep -q ":$port " 2>/dev/null || (echo > /dev/tcp/127.0.0.1/$port) >/dev/null 2>&1; then
         return 1 # Occupata
     else
         return 0 # Libera
@@ -54,10 +55,31 @@ API_URL=${API_URL:-$PREVIEW_URL}
 
 CHAINPROMPT_API_URL=$DEFAULT_CHAINPROMPT_API_URL
 
+# Calcolo APP_ID dinamico basato sul dominio appena inserito
+CLEAN_DOMAIN=$(echo "$APP_DOMAIN" | sed -e 's|https://||g' -e 's|http://||g' -e 's|/.*||g')
+[ -z "$CLEAN_DOMAIN" ] && CLEAN_DOMAIN="localhost"
+
+read -p "🆔 Hai usato l'APP_ID auto-generato durante l'installazione del backend? (y/n) [y]: " IS_AUTO_ID
+if [[ ! "$IS_AUTO_ID" =~ ^[Nn]$ ]]; then
+    read -p "   📛 Inserisci il 'Nome Servizio' scelto per il backend: " B_SERVICE
+    DEFAULT_APP_ID="com.$CLEAN_DOMAIN.${B_SERVICE:-backend}"
+else
+    DEFAULT_APP_ID="com.$CLEAN_DOMAIN.threatintel-frontend"
+fi
+
+read -p "🆔 Application ID [$DEFAULT_APP_ID]: " APP_ID
+APP_ID=${APP_ID:-$DEFAULT_APP_ID}
+echo "   ℹ️  Deve essere IDENTICO all'APP_ID scelto nel backend."
+
 while true; do
     read -p "🌐 Porta locale del servizio [$DEFAULT_PORT]: " DEPLOY_PORT
     DEPLOY_PORT=${DEPLOY_PORT:-$DEFAULT_PORT}
-    if check_port "$DEPLOY_PORT"; then break; else echo "⚠️  Porta $DEPLOY_PORT già in uso! Scegline un'altra."; fi
+    if check_port "$DEPLOY_PORT"; then 
+        echo "   ℹ️  Assicurati che corrisponda alla porta indicata nell'installazione del backend (se presente)."
+        break
+    else 
+        echo "⚠️  Porta $DEPLOY_PORT già in uso! Scegline un'altra."
+    fi
 done
 
 read -p "📦 Nexus Registry URI [$DEFAULT_REGISTRY]: " NPM_REGISTRY_URI
@@ -71,14 +93,6 @@ HP_LAT=${HP_LAT:-"48.8566"}
 
 read -p "📍 Longitudine [2.3522]: " HP_LON
 HP_LON=${HP_LON:-"2.3522"}
-
-# Calcolo APP_ID dinamico per l'installer
-CLEAN_DOMAIN=$(echo "$API_URL" | sed -e 's|https://||g' -e 's|http://||g' -e 's|/.*||g')
-[ -z "$CLEAN_DOMAIN" ] && CLEAN_DOMAIN="localhost"
-DEFAULT_APP_ID="com.$CLEAN_DOMAIN.threatintel-frontend"
-
-read -p "🆔 Application ID [Indica quello definito sul service backend]: " APP_ID
-APP_ID=${APP_ID:-$DEFAULT_APP_ID}
 
 echo "------------------------------------------------------------"
 

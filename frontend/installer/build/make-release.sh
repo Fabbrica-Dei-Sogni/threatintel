@@ -38,7 +38,7 @@ echo "$VERSION" > "$BUILD_DIR/VERSION"
 
 # 4. Copia Script di Installazione e Template
 echo "🛠️  Preparazione script di installazione..."
-sed "s|{{SERVICE_NAME}}|$SERVICE_NAME|g" "$DEPLOY_TEMPLATES/install.sh.template" > "$BUILD_DIR/install.sh"
+sed "s|\[\[SERVICE_NAME\]\]|$SERVICE_NAME|g" "$DEPLOY_TEMPLATES/install.sh.template" > "$BUILD_DIR/install.sh"
 cp "$DEPLOY_TEMPLATES/uninstall.sh.template" "$BUILD_DIR/uninstall.sh"
 cp "$DEPLOY_TEMPLATES/docker-compose.yml.template" "$BUILD_DIR/"
 cp "$DASHBOARD_SRC/entrypoint.sh" "$BUILD_DIR/"

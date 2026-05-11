@@ -8,7 +8,8 @@ INSTALLER_DIR="$PROJECT_ROOT/installer"
 BUILD_TMP="$PROJECT_ROOT/.build_tmp"
 
 # Parametri base
-VERSION=${1:-"1.0.0"}
+PACKAGE_VERSION=$(grep '"version":' "$PROJECT_ROOT/package.json" | head -n 1 | cut -d'"' -f4)
+VERSION=${1:-$PACKAGE_VERSION}
 SERVICE_NAME=${2:-"threatintel-release"}
 DEPLOY_PATH="$PROJECT_ROOT/deployments/$SERVICE_NAME"
 ARTIFACT_NAME="threatintel-bundle-$SERVICE_NAME-v$VERSION.tar.gz"
@@ -21,6 +22,9 @@ mkdir -p "$DEPLOY_PATH/data" "$DEPLOY_PATH/infra" "$DEPLOY_PATH/proxy" "$DEPLOY_
 mkdir -p "$BUILD_TMP"
 
 # 2. Compilazione
+echo "📚 Generating Swagger spec..."
+npm run swagger:gen
+
 echo "🏗️  Bundling code with ncc..."
 npx -y @vercel/ncc build "$PROJECT_ROOT/server.ts" -o "$BUILD_TMP"
 if [ $? -ne 0 ]; then
@@ -31,9 +35,15 @@ fi
 cp "$BUILD_TMP/index.js" "$DEPLOY_PATH/"
 echo "$VERSION" > "$DEPLOY_PATH/VERSION"
 
-# 3. Copia Asset statici (GeoIP)
+# 3. Copia Asset statici (GeoIP & Swagger)
 echo "🌍 Adding GeoIP data..."
 cp "$PROJECT_ROOT"/node_modules/geoip-lite/data/*.dat "$DEPLOY_PATH/data/" 2>/dev/null
+
+echo "📚 Adding Swagger UI assets for ncc bundle..."
+mkdir -p "$DEPLOY_PATH/public/swagger"
+cp -r "$PROJECT_ROOT/node_modules/swagger-ui-dist/"* "$DEPLOY_PATH/public/swagger/"
+# Copia il file spec appena generato
+cp "$PROJECT_ROOT/public/swagger/swagger-spec.json" "$DEPLOY_PATH/public/swagger/"
 
 # 4. Copia Script e Template (Agnostici)
 echo "📦 Adding templates and installer..."

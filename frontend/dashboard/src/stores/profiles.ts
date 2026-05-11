@@ -13,7 +13,7 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import type { HoneypotProfile } from '../models/HoneypotProfile';
-import { getEnv } from '../config';
+import { getEnv, getContextApiUrl } from '../config';
 
 export const useProfileStore = defineStore('profiles', () => {
     const profiles = ref<HoneypotProfile[]>(JSON.parse(localStorage.getItem('hp_profiles') || '[]'));
@@ -23,7 +23,7 @@ export const useProfileStore = defineStore('profiles', () => {
     const defaultProfile: HoneypotProfile = {
         id: 'default',
         name: getEnv('VITE_HONEYPOT_NAME') || 'Default Honeypot',
-        apiUrl: localStorage.getItem('api_url') || getEnv('VITE_APP_API_URL') || `${window.location.origin}${import.meta.env.BASE_URL}api`.replace(/\/+$/, ''),
+        apiUrl: localStorage.getItem('api_url') || getContextApiUrl(),
         lat: Number(getEnv('VITE_HONEYPOT_LOCATION_LAT')) || 48.8566,
         lon: Number(getEnv('VITE_HONEYPOT_LOCATION_LON')) || 2.3522
     };

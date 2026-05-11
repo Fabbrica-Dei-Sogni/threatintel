@@ -3,11 +3,22 @@
 # ThreatIntel Frontend - Interactive Installer (Nexus Version)
 # Questo script configura l'ambiente e avvia il Docker scaricando da Nexus.
 
-echo "🚀 Installatore Threat Intelligence Frontend (Nexus)"
+echo "🚀 Installazione Dashboard Threat Intelligence "
 echo "============================================================"
 
 # Directory di lavoro
 WORKING_DIR=$(pwd)
+
+# --- Helper Functions ---
+check_port() {
+    local port=$1
+    # Prova sia con ss che con un tentativo di connessione diretta
+    if ss -tulpn | grep -q ":$port " 2>/dev/null || (echo > /dev/tcp/127.0.0.1/$port) >/dev/null 2>&1; then
+        return 1 # Occupata
+    else
+        return 0 # Libera
+    fi
+}
 
 # 1. Wizard di Configurazione
 echo "📝 Configurazione parametri (premi INVIO per i default):"
@@ -17,6 +28,7 @@ DEFAULT_TITLE="Threat Intel Dashboard"
 DEFAULT_BASE_PATH="/"
 DEFAULT_PORT="8180"
 DEFAULT_HP_NAME="Heartquarter"
+DEFAULT_DOMAIN="localhost"
 DEFAULT_REGISTRY="https://alessandromodica.com/nexus/repository/npm-all/"
 
 DEFAULT_CHAINPROMPT_API_URL="http://localhost:5000/api"
@@ -29,13 +41,46 @@ APP_BASE_PATH=${APP_BASE_PATH:-$DEFAULT_BASE_PATH}
 [[ $APP_BASE_PATH != /* ]] && APP_BASE_PATH="/$APP_BASE_PATH"
 [[ $APP_BASE_PATH != */ ]] && APP_BASE_PATH="$APP_BASE_PATH/"
 
-read -p "🔗 API URL (lascia vuoto per rilevamento automatico) []: " API_URL
-API_URL=${API_URL:-""}
+read -p "🌐 Dominio Applicazione [$DEFAULT_DOMAIN]: " APP_DOMAIN
+APP_DOMAIN=${APP_DOMAIN:-$DEFAULT_DOMAIN}
+
+# Calcolo anteprima URL reale
+CLEAN_BASE=$APP_BASE_PATH
+# Assicuriamoci che finisca con / per il calcolo
+[[ $CLEAN_BASE != */ ]] && CLEAN_BASE="$CLEAN_BASE/"
+
+PREVIEW_URL="https://$APP_DOMAIN${CLEAN_BASE}api"
+read -p "🔗 API URL (Default: $PREVIEW_URL): " API_URL
+API_URL=${API_URL:-$PREVIEW_URL}
 
 CHAINPROMPT_API_URL=$DEFAULT_CHAINPROMPT_API_URL
 
-read -p "🌐 Porta locale del servizio [$DEFAULT_PORT]: " DEPLOY_PORT
-DEPLOY_PORT=${DEPLOY_PORT:-$DEFAULT_PORT}
+# Calcolo APP_ID dinamico basato sul dominio appena inserito
+CLEAN_DOMAIN=$(echo "$APP_DOMAIN" | sed -e 's|https://||g' -e 's|http://||g' -e 's|/.*||g')
+[ -z "$CLEAN_DOMAIN" ] && CLEAN_DOMAIN="localhost"
+
+read -p "🆔 Hai usato l'APP_ID auto-generato durante l'installazione del backend? (y/n) [y]: " IS_AUTO_ID
+if [[ ! "$IS_AUTO_ID" =~ ^[Nn]$ ]]; then
+    read -p "   📛 Inserisci il 'Nome Servizio' scelto per il backend: " B_SERVICE
+    DEFAULT_APP_ID="com.$CLEAN_DOMAIN.${B_SERVICE:-backend}"
+else
+    DEFAULT_APP_ID="com.$CLEAN_DOMAIN.threatintel-frontend"
+fi
+
+read -p "🆔 Application ID [$DEFAULT_APP_ID]: " APP_ID
+APP_ID=${APP_ID:-$DEFAULT_APP_ID}
+echo "   ℹ️  Deve essere IDENTICO all'APP_ID scelto nel backend."
+
+while true; do
+    read -p "🌐 Porta locale del servizio [$DEFAULT_PORT]: " DEPLOY_PORT
+    DEPLOY_PORT=${DEPLOY_PORT:-$DEFAULT_PORT}
+    if check_port "$DEPLOY_PORT"; then 
+        echo "   ℹ️  Assicurati che corrisponda alla porta indicata nell'installazione del backend (se presente)."
+        break
+    else 
+        echo "⚠️  Porta $DEPLOY_PORT già in uso! Scegline un'altra."
+    fi
+done
 
 read -p "📦 Nexus Registry URI [$DEFAULT_REGISTRY]: " NPM_REGISTRY_URI
 NPM_REGISTRY_URI=${NPM_REGISTRY_URI:-$DEFAULT_REGISTRY}
@@ -49,21 +94,15 @@ HP_LAT=${HP_LAT:-"48.8566"}
 read -p "📍 Longitudine [2.3522]: " HP_LON
 HP_LON=${HP_LON:-"2.3522"}
 
-# Calcolo APP_ID dinamico per l'installer
-CLEAN_DOMAIN=$(echo "$API_URL" | sed -e 's|https://||g' -e 's|http://||g' -e 's|/.*||g')
-[ -z "$CLEAN_DOMAIN" ] && CLEAN_DOMAIN="localhost"
-DEFAULT_APP_ID="com.$CLEAN_DOMAIN.threatintel-frontend"
-
-read -p "🆔 Application ID [$DEFAULT_APP_ID]: " APP_ID
-APP_ID=${APP_ID:-$DEFAULT_APP_ID}
-
 echo "------------------------------------------------------------"
 
 # 2. Generazione del file .env (utile per persistenza e Vite locale)
 echo "⚙️  Generazione file .env..."
 VERSION=$(cat VERSION 2>/dev/null || echo "0.1.10")
+SERVICE_NAME="[[SERVICE_NAME]]" # Pre-configurato al momento della release
 
 cat > ".env" <<EOF
+VITE_APP_DOMAIN=$APP_DOMAIN
 VITE_APP_TITLE=$APP_TITLE
 VITE_APP_VERSION=$VERSION
 VITE_WELCOME_PATH=/welcome
@@ -71,10 +110,11 @@ VITE_API_TIMEOUT=30000
 VITE_CHAINPROMPT_API_URL=$CHAINPROMPT_API_URL
 VITE_APP_API_URL=$API_URL
 VITE_APP_BASE_PATH=$APP_BASE_PATH
-APP_ID=$APP_ID
 VITE_HONEYPOT_NAME=$HP_NAME
 VITE_HONEYPOT_LOCATION_LAT=$HP_LAT
 VITE_HONEYPOT_LOCATION_LON=$HP_LON
+APP_ID=$APP_ID
+COMPOSE_PROJECT_NAME=$SERVICE_NAME
 EOF
 
 # 3. Generazione docker-compose.yml dal template
@@ -82,15 +122,8 @@ echo "⚙️  Generazione docker-compose.yml..."
 if [ -f "docker-compose.yml.template" ]; then
     sed -e "s|{{PORT}}|$DEPLOY_PORT|g" \
         -e "s|{{VERSION}}|$VERSION|g" \
+        -e "s|{{SERVICE_NAME}}|$SERVICE_NAME|g" \
         -e "s|{{NPM_REGISTRY_URI}}|$NPM_REGISTRY_URI|g" \
-        -e "s|{{APP_TITLE}}|$APP_TITLE|g" \
-        -e "s|{{APP_BASE_PATH}}|$APP_BASE_PATH|g" \
-        -e "s|{{HP_NAME}}|$HP_NAME|g" \
-        -e "s|{{HP_LAT}}|$HP_LAT|g" \
-        -e "s|{{HP_LON}}|$HP_LON|g" \
-        -e "s|{{CHAINPROMPT_API_URL}}|$CHAINPROMPT_API_URL|g" \
-        -e "s|{{API_URL}}|$API_URL|g" \
-        -e "s|{{APP_ID}}|$APP_ID|g" \
         "docker-compose.yml.template" > "docker-compose.yml"
 fi
 

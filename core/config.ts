@@ -16,15 +16,16 @@ export const port = process.env.PORT || ConfigDefaults.PORT;
 export const mongoUri = process.env.MONGO_URI || ConfigDefaults.MONGO_URI;
 export const uriDigitalAuth = process.env.URI_DIGITAL_AUTH;
 export const appDomain = process.env.APP_DOMAIN || ConfigDefaults.APP_DOMAIN;
-
+export const appBasePath = process.env.APP_BASE_PATH !== undefined ? process.env.APP_BASE_PATH : ConfigDefaults.APP_BASE_PATH;
 export const allowedOrigins = parseCsv(process.env.ALLOWED_ORIGINS, ConfigDefaults.ALLOWED_ORIGINS);
-export const apiBaseUrl = getApiBaseUrl(appDomain, port, process.env.API_BASE_URL);
+export const apiBaseUrl = getApiBaseUrl(appDomain, port, process.env.API_BASE_URL, appBasePath);
 
-export default { 
-    port, 
-    mongoUri, 
-    uriDigitalAuth, 
-    appDomain, 
-    allowedOrigins, 
-    apiBaseUrl 
+export default {
+    port,
+    mongoUri,
+    uriDigitalAuth,
+    appDomain,
+    allowedOrigins,
+    apiBaseUrl,
+    appBasePath
 };

@@ -15,7 +15,9 @@ import axios from 'axios';
 import type { AxiosResponse } from 'axios';
 import { getEnv } from '../config';
 
-const baseURL: string = getEnv('VITE_APP_API_URL') || `${import.meta.env.BASE_URL}api`.replace(/\/+$/, '');
+import { getContextApiUrl } from '../config';
+
+const baseURL: string = getContextApiUrl();
 
 export const apiClient = axios.create({
     baseURL,

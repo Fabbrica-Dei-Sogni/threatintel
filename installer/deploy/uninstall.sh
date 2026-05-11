@@ -59,4 +59,35 @@ else
     echo "ℹ️  Nessuna configurazione Nginx trovata da rimuovere."
 fi
 
+# 3. Docker Infrastructure Cleanup
+# L'installer salva il file come docker-compose.yml, non docker-compose.infra.yml
+COMPOSE_FILE="docker-compose.yml"
+if [ -f "$COMPOSE_FILE" ]; then
+    echo "🐳 Verifico infrastruttura Docker ($COMPOSE_FILE)..."
+    echo "🛑 Fermando e rimuovendo container e volumi Docker..."
+    docker compose -f "$COMPOSE_FILE" down -v
+    echo "✅ Infrastruttura Docker rimossa (volumi inclusi)."
+else
+    # Fallback per vecchie versioni
+    if [ -f "docker-compose.infra.yml" ]; then
+        docker compose -f docker-compose.infra.yml down -v
+    fi
+fi
+
+# 4. Storage Cleanup (Opzionale)
+if [ -f ".env" ]; then
+    STORAGE_PATH=$(grep "^STORAGE_ROOT=" .env | cut -d'=' -f2- | sed -e 's/^"//' -e 's/"$//')
+    if [ -d "$STORAGE_PATH" ]; then
+        echo -e "\n⚠️  Rilevata cartella storage: $STORAGE_PATH"
+        read -p "❓ Vuoi eliminare DEFINITIVAMENTE tutti i dati (Database e Log)? (y/N): " DELETE_STORAGE
+        if [[ "$DELETE_STORAGE" =~ ^[Yy]$ ]]; then
+            echo "🗑️  Eliminazione dati in corso..."
+            sudo rm -rf "$STORAGE_PATH"
+            echo "✅ Dati eliminati."
+        else
+            echo "📁 Dati conservati in: $STORAGE_PATH"
+        fi
+    fi
+fi
+
 echo "✨ Disinstallazione di $SERVICE_NAME completata."

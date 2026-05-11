@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# ThreatIntel Frontend - Orchestrator Manager (NEXUS VERSION)
+# ThreatIntel Frontend - Dashboard Manager
 # Questo script crea un pacchetto di rilascio leggero che scarica il codice da Nexus.
 
 FRONTEND_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../" && pwd)"
@@ -8,12 +8,20 @@ ARTIFACTS_DIR="$FRONTEND_ROOT/artifact"
 DEPLOY_TEMPLATES="$FRONTEND_ROOT/installer/deploy"
 DASHBOARD_SRC="$FRONTEND_ROOT/dashboard"
 
-# 1. Rilevamento Versione
-VERSION=$(grep '"version":' "$DASHBOARD_SRC/package.json" | cut -d'"' -f4)
-SERVICE_NAME="threatintel-frontend"
-ARTIFACT_NAME="$SERVICE_NAME-nexus-v$VERSION.tar.gz"
+# 1. Rilevamento e Conferma Versione/Nome
+DETECTED_VERSION=$(grep '"version":' "$DASHBOARD_SRC/package.json" | cut -d'"' -f4)
+DEFAULT_SERVICE="threatintel-frontend"
 
-echo "🚀 Orchestrator (Nexus): Building Release v$VERSION for $SERVICE_NAME..."
+echo "📝 Configurazione Release Dashboard:"
+read -p "🔢 Versione [$DETECTED_VERSION]: " VERSION
+VERSION=${VERSION:-$DETECTED_VERSION}
+
+read -p "📛 Nome Servizio [$DEFAULT_SERVICE]: " SERVICE_NAME
+SERVICE_NAME=${SERVICE_NAME:-$DEFAULT_SERVICE}
+
+ARTIFACT_NAME="$SERVICE_NAME-dashboard-v$VERSION.tar.gz"
+
+echo "🚀 Dashboard Release Builder: Building Release v$VERSION for $SERVICE_NAME..."
 
 # 2. Setup Directory Temporanea
 BUILD_DIR="$FRONTEND_ROOT/deployments/$SERVICE_NAME"
@@ -30,7 +38,7 @@ echo "$VERSION" > "$BUILD_DIR/VERSION"
 
 # 4. Copia Script di Installazione e Template
 echo "🛠️  Preparazione script di installazione..."
-cp "$DEPLOY_TEMPLATES/install.sh.template" "$BUILD_DIR/install.sh"
+sed "s|\[\[SERVICE_NAME\]\]|$SERVICE_NAME|g" "$DEPLOY_TEMPLATES/install.sh.template" > "$BUILD_DIR/install.sh"
 cp "$DEPLOY_TEMPLATES/uninstall.sh.template" "$BUILD_DIR/uninstall.sh"
 cp "$DEPLOY_TEMPLATES/docker-compose.yml.template" "$BUILD_DIR/"
 cp "$DASHBOARD_SRC/entrypoint.sh" "$BUILD_DIR/"
@@ -39,12 +47,12 @@ cp "$DASHBOARD_SRC/config.js.template" "$BUILD_DIR/"
 chmod +x "$BUILD_DIR/install.sh" "$BUILD_DIR/uninstall.sh"
 
 # 5. Creazione Tarball Atomico
-echo "🗜️  Creazione tarball leggero: $ARTIFACT_NAME..."
+echo "🗜️  Creazione tarball: $ARTIFACT_NAME..."
 cd "$FRONTEND_ROOT/deployments"
 tar -czf "$ARTIFACTS_DIR/$ARTIFACT_NAME" "$SERVICE_NAME"
 
 echo "------------------------------------------------------------"
-echo "✅ Orchestrazione NEXUS completata!"
+echo "✅ Release DASHBOARD completata!"
 echo "📦 Artifact: artifact/$ARTIFACT_NAME"
 echo "📂 Deployment: deployments/$SERVICE_NAME"
 echo "💡 Questo pacchetto scaricherà la versione $VERSION direttamente da Nexus durante l'installazione."

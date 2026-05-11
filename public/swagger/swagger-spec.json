@@ -1,0 +1,1789 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "ThreatIntel Core API",
+    "version": "1.0.0",
+    "description": "Documentazione delle API generata staticamente per la release"
+  },
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Auth Proxy",
+      "description": "Proxy verso l'Identity Provider per login e registrazione"
+    },
+    {
+      "name": "Dashboard API",
+      "description": "Recupero statistiche e dati investigativi"
+    },
+    {
+      "name": "Honeypot Traps",
+      "description": "API esca per catturare e tracciare gli attaccanti"
+    },
+    {
+      "name": "Dossier & Forensics",
+      "description": "Generazione investigazioni e report forensi"
+    },
+    {
+      "name": "System & Security",
+      "description": "Gestione configurazioni, Rate Limit e Access Control"
+    }
+  ],
+  "paths": {
+    "/assistant/search": {
+      "post": {
+        "summary": "Esegue una ricerca semantica RAG (Cybsersecurity Forensic Search)",
+        "description": "Interroga il database vettoriale (Qdrant) per trovare minacce, IP o campagne correlate alla query fornita.",
+        "tags": [
+          "AI Assistant & RAG"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "query"
+                ],
+                "properties": {
+                  "query": {
+                    "type": "string",
+                    "description": "La query in linguaggio naturale (es. \"Log brute force da IP russi\")",
+                    "example": "Mostrami attacchi recenti sulla porta 22"
+                  },
+                  "limit": {
+                    "type": "number",
+                    "description": "Numero massimo di risultati da restituire",
+                    "default": 5
+                  },
+                  "scoreThreshold": {
+                    "type": "number",
+                    "description": "Soglia minima di similarità (0.0 - 1.0)",
+                    "default": 0.7
+                  },
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "threat_log",
+                      "ip_details",
+                      "campaign_summary"
+                    ],
+                    "description": "Tipo di entità su cui focalizzare la ricerca"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Risultati della ricerca semantica trovati con successo."
+          },
+          "401": {
+            "description": "Non autorizzato (Token mancante o scaduto)."
+          },
+          "500": {
+            "description": "Errore interno durante la ricerca vettoriale."
+          }
+        }
+      }
+    },
+    "/assistant/ask": {
+      "post": {
+        "summary": "Genera un'analisi forense basata su RAG",
+        "description": "Utilizza un LLM (Ollama) per rispondere a una domanda tecnica analizzando i dati recuperati dal database vettoriale.",
+        "tags": [
+          "AI Assistant & RAG"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "question"
+                ],
+                "properties": {
+                  "question": {
+                    "type": "string",
+                    "description": "La domanda tecnica da porre all'assistente",
+                    "example": "Qual è l'impatto di questi attacchi SSH rilevati?"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Analisi generata con successo."
+          },
+          "500": {
+            "description": "Errore durante la generazione della risposta AI."
+          }
+        }
+      }
+    },
+    "/assistant/resolve": {
+      "post": {
+        "summary": "Risolve un riferimento sorgente (SourceRef)",
+        "description": "Converte un riferimento semantico (hit ID) nei dati tecnici originali presenti nel database SQL/Mongo.",
+        "tags": [
+          "AI Assistant & RAG"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "sourceRef"
+                ],
+                "properties": {
+                  "sourceRef": {
+                    "type": "string",
+                    "description": "L'ID del riferimento sorgente da risolvere"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Dati tecnici risolti correttamente."
+          },
+          "404": {
+            "description": "Riferimento non trovato."
+          }
+        }
+      }
+    },
+    "/assistant/logs": {
+      "post": {
+        "summary": "Ricerca diretta nei log (Tool MCP)",
+        "tags": [
+          "AI Assistant & RAG"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SearchLogArgs"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Risultati ricerca log."
+          }
+        }
+      }
+    },
+    "/assistant/attacks": {
+      "post": {
+        "summary": "Ricerca diretta negli attacchi (Tool MCP)",
+        "tags": [
+          "AI Assistant & RAG"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SearchAttacksArgs"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Risultati ricerca attacchi."
+          }
+        }
+      }
+    },
+    "/assistant/campaigns": {
+      "post": {
+        "summary": "Ricerca diretta nelle campagne (Tool MCP)",
+        "tags": [
+          "AI Assistant & RAG"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SearchCampaignsArgs"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Risultati ricerca campagne."
+          }
+        }
+      }
+    },
+    "/assistant/integrity-check": {
+      "post": {
+        "summary": "Verifica integrità del Vector Store (Admin Only)",
+        "description": "Esegue un check di coerenza tra il database vettoriale e le sorgenti dati originali.",
+        "tags": [
+          "AI Assistant & RAG"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "collection": {
+                    "type": "string",
+                    "description": "Nome della collezione da controllare"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Report di integrità generato."
+          },
+          "403": {
+            "description": "Permessi insufficienti (Richiesto ruolo admin)."
+          }
+        }
+      }
+    },
+    "/assistant/trigger-news": {
+      "post": {
+        "summary": "Triggera la generazione di una news agentica (Async)",
+        "description": "Avvia il processo di generazione news basato su RAG. Ritorna immediatamente 202.",
+        "tags": [
+          "AI Assistant & RAG"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "promptKey"
+                ],
+                "properties": {
+                  "promptKey": {
+                    "type": "string"
+                  },
+                  "params": {
+                    "type": "object"
+                  },
+                  "searchQuery": {
+                    "type": "string"
+                  },
+                  "locale": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Richiesta accettata e avviata in background."
+          }
+        }
+      }
+    },
+    "/attack/search": {
+      "post": {
+        "tags": [
+          "Dashboard API"
+        ],
+        "summary": "Ricerca attacchi raggruppati",
+        "responses": {
+          "200": {
+            "description": "Elenco attacchi aggregati."
+          }
+        }
+      }
+    },
+    "/attack/details": {
+      "post": {
+        "tags": [
+          "Dashboard API"
+        ],
+        "summary": "Ottiene dettagli specifici di un attacco",
+        "responses": {
+          "200": {
+            "description": "Dettagli dell'attacco."
+          }
+        }
+      }
+    },
+    "/attack/distributed": {
+      "post": {
+        "tags": [
+          "Dashboard API"
+        ],
+        "summary": "Ottiene dettagli investigativi per un cluster di IP (Attacco Distribuito)",
+        "responses": {
+          "200": {
+            "description": "Dettagli dell'attacco distribuito."
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": [
+          "Auth Proxy"
+        ],
+        "summary": "Effettua il login verso l'Identity Provider",
+        "description": "Invia le credenziali al Digital-Auth-TS e restituisce un JWT token.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "username",
+                  "password"
+                ],
+                "properties": {
+                  "username": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login riuscito, token restituito."
+          },
+          "401": {
+            "description": "Credenziali non valide o accesso negato."
+          }
+        }
+      }
+    },
+    "/auth/mode": {
+      "get": {
+        "tags": [
+          "Auth Proxy"
+        ],
+        "summary": "Ottiene la modalità di autenticazione corrente",
+        "responses": {
+          "200": {
+            "description": "Modalità di autenticazione (proxy o locale)."
+          }
+        }
+      }
+    },
+    "/auth/register": {
+      "post": {
+        "tags": [
+          "Auth Proxy"
+        ],
+        "summary": "Registra un nuovo utente sull'Identity Provider",
+        "description": "Crea un nuovo account associato a questa istanza di ThreatIntel.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "username",
+                  "password",
+                  "email"
+                ],
+                "properties": {
+                  "username": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string"
+                  },
+                  "firstName": {
+                    "type": "string"
+                  },
+                  "lastName": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Registrazione completata, email di attivazione inviata."
+          },
+          "400": {
+            "description": "Dati non validi o utente già esistente."
+          }
+        }
+      }
+    },
+    "/campaign/search": {
+      "get": {
+        "tags": [
+          "Campaigns Analysis"
+        ],
+        "summary": "Scopre pattern di attacco (hash) condivisi da più IP",
+        "parameters": [
+          {
+            "name": "minIps",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 2
+            }
+          },
+          {
+            "name": "minScore",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 0
+            }
+          },
+          {
+            "name": "minLogsPerIp",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "protocol",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "http",
+                "telnet",
+                "ssh"
+              ],
+              "default": "http"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 10
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": ""
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Elenco campagne distribuite trovate."
+          }
+        }
+      }
+    },
+    "/campaign/detail": {
+      "post": {
+        "tags": [
+          "Campaigns Analysis"
+        ],
+        "summary": "Ottiene dettagli forensi aggregati per una campagna",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "hash"
+                ],
+                "properties": {
+                  "hash": {
+                    "type": "string"
+                  },
+                  "minLogsPerIp": {
+                    "type": "integer"
+                  },
+                  "minScore": {
+                    "type": "number"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Dettagli della campagna."
+          }
+        }
+      }
+    },
+    "/campaign/uris": {
+      "get": {
+        "tags": [
+          "Campaigns Analysis"
+        ],
+        "summary": "Ottiene gli URI unici (Target URLs) coinvolti nelle campagne",
+        "parameters": [
+          {
+            "name": "protocol",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "minIps",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "minScore",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Elenco degli URI con conteggi."
+          }
+        }
+      }
+    },
+    "/config": {
+      "get": {
+        "tags": [
+          "System & Security"
+        ],
+        "summary": "Recupera tutte le configurazioni di sistema",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Elenco configurazioni restituito."
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "System & Security"
+        ],
+        "summary": "Salva o aggiorna una configurazione",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "key": {
+                    "type": "string"
+                  },
+                  "value": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Configurazione salvata."
+          }
+        }
+      }
+    },
+    "/config/{key}": {
+      "delete": {
+        "tags": [
+          "System & Security"
+        ],
+        "summary": "Elimina una configurazione tramite chiave",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Configurazione eliminata."
+          }
+        }
+      }
+    },
+    "/config/search": {
+      "post": {
+        "tags": [
+          "System & Security"
+        ],
+        "summary": "Ricerca tra le chiavi di configurazione",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "query": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Risultati della ricerca."
+          }
+        }
+      }
+    },
+    "/cowrie/sessions": {
+      "get": {
+        "tags": [
+          "Dashboard API"
+        ],
+        "summary": "Elenca le sessioni catturate da Cowrie (Telnet/SSH)",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 20
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "JSON string per l'ordinamento (es. {\"timestamp\":-1})",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "filters",
+            "in": "query",
+            "description": "JSON string per i filtri",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Elenco sessioni."
+          }
+        }
+      }
+    },
+    "/cowrie/search": {
+      "post": {
+        "tags": [
+          "Dashboard API"
+        ],
+        "summary": "Ricerca avanzata nelle sessioni Cowrie",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "page": {
+                    "type": "integer"
+                  },
+                  "pageSize": {
+                    "type": "integer"
+                  },
+                  "filters": {
+                    "type": "object"
+                  },
+                  "sortFields": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Risultati ricerca."
+          }
+        }
+      }
+    },
+    "/cowrie/sessions/{id}": {
+      "get": {
+        "tags": [
+          "Dashboard API"
+        ],
+        "summary": "Ottiene i dettagli completi di una sessione Cowrie",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dettagli sessione."
+          }
+        }
+      }
+    },
+    "/cowrie/sessions/{id}/events": {
+      "get": {
+        "tags": [
+          "Dashboard API"
+        ],
+        "summary": "Ottiene la timeline degli eventi di una sessione specifica",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Timeline eventi."
+          }
+        }
+      }
+    },
+    "/dossiers": {
+      "get": {
+        "tags": [
+          "Dossier & Forensics"
+        ],
+        "summary": "Elenca tutti i dossier investigativi",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "tags",
+            "in": "query",
+            "description": "Filtra per tag (separati da virgola)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "ip",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Elenco dossier."
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Dossier & Forensics"
+        ],
+        "summary": "Crea un nuovo dossier investigativo",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "title",
+                  "sections"
+                ],
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "sections": {
+                    "type": "array",
+                    "items": {
+                      "type": "object"
+                    }
+                  },
+                  "tags": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Dossier creato."
+          }
+        }
+      }
+    },
+    "/dossiers/{id}": {
+      "get": {
+        "tags": [
+          "Dossier & Forensics"
+        ],
+        "summary": "Ottiene un dossier specifico tramite ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dettaglio dossier."
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Dossier & Forensics"
+        ],
+        "summary": "Aggiorna un dossier esistente",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "open",
+                      "closed",
+                      "archived"
+                    ]
+                  },
+                  "sections": {
+                    "type": "array",
+                    "items": {
+                      "type": "object"
+                    }
+                  },
+                  "tags": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Dossier aggiornato."
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Dossier & Forensics"
+        ],
+        "summary": "Elimina un dossier investigativo",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dossier eliminato."
+          }
+        }
+      }
+    },
+    "/dossiers/{id}/export": {
+      "get": {
+        "tags": [
+          "Dossier & Forensics"
+        ],
+        "summary": "Esporta un dossier in formato forense (Classico/HUD)",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "format",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "html",
+                "pdf"
+              ],
+              "default": "pdf"
+            }
+          },
+          {
+            "name": "style",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "classic",
+                "hud",
+                "telex"
+              ],
+              "default": "classic"
+            }
+          },
+          {
+            "name": "locale",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "it-IT"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "File esportato con successo."
+          }
+        }
+      }
+    },
+    "/": {
+      "get": {
+        "tags": [
+          "Honeypot Traps"
+        ],
+        "summary": "Mostra la pagina di finto login (esca)",
+        "description": "Restituisce l'HTML della pagina di login utilizzata per catturare le credenziali degli attaccanti.",
+        "responses": {
+          "200": {
+            "description": "Pagina HTML caricata con successo."
+          }
+        }
+      }
+    },
+    "/login": {
+      "post": {
+        "tags": [
+          "Honeypot Traps"
+        ],
+        "summary": "Gestisce il tentativo di login sulla trappola",
+        "description": "Analizza le credenziali fornite, logga l'attacco e reindirizza l'attaccante.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "302": {
+            "description": "Reindirizzamento dell'attaccante."
+          }
+        }
+      }
+    },
+    "/common-endpoints": {
+      "all": {
+        "tags": [
+          "Honeypot Traps"
+        ],
+        "summary": "Endpoint comuni configurabili (es. /wp-admin, /admin)",
+        "description": "Gestisce tutte le richieste verso endpoint comuni definiti in configurazione come trappole.",
+        "responses": {
+          "200": {
+            "description": "Risposta della trappola."
+          }
+        }
+      }
+    },
+    "/blacklist-ip": {
+      "post": {
+        "tags": [
+          "System & Security"
+        ],
+        "summary": "Aggiunge manualmente un IP alla blacklist (violazioni)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "ip"
+                ],
+                "properties": {
+                  "ip": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "IP aggiunto alla blacklist."
+          }
+        }
+      }
+    },
+    "/unblacklist-ip": {
+      "post": {
+        "tags": [
+          "System & Security"
+        ],
+        "summary": "Rimuove manualmente un IP dalla blacklist",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "ip"
+                ],
+                "properties": {
+                  "ip": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "IP rimosso dalla blacklist."
+          }
+        }
+      }
+    },
+    "/mcp": {
+      "get": {
+        "summary": "Endpoint MCP (Streamable HTTP) - GET",
+        "description": "Entry point MCP utilizzato dai client per il transport HTTP.\nQuesto server non espone lo stream SSE su GET e restituisce 405.\nPer le richieste MCP usare il metodo POST con payload JSON-RPC 2.0.\n",
+        "tags": [
+          "MCP"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "405": {
+            "description": "Metodo GET non supportato per MCP (solo POST)."
+          }
+        }
+      },
+      "delete": {
+        "summary": "Chiusura sessione MCP (non supportata)",
+        "description": "Endpoint riservato alla chiusura di sessioni MCP HTTP.\nQuesto server non implementa la chiusura esplicita e restituisce 405.\n",
+        "tags": [
+          "MCP"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "405": {
+            "description": "Chiusura sessione MCP non supportata."
+          }
+        }
+      },
+      "post": {
+        "summary": "Endpoint MCP JSON-RPC",
+        "description": "Endpoint principale del server MCP, conforme al Model Context Protocol (MCP).\nAccetta richieste JSON-RPC 2.0 con metodi:\n  - \"initialize\": handshake MCP e discovery delle capabilities\n  - \"tools/list\": elenco dei tool disponibili (catalogo MCP)\n  - \"tools/call\": esecuzione di un tool\nIl body deve essere un oggetto JSON-RPC o un array di messaggi JSON-RPC.\n",
+        "tags": [
+          "MCP"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "description": "Singolo messaggio JSON-RPC 2.0"
+                  },
+                  {
+                    "type": "array",
+                    "description": "Batch di messaggi JSON-RPC 2.0"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Risposta MCP JSON-RPC 2.0 (singola o batch)."
+          },
+          "202": {
+            "description": "Nessuna risposta JSON-RPC (solo notifiche)."
+          },
+          "400": {
+            "description": "Richiesta MCP non valida."
+          },
+          "500": {
+            "description": "Errore interno durante la gestione MCP."
+          }
+        }
+      }
+    },
+    "/ratelimit/search": {
+      "post": {
+        "tags": [
+          "System & Security"
+        ],
+        "summary": "Ricerca nei log dei blocchi di rate limiting",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "page": {
+                    "type": "integer"
+                  },
+                  "pageSize": {
+                    "type": "integer"
+                  },
+                  "filters": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Risultati ricerca."
+          }
+        }
+      }
+    },
+    "/reports/dettaglio": {
+      "get": {
+        "tags": [
+          "Dossier & Forensics"
+        ],
+        "summary": "Genera un report dettagliato per un attacco (IP o SessionID)",
+        "parameters": [
+          {
+            "name": "ip",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sessionId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "attack",
+                "telnet",
+                "ip"
+              ],
+              "default": "attack"
+            }
+          },
+          {
+            "name": "format",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "html",
+                "pdf"
+              ],
+              "default": "pdf"
+            }
+          },
+          {
+            "name": "locale",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "it-IT"
+            }
+          },
+          {
+            "name": "style",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "classic",
+                "hud",
+                "telex"
+              ],
+              "default": "classic"
+            }
+          },
+          {
+            "name": "ipList",
+            "in": "query",
+            "description": "JSON array di IP per report distribuiti",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Report generato."
+          }
+        }
+      }
+    },
+    "/reports/custom": {
+      "post": {
+        "tags": [
+          "Dossier & Forensics"
+        ],
+        "summary": "Genera un report personalizzato basato su criteri specifici",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "sections": {
+                    "type": "array",
+                    "items": {
+                      "type": "object"
+                    }
+                  },
+                  "locale": {
+                    "type": "string",
+                    "default": "it-IT"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Report custom generato."
+          }
+        }
+      }
+    },
+    "/stats": {
+      "get": {
+        "tags": [
+          "Dashboard API"
+        ],
+        "summary": "Ottiene le statistiche generali delle minacce",
+        "parameters": [
+          {
+            "name": "timeframe",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "1h",
+                "24h",
+                "7d",
+                "30d"
+              ],
+              "default": "24h"
+            }
+          },
+          {
+            "name": "minScore",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 15
+            }
+          },
+          {
+            "name": "top",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "10"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Statistiche recuperate con successo."
+          }
+        }
+      }
+    },
+    "/logs": {
+      "get": {
+        "tags": [
+          "Dashboard API"
+        ],
+        "summary": "Recupera la lista dei log delle minacce",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 20
+            }
+          },
+          {
+            "name": "ip",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "suspicious",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Elenco log restituito."
+          }
+        }
+      }
+    },
+    "/search": {
+      "post": {
+        "tags": [
+          "Dashboard API"
+        ],
+        "summary": "Ricerca avanzata nei log",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "page": {
+                    "type": "integer"
+                  },
+                  "pageSize": {
+                    "type": "integer"
+                  },
+                  "filters": {
+                    "type": "object"
+                  },
+                  "sortFields": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Risultati della ricerca."
+          }
+        }
+      }
+    },
+    "/logs/{id}": {
+      "get": {
+        "tags": [
+          "Dashboard API"
+        ],
+        "summary": "Recupera un singolo log tramite ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dettaglio del log."
+          }
+        }
+      }
+    },
+    "/reputationscore/{ip}": {
+      "get": {
+        "tags": [
+          "Dashboard API"
+        ],
+        "summary": "Calcola il Reputation Score di un IP",
+        "parameters": [
+          {
+            "name": "ip",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Score calcolato."
+          }
+        }
+      }
+    },
+    "/enrichreports/{ip}": {
+      "post": {
+        "tags": [
+          "Dashboard API"
+        ],
+        "summary": "Arricchisce i report per un IP specifico",
+        "responses": {
+          "200": {
+            "description": "Dati arricchiti."
+          }
+        }
+      }
+    },
+    "/ipdetail/{ip}": {
+      "get": {
+        "tags": [
+          "Dashboard API"
+        ],
+        "summary": "Ottiene dettagli geolocalizzati e tecnici di un IP",
+        "responses": {
+          "200": {
+            "description": "Dettagli IP."
+          }
+        }
+      }
+    },
+    "/enrich/{ip}": {
+      "post": {
+        "tags": [
+          "Dashboard API"
+        ],
+        "summary": "Esegue l'enrichment manuale di un IP",
+        "responses": {
+          "200": {
+            "description": "Enrichment completato."
+          }
+        }
+      }
+    },
+    "/enrich": {
+      "post": {
+        "tags": [
+          "Dashboard API"
+        ],
+        "summary": "Esegue l'enrichment massivo (batch)",
+        "responses": {
+          "200": {
+            "description": "Risultati batch."
+          }
+        }
+      }
+    },
+    "/reanalyze-all": {
+      "post": {
+        "tags": [
+          "System & Security"
+        ],
+        "summary": "Ri-analizza tutti i log presenti nel DB (Asincrono)",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Job di ri-analisi avviati."
+          }
+        }
+      }
+    },
+    "/analyze-preview": {
+      "get": {
+        "tags": [
+          "Dashboard API"
+        ],
+        "summary": "Anteprima dell'analisi dei log",
+        "responses": {
+          "200": {
+            "description": "Anteprima generata."
+          }
+        }
+      }
+    },
+    "/status": {
+      "post": {
+        "tags": [
+          "Log Management"
+        ],
+        "summary": "Cambia lo stato di un log, attacco o campagna (active, archived, deleted)",
+        "responses": {
+          "202": {
+            "description": "Richiesta accettata."
+          }
+        }
+      }
+    },
+    "/restore": {
+      "post": {
+        "tags": [
+          "Log Management"
+        ],
+        "summary": "Ripristina i log da un contesto di archiviazione",
+        "responses": {
+          "202": {
+            "description": "Ripristino avviato."
+          }
+        }
+      }
+    }
+  }
+}

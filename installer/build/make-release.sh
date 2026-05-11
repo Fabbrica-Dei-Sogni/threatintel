@@ -22,6 +22,9 @@ mkdir -p "$DEPLOY_PATH/data" "$DEPLOY_PATH/infra" "$DEPLOY_PATH/proxy" "$DEPLOY_
 mkdir -p "$BUILD_TMP"
 
 # 2. Compilazione
+echo "📚 Generating Swagger spec..."
+npm run swagger:gen
+
 echo "🏗️  Bundling code with ncc..."
 npx -y @vercel/ncc build "$PROJECT_ROOT/server.ts" -o "$BUILD_TMP"
 if [ $? -ne 0 ]; then
@@ -39,6 +42,8 @@ cp "$PROJECT_ROOT"/node_modules/geoip-lite/data/*.dat "$DEPLOY_PATH/data/" 2>/de
 echo "📚 Adding Swagger UI assets for ncc bundle..."
 mkdir -p "$DEPLOY_PATH/public/swagger"
 cp -r "$PROJECT_ROOT/node_modules/swagger-ui-dist/"* "$DEPLOY_PATH/public/swagger/"
+# Copia il file spec appena generato
+cp "$PROJECT_ROOT/public/swagger/swagger-spec.json" "$DEPLOY_PATH/public/swagger/"
 
 # 4. Copia Script e Template (Agnostici)
 echo "📦 Adding templates and installer..."

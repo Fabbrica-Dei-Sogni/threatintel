@@ -54,10 +54,43 @@ const options: swaggerJsdoc.Options = {
     ]
   },
   // Documentiamo le rotte, i controller e l'endpoint principale (per l'auth)
-  apis: ['./core/apis/*.ts', './core/controllers/*.ts', './core/endpoint.ts']
+  apis: [
+    path.join(process.cwd(), 'core/apis/*.ts'), 
+    path.join(process.cwd(), 'core/controllers/*.ts'), 
+    path.join(process.cwd(), 'core/endpoint.ts')
+  ]
 };
 
-export const swaggerSpec = swaggerJsdoc(options);
+// Logica per caricare lo spec pre-generato in produzione (necessario per bundle ncc)
+let swaggerSpecInternal: any;
+const specPath = path.join(process.cwd(), 'public', 'swagger', 'swagger-spec.json');
+
+if (fs.existsSync(specPath)) {
+  try {
+    swaggerSpecInternal = JSON.parse(fs.readFileSync(specPath, 'utf8'));
+    
+    // Sovrascriviamo i server con quelli attuali della configurazione (Dinamici)
+    swaggerSpecInternal.servers = [
+      {
+        url: (appBasePath === '/' ? '' : appBasePath) + '/api',
+        description: 'Server (Relative Path via Nginx)'
+      },
+      {
+        url: apiBaseUrl,
+        description: 'Server (Absolute Path from Config)'
+      }
+    ];
+
+    console.log('✅ Swagger spec caricato da file statico (Server aggiornati dinamicamente)');
+  } catch (e) {
+    console.warn('⚠️ Errore caricamento swagger-spec.json, generazione dinamica...');
+    swaggerSpecInternal = swaggerJsdoc(options);
+  }
+} else {
+  swaggerSpecInternal = swaggerJsdoc(options);
+}
+
+export const swaggerSpec = swaggerSpecInternal;
 
 export const setupSwagger = (router: Router) => {
   let assetsPath: string;

@@ -153,7 +153,8 @@ if [ "$RUN_WIZARD" = true ]; then
         DEFAULT_OLLAMA_URL="http://82.112.255.186:11434"
         DEFAULT_SUMMARY_MODEL="gemma3:1b"
         DEFAULT_EMBEDDING_MODEL="nomic-embed-text"
-        DEFAULT_STORAGE="$WORKING_DIR/storage"
+        # Suggeriamo un percorso sotto /mnt per lo storage persistente
+        DEFAULT_STORAGE="/mnt/threatintel/$SERVICE_NAME/storage"
         DEFAULT_ALLOWED_ORIGINS="*"
         DEFAULT_TELNET_P="23"
         
@@ -203,7 +204,7 @@ if [ "$RUN_WIZARD" = true ]; then
         echo ""
 
         echo "📂 INFRASTRUTTURA"
-        DEFAULT_STORAGE="$WORKING_DIR/storage"
+        DEFAULT_STORAGE="/mnt/threatintel/$SERVICE_NAME/storage"
         read -p "📂 Percorso Storage Locale [$DEFAULT_STORAGE]: " APP_STORAGE
         APP_STORAGE=${APP_STORAGE:-$DEFAULT_STORAGE}
 

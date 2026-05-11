@@ -16,8 +16,8 @@
         "redis-status": "redis-cli ping",
         "clear-redis": "redis-cli flushdb",
         "swagger:gen": "ts-node scripts/generate-swagger.ts",
-        "release": "npm version $npm_config_versione -m 'v%s' && git add package.json package-lock.json && git commit -m \"Rilasciata una nuova release del core systemd v$(node -p \"require('./package.json').version\")\" --allow-empty && git push --follow-tags",
-        "patch": "npm version patch -m 'v%s' && git add package.json package-lock.json && (git diff --staged --quiet || git commit -m \"Rilasciata una nuova patch del core systemd v$(node -p \"require('./package.json').version\")\") && git push --follow-tags"
+        "release": "npm version ${npm_config_versione} -m \"Rilasciata una nuova release del core systemd v%s\" && git push --follow-tags",
+        "patch": "npm version patch -m \"Rilasciata una nuova patch del core systemd v%s\" && git push --follow-tags"
     },
     "dependencies": {
         "@qdrant/js-client-rest": "^1.17.0",

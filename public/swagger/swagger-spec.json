@@ -555,6 +555,14 @@
               "type": "string",
               "default": ""
             }
+          },
+          {
+            "name": "userAgent",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": ""
+            }
           }
         ],
         "responses": {

@@ -58,15 +58,16 @@ export class RagTranslationService {
         if (protocol === 'ssh') {
             contextParts.push(RAG_TEMPLATES.NARRATIVES.SSH_CONTEXT);
         }
-
         const context = contextParts.join(' ');
-
+        const userAgent = log.request?.userAgent || 'sconosciuto';
+ 
         return RAG_TEMPLATES.INTERPOLATE(RAG_TEMPLATES.NARRATIVES.THREAT_LOG_BASE, {
             timestamp,
             ip,
             method,
             url,
             protocol,
+            userAgent,
             indicators,
             score: score.toString(),
             geoInfo,
@@ -74,7 +75,7 @@ export class RagTranslationService {
             status
         });
     }
-
+ 
     /**
      * Traduce i dettagli di un IP e i relativi report in un sommario semantico.
      */
@@ -84,7 +85,7 @@ export class RagTranslationService {
         abuseReports?: IAbuseReport[]
     ): string {
         this.logger.debug(`Translating IP Details for ${ipDetails.ip} for RAG`);
-
+ 
         const geo = ipDetails.ipinfo?.city 
             ? `${ipDetails.ipinfo.city}, ${ipDetails.ipinfo.country}` 
             : 'posizione sconosciuta';
@@ -97,7 +98,7 @@ export class RagTranslationService {
                      (abuseReports && abuseReports.some(r => r.comment.toLowerCase().includes('tor node')));
         
         const torContext = isTor ? `\n[ALERT] ${RAG_TEMPLATES.NARRATIVES.TOR_NODE_INFO}` : '';
-
+ 
         const reportsSummary = (abuseReports || [])
             .map(r => {
                 const cleanComment = this.sanitizeComment(r.comment);
@@ -106,10 +107,10 @@ export class RagTranslationService {
             .filter(Boolean)
             .slice(0, 5)
             .join('\n');
-
+ 
         const abuseScore = abuseData?.abuseConfidenceScore || 0;
         const totalReports = abuseData?.totalReports || 0;
-
+ 
         let narrative = RAG_TEMPLATES.INTERPOLATE(RAG_TEMPLATES.NARRATIVES.IP_DETAILS_BASE, {
             ip: ipDetails.ip,
             geo,
@@ -118,19 +119,21 @@ export class RagTranslationService {
             totalReports: totalReports.toString(),
             reports: reportsSummary || 'Nessun report dettagliato disponibile.'
         });
-
+ 
         return narrative + torContext;
     }
-
+ 
     /**
      * Traduce i dati tecnici di una campagna in una narrazione deterministica.
      */
     public translateCampaign(campaign: CampaignDTO): string {
+        const uas = campaign.fingerprintAnalysis?.userAgents?.join(', ') || 'N/A';
         return RAG_TEMPLATES.INTERPOLATE(RAG_TEMPLATES.NARRATIVES.CAMPAIGN_SUMMARY_BASE, {
             hash: campaign.hash,
             ipCount: (campaign.ipCount || 0).toString(),
             correlations: (campaign.correlationHubsCount || 0).toString(),
             totaleLogs: (campaign.totaleLogs || 0).toString(),
+            userAgents: uas,
             firstSeen: new Date(campaign.firstSeen).toLocaleString('it-IT'),
             lastSeen: new Date(campaign.lastSeen).toLocaleString('it-IT'),
             averageScore: (campaign.averageScore || 0).toFixed(2),
@@ -138,7 +141,7 @@ export class RagTranslationService {
             sampleUrl: campaign.sampleUrl || '/'
         });
     }
-
+ 
     /**
      * Traduce i dati tecnici di un attacco (IP-centrico) in una narrazione deterministica.
      */
@@ -150,6 +153,8 @@ export class RagTranslationService {
         const rateLimits = attack.countRateLimit || 0;
         const protocol = attack.protocol || 'N/A';
         const isp = attack.ipDetails?.ipinfo?.org || attack.ipDetails?.isp || 'ISP sconosciuto';
+        const userAgents = attack.fingerprintAnalysis?.userAgents?.join(', ') || 
+                          attack.request?.userAgent || 'sconosciuto';
         
         // Mappatura Danger Level (da numerico a semantico)
         const dangerLevelMap: Record<number, string> = {
@@ -162,14 +167,14 @@ export class RagTranslationService {
         const dangerLevel = typeof attack.dangerLevel === 'number' 
             ? dangerLevelMap[attack.dangerLevel] || `livello ${attack.dangerLevel}`
             : (attack.dangerLevel || 'non classificato');
-
+ 
         // Estrazione geografica arricchita
         const country = attack.geo?.country || attack.ipDetails?.ipinfo?.country || 'paese sconosciuto';
         const city = attack.geo?.city || attack.ipDetails?.ipinfo?.city || 'città sconosciuta';
         const geoInfo = (city !== 'città sconosciuta' || country !== 'paese sconosciuto') 
             ? `[Origine: ${city}, ${country}]` 
             : '';
-
+ 
         let contextParts = [];
         if (attack.isDistributed) {
             contextParts.push("L'attività è parte di una struttura di attacco distribuita.");
@@ -182,7 +187,7 @@ export class RagTranslationService {
         if (attack.fingerprintAnalysis?.isTool || (attack.toolRiskScore && attack.toolRiskScore > 50)) {
             contextParts.push("L'attacco sembra essere stato condotto tramite uno strumento automatizzato o uno scanner di vulnerabilità.");
         }
-
+ 
         // Analisi sequenze e movimenti
         if (attack.sequenceAnalysis?.bruteForceSuccess) {
             contextParts.push("Attenzione: è stato rilevato un possibile successo in un attacco brute-force (codice di risposta positivo dopo vari tentativi).");
@@ -190,21 +195,21 @@ export class RagTranslationService {
         if (attack.sequenceAnalysis?.lateralMovement) {
             contextParts.push("Sono stati identificati pattern riconducibili a tentativi di movimento laterale all'interno della rete.");
         }
-
+ 
         // Metadati bot/crawler
         if (attack.metadata?.isBot) {
             contextParts.push("L'indirizzo IP è identificato come un Bot noto.");
         } else if (attack.metadata?.isCrawler) {
             contextParts.push("L'indirizzo IP è identificato come un Crawler di ricerca.");
         }
-
+ 
         // Score di rischio specifici
         if (attack.payloadRiskScore && attack.payloadRiskScore > 70) {
             contextParts.push(`Il rischio associato ai payload inviati è estremamente elevato (${attack.payloadRiskScore.toFixed(0)}/100).`);
         }
-
+ 
         const context = contextParts.join(' ');
-
+ 
         return RAG_TEMPLATES.INTERPOLATE(RAG_TEMPLATES.NARRATIVES.ATTACK_SUMMARY_BASE, {
             ip,
             geoInfo,
@@ -212,6 +217,7 @@ export class RagTranslationService {
             intensity,
             duration,
             totaleLogs: (attack.totaleLogs || 0).toString(),
+            userAgents,
             firstSeen: new Date(attack.firstSeen).toLocaleString('it-IT'),
             lastSeen: new Date(attack.lastSeen).toLocaleString('it-IT'),
             averageScore: (attack.averageScore || 0).toFixed(2),

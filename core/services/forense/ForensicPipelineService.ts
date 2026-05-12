@@ -82,6 +82,15 @@ export class ForensicPipelineService {
                 };
             }
 
+            if (Object.keys(this.tolleranceWeights).length === 0) {
+                this.tolleranceWeights = {
+                    RPSTOL: this.config.dangerScoreRpsTol,
+                    DURTOL: this.config.dangerScoreDurTol,
+                    SCORETOL: this.config.dangerScoreScoreTol,
+                    DURDECAYTOL: this.config.dangerScoreDurDecayTol
+                };
+            }
+
             // Parsing Liste (CSV based)
             this.suspiciousPatterns = suspPatternsStr ? suspPatternsStr.split(',').map((s: string) => s.trim()).filter(Boolean) : [];
             this.suspiciousReferers = suspReferersStr ? suspReferersStr.split(',').map((s: string) => s.trim()).filter(Boolean) : [];

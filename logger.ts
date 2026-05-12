@@ -8,9 +8,10 @@
  */
 import { createLogger, format, transports } from 'winston';
 import util from 'util';
+import { ConfigDefaults } from './core/utils/ConfigUtils';
 
 export const logger = createLogger({
-  level: process.env.LOG_LEVEL || 'info',
+  level: process.env.LOG_LEVEL || ConfigDefaults.LOG_LEVEL,
   format: format.combine(
     format.label({ label: '[threat-intel]' }),
     format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
@@ -20,7 +21,7 @@ export const logger = createLogger({
   ),
   transports: [
     new transports.Console({
-      format: process.env.NODE_ENV === 'production' 
+      format: (process.env.NODE_ENV || ConfigDefaults.NODE_ENV) === 'production' 
         ? format.json() 
         : format.combine(
             format.label({ label: '[threat-intel]' }),

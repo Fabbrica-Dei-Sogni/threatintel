@@ -4,8 +4,11 @@
  */
 
 export const ConfigDefaults = {
+    NODE_ENV: 'development',
+    LOG_LEVEL: 'info',
     PORT: '3000',
     MONGO_URI: 'mongodb://localhost:17017/threatintel',
+    MONGO_URI_TEST: 'mongodb://127.0.0.1:27017/threatintel_test',
     APP_DOMAIN: 'localhost',
     APP_BASE_PATH: '/honeypot',
     AUTH_URI: 'https://localhost:3443/auth/api/v1',
@@ -19,6 +22,7 @@ export const ConfigDefaults = {
         'http://82.112.255.186:5173',
         'http://82.112.255.186:4300'
     ],
+    COMMON_ENDPOINTS: '',
     RAG_REINDEX_THRESHOLD_DAYS: '7',
     OLLAMA_EMBEDDING_TIMEOUT: '30000',
     OLLAMA_GENERATE_TIMEOUT: '60000',
@@ -35,7 +39,24 @@ export const ConfigDefaults = {
     DANGER_WEIGHT_DURNORM: '0.12',
     DANGER_WEIGHT_SCORENORM: '0.50',
     DANGER_WEIGHT_UNIQUETECHNORM: '0.20',
-    DANGER_WEIGHT_DISTRIBUTED: '0.15'
+    DANGER_WEIGHT_DISTRIBUTED: '0.15',
+    // Tolleranze scoring
+    DANGER_SCORE_RPSTOL: '10',
+    DANGER_SCORE_DURTOL: '361',
+    DANGER_SCORE_SCORETOL: '40',
+    DANGER_SCORE_DURDECAYTOL: '240',
+    // Rate Limiting
+    BLACKLIST_DURATION: '7200',
+    LOG_RATE_LIMIT_EVENTS: 'false',
+    MAX_VIOLATIONS: '5',
+    DDOS_WINDOW_MS: '60000',
+    DDOS_MAX_REQUESTS: '100',
+    CRITICAL_WINDOW_MS: '900000',
+    CRITICAL_MAX_REQUESTS: '20',
+    TRAP_WINDOW_MS: '300000',
+    TRAP_MAX_REQUESTS: '50',
+    APP_WINDOW_MS: '60000',
+    APP_MAX_REQUESTS: '200'
 };
 
 /**

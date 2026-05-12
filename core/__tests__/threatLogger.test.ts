@@ -30,6 +30,11 @@ const mockPatternAnalysisService = {
     }),
 };
 
+const mockConfigProvider = {
+    mongoUri: 'mongodb://localhost:27017/threatintel',
+    isTest: true
+};
+
 // Mock solo mongoose.connect per evitare connessioni reali
 jest.spyOn(mongoose, 'connect').mockResolvedValue({} as any);
 
@@ -40,6 +45,7 @@ describe('ThreatLogger', () => {
         jest.clearAllMocks();
         threatLogger = new ThreatLogger(
             mockLogger as any,
+            mockConfigProvider as any,
             mockThreatLogService as any,
             mockPatternAnalysisService as any
         );
@@ -47,7 +53,6 @@ describe('ThreatLogger', () => {
 
     it('should initialize correctly', () => {
         expect(mockLogger.info).toHaveBeenCalledWith(expect.stringContaining('Inizializzato'));
-        expect(mongoose.connect).toHaveBeenCalled();
     });
 
     describe('middleware', () => {

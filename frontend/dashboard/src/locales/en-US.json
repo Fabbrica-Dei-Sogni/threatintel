@@ -222,6 +222,7 @@
         "months": "Months",
         "years": "Years",
         "filterByIp": "Filter by IP...",
+        "filterByUA": "Filter by User Agent...",
         "searchPlaceholder": "Search patterns, URLs, User Agents...",
         "globalSearch": "GLOBAL SEARCH",
         "clearIpFilter": "Clear IP filter",
@@ -307,6 +308,7 @@
         "searchLabel": "Search in list:",
         "searchPlaceholder": "IP, Hash, Technique...",
         "filterByUri": "Filter by Target URI",
+        "filterByUA": "Filter by User Agent...",
         "browseUris": "Browse URIs",
         "table": {
             "ips": "Involved IPs",
@@ -419,6 +421,7 @@
         "attacks": "Anomalies",
         "filterByIp": "Filter by IP...",
         "filterByUrl": "Filter by URL...",
+        "filterByUA": "Filter by User Agent...",
         "clearIpFilter": "Clear IP filter",
         "clearUrlFilter": "Clear URL filter",
         "noLogsFound": "No logs found",

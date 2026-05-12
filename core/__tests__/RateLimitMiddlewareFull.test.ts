@@ -75,7 +75,24 @@ describe('RateLimitMiddleware Full Coverage', () => {
             getState: jest.fn().mockReturnValue('ready'),
         } as any;
 
-        middleware = new RateLimitMiddleware(mockLogger, mockRedisService, mockRateLimitService);
+        const mockConfig = {
+            blacklistDuration: 7200,
+            honeypotInstanceId: 'test-id',
+            logRateLimitEvents: true,
+            appBasePath: '/honeypot',
+            excludedIps: ['127.0.0.1'],
+            ddosWindowMs: 60000,
+            ddosMaxRequests: 100,
+            criticalWindowMs: 900000,
+            criticalMaxRequests: 20,
+            trapWindowMs: 300000,
+            trapMaxRequests: 50,
+            appWindowMs: 60000,
+            appMaxRequests: 200,
+            maxViolations: 5
+        } as any;
+
+        middleware = new RateLimitMiddleware(mockLogger, mockRedisService, mockConfig, mockRateLimitService);
         jest.clearAllMocks();
     });
 
@@ -136,8 +153,6 @@ describe('RateLimitMiddleware Full Coverage', () => {
 
         it('should auto-blacklist after max violations', async () => {
             mockRedisClient.incr.mockResolvedValue(10); 
-            process.env.MAX_VIOLATIONS = '5';
-
             const tracker = middleware.violationTracker();
             const req = { ip: '2.2.2.2' } as any;
             const res = { statusCode: 429, send: jest.fn() } as any;

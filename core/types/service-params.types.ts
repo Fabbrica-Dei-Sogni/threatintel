@@ -15,6 +15,7 @@ export interface GetAttackDetailParams {
     minLogsForAttack?: number;
     timeConfig?: TimeConfig;
     protocol?: string | null;
+    userAgent?: string;
     status?: string;
 }
 
@@ -32,6 +33,7 @@ export interface ThreatLogFilter {
     'request.ip'?: string;
     'request.url'?: string;
     'request.method'?: string;
+    'request.userAgent'?: string;
     'geo.country'?: string;
     protocol?: string;
     'fingerprint.suspicious'?: boolean;
@@ -57,6 +59,7 @@ export interface AttackFilter {
     'request.ip'?: string;
     'request.url'?: string;
     'request.method'?: string;
+    'request.userAgent'?: string;
     'geo.country'?: string;
     country?: string;
     protocol?: string;
@@ -86,6 +89,7 @@ export interface CampaignFilter {
     agoUnit?: string;
     selectedUris?: string[];
     search?: string;
+    userAgent?: string;
     status?: string;
 }
 
@@ -112,6 +116,7 @@ export interface GetCampaignDetailParams {
     timeConfig?: TimeConfig;
     page?: number;
     pageSize?: number;
+    userAgent?: string;
     status?: string;
 }
 

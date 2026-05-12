@@ -19,6 +19,9 @@ export default class CampaignDTO {
     correlationHubsCount?: number;
     maxLogsInThisCampaign?: number;
     allIps?: string[];
+    fingerprintAnalysis?: {
+        userAgents: string[];
+    };
     
     // Campi opzionali per estensioni future o metadati
     metadata?: any;

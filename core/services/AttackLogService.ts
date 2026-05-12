@@ -45,7 +45,7 @@ export class AttackLogService {
         } = params;
         const skip = (page - 1) * pageSize;
 
-        const postAggFields = ['dangerLevel', 'attackPatterns', 'dangerScore', 'averageScore', 'totaleLogs', 'request.url'];
+        const postAggFields = ['dangerLevel', 'attackPatterns', 'dangerScore', 'averageScore', 'totaleLogs', 'request.url', 'request.userAgent'];
         const initialFilters: any = {};
         const postAggregationFilters: any = {};
 
@@ -265,7 +265,9 @@ export class AttackLogService {
                 } else if (value && value !== 'all') {
                     mongoFilters[key] = value;
                 }
-                // Se è 'all', null o undefined, non applichiamo il filtro protocollo
+            } else if (key === 'request.userAgent') {
+                const escaped = escapeRegex(value);
+                mongoFilters['fingerprintAnalysis.userAgents'] = { $regex: escaped, $options: 'i' };
             } else if (key === 'attackPatterns' && typeof value === 'string') {
                 // Global Behavioral Search: search in patterns, user agents and URLs
                 const words = value.trim().split(/\s+/).filter(w => w.length > 0);
@@ -290,7 +292,7 @@ export class AttackLogService {
                         andFilters.push({ [key]: { $regex: w, $options: 'i' } });
                     });
                 } else if (words.length === 1) {
-                    mongoFilters[key] = { $regex: words[0], $options: 'i' };
+                    mongoFilters[key] = { $regex: escapeRegex(words[0]), $options: 'i' };
                 }
             } else {
                 mongoFilters[key] = value;

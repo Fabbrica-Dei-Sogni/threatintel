@@ -29,6 +29,7 @@ export function useLogsFilter(
     initialUrl: string | Ref<string> = '',
     initialProtocol: string | Ref<string> = 'http',
     initialStatus: string | Ref<string> = 'active',
+    initialUserAgent: string | Ref<string> = '',
     initialPage: number | Ref<number> = 1,
     initialSortFields: SortFields | Ref<SortFields> | null = null,
     initialPageSize: number | Ref<number> = 20
@@ -38,6 +39,7 @@ export function useLogsFilter(
     const filterUrl = toRef(initialUrl);
     const filterProtocol = toRef(initialProtocol);
     const filterStatus = toRef(initialStatus);
+    const filterUserAgent = toRef(initialUserAgent);
     const logs = ref<Log[]>([]);
 
     // Integrazione useSearchBase
@@ -57,7 +59,7 @@ export function useLogsFilter(
         initialPage,
         initialPageSize,
         initialSortFields: initialSortFields ?? { timestamp: -1 },
-        filterRefs: [filterIp, filterUrl, filterProtocol, filterStatus],
+        filterRefs: [filterIp, filterUrl, filterProtocol, filterStatus, filterUserAgent],
         routeName: 'ThreatLogs'
     });
 
@@ -73,6 +75,7 @@ export function useLogsFilter(
             if (filterUrl.value) filters['request.url'] = filterUrl.value;
             if (filterProtocol.value) filters['protocol'] = filterProtocol.value;
             if (filterStatus.value) filters['status'] = filterStatus.value;
+            if (filterUserAgent.value) filters['request.userAgent'] = filterUserAgent.value;
 
             const params: FetchSearchParams = {
                 page: page.value,
@@ -99,6 +102,7 @@ export function useLogsFilter(
         filterUrl,
         filterProtocol,
         filterStatus,
+        filterUserAgent,
         sortFields,
         page,
         pageSize,

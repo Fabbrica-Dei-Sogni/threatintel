@@ -40,6 +40,7 @@ export interface SearchAttacksArgs {
   offset?: number;
   sortBy?: string;
   sortOrder?: 'asc' | 'desc';
+  userAgent?: string;
   status?: 'active' | 'archived' | 'deleted';
 }
 
@@ -55,6 +56,7 @@ export interface SearchLogArgs {
   offset?: number;
   sortBy?: string;
   sortOrder?: 'asc' | 'desc';
+  userAgent?: string;
   status?: 'active' | 'archived' | 'deleted';
 }
 
@@ -69,6 +71,7 @@ export interface SearchCampaignsArgs {
   offset?: number;
   sortBy?: string;
   sortOrder?: 'asc' | 'desc';
+  userAgent?: string;
   status?: 'active' | 'archived' | 'deleted';
 }
 

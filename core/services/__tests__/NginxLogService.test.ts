@@ -74,8 +74,6 @@ describe('NginxLogService', () => {
             }))
         };
 
-        process.env.COMMON_ENDPOINTS = '/test-endpoint,/malicious';
-
         container.registerInstance(LOGGER_TOKEN, mockLogger);
         container.registerInstance(THREAT_LOG_SERVICE_TOKEN, mockThreatLogService);
         container.registerInstance(PATTERN_ANALYSIS_SERVICE_TOKEN, mockPatternAnalysisService);

@@ -7,14 +7,14 @@ services:
     build:
       context: ./dashboard
       args:
-        NPM_VERSION: ${NPM_VERSION:-0.1.10}
+        NPM_VERSION: ${NPM_VERSION:-1.0.0}
         VITE_HONEYPOT_LOCATION_LAT: "48.8566"
         VITE_HONEYPOT_LOCATION_LON: "2.3522"
         VITE_HONEYPOT_NAME: "Honeypot (Paris)"
     environment:
       - VITE_APP_TITLE=${VITE_APP_TITLE:-Thrynt Ops Dashboard}
       - VITE_APP_BASE_PATH=${VITE_APP_BASE_PATH:-/honeypot/}
-      - VITE_APP_VERSION=${NPM_VERSION:-0.1.15}
+      #- VITE_APP_VERSION=${NPM_VERSION:-1.0.0}
     ports:
       - "127.0.0.1:8180:80"
     restart: unless-stopped

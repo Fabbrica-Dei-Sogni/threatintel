@@ -36,6 +36,7 @@ export function useCampaignsDiscovery(
     initialEndDate: (string | null) | Ref<string | null> = null,
     initialSelectedUris: string[] | Ref<string[]> = [],
     initialSearch: string | Ref<string> = '',
+    initialUserAgent: string | Ref<string> = '',
     initialMinCorrelations: number | Ref<number> = 0,
     initialStatus: string | Ref<string> = 'active'
 ) {
@@ -53,6 +54,7 @@ export function useCampaignsDiscovery(
     const endDate = toRef(initialEndDate);
     const selectedUris = toRef(initialSelectedUris);
     const search = toRef(initialSearch);
+    const userAgent = toRef(initialUserAgent);
     
     const campaigns = ref<any[]>([]);
     
@@ -69,7 +71,8 @@ export function useCampaignsDiscovery(
         startDate,
         endDate,
         selectedUris,
-        search
+        search,
+        userAgent
     ];
 
     async function fetchData() {
@@ -92,6 +95,7 @@ export function useCampaignsDiscovery(
                 pageSize: pageSize.value,
                 selectedUris: selectedUris.value,
                 search: search.value,
+                userAgent: userAgent.value,
                 status: filterStatus.value
             });
             
@@ -166,6 +170,7 @@ export function useCampaignsDiscovery(
         total,
         page,
         search,
+        userAgent,
         fetchData
     };
 }

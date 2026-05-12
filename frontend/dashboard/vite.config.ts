@@ -14,17 +14,18 @@ export default defineConfig(({ mode }) => {
             vue(),
             VitePWA({
                 registerType: 'autoUpdate',
-                injectRegister: 'auto',
-                includeAssets: ['honey.png'],
+                injectRegister: false,
+                includeAssets: ['honey.png', 'pwa-192x192.png', 'pwa-512x512.png'],
                 manifest: {
+                    id: '/honeypot/',
                     name: 'Threat Intel Dashboard',
                     short_name: 'ThreatIntel',
                     description: 'Honeypot Monitoring Dashboard',
                     theme_color: '#1a1a1a',
                     background_color: '#1a1a1a',
                     display: 'standalone',
-                    scope: './',
-                    start_url: './',
+                    scope: '/honeypot/',
+                    start_url: '/honeypot/',
                     orientation: 'any',
                     icons: [
                         {
@@ -48,8 +49,25 @@ export default defineConfig(({ mode }) => {
                     ]
                 },
                 workbox: {
+                    // Escludiamo config.js dal precache per gestire la versione runtime correttamente
+                    globIgnores: ['**/config.js'],
                     // Impedisce al Service Worker di gestire rotte esterne alla app Vue (API)
-                    navigateFallbackDenylist: [new RegExp(`^${runtimeBasePath.replace(/\//g, '\\/')}api`)]
+                    navigateFallbackDenylist: [new RegExp(`^${runtimeBasePath.replace(/\//g, '\\/')}api`)],
+                    runtimeCaching: [
+                        {
+                            urlPattern: ({ url }) => url.pathname.endsWith('config.js'),
+                            handler: 'NetworkFirst',
+                            options: {
+                                cacheName: 'runtime-config',
+                                expiration: {
+                                    maxEntries: 1,
+                                },
+                                cacheableResponse: {
+                                    statuses: [0, 200]
+                                }
+                            }
+                        }
+                    ]
                 }
             })
         ],

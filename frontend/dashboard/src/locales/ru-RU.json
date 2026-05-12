@@ -222,6 +222,7 @@
         "months": "Месяцы",
         "years": "Годы",
         "filterByIp": "Фильтр по IP...",
+        "filterByUA": "Фильтр по User Agent...",
         "searchPlaceholder": "Поиск паттернов, URL, User Agent...",
         "globalSearch": "ГЛОБАЛЬНЫЙ ПОИСК",
         "clearIpFilter": "Очистить фильтр IP",
@@ -307,6 +308,7 @@
         "searchLabel": "Поиск в списке:",
         "searchPlaceholder": "IP, Хэш, Техника...",
         "filterByUri": "Фильтр по целевому URI",
+        "filterByUA": "Фильтр по User Agent...",
         "browseUris": "Просмотр URI",
         "table": {
             "ips": "Задействовано IP",
@@ -419,6 +421,7 @@
         "attacks": "Аномалии",
         "filterByIp": "Фильтр по IP...",
         "filterByUrl": "Фильтр по URL...",
+        "filterByUA": "Фильтр по User Agent...",
         "clearIpFilter": "Очистить фильтр IP",
         "clearUrlFilter": "Очистить фильтр URL",
         "noLogsFound": "Журналов не найдено",

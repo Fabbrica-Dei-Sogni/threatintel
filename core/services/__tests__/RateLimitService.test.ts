@@ -13,12 +13,13 @@ import mongoose from 'mongoose';
 import { RateLimitService } from '../RateLimitService';
 import RateLimitEvent from '../../models/RateLimitEventSchema';
 import { RATE_LIMIT_SERVICE_TOKEN } from '../../di/tokens';
+import { ConfigDefaults } from '../../utils/ConfigUtils';
 
 describe('RateLimitService', () => {
     let service: RateLimitService;
 
     beforeAll(async () => {
-        const uri = process.env.MONGO_URI_TEST || 'mongodb://127.0.0.1:27017/threatintel_test';
+        const uri = process.env.MONGO_URI_TEST || ConfigDefaults.MONGO_URI_TEST;
         if (mongoose.connection.readyState === 0) {
             await mongoose.connect(uri);
         }

@@ -119,6 +119,7 @@ export default class AttackDTO {
         ip?: string;
         url?: string;
         method?: string;
+        userAgent?: string;
         headers?: Record<string, string>;
         body?: any;
         query?: Record<string, any>;

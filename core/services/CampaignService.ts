@@ -34,6 +34,7 @@ export class CampaignService {
             pageSize = 10,
             selectedUris = [],
             search = '',
+            userAgent = '',
             status = 'active',
             protocol = 'http'
         } = params;
@@ -78,6 +79,14 @@ export class CampaignService {
             }
         }
 
+        const postAggFilters: any[] = [];
+        if (userAgent) {
+            const cleanUA = userAgent.trim();
+            if (cleanUA.length > 0) {
+                postAggFilters.push({ 'fingerprintAnalysis.userAgents': { $regex: escapeRegex(cleanUA), $options: 'i' } });
+            }
+        }
+
         try {
             // Calcolo date globali per i metadati (bounds temporali)
             const [oldestLog] = await ThreatLog.find(baseFilters).sort({ timestamp: 1 }).limit(1).select('timestamp').lean();
@@ -87,8 +96,19 @@ export class CampaignService {
 
             const pipeline = await this.forensicPipeline.buildCampaignDiscoveryPipeline(baseFilters, params);
 
+            // 2.5 Iniezione filtri post-aggregazione (prima del facet finale)
+            if (postAggFilters.length > 0) {
+                const facetIndex = pipeline.findIndex((s: any) => s.$facet);
+                if (facetIndex !== -1) {
+                    pipeline.splice(facetIndex, 0, { $match: { $and: postAggFilters } });
+                }
+            }
+
             // Allineamento logica: lo status viene iniettato prima del facet finale
-            pipeline.splice(pipeline.length - 1, 0, { $match: { status: requestedStatus } });
+            const finalFacetIndex = pipeline.findIndex((s: any) => s.$facet);
+            if (finalFacetIndex !== -1) {
+                pipeline.splice(finalFacetIndex, 0, { $match: { status: requestedStatus } });
+            }
 
             // 3. Esecuzione Aggregazione
             const [result] = await ThreatLog.aggregate(pipeline).allowDiskUse(true);
@@ -153,14 +173,15 @@ export class CampaignService {
         const {
             hash,
             status = 'active',
-            protocol = null
+            protocol = null,
+            userAgent = ''
         } = params;
 
         // 1. Preparazione Filtro Mongo Base
         const baseFilters: any = { 'fingerprint.hash': hash };
 
         const requestedStatus = status || 'active';
-
+        
         if (protocol) {
             if (protocol === 'http') {
                 baseFilters.$or = [{ protocol: 'http' }, { protocol: { $exists: false } }, { protocol: null }];
@@ -169,8 +190,24 @@ export class CampaignService {
             }
         }
 
+        const postAggFilters: any[] = [];
+        if (userAgent) {
+            const cleanUA = userAgent.trim();
+            if (cleanUA.length > 0) {
+                postAggFilters.push({ 'fingerprintAnalysis.userAgents': { $regex: escapeRegex(cleanUA), $options: 'i' } });
+            }
+        }
+
         try {
             const pipeline = await this.forensicPipeline.buildCampaignDetailPipeline(baseFilters, params);
+
+            // Iniezione filtri post-aggregazione (sui nodi/IP)
+            if (postAggFilters.length > 0) {
+                const facetIndex = pipeline.findIndex((s: any) => s.$facet);
+                if (facetIndex !== -1) {
+                    pipeline.splice(facetIndex, 0, { $match: { $and: postAggFilters } });
+                }
+            }
 
             // 3. Esecuzione Aggregazione
             const [result] = await ThreatLog.aggregate(pipeline).allowDiskUse(true);
@@ -211,6 +248,7 @@ export class CampaignService {
         const {
             protocol = 'http',
             search = '',
+            userAgent = '',
             status = 'active'
         } = params;
 
@@ -240,9 +278,26 @@ export class CampaignService {
             }
         }
 
+        const postAggFilters: any[] = [];
+        if (userAgent) {
+            const cleanUA = userAgent.trim();
+            if (cleanUA.length > 0) {
+                postAggFilters.push({ 'fingerprintAnalysis.userAgents': { $regex: escapeRegex(cleanUA), $options: 'i' } });
+            }
+        }
+
         try {
             // 2. Costruzione Pipeline tramite ForensicPipelineService
             const pipeline = await this.forensicPipeline.buildUniqueSampleUrlsPipeline(baseFilters, params);
+
+            // Iniezione filtri post-aggregazione
+            if (postAggFilters.length > 0) {
+                // Per gli URIs, il post-agg filter va applicato nel facet o dopo l'unwind se presente.
+                // In ForensicPipelineService.buildUniqueSampleUrlsPipeline, l'ultimo stage è un oggetto con generate()
+                // che contiene un $facet. Dobbiamo iniettare il filtro DENTRO quel generate se possibile, 
+                // o aggiungere uno stage prima.
+                pipeline.splice(pipeline.length - 1, 0, { $match: { $and: postAggFilters } });
+            }
 
             // 3. Esecuzione Aggregazione
             const [result] = await ThreatLog.aggregate(pipeline).allowDiskUse(true);

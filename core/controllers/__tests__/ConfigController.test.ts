@@ -53,12 +53,14 @@ jest.mock('../../middlewares/AuthMiddleware', () => {
     };
 });
 
+import { ConfigDefaults } from '../../utils/ConfigUtils';
+
 describe('ConfigRoutes API', () => {
     let app: express.Application;
 
 
     beforeAll(async () => {
-        const uri = (process.env.MONGO_URI_TEST || 'mongodb://127.0.0.1:27017/test-routes') + '-config-controller';
+        const uri = (process.env.MONGO_URI_TEST || ConfigDefaults.MONGO_URI_TEST) + '-config-controller';
         await mongoose.connect(uri);
 
         app = express();

@@ -28,12 +28,6 @@ describe('Forensic Pipeline Service Test', () => {
     let newService: ForensicPipelineService;
 
     beforeEach(async () => {
-        // Enforce implicit defaults or specific values to avoid .env pollution
-        process.env.DANGER_WEIGHT_RPSNORM = '0.18';
-        process.env.DANGER_WEIGHT_DURNORM = '0.12';
-        process.env.DANGER_WEIGHT_SCORENORM = '0.50';
-        process.env.DANGER_WEIGHT_UNIQUETECHNORM = '0.20';
-
         // Mock config values
         mockConfigService.getConfigValue.mockImplementation((key: string) => {
             if (key === 'DANGER_WEIGHT') return Promise.resolve(null);
@@ -48,10 +42,7 @@ describe('Forensic Pipeline Service Test', () => {
     });
 
     afterEach(() => {
-        delete process.env.DANGER_WEIGHT_RPSNORM;
-        delete process.env.DANGER_WEIGHT_DURNORM;
-        delete process.env.DANGER_WEIGHT_SCORENORM;
-        delete process.env.DANGER_WEIGHT_UNIQUETECHNORM;
+        jest.clearAllMocks();
     });
 
     it('should build a standard pipeline correctly', async () => {

@@ -594,13 +594,14 @@ export async function fetchCampaigns({
     pageSize = 10,
     selectedUris = [],
     search = '',
+    userAgent = '',
     minCorrelations = 0,
     status = 'active'
 }: FetchCampaignsParams = {}): Promise<FetchCampaignsResponse> {
-    console.log('[fetchCampaigns] Params:', { startTime, endTime, timeMode, agoValue, agoUnit, minIps, minScore, minLogsPerIp, minCorrelations, protocol, page, pageSize, selectedUris, search, status });
+    console.log('[fetchCampaigns] Params:', { startTime, endTime, timeMode, agoValue, agoUnit, minIps, minScore, minLogsPerIp, minCorrelations, protocol, page, pageSize, selectedUris, search, userAgent, status });
     try {
         const response = await apiClient.get('/campaign/search', {
-            params: { startTime, endTime, timeMode, agoValue, agoUnit, minIps, minScore, minLogsPerIp, minCorrelations, protocol, page, pageSize, selectedUris, search, status }
+            params: { startTime, endTime, timeMode, agoValue, agoUnit, minIps, minScore, minLogsPerIp, minCorrelations, protocol, page, pageSize, selectedUris, search, userAgent, status }
         });
         console.log('[fetchCampaigns] Response status:', response.status);
         console.log('[fetchCampaigns] Number of campaigns received:', response.data?.campaigns?.length || 0);

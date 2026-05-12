@@ -27,6 +27,7 @@ export interface CampaignsFilters {
     selectedUris: string[];
     search: string;
     minCorrelations: number;
+    userAgent: string;
     status: string;
 }
 
@@ -81,6 +82,7 @@ const DEFAULT_STATE: CampaignsState = {
         endDate: null,
         selectedUris: [],
         search: '',
+        userAgent: '',
         status: 'active'
     },
     pagination: {

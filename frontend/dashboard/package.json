@@ -1,6 +1,6 @@
 {
     "name": "honeypot-dashboard",
-    "version": "0.1.15",
+    "version": "1.0.0",
     "description": "ThreatIntel Reference Implementation Dashboard (Vue.js)",
     "author": "Alessandro Modica",
     "license": "BSL-1.1",

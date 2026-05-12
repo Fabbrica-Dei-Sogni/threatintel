@@ -8,6 +8,7 @@
 
 import 'reflect-metadata';
 import mongoose from 'mongoose';
+import { ConfigDefaults } from '../../utils/ConfigUtils';
 import { ThreatLogService } from '../ThreatLogService';
 import ThreatLog from '../../models/ThreatLogSchema';
 import * as Tokens from '../../di/tokens';
@@ -25,7 +26,7 @@ describe('ThreatLogService', () => {
     let mockTranslator: any;
 
     beforeAll(async () => {
-        const uri = process.env.MONGO_URI_TEST || 'mongodb://127.0.0.1:27017/threatintel_test';
+        const uri = process.env.MONGO_URI_TEST || ConfigDefaults.MONGO_URI_TEST;
         if (mongoose.connection.readyState === 0) {
             await mongoose.connect(uri);
         }

@@ -1,6 +1,6 @@
 {
     "name": "threat-intelligence-logger",
-    "version": "1.0.0",
+    "version": "1.0.2",
     "description": "Sistema di logging per threat intelligence domestica",
     "author": "Alessandro Modica",
     "license": "BSL-1.1",
@@ -17,7 +17,9 @@
         "test-ratelimit": "node test/rateLimitTest.js",
         "redis-status": "redis-cli ping",
         "clear-redis": "redis-cli flushdb",
-        "swagger:gen": "ts-node scripts/generate-swagger.ts"
+        "swagger:gen": "ts-node scripts/generate-swagger.ts",
+        "release": "npm version ${npm_config_versione} -m \"Rilasciata una nuova release del core systemd v%s\" && git push --follow-tags",
+        "patch": "npm version patch -m \"Rilasciata una nuova patch del core systemd v%s\" && git push --follow-tags"
     },
     "dependencies": {
         "@qdrant/js-client-rest": "^1.17.0",

@@ -68,6 +68,7 @@ export const TOOL_TEMPLATES = {
       OFFSET: "Numero di risultati da saltare per paginazione.",
       SORT_BY: "Campo di ordinamento: 'timestamp', 'fingerprint.score'.",
       SORT_ORDER: "'desc' (default) o 'asc'.",
+      USER_AGENT: "Filtra per User-Agent o parte di esso (es: 'Nmap', 'python-requests').",
       STATUS: "Stato del log: 'active' (default), 'archived', 'deleted'."
     }
   },
@@ -92,6 +93,7 @@ export const TOOL_TEMPLATES = {
       OFFSET: "Numero di risultati da saltare per paginazione.",
       SORT_BY: "Campo di ordinamento: 'lastSeen', 'totaleLogs', 'dangerScore', 'averageScore'.",
       SORT_ORDER: "'desc' (default) o 'asc'.",
+      USER_AGENT: "Filtra per User-Agent utilizzato nell'attacco (es: 'sqlmap', 'Mozilla/5.0').",
       STATUS: "Stato del log: 'active' (default), 'archived' (storico/whitelist), 'deleted' (cestino)."
     }
   },
@@ -115,6 +117,7 @@ export const TOOL_TEMPLATES = {
       OFFSET: "Numero di risultati da saltare per paginazione.",
       SORT_BY: "Campo di ordinamento: 'lastSeen', 'firstSeen', 'ipCount', 'totaleLogs', 'averageScore'.",
       SORT_ORDER: "'desc' (default) o 'asc'.",
+      USER_AGENT: "Filtra per User-Agent coinvolto nella campagna (es: 'Zgrab', 'Go-http-client').",
       STATUS: "Stato dei log della campagna: 'active' (default), 'archived', 'deleted'."
     }
   },

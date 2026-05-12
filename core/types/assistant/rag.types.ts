@@ -100,6 +100,7 @@ export interface CampaignSummaryPayload extends RagBasePayload {
     campaignId: string;
     ipCount: number;
     protocols: string[];
+    userAgents: string[];
     topIps: string[];
     totaleLogs?: number;
     averageScore?: number;

@@ -24,6 +24,7 @@ import {
     sanitizePageSize,
     sanitizePage,
     sanitizeLimit,
+    escapeRegex,
     SortAllowedFields,
     FilterAllowedFields
 } from '../utils/queryGuard';
@@ -230,10 +231,10 @@ export class ThreatLogService {
                 if (words.length > 1) {
                     // Usiamo $and per compatibilità massima invece di $all con regex
                     words.forEach(w => {
-                        andFilters.push({ [key]: { $regex: w, $options: 'i' } });
+                        andFilters.push({ [key]: { $regex: escapeRegex(w), $options: 'i' } });
                     });
                 } else if (words.length === 1) {
-                    mongoFilters[key] = { $regex: words[0], $options: 'i' };
+                    mongoFilters[key] = { $regex: escapeRegex(words[0]), $options: 'i' };
                 }
             } else {
                 mongoFilters[key] = value;

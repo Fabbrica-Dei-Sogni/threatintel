@@ -3,8 +3,8 @@ import { Server as HttpServer } from "http";
 import { inject, singleton } from "tsyringe";
 import { Logger } from "winston";
 import * as Tokens from "../../di/tokens";
-import { allowedOrigins } from "../../config";
 import { SocketEvents } from "../../types/SocketEvents";
+import { AppConfigProvider } from "../AppConfigProvider";
 
 /**
  * SocketServerHub - Gestore dell'infrastruttura Socket.io.
@@ -17,7 +17,8 @@ export class SocketServerHub {
     private initialized = false;
 
     constructor(
-        @inject(Tokens.LOGGER_TOKEN) private readonly logger: Logger
+        @inject(Tokens.LOGGER_TOKEN) private readonly logger: Logger,
+        @inject(Tokens.CONFIG_PROVIDER_TOKEN) private readonly config: AppConfigProvider
     ) {}
 
     /**
@@ -33,7 +34,7 @@ export class SocketServerHub {
 
         this.io = new SocketIOServer(httpServer, {
             cors: {
-                origin: allowedOrigins,
+                origin: this.config.allowedOrigins,
                 methods: ["GET", "POST"],
                 credentials: true
             },

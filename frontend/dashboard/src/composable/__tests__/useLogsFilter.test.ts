@@ -16,7 +16,7 @@ describe('useLogsFilter', () => {
   });
 
   it('should initialize with provided values', () => {
-    const { filterIp, filterProtocol, page } = useLogsFilter('1.2.3.4', '', 'ssh', 'active', 2);
+    const { filterIp, filterProtocol, page } = useLogsFilter('1.2.3.4', '', 'ssh', 'active', '', 2);
     
     expect(filterIp.value).toBe('1.2.3.4');
     expect(filterProtocol.value).toBe('ssh');

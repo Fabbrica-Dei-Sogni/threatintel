@@ -713,6 +713,7 @@ const {
   '', '',
   toRef(dashboardState.rankings, 'logProtocol'),
   'active', // initialStatus
+  '', // initialUserAgent
   toRef(dashboardState.rankings, 'logPage'),
   { timestamp: -1 }, 10
 )

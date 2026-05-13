@@ -10,20 +10,12 @@ import './assets/styles/classic-shared.css';
 import i18n from './locales/index';
 import { registerSW } from 'virtual:pwa-register';
 
-// Registrazione manuale del Service Worker per la PWA
-const updateSW = registerSW({
+// Registrazione automatica del Service Worker per la PWA
+// Con 'autoUpdate' in vite.config.ts, l'app si aggiornerà silenziamente in background
+registerSW({
     immediate: true,
     onRegistered(r) {
         console.log('[PWA] Service Worker registrato:', r?.scope);
-    },
-    onNeedRefresh() {
-        console.log('[PWA] Nuovo contenuto disponibile, ricaricare la pagina.');
-        if (confirm('Nuovo aggiornamento disponibile. Ricaricare ora?')) {
-            updateSW(true);
-        }
-    },
-    onOfflineReady() {
-        console.log('[PWA] App pronta per l\'uso offline.');
     },
     onRegisterError(error) {
         console.error('[PWA] Errore SW:', error);

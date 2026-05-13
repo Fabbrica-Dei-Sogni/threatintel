@@ -930,6 +930,8 @@
         },
         "job_completed": "Operazione Completata",
         "completed_successfully": "completata con successo",
-        "job_failed": "Operazione Fallita"
+        "job_failed": "Operazione Fallita",
+        "job_cancelled": "Operazione Annullata",
+        "cancelled_successfully": "interrotta dall'utente"
     }
 }

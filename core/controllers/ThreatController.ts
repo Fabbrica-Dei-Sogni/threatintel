@@ -403,15 +403,17 @@ export class ThreatController {
             const { batchSize = 100, updateDatabase = true } = req.body;
             const user = (req as any).user?.name || 'admin';
 
-            // Avviamo entrambi i job in parallelo (in background)
+            // Avviamo il job di ri-analisi HTTP in background
             const httpJob = await this.jobManager.startJob('threat_reanalyze', { batchSize, updateDatabase }, user);
-            const sshJob = await this.jobManager.startJob('ssh_reanalyze', { batchSize }, user);
+            
+            // DISABILITATO SU RICHIESTA UTENTE: ssh_reanalyze sarà un job separato
+            // const sshJob = await this.jobManager.startJob('ssh_reanalyze', { batchSize }, user);
 
             res.status(202).json({ 
-                message: 'Processi di ri-analisi avviati in background',
+                message: 'Processo di ri-analisi HTTP avviato in background',
                 jobs: {
-                    http: { jobId: httpJob.id, status: httpJob.status },
-                    ssh: { jobId: sshJob.id, status: sshJob.status }
+                    http: { jobId: httpJob.id, status: httpJob.status }
+                    // ssh: { jobId: sshJob.id, status: sshJob.status }
                 }
             });
         } catch (err: any) {

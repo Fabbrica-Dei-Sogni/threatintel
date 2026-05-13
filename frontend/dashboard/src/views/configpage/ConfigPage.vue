@@ -399,13 +399,13 @@ async function handleDelete(key: string) {
 async function handleReanalyze() {
     confirmModalConfig.value = {
         title: 'RIANALISI COMPLETA',
-        message: 'Questa operazione scansionerà tutti i log HTTP e SSH. Potrebbe richiedere tempo.',
+        message: 'Questa operazione scansionerà tutti i log HTTP per ricalcolare i pattern di minaccia. Potrebbe richiedere tempo.',
         isDanger: false
     };
     
     pendingAction = async () => {
         try {
-            await jobStore.runJob('reanalyze', { batchSize: 200 });
+            await jobStore.runJob('threat_reanalyze', { batchSize: 200 });
             showSuccess(t('config.reanalyzeStarted') || 'Rianalisi avviata in background');
         } catch (err) {
             console.error('[ConfigPage] Failed to start reanalysis:', err);

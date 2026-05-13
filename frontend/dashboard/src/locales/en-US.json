@@ -931,6 +931,8 @@
         },
         "job_completed": "Job Completed",
         "completed_successfully": "completed successfully",
-        "job_failed": "Job Failed"
+        "job_failed": "Job Failed",
+        "job_cancelled": "Job Cancelled",
+        "cancelled_successfully": "stopped by user"
     }
 }

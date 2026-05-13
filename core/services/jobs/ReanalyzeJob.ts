@@ -23,9 +23,11 @@ export class ReanalyzeJob implements IBackgroundJob {
         // Nota: non attendiamo il completamento qui per non bloccare il manager, 
         // ma in un'architettura più complessa potremmo monitorarli.
         await this.jobManager.startJob('threat_reanalyze', { batchSize, updateDatabase }, 'system-orchestrator');
-        await this.jobManager.startJob('ssh_reanalyze', { batchSize }, 'system-orchestrator');
         
-        this.logger.info(`[FullReanalyzeJob] Job di rianalisi lanciati con successo.`);
+        // DISABILITATO SU RICHIESTA UTENTE: la rianalisi SSH sarà gestita separatamente
+        // await this.jobManager.startJob('ssh_reanalyze', { batchSize }, 'system-orchestrator');
+        
+        this.logger.info(`[FullReanalyzeJob] Job di rianalisi (HTTP) lanciato con successo.`);
     }
 
     async stop(): Promise<void> {

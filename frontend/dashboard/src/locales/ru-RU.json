@@ -931,6 +931,8 @@
         },
         "job_completed": "Задание завершено",
         "completed_successfully": "успешно завершено",
-        "job_failed": "Задание не удалось"
+        "job_failed": "Задание не удалось",
+        "job_cancelled": "Задание отменено",
+        "cancelled_successfully": "остановлено пользователем"
     }
 }

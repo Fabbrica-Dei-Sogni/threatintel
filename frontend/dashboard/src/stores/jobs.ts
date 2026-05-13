@@ -177,6 +177,11 @@ export const useJobStore = defineStore('jobs', () => {
     }
 
     function updateJobStatus(jobId: string, updates: Partial<AnalysisJob>) {
+        // Se il job è già marcato come in rimozione o definitivamente terminale in questa sessione, ignoriamo l'evento
+        if (terminalIds.has(jobId) || finishingJobs.has(jobId)) {
+            return;
+        }
+
         if (activeJobs[jobId]) {
             // Se lo stato attuale è già terminale, non accettiamo aggiornamenti non terminali (race condition socket/poll)
             if (isTerminal(activeJobs[jobId].status) && !isTerminal(updates.status || '')) {
@@ -190,6 +195,11 @@ export const useJobStore = defineStore('jobs', () => {
             }
         } else {
             // Se non lo stiamo monitorando ma arriva un aggiornamento (es. appena creato), lo aggiungiamo
+            // A meno che non sia già terminale (evita di mostrare job già finiti se arriva l'evento in ritardo)
+            if (updates.status && isTerminal(updates.status)) {
+                return;
+            }
+
             if (updates.status === JobStatus.RUNNING || updates.status === JobStatus.PENDING) {
                 // Inizializziamo con dati di default per evitare errori di template (metadata mancanti)
                 activeJobs[jobId] = { 

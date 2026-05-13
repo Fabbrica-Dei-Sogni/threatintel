@@ -4,6 +4,7 @@ import { Logger } from 'winston';
 import { IBackgroundJob } from '../../types/jobs';
 import { RagSyncService } from '../assistant/RagSyncService';
 import AnalysisJob, { JobStatus } from '../../models/AnalysisJobSchema';
+import { EventBus, AppEvents } from '../EventBus';
 
 @injectable()
 export class RagReindexJob implements IBackgroundJob {
@@ -12,7 +13,8 @@ export class RagReindexJob implements IBackgroundJob {
 
     constructor(
         @inject(Tokens.LOGGER_TOKEN) private readonly logger: Logger,
-        @inject(Tokens.RAG_SYNC_SERVICE_TOKEN) private readonly ragSync: RagSyncService
+        @inject(Tokens.RAG_SYNC_SERVICE_TOKEN) private readonly ragSync: RagSyncService,
+        @inject(Tokens.EVENT_BUS_TOKEN) private readonly eventBus: EventBus
     ) { }
 
     async execute(jobId: string, params: any): Promise<void> {
@@ -41,6 +43,7 @@ export class RagReindexJob implements IBackgroundJob {
 
             let totalToProcess = 0;
             for (const collection of collections) {
+                this.logger.info(`[RagReindexJob] Conteggio punti obsoleti per ${collection}...`);
                 const count = await this.ragSync.countObsoletePoints(collection, thresholdDate);
                 totalToProcess += count;
             }
@@ -62,30 +65,57 @@ export class RagReindexJob implements IBackgroundJob {
                 this.logger.info(`[RagReindexJob] Processamento collection: ${collection}`);
 
                 let hasMore = true;
+                let currentOffset = undefined;
+
                 while (hasMore && !this.isStopped) {
-                    const result = await this.ragSync.reindexObsoletePoints(collection, batchSize, thresholdDate);
+                    this.logger.debug(`[RagReindexJob] Richiesta batch di re-indexing per ${collection} (Offset: ${currentOffset || 'inizio'})...`);
+                    
+                    const result = await this.ragSync.reindexObsoletePoints(
+                        collection, 
+                        batchSize, 
+                        thresholdDate, 
+                        currentOffset,
+                        async (itemStats) => {
+                            // Aggiornamento granulare per ogni punto
+                            totalProcessed += itemStats.processed;
+                            totalUpdated += itemStats.updated;
+                            totalDeleted += itemStats.deleted;
 
-                    totalProcessed += result.processed;
-                    totalUpdated += result.updated;
-                    totalDeleted += result.deleted;
+                            const progress = totalToProcess > 0 
+                                ? Math.min(100, Math.round((totalProcessed / totalToProcess) * 100)) 
+                                : 0;
 
-                    // Calcoliamo la percentuale di progresso
-                    const progress = totalToProcess > 0 
-                        ? Math.round((totalProcessed / totalToProcess) * 100) 
-                        : 0;
+                            await AnalysisJob.findByIdAndUpdate(jobId, {
+                                $set: {
+                                    progress,
+                                    'metadata.processed': totalProcessed,
+                                    'metadata.updated': totalUpdated,
+                                    'metadata.deleted': totalDeleted
+                                }
+                            });
 
-                    // Aggiorniamo il progresso nel database usando $set per sicurezza
-                    await AnalysisJob.findByIdAndUpdate(jobId, {
-                        $set: {
-                            progress,
-                            'metadata.processed': totalProcessed,
-                            'metadata.updated': totalUpdated,
-                            'metadata.deleted': totalDeleted,
-                            'metadata.total': totalToProcess // Riaffermiamo il totale
+                            // Emissione evento per WebSockets
+                            this.eventBus.emit(AppEvents.JOB_PROGRESS, {
+                                id: jobId,
+                                jobName: this.type,
+                                status: JobStatus.RUNNING,
+                                progress,
+                                metadata: {
+                                    processed: totalProcessed,
+                                    total: totalToProcess,
+                                    updated: totalUpdated,
+                                    deleted: totalDeleted
+                                }
+                            });
                         }
-                    });
+                    );
 
-                    if (result.processed === 0) {
+                    this.logger.debug(`[RagReindexJob] Batch completato per ${collection}. Offset successivo: ${result.nextOffset || 'nessuno'}`);
+                    
+                    // Nota: totalProcessed e altri sono già stati aggiornati dal callback per ogni item
+                    currentOffset = result.nextOffset;
+
+                    if (!currentOffset || result.processed === 0) {
                         hasMore = false;
                     }
                 }

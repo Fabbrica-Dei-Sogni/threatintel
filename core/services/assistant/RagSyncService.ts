@@ -114,11 +114,17 @@ export class RagSyncService {
         }
     }
 
-    public async reindexObsoletePoints(collectionName: string, limit: number = 20, customThresholdDate?: string): Promise<{ processed: number, updated: number, deleted: number }> {
+    public async reindexObsoletePoints(
+        collectionName: string, 
+        limit: number = 20, 
+        customThresholdDate?: string, 
+        offset?: any,
+        onProgress?: (stats: { processed: number, updated: number, deleted: number }) => Promise<void>
+    ): Promise<{ processed: number, updated: number, deleted: number, nextOffset?: any }> {
         if (!this.checkOperational()) return { processed: 0, updated: 0, deleted: 0 };
 
-        this.logger.info(`[RagSync] Starting re-indexing check for obsolete points in ${collectionName}...`);
-        let stats = { processed: 0, updated: 0, deleted: 0 };
+        this.logger.debug(`[RagSync] Starting re-indexing check for ${collectionName} (Offset: ${offset || 'start'})...`);
+        let stats = { processed: 0, updated: 0, deleted: 0, nextOffset: undefined as any };
 
         try {
             // Se non fornita, calcoliamo la soglia in base alla configurazione attuale
@@ -140,10 +146,12 @@ export class RagSyncService {
 
             const result = await this.qdrant.scrollPoints(collectionName, {
                 filter,
-                limit
+                limit,
+                offset
             });
 
             stats.processed = result.points.length;
+            stats.nextOffset = result.next_page_offset;
             this.logger.info(`[RagSync] Scrolled ${stats.processed} points for re-indexing in ${collectionName} (Older than ${thresholdDate})`);
 
             for (const point of result.points) {
@@ -219,13 +227,18 @@ export class RagSyncService {
                         stats.deleted++;
                     }
 
+                    // Notifica progresso se richiesto
+                    if (onProgress) {
+                        await onProgress({ processed: 1, updated: reindexed ? 1 : 0, deleted: (pruned || (!reindexed && !pruned)) ? 1 : 0 });
+                    }
+
                 } catch (err) {
                     this.logger.error(`[RagSync] Failed to re-index point ${point.id}: ${err.message}`);
                 }
             }
 
             if (stats.processed > 0) {
-                this.logger.info(`[RagSync] Re-indexing finished: ${stats.updated} updated, ${stats.deleted} deleted.`);
+                this.logger.debug(`[RagSync] Re-indexing batch finished: ${stats.updated} updated, ${stats.deleted} deleted.`);
             }
 
             return stats;

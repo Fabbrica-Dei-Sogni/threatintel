@@ -3,7 +3,7 @@ import * as Tokens from '../../di/tokens';
 import { Logger } from 'winston';
 import { IBackgroundJob } from '../../types/jobs';
 import { RagSyncService } from '../assistant/RagSyncService';
-import AnalysisJob from '../../models/AnalysisJobSchema';
+import AnalysisJob, { JobStatus } from '../../models/AnalysisJobSchema';
 
 @injectable()
 export class RagReindexJob implements IBackgroundJob {
@@ -94,15 +94,18 @@ export class RagReindexJob implements IBackgroundJob {
             if (this.isStopped) {
                 this.logger.info(`[RagReindexJob] Job ${jobId} interrotto dall'utente.`);
                 await AnalysisJob.findByIdAndUpdate(jobId, {
-                    $set: { status: 'cancelled' as any }
+                    $set: { status: JobStatus.CANCELLED }
                 });
             } else {
                 this.logger.info(`[RagReindexJob] Job ${jobId} completato con successo. Processati: ${totalProcessed}, Aggiornati: ${totalUpdated}, Eliminati: ${totalDeleted}`);
+                // Lasciamo che sia il BackgroundJobManager a marcare come COMPLETED e a inviare l'evento finale
+                // ma aggiorniamo i contatori finali
                 await AnalysisJob.findByIdAndUpdate(jobId, {
                     $set: { 
-                        status: 'completed' as any,
                         progress: 100,
-                        completedAt: new Date()
+                        'metadata.processed': totalProcessed,
+                        'metadata.updated': totalUpdated,
+                        'metadata.deleted': totalDeleted
                     }
                 });
             }
@@ -112,7 +115,7 @@ export class RagReindexJob implements IBackgroundJob {
             
             await AnalysisJob.findByIdAndUpdate(jobId, {
                 $set: { 
-                    status: 'failed' as any,
+                    status: JobStatus.FAILED,
                     error: err.message,
                     completedAt: new Date()
                 }

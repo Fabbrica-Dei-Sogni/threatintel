@@ -31,8 +31,8 @@
                         <span class="progress-text">{{ job.progress }}%</span>
                     </div>
 
-                    <div class="job-metadata">
-                        <span>PROCESSED: {{ job.metadata.processed }} / {{ job.metadata.total }}</span>
+                    <div class="job-metadata" v-if="job.metadata">
+                        <span>PROCESSED: {{ job.metadata.processed || 0 }} / {{ job.metadata.total || 0 }}</span>
                         <span v-if="job.metadata.updated !== undefined">UPDATED: {{ job.metadata.updated }}</span>
                     </div>
 

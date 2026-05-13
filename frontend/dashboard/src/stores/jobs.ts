@@ -8,7 +8,28 @@ export const useJobStore = defineStore('jobs', () => {
     const error = ref<string | null>(null);
     const activeJobs = reactive<Record<string, AnalysisJob>>({});
     
+    const finishingJobs = new Set<string>();
+    const terminalIds = new Set<string>();
     let pollInterval: any = null;
+    let loadRecentTimeout: any = null;
+
+    /**
+     * Helper to check if a status is terminal
+     */
+    function isTerminal(status: JobStatus | string): boolean {
+        return status === JobStatus.COMPLETED || status === JobStatus.FAILED || status === JobStatus.CANCELLED;
+    }
+
+    /**
+     * Debounced version of loadRecentJobs
+     */
+    function debouncedLoadRecentJobs() {
+        if (loadRecentTimeout) clearTimeout(loadRecentTimeout);
+        loadRecentTimeout = setTimeout(() => {
+            loadRecentJobs();
+            loadRecentTimeout = null;
+        }, 300);
+    }
 
     async function loadRecentJobs() {
         loading.value = true;
@@ -47,6 +68,8 @@ export const useJobStore = defineStore('jobs', () => {
         try {
             await purgeJob(jobId);
             delete activeJobs[jobId];
+            terminalIds.delete(jobId);
+            finishingJobs.delete(jobId);
             jobs.value = jobs.value.filter(j => j._id !== jobId);
             await loadRecentJobs();
         } catch (err: any) {
@@ -57,6 +80,8 @@ export const useJobStore = defineStore('jobs', () => {
 
     function monitorJobs(jobIds: string[]) {
         jobIds.forEach(id => {
+            if (terminalIds.has(id)) return; // Mai riaggiungere job già finiti
+
             if (!activeJobs[id]) {
                 const existing = jobs.value.find(j => j._id === id);
                 if (existing) {
@@ -83,11 +108,13 @@ export const useJobStore = defineStore('jobs', () => {
         if (pollInterval) return;
         
         pollInterval = setInterval(async () => {
-            const ids = Object.keys(activeJobs);
-            if (ids.length === 0) {
+            const ids = Object.keys(activeJobs).filter(id => !finishingJobs.has(id));
+            if (ids.length === 0 && finishingJobs.size === 0) {
                 stopPolling();
                 return;
             }
+
+            if (ids.length === 0) return;
 
             const promises = ids.map(id => fetchJobStatus(id));
             const results = await Promise.allSettled(promises);
@@ -96,19 +123,36 @@ export const useJobStore = defineStore('jobs', () => {
                 const id = ids[index];
                 if (res.status === 'fulfilled') {
                     const job = res.value;
+                    
+                    // Solo se lo stato ricevuto è "più avanzato" o uguale a quello attuale
+                    // Evitiamo che un poll ritardato sovrascriva uno stato terminale
+                    const currentJob = activeJobs[id];
+                    if (currentJob && isTerminal(currentJob.status)) {
+                        return; 
+                    }
+
                     activeJobs[id] = job;
                     
-                    if (job.status === JobStatus.COMPLETED || job.status === JobStatus.FAILED || job.status === JobStatus.CANCELLED) {
-                        setTimeout(() => {
-                            delete activeJobs[id];
-                            loadRecentJobs();
-                        }, 5000);
+                    if (isTerminal(job.status)) {
+                        scheduleJobRemoval(id);
                     }
                 } else {
                     console.error(`[JobStore] Failed to poll job ${id}:`, res.reason);
                 }
             });
         }, 2000);
+    }
+
+    function scheduleJobRemoval(jobId: string) {
+        if (finishingJobs.has(jobId)) return;
+        
+        terminalIds.add(jobId); // Marcalo come terminale per sempre (o finché la pagina non viene ricaricata)
+        finishingJobs.add(jobId);
+        setTimeout(() => {
+            delete activeJobs[jobId];
+            finishingJobs.delete(jobId);
+            debouncedLoadRecentJobs();
+        }, 5000);
     }
 
     function stopPolling() {
@@ -134,19 +178,30 @@ export const useJobStore = defineStore('jobs', () => {
 
     function updateJobStatus(jobId: string, updates: Partial<AnalysisJob>) {
         if (activeJobs[jobId]) {
+            // Se lo stato attuale è già terminale, non accettiamo aggiornamenti non terminali (race condition socket/poll)
+            if (isTerminal(activeJobs[jobId].status) && !isTerminal(updates.status || '')) {
+                return;
+            }
+
             Object.assign(activeJobs[jobId], updates);
             
-            // Se il job è terminato, lo spostiamo nello storico dopo un po'
-            if (updates.status === JobStatus.COMPLETED || updates.status === JobStatus.FAILED || updates.status === JobStatus.CANCELLED) {
-                setTimeout(() => {
-                    delete activeJobs[jobId];
-                    loadRecentJobs();
-                }, 5000);
+            if (updates.status && isTerminal(updates.status)) {
+                scheduleJobRemoval(jobId);
             }
         } else {
             // Se non lo stiamo monitorando ma arriva un aggiornamento (es. appena creato), lo aggiungiamo
             if (updates.status === JobStatus.RUNNING || updates.status === JobStatus.PENDING) {
-                activeJobs[jobId] = { _id: jobId, ...updates } as any;
+                // Inizializziamo con dati di default per evitare errori di template (metadata mancanti)
+                activeJobs[jobId] = { 
+                    _id: jobId, 
+                    status: updates.status,
+                    progress: updates.progress || 0,
+                    type: updates.type || 'unknown',
+                    metadata: { processed: 0, total: 0, errors: [], params: {} },
+                    createdAt: new Date().toISOString(),
+                    ...updates 
+                } as any;
+                if (!pollInterval) startPolling();
             }
         }
     }

@@ -63,9 +63,12 @@ export class ThreatController {
             const minLogs = parseInt(req.query.minLogs as string) || 1;
             const topParam = req.query.top as string;
             const top = topParam === 'all' ? -1 : parseInt(topParam) || 10;
+            
+            const protocolsParam = req.query.protocols as string;
+            const protocols = protocolsParam ? protocolsParam.split(',').map(p => p.trim()).filter(p => p.length > 0) : [];
 
-            const stats = await this.threatLogService.getStats(timeframe, minScore, top, minLogs);
-            const topThreats = await this.threatLogService.getTopThreats(10, timeframe, minScore);
+            const stats = await this.threatLogService.getStats(timeframe, minScore, top, minLogs, protocols);
+            const topThreats = await this.threatLogService.getTopThreats(top, timeframe, minScore, protocols);
 
             res.json({
                 stats: stats,

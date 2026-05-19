@@ -515,12 +515,12 @@ export class ThreatLogService {
         return { message: 'Rianalisi di tutti i log completata', results };
     }
 
-    async getStats(timeframe = '24h', minScore = 15, limit = 10, minLogs = 1) {
-        return this.analyticsService.getStats(timeframe, minScore, limit, minLogs);
+    async getStats(timeframe = '24h', minScore = 15, limit = 10, minLogs = 1, protocols: string[] = []) {
+        return this.analyticsService.getStats(timeframe, minScore, limit, minLogs, protocols);
     }
 
-    async getTopThreats(limit = 10, timeframe = '24h', minScore = 15) {
-        return this.analyticsService.getTopThreats(limit, timeframe, minScore);
+    async getTopThreats(limit = 10, timeframe = '24h', minScore = 15, protocols: string[] = []) {
+        return this.analyticsService.getTopThreats(limit, timeframe, minScore, protocols);
     }
 }
 

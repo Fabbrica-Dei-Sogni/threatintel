@@ -183,7 +183,7 @@ describe('ThreatRoutes API', () => {
             
             const response = await request(app).post('/api/reanalyze-all').send({});
             expect(response.status).toBe(202);
-            expect(response.body.message).toContain('avviati in background');
+            expect(response.body.message).toContain('avviato in background');
             expect(response.body.jobs.http.jobId).toBe('job-123');
         });
     });

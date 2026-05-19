@@ -181,7 +181,7 @@ export class ThreatAnalyticsService {
         };
     }
 
-    async getTopThreats(limit = 10, timeframe = '24h', minScore = 15, protocols: string[] = []) {
+    async getTopThreats(limit = 10, timeframe = '24h', minScore = 15, protocols: string[] = [], minLogs = 1) {
         let match: any = { 'fingerprint.suspicious': true };
 
         if (protocols && protocols.length > 0) {
@@ -204,6 +204,16 @@ export class ThreatAnalyticsService {
 
         if (minScore > 0) {
             match['fingerprint.score'] = { $gte: minScore };
+        }
+
+        if (minLogs > 1) {
+            const ipCounts = await ThreatLog.aggregate([
+                { $match: match },
+                { $group: { _id: "$request.ip", count: { $sum: 1 } } },
+                { $match: { count: { $gte: minLogs } } }
+            ]);
+            const allowedIps = ipCounts.map(c => c._id);
+            match['request.ip'] = { $in: allowedIps };
         }
 
         const effectiveLimit = limit > 0 ? limit : 1000;

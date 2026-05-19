@@ -519,8 +519,8 @@ export class ThreatLogService {
         return this.analyticsService.getStats(timeframe, minScore, limit, minLogs, protocols);
     }
 
-    async getTopThreats(limit = 10, timeframe = '24h', minScore = 15, protocols: string[] = []) {
-        return this.analyticsService.getTopThreats(limit, timeframe, minScore, protocols);
+    async getTopThreats(limit = 10, timeframe = '24h', minScore = 15, protocols: string[] = [], minLogs = 1) {
+        return this.analyticsService.getTopThreats(limit, timeframe, minScore, protocols, minLogs);
     }
 }
 

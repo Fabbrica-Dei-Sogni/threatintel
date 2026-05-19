@@ -2,8 +2,8 @@
 # Destinazione: /etc/nginx/sites-enabled/{{SERVICE_NAME}}.conf
 
 server {
-    listen 80;
-    listen [::]:80;
+    listen 80 default_server;
+    listen [::]:80 default_server;
     
     # Porte Traps (Raccolta dati grezzi)
     listen 8080;

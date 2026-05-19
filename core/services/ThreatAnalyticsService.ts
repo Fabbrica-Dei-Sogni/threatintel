@@ -31,9 +31,9 @@ export class ThreatAnalyticsService {
         }
 
         // Backward compatibility fallbacks
-        if (timeframe === '1m') return 720; 
-        if (timeframe === '1w') return 168; 
-        if (timeframe === '1y') return 8760; 
+        if (timeframe === '1m') return 720;
+        if (timeframe === '1w') return 168;
+        if (timeframe === '1y') return 8760;
 
         const parsed = parseInt(timeframe);
         if (!isNaN(parsed) && parsed > 0) {
@@ -66,7 +66,7 @@ export class ThreatAnalyticsService {
             this.logger.info(`[ThreatAnalyticsService] Calculating stats for ALL TIME with minScore: ${minScore}, minLogs: ${minLogs}, limit: ${limit}`);
         }
 
-        const effectiveLimit = limit > 0 ? limit : 1000;
+        //const effectiveLimit = limit > 0 ? limit : 10000;
 
         // Pipeline definitiva: separa il traffico globale dall'analisi delle minacce filtrata
         const results = await ThreatLog.aggregate([
@@ -124,7 +124,7 @@ export class ThreatAnalyticsService {
                         { $match: { count: { $gte: minLogs }, isSuspicious: 1, country: { $exists: true, $ne: null } } },
                         { $group: { _id: "$country", count: { $sum: 1 } } },
                         { $sort: { count: -1 } },
-                        { $limit: effectiveLimit }
+                        //{ $limit: effectiveLimit }
                     ],
                     // 4. Top Indicators (FILTERED BY minLogs)
                     topIndicators: [
@@ -149,14 +149,14 @@ export class ThreatAnalyticsService {
                         { $group: { _id: { ip: "$_id", ind: "$indicators" } } },
                         { $group: { _id: "$_id.ind", count: { $sum: 1 } } },
                         { $sort: { count: -1 } },
-                        { $limit: effectiveLimit }
-                    ],
-                    // 5. Nodi Unici (FILTERED BY minLogs)
-                    uniqueIPs: [
+                        //{ $limit: effectiveLimit }
+                    ]
+                    // 5. Nodi Unici (FILTERED BY minLogs) - COMMENTATO PER PRESTAZIONI
+                    /* uniqueIPs: [
                         { $group: { _id: "$request.ip", count: { $sum: 1 } } },
                         { $match: { count: { $gte: minLogs } } },
                         { $group: { _id: null, ips: { $push: "$_id" } } }
-                    ]
+                    ] */
                 }
             }
         ]);
@@ -176,7 +176,7 @@ export class ThreatAnalyticsService {
             suspiciousRequests: threats.count,
             topCountries: countriesMap,
             topIndicators: indicatorsMap,
-            uniqueIPs: facet.uniqueIPs[0]?.ips || [],
+            uniqueIPs: [], // Ritorna array vuoto per evitare traffico e calcoli inutili (commentato per prestazioni)
             scoreDistribution: { min: global.min, max: global.max, avg: global.avg }
         };
     }
@@ -216,7 +216,7 @@ export class ThreatAnalyticsService {
             match['request.ip'] = { $in: allowedIps };
         }
 
-        const effectiveLimit = limit > 0 ? limit : 1000;
+        //const effectiveLimit = limit > 0 ? limit : 1000;
 
         return await ThreatLog.aggregate([
             { $match: match },
@@ -230,7 +230,7 @@ export class ThreatAnalyticsService {
                 }
             },
             { $sort: { timestamp: -1 } },
-            { $limit: effectiveLimit },
+            //{ $limit: effectiveLimit },
             {
                 $project: {
                     _id: 0,

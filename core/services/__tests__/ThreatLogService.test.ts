@@ -211,7 +211,7 @@ describe('ThreatLogService', () => {
             const stats = await service.getStats('24h');
             expect(stats.totalRequests).toBe(1);
             expect(stats.suspiciousRequests).toBe(1);
-            expect(stats.uniqueIPs).toContain('1.2.3.4');
+            expect(stats.uniqueIPs).toEqual([]);
         });
     });
 

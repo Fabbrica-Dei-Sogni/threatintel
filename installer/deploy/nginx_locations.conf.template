@@ -33,7 +33,7 @@ location {{APP_BASE_PATH}}/socket.io/ {
 rewrite ^{{API_BASE_PATH}}$ {{API_BASE_PATH}}/ permanent;
 
 # 4. Frontend HUD (Scommentato per default per integrazione locale)
-location {{APP_BASE_PATH}}/ {
+location ^~ {{APP_BASE_PATH}}/ {
     
     #scommentare per definire la porta su cui gira il frontend
     #proxy_pass http://localhost:{{PORT_FRONTEND}}/;

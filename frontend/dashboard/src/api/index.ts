@@ -465,7 +465,7 @@ export async function fetchCustomReport(payload: any, format: string = 'pdf', st
 // ==========================
 
 /**
- * @param timeframe '24h' | '1w' | '1m' | '1y' | 'all'
+ * @param timeframe '24h' | '1w' | '1M' | '1y' | 'all'
  * @param minScore Sogli minima di rischio
  * @param limit Numero di elementi per le classifiche top (può essere "all" o numero)
  */

@@ -21,7 +21,7 @@
         <span class="group-label">{{ t('telemetry.filter_label') }}</span>
         <div class="tabs-row">
           <button 
-            v-for="tf in ['24h', '1w', '1m', '1y', 'all']" 
+            v-for="tf in ['24h', '1w', '1M', '1y', 'all']" 
             :key="tf"
             class="tab-btn"
             :class="{ active: selectedTimeframe === tf }"

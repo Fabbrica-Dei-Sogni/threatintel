@@ -59,7 +59,8 @@ export class ThreatController {
         this.logger.info('[ThreatController] Requesting stats');
         try {
             const timeframe = (req.query.timeframe as string) || '24h';
-            const minScore = parseInt(req.query.minScore as string) || 15;
+            const parsedScore = parseInt(req.query.minScore as string);
+            const minScore = isNaN(parsedScore) ? 15 : parsedScore;
             const minLogs = parseInt(req.query.minLogs as string) || 1;
             const topParam = req.query.top as string;
             const top = topParam === 'all' ? -1 : parseInt(topParam) || 10;

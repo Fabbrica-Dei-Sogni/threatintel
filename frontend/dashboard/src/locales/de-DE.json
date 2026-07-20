@@ -931,6 +931,8 @@
         },
         "job_completed": "Auftrag abgeschlossen",
         "completed_successfully": "erfolgreich abgeschlossen",
-        "job_failed": "Auftrag fehlgeschlagen"
+        "job_failed": "Auftrag fehlgeschlagen",
+        "job_cancelled": "Vorgang abgebrochen",
+        "cancelled_successfully": "vom Benutzer gestoppt"
     }
 }

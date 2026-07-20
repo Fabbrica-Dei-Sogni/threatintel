@@ -67,13 +67,17 @@ export class ThreatController {
         this.logger.info('[ThreatController] Requesting stats');
         try {
             const timeframe = (req.query.timeframe as string) || '24h';
-            const minScore = parseInt(req.query.minScore as string) || 15;
+            const parsedScore = parseInt(req.query.minScore as string);
+            const minScore = isNaN(parsedScore) ? 15 : parsedScore;
             const minLogs = parseInt(req.query.minLogs as string) || 1;
             const topParam = req.query.top as string;
             const top = topParam === 'all' ? -1 : parseInt(topParam) || 10;
+            
+            const protocolsParam = req.query.protocols as string;
+            const protocols = protocolsParam ? protocolsParam.split(',').map(p => p.trim()).filter(p => p.length > 0) : [];
 
-            const stats = await this.threatLogService.getStats(timeframe, minScore, top, minLogs);
-            const topThreats = await this.threatLogService.getTopThreats(10, timeframe, minScore);
+            const stats = await this.threatLogService.getStats(timeframe, minScore, top, minLogs, protocols);
+            const topThreats = await this.threatLogService.getTopThreats(top, timeframe, minScore, protocols, minLogs);
 
             res.json({
                 stats: stats,
@@ -411,15 +415,17 @@ export class ThreatController {
             const { batchSize = 100, updateDatabase = true } = req.body;
             const user = (req as any).user?.name || 'admin';
 
-            // Avviamo entrambi i job in parallelo (in background)
+            // Avviamo il job di ri-analisi HTTP in background
             const httpJob = await this.jobManager.startJob('threat_reanalyze', { batchSize, updateDatabase }, user);
-            const sshJob = await this.jobManager.startJob('ssh_reanalyze', { batchSize }, user);
+            
+            // DISABILITATO SU RICHIESTA UTENTE: ssh_reanalyze sarà un job separato
+            // const sshJob = await this.jobManager.startJob('ssh_reanalyze', { batchSize }, user);
 
             res.status(202).json({ 
-                message: 'Processi di ri-analisi avviati in background',
+                message: 'Processo di ri-analisi HTTP avviato in background',
                 jobs: {
-                    http: { jobId: httpJob.id, status: httpJob.status },
-                    ssh: { jobId: sshJob.id, status: sshJob.status }
+                    http: { jobId: httpJob.id, status: httpJob.status }
+                    // ssh: { jobId: sshJob.id, status: sshJob.status }
                 }
             });
         } catch (err: any) {

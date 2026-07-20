@@ -84,7 +84,7 @@ export class BackgroundJobManager {
         this.eventBus.emit(AppEvents.JOB_PROGRESS, {
             id: jobDoc.id,
             jobName: type,
-            status: 'started',
+            status: JobStatus.PENDING,
             progress: 0
         });
 
@@ -102,7 +102,31 @@ export class BackgroundJobManager {
                 startedAt: new Date()
             });
 
+            // Notifica passaggio a running
+            this.eventBus.emit(AppEvents.JOB_PROGRESS, {
+                id: jobId,
+                jobName: jobInstance.type,
+                status: JobStatus.RUNNING,
+                progress: 0
+            });
+
             await jobInstance.execute(jobId, params);
+
+            // Recuperiamo lo stato attuale per evitare di sovrascrivere stati terminali impostati dal job stesso
+            const finalJob = await AnalysisJob.findById(jobId);
+            if (finalJob && (finalJob.status === JobStatus.COMPLETED || finalJob.status === JobStatus.FAILED || finalJob.status === JobStatus.CANCELLED)) {
+                this.logger.debug(`[BackgroundJobManager] Job ${jobId} già in stato terminale (${finalJob.status}), salto aggiornamento finale.`);
+                
+                // Notifichiamo comunque l'evento finale se non già fatto (anche se solitamente è meglio che lo faccia il manager)
+                this.eventBus.emit(AppEvents.JOB_PROGRESS, {
+                    id: jobId,
+                    jobName: jobInstance.type,
+                    status: finalJob.status,
+                    progress: finalJob.progress,
+                    error: finalJob.error
+                });
+                return;
+            }
 
             await AnalysisJob.findByIdAndUpdate(jobId, { 
                 status: JobStatus.COMPLETED,
@@ -113,7 +137,8 @@ export class BackgroundJobManager {
             // Notifica completamento
             this.eventBus.emit(AppEvents.JOB_PROGRESS, {
                 id: jobId,
-                status: 'completed',
+                jobName: jobInstance.type,
+                status: JobStatus.COMPLETED,
                 progress: 100
             });
 
@@ -129,7 +154,8 @@ export class BackgroundJobManager {
             // Notifica fallimento
             this.eventBus.emit(AppEvents.JOB_PROGRESS, {
                 id: jobId,
-                status: 'failed',
+                jobName: jobInstance.type,
+                status: JobStatus.FAILED,
                 error: err.message
             });
         } finally {

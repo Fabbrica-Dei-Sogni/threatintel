@@ -931,6 +931,8 @@
         },
         "job_completed": "Zadanie ukończone",
         "completed_successfully": "ukończone pomyślnie",
-        "job_failed": "Zadanie nie powiodło się"
+        "job_failed": "Zadanie nie powiodło się",
+        "job_cancelled": "Zadanie anulowane",
+        "cancelled_successfully": "zatrzymane przez użytkownika"
     }
 }

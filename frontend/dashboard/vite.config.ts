@@ -49,6 +49,11 @@ export default defineConfig(({ mode }) => {
                     ]
                 },
                 workbox: {
+                    // Pulizia automatica delle vecchie cache residue di build precedenti
+                    cleanupOutdatedCaches: true,
+                    // Forza il Service Worker ad attivarsi immediatamente senza aspettare la chiusura dei tab
+                    skipWaiting: true,
+                    clientsClaim: true,
                     // Escludiamo config.js dal precache per gestire la versione runtime correttamente
                     globIgnores: ['**/config.js'],
                     // Impedisce al Service Worker di gestire rotte esterne alla app Vue (API)

@@ -10,17 +10,52 @@ export class ThreatAnalyticsService {
     ) { }
 
     private getTimeframeHours(timeframe: string): number {
-        switch (timeframe) {
-            case '1w': return 168;
-            case '1m': return 720;
-            case '1y': return 8760;
-            case '24h':
-            default: return 24;
+        const match = timeframe.match(/^(\d+)([mhdwMy])$/);
+        if (match) {
+            const value = parseInt(match[1]);
+            const unit = match[2];
+            switch (unit) {
+                case 'm': // minutes
+                    return value / 60;
+                case 'h': // hours
+                    return value;
+                case 'd': // days
+                    return value * 24;
+                case 'w': // weeks
+                    return value * 168;
+                case 'M': // months
+                    return value * 720;
+                case 'y': // years
+                    return value * 8760;
+            }
         }
+
+        // Backward compatibility fallbacks
+        if (timeframe === '1m') return 720;
+        if (timeframe === '1w') return 168;
+        if (timeframe === '1y') return 8760;
+
+        const parsed = parseInt(timeframe);
+        if (!isNaN(parsed) && parsed > 0) {
+            return parsed * 24;
+        }
+        return 24;
     }
 
-    async getStats(timeframe = '24h', minScore = 15, limit = 10, minLogs = 1) {
+    async getStats(timeframe = '24h', minScore = 15, limit = 10, minLogs = 1, protocols: string[] = []) {
         let timeframeMatch: any = {};
+
+        if (protocols && protocols.length > 0) {
+            if (protocols.includes('http')) {
+                timeframeMatch.$or = [
+                    { protocol: { $in: protocols } },
+                    { protocol: { $exists: false } },
+                    { protocol: null }
+                ];
+            } else {
+                timeframeMatch.protocol = { $in: protocols };
+            }
+        }
 
         if (timeframe !== 'all') {
             const hours = this.getTimeframeHours(timeframe);
@@ -31,7 +66,7 @@ export class ThreatAnalyticsService {
             this.logger.info(`[ThreatAnalyticsService] Calculating stats for ALL TIME with minScore: ${minScore}, minLogs: ${minLogs}, limit: ${limit}`);
         }
 
-        const effectiveLimit = limit > 0 ? limit : 1000;
+        //const effectiveLimit = limit > 0 ? limit : 10000;
 
         // Pipeline definitiva: separa il traffico globale dall'analisi delle minacce filtrata
         const results = await ThreatLog.aggregate([
@@ -89,7 +124,7 @@ export class ThreatAnalyticsService {
                         { $match: { count: { $gte: minLogs }, isSuspicious: 1, country: { $exists: true, $ne: null } } },
                         { $group: { _id: "$country", count: { $sum: 1 } } },
                         { $sort: { count: -1 } },
-                        { $limit: effectiveLimit }
+                        //{ $limit: effectiveLimit }
                     ],
                     // 4. Top Indicators (FILTERED BY minLogs)
                     topIndicators: [
@@ -114,14 +149,14 @@ export class ThreatAnalyticsService {
                         { $group: { _id: { ip: "$_id", ind: "$indicators" } } },
                         { $group: { _id: "$_id.ind", count: { $sum: 1 } } },
                         { $sort: { count: -1 } },
-                        { $limit: effectiveLimit }
-                    ],
-                    // 5. Nodi Unici (FILTERED BY minLogs)
-                    uniqueIPs: [
+                        //{ $limit: effectiveLimit }
+                    ]
+                    // 5. Nodi Unici (FILTERED BY minLogs) - COMMENTATO PER PRESTAZIONI
+                    /* uniqueIPs: [
                         { $group: { _id: "$request.ip", count: { $sum: 1 } } },
                         { $match: { count: { $gte: minLogs } } },
                         { $group: { _id: null, ips: { $push: "$_id" } } }
-                    ]
+                    ] */
                 }
             }
         ]);
@@ -141,27 +176,78 @@ export class ThreatAnalyticsService {
             suspiciousRequests: threats.count,
             topCountries: countriesMap,
             topIndicators: indicatorsMap,
-            uniqueIPs: facet.uniqueIPs[0]?.ips || [],
+            uniqueIPs: [], // Ritorna array vuoto per evitare traffico e calcoli inutili (commentato per prestazioni)
             scoreDistribution: { min: global.min, max: global.max, avg: global.avg }
         };
     }
 
-    async getTopThreats(limit = 10, timeframe = '24h', minScore = 15) {
-        let query: any = { 'fingerprint.suspicious': true };
+    async getTopThreats(limit = 10, timeframe = '24h', minScore = 15, protocols: string[] = [], minLogs = 1) {
+        let match: any = { 'fingerprint.suspicious': true };
+
+        if (protocols && protocols.length > 0) {
+            if (protocols.includes('http')) {
+                match.$or = [
+                    { protocol: { $in: protocols } },
+                    { protocol: { $exists: false } },
+                    { protocol: null }
+                ];
+            } else {
+                match.protocol = { $in: protocols };
+            }
+        }
 
         if (timeframe !== 'all') {
             const hours = this.getTimeframeHours(timeframe);
             const since = new Date(Date.now() - hours * 60 * 60 * 1000);
-            query.timestamp = { $gte: since };
+            match.timestamp = { $gte: since };
         }
 
         if (minScore > 0) {
-            query['fingerprint.score'] = { $gte: minScore };
+            match['fingerprint.score'] = { $gte: minScore };
         }
 
-        return await ThreatLog.find(query)
-            .sort({ timestamp: -1 })
-            .limit(limit)
-            .select('request.ip request.url fingerprint.score fingerprint.indicators geo.country timestamp');
+        if (minLogs > 1) {
+            const ipCounts = await ThreatLog.aggregate([
+                { $match: match },
+                { $group: { _id: "$request.ip", count: { $sum: 1 } } },
+                { $match: { count: { $gte: minLogs } } }
+            ]);
+            const allowedIps = ipCounts.map(c => c._id);
+            match['request.ip'] = { $in: allowedIps };
+        }
+
+        //const effectiveLimit = limit > 0 ? limit : 1000;
+
+        return await ThreatLog.aggregate([
+            { $match: match },
+            {
+                $group: {
+                    _id: { ip: "$request.ip", url: "$request.url" },
+                    score: { $max: "$fingerprint.score" },
+                    indicators: { $first: "$fingerprint.indicators" },
+                    country: { $first: "$geo.country" },
+                    timestamp: { $max: "$timestamp" }
+                }
+            },
+            { $sort: { timestamp: -1 } },
+            //{ $limit: effectiveLimit },
+            {
+                $project: {
+                    _id: 0,
+                    request: {
+                        ip: "$_id.ip",
+                        url: "$_id.url"
+                    },
+                    fingerprint: {
+                        score: "$score",
+                        indicators: "$indicators"
+                    },
+                    geo: {
+                        country: "$country"
+                    },
+                    timestamp: 1
+                }
+            }
+        ]);
     }
 }

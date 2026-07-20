@@ -1,6 +1,6 @@
 {
     "name": "threat-intelligence-logger",
-    "version": "1.0.2",
+    "version": "1.0.4",
     "description": "Sistema di logging per threat intelligence domestica",
     "author": "Alessandro Modica",
     "license": "BSL-1.1",

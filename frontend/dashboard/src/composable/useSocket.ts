@@ -9,6 +9,10 @@ import { SocketEvents } from '../models/SocketEvents';
 import { useNewsStore } from '../stores/news';
 import { translateFromIt } from '../utils/translator';
 
+// Set globale (modulo) per deduplicare le notifiche dei job terminati nell'intera sessione app.
+// Impedisce che eventi duplicati o ritardati scatenino più volte lo stesso toast.
+const notifiedJobs = new Set<string>();
+
 /**
  * useSocket - Composable per gestire gli eventi real-time globali.
  * Centralizza la logica di reazione ai messaggi del server.
@@ -23,6 +27,12 @@ export function useSocket() {
 
     const setupListeners = () => {
         if (!socketStore.socket) return;
+
+        // Rimuove eventuali listener precedenti per evitare duplicati in caso di ricaricamento manuale o riconnessione
+        socketStore.socket.off(SocketEvents.SYSTEM_STATUS_UPDATE);
+        socketStore.socket.off(SocketEvents.SYSTEM_JOB_PROGRESS);
+        socketStore.socket.off(SocketEvents.INTEL_NEW_LOG);
+        socketStore.socket.off(SocketEvents.INTEL_AI_RESPONSE);
 
         // A. Tactical Engine & Job Progress
         socketStore.socket.on(SocketEvents.SYSTEM_STATUS_UPDATE, (status: string) => {
@@ -45,8 +55,9 @@ export function useSocket() {
                 dashboardStore.updateJobStatus(data);
             }
 
-            // Notifica se un job è completato
-            if (data.status === 'completed') {
+            // Notifica se un job è terminato (Deduplicato per ID)
+            if (data.status === 'completed' && !notifiedJobs.has(data.id)) {
+                notifiedJobs.add(data.id);
                 dashboardStore.state.lastSystemUpdate = Date.now();
                 ElNotification({
                     title: t('maintenance.job_completed') || 'Job Completed',
@@ -55,12 +66,23 @@ export function useSocket() {
                     position: 'bottom-right',
                     duration: 5000
                 });
-            } else if (data.status === 'failed') {
+            } else if (data.status === 'failed' && !notifiedJobs.has(data.id)) {
+                notifiedJobs.add(data.id);
                 ElNotification({
                     title: t('maintenance.job_failed') || 'Job Failed',
-                    message: `${data.jobName || 'Task'}: ${data.error || 'Unknown error'}`,
+                    message: `${data.jobName || 'Task'}: ${data.error || t('common.error')}`,
                     type: 'error',
-                    position: 'bottom-right'
+                    position: 'bottom-right',
+                    duration: 7000
+                });
+            } else if (data.status === 'cancelled' && !notifiedJobs.has(data.id)) {
+                notifiedJobs.add(data.id);
+                ElNotification({
+                    title: t('maintenance.job_cancelled') || 'Job Cancelled',
+                    message: `${data.jobName || 'Task'} ${t('maintenance.cancelled_successfully') || 'stopped by user'}`,
+                    type: 'warning',
+                    position: 'bottom-right',
+                    duration: 5000
                 });
             }
         });

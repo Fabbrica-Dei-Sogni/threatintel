@@ -12,7 +12,7 @@ services:
       dockerfile: ./Dockerfile.release
       args:
         NPM_VERSION: ${NPM_VERSION:-0.1.9}
-        NPM_REGISTRY_URI: ${NPM_REGISTRY_URI:-https://alessandromodica.com/nexus/repository/npm-all/}
+        NPM_REGISTRY_URI: ${NPM_REGISTRY_URI:-https://alessandromodica.it/nexus/repository/npm-all/}
         # Variabili Vite iniettate al build time (Default)
         VITE_APP_TITLE: ${VITE_APP_TITLE:-Threat Intel Dashboard - Production}
         VITE_WELCOME_PATH: ${VITE_WELCOME_PATH:-"/welcome"}

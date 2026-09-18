@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { setActivePinia, createPinia } from 'pinia';
 import { useProfileStore } from '../profiles';
+import { getContextApiUrl } from '../../config';
 
 describe('ProfileStore', () => {
   beforeEach(() => {
@@ -11,7 +12,9 @@ describe('ProfileStore', () => {
   it('should use default profile when no active profile is set', () => {
     const store = useProfileStore();
     expect(store.activeProfile.id).toBe('default');
-    expect(store.activeProfile.apiUrl).toBe('https://alessandromodica.com/honeypot/api');
+    // L'URL viene da getContextApiUrl() — verificato dinamicamente così il test
+    // non dipende dal dominio specifico configurato nel .env
+    expect(store.activeProfile.apiUrl).toBe(getContextApiUrl());
   });
 
   it('should add a new custom profile', () => {

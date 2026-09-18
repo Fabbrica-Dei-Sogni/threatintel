@@ -3,6 +3,7 @@ import { ref, computed, watch } from 'vue';
 import { getAuthMode } from '../api/auth';
 import router from '../router';
 import { storage, StorageNamespace } from '../utils/storage';
+import { getEnv } from '../config';
 
 interface AuthState {
     token: string | null;
@@ -20,12 +21,31 @@ export const useAuthStore = defineStore('auth', () => {
 
     const isAdmin = computed(() => {
         if (!user.value || !user.value.roles) return false;
-        // Struttura reale post-populate: { appId: string, role: { name: string, ... } }
-        // Struttura flat per utenti anonimi: { name: string }
-        return user.value.roles.some((r: any) =>
-            r.role?.name === 'admin' || r.role?.name === 'superadmin' ||  // struttura annidata (reale)
-            r.name === 'admin' || r.name === 'superadmin'                  // struttura flat (anonimo/legacy)
-        );
+
+        // APP_ID di questa istanza ThreatIntel (es. 'honeypot-host-001')
+        // Se non configurato (dev locale), non blocchiamo sul filtro appId
+        const currentAppId = getEnv('APP_ID');
+
+        return user.value.roles.some((r: any) => {
+            // Struttura reale post-populate: { appId: string, role: { name: string } }
+            // Struttura flat per utenti anonimi/legacy: { name: string }
+            const roleName: string = r.role?.name || r.name;
+
+            // Il superadmin è un ruolo di sistema (ips-management): bypass globale
+            if (roleName === 'superadmin') return true;
+
+            // Per il ruolo admin: deve appartenere a questa specifica app
+            if (roleName === 'admin') {
+                // Se appId non è configurato (dev), accettiamo qualsiasi admin
+                if (!currentAppId) return true;
+                // Struttura annidata: verifica appId esplicito
+                if (r.appId) return r.appId === currentAppId;
+                // Struttura flat (anonimo): nessun appId → accettiamo
+                return true;
+            }
+
+            return false;
+        });
     });
 
     // Salvataggio automatico allo store ogni volta che token o user cambiano

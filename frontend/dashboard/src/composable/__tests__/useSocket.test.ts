@@ -48,10 +48,11 @@ describe('useSocket', () => {
   it('should register listeners on mount', () => {
     mount(TestComponent);
     
+    // Listener attivi — intel:attack_detected è commentato di proposito (gestito dal polling)
     expect(mockSocket.on).toHaveBeenCalledWith('system:status_update', expect.any(Function));
     expect(mockSocket.on).toHaveBeenCalledWith('system:job_progress', expect.any(Function));
-    expect(mockSocket.on).toHaveBeenCalledWith('intel:attack_detected', expect.any(Function));
     expect(mockSocket.on).toHaveBeenCalledWith('intel:new_log', expect.any(Function));
+    expect(mockSocket.on).toHaveBeenCalledWith('intel:ai_response', expect.any(Function));
   });
 
   it('should update engineStatus when system:status_update is received', () => {
@@ -80,17 +81,17 @@ describe('useSocket', () => {
     }));
   });
 
-  it('should add new attack to dashboard when intel:attack_detected is received', () => {
+  it('should add new log to dashboard when intel:new_log is received', () => {
     mount(TestComponent);
     const dashboardStore = useDashboardStore();
-    dashboardStore.state.recentAttacks = [];
+    dashboardStore.state.recentLogs = [];
     
-    const attackListener = mockSocket.on.mock.calls.find(call => call[0] === 'intel:attack_detected')[1];
+    const logListener = mockSocket.on.mock.calls.find(call => call[0] === 'intel:new_log')[1];
     
-    const mockAttack = { _id: 'attack1', ip: '1.1.1.1' };
-    attackListener(mockAttack);
+    const mockLog = { _id: 'log1', ip: '2.2.2.2' };
+    logListener(mockLog);
     
-    expect(dashboardStore.state.recentAttacks).toHaveLength(1);
-    expect(dashboardStore.state.recentAttacks[0]).toEqual(mockAttack);
+    expect(dashboardStore.state.recentLogs).toHaveLength(1);
+    expect(dashboardStore.state.recentLogs[0]).toEqual(mockLog);
   });
 });

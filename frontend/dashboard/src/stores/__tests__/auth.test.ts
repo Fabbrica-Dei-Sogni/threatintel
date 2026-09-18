@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { setActivePinia, createPinia } from 'pinia';
 import { useAuthStore } from '../auth';
 import * as authApi from '../../api/auth';
+import * as config from '../../config';
 import { storage, StorageNamespace } from '../../utils/storage';
 import { nextTick } from 'vue';
 
@@ -20,6 +21,12 @@ vi.mock('../../router', () => ({
 // Mock dell'API
 vi.mock('../../api/auth', () => ({
   getAuthMode: vi.fn().mockResolvedValue({ data: {} })
+}));
+
+// Mock di getEnv: per default APP_ID non configurato (dev)
+vi.mock('../../config', () => ({
+  getEnv: vi.fn().mockReturnValue(''),
+  getContextApiUrl: vi.fn().mockReturnValue('http://localhost/api')
 }));
 
 describe('AuthStore', () => {
@@ -56,30 +63,38 @@ describe('AuthStore', () => {
     expect(saved.user).toEqual(mockUser);
   });
 
-  it('should identify admin role correctly — struttura annidata reale', () => {
+  it('should identify admin role correctly — struttura annidata reale (con appId)', () => {
+    // Simula istanza con APP_ID configurato
+    vi.mocked(config.getEnv).mockReturnValue('honeypot-host-001');
     const store = useAuthStore();
 
     // Ruolo generico: non admin
-    store.setAuth('tk', { roles: [{ appId: 'app', role: { name: 'user' } }] });
+    store.setAuth('tk', { roles: [{ appId: 'honeypot-host-001', role: { name: 'user' } }] });
     expect(store.isAdmin).toBe(false);
 
-    // Ruolo admin con struttura annidata
-    store.setAuth('tk', { roles: [{ appId: 'app', role: { name: 'admin' } }] });
+    // Ruolo admin sull'app corretta
+    store.setAuth('tk', { roles: [{ appId: 'honeypot-host-001', role: { name: 'admin' } }] });
     expect(store.isAdmin).toBe(true);
 
-    // Ruolo superadmin con struttura annidata — deve valere come admin
+    // Ruolo admin su un'altra app (cross-tenant) — deve essere RIFIUTATO
+    store.setAuth('tk', { roles: [{ appId: 'digital-portfolio', role: { name: 'admin' } }] });
+    expect(store.isAdmin).toBe(false);
+
+    // Superadmin su ips-management — bypass globale
     store.setAuth('tk', { roles: [{ appId: 'ips-management', role: { name: 'superadmin' } }] });
     expect(store.isAdmin).toBe(true);
   });
 
-  it('should identify admin role correctly — struttura flat (anonimo/legacy)', () => {
+  it('should identify admin role correctly — struttura flat (anonimo/dev, senza appId)', () => {
+    // Nessun APP_ID configurato: fallback permissivo
+    vi.mocked(config.getEnv).mockReturnValue('');
     const store = useAuthStore();
 
     // Flat: ruolo non admin
     store.setAuth('tk', { roles: [{ name: 'viewer' }] });
     expect(store.isAdmin).toBe(false);
 
-    // Flat: ruolo admin
+    // Flat: ruolo admin — accettato perché APP_ID non configurato
     store.setAuth('tk', { roles: [{ name: 'admin' }] });
     expect(store.isAdmin).toBe(true);
 

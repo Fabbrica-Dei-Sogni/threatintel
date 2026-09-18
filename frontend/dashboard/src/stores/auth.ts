@@ -20,8 +20,12 @@ export const useAuthStore = defineStore('auth', () => {
 
     const isAdmin = computed(() => {
         if (!user.value || !user.value.roles) return false;
-        return user.value.roles.some((r: any) => r.role?.name === 'superadmin' || r.role?.name === 'root' || r.name === 'superadmin')
-        //return user.value.roles.some((role: any) => role.name === 'admin');
+        // Struttura reale post-populate: { appId: string, role: { name: string, ... } }
+        // Struttura flat per utenti anonimi: { name: string }
+        return user.value.roles.some((r: any) =>
+            r.role?.name === 'admin' || r.role?.name === 'superadmin' ||  // struttura annidata (reale)
+            r.name === 'admin' || r.name === 'superadmin'                  // struttura flat (anonimo/legacy)
+        );
     });
 
     // Salvataggio automatico allo store ogni volta che token o user cambiano

@@ -146,12 +146,12 @@ describe('useDossierDetail', () => {
     authStore.user = { username: 'admin' } as any;
     expect(canModify.value).toBe(true);
 
-    // Logged in as other user, not admin
-    authStore.user = { username: 'other', roles: [{ name: 'user' }] } as any;
+    // Logged in as other user, not admin (struttura annidata)
+    authStore.user = { username: 'other', roles: [{ appId: 'honeypot-host-001', role: { name: 'user' } }] } as any;
     expect(canModify.value).toBe(false);
 
-    // Logged in as other user, but is admin
-    authStore.user = { username: 'other', roles: [{ name: 'admin' }] } as any;
+    // Logged in as other user, but is admin (struttura annidata)
+    authStore.user = { username: 'other', roles: [{ appId: 'honeypot-host-001', role: { name: 'admin' } }] } as any;
     expect(canModify.value).toBe(true);
   });
 

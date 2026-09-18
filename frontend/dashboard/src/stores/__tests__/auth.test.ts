@@ -38,7 +38,8 @@ describe('AuthStore', () => {
 
   it('should set authentication correctly via StorageManager', async () => {
     const store = useAuthStore();
-    const mockUser = { username: 'admin', roles: [{ name: 'admin' }] };
+    // Struttura annidata reale: come restituita dal backend dopo populate('roles.role')
+    const mockUser = { username: 'admin', roles: [{ appId: 'honeypot-host-001', role: { name: 'admin', permissions: [] } }] };
     store.setAuth('fake-token', mockUser);
 
     expect(store.token).toBe('fake-token');
@@ -55,12 +56,35 @@ describe('AuthStore', () => {
     expect(saved.user).toEqual(mockUser);
   });
 
-  it('should identify admin role correctly', () => {
+  it('should identify admin role correctly — struttura annidata reale', () => {
     const store = useAuthStore();
+
+    // Ruolo generico: non admin
+    store.setAuth('tk', { roles: [{ appId: 'app', role: { name: 'user' } }] });
+    expect(store.isAdmin).toBe(false);
+
+    // Ruolo admin con struttura annidata
+    store.setAuth('tk', { roles: [{ appId: 'app', role: { name: 'admin' } }] });
+    expect(store.isAdmin).toBe(true);
+
+    // Ruolo superadmin con struttura annidata — deve valere come admin
+    store.setAuth('tk', { roles: [{ appId: 'ips-management', role: { name: 'superadmin' } }] });
+    expect(store.isAdmin).toBe(true);
+  });
+
+  it('should identify admin role correctly — struttura flat (anonimo/legacy)', () => {
+    const store = useAuthStore();
+
+    // Flat: ruolo non admin
     store.setAuth('tk', { roles: [{ name: 'viewer' }] });
     expect(store.isAdmin).toBe(false);
 
+    // Flat: ruolo admin
     store.setAuth('tk', { roles: [{ name: 'admin' }] });
+    expect(store.isAdmin).toBe(true);
+
+    // Flat: ruolo superadmin
+    store.setAuth('tk', { roles: [{ name: 'superadmin' }] });
     expect(store.isAdmin).toBe(true);
   });
 

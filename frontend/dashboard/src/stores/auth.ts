@@ -17,10 +17,11 @@ export const useAuthStore = defineStore('auth', () => {
     const user = ref<any | null>(savedAuth?.user || null);
 
     const isAuthenticated = computed(() => !!token.value);
-    
+
     const isAdmin = computed(() => {
         if (!user.value || !user.value.roles) return false;
-        return user.value.roles.some((role: any) => role.name === 'admin');
+        return user.value.roles.some((r: any) => r.role?.name === 'superadmin' || r.role?.name === 'root' || r.name === 'superadmin')
+        //return user.value.roles.some((role: any) => role.name === 'admin');
     });
 
     // Salvataggio automatico allo store ogni volta che token o user cambiano

@@ -39,7 +39,12 @@ export class AuthService {
             const response = await this.instance.post(
                 `${this.getUri()}/verify`,
                 { appId: this.appId }, // Body della POST
-                { headers: { 'Authorization': token } }
+                { 
+                    headers: { 
+                        'Authorization': token,
+                        'x-app-id': this.appId 
+                    } 
+                }
             );
 
             if (response.data.success && response.data.user) {

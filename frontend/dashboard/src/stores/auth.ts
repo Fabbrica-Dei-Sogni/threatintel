@@ -22,25 +22,23 @@ export const useAuthStore = defineStore('auth', () => {
     const isAdmin = computed(() => {
         if (!user.value || !user.value.roles) return false;
 
-        // APP_ID di questa istanza ThreatIntel (es. 'honeypot-host-001')
-        // Se non configurato (dev locale), non blocchiamo sul filtro appId
-        const currentAppId = getEnv('APP_ID');
+        // APP_ID di questa istanza ThreatIntel (default: 'honeypot-host-001')
+        // Se non configurato o default, accettiamo admin dell'app corrente o generico
+        const currentAppId = getEnv('APP_ID') || 'honeypot-host-001';
 
         return user.value.roles.some((r: any) => {
             // Struttura reale post-populate: { appId: string, role: { name: string } }
-            // Struttura flat per utenti anonimi/legacy: { name: string }
-            const roleName: string = r.role?.name || r.name;
+            // Struttura flat per utenti anonimi/legacy o stringhe: { name: string } | "admin"
+            const roleName: string = typeof r === 'string' ? r : (r.role?.name || r.name);
 
             // Il superadmin è un ruolo di sistema (ips-management): bypass globale
             if (roleName === 'superadmin') return true;
 
-            // Per il ruolo admin: deve appartenere a questa specifica app
+            // Per il ruolo admin: deve appartenere a questa specifica app o non avere vincoli
             if (roleName === 'admin') {
-                // Se appId non è configurato (dev), accettiamo qualsiasi admin
-                if (!currentAppId) return true;
-                // Struttura annidata: verifica appId esplicito
+                // Struttura annidata con appId definito: deve corrispondere
                 if (r.appId) return r.appId === currentAppId;
-                // Struttura flat (anonimo): nessun appId → accettiamo
+                // Struttura flat o ruolo senza appId restrittivo (es. Zitadel o anonimo): accettato
                 return true;
             }
 

@@ -84,13 +84,22 @@ export class AuthMiddleware {
             const user = (req as any).user;
             const locale = this.getLocale(req);
 
-            if (!user || !user.roles) {
+            if (!user || !user.roles || !Array.isArray(user.roles)) {
                 const message = this.i18n.t('errors.auth.forbidden', locale);
                 this.logger.warn(`[AuthMiddleware] Forbidden: ${message}`);
                 return res.status(403).json({ message });
             }
 
-            const hasRole = user.roles.some((role: any) => role.name === roleName);
+            const hasRole = user.roles.some((entry: any) => {
+                const currentRoleName = typeof entry === 'string'
+                    ? entry
+                    : (entry.role?.name || entry.name);
+
+                if (currentRoleName === 'superadmin') return true;
+
+                return currentRoleName === roleName;
+            });
+
             if (hasRole) {
                 next();
             } else {

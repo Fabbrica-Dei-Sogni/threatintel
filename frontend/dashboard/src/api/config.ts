@@ -26,11 +26,11 @@ apiClient.interceptors.request.use((config) => {
     return Promise.reject(error);
 });
 
-// Interceptor per gestire errori di autenticazione/autorizzazione → sempre /login
+// Interceptor per gestire errori di autenticazione (401) → solo su 401 si redirige a /login
 apiClient.interceptors.response.use((response) => {
     return response;
 }, (error) => {
-    if (error.response && [401, 403].includes(error.response.status)) {
+    if (error.response && error.response.status === 401) {
         try {
             const authStore = useAuthStore();
             authStore.handleAuthError();

@@ -68,7 +68,10 @@ export class DossierController {
             const p = sanitizePage(page);
             const ps = sanitizePageSize(pageSize);
 
-            const isAdmin = user.roles?.some((r: any) => r.name === 'admin');
+            const isAdmin = user.roles?.some((r: any) => {
+                const name = typeof r === 'string' ? r : (r.role?.name || r.name);
+                return name === 'admin' || name === 'superadmin';
+            });
             const result = await this.dossierService.listDossiers(filters, p, ps);
             
             return res.status(200).json(result);
@@ -201,7 +204,10 @@ export class DossierController {
     async update(req: Request, res: Response) {
         try {
             const user = (req as any).user;
-            const isAdmin = user.roles?.some((r: any) => r.name === 'admin');
+            const isAdmin = user.roles?.some((r: any) => {
+                const name = typeof r === 'string' ? r : (r.role?.name || r.name);
+                return name === 'admin' || name === 'superadmin';
+            });
             const id = req.params.id as string;
             const dossier = await this.dossierService.updateDossier(id, req.body, user.username, isAdmin);
             if (!dossier) {
@@ -237,7 +243,10 @@ export class DossierController {
     async delete(req: Request, res: Response) {
         try {
             const user = (req as any).user;
-            const isAdmin = user.roles?.some((r: any) => r.name === 'admin');
+            const isAdmin = user.roles?.some((r: any) => {
+                const name = typeof r === 'string' ? r : (r.role?.name || r.name);
+                return name === 'admin' || name === 'superadmin';
+            });
             const id = req.params.id as string;
             const success = await this.dossierService.deleteDossier(id, user.username, isAdmin);
             if (!success) {

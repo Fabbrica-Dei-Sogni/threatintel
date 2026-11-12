@@ -87,8 +87,26 @@ describe('AuthMiddleware', () => {
     });
 
     describe('hasRole', () => {
-        it('should call next if user has the role', () => {
+        it('should call next if user has the role (flat structure)', () => {
             (req as any).user = { roles: [{ name: 'admin' }] };
+            middleware.hasRole('admin')(req as Request, res as Response, next);
+            expect(next).toHaveBeenCalled();
+        });
+
+        it('should call next if user has nested digital-auth role structure', () => {
+            (req as any).user = { roles: [{ appId: 'honeypot-host-001', role: { name: 'admin' } }] };
+            middleware.hasRole('admin')(req as Request, res as Response, next);
+            expect(next).toHaveBeenCalled();
+        });
+
+        it('should call next if user has role as string', () => {
+            (req as any).user = { roles: ['admin'] };
+            middleware.hasRole('admin')(req as Request, res as Response, next);
+            expect(next).toHaveBeenCalled();
+        });
+
+        it('should grant access to admin endpoints if user is superadmin', () => {
+            (req as any).user = { roles: [{ appId: 'ips-management', role: { name: 'superadmin' } }] };
             middleware.hasRole('admin')(req as Request, res as Response, next);
             expect(next).toHaveBeenCalled();
         });

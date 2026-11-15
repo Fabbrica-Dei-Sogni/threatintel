@@ -1,5 +1,8 @@
 # Roadmap: Formalizzazione Entità Dossier su MongoDB
 
+> [!WARNING]
+> Proposta del 1 aprile 2026, non aggiornata come backlog corrente. La codebase ora contiene un modello di dossier, API/controller e funzionalità frontend dedicate: verificare ogni fase rispetto a codice e test prima di riaprire questi task. Questo documento non certifica quali requisiti siano completi.
+
 L'obiettivo è trasformare il sistema attuale di "Dossier Recorder" (basato su Pinia/Store volatile) in un'entità persistente su MongoDB. Questo permetterà di salvare le investigazioni, ricercarle e visualizzarle in futuro come report consolidati.
 
 ## Architettura Proposta

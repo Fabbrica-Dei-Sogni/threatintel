@@ -2,6 +2,19 @@
 
 Questo documento riassume le modifiche architetturali apportate per integrare correttamente il sistema di Identity Provider (`digital-auth-ts`) nel core di `threatintel`.
 
+## Stato corrente verificato
+
+Verificato sulla codebase al 15 novembre 2026. ThreatIntel delega la verifica del token a `digital-auth-ts`: `AuthService.verify` invia l'`appId` nel body e nell'header `x-app-id`, quindi restituisce l'utente fornito dall'IdP. Il popolamento e la persistenza dei ruoli restano responsabilità dell'IdP; il codice ThreatIntel deve interpretare correttamente le forme ricevute.
+
+- Il middleware backend accetta ruoli come stringhe (`"admin"`), oggetti flat (`{ name: "admin" }`) o oggetti annidati (`{ role: { name: "admin" } }`).
+- `superadmin` soddisfa i controlli `hasRole` e i controlli amministrativi del dossier.
+- La dashboard applica il vincolo `appId` al ruolo `admin` annidato; un `superadmin` è globale e un ruolo senza `appId` è trattato come non vincolato.
+- `AuthMiddleware.hasRole` confronta il nome del ruolo e non applica un filtro `appId`; la verifica dell'applicazione viene inoltrata all'IdP tramite `AuthService.verify`.
+- Gli interceptor API della dashboard reindirizzano al login solo per risposte HTTP `401`; un `403` resta un errore di autorizzazione e non provoca quel redirect.
+- I test di `AuthMiddleware` coprono le tre forme del ruolo, `superadmin` e il rifiuto di ruoli insufficienti.
+
+Queste regole descrivono il consumo del payload in ThreatIntel, non garantiscono da sole che l'IdP restituisca ruoli corretti o autorizzi l'utente per l'applicazione.
+
 ## 🛡️ Interventi Effettuati
 
 L'obiettivo era risolvere i blocchi CORS, gli errori SMTP e le incongruenze nei permessi Admin (RBAC).
@@ -16,8 +29,8 @@ L'obiettivo era risolvere i blocchi CORS, gli errori SMTP e le incongruenze nei 
 - **Dynamic Env Loading**: È stato implementato un sistema a variabili d'ambiente di sistema. Tramite `export SMTP_PASSKEY=$(cat ~/.passkeyGoogle)` nella shell dell'utente linux e il mapping in `release.yml`, la password viene iniettata nel container in runtime senza mai essere scritta su file persistenti nel repository.
 
 ### 3. Integrità Dati e RBAC (Fix Critici)
-- **Popolamento Ruoli**: Corretto il processo di login dell'IdP. Ora restituisce l'oggetto `user` completo di ruoli popolati (`admin`, `user`). Senza questo, il frontend non riconosceva i permessi dell'amministratore.
-- **Serializzazione Lean**: Implementato l'uso di `.lean()` nelle query Mongoose dell'IdP. Questo ha risolto gli errori "contraddittori" (Token valido ma oggetto utente non riconosciuto) dovuti alla complessità degli oggetti Mongoose durante la serializzazione JSON di Axios.
+- **Payload di verifica**: ThreatIntel usa l'oggetto `user` restituito dall'endpoint `/verify` dell'IdP. I dettagli interni di query, popolamento e serializzazione Mongoose appartengono al repository `digital-auth-ts` e vanno verificati lì.
+- **Interpretazione dei ruoli**: La correzione corrente rende il middleware backend e i controlli amministrativi del dossier compatibili con ruoli flat, annidati o stringa, e riconosce `superadmin`. La dashboard applica inoltre il controllo dell'`appId` per i ruoli `admin` associati a un'applicazione.
 
 ---
 

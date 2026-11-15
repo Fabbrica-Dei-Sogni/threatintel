@@ -4,6 +4,9 @@
 **Versione corrente**: 1.0.0 (JavaScript)  
 **Target versione**: 2.0.0 (TypeScript + DI)
 
+> [!WARNING]
+> La tabella di avanzamento, le percentuali e la timeline di questo documento risalgono alla revisione del 6 maggio 2026 e non sono state ricontrollate integralmente sulla codebase. Non usarle come misura dello stato attuale. La sezione M10 riporta separatamente l'unico aggiornamento verificato in questa revisione (15 novembre 2026); le altre milestone restano da riallineare con codice e test.
+
 ---
 
 ## 🎯 Milestone Overview
@@ -19,7 +22,7 @@
 | [M7: Frontend Enhancements](#m7-frontend-enhancements) | 🟢 In Progress (95%) | 🟠 Medium | 2 settimane |
 | [M8: Log Analysis & Hardening](#m8-log-analysis--hardening) | ✅ Completed | 🔴 High | 1-2 settimane |
 | [M9: Backend Release System](#m9-backend-release-system) | ✅ Completed | 🔴 High | 1 settimana |
-| [M10: Auth Module Consolidation](#m10-auth-module-consolidation) | ⚪ Planned | 🟠 Medium | 1 settimana |
+| [M10: Auth Module Consolidation](#m10-auth-module-consolidation) | 🟢 In Progress (RBAC parziale) | 🟠 Medium | 1 settimana |
 
 **Legenda:**
 - 🟢 In Progress
@@ -421,7 +424,12 @@ Aprile 2026      M6 (Monitoring)
 
 **Obiettivo**: Rafforzare e pulire il flusso di autenticazione e registrazione per gestire più applicazioni in modo agnostico.
 
-**Status**: ⚪ Planned
+**Status**: 🟢 In Progress — compatibilità RBAC aggiornata; consolidamento della registrazione ancora pianificato.
+
+### Stato verificato al 15 novembre 2026
+- [x] Backend e dashboard gestiscono le forme flat, annidate e stringa dei ruoli; i controlli amministrativi riconoscono `superadmin`.
+- [x] La dashboard limita il ruolo `admin` annidato all'`appId` dell'applicazione corrente; gli interceptor reindirizzano al login solo su `401`.
+- [ ] Verificare e completare il redirect agnostico dopo l'attivazione email: è una proposta separata e non risulta attestata da questa revisione.
 
 ### Tasks
 - [ ] Implementazione Redirect Agnostico (per `appId`) post-attivazione email.
@@ -451,5 +459,5 @@ Aprile 2026      M6 (Monitoring)
 
 ---
 
-**Ultimo aggiornamento**: 2026-05-06
-**Prossimo checkpoint**: M4 Performance Profiling & Redis Caching
+**Ultimo aggiornamento**: 2026-11-15 (revisione parziale; solo M10 è stata verificata rispetto alla codebase)
+**Prossimo checkpoint proposto**: verificare le milestone M4-M9 e aggiornare priorità e stime.

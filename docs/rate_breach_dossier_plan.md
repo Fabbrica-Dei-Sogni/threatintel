@@ -1,5 +1,8 @@
 # Integrazione Architetturale: Rate Breach Dossier (Fase 2)
 
+> [!WARNING]
+> Piano non riallineato alla codebase corrente. Sono già presenti i fragment EJS Classic/HUD e i componenti Vue `RateBreachSection` e `RateBreachEditor`, oltre al riconoscimento del tipo nel dossier store. Non trattare le voci `[NEW]` come lavoro ancora da fare senza verificare il flusso end-to-end e i test rimanenti.
+
 L'obiettivo della Fase 2, dopo aver completato l'integrazione granulare nella clipboard TELEX per i singoli eventi, è definire l'intera architettura di persistenza e visualizzazione avanzata (Backend + Frontend) per trasformare il raw testuale di "Rate Breach" in una `DossierSection` di prima classe.
 
 ## Proposed Changes

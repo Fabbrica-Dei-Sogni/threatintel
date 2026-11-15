@@ -1,5 +1,8 @@
 # Procedura standard per installare l'honeypot al pari di come è installato ora
 
+> [!WARNING]
+> Questa procedura descrive una specifica installazione storica e non è stata verificata rispetto alla codebase e all'infrastruttura attuali. Non eseguire i comandi privilegiati senza prima adattarli e revisionarli. Per stack e comandi di progetto aggiornati, consultare il Kit Harness in `../devops-procedure/codeassist/products/threatintel/PRODUCT.md`.
+
 [Analisi tecnica](./docs/analisi-tecnica-codebase.md)
 
 Aggiornare l'host con i comandi

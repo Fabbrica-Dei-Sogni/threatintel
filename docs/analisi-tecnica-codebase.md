@@ -1,5 +1,8 @@
 # Analisi Tecnica e Funzionale della Codebase - Threat Intelligence Honeypot
 
+> [!WARNING]
+> Snapshot tecnico storico, non allineato alla codebase corrente. In particolare, le sezioni che descrivono autenticazione incompleta, modelli auth inutilizzati e servizi JavaScript non devono essere usate come stato attuale. Consultare il [PRODUCT.md del Kit Harness](../../devops-procedure/codeassist/products/threatintel/PRODUCT.md) per stack e comandi e `auth_integration.md` per l'integrazione di autenticazione. Le altre valutazioni richiedono una verifica prima di essere riutilizzate.
+
 ## 📋 Indice
 1. [Panoramica del Sistema](#panoramica-del-sistema)
 2. [Architettura Generale](#architettura-generale)

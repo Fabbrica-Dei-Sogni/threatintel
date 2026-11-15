@@ -1,5 +1,8 @@
 # Roadmap: Distributed Forensic Intelligence (Campagne & Cluster)
 
+> [!NOTE]
+> Stato consolidato e passi futuri riportati qui sono riferiti alla revisione del 27 aprile 2026. Le fasi future non sono state verificate rispetto alla codebase al 15 novembre 2026; controllarle prima di pianificare nuovi work item.
+
 Questo documento traccia l'evoluzione del sistema di analisi distribuita, partendo dalla scoperta dei pattern comuni fino alla generazione di dossier investigativi avanzati.
 
 ## 🟢 Stato Attuale (Consolidato)

@@ -1,5 +1,8 @@
 # Roadmap: Advanced Threat Campaign Wave Analysis (Clustering Temporale)
 
+> [!NOTE]
+> Proposta del 24-25 aprile 2026. L'implementazione descritta non è stata verificata come ancora necessaria sulla codebase corrente; controllare servizi, API e test prima di aprire un work item.
+
 ## Obiettivo dell'Iniziativa
 Evolvere l'analisi forense delle campagne (identificate tramite Fingerprint Hash) per passare da una visione "monolitica" (un unico blocco di log dall'inizio alla fine della campagna) a una visione "dinamica a ondate" (Wave Analysis). 
 

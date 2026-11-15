@@ -2,6 +2,9 @@
 
 Questo report analizza lo stato attuale del sistema integrato, focalizzandosi sulla postura di sicurezza, la gestione dell'identità e la robustezza dell'infrastruttura.
 
+> [!WARNING]
+> Questo è un report descrittivo, non una verifica aggiornata della configurazione di produzione. Le affermazioni su TLS, Nginx, rate limiting, segreti e configurazione dell'IdP devono essere ricontrollate sull'ambiente operativo prima di essere considerate evidenza. Per il comportamento RBAC della codebase, fare riferimento a `auth_integration.md`.
+
 ## 🛡️ Analisi della Sicurezza: Autenticazione (AAA)
 
 ### Punti di Forza
